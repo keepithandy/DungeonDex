@@ -237,7 +237,7 @@ p { color: var(--soft); line-height: 1.35; }
 }
 .threshold-head h2 {
   margin: 2px 0 0;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   text-shadow: 0 2px 18px rgba(0,0,0,0.62);
 }
 .threshold-copy {
@@ -4537,3 +4537,386 @@ button:focus-visible,
 }
 
 /* End v1.3.33 - Dead Code / Old UI Cleanup */
+
+/* v1.3.34 - Mobile Readability Final */
+.screen,
+.panel,
+.split,
+.card-head,
+.merchant-head,
+.market-subhead,
+.ledger-subhead,
+.elite-contract-head,
+.threshold-head {
+  min-width: 0;
+}
+
+.split > div,
+.card-head > div,
+.merchant-head > div,
+.market-subhead > div,
+.ledger-subhead > div,
+.elite-contract-head > div,
+.threshold-head > div {
+  min-width: 0;
+}
+
+.small,
+.shop-item p,
+.quest-card p,
+.elite-contract-card p,
+.charter-copy,
+.threshold-copy,
+#districtLine {
+  line-height: 1.42;
+}
+
+.item-meta,
+.item-level,
+.rarity-eyebrow,
+.feed-body,
+.run-history-rewards,
+.archive-line,
+.monster-card {
+  line-height: 1.32;
+}
+
+.item-name,
+.shop-item .item-meta,
+.district-ware .item-meta,
+.elite-contract-card strong,
+.threshold-copy,
+.charter-copy,
+.run-history-rewards,
+.archive-line,
+.monster-card {
+  overflow-wrap: anywhere;
+}
+
+.town-district-hub {
+  gap: 10px;
+}
+
+.district-mood {
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.town-district-hub .inline-actions {
+  align-items: stretch;
+}
+
+.town-district-hub .inline-actions button {
+  min-width: 116px;
+}
+
+.rest-cost-chip,
+.charter-badge,
+.elite-contract-actions .pill,
+.run-history-rewards {
+  max-width: 100%;
+}
+
+#merchantPanel .shop-item,
+.district-ware,
+.warden-objective-card,
+.elite-contract-card,
+.loot-card,
+.equip-slot {
+  display: grid;
+  gap: 8px;
+}
+
+#merchantPanel .shop-item > .split,
+.district-ware > .split,
+.loot-card > .split,
+.equip-slot > .split,
+.elite-contract-card > .split {
+  gap: 9px;
+  align-items: flex-start;
+}
+
+#merchantPanel .shop-item .tag-row,
+.district-ware .tag-row,
+.loot-card .tag-row,
+.equip-slot .tag-row {
+  row-gap: 5px;
+}
+
+#forgePanel {
+  display: grid;
+  gap: 8px;
+}
+
+#forgeBtn {
+  width: 100%;
+}
+
+.intro-modal-window,
+.run-log-list,
+.log-wrap {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-shell.combat-active .hp-label-row {
+  gap: 8px;
+}
+
+.app-shell.combat-active .hp-label-row strong,
+.app-shell.combat-active .hp-label-row span {
+  min-width: 0;
+}
+
+.app-shell.combat-active .hp-label-row span {
+  flex: 0 0 auto;
+}
+
+.app-shell.combat-active .combat-stat-row .pill,
+.app-shell.combat-active .run-log-head .pill,
+.app-shell.combat-active .feed-chip {
+  line-height: 1.14;
+}
+
+.app-shell.combat-active .run-log-list {
+  padding-bottom: 4px;
+}
+
+.app-shell.combat-active .run-log-list .combat-feed-line {
+  gap: 7px;
+}
+
+.app-shell.combat-active .feed-body {
+  line-height: 1.34;
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding-inline: 8px;
+    scroll-padding-bottom: calc(128px + var(--safe-bottom));
+  }
+
+  .top-actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 5px;
+  }
+
+  .top-actions .save-status {
+    margin-right: auto;
+  }
+
+  .top-actions button {
+    flex: 0 1 82px;
+  }
+
+  .hero {
+    padding: 11px;
+  }
+
+  .hero-main {
+    gap: 8px;
+  }
+
+  .town-district-hub {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 11px;
+  }
+
+  .town-district-hub .inline-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+    width: 100%;
+    gap: 7px;
+  }
+
+  .town-district-hub .inline-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .rest-cost-chip {
+    grid-column: 1 / -1;
+    justify-self: start;
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  .district-charter-slot {
+    margin-top: 0;
+  }
+
+  .deep-charter-card {
+    gap: 7px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .charter-head {
+    gap: 8px;
+  }
+
+  .charter-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .charter-price-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #merchantPanel,
+  #forgePanel,
+  #questPanel {
+    padding: 11px;
+  }
+
+  #merchantPanel .shop-item,
+  .district-ware,
+  .warden-objective-card,
+  .elite-contract-card {
+    padding: 9px;
+  }
+
+  #merchantPanel .shop-item .item-actions,
+  .district-ware .item-actions,
+  .elite-contract-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .elite-contract-actions .pill {
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .tag-row,
+  .market-stock-list,
+  .district-ware-list,
+  .warden-objective-list,
+  .elite-contract-list {
+    gap: 6px;
+  }
+
+  .tag-row .pill {
+    line-height: 1.15;
+  }
+
+  #refreshMerchantBtn.refresh-compact {
+    flex-basis: 78px;
+  }
+
+  .inventory-head {
+    gap: 7px;
+  }
+
+  .inventory-actions {
+    row-gap: 6px;
+  }
+
+  .intro-modal-backdrop {
+    align-items: start;
+    padding: max(10px, env(safe-area-inset-top)) 8px max(10px, env(safe-area-inset-bottom));
+  }
+
+  .intro-modal-window {
+    width: min(100%, calc(100vw - 16px));
+    max-height: min(86dvh, 680px);
+    padding: 10px;
+  }
+
+  .threshold-hero {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 15px;
+  }
+
+  .threshold-copy {
+    line-height: 1.42;
+  }
+
+  .threshold-meta-row,
+  .threshold-footer {
+    gap: 6px;
+  }
+
+  .threshold-meta-row span,
+  .threshold-footer span {
+    padding: 7px 8px;
+    font-size: 0.72rem;
+    line-height: 1.18;
+  }
+
+  .tabs {
+    gap: 5px;
+    padding-inline: 7px;
+  }
+
+  .tabs .tab,
+  .tab {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-shell.combat-active .combat-device-actions {
+    gap: 6px;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 44px;
+    padding: 7px 3px;
+    font-size: 0.66rem;
+    line-height: 1.08;
+  }
+
+  .app-shell.combat-active .run-log-list {
+    max-height: clamp(88px, 15dvh, 126px);
+  }
+
+  .app-shell.combat-active .feed-body {
+    font-size: 0.68rem;
+    line-height: 1.3;
+  }
+
+  .app-shell.combat-active .hp-label-row {
+    font-size: 0.66rem;
+    line-height: 1.15;
+  }
+
+  .app-shell.combat-active .combat-stat-row .pill {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 370px) {
+  .charter-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .town-district-hub .inline-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .top-actions button {
+    flex-basis: 76px;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 43px;
+    font-size: 0.64rem;
+  }
+}
+
+/* End v1.3.34 - Mobile Readability Final */
+
+/* v1.3.34 - GitHub Working Folder Baseline
+   No layout changes; active build/cache labels now identify the GitHub folder pass.
+*/

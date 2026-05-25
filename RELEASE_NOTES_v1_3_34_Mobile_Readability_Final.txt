@@ -1,0 +1,9 @@
+DungeonDex v1.3.34 - Mobile Readability Final
+
+- Improved mobile readability across town, market, forge, contracts, inventory, combat, and the intro modal.
+- Cleaner button spacing and better touch comfort for major phone actions.
+- Improved card spacing, small-label readability, and long-text wrapping.
+- Cleaner Lowfire District and combat feed readability.
+- Final mobile polish before the regression and release-prep phase.
+
+No gameplay balance, save format, combat math, item scaling, forge logic, charter logic, or economy values changed.

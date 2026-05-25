@@ -1,0 +1,29 @@
+DungeonDex v1.3.34 - GitHub Working Folder Baseline Smoke Test
+
+Required Checks
+- Search old build labels and stale cache names.
+- Verify app.js syntax.
+- Verify manifest.json parses.
+- Verify files referenced by index.html exist.
+- Verify Enter Dungeon / Continue Run / Merchant / Inventory / Archive are still present and wired.
+
+Expected Result
+- Header build label shows "DungeonDex v1.3.34 - GitHub Working Folder Baseline" after app.js loads.
+- index.html references app.js and styles.css with build=1.3.34-github-working-folder-baseline.
+- sw.js uses dungeon-dex-v1.3.34-github-working-folder-baseline.
+- Archive > Local Notes includes the GitHub baseline marker.
+- No gameplay behavior changes are expected.
+
+Manual Browser Pass
+- Serve the folder with a simple local static server.
+- Open index.html through that local server.
+- Confirm Town loads, Enter Dungeon starts or continues a run, Merchant stock renders, Gear inventory renders, and Archive opens.
+
+Run Results - 2026-05-25
+- app.js syntax check passed with node --check app.js.
+- manifest.json parsed successfully with ConvertFrom-Json.
+- index.html references manifest.json, sw.js, styles.css, and app.js; those files are present in the GitHub folder.
+- Active stale build/cache search found no v1.3.33 cleanup labels, v1.0.0 fallback label, or v1.3.34 mobile-readability cache labels in active runtime files.
+- Static wiring scan found Enter Dungeon / Continue Run, Merchant stock/buy/refresh, Inventory render/actions, and Archive tab/render paths.
+- Headless Chrome rendered the GitHub baseline build label, Town, Merchant, Inventory, and Archive content.
+- Temporary local Node static server plus headless Chrome runtime smoke exited cleanly after checking the baseline label, Lowfire Market, Inventory, Archive Log, and Enter Dungeon text.

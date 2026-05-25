@@ -2,7 +2,7 @@
   'use strict';
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.33 - Dead Code & Old UI Cleanup';
+  const BUILD = 'DungeonDex v1.3.34 - GitHub Working Folder Baseline';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -4067,8 +4067,8 @@
 
     el('settingsPanel').innerHTML = `
       <h2>Local Notes</h2>
-      <p class="small">Local save, compact layout, generated catalog scale, and mobile-friendly controls.</p>
-      <div class="tag-row"><span class="pill">Local save</span><span class="pill">Single-page app</span><span class="pill">iPhone-safe layout</span></div>
+      <p class="small">Local save, compact layout, generated catalog scale, mobile-friendly controls, and GitHub-folder baseline labels.</p>
+      <div class="tag-row"><span class="pill">Local save</span><span class="pill">Single-page app</span><span class="pill">GitHub baseline</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
