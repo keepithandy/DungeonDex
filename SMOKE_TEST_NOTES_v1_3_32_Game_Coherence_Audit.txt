@@ -1,0 +1,43 @@
+DungeonDex v1.3.32 - Game Coherence Audit Smoke Notes
+
+Scope:
+- Audit/report pass only.
+- No gameplay systems were added.
+- No combat, loot, merchant economy, forge behavior, Deep Stair Charter logic, save format, item scaling, or town structure was changed.
+- Runtime app code was not changed in this pass.
+- No package folder or zip was created.
+
+Files inspected:
+- index.html
+- app.js
+- styles.css
+- sw.js
+- manifest.json
+- Existing v1.3.31b smoke/release notes in the working folder
+
+Checks run:
+- PASS: app.js syntax check with node --check app.js.
+- PASS: sw.js syntax check with node --check sw.js.
+- PASS: manifest.json parsed with ConvertFrom-Json.
+- PASS: index.html references styles.css and app.js with matching v1.3.31b cache query strings.
+- PASS: sw.js caches styles.css and app.js with matching v1.3.31b cache query strings.
+- PASS: runtime files contain no v1.4 / 1.4.0 label.
+- PASS: runtime files contain no Primary Descent text.
+- PASS: runtime files contain no rimary descent typo.
+- PASS: runtime files contain no primary-descent or descent-primary class/id.
+- PASS: current working folder confirmed as C:\Users\quali\Desktop\GPT5.5\DungeonDex_Working.
+- PASS: no zip / 7z / rar package archives were present or created.
+
+Audit observations:
+- Core loop is coherent and playable.
+- Lowfire District is the single in-town entry area.
+- First-load intro modal still duplicates entry framing outside the Town panel.
+- Warden Objectives UI is improved, but player-facing quest terminology remains in logs/history.
+- Vow language remains as flavor text/item suffix and should be cleaned before v1.4.
+- Old audit helpers are exposed on window and should be reviewed before public release.
+- Mobile layout is likely acceptable but needs a dedicated screenshot pass for the town hub, market, contracts, gear, archive, and intro modal.
+
+Created in this pass:
+- GAME_COHERENCE_AUDIT_v1_3_32.txt
+- SMOKE_TEST_NOTES_v1_3_32_Game_Coherence_Audit.txt
+- RELEASE_NOTES_v1_3_32_Game_Coherence_Audit.txt

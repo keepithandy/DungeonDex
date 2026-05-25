@@ -1,0 +1,25 @@
+DungeonDex v1.3.31b - Town Cleanup Regression Check
+
+Release focus:
+- Verified the Lowfire town cleanup after removing the accidental duplicate descent section.
+- Confirmed the Town screen keeps one in-page dungeon entry path in the Lowfire District hub.
+- Confirmed merchant, District Wares, Relic Forge, Deep Stair Charters, Warden Objectives, and Elite Contract Board still render.
+
+Fixes:
+- Updated build/cache metadata for the v1.3.31b regression-check pass.
+- Cleaned one prior smoke note so removed-label search terms no longer appear anywhere in the workspace.
+
+Preserved behavior:
+- Enter Dungeon / Continue Run.
+- Rest.
+- Merchant refresh and District Wares.
+- Deep Stair Charters.
+- Relic Forge.
+- Elite Contracts.
+- Gear, Dex, Archive, Save, and Reset.
+
+Technical notes:
+- No save format changes.
+- No combat math changes.
+- No loot, item scaling, or merchant economy changes.
+- No forge, charter, elite contract, archive, or inventory logic changes.

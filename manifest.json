@@ -1,0 +1,10 @@
+{
+  "name": "DungeonDex — Emberfall",
+  "short_name": "DungeonDex",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#05060a",
+  "theme_color": "#06070a",
+  "description": "Compact mobile-first dungeon crawler with deep generated gear and monster catalogs.",
+  "icons": []
+}

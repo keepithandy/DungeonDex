@@ -1,0 +1,288 @@
+DungeonDex v1.3.32 - Game Coherence Audit
+
+1. Executive Summary
+
+Current condition: Needs polish, not a systems rewrite.
+
+DungeonDex has a recognizable core loop:
+Lowfire District -> Enter Dungeon -> Combat -> Loot -> Extract / Die -> Merchant / Forge / Archive -> Repeat.
+
+The loop is playable and most visible systems now point back to dungeon runs. The largest coherence issue is not missing functionality; it is naming and presentation drift from several incremental passes. Town mostly reads as a hub now, but the first-load intro modal still repeats dungeon-entry framing outside the town panel, Warden Objectives still leak "quest" terminology in logs/history, and several debug/audit helpers and old patch comments remain in the runtime files.
+
+No new v1.4 labels were introduced in runtime files. No Primary Descent text or slug remains in runtime files. No zip/package was created during this audit.
+
+2. Release Blockers
+
+No hard gameplay blockers found for a v1.4 coherence release.
+
+Potential public-coherence blocker if left untouched:
+- First-load intro modal: It presents "Dungeon Threshold" with its own Enter Dungeon button before the player engages with the Lowfire District hub. It is functional, but it can feel like a second dungeon-entry surface. This should be aligned, simplified, or made less prominent before public v1.4 if the goal is one clear town hub.
+
+3. High-Priority Cleanup
+
+1. Align or reduce the first-load intro modal.
+   - Current: introProgressMarkup('modal') renders "Dungeon Threshold", Return Point, and an Enter Dungeon button.
+   - Risk: Feels like a second entry area after the Primary Descent cleanup.
+   - Recommendation: In v1.3.33, keep the modal if needed, but make it clearly an onboarding/status overlay rather than another primary town panel.
+   - Rating: Needs fix before v1.4.
+
+2. Clean up quest/objective naming leaks.
+   - Current visible UI says Warden Objectives, but app logs/history can still say "Quest complete" and "quest progress".
+   - Risk: The player sees a mixed identity: objectives vs quests vs contracts.
+   - Recommendation: Rename visible player-facing "Quest complete" and run-history "quest progress" copy to "Objective complete" / "objective progress". Do not change save keys yet.
+   - Rating: Needs fix before v1.4.
+
+3. Remove or hide vow-language that implies a future system.
+   - Current: item suffix "of Vows" and lore line "unfinished vows".
+   - Risk: The user has explicitly deferred the real v1.5 Vow system; visible vow language can imply a system that does not exist.
+   - Recommendation: Replace these two flavor strings with neutral Emberfall terms in a small copy-only pass.
+   - Rating: Needs polish before v1.4.
+
+4. Decide whether Deep Stair Charters should remain inside the Lowfire District banner.
+   - Current: Charters are functionally attached to the dungeon-entry hub, which is coherent, but the copy is long and pushes the top town card taller.
+   - Risk: Mobile first screen can feel dense before the player reaches market/forge.
+   - Recommendation: Keep the placement for now, shorten copy and button labels only.
+   - Rating: Needs polish.
+
+5. Runtime build/cache metadata remains v1.3.31b.
+   - Current: BUILD, index.html query strings, and sw.js cache are v1.3.31b.
+   - Risk: Fine for this audit because runtime code was not changed, but update deliberately in the next implementation pass if public artifacts are produced.
+   - Recommendation: Do not rename to v1.4 yet. If v1.3.32 becomes public, update metadata in a dedicated version-only pass.
+   - Rating: Needs fix only if shipping this exact build.
+
+4. Medium-Priority Polish
+
+1. Lowfire Market density.
+   - Merchant stock, District Wares, active sink pills, and refresh are coherent, but the panel can become visually heavy with four stock cards plus wares.
+   - Recommendation: Keep systems in place; polish card density and section rhythm later.
+   - Rating: Needs polish.
+
+2. District Wares identity.
+   - Current: Useful gold sinks, but "District Wares" and "coin sinks" are still mechanical phrasing.
+   - Recommendation: Keep the name; reduce copy around "gold sinks" in public UI. Use effect-first text.
+   - Rating: Needs polish.
+
+3. Dex naming.
+   - Current: Tab says Dex, panel says Emberfall Index, sections say Monster Register and Relic Register.
+   - Risk: Not broken, but the hierarchy is not obvious.
+   - Recommendation: Pick one naming family: Dex / Register / Index. "Dex" is concise for tab; "Emberfall Index" is acceptable if copy explains less.
+   - Rating: Needs polish.
+
+4. Gear / inventory density.
+   - Current: Gear screen has loadout, filters, inventory, rarity tags, stat pills, sell buttons.
+   - Risk: Dense on mobile, but useful.
+   - Recommendation: Avoid structural changes; only tighten typography and wrapping after screenshot review.
+   - Rating: Needs polish.
+
+5. Archive/System Notes.
+   - Current: Archive includes Run History, Archive Log, and System Notes.
+   - Risk: "System Notes" is useful but feels development-oriented beside narrative history.
+   - Recommendation: Rename to a more in-world but still clear label, or move it lower. No behavior change needed.
+   - Rating: Needs polish.
+
+6. Boss naming and depth language.
+   - Current: Variables and some copy mix floor/depth/room/chapter.
+   - Risk: Player sees Depth/Floor/Room/Chapter in several places. Mostly understandable, but release copy should choose a hierarchy.
+   - Recommendation: Use "Depth" for raw progress and "Floor / Room / Chapter" as detail. Avoid "floor" when referring to unlock depth in visible copy.
+   - Rating: Needs polish.
+
+5. Defer to v1.5+
+
+Do not add these before v1.4:
+- Real Vow system.
+- Factions.
+- Reputation.
+- Town evolution.
+- New dungeon branches.
+- New crafting systems beyond current Relic Forge.
+- New economy layers.
+- Additional contract types beyond the existing Elite Contract Board.
+- Merchant personalities or faction stock.
+
+6. Town Coherence Notes
+
+Lowfire District hub:
+- Purpose: main staging hub, enter/continue, rest, rest cost, charter context.
+- Current usefulness: high.
+- Loop connection: direct start/restart point for dungeon loop.
+- Status: Needs polish, not redesign.
+- Notes: The Lowfire banner now owns the single in-town entry path. This is coherent. Charters inside the banner make sense, but copy is long.
+
+Rest:
+- Purpose: restore HP for a visible cost.
+- Current usefulness: high.
+- Loop connection: recovery before next run.
+- Status: Ready.
+- Notes: Clear enough. Keep cost visible.
+
+Lowfire Market:
+- Purpose: buy gear and run-support wares.
+- Current usefulness: high.
+- Loop connection: spend run rewards to improve next run.
+- Status: Needs polish.
+- Notes: "Merchant stock, district wares, and coin sinks" is accurate but slightly mechanical. Consider shorter, effect-first copy.
+
+District Wares:
+- Purpose: permanent/limited gold sinks unlocked by progress.
+- Current usefulness: medium/high.
+- Loop connection: spends gold earned from runs on next-run bonuses or protection.
+- Status: Needs polish.
+- Notes: Useful, but "gold sink" language reads like design terminology. Avoid adding more economy layers.
+
+Relic Forge:
+- Purpose: convert sparks/shards into a rare+ item.
+- Current usefulness: high once resources exist.
+- Loop connection: rewards from dungeon feed forge, forge feeds gear.
+- Status: Ready with minor copy polish.
+- Notes: Keep current behavior. Do not expand crafting.
+
+Deep Stair Charters:
+- Purpose: buy/activate permanent deeper starts after safe extraction milestones.
+- Current usefulness: high for long runs, low early.
+- Loop connection: progression convenience tied to extraction safety.
+- Status: Needs polish.
+- Notes: Functional and relevant, but the "Every 40 safe depths... mega-depth..." copy is long for a top-town card.
+
+Contract Board / Warden Objectives:
+- Purpose: objectives and elite risk jobs.
+- Current usefulness: medium/high.
+- Loop connection: rewards players for kills, loot, equipment, and elite fights.
+- Status: Needs fix before v1.4.
+- Notes: UI name is better than Vows. Player-facing "quest" logs/history still need copy cleanup.
+
+Gear:
+- Purpose: equip loot, sell extras, filter inventory.
+- Current usefulness: high.
+- Loop connection: loot -> power -> deeper runs.
+- Status: Needs polish.
+
+Dex:
+- Purpose: record discovered monsters/relics.
+- Current usefulness: medium.
+- Loop connection: supports collection fantasy, not core power.
+- Status: Needs polish.
+- Notes: Keep, but consider making its empties and names less generic.
+
+Archive:
+- Purpose: run history, losses, rewards, archive log, system notes.
+- Current usefulness: high for clarity.
+- Loop connection: shows extraction/death outcomes.
+- Status: Needs polish.
+
+Save / Reset:
+- Purpose: persistence and full reset.
+- Current usefulness: high.
+- Loop connection: infrastructure, not gameplay.
+- Status: Ready.
+
+First-load intro modal:
+- Purpose: orient player to current return point and start/continue.
+- Current usefulness: medium.
+- Loop connection: direct entry, but duplicates Town entry.
+- Status: Needs fix before v1.4.
+- Notes: Keep if it improves onboarding; otherwise reduce to a dismissible status overlay.
+
+7. Dead UI / Old Code Candidates
+
+1. introProgressMarkup non-modal branch.
+   - The function still has non-modal IDs introEnterDungeonBtn / introContinueRunBtn, but current runtime only calls introProgressMarkup('modal').
+   - Candidate for removal or simplification.
+
+2. bindDynamic handlers for introEnterDungeonBtn / introContinueRunBtn.
+   - Likely leftover from the removed town entry panel.
+   - Safe candidate for cleanup if no caller remains.
+
+3. renderStickyBar always hides stickyBar.
+   - The footer remains in index.html but renderStickyBar clears and hides it every render.
+   - Candidate for removal or future explicit use decision.
+
+4. window.DungeonDexBalanceAudit and window.DungeonDexCheckpointAudit.
+   - Useful development hooks, but public runtime exposes audit tooling.
+   - Candidate to hide behind dev flag or remove from public build.
+
+5. console.info / console.table audit output.
+   - Not player-visible, but public devtools noise.
+   - Candidate for cleanup before v1.4 public release.
+
+6. Old patch comments in styles.css.
+   - Many comments preserve history but make current ownership hard to read.
+   - Do not delete blindly; consolidate in a later CSS hygiene pass.
+
+7. Prior smoke/release notes in the folder.
+   - Current folder contains v1.3.31b notes. This audit creates v1.3.32 notes.
+   - Do not package old notes in any later release unless specifically requested.
+
+8. Naming / Copy Issues
+
+High priority:
+- "Quest complete" -> "Objective complete".
+- "quest progress" in run history -> "objective progress".
+- "of Vows" item suffix -> neutral suffix before v1.4.
+- "unfinished vows" lore line -> neutral lore before v1.4.
+
+Medium priority:
+- "Dungeon Threshold" modal title may conflict with Lowfire/Hollow Stair framing.
+- "Return Point" and "Active Descent" are clear but less grounded than Lowfire/Hollow Stair language.
+- "gold sinks" in market copy is design terminology.
+- "No active run" on Run tab is functional but dry.
+- "System Notes" in Archive feels development-facing.
+- "Dex", "Emberfall Index", "Monster Register", "Relic Register" should use one naming family.
+- "unlock Depth" is clearer than internal unlockFloor, but audit future text for floor/depth consistency.
+
+No current issue:
+- No Primary Descent or rimary descent text found.
+- No primary-descent or descent-primary class/id found.
+- No runtime v1.4 label found.
+
+9. Mobile Readability Risks
+
+Needs manual screenshot pass:
+- Lowfire District hub plus Deep Stair Charter copy may be tall on 360px-wide phones.
+- Merchant stock cards are dense, especially with money markup and item summaries.
+- District Wares cards combine rarity, cost, effect, summary, status, and buy reason.
+- Elite Contract Board card has objective/risk/reward/action; reward money can wrap.
+- Gear cards have rarity, name, ilvl, slot/maker, stat pills, set previews, equip/sell controls.
+- Archive run-history cards include many metadata pills and reward summaries.
+- Intro modal uses a rich threshold layout and can compete with the first screen on small itch/browser frames.
+- Fixed bottom tabs require continued padding checks to avoid content being hidden near the bottom.
+- Combat action buttons are compact but likely acceptable; keep screenshot checks on 360px and 390px widths.
+
+10. Release Readiness Ratings
+
+Core loop: Ready with polish.
+Town / Lowfire District: Needs polish.
+First-load intro modal: Needs fix before v1.4.
+Combat: Ready.
+Enemies: Ready with polish.
+Bosses: Needs polish.
+Elites: Ready with polish.
+Elite contracts: Needs polish.
+Loot: Ready.
+Item rarity: Ready.
+Mythics: Ready with polish.
+Relic Forge: Ready.
+Merchant: Ready with polish.
+District Wares: Needs polish.
+Deep Stair Charters: Needs polish.
+Archive / history: Needs polish.
+Dex: Needs polish.
+Gear / inventory: Needs polish.
+Warden Objectives: Needs fix before v1.4.
+Save / reset: Ready.
+Service worker/cache/version strings: Needs fix only if shipping v1.3.32 publicly.
+
+11. Recommended Next Pass
+
+Recommended v1.3.33 pass:
+"Copy and Dead UI Coherence Cleanup"
+
+Safe scope:
+- No mechanics changes.
+- No economy changes.
+- No save format changes.
+- Rename visible quest copy to objective copy.
+- Replace vow flavor terms.
+- Simplify or reframe the first-load intro modal without adding a new panel.
+- Remove unused introProgressMarkup non-modal branch and matching dead handlers only if confirmed unused.
+- Shorten Deep Stair Charter and District Wares copy.
+- Leave combat, scaling, forge, charters, and merchant values untouched.

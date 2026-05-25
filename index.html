@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#06070a" />
+  <link rel="manifest" href="manifest.json" />
+  <title>DungeonDex - Emberfall</title>
+  <link rel="stylesheet" href="styles.css?build=1.3.33-dead-code-old-ui-cleanup" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">EMBERFALL BUILD <span id="buildTag">v1.0.0</span></div>
+        <h1>DungeonDex</h1>
+      </div>
+      <div class="top-actions">
+        <span class="save-status" id="saveStatus">Saved</span>
+        <button class="ghost mini" id="saveBtn">Save</button>
+        <button class="ghost mini" id="resetBtn">Reset</button>
+      </div>
+    </header>
+
+    <section class="hero panel">
+      <div class="hero-main">
+        <div class="hero-copy">
+          <div class="title-row">
+            <strong id="playerName">Warden</strong>
+            <span class="pill rarity-legendary" id="playerTitle">Ashbound Delver</span>
+          </div>
+          <p id="loreLine">In the drowned ember-city of Veyruhn, wardens descend into living dungeons to reclaim names, relics, and light.</p>
+        </div>
+        <div class="hero-stats compact-grid" id="heroStats"></div>
+      </div>
+      <div class="hero-footer compact-grid" id="resourceBar"></div>
+    </section>
+
+    <nav class="tabs panel">
+      <button class="tab active" data-screen="town">Town</button>
+      <button class="tab" data-screen="run">Run</button>
+      <button class="tab" data-screen="gear">Gear</button>
+      <button class="tab" data-screen="dex">Dex</button>
+      <button class="tab" data-screen="archive">Archive</button>
+    </nav>
+
+    <main class="screens">
+      <section class="screen active" id="screen-town">
+        <div class="stack-8">
+          <div class="panel section-header">
+            <div>
+              <h2 id="districtName">Lowfire District</h2>
+              <p id="districtLine">Debt begins above. The Stair waits below.</p>
+            </div>
+            <div class="inline-actions">
+              <button class="primary" id="startRunBtn">Enter Dungeon</button>
+              <button class="ghost" id="restBtn">Rest</button>
+              <span class="rest-cost-chip" id="restCostPill" title="Rest cost">Cost --</span>
+            </div>
+            <div class="district-charter-slot" id="districtCharterSlot"></div>
+          </div>
+
+          <div class="grid-2">
+            <section class="panel" id="merchantPanel"></section>
+            <section class="panel" id="forgePanel"></section>
+          </div>
+
+          <section class="panel" id="questPanel"></section>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-run">
+        <div class="stack-8">
+          <section class="panel" id="runStatus"></section>
+          <section class="panel combat-panel" id="combatPanel"></section>
+          <section class="panel" id="combatLog"></section>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-gear">
+        <div class="stack-8">
+          <section class="panel" id="equipmentPanel"></section>
+          <section class="panel" id="filtersPanel"></section>
+          <section class="panel" id="inventoryPanel"></section>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-dex">
+        <div class="stack-8">
+          <section class="panel" id="dexSummary"></section>
+          <section class="panel" id="monsterDex"></section>
+          <section class="panel" id="gearDex"></section>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-archive">
+        <div class="stack-8">
+          <section class="panel" id="archivePanel"></section>
+          <section class="panel" id="settingsPanel"></section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="sticky-actions panel" id="stickyBar"></footer>
+  </div>
+
+  <div class="intro-modal-backdrop" id="introModal" hidden>
+    <section class="panel intro-progress intro-modal-window" id="introModalContent"></section>
+  </div>
+
+  <script>
+    // Itch/mobile iframe scroll fallback: keep the app shell tied to the visible viewport.
+    (function(){
+      function fit(){
+        var shell = document.querySelector('.app-shell');
+        if(!shell) return;
+        var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        if(h && h > 320){ shell.style.height = h + 'px'; shell.style.maxHeight = h + 'px'; }
+      }
+      window.addEventListener('load', fit, { passive: true });
+      window.addEventListener('resize', fit, { passive: true });
+      if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit, { passive: true }); }
+    })();
+  </script>
+  <script>if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{})); }</script>
+  <script src="app.js?build=1.3.33-dead-code-old-ui-cleanup"></script>
+</body>
+</html>
