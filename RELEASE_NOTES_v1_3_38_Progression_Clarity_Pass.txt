@@ -1,0 +1,53 @@
+DungeonDex v1.3.38 - Progression Clarity Pass
+
+Purpose:
+This is a player-understanding pass for the existing descent loop. It clarifies floor progress, boss rhythm, extraction, defeat, safe return progress, and the Lowfire next step without changing combat math, scaling, rewards, economy, save format, or systems.
+
+Player-facing label:
+- The visible label is short: DungeonDex v1.3.38.
+- No long all-caps build banner was added.
+- The full pass name is used only for internal build/cache labels and these notes.
+
+Progression clarity:
+- Best progress now leads with Best Floor instead of a generic Depth stat.
+- Run labels now show Floor first, with room/chapter and raw D-depth kept as compact supporting detail.
+- Intro/threshold copy now calls out Best Floor, Safe Return, and Next Boss.
+- Lowfire return copy now gives a clear next step: rest, improve gear, claim work, then descend again.
+- Charter copy now explains safe extraction as the way to unlock more Hollow Stair charters.
+
+Boss and floor clarity:
+- Boss display now uses Boss Floor language.
+- Active run status shows current floor and next boss floor.
+- Boss combat hint explicitly says bosses appear every 5 floors.
+- Boss-related set bonus copy now says boss floors instead of boss depths.
+
+Extraction and defeat clarity:
+- Extraction result copy now says unsecured rewards are banked and the next descent can start from the secured return point.
+- Defeat result copy now says unsecured run rewards are lost while banked gear and currency stay safe.
+- Extraction failure copy now warns that unsecured rewards remain at risk.
+- Archive history now labels banked vs lost rewards more clearly.
+
+Archive and history clarity:
+- Descent History now explains what was banked, what was lost, and where the next descent starts.
+- Run history entries use Next Start/Restart language.
+- System Notes quietly describe the v1.3.38 clarity focus without showing the full pass name as a banner.
+
+Preserved:
+- No combat math changes.
+- No boss timing changes.
+- No enemy, item, merchant, forge, or economy scaling changes.
+- No reward tuning changes.
+- No save format change.
+- No file reorganization.
+- No new major systems.
+- No 1.4 roadmap, faction, or vow features.
+
+Files updated:
+- app.js
+- index.html
+- styles.css
+- sw.js
+
+Documentation added:
+- RELEASE_NOTES_v1_3_38_Progression_Clarity_Pass.txt
+- SMOKE_TEST_NOTES_v1_3_38_Progression_Clarity_Pass.txt

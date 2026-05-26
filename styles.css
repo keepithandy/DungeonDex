@@ -4921,8 +4921,8 @@ button:focus-visible,
    Light copy and identity pass only; no broad CSS redesign.
 */
 
-/* v1.3.37 - Mobile Dungeon UI Polish
-   Presentation-only mobile readability and tap-target pass. */
+/* Mobile Dungeon UI Polish
+   Historical presentation-only mobile readability and tap-target pass. */
 .app-shell.combat-active {
   max-width: 440px;
   padding-inline: 8px;
