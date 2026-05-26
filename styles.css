@@ -4917,6 +4917,6 @@ button:focus-visible,
 
 /* End v1.3.34 - Mobile Readability Final */
 
-/* v1.3.35 - Core Loop Regression Guard
-   No layout changes; runtime labels and cache keys identify the regression-guard pass.
+/* v1.3.36 - Emberfall Identity Polish
+   Light copy and identity pass only; no broad CSS redesign.
 */

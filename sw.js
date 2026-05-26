@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.35-core-loop-regression-guard';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.35-core-loop-regression-guard','./app.js?build=1.3.35-core-loop-regression-guard','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.36-emberfall-identity-polish';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.36-emberfall-identity-polish','./app.js?build=1.3.36-emberfall-identity-polish','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)

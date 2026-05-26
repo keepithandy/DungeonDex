@@ -2,14 +2,14 @@
   'use strict';
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.35 - Core Loop Regression Guard';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.35';
+  const BUILD = 'DungeonDex v1.3.36 - Emberfall Identity Polish';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.36';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
   const DEPTH_CHAPTERS_PER_FLOOR = DEPTH_CHAPTERS_PER_ROOM * DEPTH_ROOMS_PER_FLOOR;
   const DEPTH_CHAPTERS_PER_THREAT_STEP = 3;
-  // Depth is the raw chapter counter: 10 chapters make a room, 15 rooms make a dungeon floor.
+  // Depth is the raw chapter counter: 10 chapters make a room, 15 rooms make a Hollow Stair floor.
   // Threat steps advance every 3 depth chapters; bosses appear every 5 threat steps,
   // so the current boss cadence lands on raw Depth 15, 30, 45, and so on.
   const ACTION_GUARD_MS = 160;
@@ -47,7 +47,7 @@
   const PREFIXES = ['Ash','Moon','Viper','Saint','Cinder','Glass','Storm','Grave','Ember','Thorn','Iron','Gold','Night','Hollow','Radiant','Sable','Frost','Blood','Star','Dread'];
   const SUFFIXES = ['of Lowflame','of Ruin','of Lanterns','of Ashes','of Sparks','of Teeth','of Silence','of Mercy','of Echoes','of the Hollow','of Black Rain','of Dawning','of Fevers','of Bells','of Graves','of Drift','of the Ninth Flame','of Fangs','of Kings','of the Last Gate'];
   const TRINKET_SUFFIXES = ['of the Hollow Bell','of Ember Debt','of Room-Tithes','of Last Light'];
-  const MAKERS = ['Veyruhn','Rookery','Sunken Court','Lowfire','Mireglass','Red Chapel','Salt Forge','Ivory Span','Silt Borough','Noctis Atelier'];
+  const MAKERS = ['Emberfall','Rookery','Sunken Court','Lowfire','Mireglass','Red Chapel','Salt Forge','Ivory Span','Silt Borough','Noctis Atelier'];
   const THEMES = ['breaker','guardian','duelist','skirmisher','seer','warden','reaver','sage','ranger','occult'];
 
 
@@ -92,12 +92,12 @@
       bonuses: {
         2: '+Max HP',
         3: 'Boss-depth defense bonus',
-        5: 'Survive lethal damage once per run'
+        5: 'Survive lethal damage once per descent'
       }
     },
     veyruhn_bellforge: {
       id: 'veyruhn_bellforge',
-      name: 'Veyruhn Bellforge',
+      name: 'Emberfall Bellforge',
       theme: 'forge / heavy hits / boss damage',
       role: 'damage scaling',
       slots: MYTHIC_SET_SLOTS,
@@ -145,7 +145,7 @@
     'Every relic carries a stolen memory. Stronger relics remember more than their bearer.',
     'The Lowfire merchants do not ask where your gear came from. Only whether it still whispers.',
     'In Emberfall, even sunlight is traded by weight.',
-    'The ninth bell beneath Veyruhn rings only when a warden dies with unpaid debts.'
+    'The ninth bell beneath Emberfall rings only when a warden dies with unpaid debts.'
   ];
 
   const DISTRICT_DATA = [
@@ -156,7 +156,7 @@
     { id:'cinderbone', min:41, max:50, name:'Cinderbone Halls', line:'Old champions become architecture.', tone:'cinderbone', mood:'Bone pillars and furnace glow.' },
     { id:'blacktithe', min:51, max:60, name:'Blacktithe Deep', line:'Every step is counted twice.', tone:'blacktithe', mood:'Gold shadow, sealed doors, heavy tolls.' },
     { id:'lanternless', min:61, max:70, name:'Lanternless Vault', line:'Hope is stored here, unpaid.', tone:'lanternless', mood:'Dim vaults and dead lampglass.' },
-    { id:'hunger-kilns', min:71, max:80, name:'The Hunger Kilns', line:'The dungeon learns what you need.', tone:'hunger', mood:'Open heat, empty racks, watching mouths.' },
+    { id:'hunger-kilns', min:71, max:80, name:'The Hunger Kilns', line:'The Stair learns what you need.', tone:'hunger', mood:'Open heat, empty racks, watching mouths.' },
     { id:'redwake', min:81, max:90, name:'Redwake Catacombs', line:'The dead do not rest. They accrue.', tone:'redwake', mood:'Red water and bone invoices.' },
     { id:'final-lowflame', min:91, max:100, name:'The Final Lowflame', line:'The first ember waits at the bottom.', tone:'final-lowflame', mood:'A small flame under impossible weight.' }
   ];
@@ -232,7 +232,7 @@
       return true;
     }
     if (state?.run?.active) {
-      recoverRunToTown(state, 'Recovered from an incomplete active run and returned to Lowfire.');
+      recoverRunToTown(state, 'Recovered from an incomplete active descent and returned to Lowfire.');
     } else if (state) {
       state.screen = 'town';
     }
@@ -511,7 +511,7 @@
 
   const DISTRICT_MARKET_WARES = [
     { id:'junkers_token', districtId:'lowfire', unlockFloor:1, name:"Junker's Token", rarity:'common', cost:coins(0,18,0), effect:'Next junk/common sell action pays +15%.', summary:'A cheap Lowfire marker for squeezing a little more coin out of junk piles.' },
-    { id:'small_debt_charm', districtId:'lowfire', unlockFloor:1, name:'Small Debt Charm', rarity:'uncommon', cost:coins(0,25,0), effect:'+10% gold during your next run.', summary:'A minor charm that makes the next descent pay slightly better.' },
+    { id:'small_debt_charm', districtId:'lowfire', unlockFloor:1, name:'Small Debt Charm', rarity:'uncommon', cost:coins(0,25,0), effect:'+10% gold during your next descent.', summary:'A minor charm that makes the next descent pay slightly better.' },
     { id:'black_market_key', districtId:'ashgate', unlockFloor:11, name:'Black Market Key', rarity:'rare', cost:coins(0,55,0), effect:'Adds one shady rare shelf item to the merchant.', summary:'Opens a side drawer in Ashgate stock. The item still has to be bought.' },
     { id:'cursed_reroll_token', districtId:'ember-debtworks', unlockFloor:21, name:'Cursed Reroll Token', rarity:'epic', cost:coins(0,85,0), effect:'Rerolls one weak unequipped item.', summary:'The Debtworks will remake a bad relic. It chooses the weakest safe target.' },
     { id:'legendary_bounty_writ', districtId:'sootveil', unlockFloor:31, name:'Legendary Bounty Writ', rarity:'legendary', cost:coins(1,25,0), effect:'Next boss drops one extra better relic.', summary:'Raises the reward on the next boss without changing normal shop gear.' },
@@ -786,7 +786,7 @@
   function goldSinkStatus(state, ware) {
     const sink = ensureGoldSinkState(state);
     if (ware.id === 'junkers_token' && sink.junkSaleBonusCharges > 0) return `${sink.junkSaleBonusCharges}/3 ready`;
-    if (ware.id === 'small_debt_charm' && sink.nextRunGoldBonusPct > 0) return 'next run ready';
+    if (ware.id === 'small_debt_charm' && sink.nextRunGoldBonusPct > 0) return 'next descent ready';
     if (ware.id === 'legendary_bounty_writ' && sink.nextBossBounty) return 'bounty active';
     if (ware.id === 'golden_coffin' && sink.goldenCoffin) return 'armed';
     return '';
@@ -807,8 +807,8 @@
     const sink = ensureGoldSinkState(state);
     const pills = [];
     if (sink.junkSaleBonusCharges > 0) pills.push(`Junk bonus x${sink.junkSaleBonusCharges}`);
-    if (sink.nextRunGoldBonusPct > 0) pills.push(`Next run +${sink.nextRunGoldBonusPct}% gold`);
-    if (state.run?.active && state.run.goldBonusPct > 0) pills.push(`Run gold +${state.run.goldBonusPct}%`);
+    if (sink.nextRunGoldBonusPct > 0) pills.push(`Next descent +${sink.nextRunGoldBonusPct}% gold`);
+    if (state.run?.active && state.run.goldBonusPct > 0) pills.push(`Descent gold +${state.run.goldBonusPct}%`);
     if (sink.nextBossBounty) pills.push('Boss bounty armed');
     if (sink.goldenCoffin) pills.push('Golden Coffin armed');
     return pills;
@@ -923,8 +923,8 @@
 
   function bossAtmosphereLine(depth) {
     const name = bossFloorNameByDepth(depth);
-    if (!name) return 'The stair tightens. Something below is listening.';
-    return `${name} waits ahead. The dungeon collects what it is owed.`;
+    if (!name) return 'The Stair tightens. Something below is listening.';
+    return `${name} waits ahead. The Hollow Stair collects what it is owed.`;
   }
 
   function districtArrivalLine(district) {
@@ -958,9 +958,9 @@
     const district = currentStagingDistrict(state);
     const depth = state?.run?.floor || state?.player?.depth || 1;
     const depthStr = depthWithRawLabel(state.player.depth || depth);
-    if (reason === 'extract') return `Extracted safely from ${district.name}. Banked unsecured rewards and kept the return point at ${runDepthLabel(state)}. Record depth: ${depthStr}.`;
-    if (reason === 'defeat') return `Death claimed the run in ${district.name} at ${runDepthLabel(state)}. Unsecured rewards were forfeited. Restart checkpoint: ${hardcoreDeathCheckpointLabel(state, depth)}. Record depth: ${depthStr}.`;
-    return `Run ended in ${district.name} at ${runDepthLabel(state)}.`;
+    if (reason === 'extract') return `The Warden returned from ${district.name}. Banked unsecured rewards and kept the return point at ${runDepthLabel(state)}. Record depth: ${depthStr}.`;
+    if (reason === 'defeat') return `Death claimed the Warden in ${district.name} at ${runDepthLabel(state)}. Unsecured rewards were forfeited. Restart checkpoint: ${hardcoreDeathCheckpointLabel(state, depth)}. Record depth: ${depthStr}.`;
+    return `Descent ended in ${district.name} at ${runDepthLabel(state)}.`;
   }
 
 
@@ -1096,7 +1096,7 @@
   function depthMilestoneNotice(depth) {
     const d = depthStructureFromRawDepth(depth);
     if (d.rawDepth <= 1 || d.chapter !== 1) return '';
-    if (d.room === 1) return `Floor ${d.floor} reached — a deeper floor of the dungeon opens.`;
+    if (d.room === 1) return `Floor ${d.floor} reached — a deeper Hollow Stair floor opens.`;
     return `Room ${d.room} secured on Floor ${d.floor}.`;
   }
 
@@ -2093,7 +2093,7 @@
         danger: 1,
         zone: 'Low Steps',
         monster: null,
-        combatLog: ['The city waits below.'],
+        combatLog: ['Lowfire waits above. The Hollow Stair waits below.'],
         roomsCleared: 0,
         encounters: 0,
         choices: [],
@@ -2110,8 +2110,8 @@
 
     state.player.inventory.push(generateStarterJunk());
     rollMerchant(state, true);
-    spawnQuestLore(state, 'The Lowfire quarter sends you down with almost nothing. Survival must be earned.');
-    pushLog(state, 'Iron Economy merchant polish active: leaner stock, useful slots, and tighter buying pressure.');
+    spawnQuestLore(state, 'Lowfire sends the Warden down with almost nothing. Survival must be earned.');
+    pushLog(state, 'Lowfire market stock is lean, useful, and priced for a hard descent.');
     return state;
   }
 
@@ -2527,7 +2527,7 @@
       return true;
     }
     if (run.active && !run.monster) {
-      recoverRunToTown(state, 'Recovered from an incomplete active run before starting a new descent.');
+      recoverRunToTown(state, 'Recovered from an incomplete active descent before starting a new descent.');
     }
     calcDerived(state);
     const sink = ensureGoldSinkState(state);
@@ -2554,16 +2554,16 @@
     run.combatLog = [];
     if (!state.ui) state.ui = { combatLogExpanded:false };
     state.ui.combatLogExpanded = false;
-    // Dungeon entry preserves current HP; only clamp invalid saved/runtime values.
+    // Hollow Stair entry preserves current HP; only clamp invalid saved/runtime values.
     state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 1, state.player.maxHp));
     nextEncounter(state);
     if (!state.run.monster) {
-      recoverRunToTown(state, 'The dungeon entry failed to create a threat; returned safely to Lowfire.');
+      recoverRunToTown(state, 'The Hollow Stair failed to raise a threat; returned safely to Lowfire.');
       return false;
     }
     state.screen = 'run';
     pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The stair holds its breath.`);
-    if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this run.`);
+    if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this descent.`);
     return true;
   }
 
@@ -2572,7 +2572,7 @@
     const startDepth = normalizeCharterMilestoneDepth(depth);
     if (state.run?.active) {
       state.screen = 'run';
-      return pushLog(state, 'A run is already active. Continue it before using a charter.');
+      return pushLog(state, 'A descent is already active. Continue it before using a charter.');
     }
     const alreadyOwned = ownsPermanentCharter(state, startDepth);
     if (!alreadyOwned && !isCharterDepthUnlocked(state, startDepth)) return pushLog(state, 'That Deep Stair Charter is not unlocked yet.');
@@ -2900,19 +2900,19 @@
       const secured = bankPendingRunRewards(state);
       const securedText = cleanDisplayText(secured, 'no unsecured rewards');
       runResultDetail = `Banked: ${securedText}. Return point: ${returnLabel}.`;
-      pushCombat(state, `Run secured. Banked: ${securedText}.`);
-      pushLog(state, `Run secured. Banked: ${securedText}. Return point: ${returnLabel}.`);
+      pushCombat(state, `Descent secured. Banked: ${securedText}.`);
+      pushLog(state, `Descent secured. Banked: ${securedText}. Return point: ${returnLabel}.`);
       showExtractionPopup(`${extractionPopupSummary(rewardSnapshot, securedText)} • Return: ${returnLabel}`);
       recordSafeExtractionProgress(state);
     } else if (reason === 'defeat') {
       const lost = discardPendingRunRewards(state);
       const lostText = cleanDisplayText(lost, 'no unsecured rewards');
       runResultDetail = `Forfeited: ${lostText}. Restart checkpoint: ${returnLabel}.`;
-      pushLog(state, `Death claimed the run. Forfeited: ${lostText}. Restart checkpoint: ${returnLabel}.`);
+      pushLog(state, `Death claimed the Warden. Forfeited: ${lostText}. Restart checkpoint: ${returnLabel}.`);
       showDefeatPopup(`Forfeited ${lostText}. Restart: ${returnLabel}.`);
     } else {
       clearPendingRunRewards(state);
-      runResultDetail = 'Run ended without unsecured rewards.';
+      runResultDetail = 'Descent ended without unsecured rewards.';
     }
     const summaryLine = extractionSummaryLine(state, reason);
     if (summaryLine) pushLog(state, summaryLine);
@@ -2954,8 +2954,8 @@
 
   function defeat(state) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
-    pushCombat(state, 'You died. All unextracted loot and currency were lost.');
-    spawnQuestLore(state, `The bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
+    pushCombat(state, 'The Warden fell. All unextracted loot and currency were lost.');
+    spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
     finishRun(state, 'defeat');
   }
 
@@ -3121,7 +3121,7 @@
 
     if (ware.id === 'small_debt_charm') {
       sink.nextRunGoldBonusPct = 10;
-      pushLog(state, `Bought ${ware.name}. Your next run earns +10% gold.`);
+      pushLog(state, `Bought ${ware.name}. Your next descent earns +10% gold.`);
       return;
     }
 
@@ -3188,10 +3188,10 @@
   }
 
   function rollMerchant(state, first = false) {
-    if (!first && state.player.gold < state.town.merchantRefreshCost) return pushLog(state, 'Not enough coin to refresh stock.');
+    if (!first && state.player.gold < state.town.merchantRefreshCost) return pushLog(state, 'Not enough coin to refresh Lowfire stock.');
     if (!first) state.player.gold -= state.town.merchantRefreshCost;
     state.merchantStock = buildMerchantStock(state);
-    pushLog(state, 'Merchant stock updated.');
+    pushLog(state, 'Lowfire market stock updated.');
   }
 
   function forgeItem(state) {
@@ -3418,7 +3418,7 @@
     state.run.combatLog = asArray(state.run.combatLog, base.run.combatLog).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.monster = state.run.active ? normalizeMonster(state.run.monster, state.run.floor) : null;
     if (state.run.active && !state.run.monster) {
-      recoverRunToTown(state, 'Recovered from an incomplete combat save and returned to town.');
+      recoverRunToTown(state, 'Recovered from an incomplete combat save and returned to Lowfire.');
     }
     if (state.run.active && state.run.monster) state.screen = 'run';
 
@@ -3453,7 +3453,7 @@
     state.run.choices = asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     if (state.run.active && !state.run.choices.length) state.run.choices = CORE_COMBAT_ACTIONS.slice();
     if (state.run.active && !state.run.monster) {
-      recoverRunToTown(state, 'Recovered from an incomplete combat state before saving.');
+      recoverRunToTown(state, 'Recovered from an incomplete combat state before saving and returned to Lowfire.');
     }
     return true;
   }
@@ -3621,7 +3621,7 @@
     popup.className = 'defeat-result-popup';
     popup.setAttribute('role', 'status');
     popup.setAttribute('aria-live', 'polite');
-    popup.innerHTML = `<strong>Run Lost</strong><span>${escapeHtml(summary || 'Unsecured rewards were forfeited.')}</span>`;
+    popup.innerHTML = `<strong>Descent Lost</strong><span>${escapeHtml(summary || 'Unsecured rewards were forfeited.')}</span>`;
     document.body.appendChild(popup);
     requestAnimationFrame(() => popup.classList.add('show'));
     setTimeout(() => popup.classList.remove('show'), 2400);
@@ -3630,12 +3630,12 @@
 
   function latestRunSummary(state) {
     const latest = asArray(state.player.runHistory, [])[0];
-    if (!latest) return 'No runs logged yet';
+    if (!latest) return 'No descents logged yet';
     const floor = Math.max(0, Math.floor(numberOr(latest.floor, 0, 0, 999999)));
     const reason = normalizeRunHistoryReason(latest.reason);
-    if (reason === 'extract') return `Last run: extracted at ${depthWithRawLabel(floor || 1)}`;
-    if (reason === 'defeat') return `Last run: died at ${depthWithRawLabel(floor || 1)}`;
-    return `Last run: ${reason} at ${depthWithRawLabel(floor || 1)}`;
+    if (reason === 'extract') return `Last descent: extracted at ${depthWithRawLabel(floor || 1)}`;
+    if (reason === 'defeat') return `Last descent: died at ${depthWithRawLabel(floor || 1)}`;
+    return `Last descent: ${reason} at ${depthWithRawLabel(floor || 1)}`;
   }
 
   function nextBossFloorFromDepth(depth) {
@@ -3671,18 +3671,18 @@
           const aria = owned ? `Start at owned ${startLabel}` : `Permanently buy ${startLabel} for ${cleanPrice}`;
           return `<button class="ghost mini charter-price-btn${ownedClass}" data-charter-start="${depth}" title="${escapeHtml(title)}" aria-label="${escapeHtml(aria)}" ${disabled}>${labelText}</button>`;
         }).join('')
-      : '<span class="charter-empty small">No permanent stairs claimed yet.</span>';
+      : '<span class="charter-empty small">No Hollow Stair charters claimed yet.</span>';
 
-    return `<div class="deep-charter-card compact-charter-card" aria-label="Deep Stair Charters">
+    return `<div class="deep-charter-card compact-charter-card" aria-label="Hollow Stair Charters">
       <div class="charter-glow" aria-hidden="true"></div>
       <div class="charter-head">
         <div>
-          <div class="charter-kicker">Safe Extraction Milestone</div>
-          <strong>Deep Stair Charters</strong>
+          <div class="charter-kicker">Safe Return Milestone</div>
+          <strong>Hollow Stair Charters</strong>
         </div>
         <span class="charter-badge">Next D${format(nextUnlock)}</span>
       </div>
-      <p class="charter-copy small">${escapeHtml(label)} Every 40 safe depths unlocks a charter through D800. After that, mega-depth charters unlock every 5,000 depths and stay affordable forever.</p>
+      <p class="charter-copy small">${escapeHtml(label)} Every 40 safe depths unlocks a Hollow Stair charter through D800. After that, mega-depth charters unlock every 5,000 depths and stay affordable forever.</p>
       <div class="charter-progress"><div style="width:${progress.toFixed(1)}%"></div></div>
       <div class="charter-actions">${buttons}</div>
     </div>`;
@@ -3697,12 +3697,12 @@
     const returnDepth = S.run.active ? activeDepth : defaultRunStartDepth(S);
     const boss = nextBossFloorFromDepth(activeDepth);
     const bossText = boss.name ? `D${format(boss.floor)} - ${escapeHtml(boss.name)}` : `D${format(boss.floor)}`;
-    const lastRunText = S.run.active ? `Current run burning at ${depthShortLabel(activeDepth)}` : latestRunSummary(S);
-    const title = S.run.active ? 'Run Still Burning' : 'Dungeon Threshold';
+    const lastRunText = S.run.active ? `Current descent burning at ${depthShortLabel(activeDepth)}` : latestRunSummary(S);
+    const title = S.run.active ? 'Descent Still Burning' : 'Hollow Stair Threshold';
     const subtitle = S.player.runHistory.length || S.player.depth > 0
       ? stagingDistrict.line
-      : 'The Hollow Stair descends below Veyruhn. Only debt is free here.';
-    const kicker = S.run.active ? 'Active Descent' : 'Return Point';
+      : 'The Hollow Stair descends below Emberfall. Only debt is free here.';
+    const kicker = S.run.active ? 'Active Descent' : 'Lowfire Return';
     const metaMarkup = `<span><b>Best</b> ${escapeHtml(depthShortLabel(bestDepth))}</span>
           <span><b>Safe</b> ${escapeHtml(depthShortLabel(safeDepth))}</span>
           <span><b>Boss</b> ${bossText}</span>`;
@@ -3730,14 +3730,14 @@
           </div>
           <span class="pill threshold-pill">${escapeHtml(depthShortLabel(returnDepth))}</span>
         </div>
-        <div class="threshold-progress" aria-label="Dungeon progress">
+        <div class="threshold-progress" aria-label="Hollow Stair progress">
           <div class="split threshold-progress-head">
             <span>Room ${format(activeDepthMeta.room)}/${format(DEPTH_ROOMS_PER_FLOOR)}</span>
             <b>${activeDepthMeta.chapterPct.toFixed(0)}% through room</b>
           </div>
           <div class="depth-meter threshold-meter"><div style="width:${activeDepthMeta.chapterPct.toFixed(1)}%"></div></div>
         </div>
-        <div class="threshold-meta-row" aria-label="Dungeon status">
+        <div class="threshold-meta-row" aria-label="Hollow Stair status">
           ${metaMarkup}
         </div>
         <div class="threshold-footer">
@@ -3796,7 +3796,7 @@
       const objective = eliteContractObjective(contract);
       return `<div class="elite-contract-board">
         <div class="elite-contract-head">
-          <div><h3>Elite Contract Board</h3><p>Clear paid marks for wardens taking extra elite risk.</p></div>
+          <div><h3>Lowfire Elite Board</h3><p>Clear paid marks for wardens taking extra elite risk.</p></div>
           <span class="pill ${ready ? 'rarity-rare' : ''}">${statusLabel}</span>
         </div>
         <div class="elite-contract-card ${ready ? 'ready' : 'active'}">
@@ -3811,7 +3811,7 @@
           <div class="elite-contract-meter"><div style="width:${pct}%"></div></div>
           <div class="elite-contract-actions">
             <span class="pill">${ready ? 'Ready to Claim' : 'Payment held'}: ${formatMoney(rewardAmount)}</span>
-            ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>' : '<span class="small muted">Finish the elite mark, then claim from town.</span>'}
+            ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>' : '<span class="small muted">Finish the elite mark, then claim in Lowfire.</span>'}
           </div>
         </div>
       </div>`;
@@ -3835,7 +3835,7 @@
 
     return `<div class="elite-contract-board">
       <div class="elite-contract-head">
-        <div><h3>Elite Contract Board</h3><p>Take more danger for a clear payout.</p></div>
+        <div><h3>Lowfire Elite Board</h3><p>Take marked danger for a clear payout.</p></div>
         <span class="pill">No Active (${contracts.claimed.length}/${ELITE_CONTRACTS.length})</span>
       </div>
       <div class="elite-contract-list">${body}</div>
@@ -3853,7 +3853,7 @@
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(lowfireDistrict)}`;
     }
     if (el('districtName')) el('districtName').textContent = 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `Hollow Stair staging, market work, paid marks, and the forge.<br><span class="district-mood">${escapeHtml(lowfireDistrict.mood || '')}</span>`;
+    if (el('districtLine')) el('districtLine').innerHTML = `The Warden's Lowfire return: bunks, market work, paid marks, and the forge.<br><span class="district-mood">${escapeHtml(lowfireDistrict.mood || '')}</span>`;
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {
@@ -3865,9 +3865,9 @@
     }
     if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
     if (questPanel) questPanel.innerHTML = `
-      <div class="card-head"><div><h2>Contract Board</h2><p>Paid risk work and Warden Objectives tracked from Lowfire.</p></div></div>
+      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and Warden Objectives tracked from the safe district.</p></div></div>
       <div class="warden-ledger">
-        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Simple work orders that pay out as you delve.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
+        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short Lowfire orders paid after descent work.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
       </div>
       <div class="list warden-objective-list">
         ${S.player.quests.map(q => `
@@ -3882,12 +3882,12 @@
     const districtWares = unlockedDistrictWares(S);
     const activeSinkPills = activeGoldSinkPills(S);
     if (merchantPanel) merchantPanel.innerHTML = `
-      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Merchant stock, district wares, and run support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
+      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Stair gear, district wares, and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
       ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
       <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
       <div class="sep"></div>
       <div class="district-market lowfire-wares">
-        <div class="split market-subhead"><div><strong>District Wares</strong><p class="small">Run support unlocked by your deepest district.</p></div><span class="pill">${districtWares.length}/${DISTRICT_MARKET_WARES.length}</span></div>
+        <div class="split market-subhead"><div><strong>District Wares</strong><p class="small">Support unlocked by your deepest Hollow Stair district.</p></div><span class="pill">${districtWares.length}/${DISTRICT_MARKET_WARES.length}</span></div>
         <div class="list district-ware-list">${districtWares.map(ware => districtWareCard(ware)).join('')}</div>
       </div>`;
 
@@ -3905,7 +3905,7 @@
     const status = goldSinkStatus(S, ware);
     const reason = goldSinkCannotBuyReason(S, ware);
     const disabled = reason ? 'disabled' : '';
-    const buttonText = status && ['owned','armed','bounty active','next run ready'].includes(status) ? status : 'Buy';
+    const buttonText = status && ['owned','armed','bounty active','next descent ready'].includes(status) ? status : 'Buy';
     return `<div class="shop-item district-ware rarity-card rarity-card-${ware.rarity}">
       <div class="split"><div><div class="item-name ${rarityClass(ware.rarity)}">${escapeHtml(ware.name)}</div><div class="item-meta">${escapeHtml(district.name)} • unlock Depth ${ware.unlockFloor}</div></div><span class="pill ${rarityClass(ware.rarity)}">${escapeHtml(ware.rarity)}</span></div>
       <div class="tag-row"><span class="pill">${merchantCostMarkup(S, ware.cost)}</span>${status ? `<span class="pill rarity-uncommon">${escapeHtml(status)}</span>` : ''}</div>
@@ -3937,7 +3937,7 @@
     const runDistrict = currentStagingDistrict(S);
     const isBossFight = monster && monster.tier === 'Boss';
     const isEliteFight = monster && monster.tier === 'Elite';
-    const encounterLabel = isBossFight ? 'Boss Encounter' : isEliteFight ? 'Elite Encounter' : 'Dungeon Encounter';
+    const encounterLabel = isBossFight ? 'Boss Encounter' : isEliteFight ? 'Elite Encounter' : 'Hollow Stair Encounter';
     const bossTitle = isBossFight ? (bossFloorNameByDepth(depth) || 'Boss Depth') : '';
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
     const monsterHpPct = monster ? Math.max(0, Math.min(100, (monster.hp / Math.max(1, monster.maxHp)) * 100)) : 0;
@@ -3958,9 +3958,9 @@
 
     if (!S.run.active || !monster) {
       runStatus.innerHTML = `
-        <div class="split"><div><h2>No active run</h2><p>Rest in Lowfire, then return to the Hollow Stair when ready.</p></div><button class="primary mini" id="runFromIdleBtn">Enter</button></div>`;
-      combatPanel.innerHTML = `<p>No threat detected.</p>`;
-      combatLog.innerHTML = `<div class="run-log-head split"><h2>Combat Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">No combat messages yet.</div></div></div></div>`;
+        <div class="split"><div><h2>No active descent</h2><p>Rest in Lowfire, then return to the Hollow Stair when ready.</p></div><button class="primary mini" id="runFromIdleBtn">Enter Dungeon</button></div>`;
+      combatPanel.innerHTML = `<p>No Hollow Stair threat detected.</p>`;
+      combatLog.innerHTML = `<div class="run-log-head split"><h2>Combat Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">Lowfire is quiet.</div></div></div></div>`;
       return;
     }
 
@@ -4029,7 +4029,7 @@
           <button class="primary combat-btn attack-btn" data-action="attack" aria-label="Attack enemy">Attack</button>
           <button class="ghost combat-btn skill-btn" data-action="skill" aria-label="Use Ashburst skill">Skill</button>
           <button class="ghost combat-btn guard-btn" data-action="guard" aria-label="Guard and recover HP">Guard</button>
-          <button class="ghost combat-btn danger-btn extract-btn" data-action="extract" aria-label="Attempt to extract from dungeon">Extract</button>
+          <button class="ghost combat-btn danger-btn extract-btn" data-action="extract" aria-label="Attempt to extract from the Hollow Stair">Extract</button>
         </section>
       </div>`;
 
@@ -4059,7 +4059,7 @@
         <select id="rarityFilter">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${x}" ${S.filters.rarity===x?'selected':''}>${x}</option>`).join('')}</select>
         <select id="sortFilter">
           <option value="power" ${S.filters.sort==='power'?'selected':''}>power first</option>
-          <option value="level" ${S.filters.sort==='level'?'selected':''}>level first</option>
+          <option value="level" ${S.filters.sort==='level'?'selected':''}>ilvl first</option>
           <option value="rarity" ${S.filters.sort==='rarity'?'selected':''}>rarity first</option>
           <option value="value" ${S.filters.sort==='value'?'selected':''}>value first</option>
           <option value="slot" ${S.filters.sort==='slot'?'selected':''}>slot order</option>
@@ -4116,7 +4116,7 @@
   function renderDex() {
     if (!el('dexSummary') || !el('monsterDex') || !el('gearDex')) return;
     el('dexSummary').innerHTML = `
-      <div class="split"><div><h2>Emberfall Index</h2><p>A complete-feeling archive built around scale, discovery, and compact readability.</p></div><span class="pill">Depth ${S.player.depth}</span></div>
+      <div class="split"><div><h2>Emberfall Index</h2><p>Relics and sightings logged by the Warden across the Hollow Stair.</p></div><span class="pill">Depth ${S.player.depth}</span></div>
       <div class="tag-row"><span class="pill">Seen gear: ${S.player.discoveredGear.length}</span><span class="pill">Seen monsters: ${S.player.discoveredMonsters.length}</span></div>`;
     el('monsterDex').innerHTML = `<h2>Monster Register</h2><div class="list">${S.player.discoveredMonsters.slice(0, 40).map(n => `<div class="monster-card small">${n}</div>`).join('') || '<p class="small muted">No sightings yet.</p>'}</div>`;
     el('gearDex').innerHTML = `<h2>Relic Register</h2><div class="list">${S.player.discoveredGear.slice(0, 40).map(n => `<div class="monster-card small">${n}</div>`).join('') || '<p class="small muted">No relics logged yet.</p>'}</div>`;
@@ -4134,7 +4134,7 @@
       const outcomeClass = isWin ? 'outcome-win' : isDefeat ? 'outcome-loss' : 'outcome-neutral';
       const icon = isWin ? '✓' : isDefeat ? '✕' : '•';
       const zone = cleanDisplayText(r.zone || r.district || 'Hollow Stair', 'Hollow Stair');
-      const fallbackDetail = isWin ? 'Extracted safely. Rewards were secured and banked.' : isDefeat ? 'Death claimed the run. Unsecured rewards were lost.' : 'Run ended.';
+      const fallbackDetail = isWin ? 'Returned to Lowfire. Rewards were secured and banked.' : isDefeat ? 'Death claimed the Warden. Unsecured rewards were lost.' : 'Descent ended.';
       const detail = cleanDisplayText(r.detail || r.summary || fallbackDetail, fallbackDetail);
       const runLabel = cleanDisplayText(r.runLabel || depthWithRawLabel(r.floor || 1), depthWithRawLabel(1));
       const lootPreview = asArray(r.lootPreview, []).slice(0, 3)
@@ -4163,28 +4163,28 @@
           ${dateText ? `<div class="run-history-sub small muted">${escapeHtml(dateText)}</div>` : ''}
         </div>
       </div>`;
-    }).join('') || '<p class="small muted">No runs logged yet. Descend to begin.</p>';
+    }).join('') || '<p class="small muted">No descents logged yet. Enter the Hollow Stair to begin.</p>';
 
     const archiveLines = asArray(S.archive, []).filter(isPlainObject).map(a => {
       const stamp = cleanDisplayText(a.stamp || '');
-      const text = cleanDisplayText(a.text || '', 'Archive entry unavailable.');
+      const text = cleanDisplayText(a.text || '', 'Archive note unavailable.');
       return `<div class="archive-line"><div class="small muted">${escapeHtml(stamp)}</div><div>${escapeHtml(text)}</div></div>`;
-    }).join('') || '<p class="small muted">Archive is quiet.</p>';
+    }).join('') || '<p class="small muted">No Emberfall notes yet.</p>';
 
     el('archivePanel').innerHTML = `
       <div class="archive-history-head">
-        <div><h2>Run History</h2><p class="small muted">Extracts, deaths, lost rewards, and banked loot stay visible here.</p></div>
+        <div><h2>Descent History</h2><p class="small muted">Lowfire records each extraction, death, lost reward, and banked relic.</p></div>
         <span class="pill">Latest ${format(history.length)}</span>
       </div>
       <div class="list run-history-list">${historyMarkup}</div>
       <div class="sep"></div>
-      <h3>Archive Log</h3>
+      <h3>Emberfall Notes</h3>
       <div class="list archive-log-list">${archiveLines}</div>`;
 
     el('settingsPanel').innerHTML = `
-      <h2>Local Notes</h2>
-      <p class="small">Local save, compact layout, generated catalog scale, mobile-friendly controls, and guarded core-loop state.</p>
-      <div class="tag-row"><span class="pill">Local save</span><span class="pill">Single-page app</span><span class="pill">Guarded loop</span></div>
+      <h2>System Notes</h2>
+      <p class="small">DungeonDex v1.3.36 keeps Emberfall, Lowfire, the Hollow Stair, and the Warden clear while leaving combat, economy, and scaling unchanged.</p>
+      <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
