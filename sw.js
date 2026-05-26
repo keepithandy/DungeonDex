@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.38-progression-clarity-pass';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.38-progression-clarity-pass','./app.js?build=1.3.38-progression-clarity-pass','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.38-structure-foundation-pass';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.38-structure-foundation-pass','./app.js?build=1.3.38-structure-foundation-pass','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)

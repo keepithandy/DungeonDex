@@ -1,0 +1,21 @@
+DungeonDex v1.3.38 - Structure Foundation Pass
+
+Summary
+- No gameplay changes.
+- No save format changes.
+- No balance changes.
+- No combat, merchant, dungeon progression, or mobile UX changes.
+
+Structure additions
+- Added jsconfig.json for plain JavaScript editor intelligence in VS Code/Codex.
+- Kept checkJs disabled to avoid turning the current legacy single-file app into a noisy type-checking pass.
+- Added lightweight JSDoc typedef foundations in app.js for Currency, Player, Item, Enemy, RunState, and GameState.
+- Added data planning docs for possible future structured content files.
+- Added tools/check_dungeondex_package.py as an offline standard-library package checker.
+
+Runtime notes
+- DungeonDex still launches directly from index.html.
+- No build step was added.
+- No npm dependencies were added.
+- No runtime JSON loading or fetch() calls were added.
+- The visible player-facing build label remains short: DungeonDex v1.3.38.

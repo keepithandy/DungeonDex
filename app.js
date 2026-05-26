@@ -1,8 +1,101 @@
 (() => {
   'use strict';
 
+  /**
+   * Editor-only state shape notes for future structure passes.
+   * These broad typedefs document the plain-JS save/runtime objects without
+   * changing runtime behavior, storage keys, or requiring TypeScript.
+   *
+   * @typedef {number} Currency
+   *
+   * @typedef {Object} StatBlock
+   * @property {number} power
+   * @property {number} guard
+   * @property {number} wit
+   * @property {number} luck
+   * @property {number} speed
+   * @property {number} [hp]
+   *
+   * @typedef {Object} Item
+   * @property {string} id
+   * @property {string} name
+   * @property {string} slot
+   * @property {string} rarity
+   * @property {number} level
+   * @property {number} rating
+   * @property {Currency} value
+   * @property {StatBlock} stats
+   * @property {string[]} tags
+   * @property {string} summary
+   *
+   * @typedef {Object} Enemy
+   * @property {string} id
+   * @property {string} name
+   * @property {string} tier
+   * @property {number} level
+   * @property {number} power
+   * @property {number} hp
+   * @property {number} maxHp
+   * @property {number} guard
+   * @property {number} speed
+   * @property {Currency} rewardGold
+   * @property {number} rewardXp
+   * @property {number} rewardShard
+   *
+   * @typedef {Object} RunState
+   * @property {boolean} active
+   * @property {number} floor
+   * @property {number} chain
+   * @property {number} danger
+   * @property {string} zone
+   * @property {Enemy|null} monster
+   * @property {string[]} combatLog
+   * @property {number} roomsCleared
+   * @property {number} encounters
+   * @property {string[]} choices
+   * @property {number} goldBonusPct
+   * @property {Object} pendingRewards
+   *
+   * @typedef {Object} Player
+   * @property {string} name
+   * @property {string} title
+   * @property {number} level
+   * @property {number} xp
+   * @property {number} xpNext
+   * @property {number} hp
+   * @property {number} maxHp
+   * @property {Currency} gold
+   * @property {number} currencyVersion
+   * @property {number} shards
+   * @property {number} ember
+   * @property {number} depth
+   * @property {number} safeExtractDepth
+   * @property {number} returnDepth
+   * @property {number} kills
+   * @property {number} crit
+   * @property {number} dodge
+   * @property {StatBlock} stats
+   * @property {Object.<string, Item>} equipment
+   * @property {Item[]} inventory
+   * @property {string[]} discoveredMonsters
+   * @property {string[]} discoveredGear
+   * @property {string[]} log
+   * @property {Object[]} runHistory
+   *
+   * @typedef {Object} GameState
+   * @property {string} build
+   * @property {string} screen
+   * @property {Object} filters
+   * @property {Player} player
+   * @property {Object} town
+   * @property {RunState} run
+   * @property {Item[]} merchantStock
+   * @property {Object[]} archive
+   * @property {Object} ui
+   */
+
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.38 - Progression Clarity Pass';
+  const BUILD = 'DungeonDex v1.3.38';
   const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.38';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
@@ -4198,7 +4291,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.38 clarifies floors, boss rhythm, extraction, defeat, and Lowfire return copy.</p>
+      <p class="small">DungeonDex v1.3.38</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
