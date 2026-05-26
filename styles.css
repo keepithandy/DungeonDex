@@ -4920,3 +4920,390 @@ button:focus-visible,
 /* v1.3.36 - Emberfall Identity Polish
    Light copy and identity pass only; no broad CSS redesign.
 */
+
+/* v1.3.37 - Mobile Dungeon UI Polish
+   Presentation-only mobile readability and tap-target pass. */
+.app-shell.combat-active {
+  max-width: 440px;
+  padding-inline: 8px;
+}
+
+.app-shell.combat-active #screen-run .stack-8 {
+  border-radius: 20px;
+}
+
+.app-shell.combat-active #runStatus {
+  padding: 8px 10px 6px;
+}
+
+.app-shell.combat-active #combatPanel,
+.app-shell.combat-active #combatLog {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.app-shell.combat-active .combat-device-top {
+  display: grid;
+  gap: 7px;
+}
+
+.app-shell.combat-active .combat-top-strip {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 28px;
+  padding: 5px 8px;
+  font-size: 0.67rem;
+}
+
+.app-shell.combat-active .combat-top-strip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-shell.combat-active .combat-top-strip span:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.app-shell.combat-active .run-progress-copy {
+  gap: 8px;
+  font-size: 0.68rem;
+  line-height: 1.18;
+}
+
+.app-shell.combat-active .combat-device-shell {
+  gap: 8px;
+  padding: 9px;
+  border-radius: 18px;
+}
+
+.app-shell.combat-active .combat-enemy-header {
+  gap: 4px;
+  padding: 1px 4px 0;
+}
+
+.app-shell.combat-active .combat-enemy-header h2 {
+  max-width: 100%;
+  font-size: clamp(1.04rem, 4.8vw, 1.28rem);
+  line-height: 1.08;
+  letter-spacing: 0.025em;
+}
+
+.app-shell.combat-active .combat-enemy-header p {
+  font-size: 0.7rem;
+  line-height: 1.24;
+}
+
+.app-shell.combat-active .depth-kicker {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+
+.app-shell.combat-active .combat-threat-brief {
+  width: 100%;
+  line-height: 1.28;
+}
+
+.app-shell.combat-active .combat-monster-stage {
+  min-height: clamp(108px, 18dvh, 146px);
+  border-radius: 16px;
+}
+
+.app-shell.combat-active .combat-monster-stage.stage-boss {
+  min-height: clamp(116px, 19dvh, 154px);
+}
+
+.app-shell.combat-active .combat-hp-card {
+  gap: 6px;
+  padding: 8px 9px;
+  border-color: rgba(255,210,128,0.13);
+  background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(255,255,255,0.025));
+}
+
+.app-shell.combat-active .enemy-hp {
+  border-color: rgba(255,128,88,0.20);
+}
+
+.app-shell.combat-active .player-hp {
+  border-color: rgba(116,220,142,0.18);
+}
+
+.app-shell.combat-active .hp-label-row {
+  align-items: center;
+  gap: 10px;
+  font-size: 0.72rem;
+  line-height: 1.18;
+}
+
+.app-shell.combat-active .hp-label-row strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell.combat-active .hp-label-row span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: rgba(246,240,230,0.84);
+}
+
+.app-shell.combat-active .hpbar,
+.app-shell.combat-active .boss-hp .hpbar {
+  height: 8px;
+}
+
+.app-shell.combat-active .combat-stat-row {
+  gap: 6px;
+}
+
+.app-shell.combat-active .combat-stat-row .pill {
+  padding: 3px 7px;
+  font-size: 0.64rem;
+  line-height: 1.12;
+}
+
+.app-shell.combat-active .run-stat-grid {
+  gap: 6px;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box {
+  min-height: 40px;
+  padding: 6px 5px;
+  border-radius: 12px;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box .small {
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box strong {
+  font-size: 0.84rem;
+  line-height: 1.08;
+}
+
+.app-shell.combat-active .combat-device-actions {
+  gap: 6px;
+}
+
+.app-shell.combat-active .combat-device-actions button {
+  min-height: 46px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.app-shell.combat-active .attack-btn {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045), 0 10px 20px rgba(0,0,0,0.20), 0 0 16px rgba(220,80,48,0.12);
+}
+
+.app-shell.combat-active .guard-btn {
+  border-color: rgba(80,200,130,0.30);
+  color: #c9f6d9;
+}
+
+.app-shell.combat-active .extract-btn {
+  border-color: rgba(255,204,96,0.38);
+  color: #ffe2a6;
+}
+
+.app-shell.combat-active .run-log-head {
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.app-shell.combat-active .run-log-head h2 {
+  font-size: 0.94rem;
+  line-height: 1.1;
+}
+
+.app-shell.combat-active .run-log-head .pill {
+  padding: 3px 7px;
+  font-size: 0.64rem;
+}
+
+.app-shell.combat-active .run-log-list {
+  max-height: clamp(118px, 20dvh, 164px);
+  gap: 6px;
+  padding: 1px 2px 5px;
+}
+
+.app-shell.combat-active .run-log-list .combat-feed-line {
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 14px;
+}
+
+.app-shell.combat-active .run-log-list .combat-feed-line:first-child {
+  border-color: rgba(255,210,128,0.18);
+  background: linear-gradient(180deg, rgba(255,210,128,0.060), rgba(255,255,255,0.026));
+}
+
+.app-shell.combat-active .feed-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.app-shell.combat-active .feed-copy {
+  gap: 3px;
+}
+
+.app-shell.combat-active .feed-kicker {
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+.app-shell.combat-active .feed-body {
+  font-size: 0.74rem;
+  line-height: 1.38;
+  -webkit-line-clamp: 4;
+  overflow-wrap: anywhere;
+}
+
+.extract-success-popup,
+.defeat-result-popup {
+  line-height: 1.28;
+}
+
+@media (max-width: 560px) {
+  .town-district-hub .inline-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    gap: 8px;
+  }
+
+  .town-district-hub .inline-actions button,
+  .intro-actions button,
+  .threshold-enter,
+  .threshold-close {
+    min-height: 43px;
+  }
+
+  #merchantPanel,
+  #forgePanel,
+  #questPanel,
+  #inventoryPanel {
+    padding: 10px;
+  }
+
+  #merchantPanel .shop-item,
+  .district-ware,
+  .loot-card,
+  .equip-slot {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  #merchantPanel .shop-item .item-actions,
+  .district-ware .item-actions,
+  .loot-card .item-actions,
+  .polished-actions {
+    gap: 7px;
+  }
+
+  #merchantPanel .shop-item .item-actions .mini,
+  .district-ware .item-actions .mini,
+  .loot-card .item-actions .mini,
+  .polished-actions .mini {
+    min-height: 41px;
+  }
+
+  .shop-item p.small,
+  .loot-card p.small {
+    line-height: 1.38;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-shell.combat-active {
+    padding-inline: 7px;
+  }
+
+  .app-shell.combat-active #combatPanel,
+  .app-shell.combat-active #combatLog,
+  .app-shell.combat-active #runStatus {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .app-shell.combat-active .combat-device-shell {
+    padding: 8px;
+  }
+
+  .app-shell.combat-active .combat-enemy-header h2 {
+    font-size: clamp(1rem, 5.1vw, 1.22rem);
+  }
+
+  .app-shell.combat-active .combat-monster-stage {
+    min-height: clamp(96px, 16dvh, 126px);
+  }
+
+  .app-shell.combat-active .combat-monster-stage.stage-boss {
+    min-height: clamp(104px, 17dvh, 136px);
+  }
+
+  .app-shell.combat-active .hp-label-row {
+    font-size: 0.69rem;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 45px;
+    font-size: 0.68rem;
+  }
+
+  .app-shell.combat-active .run-log-list {
+    max-height: clamp(106px, 18dvh, 144px);
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell.combat-active .combat-top-strip {
+    font-size: 0.62rem;
+  }
+
+  .app-shell.combat-active .combat-enemy-header p {
+    font-size: 0.66rem;
+  }
+
+  .app-shell.combat-active .combat-stat-row .pill {
+    font-size: 0.6rem;
+    padding-inline: 6px;
+  }
+
+  .app-shell.combat-active .combat-device-actions {
+    gap: 5px;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 44px;
+    padding-inline: 3px;
+    font-size: 0.65rem;
+  }
+
+  .app-shell.combat-active .feed-body {
+    font-size: 0.7rem;
+    line-height: 1.32;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 760px) {
+  .app-shell.combat-active .combat-device-shell {
+    gap: 6px;
+  }
+
+  .app-shell.combat-active .combat-monster-stage {
+    min-height: clamp(86px, 13dvh, 108px);
+  }
+
+  .app-shell.combat-active .combat-monster-stage.stage-boss {
+    min-height: clamp(94px, 14dvh, 116px);
+  }
+
+  .app-shell.combat-active .run-log-list {
+    max-height: clamp(94px, 16dvh, 124px);
+  }
+}

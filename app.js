@@ -2,8 +2,8 @@
   'use strict';
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.36 - Emberfall Identity Polish';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.36';
+  const BUILD = 'DungeonDex v1.3.37 - Mobile Dungeon UI Polish';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.37';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -15,7 +15,7 @@
   const ACTION_GUARD_MS = 160;
   const COMBAT_ACTION_GUARD_MS = 12;
   const COMBAT_LOG_STORE_LIMIT = 28;
-  const COMBAT_LOG_RENDER_LIMIT = 2;
+  const COMBAT_LOG_RENDER_LIMIT = 3;
   const COMBAT_AUTOSAVE_MS = 1500;
   const INTRO_MODAL_SESSION_KEY = 'dungeondex_intro_v130_seen';
   const VALID_SCREENS = ['town','run','gear','dex','archive'];
@@ -4183,7 +4183,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.36 keeps Emberfall, Lowfire, the Hollow Stair, and the Warden clear while leaving combat, economy, and scaling unchanged.</p>
+      <p class="small">DungeonDex v1.3.37 keeps Emberfall identity intact while tightening phone combat spacing, logs, and tap targets.</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
