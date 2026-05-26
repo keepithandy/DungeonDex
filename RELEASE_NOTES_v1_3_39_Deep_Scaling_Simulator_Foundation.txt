@@ -1,0 +1,19 @@
+DungeonDex v1.3.39 - Deep Scaling Simulator Foundation
+
+Summary
+- No gameplay changes.
+- No save format changes.
+- No balance changes yet.
+- No combat, item scaling, merchant stock, enemy scaling, gold gain, mythic scaling, charter pricing, dungeon progression, or mobile layout changes.
+
+Tooling added
+- Added tools/simulate_deep_scaling.py as an offline, standard-library Python report tool.
+- The simulator reads app.js as text for static detection and does not execute the game.
+- The report covers raw depth checkpoints from early floors through D5000.
+- The report includes enemy power, merchant stock power, loot/item power, mythic item power, gold pressure, Deep Stair Charter costs, drop estimates, and warnings where curves drift apart.
+- Approximate sections are labeled as estimates so this pass can guide a future balance patch without changing current balance.
+
+Runtime notes
+- DungeonDex still launches directly from index.html.
+- No pip packages, npm packages, build step, JSON data loading, or internet access were added.
+- The visible player-facing build label remains short: DungeonDex v1.3.39.

@@ -1,0 +1,36 @@
+DungeonDex v1.3.39 - Deep Scaling Simulator Foundation Smoke Test Notes
+
+Required smoke coverage
+- App still loads from index.html.
+- Enter Dungeon still starts or continues a descent.
+- Combat buttons still work: Attack, Guard, Skill, Extract.
+- Merchant and town panels still open.
+- Package checker still runs.
+- Deep scaling simulator runs.
+- No gameplay systems were intentionally changed.
+
+Expected technical checks
+- python tools/check_dungeondex_package.py
+- python tools/simulate_deep_scaling.py
+- node --check app.js
+- node --check sw.js
+
+Checks performed in this pass
+- PASS: python tools/check_dungeondex_package.py
+- PASS: python tools/simulate_deep_scaling.py
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: headless Chrome DOM load rendered DungeonDex v1.3.39, Enter Dungeon, Lowfire Market, town panels, idle combat panel, and merchant stock.
+- NOTE: No checked-in interactive smoke/runtime harness was found. Enter Dungeon and combat button behavior were not manually click-tested in a browser during this tooling-only pass.
+
+Regression boundaries
+- Combat math intentionally untouched.
+- Enemy scaling intentionally untouched.
+- Item scaling intentionally untouched.
+- Merchant stock behavior intentionally untouched.
+- Mythic scaling intentionally untouched.
+- Deep Stair Charter pricing intentionally untouched.
+- Gold gain intentionally untouched.
+- Dungeon progression intentionally untouched.
+- Save format and localStorage keys intentionally untouched.
+- Mobile layout intentionally untouched.
