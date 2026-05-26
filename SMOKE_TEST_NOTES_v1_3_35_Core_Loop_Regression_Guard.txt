@@ -1,0 +1,52 @@
+DungeonDex v1.3.35 - Core Loop Regression Guard Smoke Notes
+
+Scope:
+Static/runtime syntax checks plus a headless local DOM load were performed. Manual interactive browser clicking was not performed.
+
+Validation performed:
+- JavaScript syntax check: PASS
+  Command: node --check app.js
+- Service worker syntax check: PASS
+  Command: node --check sw.js
+- Manifest JSON parse: PASS
+  Command: node -e "const fs=require('fs'); JSON.parse(fs.readFileSync('manifest.json','utf8')); console.log('manifest.json parsed');"
+- Static asset reference check: PASS
+  index.html references manifest.json, styles.css, sw.js, and app.js; those files exist in the repo root.
+- Stale v1.3.34 runtime label search: PASS
+  app.js, index.html, sw.js, and manifest.json have no v1.3.34 runtime labels after the update.
+  styles.css still has historical v1.3.34 Mobile Readability Final comments.
+- Long visible build-banner search: PASS
+  The old visible EMBERFALL BUILD/GitHub Baseline treatment was removed from index.html.
+- Headless local DOM load: PASS
+  Chrome headless rendered the app shell, town panels, intro modal, and visible label DungeonDex v1.3.35.
+- TODO/FIXME search: PASS
+  No TODO/FIXME markers found in the runtime files checked.
+
+Core loop checklist:
+- App shell loads: PASS via headless DOM load.
+- Visible label is short, DungeonDex v1.3.35: PASS via source and headless DOM.
+- Intro modal can start a run: STATIC PASS. introModalEnterDungeonBtn is rendered and wired through runGuardedAction -> startRun -> render.
+- Main Enter Dungeon can start a run: STATIC PASS. startRunBtn is guarded and wired to startRun or Continue Run behavior.
+- Continue Run does not crash: STATIC PASS. continueRun now recovers incomplete active-run state and otherwise switches to run.
+- Combat actions remain present: STATIC PASS. Attack, Skill, Guard, and Extract buttons render with data-action values.
+- Attack button is wired: STATIC PASS. data-action="attack" routes through bindCombatActions -> combatAction.
+- Skill button is wired: STATIC PASS. data-action="skill" routes through bindCombatActions -> combatAction.
+- Guard button is wired: STATIC PASS. data-action="guard" routes through bindCombatActions -> combatAction.
+- Extract button is wired: STATIC PASS. data-action="extract" routes through bindCombatActions -> combatAction.
+- Extraction returns to town: STATIC PASS. finishRun('extract') banks pending rewards, records history, clears active run, and sets screen to town.
+- Defeat returns to town/safe state: STATIC PASS. defeat() calls finishRun('defeat'), discards pending rewards, records history, clears active run, and sets screen to town.
+- Merchant opens/renders after run: STATIC PASS. merchantPanel render is guarded and remains town-rendered after state.screen returns to town.
+- Inventory opens/renders after run: STATIC PASS. gear render paths remain guarded and inventory actions still bind dynamically.
+- Archive opens/renders after run: STATIC PASS. archivePanel render is guarded and run history rendering remains intact.
+- Save/load does not obviously crash: PASS for syntax and JSON parse; save/load now has additional malformed-save guards.
+- Service worker cache label is current: PASS. Cache name is dungeon-dex-v1.3.35-core-loop-regression-guard.
+
+Checks not performed:
+- Manual interactive click-through in a visible browser was not performed.
+- No full gameplay balance, scaling, or economy verification was performed because this pass intentionally avoids those changes.
+- No corrupt localStorage matrix was executed beyond static/code-path inspection.
+
+Remaining risks:
+- Headless DOM load verifies render, not real touch latency or a full combat/extract/death play session.
+- Rare interrupted-save cases around a monster already reduced to 0 HP are recovered conservatively, but were not exhaustively simulated.
+- Service worker update behavior was checked statically; no installed-PWA cache migration was manually exercised.

@@ -2,7 +2,8 @@
   'use strict';
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.34 - GitHub Working Folder Baseline';
+  const BUILD = 'DungeonDex v1.3.35 - Core Loop Regression Guard';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.35';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -17,6 +18,9 @@
   const COMBAT_LOG_RENDER_LIMIT = 2;
   const COMBAT_AUTOSAVE_MS = 1500;
   const INTRO_MODAL_SESSION_KEY = 'dungeondex_intro_v130_seen';
+  const VALID_SCREENS = ['town','run','gear','dex','archive'];
+  const CORE_COMBAT_ACTIONS = ['attack','guard','skill','extract'];
+  const DEFAULT_PLAYER_STATS = Object.freeze({ power: 8, guard: 6, wit: 5, luck: 4, speed: 5 });
   const SLOT_ORDER = ['weapon','offhand','helm','armor','gloves','boots','ring','amulet','cloak','charm'];
   const INVENTORY_SORTS = ['power','level','rarity','value','slot','newest'];
   const RARITIES = [
@@ -193,6 +197,47 @@
     const n = Number(value);
     return clamp(Number.isFinite(n) ? n : fallback, min, max);
   };
+  function normalizeScreenName(screen, fallback = 'town') {
+    return VALID_SCREENS.includes(screen) ? screen : fallback;
+  }
+  function ensureRunShell(state) {
+    if (!state) return {};
+    if (!isPlainObject(state.run)) state.run = {};
+    state.run.combatLog = asArray(state.run.combatLog, []);
+    state.run.choices = asArray(state.run.choices, []);
+    state.run.pendingRewards = createPendingRunRewards(state.run.pendingRewards);
+    return state.run;
+  }
+  function hasActiveCombat(state) {
+    return !!(state?.run?.active && state.run.monster && state?.player && numberOr(state.player.hp, 0, 0, Number.MAX_SAFE_INTEGER) > 0);
+  }
+  function recoverRunToTown(state, message = '') {
+    if (!state) return false;
+    ensureRunShell(state);
+    state.run.active = false;
+    state.run.monster = null;
+    state.run.choices = [];
+    state.run.chain = 0;
+    state.run.goldBonusPct = 0;
+    state.run.startedFromCharter = false;
+    state.run.charterStartFloor = 0;
+    clearPendingRunRewards(state);
+    state.screen = 'town';
+    if (message && state.player) pushLog(state, message);
+    return true;
+  }
+  function continueRun(state) {
+    if (hasActiveCombat(state)) {
+      state.screen = 'run';
+      return true;
+    }
+    if (state?.run?.active) {
+      recoverRunToTown(state, 'Recovered from an incomplete active run and returned to Lowfire.');
+    } else if (state) {
+      state.screen = 'town';
+    }
+    return false;
+  }
   function makeId(prefix = 'id') {
     if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
     const bytes = new Uint32Array(2);
@@ -2018,7 +2063,7 @@
         kills: 0,
         crit: 6,
         dodge: 4,
-        stats: { power: 8, guard: 6, wit: 5, luck: 4, speed: 5 },
+        stats: { ...DEFAULT_PLAYER_STATS },
         equipment: {},
         inventory: [],
         discoveredMonsters: [],
@@ -2232,7 +2277,13 @@
   }
 
   function calcDerived(state) {
-    const base = state.player.stats;
+    if (!isPlainObject(state?.player)) return { ...DEFAULT_PLAYER_STATS, hpBonus: 0 };
+    if (!isPlainObject(state.player.stats)) state.player.stats = { ...DEFAULT_PLAYER_STATS };
+    const base = { ...DEFAULT_PLAYER_STATS, ...state.player.stats };
+    Object.keys(DEFAULT_PLAYER_STATS).forEach(k => {
+      base[k] = Math.floor(numberOr(base[k], DEFAULT_PLAYER_STATS[k], 0, 99999));
+      state.player.stats[k] = base[k];
+    });
     const equip = { power:0, guard:0, wit:0, speed:0, luck:0, hp:0 };
     const seen = new Set();
     Object.values(state.player.equipment || {}).forEach(item => {
@@ -2255,8 +2306,9 @@
       luck: base.luck + equip.luck,
       hpBonus: equip.hp
     };
+    state.player.level = Math.floor(numberOr(state.player.level, 1, 1, 999));
     state.player.maxHp = 100 + total.hpBonus + state.player.level * 10;
-    state.player.hp = clamp(state.player.hp, 0, state.player.maxHp);
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
     return total;
   }
 
@@ -2283,6 +2335,8 @@
     state.run.combatLog = state.run.combatLog.slice(0, COMBAT_LOG_STORE_LIMIT);
   }
   function pushLog(state, line) {
+    if (!state?.player) return;
+    state.player.log = asArray(state.player.log, []);
     state.player.log.unshift(line);
     state.player.log = state.player.log.slice(0, 60);
   }
@@ -2459,11 +2513,22 @@
     </div>`;
   }
   function spawnQuestLore(state, text) {
+    if (!state) return;
+    state.archive = asArray(state.archive, []);
     state.archive.unshift({ stamp: new Date().toLocaleString(), text });
     state.archive = state.archive.slice(0, 40);
   }
 
   function startRun(state, startDepth = null) {
+    if (!isPlainObject(state) || !isPlainObject(state.player)) return false;
+    const run = ensureRunShell(state);
+    if (run.active && run.monster) {
+      state.screen = 'run';
+      return true;
+    }
+    if (run.active && !run.monster) {
+      recoverRunToTown(state, 'Recovered from an incomplete active run before starting a new descent.');
+    }
     calcDerived(state);
     const sink = ensureGoldSinkState(state);
     const hasExplicitStart = startDepth !== null && startDepth !== undefined;
@@ -2473,28 +2538,33 @@
     const allowedCharterStart = requestedDepth > 1 && canUseCharterStart(state, requestedDepth);
     const allowedSafeReturnStart = !hasExplicitStart && canUseSafeReturnStart(state, requestedDepth);
     const actualStartDepth = requestedDepth === 1 || allowedCharterStart || allowedSafeReturnStart ? requestedDepth : 1;
-    state.run.active = true;
-    state.run.floor = actualStartDepth;
-    state.run.startedFromCharter = allowedCharterStart;
-    state.run.charterStartFloor = allowedCharterStart ? state.run.floor : 0;
-    state.run.setBonuses = { ashboundLethalUsed: false, bellforgeHits: 0 };
-    state.run.chain = 0;
-    state.run.roomsCleared = 0;
-    state.run.encounters = 0;
-    state.run.goldBonusPct = Math.floor(numberOr(sink.nextRunGoldBonusPct, 0, 0, 50));
+    run.active = true;
+    run.floor = actualStartDepth;
+    run.startedFromCharter = allowedCharterStart;
+    run.charterStartFloor = allowedCharterStart ? run.floor : 0;
+    run.setBonuses = { ashboundLethalUsed: false, bellforgeHits: 0 };
+    run.chain = 0;
+    run.roomsCleared = 0;
+    run.encounters = 0;
+    run.goldBonusPct = Math.floor(numberOr(sink.nextRunGoldBonusPct, 0, 0, 50));
     sink.nextRunGoldBonusPct = 0;
-    state.run.pendingRewards = createPendingRunRewards();
-    state.run.zone = zoneName(state.run.floor);
-    state.run.danger = dangerRatingForDepth(state.run.floor);
-    state.run.combatLog = [];
+    run.pendingRewards = createPendingRunRewards();
+    run.zone = zoneName(run.floor);
+    run.danger = dangerRatingForDepth(run.floor);
+    run.combatLog = [];
     if (!state.ui) state.ui = { combatLogExpanded:false };
     state.ui.combatLogExpanded = false;
     // Dungeon entry preserves current HP; only clamp invalid saved/runtime values.
-    state.player.hp = clamp(state.player.hp, 1, state.player.maxHp);
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 1, state.player.maxHp));
     nextEncounter(state);
+    if (!state.run.monster) {
+      recoverRunToTown(state, 'The dungeon entry failed to create a threat; returned safely to Lowfire.');
+      return false;
+    }
     state.screen = 'run';
     pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The stair holds its breath.`);
     if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this run.`);
+    return true;
   }
 
 
@@ -2522,10 +2592,18 @@
   }
 
   function nextEncounter(state) {
-    if (!state.run.active) return;
-    state.run.monster = generateMonster(state.run.floor, state);
+    const run = ensureRunShell(state);
+    if (!run.active) return;
+    run.floor = progressDepthValue(run.floor, defaultRunStartDepth(state));
+    run.zone = zoneName(run.floor);
+    run.monster = generateMonster(run.floor, state);
+    if (!run.monster) {
+      recoverRunToTown(state, 'Recovered from a failed encounter roll and returned to Lowfire.');
+      return;
+    }
     state.run.encounters += 1;
     state.run.choices = ['attack','guard','skill','extract'];
+    state.player.discoveredMonsters = asArray(state.player.discoveredMonsters, []);
     if (!state.player.discoveredMonsters.includes(state.run.monster.name)) state.player.discoveredMonsters.push(state.run.monster.name);
     pushCombat(state, `${state.run.monster.name} rises in ${state.run.zone}.`);
     const modifiers = eliteModifiersForMonster(state.run.monster);
@@ -2541,8 +2619,23 @@
 
   function combatAction(state, action) {
     const result = { saveNow: false, fullRender: false };
-    if (!state.run.active || !state.run.monster || state.player.hp <= 0) return result;
+    ensureRunShell(state);
+    action = String(action || '');
+    if (!CORE_COMBAT_ACTIONS.includes(action)) return result;
+    if (!hasActiveCombat(state)) {
+      if (state?.run?.active && !state.run.monster) {
+        recoverRunToTown(state, 'Recovered from an incomplete combat state and returned to Lowfire.');
+        result.saveNow = true;
+        result.fullRender = true;
+      }
+      return result;
+    }
     const monster = state.run.monster;
+    if (numberOr(monster.hp, 0, 0, Number.MAX_SAFE_INTEGER) <= 0) {
+      winEncounter(state);
+      result.saveNow = true;
+      return result;
+    }
     const stats = calcDerived(state);
     let playerSwing = 1;
     let playerShield = 0;
@@ -2657,7 +2750,12 @@
   }
 
   function winEncounter(state) {
+    ensureRunShell(state);
     const m = state.run.monster;
+    if (!m) {
+      recoverRunToTown(state, 'Recovered from a cleared encounter with no active threat.');
+      return;
+    }
     const source = m.tier === 'Boss' ? 'boss' : m.tier === 'Elite' ? 'elite' : 'normal';
     const eliteModifiers = source === 'elite' ? eliteModifiersForMonster(m) : [];
     const eliteReward = source === 'elite' ? normalizeEliteRewardProfile(m.eliteReward, eliteModifiers, state.run.floor) : null;
@@ -2788,6 +2886,7 @@
   }
 
   function finishRun(state, reason) {
+    ensureRunShell(state);
     let runResultDetail = '';
     const endedAtFloor = progressDepthValue(state.run.floor, state.player?.returnDepth || 1);
     const endedAtZone = state.run.zone || currentStagingDistrict(state).name;
@@ -2821,6 +2920,7 @@
     if (reason === 'extract') state.player.safeExtractDepth = Math.max(state.player.safeExtractDepth || 1, nextReturnDepth);
     state.run.active = false;
     state.run.monster = null;
+    state.run.choices = [];
     state.run.chain = 0;
     state.run.goldBonusPct = 0;
     state.player.debtbrandBoostReady = false;
@@ -3193,7 +3293,7 @@
       level,
       power: Math.floor(numberOr(monster.power, Math.max(8, level * 10), 1, 999999)),
       maxHp,
-      hp: Math.floor(numberOr(monster.hp, maxHp, 0, maxHp)),
+      hp: Math.floor(numberOr(monster.hp, maxHp, 1, maxHp)),
       guard: Math.floor(numberOr(monster.guard, Math.max(1, level * 3), 0, 999999)),
       speed: Math.floor(numberOr(monster.speed, Math.max(1, level * 2), 0, 999999)),
       rewardGold: Math.floor(numberOr(monster.rewardGold, encounterCoinReward(level, Math.max(8, level * 10), tier, 1), 0, Number.MAX_SAFE_INTEGER)),
@@ -3210,7 +3310,7 @@
     const savedPlayer = parsed.player;
     const state = { ...base, ...parsed };
     state.build = BUILD;
-    state.screen = ['town','run','gear','dex','archive'].includes(state.screen) ? state.screen : 'town';
+    state.screen = normalizeScreenName(state.screen);
     state.filters = { ...base.filters, ...(isPlainObject(parsed.filters) ? parsed.filters : {}) };
     if (!FUTURE_EQUIPMENT_SLOTS.includes(state.filters.slot) && state.filters.slot !== 'all') state.filters.slot = 'all';
     if (!RARITIES.some(r => r.key === state.filters.rarity) && state.filters.rarity !== 'all') state.filters.rarity = 'all';
@@ -3223,6 +3323,8 @@
     state.player.level = Math.floor(numberOr(state.player.level, 1, 1, 999));
     state.player.xp = Math.floor(numberOr(state.player.xp, 0, 0, Number.MAX_SAFE_INTEGER));
     state.player.xpNext = Math.floor(numberOr(state.player.xpNext, 100, 1, Number.MAX_SAFE_INTEGER));
+    state.player.maxHp = Math.floor(numberOr(state.player.maxHp, base.player.maxHp, 1, 999999));
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
     state.player.gold = Math.floor(numberOr(state.player.gold, base.player.gold, 0, Number.MAX_SAFE_INTEGER));
     state.player.currencyVersion = Math.floor(numberOr(state.player.currencyVersion, 3, 1, 99));
     state.player.shards = Math.floor(numberOr(state.player.shards, 0, 0, Number.MAX_SAFE_INTEGER));
@@ -3298,7 +3400,9 @@
 
     state.run = { ...base.run, ...(isPlainObject(parsed.run) ? parsed.run : {}) };
     state.run.active = !!state.run.active;
-    state.run.floor = Math.floor(numberOr(state.run.floor, 0, 0, 999999));
+    state.run.floor = state.run.active
+      ? progressDepthValue(state.run.floor, defaultRunStartDepth(state))
+      : Math.floor(numberOr(state.run.floor, 0, 0, 999999));
     state.run.chain = Math.floor(numberOr(state.run.chain, 0, 0, 99999));
     state.run.danger = dangerRatingForDepth(Math.max(1, state.run.floor || 1));
     state.run.zone = String(state.run.zone || zoneName(Math.max(1, state.run.floor || 1)));
@@ -3310,14 +3414,11 @@
     state.run.charterStartFloor = Math.floor(numberOr(state.run.charterStartFloor, 0, 0, 999999));
     ensureRunSetBonusState(state);
     if (!state.run.active) { state.run.startedFromCharter = false; state.run.charterStartFloor = 0; state.run.setBonuses = { ashboundLethalUsed:false, bellforgeHits:0 }; clearPendingRunRewards(state); }
-    state.run.choices = asArray(state.run.choices, ['attack','guard','skill','extract']).filter(x => ['attack','guard','skill','extract'].includes(x));
+    state.run.choices = asArray(state.run.choices, CORE_COMBAT_ACTIONS).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     state.run.combatLog = asArray(state.run.combatLog, base.run.combatLog).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.monster = state.run.active ? normalizeMonster(state.run.monster, state.run.floor) : null;
     if (state.run.active && !state.run.monster) {
-      state.run.active = false;
-      state.screen = 'town';
-      clearPendingRunRewards(state);
-      pushLog(state, 'Recovered from an incomplete combat save and returned to town.');
+      recoverRunToTown(state, 'Recovered from an incomplete combat save and returned to town.');
     }
     if (state.run.active && state.run.monster) state.screen = 'run';
 
@@ -3331,24 +3432,28 @@
   function sanitizeLiveStateForSave(state) {
     if (!isPlainObject(state) || !isPlainObject(state.player)) return false;
     state.build = BUILD;
+    state.screen = normalizeScreenName(state.screen);
+    state.player.maxHp = Math.floor(numberOr(state.player.maxHp, 100, 1, 999999));
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
     state.player.gold = sanitizeCurrencyValue(state.player.gold, 0);
     state.player.shards = sanitizeCurrencyValue(state.player.shards, 0);
     state.player.ember = sanitizeCurrencyValue(state.player.ember, 0);
     state.player.forgeSpark = sanitizeCurrencyValue(state.player.forgeSpark, 0);
     state.player.log = asArray(state.player.log, []).map(String).slice(0, 60);
     state.player.eliteContracts = createEliteContractState(isPlainObject(state.player.eliteContracts) ? state.player.eliteContracts : {}, state);
-    if (isPlainObject(state.run)) {
-      state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
-      state.run.pendingRewards = state.run.active ? createPendingRunRewards(state.run.pendingRewards) : createPendingRunRewards();
-      state.run.combatLog = asArray(state.run.combatLog, []).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
-      state.run.choices = asArray(state.run.choices, []).filter(x => ['attack','guard','skill','extract'].includes(x));
-      if (!state.run.choices.length) state.run.choices = ['attack','guard','skill','extract'];
-      if (state.run.active && !state.run.monster) {
-        state.run.active = false;
-        state.screen = 'town';
-        clearPendingRunRewards(state);
-        pushLog(state, 'Recovered from an incomplete combat state before saving.');
-      }
+    if (!isPlainObject(state.run)) state.run = {};
+    ensureRunShell(state);
+    state.run.active = !!state.run.active;
+    state.run.floor = state.run.active
+      ? progressDepthValue(state.run.floor, defaultRunStartDepth(state))
+      : Math.floor(numberOr(state.run.floor, 0, 0, 999999));
+    state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
+    state.run.pendingRewards = state.run.active ? createPendingRunRewards(state.run.pendingRewards) : createPendingRunRewards();
+    state.run.combatLog = asArray(state.run.combatLog, []).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
+    state.run.choices = asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
+    if (state.run.active && !state.run.choices.length) state.run.choices = CORE_COMBAT_ACTIONS.slice();
+    if (state.run.active && !state.run.monster) {
+      recoverRunToTown(state, 'Recovered from an incomplete combat state before saving.');
     }
     return true;
   }
@@ -3372,15 +3477,15 @@
       if (!parsed || typeof parsed !== 'object') return createBaseState();
       parsed.build = BUILD;
       if (!parsed.archive) parsed.archive = [];
-      if (!parsed.player) return createBaseState();
+      if (!isPlainObject(parsed.player)) return createBaseState();
       if (parsed.player.permanentStartFloor == null) parsed.player.permanentStartFloor = 1;
       if (parsed.player.boughtStart20Scroll == null) parsed.player.boughtStart20Scroll = false;
       if ((parsed.player.currencyVersion || 1) < 2) {
         parsed.player.gold = toCopper(parsed.player.gold || 0);
         if (parsed.town && parsed.town.merchantRefreshCost != null) parsed.town.merchantRefreshCost = toCopper(parsed.town.merchantRefreshCost);
-        if (Array.isArray(parsed.player.inventory)) parsed.player.inventory.forEach(item => { item.value = toCopper(item.value || 0); });
-        if (parsed.player.equipment && typeof parsed.player.equipment === 'object') Object.values(parsed.player.equipment).forEach(item => { if (item) item.value = toCopper(item.value || 0); });
-        if (Array.isArray(parsed.merchantStock)) parsed.merchantStock.forEach(item => { item.value = toCopper(item.value || 0); });
+        if (Array.isArray(parsed.player.inventory)) parsed.player.inventory.forEach(item => { if (isPlainObject(item)) item.value = toCopper(item.value || 0); });
+        if (isPlainObject(parsed.player.equipment)) Object.values(parsed.player.equipment).forEach(item => { if (isPlainObject(item)) item.value = toCopper(item.value || 0); });
+        if (Array.isArray(parsed.merchantStock)) parsed.merchantStock.forEach(item => { if (isPlainObject(item)) item.value = toCopper(item.value || 0); });
       }
       if ((parsed.player.currencyVersion || 1) < 3) {
         parsed.player.gold = Math.min(Math.max(0, Math.floor(parsed.player.gold || 0)), coins(2, 0, 0));
@@ -3392,7 +3497,7 @@
           if (item.value > coins(4, 0, 0)) item.value = Math.max(coins(0, 0, 25), Math.round(item.value / COPPER_PER_GOLD * 100));
         };
         if (Array.isArray(parsed.player.inventory)) parsed.player.inventory.forEach(normalizeItem);
-        if (parsed.player.equipment && typeof parsed.player.equipment === 'object') Object.values(parsed.player.equipment).forEach(normalizeItem);
+        if (isPlainObject(parsed.player.equipment)) Object.values(parsed.player.equipment).forEach(normalizeItem);
         if (Array.isArray(parsed.merchantStock)) parsed.merchantStock.forEach(normalizeItem);
       }
       if (parsed.player.earlyAidGiven == null) parsed.player.earlyAidGiven = false;
@@ -3406,8 +3511,8 @@
   let S = load();
 
   function switchScreen(screen) {
-    if (S.run.active && screen !== 'run') screen = 'run';
-    if (!['town','run','gear','dex','archive'].includes(screen)) screen = 'town';
+    if (S?.run?.active && screen !== 'run') screen = 'run';
+    screen = normalizeScreenName(screen);
     S.screen = screen;
     $$('.screen').forEach(node => node.classList.toggle('active', node.id === `screen-${screen}`));
     $$('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === screen));
@@ -3456,20 +3561,24 @@
   function renderStatBoxes() {
     calcDerived(S);
     const d = calcDerived(S);
-    el('heroStats').innerHTML = [
+    const heroStats = el('heroStats');
+    const resourceBar = el('resourceBar');
+    if (heroStats) heroStats.innerHTML = [
       statBox('Level', S.player.level),
       statBox('Depth', depthShortLabel(Math.max(1, S.player.depth || S.player.safeExtractDepth || 1))),
       statBox('Power', d.power),
       statBox('Guard', d.guard)
     ].join('');
-    el('resourceBar').innerHTML = [
+    if (resourceBar) resourceBar.innerHTML = [
       resourceBox('HP', `${format(S.player.hp)}/${format(S.player.maxHp)}`),
       resourceBox('Wallet', formatMoney(S.player.gold)),
       resourceBox('Shards', format(S.player.shards)),
       resourceBox('Ember', format(S.player.ember))
     ].join('');
-    el('buildTag').textContent = BUILD;
-    el('loreLine').textContent = SESSION_LORE_LINE;
+    const buildTag = el('buildTag');
+    if (buildTag) buildTag.textContent = VISIBLE_VERSION_LABEL;
+    const loreLine = el('loreLine');
+    if (loreLine) loreLine.textContent = SESSION_LORE_LINE;
   }
 
   function statBox(label, value) { return `<div class="stat-box"><div class="small muted">${escapeHtml(label)}</div><strong>${escapeHtml(value)}</strong></div>`; }
@@ -3736,6 +3845,9 @@
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
     const lowfireDistrict = DISTRICT_DATA.find(district => district.id === 'lowfire') || stagingDistrict;
+    const questPanel = el('questPanel');
+    const merchantPanel = el('merchantPanel');
+    const forgePanel = el('forgePanel');
     const districtPanel = el('districtName')?.closest('.panel');
     if (districtPanel) {
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(lowfireDistrict)}`;
@@ -3752,7 +3864,7 @@
       restCostNode.title = affordable ? 'Cost to rest and restore HP' : `Need ${cleanDisplayText(formatMoney(cost))} to rest`;
     }
     if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
-    el('questPanel').innerHTML = `
+    if (questPanel) questPanel.innerHTML = `
       <div class="card-head"><div><h2>Contract Board</h2><p>Paid risk work and Warden Objectives tracked from Lowfire.</p></div></div>
       <div class="warden-ledger">
         <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Simple work orders that pay out as you delve.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
@@ -3769,7 +3881,7 @@
 
     const districtWares = unlockedDistrictWares(S);
     const activeSinkPills = activeGoldSinkPills(S);
-    el('merchantPanel').innerHTML = `
+    if (merchantPanel) merchantPanel.innerHTML = `
       <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Merchant stock, district wares, and run support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
       ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
       <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
@@ -3779,7 +3891,7 @@
         <div class="list district-ware-list">${districtWares.map(ware => districtWareCard(ware)).join('')}</div>
       </div>`;
 
-    el('forgePanel').innerHTML = `
+    if (forgePanel) forgePanel.innerHTML = `
       <div class="card-head"><div><h2>Relic Forge</h2><p>Sparks, shards, and salvage work.</p></div></div>
       <div class="tag-row"><span class="pill">Forge spark: ${S.player.forgeSpark}</span><span class="pill">Shards: ${S.player.shards}</span></div>
       <div class="sep"></div>
@@ -3813,6 +3925,10 @@
   }
 
   function renderRun() {
+    const runStatus = el('runStatus');
+    const combatPanel = el('combatPanel');
+    const combatLog = el('combatLog');
+    if (!runStatus || !combatPanel || !combatLog) return;
     const d = calcDerived(S);
     const monster = S.run.monster;
     if (!S.ui) S.ui = { combatLogExpanded:false };
@@ -3841,14 +3957,14 @@
       : '';
 
     if (!S.run.active || !monster) {
-      el('runStatus').innerHTML = `
+      runStatus.innerHTML = `
         <div class="split"><div><h2>No active run</h2><p>Rest in Lowfire, then return to the Hollow Stair when ready.</p></div><button class="primary mini" id="runFromIdleBtn">Enter</button></div>`;
-      el('combatPanel').innerHTML = `<p>No threat detected.</p>`;
-      el('combatLog').innerHTML = `<div class="run-log-head split"><h2>Combat Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">No combat messages yet.</div></div></div></div>`;
+      combatPanel.innerHTML = `<p>No threat detected.</p>`;
+      combatLog.innerHTML = `<div class="run-log-head split"><h2>Combat Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">No combat messages yet.</div></div></div></div>`;
       return;
     }
 
-    el('runStatus').innerHTML = `
+    runStatus.innerHTML = `
       <div class="combat-device-top ${shellTone}">
         <div class="combat-top-strip run-shell-top" aria-label="Run status">
           <span class="combat-district-title">${escapeHtml(runDistrict.name)}</span>
@@ -3863,7 +3979,7 @@
         </div>
       </div>`;
 
-    el('combatPanel').innerHTML = `
+    combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
         <section class="combat-enemy-header">
           <div class="depth-kicker">${escapeHtml(monster.tier || 'Enemy')}</div>
@@ -3918,7 +4034,7 @@
       </div>`;
 
     const logLines = asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT);
-    el('combatLog').innerHTML = `
+    combatLog.innerHTML = `
       <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Latest ×${format(logLines.length)}</span></div></div>
       <div class="run-log-list">${logLines.length ? logLines.map(renderCombatFeedLine).join('') : '<div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Quiet</div><div class="feed-body">No combat messages yet.</div></div></div>'}</div>`;
   }
@@ -4067,14 +4183,15 @@
 
     el('settingsPanel').innerHTML = `
       <h2>Local Notes</h2>
-      <p class="small">Local save, compact layout, generated catalog scale, mobile-friendly controls, and GitHub-folder baseline labels.</p>
-      <div class="tag-row"><span class="pill">Local save</span><span class="pill">Single-page app</span><span class="pill">GitHub baseline</span></div>
+      <p class="small">Local save, compact layout, generated catalog scale, mobile-friendly controls, and guarded core-loop state.</p>
+      <div class="tag-row"><span class="pill">Local save</span><span class="pill">Single-page app</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
 
   function renderStickyBar() {
     const bar = el('stickyBar');
+    if (!bar) return;
     bar.classList.remove('context-actions');
     bar.style.display = 'none';
     bar.innerHTML = '';
@@ -4206,7 +4323,7 @@
       const handler = (e) => {
         if (e) e.preventDefault();
         const action = btn.dataset.action;
-        if (!S.run.active || !S.run.monster || S.player.hp <= 0) return;
+        if (!hasActiveCombat(S) || !CORE_COMBAT_ACTIONS.includes(action)) return;
         btn.classList.add('tap-now');
         window.setTimeout(() => btn.classList.remove('tap-now'), 90);
         runCombatGuardedAction(() => {
@@ -4218,7 +4335,12 @@
           }
         });
       };
-      btn.onclick = null;
+      const canAct = hasActiveCombat(S) && CORE_COMBAT_ACTIONS.includes(btn.dataset.action);
+      btn.disabled = !canAct;
+      btn.onclick = (e) => {
+        if (e && e.detail !== 0) return;
+        handler(e);
+      };
       btn.onpointerdown = handler;
     });
   }
@@ -4233,10 +4355,11 @@
       });
     }
     if (el('introModalContinueRunBtn')) {
-      el('introModalContinueRunBtn').onclick = () => {
+      el('introModalContinueRunBtn').onclick = () => runGuardedAction(() => {
         hideIntroModal();
-        switchScreen('run');
-      };
+        if (continueRun(S)) switchScreen('run');
+        else render();
+      });
     }
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
       hideIntroModal();
@@ -4333,17 +4456,22 @@
 
   function bindStatic() {
     $$('.tab').forEach(btn => btn.addEventListener('click', () => switchScreen(btn.dataset.screen)));
-    el('startRunBtn').onclick = () => runGuardedAction(() => {
-      if (S.run.active) {
-        switchScreen('run');
+    const startRunBtn = el('startRunBtn');
+    if (startRunBtn) startRunBtn.onclick = () => runGuardedAction(() => {
+      if (S.run?.active) {
+        if (continueRun(S)) switchScreen('run');
+        else render();
         return;
       }
       startRun(S);
       render();
     });
-    el('restBtn').onclick = () => runGuardedAction(() => { restPlayer(S); render(); });
-    el('saveBtn').onclick = () => { pushLog(S, save(S) ? 'Manual save written.' : 'Manual save failed; browser storage is unavailable.'); render(); };
-    el('resetBtn').onclick = () => {
+    const restBtn = el('restBtn');
+    if (restBtn) restBtn.onclick = () => runGuardedAction(() => { restPlayer(S); render(); });
+    const saveBtn = el('saveBtn');
+    if (saveBtn) saveBtn.onclick = () => { pushLog(S, save(S) ? 'Manual save written.' : 'Manual save failed; browser storage is unavailable.'); render(); };
+    const resetBtn = el('resetBtn');
+    if (resetBtn) resetBtn.onclick = () => {
       if (!confirm('Reset all progress?')) return;
       S = createBaseState();
       render();

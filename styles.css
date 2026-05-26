@@ -4917,6 +4917,6 @@ button:focus-visible,
 
 /* End v1.3.34 - Mobile Readability Final */
 
-/* v1.3.34 - GitHub Working Folder Baseline
-   No layout changes; active build/cache labels now identify the GitHub folder pass.
+/* v1.3.35 - Core Loop Regression Guard
+   No layout changes; runtime labels and cache keys identify the regression-guard pass.
 */

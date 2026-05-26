@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.34-github-working-folder-baseline';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.34-github-working-folder-baseline','./app.js?build=1.3.34-github-working-folder-baseline','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.35-core-loop-regression-guard';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.35-core-loop-regression-guard','./app.js?build=1.3.35-core-loop-regression-guard','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
