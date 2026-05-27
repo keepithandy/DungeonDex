@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.39';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.39';
+  const BUILD = 'DungeonDex v1.3.40';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.40';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -2037,13 +2037,13 @@
   // descent depth can be thousands of chapters. Keep raw-depth pressure visible without
   // letting Mythic rarity become a runaway multiplier at very deep floors.
   //
-  // v1.3.20 tuning note: Mythics should still beat Legendaries at deep floors. The softener
-  // eases raw-stat growth after depth 1000, but only to a 0.86 floor by depth 4000+.
+  // v1.3.40 tuning note: Mythics should still beat Legendaries at deep floors. The softener
+  // begins after depth 500 and reaches the existing 0.86 deep floor by depth 1000.
   function mythicDepthSoftener(level, rawDepth = 0) {
     const itemLevel = Math.max(1, Math.floor(numberOr(level, 1, 1, 999999)));
     const depth = Math.max(itemLevel, Math.floor(numberOr(rawDepth, 0, 0, 999999)));
-    if (depth < 1000) return 1;
-    const band = clamp((depth - 1000) / 3000, 0, 1);
+    if (depth <= 500) return 1;
+    const band = clamp((depth - 500) / 500, 0, 1);
     return 1 - band * 0.14;
   }
 
@@ -2056,13 +2056,14 @@
   }
 
   // Monster scaling audit: prior deep floors leaned too heavily on capped room/floor
-  // pressure. This soft ramp begins only after raw depth 800 so early/midgame pacing stays
-  // intact while depths 3000-4000 remain dangerous.
+  // pressure. Common enemies keep the existing readable deep curve; elite and boss enemies
+  // gain a bounded post-D800 pressure bump so deep Mythics do not make marked fights soft.
   function deepMonsterPowerMultiplier(rawDepth, tier = 'Common') {
     const depth = depthStageValue(rawDepth);
     if (depth <= 800) return 1;
     const base = Math.min(0.55, (depth - 800) * 0.00018);
-    const tierBonus = tier === 'Boss' ? 0.08 : tier === 'Elite' ? 0.04 : 0;
+    const deepTierRamp = clamp((depth - 800) / 300, 0, 1);
+    const tierBonus = tier === 'Boss' ? 0.08 + deepTierRamp * 0.15 : tier === 'Elite' ? 0.04 + deepTierRamp * 0.13 : 0;
     return 1 + base + tierBonus;
   }
 
@@ -2329,11 +2330,12 @@
   function runDeepScalingAudit(state = S) {
     const depths = [50, 100, 250, 500, 1000, 2000, 3000, 4000];
     const ratio = (a, b) => (Number.isFinite(a) && Number.isFinite(b) && b > 0 ? +(a / b).toFixed(2) : 'n/a');
-    const verdictFor = (rawDepth, mythicVsNormal, mythicVsElite, mythicVsLegendary) => {
+    const verdictFor = (rawDepth, mythicVsNormal, mythicVsElite, mythicVsBoss, mythicVsLegendary) => {
       if (rawDepth < 1000) return 'early/mid reference';
       if (mythicVsLegendary < 1.04) return 'watch: mythic identity thin';
-      if (mythicVsNormal > 1.35) return 'watch: mythic outruns normal';
-      if (mythicVsElite > 1.12) return 'watch: elites too soft';
+      if (mythicVsBoss > 1.15) return 'watch: mythic outruns boss pressure';
+      if (mythicVsElite > 1.30) return 'watch: mythic outruns elite pressure';
+      if (mythicVsNormal > 1.65) return 'watch: mythic ahead of commons';
       if (mythicVsNormal < 0.95) return 'watch: monsters too steep';
       return 'healthy band';
     };
@@ -2350,6 +2352,7 @@
       const bossMonster = expectedMonsterPowerAtDepth(rawDepth, 'Boss');
       const mythicVsNormal = ratio(mythic, normalMonster);
       const mythicVsElite = ratio(mythic, eliteMonster);
+      const mythicVsBoss = ratio(mythic, bossMonster);
       const mythicVsLegendary = ratio(mythic, legendary);
       return {
         depth: rawDepth,
@@ -2364,16 +2367,16 @@
         mythicSoftener: +mythicDepthSoftener(level, rawDepth).toFixed(3),
         mythicVsNormal,
         mythicVsElite,
-        mythicVsBoss: ratio(mythic, bossMonster),
+        mythicVsBoss,
         mythicVsLegendary,
         eliteVsNormal: ratio(eliteMonster, normalMonster),
         bossVsNormal: ratio(bossMonster, normalMonster),
         currentPlayerPower: playerPower || 'n/a',
         currentPlayerToNormalRatio: playerPower ? ratio(playerPower, normalMonster) : 'n/a',
-        tuningVerdict: verdictFor(rawDepth, mythicVsNormal, mythicVsElite, mythicVsLegendary)
+        tuningVerdict: verdictFor(rawDepth, mythicVsNormal, mythicVsElite, mythicVsBoss, mythicVsLegendary)
       };
     });
-    console.info('DungeonDex scaling audit target: deep Mythics should stay exciting without exceeding normal monsters by more than ~35%, while elites should land near or above Mythic sample power at 3000+.');
+    console.info('DungeonDex scaling audit target: deep Mythics stay exciting while elite and boss pressure remains credible beyond D1000.');
     console.table(rows);
     return rows;
   }
@@ -4291,7 +4294,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.39</p>
+      <p class="small">DungeonDex v1.3.40</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;

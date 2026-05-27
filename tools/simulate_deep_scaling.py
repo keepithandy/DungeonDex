@@ -202,9 +202,9 @@ def early_stat_scale(level: int) -> float:
 def mythic_depth_softener(level: int, raw_depth: int = 0) -> float:
     item_level = max(1, int(math.floor(level)))
     depth = max(item_level, max(0, int(math.floor(raw_depth))))
-    if depth < 1000:
+    if depth <= 500:
         return 1.0
-    band = clamp((depth - 1000) / 3000, 0, 1)
+    band = clamp((depth - 500) / 500, 0, 1)
     return 1 - band * 0.14
 
 
@@ -228,7 +228,12 @@ def deep_monster_power_multiplier(raw_depth: int, tier: str, c: Constants) -> fl
     if depth <= 800:
         return 1.0
     base = min(0.55, (depth - 800) * 0.00018)
-    tier_bonus = 0.08 if tier == "Boss" else 0.04 if tier == "Elite" else 0.0
+    deep_tier_ramp = clamp((depth - 800) / 300, 0, 1)
+    tier_bonus = 0.0
+    if tier == "Boss":
+        tier_bonus = 0.08 + deep_tier_ramp * 0.15
+    elif tier == "Elite":
+        tier_bonus = 0.04 + deep_tier_ramp * 0.13
     return 1 + base + tier_bonus
 
 
@@ -385,6 +390,7 @@ def warning_notes(depth: int, values: dict[str, float], c: Constants) -> list[st
     notes: list[str] = []
     mythic_vs_normal = ratio(values["mythic_boss"], values["enemy_common"])
     mythic_vs_elite = ratio(values["mythic_boss"], values["enemy_elite"])
+    mythic_vs_boss = ratio(values["mythic_boss"], values["enemy_boss"])
     mythic_vs_legendary = ratio(values["mythic_boss"], values["loot_legendary"])
     merchant_vs_normal = ratio(values["merchant_avg"], values["enemy_common"])
     rare_vs_normal = ratio(values["loot_rare"], values["enemy_common"])
@@ -392,10 +398,12 @@ def warning_notes(depth: int, values: dict[str, float], c: Constants) -> list[st
     if depth >= 1000:
         if mythic_vs_legendary < 1.04:
             notes.append("mythic identity thin vs legendary boss loot")
-        if mythic_vs_normal > 1.35:
-            notes.append("mythic item estimate outruns normal enemy power")
-        if mythic_vs_elite > 1.12:
-            notes.append("mythic item estimate may make elites look soft")
+        if mythic_vs_boss > 1.15:
+            notes.append("Mythic outruns boss pressure")
+        if mythic_vs_elite > 1.30:
+            notes.append("Mythic outruns elite pressure")
+        if mythic_vs_normal > 1.65:
+            notes.append("mythic estimate is ahead of common enemy power")
         if mythic_vs_normal < 0.95:
             notes.append("normal enemy power may be steep vs mythic item estimate")
     else:
@@ -403,7 +411,7 @@ def warning_notes(depth: int, values: dict[str, float], c: Constants) -> list[st
             notes.append("watch mythic vs legendary spread")
 
     if merchant_vs_normal < 0.45 and depth >= 80:
-        notes.append("merchant stock estimate trails normal enemy power")
+        notes.append("Merchant trails enemies")
     if rare_vs_normal < 0.55 and depth >= 200:
         notes.append("rare loot estimate trails normal enemy power")
 
@@ -411,9 +419,15 @@ def warning_notes(depth: int, values: dict[str, float], c: Constants) -> list[st
     normal_gold = max(1, values["normal_gold"])
     common_wins = ratio(charter_cost, normal_gold)
     if depth >= c.charter_early_step and common_wins > 250:
-        notes.append("charter cost is high vs common encounter gold")
+        notes.append("Charter cost high vs common gold")
     if depth >= c.charter_early_limit and values["charter_depth"] < depth:
-        notes.append(f"between charter milestones; latest charter is D{int(values['charter_depth']):,}")
+        if c.charter_late_step > c.charter_early_step and int(values["charter_depth"]) == c.charter_early_limit:
+            notes.append(
+                f"Charter milestone gap appears intentional under configured post-D{c.charter_early_limit:,} spacing; "
+                f"latest charter is D{int(values['charter_depth']):,}"
+            )
+        else:
+            notes.append(f"between charter milestones; latest charter is D{int(values['charter_depth']):,}")
 
     return notes
 
@@ -438,6 +452,7 @@ def checkpoint(depth: int, c: Constants) -> Checkpoint:
     values = {
         "enemy_common": enemy_common,
         "enemy_elite": enemy_elite,
+        "enemy_boss": enemy_boss,
         "loot_rare": loot_rare,
         "loot_legendary": loot_legendary,
         "mythic_boss": mythic_boss,
@@ -546,7 +561,9 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
             f"D{row.depth:,}",
             f"F{row.threat:,}",
             f"L{row.layer} R{row.room} C{row.chapter}",
-            f"{row.enemy_common:,}/{row.enemy_elite:,}/{row.enemy_boss:,}",
+            compact_int(row.enemy_common),
+            compact_int(row.enemy_elite),
+            compact_int(row.enemy_boss),
             compact_int(row.merchant_avg),
             compact_int(row.loot_rare),
             compact_int(row.loot_legendary),
@@ -584,7 +601,7 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     ]
 
     lines: list[str] = []
-    lines.append("DungeonDex v1.3.39 Deep Scaling Simulator Foundation")
+    lines.append("DungeonDex v1.3.40 Mythic/Elite Deep Scaling Alignment")
     lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(f"Project root: {root}")
     lines.append(f"Static source: {app_path if app_path.exists() else 'app.js missing'}")
@@ -608,7 +625,19 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     lines.append("Power Checkpoints")
     lines.extend(
         table(
-            ["Depth", "Threat", "Layer", "Enemy C/E/B", "Merchant", "Rare Loot", "Leg Loot", "Mythic", "Mythic Soft"],
+            [
+                "Depth",
+                "Threat",
+                "Layer",
+                "Common Enemy",
+                "Elite Enemy",
+                "Boss Enemy",
+                "Merchant Stock",
+                "Rare Loot",
+                "Legendary Loot",
+                "Mythic Estimate",
+                "Mythic Softener",
+            ],
             power_rows,
         )
     )
