@@ -3,6 +3,12 @@
 
 This script reads app.js as text for static detection only. It does not import,
 evaluate, or execute the game, and it does not touch saves or browser storage.
+
+Version context:
+- v1.3.39 introduced this read-only report so deep-floor balance could be
+  inspected without changing combat, loot, economy, merchants, or saves.
+- v1.3.40 applied the bounded mythic/elite/boss deep-scaling alignment that
+  this report now mirrors for measurement.
 """
 
 from __future__ import annotations
@@ -601,7 +607,7 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     ]
 
     lines: list[str] = []
-    lines.append("DungeonDex v1.3.40 Mythic/Elite Deep Scaling Alignment")
+    lines.append("DungeonDex v1.3.41 Deep Scaling Report")
     lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(f"Project root: {root}")
     lines.append(f"Static source: {app_path if app_path.exists() else 'app.js missing'}")
@@ -611,6 +617,11 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     lines.append("- Reads app.js as text for detection only; avoids eval and does not execute browser code.")
     lines.append("- Checkpoints are raw Depth values. Threat Floor is ceil(Depth / threat step).")
     lines.append("- Random rolls are collapsed to conservative expected averages for inspection.")
+    lines.append("")
+    lines.append("Version Context")
+    lines.append("- v1.3.39: added the offline simulator/report only; no balance or save changes.")
+    lines.append("- v1.3.40: applied bounded deep-floor mythic, elite, and boss alignment; merchants, gold, charters, drop rates, and saves stayed unchanged.")
+    lines.append("- v1.3.41: report readability and release documentation only; no formula changes.")
     lines.append("")
     lines.append("Static Formula Scan")
     lines.append(f"- Detected {detected_count}/{expected_count} searched helper or constant names.")
@@ -645,7 +656,7 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     lines.append("Economy And Charter Pressure")
     lines.extend(
         table(
-            ["Depth", "Common Gold", "Elite Gold", "Boss Gold", "Room Bonus", "Layer Bonus", "Charter", "Cost", "Common Wins"],
+            ["Depth", "Common Gold", "Elite Gold", "Boss Gold", "Room Bonus", "Layer Bonus", "Charter", "Cost", "Common Wins To Charter"],
             economy_rows,
         )
     )

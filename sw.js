@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.40-mythic-elite-deep-scaling-alignment';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.40-mythic-elite-deep-scaling-alignment','./app.js?build=1.3.40-mythic-elite-deep-scaling-alignment','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.41-scaling-report-polish-release-cleanup';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.41-scaling-report-polish-release-cleanup','./app.js?build=1.3.41-scaling-report-polish-release-cleanup','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
