@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.42';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.42';
+  const BUILD = 'DungeonDex v1.3.43';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.43';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -482,8 +482,8 @@
     pending.eliteContractKills = Math.min(999999, pending.eliteContractKills + 1);
     const projected = Math.min(contract.goal, Math.floor(numberOr(active.progress, 0, 0, contract.goal)) + pending.eliteContractKills);
     pushCombat(state, projected >= contract.goal
-      ? 'Elite contract mark ready. Extract to keep the progress.'
-      : `Elite contract mark: ${projected} / ${contract.goal}. Extract to keep progress.`);
+      ? 'Elite contract mark ready. Extract to bank the progress.'
+      : `Elite contract mark: ${projected} / ${contract.goal}. Extract to bank progress.`);
     return true;
   }
 
@@ -830,7 +830,7 @@
       active.complete = true;
       active.claimable = true;
       if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
-      pushCombat(state, `Contract complete. Return to Lowfire to claim payment: ${formatMoney(active.rewardAmount)}.`);
+      pushCombat(state, `Elite contract complete. Return to Lowfire to claim ${formatMoney(active.rewardAmount)}.`);
     } else {
       pushCombat(state, `Elite contract: ${active.progress} / ${contract.goal} elites defeated.`);
     }
@@ -1017,7 +1017,7 @@
   function bossAtmosphereLine(depth) {
     const name = bossFloorNameByDepth(depth);
     if (!name) return 'The Stair tightens. Something below is listening.';
-    return `${name} waits on a boss floor. Bosses return every 5 floors.`;
+    return `Boss sign: ${name} waits below. Bosses return every 5 floors.`;
   }
 
   function districtArrivalLine(district) {
@@ -1051,8 +1051,8 @@
     const district = currentStagingDistrict(state);
     const depth = state?.run?.floor || state?.player?.depth || 1;
     const bestStr = depthWithRawLabel(state.player.depth || depth);
-    if (reason === 'extract') return `Extracted from ${district.name} at ${runDepthLabel(state)}. Unsecured rewards were banked and the next descent can start there. Best: ${bestStr}.`;
-    if (reason === 'defeat') return `Defeated in ${district.name} at ${runDepthLabel(state)}. Unsecured run rewards were lost; banked gear and currency stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
+    if (reason === 'extract') return `Extracted from ${district.name} at ${runDepthLabel(state)}. The haul was banked; the next descent can start there. Best: ${bestStr}.`;
+    if (reason === 'defeat') return `The descent claimed this run in ${district.name} at ${runDepthLabel(state)}. Lost unsecured rewards; banked gear and currency stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
     return `Descent ended in ${district.name} at ${runDepthLabel(state)}.`;
   }
 
@@ -1096,7 +1096,7 @@
     if (snapshot.ember) parts.push(`${format(snapshot.ember)} ember`);
     if (snapshot.xp) parts.push(`${format(snapshot.xp)} XP`);
     if (snapshot.lootCount) parts.push(`${format(snapshot.lootCount)} loot`);
-    return parts.length ? `Banked ${parts.join(' • ')}` : (securedText || 'Rewards banked. You made it back to Lowfire.');
+    return parts.length ? `Haul banked: ${parts.join(' • ')}` : (securedText || 'You extract safely with your haul.');
   }
 
   function milestoneAtmosphereMarkup(depth, district) {
@@ -1198,8 +1198,8 @@
   function depthMilestoneNotice(depth) {
     const d = depthStructureFromRawDepth(depth);
     if (d.rawDepth <= 1 || d.chapter !== 1) return '';
-    if (d.room === 1) return `Hollow Stair layer ${d.floor} reached - prepare before pushing farther.`;
-    return `Room ${d.room} secured on ${floorNumberLabel(depth)}.`;
+    if (d.room === 1) return `Hollow Stair floor ${d.floor} reached. Prepare before pushing farther.`;
+    return `Room ${d.room} cleared on ${floorNumberLabel(depth)}.`;
   }
 
   function isRoomMilestoneDepth(depth) {
@@ -1219,7 +1219,7 @@
     const recovered = Math.min(missingHp, Math.max(1, Math.round(state.player.maxHp * 0.05)));
     addPendingRunGold(state, rewardGold);
     if (recovered > 0) state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
-    pushCombat(state, `Room secured: unsecured +${formatMoney(rewardGold)}${recovered > 0 ? `, recovered ${recovered} HP` : ''}.`);
+    pushCombat(state, `Room cleared: unsecured +${formatMoney(rewardGold)}${recovered > 0 ? `, recovered ${recovered} HP` : ''}.`);
     pushLog(state, `Room milestone reached: ${depthLabel(currentDepth)}.`);
   }
 
@@ -1241,8 +1241,8 @@
     const parts = [`+${formatMoney(rewardGold)}`, `+${format(shardReward)} shards`];
     if (emberReward > 0) parts.push(`+${format(emberReward)} ember`);
     if (recovered > 0) parts.push(`recovered ${recovered} HP`);
-    pushCombat(state, `Hollow Stair layer ${meta.floor} secured: unsecured ${parts.join(', ')}.`);
-    pushLog(state, `Hollow Stair layer ${meta.floor} opened after ${format(DEPTH_CHAPTERS_PER_FLOOR)} chapters of descent.`);
+    pushCombat(state, `Hollow Stair floor ${meta.floor} cleared: unsecured ${parts.join(', ')}.`);
+    pushLog(state, `Hollow Stair floor ${meta.floor} opened after ${format(DEPTH_CHAPTERS_PER_FLOOR)} chapters of descent.`);
   }
 
   function depthDifficultyLadder(depth) {
@@ -1322,8 +1322,8 @@
       ? 'Room clears after this chapter.'
       : `${format(d.chaptersUntilRoom)} chapter${d.chaptersUntilRoom === 1 ? '' : 's'} until the next room.`;
     const floorLine = d.roomsUntilFloor === 0 && d.chaptersUntilRoom === 0
-      ? 'Next Hollow Stair layer begins after this room.'
-      : `Next Hollow Stair layer begins at D${format(d.nextFloorAtDepth)}.`;
+      ? 'Next Hollow Stair floor begins after this room.'
+      : `Next Hollow Stair floor begins at D${format(d.nextFloorAtDepth)}.`;
     return `<div class="depth-progress-card" aria-label="Hollow Stair progress">
       <div class="split depth-progress-head">
         <div>
@@ -2513,17 +2513,17 @@
     const raw = String(line || '');
     const lower = stripHtml(raw).toLowerCase();
     if (!lower) return 'empty';
-    if (lower.includes('hardcore') || lower.includes('death') || lower.includes('defeated') || lower.includes('forfeit')) return 'death';
-    if (/\b(extract|extracted|extraction|escaped|secured)\b/.test(lower)) return 'escape';
+    if (lower.includes('hardcore') || lower.includes('death') || lower.startsWith('defeated.') || lower.startsWith('defeated in ') || lower.includes('forfeit') || lower.includes('descent claimed') || lower.includes('run failed')) return 'death';
+    if (/\b(extract|extracted|extraction|escaped)\b/.test(lower) || lower.includes('extraction secured')) return 'escape';
     if (lower.includes('boss') || lower.includes('warning') || lower.includes('enraged')) return 'boss';
     if (lower.includes('elite') || lower.includes('frenzied') || lower.includes('ironhide') || lower.includes('venomous') || lower.includes('swift') || lower.includes('hollow-eyed') || lower.includes('ash-fed') || lower.includes('gravebound') || lower.includes('wardmarked')) return 'elite';
+    if (lower.includes('floor secured') || lower.includes('floor cleared') || lower.includes('floor reached') || lower.startsWith('floor ')) return 'floor';
+    if (lower.includes('room secured') || lower.includes('room cleared') || lower.includes('room reached')) return 'milestone';
     if (lower.includes('recovered') || lower.includes('healed') || lower.includes('returns') || lower.includes('regen')) return 'heal';
     if (lower.includes('loot') || lower.includes('found:') || lower.includes('relic') || lower.includes('drop') || lower.includes('cache')) return 'loot';
     if (lower.includes('gold') || lower.includes('shard') || lower.includes('reward')) return 'reward';
-    if (lower.includes('floor secured') || lower.includes('floor reached') || lower.startsWith('floor ')) return 'floor';
-    if (lower.includes('room secured') || lower.includes('room reached')) return 'milestone';
     if (lower.includes('you hit') || lower.includes('ashburst') || lower.includes('critical') || lower.includes('strike')) return 'player-hit';
-    if (lower.includes('hits for') || lower.includes('takes') || lower.includes('poison') || lower.includes('bleed') || lower.includes('pierces for') || lower.includes('seeps for') || lower.includes('lingers for')) return 'enemy-hit';
+    if (lower.includes('hits for') || lower.includes('misses') || lower.includes('takes') || lower.includes('poison') || lower.includes('bleed') || lower.includes('pierces for') || lower.includes('seeps for') || lower.includes('lingers for')) return 'enemy-hit';
     if (lower.includes('guard') || lower.includes('brace')) return 'guard';
     if (lower.includes('descent continues') || lower.includes('entering ') || lower.includes('contract')) return 'progress';
     return 'action';
@@ -2602,7 +2602,9 @@
       .replace(/Ash-fed/gi, '<span class="feed-chip feed-chip-elite feed-mod-ash-fed">Ash-fed</span>')
       .replace(/Gravebound/gi, '<span class="feed-chip feed-chip-elite feed-mod-gravebound">Gravebound</span>')
       .replace(/Wardmarked/gi, '<span class="feed-chip feed-chip-elite feed-mod-wardmarked">Wardmarked</span>')
+      .replace(/Floor cleared/gi, '<span class="feed-chip feed-chip-floor">Floor cleared</span>')
       .replace(/Floor secured/gi, '<span class="feed-chip feed-chip-floor">Floor secured</span>')
+      .replace(/Room cleared/gi, '<span class="feed-chip feed-chip-floor">Room cleared</span>')
       .replace(/Room secured/gi, '<span class="feed-chip feed-chip-floor">Room secured</span>')
       .replace(/\bUnsecured\b/gi, '<span class="feed-chip feed-chip-unsecured">Unsecured</span>')
       .replace(/\b(Extraction|Extracted|Extract)\b/gi, match => `<span class="feed-chip feed-chip-extract">${match}</span>`)
@@ -2667,7 +2669,7 @@
       return false;
     }
     state.screen = 'run';
-    pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The stair holds its breath.`);
+    pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The Hollow Stair seals behind you.`);
     if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this descent.`);
     return true;
   }
@@ -2710,10 +2712,17 @@
     state.run.choices = ['attack','guard','skill','extract'];
     state.player.discoveredMonsters = asArray(state.player.discoveredMonsters, []);
     if (!state.player.discoveredMonsters.includes(state.run.monster.name)) state.player.discoveredMonsters.push(state.run.monster.name);
-    pushCombat(state, `${state.run.monster.name} rises in ${state.run.zone}.`);
-    const modifiers = eliteModifiersForMonster(state.run.monster);
-    if (state.run.monster.tier === 'Elite' && modifiers.length) {
-      pushCombat(state, `Elite warning: ${eliteModifierNames(modifiers)} — ${eliteModifierDangerSummary(modifiers)}`);
+    const monster = state.run.monster;
+    if (monster.tier === 'Boss') {
+      pushCombat(state, `Boss pressure locks the stair: ${monster.name}.`);
+    } else if (monster.tier === 'Elite') {
+      pushCombat(state, `Elite pressure rises: ${monster.name}.`);
+    } else {
+      pushCombat(state, `Encounter: ${monster.name} rises in ${state.run.zone}.`);
+    }
+    const modifiers = eliteModifiersForMonster(monster);
+    if (monster.tier === 'Elite' && modifiers.length) {
+      pushCombat(state, `Elite read: ${eliteModifierNames(modifiers)}. ${eliteModifierDangerSummary(modifiers)}`);
       pushCombat(state, `Elite plan: ${eliteModifierPlanLine(modifiers)}`);
     }
   }
@@ -2765,10 +2774,10 @@
       playerShield = Math.round(stats.guard * 0.65 + stats.wit * 0.25);
       const recovered = Math.max(1, Math.round(stats.guard * 0.09));
       state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
-      pushCombat(state, `You brace and recover ${recovered}.`);
+      pushCombat(state, `You brace and recover ${recovered} HP.`);
     } else if (action === 'skill') {
       if (state.player.ember <= 0) {
-        pushCombat(state, 'No ember left. The skill fizzles.');
+        pushCombat(state, 'No ember left. Ashburst fizzles.');
       } else {
         state.player.ember -= 1;
         const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
@@ -2776,18 +2785,18 @@
         monster.hp -= dealt;
         const siphon = Math.max(1, Math.round(stats.wit * 0.18));
         state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
-        pushCombat(state, `Ashburst tears through the dark for ${dealt} and returns ${siphon}.`);
+        pushCombat(state, `Ashburst burns for ${dealt} and returns ${siphon} HP.`);
       }
     } else if (action === 'extract') {
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
       if (Math.random() * 100 <= odds) {
-        pushCombat(state, `Extracted from ${state.run.zone} at ${runDepthLabel(state)}.`);
+        pushCombat(state, `You extract safely from ${state.run.zone} at ${runDepthLabel(state)}.`);
         finishRun(state, 'extract');
         result.saveNow = true;
         result.fullRender = true;
         return result;
       } else {
-        pushCombat(state, 'Extraction failed. Unsecured rewards stay at risk; guard or finish the fight.');
+        pushCombat(state, 'Extraction failed. The haul stays unsecured; guard or finish the fight.');
       }
     } else {
       return result;
@@ -2797,7 +2806,7 @@
       if (hasEliteModifier(monster, 'Gravebound') && !monster.reviveUsed) {
         monster.reviveUsed = true;
         monster.hp = Math.max(1, Math.round(monster.maxHp * 0.22));
-        pushCombat(state, `${monster.name} claws back from the brink. Gravebound elites revive once.`);
+        pushCombat(state, `Gravebound refuses death. ${monster.name} rises again.`);
       } else {
         winEncounter(state);
         result.saveNow = true;
@@ -2808,7 +2817,7 @@
     if (hasEliteModifier(monster, 'Ash-fed') && !monster.ashFedTriggered && monster.hp <= monster.maxHp * 0.35) {
       monster.ashFedTriggered = true;
       monster.power = Math.round(monster.power * 1.06);
-      pushCombat(state, `${monster.name} feeds on the ash and surges. Ash-fed elites grow deadlier near defeat.`);
+      pushCombat(state, `Ash-fed surge. ${monster.name} burns hotter near defeat.`);
     }
 
     if (hasEquippedSetBonus(state, 'ashbound_warden', 3) && monster.tier === 'Boss') {
@@ -2824,15 +2833,15 @@
       pushCombat(state, `${monster.name} hits for ${incoming}.`);
       if (hasEliteModifier(monster, 'Venomous')) {
         const venom = Math.max(1, Math.round(threatDepthFromDepth(monster.level) * 0.7));
-        const venomNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Venomous elites add poison'));
+        const venomNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Venomous poison follows clean hits'));
         state.player.hp -= venom;
-        pushCombat(state, venomNoted ? `Venom seeps for ${venom}.` : `Venom seeps for ${venom}. Venomous elites add poison after hits.`);
+        pushCombat(state, venomNoted ? `Venom seeps for ${venom}.` : `Venom seeps for ${venom}. Venomous poison follows clean hits.`);
       }
       if (hasEliteModifier(monster, 'Hollow-Eyed') && Math.random() < 0.18) {
         const pierce = Math.max(2, Math.round(threatDepthFromDepth(monster.level) * 1.1));
-        const hollowNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('This elite can chip through defenses'));
+        const hollowNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Hollow-Eyed can pierce guard'));
         state.player.hp -= pierce;
-        pushCombat(state, hollowNoted ? `Hollow-Eyed precision pierces for ${pierce}.` : `Hollow-Eyed precision pierces for ${pierce}. This elite can chip through defenses.`);
+        pushCombat(state, hollowNoted ? `Hollow-Eyed precision pierces for ${pierce}.` : `Hollow-Eyed precision pierces for ${pierce}. Hollow-Eyed can pierce guard.`);
       }
     }
 
@@ -2875,8 +2884,9 @@
     addPendingRunKill(state, 1);
     state.run.roomsCleared += 1;
     state.run.chain += 1;
-    pushCombat(state, `${m.name} falls. Unsecured: +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}${m.tier === 'Boss' ? ' — boss cleared.' : ''}.`);
-    pushLog(state, `Defeated ${m.name} at ${runDepthLabel(state)}.`);
+    const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
+    pushCombat(state, `${victoryLead}: ${m.name}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
+    pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
     updateQuest(state, 'kill', 1);
 
     const lootRolls = source === 'boss' ? 2 : 1;
@@ -2888,18 +2898,22 @@
         : generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source, depthRaw: state.run.floor, state });
       addPendingRunLoot(state, loot);
       drops += 1;
-      pushCombat(state, `Unsecured ${source === 'elite' ? 'elite drop' : source === 'boss' ? 'boss relic' : 'find'}: ${loot.name} (${loot.rarity}).`);
+      const lootLabel = source === 'boss' ? 'Boss relic' : source === 'elite' ? 'Elite drop' : 'Found gear';
+      const lootLine = loot.rarity === 'mythic'
+        ? `${lootLabel} hums with Lowfire heat`
+        : lootLabel;
+      pushCombat(state, `${lootLine} unsecured: ${loot.name} (${loot.rarity}).`);
       updateQuest(state, 'loot', 1);
     }
     if (source === 'elite' && eliteReward?.modifierCount) {
       const bonusPct = Math.round(eliteReward.bonusLootChance * 100);
-      pushCombat(state, `Dangerous elite defeated: unsecured +${bonusPct}% bonus loot chance.`);
+      pushCombat(state, `Elite risk bonus: +${bonusPct}% bonus loot roll.`);
       if (Math.random() < eliteReward.bonusLootChance) {
         const bonusLoot = generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source:'elite', depthRaw:state.run.floor, state });
         bonusLoot.tags = asArray(bonusLoot.tags, []).concat(['elite-risk-bonus']);
         addPendingRunLoot(state, bonusLoot);
         drops += 1;
-        pushCombat(state, `Unsecured elite bonus loot: ${bonusLoot.name} (${bonusLoot.rarity}).`);
+        pushCombat(state, `Elite bonus loot unsecured: ${bonusLoot.name} (${bonusLoot.rarity}).`);
         updateQuest(state, 'loot', 1);
       }
     }
@@ -2915,11 +2929,11 @@
         addPendingRunLoot(state, bounty);
         sink.nextBossBounty = false;
         drops += 1;
-        pushCombat(state, `Unsecured bounty relic: ${bounty.name} (${bounty.rarity}).`);
+        pushCombat(state, `Bounty relic unsecured: ${bounty.name} (${bounty.rarity}).`);
         updateQuest(state, 'loot', 1);
       }
     }
-    if (!drops && source === 'normal') pushCombat(state, 'Nothing worth keeping — keep pushing deeper.');
+    if (!drops && source === 'normal') pushCombat(state, 'No keepable gear. Push deeper or extract with the haul.');
 
     if (source === 'elite' && !m.eliteContractCounted) {
       m.eliteContractCounted = true;
@@ -2937,7 +2951,7 @@
       aid.value = Math.max(aid.value, coins(0, 1, 80));
       aid.tags = asArray(aid.tags, []).concat(['early-aid-cache']);
       addPendingRunLoot(state, aid);
-      pushCombat(state, `Unsecured scrap cache found: ${aid.name}.`);
+      pushCombat(state, `Scrap cache unsecured: ${aid.name}.`);
       pushLog(state, `A last-resort Lowfire cache produced basic gear: ${aid.name}.`);
       updateQuest(state, 'loot', 1);
     }
@@ -3004,16 +3018,16 @@
     if (reason === 'extract') {
       const secured = bankPendingRunRewards(state);
       const securedText = cleanDisplayText(secured, 'no unsecured rewards');
-      runResultDetail = `Banked: ${securedText}. Next descent can start from ${returnLabel}.`;
-      pushCombat(state, `Extraction secured. Banked: ${securedText}.`);
-      pushLog(state, `Extraction secured. Banked: ${securedText}. Next start: ${returnLabel}.`);
+      runResultDetail = `Banked haul: ${securedText}. Next descent can start from ${returnLabel}.`;
+      pushCombat(state, `Extraction secured. Banked haul: ${securedText}.`);
+      pushLog(state, `Extraction secured. Banked haul: ${securedText}. Next start: ${returnLabel}.`);
       showExtractionPopup(`${extractionPopupSummary(rewardSnapshot, securedText)} • Next: ${returnLabel}`);
       recordSafeExtractionProgress(state);
     } else if (reason === 'defeat') {
       const lost = discardPendingRunRewards(state);
       const lostText = cleanDisplayText(lost, 'no unsecured rewards');
       runResultDetail = `Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked progress stayed safe.`;
-      pushLog(state, `Defeated. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}.`);
+      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}.`);
       showDefeatPopup(`Lost unsecured: ${lostText}. Restart: ${returnLabel}.`);
     } else {
       clearPendingRunRewards(state);
@@ -3059,7 +3073,7 @@
 
   function defeat(state) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
-    pushCombat(state, 'The Warden fell. Unsecured run rewards were lost; banked progress stayed safe.');
+    pushCombat(state, 'The descent claims this run. Unsecured rewards were lost; banked progress stayed safe.');
     spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
     finishRun(state, 'defeat');
   }
@@ -4060,7 +4074,7 @@
     const eliteMarkup = monster ? eliteModifierMarkup(monster) : '';
     const threatBrief = monster
       ? isBossFight
-        ? `<div class="combat-threat-brief boss-threat-brief"><b>Boss floor:</b> Bosses appear every 5 floors. Guard before risky bursts.</div>`
+        ? `<div class="combat-threat-brief boss-threat-brief"><b>Boss floor:</b> heavier pressure, better stakes. Guard before risky bursts.</div>`
         : isEliteFight
           ? `<div class="combat-threat-brief elite-threat-brief"><b>Elite plan:</b> ${escapeHtml(eliteModifierPlanLine(eliteModifiersForMonster(monster)))}</div>`
           : ''
@@ -4245,7 +4259,7 @@
       const outcomeClass = isWin ? 'outcome-win' : isDefeat ? 'outcome-loss' : 'outcome-neutral';
       const icon = isWin ? '✓' : isDefeat ? '✕' : '•';
       const zone = cleanDisplayText(r.zone || r.district || 'Hollow Stair', 'Hollow Stair');
-      const fallbackDetail = isWin ? 'Extracted to Lowfire. Unsecured rewards were banked.' : isDefeat ? 'Defeated. Unsecured rewards were lost; banked progress stayed safe.' : 'Descent ended.';
+      const fallbackDetail = isWin ? 'Extracted to Lowfire. The haul was banked.' : isDefeat ? 'Run failed. Unsecured rewards were lost; banked progress stayed safe.' : 'Descent ended.';
       const detail = cleanDisplayText(r.detail || r.summary || fallbackDetail, fallbackDetail);
       const runLabel = cleanDisplayText(r.runLabel || depthWithRawLabel(r.floor || 1), depthWithRawLabel(1));
       const lootPreview = asArray(r.lootPreview, []).slice(0, 3)
@@ -4294,7 +4308,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.42</p>
+      <p class="small">DungeonDex v1.3.43</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;

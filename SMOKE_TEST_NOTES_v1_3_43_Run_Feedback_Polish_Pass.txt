@@ -1,0 +1,64 @@
+DungeonDex v1.3.43 - Run Feedback Polish Pass Smoke Test Notes
+
+Required smoke coverage
+- App loads.
+- Enter Dungeon works.
+- Combat buttons work: Attack, Guard, Skill, Extract.
+- Enemy encounter messages appear.
+- Elite messages still appear if testable.
+- Boss messages still appear if testable.
+- Reward messages still appear.
+- Extraction wording still appears if testable.
+- Death wording still appears if testable.
+- Resume/continue run wording still appears if testable.
+- Merchant opens/renders.
+- Package checker passes.
+- Deep scaling simulator runs.
+- Content registry audit tool runs.
+- Node syntax checks pass if available.
+- sw.js syntax check runs because the cache label changed.
+- No save migration required.
+
+Automated checks performed
+- PASS: python tools/check_dungeondex_package.py
+  - Summary: PASS (14 paths checked, 0 warnings)
+- PASS: python tools/simulate_deep_scaling.py
+  - Report title: DungeonDex v1.3.43 Deep Scaling Report
+  - Static formula scan: 19/19 searched helper or constant names detected
+- PASS: python tools/audit_content_registries.py
+  - Findings: 108
+  - Areas with mixed/risky/not-ready status: 9
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: static source smoke scan found startRunBtn, runFromIdleBtn, combatAction, data-action combat buttons, merchantPanel, buildMerchantStock, generateGear, generateMythicSetPiece, mythicSetDropChance, generateMonster, Boss, and Elite paths.
+- PASS: headless Chrome DOM load rendered DungeonDex v1.3.43, Enter Dungeon, Lowfire Market, merchant stock, idle run panel, archive system notes, and the v1.3.43 asset query strings.
+
+Notes
+- The package checker, deep scaling simulator, and content registry audit were rerun with approval after sandboxed Python spawns failed before the scripts started.
+- No separate smoke/runtime harness exists in the repository beyond the checked tools, static scan, and headless DOM load above.
+
+Static smoke targets
+- startRunBtn
+- runFromIdleBtn
+- combatAction
+- data-action combat buttons
+- merchantPanel
+- buildMerchantStock
+- generateGear
+- generateMythicSetPiece
+- mythicSetDropChance
+- generateMonster
+- Boss and Elite paths
+
+Regression boundaries
+- No gameplay changes.
+- No combat math changes.
+- No item scaling changes.
+- No enemy scaling changes.
+- No mythic scaling changes.
+- No elite or boss scaling changes.
+- No merchant behavior changes.
+- No gold reward changes.
+- No Deep Stair Charter behavior changes.
+- No save format, save migration, localStorage key, or progress reset changes.
+- No CSS or mobile layout changes.
