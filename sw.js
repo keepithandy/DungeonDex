@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.43-run-feedback-polish-pass';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.43-run-feedback-polish-pass','./app.js?build=1.3.43-run-feedback-polish-pass','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.44-reward-reveal-run-summary-polish';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.44-reward-reveal-run-summary-polish','./app.js?build=1.3.44-reward-reveal-run-summary-polish','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)

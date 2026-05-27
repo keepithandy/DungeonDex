@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.43';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.43';
+  const BUILD = 'DungeonDex v1.3.44';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.44';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -1051,8 +1051,8 @@
     const district = currentStagingDistrict(state);
     const depth = state?.run?.floor || state?.player?.depth || 1;
     const bestStr = depthWithRawLabel(state.player.depth || depth);
-    if (reason === 'extract') return `Extracted from ${district.name} at ${runDepthLabel(state)}. The haul was banked; the next descent can start there. Best: ${bestStr}.`;
-    if (reason === 'defeat') return `The descent claimed this run in ${district.name} at ${runDepthLabel(state)}. Lost unsecured rewards; banked gear and currency stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
+    if (reason === 'extract') return `Extraction Haul secured in ${district.name} at ${runDepthLabel(state)}. Lowfire banks the haul; the next descent can start there. Best: ${bestStr}.`;
+    if (reason === 'defeat') return `The run ends in ${district.name} at ${runDepthLabel(state)}. Unsecured rewards were lost; banked gear and wallet stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
     return `Descent ended in ${district.name} at ${runDepthLabel(state)}.`;
   }
 
@@ -1076,8 +1076,8 @@
   }
 
   function runHistoryOutcomeLabel(reason) {
-    if (reason === 'extract') return 'Extracted';
-    if (reason === 'defeat') return 'Defeated';
+    if (reason === 'extract') return 'Extraction Secured';
+    if (reason === 'defeat') return 'Run Lost';
     return 'Ended';
   }
 
@@ -1096,7 +1096,7 @@
     if (snapshot.ember) parts.push(`${format(snapshot.ember)} ember`);
     if (snapshot.xp) parts.push(`${format(snapshot.xp)} XP`);
     if (snapshot.lootCount) parts.push(`${format(snapshot.lootCount)} loot`);
-    return parts.length ? `Haul banked: ${parts.join(' • ')}` : (securedText || 'You extract safely with your haul.');
+    return parts.length ? `Extraction Haul secured: ${parts.join(' • ')}` : (securedText || 'Extraction Haul secured. Lowfire marks the run complete.');
   }
 
   function milestoneAtmosphereMarkup(depth, district) {
@@ -1214,12 +1214,13 @@
 
   function applyRoomMilestoneReward(state, previousDepth, currentDepth) {
     if (!state?.run?.active || !isRoomMilestoneDepth(currentDepth)) return;
+    const meta = depthStructureFromRawDepth(currentDepth);
     const rewardGold = Math.max(coins(0, 0, 14), Math.round(coins(0, 0, 14) + threatDepthFromDepth(currentDepth) * rand(3, 6)));
     const missingHp = Math.max(0, state.player.maxHp - state.player.hp);
     const recovered = Math.min(missingHp, Math.max(1, Math.round(state.player.maxHp * 0.05)));
     addPendingRunGold(state, rewardGold);
     if (recovered > 0) state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
-    pushCombat(state, `Room cleared: unsecured +${formatMoney(rewardGold)}${recovered > 0 ? `, recovered ${recovered} HP` : ''}.`);
+    pushCombat(state, `Room cleared: floor ${meta.floor}, room ${meta.room}. Room Reward unsecured +${formatMoney(rewardGold)}${recovered > 0 ? `, recovered ${recovered} HP` : ''}.`);
     pushLog(state, `Room milestone reached: ${depthLabel(currentDepth)}.`);
   }
 
@@ -1241,7 +1242,7 @@
     const parts = [`+${formatMoney(rewardGold)}`, `+${format(shardReward)} shards`];
     if (emberReward > 0) parts.push(`+${format(emberReward)} ember`);
     if (recovered > 0) parts.push(`recovered ${recovered} HP`);
-    pushCombat(state, `Hollow Stair floor ${meta.floor} cleared: unsecured ${parts.join(', ')}.`);
+    pushCombat(state, `Floor cleared: Hollow Stair floor ${meta.floor}. Milestone Reward unsecured ${parts.join(', ')}.`);
     pushLog(state, `Hollow Stair floor ${meta.floor} opened after ${format(DEPTH_CHAPTERS_PER_FLOOR)} chapters of descent.`);
   }
 
@@ -2586,6 +2587,11 @@
       .replace(/seeps for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">seeps for $1</span>')
       .replace(/lingers for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">lingers for $1</span>')
       .replace(/pierces for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">pierces for $1</span>')
+      .replace(/Boss Spoils/gi, '<span class="feed-chip feed-chip-boss">Boss Spoils</span>')
+      .replace(/Elite Spoils/gi, '<span class="feed-chip feed-chip-elite">Elite Spoils</span>')
+      .replace(/Room Reward/gi, '<span class="feed-chip feed-chip-floor">Room Reward</span>')
+      .replace(/Milestone Reward/gi, '<span class="feed-chip feed-chip-floor">Milestone Reward</span>')
+      .replace(/Mythic Find/gi, '<span class="feed-chip rarity-mythic">Mythic Find</span>')
       .replace(/Boss relic/gi, '<span class="feed-chip feed-chip-boss">Boss relic</span>')
       .replace(/Bounty relic/gi, '<span class="feed-chip feed-chip-boss">Bounty relic</span>')
       .replace(/Elite warning/gi, '<span class="feed-chip feed-chip-elite feed-chip-threat">Elite warning</span>')
@@ -2885,7 +2891,9 @@
     state.run.roomsCleared += 1;
     state.run.chain += 1;
     const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
-    pushCombat(state, `${victoryLead}: ${m.name}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
+    const rewardLead = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward';
+    const victoryVerb = source === 'boss' ? 'cleared' : source === 'elite' ? 'defeated' : 'secured';
+    pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
     pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
     updateQuest(state, 'kill', 1);
 
@@ -2898,22 +2906,22 @@
         : generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source, depthRaw: state.run.floor, state });
       addPendingRunLoot(state, loot);
       drops += 1;
-      const lootLabel = source === 'boss' ? 'Boss relic' : source === 'elite' ? 'Elite drop' : 'Found gear';
+      const lootLabel = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward loot';
       const lootLine = loot.rarity === 'mythic'
-        ? `${lootLabel} hums with Lowfire heat`
+        ? `Mythic Find from ${lootLabel}`
         : lootLabel;
-      pushCombat(state, `${lootLine} unsecured: ${loot.name} (${loot.rarity}).`);
+      pushCombat(state, `${lootLine}: ${loot.name} (${loot.rarity}) added to the unsecured haul.`);
       updateQuest(state, 'loot', 1);
     }
     if (source === 'elite' && eliteReward?.modifierCount) {
       const bonusPct = Math.round(eliteReward.bonusLootChance * 100);
-      pushCombat(state, `Elite risk bonus: +${bonusPct}% bonus loot roll.`);
+      pushCombat(state, `Elite Spoils: elite risk adds a +${bonusPct}% bonus loot roll.`);
       if (Math.random() < eliteReward.bonusLootChance) {
         const bonusLoot = generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source:'elite', depthRaw:state.run.floor, state });
         bonusLoot.tags = asArray(bonusLoot.tags, []).concat(['elite-risk-bonus']);
         addPendingRunLoot(state, bonusLoot);
         drops += 1;
-        pushCombat(state, `Elite bonus loot unsecured: ${bonusLoot.name} (${bonusLoot.rarity}).`);
+        pushCombat(state, `Elite Spoils bonus loot: ${bonusLoot.name} (${bonusLoot.rarity}) added to the unsecured haul.`);
         updateQuest(state, 'loot', 1);
       }
     }
@@ -2929,11 +2937,12 @@
         addPendingRunLoot(state, bounty);
         sink.nextBossBounty = false;
         drops += 1;
-        pushCombat(state, `Bounty relic unsecured: ${bounty.name} (${bounty.rarity}).`);
+        pushCombat(state, `Boss Spoils bounty relic: ${bounty.name} (${bounty.rarity}) added to the unsecured haul.`);
         updateQuest(state, 'loot', 1);
       }
     }
-    if (!drops && source === 'normal') pushCombat(state, 'No keepable gear. Push deeper or extract with the haul.');
+    if (!drops && source === 'normal') pushCombat(state, 'No gear found. You pocket the coin and move on.');
+    if (!drops && source === 'elite') pushCombat(state, 'Elite Spoils: no gear found. Coin, shards, and XP stay in the unsecured haul.');
 
     if (source === 'elite' && !m.eliteContractCounted) {
       m.eliteContractCounted = true;
@@ -2951,7 +2960,7 @@
       aid.value = Math.max(aid.value, coins(0, 1, 80));
       aid.tags = asArray(aid.tags, []).concat(['early-aid-cache']);
       addPendingRunLoot(state, aid);
-      pushCombat(state, `Scrap cache unsecured: ${aid.name}.`);
+      pushCombat(state, `Room Reward cache: ${aid.name} added to the unsecured haul.`);
       pushLog(state, `A last-resort Lowfire cache produced basic gear: ${aid.name}.`);
       updateQuest(state, 'loot', 1);
     }
@@ -3018,17 +3027,17 @@
     if (reason === 'extract') {
       const secured = bankPendingRunRewards(state);
       const securedText = cleanDisplayText(secured, 'no unsecured rewards');
-      runResultDetail = `Banked haul: ${securedText}. Next descent can start from ${returnLabel}.`;
-      pushCombat(state, `Extraction secured. Banked haul: ${securedText}.`);
-      pushLog(state, `Extraction secured. Banked haul: ${securedText}. Next start: ${returnLabel}.`);
+      runResultDetail = `Extraction Haul secured: ${securedText}. Lowfire marks the run complete. Next descent can start from ${returnLabel}.`;
+      pushCombat(state, `Extraction Haul secured. Banked: ${securedText}.`);
+      pushLog(state, `Extraction Haul secured. Banked: ${securedText}. Next start: ${returnLabel}.`);
       showExtractionPopup(`${extractionPopupSummary(rewardSnapshot, securedText)} • Next: ${returnLabel}`);
       recordSafeExtractionProgress(state);
     } else if (reason === 'defeat') {
       const lost = discardPendingRunRewards(state);
       const lostText = cleanDisplayText(lost, 'no unsecured rewards');
-      runResultDetail = `Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked progress stayed safe.`;
-      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}.`);
-      showDefeatPopup(`Lost unsecured: ${lostText}. Restart: ${returnLabel}.`);
+      runResultDetail = `The run ends here. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`;
+      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`);
+      showDefeatPopup(`Run ended. Lost unsecured: ${lostText}. Restart: ${returnLabel}.`);
     } else {
       clearPendingRunRewards(state);
       runResultDetail = 'Descent ended without unsecured rewards.';
@@ -3073,7 +3082,7 @@
 
   function defeat(state) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
-    pushCombat(state, 'The descent claims this run. Unsecured rewards were lost; banked progress stayed safe.');
+    pushCombat(state, 'The run ends here. Lowfire records the floor. Unsecured rewards were lost; banked gear and wallet stayed safe.');
     spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
     finishRun(state, 'defeat');
   }
@@ -3727,7 +3736,7 @@
     popup.className = 'extract-success-popup';
     popup.setAttribute('role', 'status');
     popup.setAttribute('aria-live', 'polite');
-    popup.innerHTML = `<strong>Extraction Secured</strong><span>${escapeHtml(summary || 'Rewards banked. You made it back to Lowfire.')}</span>`;
+    popup.innerHTML = `<strong>Extraction Haul</strong><span>${escapeHtml(summary || 'Rewards banked. You made it back to Lowfire.')}</span>`;
     document.body.appendChild(popup);
     requestAnimationFrame(() => popup.classList.add('show'));
     setTimeout(() => popup.classList.remove('show'), 2100);
@@ -3741,7 +3750,7 @@
     popup.className = 'defeat-result-popup';
     popup.setAttribute('role', 'status');
     popup.setAttribute('aria-live', 'polite');
-    popup.innerHTML = `<strong>Descent Lost</strong><span>${escapeHtml(summary || 'Unsecured rewards were forfeited.')}</span>`;
+    popup.innerHTML = `<strong>Run Lost</strong><span>${escapeHtml(summary || 'Unsecured rewards were forfeited.')}</span>`;
     document.body.appendChild(popup);
     requestAnimationFrame(() => popup.classList.add('show'));
     setTimeout(() => popup.classList.remove('show'), 2400);
@@ -3753,8 +3762,8 @@
     if (!latest) return 'No descents logged yet';
     const floor = Math.max(0, Math.floor(numberOr(latest.floor, 0, 0, 999999)));
     const reason = normalizeRunHistoryReason(latest.reason);
-    if (reason === 'extract') return `Last descent: extracted at ${depthWithRawLabel(floor || 1)}`;
-    if (reason === 'defeat') return `Last descent: defeated at ${depthWithRawLabel(floor || 1)}`;
+    if (reason === 'extract') return `Last descent: extraction secured at ${depthWithRawLabel(floor || 1)}`;
+    if (reason === 'defeat') return `Last descent: run lost at ${depthWithRawLabel(floor || 1)}`;
     return `Last descent: ${reason} at ${depthWithRawLabel(floor || 1)}`;
   }
 
@@ -4259,7 +4268,7 @@
       const outcomeClass = isWin ? 'outcome-win' : isDefeat ? 'outcome-loss' : 'outcome-neutral';
       const icon = isWin ? '✓' : isDefeat ? '✕' : '•';
       const zone = cleanDisplayText(r.zone || r.district || 'Hollow Stair', 'Hollow Stair');
-      const fallbackDetail = isWin ? 'Extracted to Lowfire. The haul was banked.' : isDefeat ? 'Run failed. Unsecured rewards were lost; banked progress stayed safe.' : 'Descent ended.';
+      const fallbackDetail = isWin ? 'Extraction Haul secured. Lowfire marked the run complete.' : isDefeat ? 'The run ended here. Unsecured rewards were lost; banked gear and wallet stayed safe.' : 'Descent ended.';
       const detail = cleanDisplayText(r.detail || r.summary || fallbackDetail, fallbackDetail);
       const runLabel = cleanDisplayText(r.runLabel || depthWithRawLabel(r.floor || 1), depthWithRawLabel(1));
       const lootPreview = asArray(r.lootPreview, []).slice(0, 3)
@@ -4308,7 +4317,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.43</p>
+      <p class="small">DungeonDex v1.3.44</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
