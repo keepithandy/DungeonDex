@@ -19,3 +19,9 @@ Restrictions for future extraction:
 - Do not add external JSON loading until offline, `file://`, Koder, itch, GitHub Pages, and mobile behavior are verified.
 - Preserve the current save format and localStorage keys unless a dedicated migration pass explicitly changes them.
 - Treat any content extraction as a separate pass with focused regression testing.
+
+## v1.3.42 content registry audit
+
+- `tools/audit_content_registries.py` maps likely content-like registries in `app.js` without executing the game or changing project files.
+- The audit is preparation only. It does not introduce runtime JSON loading, move content out of `app.js`, or change save/storage behavior.
+- Future extraction should start with display-only strings and avoid balance, merchant, charter, combat, reward, and save-state logic.

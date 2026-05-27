@@ -607,7 +607,7 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     ]
 
     lines: list[str] = []
-    lines.append("DungeonDex v1.3.41 Deep Scaling Report")
+    lines.append("DungeonDex v1.3.42 Deep Scaling Report")
     lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(f"Project root: {root}")
     lines.append(f"Static source: {app_path if app_path.exists() else 'app.js missing'}")
@@ -622,6 +622,7 @@ def build_report(root: Path, checkpoints: list[int]) -> tuple[str, list[Checkpoi
     lines.append("- v1.3.39: added the offline simulator/report only; no balance or save changes.")
     lines.append("- v1.3.40: applied bounded deep-floor mythic, elite, and boss alignment; merchants, gold, charters, drop rates, and saves stayed unchanged.")
     lines.append("- v1.3.41: report readability and release documentation only; no formula changes.")
+    lines.append("- v1.3.42: content registry audit/data extraction prep only; no formula changes.")
     lines.append("")
     lines.append("Static Formula Scan")
     lines.append(f"- Detected {detected_count}/{expected_count} searched helper or constant names.")

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.41-scaling-report-polish-release-cleanup';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.41-scaling-report-polish-release-cleanup','./app.js?build=1.3.41-scaling-report-polish-release-cleanup','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.42-content-registry-audit-data-extraction-prep';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.42-content-registry-audit-data-extraction-prep','./app.js?build=1.3.42-content-registry-audit-data-extraction-prep','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
