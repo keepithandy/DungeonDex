@@ -2080,44 +2080,278 @@ html {
 }
 .combat-monster-stage.stage-elite { border-color: rgba(196,123,255,0.22); box-shadow: inset 0 -18px 40px rgba(0,0,0,0.64), 0 0 24px rgba(151,80,255,0.075); }
 .combat-monster-stage.stage-boss { min-height: 152px; border-color: rgba(255,141,141,0.26); box-shadow: inset 0 -18px 40px rgba(0,0,0,0.68), 0 0 28px rgba(255,89,58,0.09); }
+/* v1.3.45 — Monster Visual Pass */
+
+/* ─── Keyframe animations ─── */
+@keyframes auraBreath {
+  0%, 100% { opacity: .7; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 1;  transform: translate(-50%, -50%) scale(1.08); }
+}
+@keyframes auraBreathElite {
+  0%, 100% { opacity: .65; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.12); }
+}
+@keyframes auraBreathBoss {
+  0%, 100% { opacity: .72; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.14); }
+}
+@keyframes coreGlow {
+  0%, 100% { box-shadow: 0 0 10px 2px rgba(255,92,64,.38); }
+  50%       { box-shadow: 0 0 22px 6px rgba(255,92,64,.62); }
+}
+@keyframes coreGlowElite {
+  0%, 100% { box-shadow: 0 0 10px 3px rgba(196,120,255,.44); }
+  50%       { box-shadow: 0 0 24px 8px rgba(196,120,255,.72); }
+}
+@keyframes coreGlowBoss {
+  0%, 100% { box-shadow: 0 0 14px 4px rgba(255,76,50,.48); }
+  50%       { box-shadow: 0 0 30px 10px rgba(255,76,50,.78); }
+}
+@keyframes torchFlicker {
+  0%, 100% { opacity: 1; transform: scaleX(1) translateX(-50%); }
+  33%       { opacity: .88; transform: scaleX(.92) translateX(-50%); }
+  66%       { opacity: .96; transform: scaleX(1.06) translateX(-50%); }
+}
+
+/* ─── Stage floor shadow ─── */
 .stage-floor {
   position: absolute;
-  left: 13%; right: 13%; bottom: 14px;
-  height: 20px;
+  left: 10%; right: 10%; bottom: 12px;
+  height: 22px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255,213,128,0.20), rgba(255,255,255,0.035) 46%, transparent 72%);
-  filter: blur(.3px);
+  background: radial-gradient(ellipse at center, rgba(255,200,100,0.22), rgba(255,255,255,0.04) 52%, transparent 76%);
+  filter: blur(.5px);
 }
+
+/* ─── Monster aura: base + tier variants ─── */
+.monster-aura {
+  position: absolute;
+  left: 50%; top: 54%;
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: auraBreath 3.2s ease-in-out infinite;
+}
+
+.stage-elite .monster-aura {
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(184,100,255,0.18), transparent 70%);
+  box-shadow: 0 0 60px 28px rgba(164,100,255,.16);
+  animation: auraBreathElite 2.8s ease-in-out infinite;
+}
+
+.stage-boss .monster-aura {
+  width: 92px; height: 92px;
+  background: radial-gradient(circle, rgba(255,80,50,0.20), transparent 68%);
+  box-shadow: 0 0 72px 36px rgba(255,75,47,.18);
+  animation: auraBreathBoss 2.4s ease-in-out infinite;
+}
+
+/* Normal aura: subtle ember glow */
+.combat-monster-stage:not(.stage-elite):not(.stage-boss) .monster-aura {
+  background: radial-gradient(circle, rgba(255,110,70,0.10), transparent 72%);
+  box-shadow: 0 0 40px 14px rgba(255,100,60,.09);
+}
+
+/* ─── Silhouette: base (normal enemy) ─── */
 .monster-silhouette {
-  position:absolute;
-  left:50%; bottom:28px;
-  width: 92px; height: 88px;
+  position: absolute;
+  left: 50%; bottom: 26px;
+  width: 86px; height: 90px;
   transform: translateX(-50%);
-  border-radius: 44% 44% 36% 36%;
+  /* Hunched body shape: wider shoulders, tapered bottom */
+  border-radius: 40% 40% 34% 34% / 44% 44% 32% 32%;
   background:
-    radial-gradient(circle at 50% 31%, rgba(255,95,70,0.85) 0 3px, transparent 4px),
-    linear-gradient(145deg, rgba(44,48,55,0.96), rgba(9,10,12,0.98));
-  border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 0 18px 24px rgba(0,0,0,0.54), inset 0 0 18px rgba(255,255,255,0.035), 0 0 28px rgba(255,110,70,0.08);
+    /* Eyes: two faint amber dots */
+    radial-gradient(circle at 37% 34%, rgba(255,148,60,0.90) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 63% 34%, rgba(255,148,60,0.90) 0 2.5px, transparent 3.5px),
+    /* Shoulder highlight */
+    radial-gradient(ellipse at 50% 8%, rgba(255,255,255,0.06) 0 38%, transparent 62%),
+    /* Body gradient */
+    linear-gradient(160deg, rgba(38,42,50,0.97) 0%, rgba(14,15,18,0.99) 60%);
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow:
+    0 16px 28px rgba(0,0,0,0.58),
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 0 22px rgba(255,100,60,0.07);
+  transition: transform .14s ease, filter .18s ease;
+  overflow: visible;
 }
+
+/* Leg/arm extensions */
 .monster-silhouette::before,
 .monster-silhouette::after {
-  content:""; position:absolute; bottom:2px; width:22px; height:48px; border-radius:18px;
-  background: linear-gradient(180deg, rgba(28,31,36,0.98), rgba(5,6,8,0.98));
-  border:1px solid rgba(255,255,255,0.06);
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  width: 20px; height: 46px;
+  border-radius: 14px 14px 10px 10px;
+  background: linear-gradient(180deg, rgba(32,36,44,0.98), rgba(8,9,11,0.99));
+  border: 1px solid rgba(255,255,255,0.055);
 }
-.monster-silhouette::before { left:-18px; transform: rotate(14deg); }
-.monster-silhouette::after { right:-18px; transform: rotate(-14deg); }
-.silhouette-elite { box-shadow: 0 18px 24px rgba(0,0,0,0.56), 0 0 32px rgba(178,92,255,0.16), inset 0 0 18px rgba(178,92,255,0.055); }
-.silhouette-boss { width:108px; height:96px; box-shadow: 0 20px 26px rgba(0,0,0,0.62), 0 0 38px rgba(255,76,60,0.18), inset 0 0 20px rgba(255,162,74,0.055); }
-.monster-core { position:absolute; left:50%; top:46%; width:18px; height:22px; transform:translate(-50%,-50%); border-radius:999px; background:rgba(255,92,64,0.17); box-shadow:0 0 16px rgba(255,92,64,0.35); }
-.monster-horn { position:absolute; top:-10px; width:24px; height:24px; border-top:2px solid rgba(255,213,128,0.45); border-radius: 50%; }
-.horn-left { left:11px; transform:rotate(-28deg); }
-.horn-right { right:11px; transform:rotate(28deg); }
-.stage-torch { position:absolute; top:28px; width:8px; height:42px; border-radius:999px; background:rgba(110,66,42,0.7); box-shadow:0 0 18px rgba(255,132,66,0.34); }
-.stage-torch::before { content:""; position:absolute; left:50%; top:-13px; width:18px; height:24px; transform:translateX(-50%); border-radius:50% 50% 48% 48%; background:radial-gradient(circle, #ffd580 0 20%, #ff7c49 45%, transparent 72%); filter:blur(.4px); }
-.torch-left { left:24px; }
-.torch-right { right:24px; }
+.monster-silhouette::before { left: -16px; transform: rotate(13deg); transform-origin: top center; }
+.monster-silhouette::after  { right: -16px; transform: rotate(-13deg); transform-origin: top center; }
+
+/* ─── Monster horns: normal (subtle nubs) ─── */
+.monster-horns {
+  position: absolute;
+  left: 50%; top: -2px;
+  transform: translateX(-50%);
+  width: 60px; height: 14px;
+  pointer-events: none;
+}
+.monster-horns::before,
+.monster-horns::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 9px; height: 14px;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, rgba(80,86,96,0.88), rgba(28,32,38,0.92));
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.monster-horns::before { left: 8px;  transform: rotate(-8deg);  transform-origin: bottom center; }
+.monster-horns::after  { right: 8px; transform: rotate(8deg);   transform-origin: bottom center; }
+
+/* ─── Monster core glyph ─── */
+.monster-core {
+  position: absolute;
+  left: 50%; top: 52%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: .62rem;
+  font-weight: 900;
+  color: rgba(255,148,60,0.88);
+  background: rgba(255,92,64,0.12);
+  animation: coreGlow 2.8s ease-in-out infinite;
+}
+
+/* ─── Elite silhouette overrides ─── */
+.combat-device-elite .monster-silhouette {
+  /* Taller, leaner — more dangerous proportions */
+  width: 80px; height: 98px;
+  border-radius: 36% 36% 32% 32% / 42% 42% 30% 30%;
+  background:
+    radial-gradient(circle at 36% 30%, rgba(200,130,255,0.95) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 64% 30%, rgba(200,130,255,0.95) 0 2.5px, transparent 3.5px),
+    radial-gradient(ellipse at 50% 6%, rgba(180,100,255,0.09) 0 40%, transparent 64%),
+    linear-gradient(158deg, rgba(40,34,56,0.97), rgba(12,9,18,0.99) 58%);
+  border-color: rgba(190,120,255,0.22);
+  box-shadow:
+    0 16px 28px rgba(0,0,0,0.60),
+    inset 0 1px 0 rgba(210,150,255,0.08),
+    0 0 32px rgba(178,92,255,0.14);
+}
+
+/* Elite horns: sharper and taller */
+.combat-device-elite .monster-horns::before,
+.combat-device-elite .monster-horns::after {
+  width: 10px; height: 20px;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, rgba(190,120,255,0.72), rgba(60,34,88,0.90));
+  border-color: rgba(200,140,255,0.20);
+}
+.combat-device-elite .monster-horns::before { left: 6px;  transform: rotate(-12deg); }
+.combat-device-elite .monster-horns::after  { right: 6px; transform: rotate(12deg); }
+
+.combat-device-elite .monster-core {
+  color: rgba(210,150,255,0.90);
+  background: rgba(184,100,255,0.14);
+  animation: coreGlowElite 2.6s ease-in-out infinite;
+}
+
+/* ─── Boss silhouette overrides ─── */
+.combat-device-boss .monster-silhouette {
+  /* Wider, more massive, slightly hunched lower */
+  width: 108px; height: 96px;
+  border-radius: 46% 46% 38% 38% / 48% 48% 34% 34%;
+  background:
+    radial-gradient(circle at 34% 32%, rgba(255,80,50,0.98) 0 3px, transparent 4px),
+    radial-gradient(circle at 66% 32%, rgba(255,80,50,0.98) 0 3px, transparent 4px),
+    radial-gradient(ellipse at 50% 6%, rgba(255,100,60,0.11) 0 42%, transparent 66%),
+    linear-gradient(155deg, rgba(52,30,24,0.97), rgba(12,6,5,0.99) 56%);
+  border-color: rgba(255,100,60,0.24);
+  box-shadow:
+    0 20px 32px rgba(0,0,0,0.64),
+    inset 0 1px 0 rgba(255,160,80,0.07),
+    0 0 40px rgba(255,76,50,0.16);
+}
+
+/* Boss pseudo-elements: heavier limbs */
+.combat-device-boss .monster-silhouette::before,
+.combat-device-boss .monster-silhouette::after {
+  width: 24px; height: 52px;
+  border-radius: 16px 16px 10px 10px;
+}
+.combat-device-boss .monster-silhouette::before { left: -20px; transform: rotate(11deg); }
+.combat-device-boss .monster-silhouette::after  { right: -20px; transform: rotate(-11deg); }
+
+/* Boss horns: large curved crown horns */
+.combat-device-boss .monster-horns {
+  width: 76px; height: 22px;
+  top: -6px;
+}
+.combat-device-boss .monster-horns::before,
+.combat-device-boss .monster-horns::after {
+  width: 14px; height: 26px;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, rgba(255,160,60,0.80), rgba(90,30,10,0.90));
+  border-color: rgba(255,140,60,0.22);
+}
+.combat-device-boss .monster-horns::before { left: 4px;  transform: rotate(-16deg); }
+.combat-device-boss .monster-horns::after  { right: 4px; transform: rotate(16deg); }
+
+.combat-device-boss .monster-core {
+  width: 22px; height: 24px;
+  font-size: .68rem;
+  color: rgba(255,120,60,0.92);
+  background: rgba(255,76,50,0.14);
+  animation: coreGlowBoss 2.2s ease-in-out infinite;
+}
+
+/* ─── Attack hit reaction: silhouette recoil ─── */
+.combat-device-shell:has(.attack-btn.tap-now) .monster-silhouette,
+.combat-device-shell:has(.skill-btn.tap-now) .monster-silhouette {
+  transform: translateX(3px) scale(0.97);
+  filter: brightness(1.28) saturate(1.3);
+}
+
+/* ─── Guard reaction: player HP card flash ─── */
+.combat-device-shell:has(.guard-btn.tap-now) .player-hp {
+  box-shadow: 0 0 0 1px rgba(118,196,255,0.28), inset 0 0 22px rgba(118,196,255,0.07);
+}
+
+/* ─── Extract reaction: whole shell glow ─── */
+.combat-device-shell:has(.extract-btn.tap-now) {
+  box-shadow: 0 20px 46px rgba(0,0,0,0.48), 0 0 28px rgba(255,205,102,0.14);
+}
+
+/* ─── Stage torches ─── */
+.stage-torch {
+  position: absolute;
+  top: 24px;
+  width: 8px; height: 44px;
+  border-radius: 999px;
+  background: rgba(106,60,36,0.72);
+  box-shadow: 0 0 18px rgba(255,132,66,0.32);
+}
+.stage-torch::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: -14px;
+  width: 18px; height: 24px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 48% 48%;
+  background: radial-gradient(circle, #ffd580 0 18%, #ff7c49 44%, transparent 72%);
+  filter: blur(.4px);
+  animation: torchFlicker 1.8s ease-in-out infinite;
+}
+.torch-left  { left: 22px; }
+.torch-right { right: 22px; }
 .combat-stat-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto;
@@ -2209,20 +2443,6 @@ html {
 
 .monster-silhouette {
   transition: transform .14s ease, filter .18s ease;
-}
-
-.combat-device-shell:has(.attack-btn.tap-now) .monster-silhouette,
-.combat-device-shell:has(.skill-btn.tap-now) .monster-silhouette {
-  transform: translateX(2px) scale(1.035);
-  filter: brightness(1.18);
-}
-
-.combat-device-shell:has(.guard-btn.tap-now) .player-hp {
-  box-shadow: 0 0 0 1px rgba(118, 196, 255, 0.24), inset 0 0 22px rgba(118, 196, 255, 0.06);
-}
-
-.combat-device-shell:has(.extract-btn.tap-now) {
-  box-shadow: 0 20px 46px rgba(0,0,0,0.48), 0 0 28px rgba(255, 205, 102, 0.12);
 }
 
 .hp-label-row {
@@ -2495,12 +2715,9 @@ html {
   color: #ead0ff;
 }
 
-.stage-elite .monster-aura {
-  box-shadow: 0 0 70px 34px rgba(164, 100, 255, .14);
-}
-
+.stage-elite .monster-aura,
 .stage-boss .monster-aura {
-  box-shadow: 0 0 78px 38px rgba(255, 75, 47, .16);
+  /* Defined in v1.3.45 monster visual block above */
 }
 
 @media (max-width: 420px) {
@@ -5603,3 +5820,226 @@ button:focus-visible,
     font-size: .76rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   v1.3.46 — Stage Atmosphere Pass
+   Per-district combat stage backgrounds + tier atmosphere overlays.
+   CSS only. No combat math, save keys, or mechanics changed.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Shared stage keyframes ─── */
+@keyframes stagePulse {
+  0%, 100% { opacity: .8; }
+  50%       { opacity: 1; }
+}
+@keyframes bossGroundFlare {
+  0%, 100% { opacity: .55; transform: scaleX(1); }
+  40%       { opacity: .80; transform: scaleX(1.06); }
+  70%       { opacity: .62; transform: scaleX(.97); }
+}
+@keyframes eliteGroundShimmer {
+  0%, 100% { opacity: .50; }
+  50%       { opacity: .80; }
+}
+
+/* ─── Improved base stage background (all normal enemies) ─── */
+.combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.68) 0, transparent 24%, transparent 76%, rgba(0,0,0,.68) 100%),
+    radial-gradient(ellipse at 50% 88%, rgba(255,130,60,.15), transparent 42%),
+    radial-gradient(circle  at 50% 14%, rgba(255,213,128,.06), transparent 44%),
+    linear-gradient(180deg, rgba(22,18,16,.94), rgba(6,7,10,.99));
+}
+
+/* ─── Stage floor lighting: animated on boss, shimmer on elite ─── */
+.stage-boss .stage-floor {
+  animation: bossGroundFlare 2.6s ease-in-out infinite;
+}
+.stage-elite .stage-floor {
+  background: radial-gradient(ellipse at center, rgba(190,120,255,.22), rgba(255,255,255,.03) 50%, transparent 76%);
+  animation: eliteGroundShimmer 2.8s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════
+   DISTRICT STAGE BACKGROUNDS
+   Each uses the district-tone-X class
+   already applied to .combat-device-shell
+   ══════════════════════════════════ */
+
+/* ── D1–10: Lowfire District
+   Warm amber embers, orange hearth light from below, shallow threat */
+.district-tone-lowfire .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.62) 0, transparent 26%, transparent 74%, rgba(0,0,0,.62) 100%),
+    radial-gradient(ellipse at 50% 92%, rgba(255,160,60,.20), transparent 44%),
+    radial-gradient(ellipse at 30% 70%, rgba(255,120,40,.10), transparent 36%),
+    radial-gradient(circle  at 50% 12%, rgba(255,200,100,.07), transparent 46%),
+    linear-gradient(180deg, rgba(26,18,12,.93), rgba(8,6,4,.99));
+  border-color: rgba(255,170,80,.14);
+}
+
+/* ── D11–20: Ashgate Warrens
+   Cold coal-smoke grey, narrow blue lamplight, damp stone */
+.district-tone-ashgate .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.70) 0, transparent 24%, transparent 76%, rgba(0,0,0,.70) 100%),
+    radial-gradient(ellipse at 50% 90%, rgba(90,110,140,.18), transparent 42%),
+    radial-gradient(ellipse at 68% 55%, rgba(140,168,210,.09), transparent 32%),
+    radial-gradient(circle  at 50% 10%, rgba(160,180,210,.05), transparent 44%),
+    linear-gradient(180deg, rgba(18,20,26,.95), rgba(5,6,9,.99));
+  border-color: rgba(130,155,190,.14);
+}
+
+/* ── D21–30: Ember Debtworks
+   Red worklight, iron chains, debt ledger crimson */
+.district-tone-debtworks .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.65) 0, transparent 24%, transparent 76%, rgba(0,0,0,.65) 100%),
+    radial-gradient(ellipse at 50% 88%, rgba(220,60,30,.18), transparent 44%),
+    radial-gradient(ellipse at 22% 60%, rgba(180,40,20,.10), transparent 32%),
+    radial-gradient(circle  at 78% 18%, rgba(255,160,60,.06), transparent 38%),
+    linear-gradient(180deg, rgba(28,14,10,.94), rgba(7,4,3,.99));
+  border-color: rgba(220,80,40,.16);
+}
+
+/* ── D31–40: Sootveil Descent
+   Black dust, near-darkness, a single dim overhead light */
+.district-tone-sootveil .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.76) 0, transparent 22%, transparent 78%, rgba(0,0,0,.76) 100%),
+    radial-gradient(ellipse at 50% 88%, rgba(70,72,88,.14), transparent 40%),
+    radial-gradient(circle  at 50% 8%,  rgba(120,120,140,.05), transparent 36%),
+    linear-gradient(180deg, rgba(14,14,18,.96), rgba(4,4,6,.99));
+  border-color: rgba(90,90,110,.12);
+}
+
+/* ── D41–50: Cinderbone Halls
+   Furnace orange, bone-white highlights, buried heat */
+.district-tone-cinderbone .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.64) 0, transparent 25%, transparent 75%, rgba(0,0,0,.64) 100%),
+    radial-gradient(ellipse at 50% 90%, rgba(255,140,60,.20), transparent 46%),
+    radial-gradient(ellipse at 72% 40%, rgba(220,190,140,.08), transparent 30%),
+    radial-gradient(circle  at 28% 22%, rgba(255,210,160,.06), transparent 40%),
+    linear-gradient(180deg, rgba(28,18,10,.94), rgba(7,5,3,.99));
+  border-color: rgba(240,150,80,.15);
+}
+
+/* ── D51–60: Blacktithe Deep
+   Gold shadow, sealed oppression, faint amber toll-light */
+.district-tone-blacktithe .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.68) 0, transparent 24%, transparent 76%, rgba(0,0,0,.68) 100%),
+    radial-gradient(ellipse at 50% 86%, rgba(200,160,60,.16), transparent 42%),
+    radial-gradient(circle  at 50% 10%, rgba(255,213,100,.06), transparent 40%),
+    radial-gradient(ellipse at 18% 72%, rgba(90,70,20,.12), transparent 36%),
+    linear-gradient(180deg, rgba(20,16,8,.95), rgba(6,5,2,.99));
+  border-color: rgba(200,160,60,.16);
+}
+
+/* ── D61–70: Lanternless Vault
+   Near-total dark, cold blue void, one dead lamp overhead */
+.district-tone-lanternless .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.80) 0, transparent 20%, transparent 80%, rgba(0,0,0,.80) 100%),
+    radial-gradient(ellipse at 50% 90%, rgba(50,60,110,.12), transparent 38%),
+    radial-gradient(circle  at 50% 6%,  rgba(100,120,180,.05), transparent 32%),
+    radial-gradient(ellipse at 50% 48%, rgba(30,35,60,.22), transparent 56%),
+    linear-gradient(180deg, rgba(10,11,18,.97), rgba(3,3,7,.99));
+  border-color: rgba(80,100,160,.12);
+}
+
+/* ── D71–80: Hunger Kilns
+   Open white-hot heat, pale kiln light, watching orange */
+.district-tone-hunger .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.60) 0, transparent 26%, transparent 74%, rgba(0,0,0,.60) 100%),
+    radial-gradient(ellipse at 50% 94%, rgba(255,180,80,.22), transparent 48%),
+    radial-gradient(circle  at 50% 14%, rgba(255,240,200,.07), transparent 40%),
+    radial-gradient(ellipse at 80% 50%, rgba(240,100,40,.10), transparent 34%),
+    linear-gradient(180deg, rgba(30,20,10,.93), rgba(8,5,2,.99));
+  border-color: rgba(255,160,60,.16);
+}
+
+/* ── D81–90: Redwake Catacombs
+   Deep red water-light, bone invoice walls, bloody mist */
+.district-tone-redwake .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.68) 0, transparent 24%, transparent 76%, rgba(0,0,0,.68) 100%),
+    radial-gradient(ellipse at 50% 92%, rgba(180,20,20,.22), transparent 46%),
+    radial-gradient(ellipse at 26% 58%, rgba(140,10,10,.12), transparent 32%),
+    radial-gradient(circle  at 74% 16%, rgba(200,40,20,.06), transparent 36%),
+    linear-gradient(180deg, rgba(22,8,8,.95), rgba(6,2,2,.99));
+  border-color: rgba(200,40,40,.18);
+}
+
+/* ── D91–100: The Final Lowflame
+   Ancient ember, vast dark, single sacred light from below */
+.district-tone-final-lowflame .combat-monster-stage {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.72) 0, transparent 22%, transparent 78%, rgba(0,0,0,.72) 100%),
+    radial-gradient(ellipse at 50% 96%, rgba(255,200,80,.24), transparent 52%),
+    radial-gradient(ellipse at 50% 96%, rgba(255,120,40,.14), transparent 34%),
+    radial-gradient(circle  at 50% 8%,  rgba(255,240,180,.04), transparent 44%),
+    radial-gradient(ellipse at 50% 52%, rgba(40,28,10,.28), transparent 62%),
+    linear-gradient(180deg, rgba(16,12,6,.96), rgba(4,3,1,.99));
+  border-color: rgba(255,180,60,.18);
+  box-shadow: inset 0 -22px 44px rgba(0,0,0,.64), inset 0 1px 0 rgba(255,255,255,.04), 0 0 32px rgba(255,160,50,.08);
+}
+
+/* ══════════════════════════════════
+   TIER ATMOSPHERE OVERLAYS
+   Applied on top of the district base
+   ══════════════════════════════════ */
+
+/* Elite: purple veil laid over district colour */
+.stage-elite {
+  border-color: rgba(190,120,255,.24);
+  box-shadow: inset 0 -20px 42px rgba(0,0,0,.66), 0 0 28px rgba(160,90,255,.10);
+}
+.stage-elite::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 80%, rgba(160,80,255,.14), transparent 50%),
+    radial-gradient(circle  at 50% 12%, rgba(200,140,255,.06), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Boss: crimson heat pressed through whatever district you're in */
+.stage-boss {
+  border-color: rgba(255,90,60,.26);
+  box-shadow: inset 0 -22px 46px rgba(0,0,0,.70), 0 0 36px rgba(255,70,40,.12);
+}
+.stage-boss::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 84%, rgba(255,60,30,.18), transparent 54%),
+    radial-gradient(circle  at 50% 10%, rgba(255,200,80,.05), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure silhouette and aura sit above the ::after overlay */
+.combat-monster-stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── combat-device-shell ambient border per district ─── */
+/* Subtle: just enough colour on the panel border to feel grounded */
+.district-tone-ashgate    .combat-device-shell { border-color: rgba(130,155,190,.20); }
+.district-tone-debtworks  .combat-device-shell { border-color: rgba(200,70,40,.20); }
+.district-tone-sootveil   .combat-device-shell { border-color: rgba(80,82,100,.18); }
+.district-tone-cinderbone .combat-device-shell { border-color: rgba(230,140,70,.20); }
+.district-tone-blacktithe .combat-device-shell { border-color: rgba(190,150,50,.20); }
+.district-tone-lanternless .combat-device-shell { border-color: rgba(70,90,150,.18); }
+.district-tone-hunger     .combat-device-shell { border-color: rgba(240,140,50,.20); }
+.district-tone-redwake    .combat-device-shell { border-color: rgba(190,30,30,.22); }
+.district-tone-final-lowflame .combat-device-shell { border-color: rgba(255,170,50,.22); }

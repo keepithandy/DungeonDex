@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.45';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.45';
+  const BUILD = 'DungeonDex v1.3.46';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.46';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -4317,7 +4317,7 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.45</p>
+      <p class="small">DungeonDex v1.3.46</p>
       <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
