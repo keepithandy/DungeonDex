@@ -5309,218 +5309,297 @@ button:focus-visible,
 }
 
 
-/* v1.3.44b — Combat Spam Stability Hotfix
-   Goal: keep active combat from jumping vertically while players rapidly clear low-level fights.
-   Scope: CSS/layout only. No combat math, reward logic, save keys, or merchant behavior changed. */
+/* v1.3.45 — Combat Page V2
+   Goal: proper combat layout redesign — stable action buttons, scrolling combat log,
+   readable enemy/HP cards, intentional visual hierarchy. No math or save changes.
+   Replaces the v1.3.44b hotfix which overcorrected and made combat look cramped. */
+
+/* ─── Combat shell: natural grid flow, no forced height-locking ─── */
 .app-shell.combat-active {
-  overflow: hidden;
-}
-
-.app-shell.combat-active .screens,
-.app-shell.combat-active #screen-run,
-.app-shell.combat-active #screen-run .stack-8,
-.app-shell.combat-active #runStatus,
-.app-shell.combat-active #combatPanel,
-.app-shell.combat-active #combatLog,
-.app-shell.combat-active .combat-device-shell {
-  min-height: 0;
-}
-
-.app-shell.combat-active #screen-run.active {
-  height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 14px);
-  max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 14px);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .app-shell.combat-active #screen-run .stack-8 {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) clamp(112px, 19dvh, 156px);
-  align-content: stretch;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  contain: layout paint;
+  gap: 8px;
 }
 
-.app-shell.combat-active #runStatus,
-.app-shell.combat-active #combatPanel,
-.app-shell.combat-active #combatLog {
-  overflow: hidden;
-}
-
-.app-shell.combat-active #combatPanel {
-  display: grid;
-}
-
+/* ─── Combat device shell: flex column so actions can anchor at bottom ─── */
 .app-shell.combat-active .combat-device-shell {
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  grid-template-rows: minmax(48px, auto) minmax(72px, 1fr) auto auto auto minmax(44px, auto);
-  align-content: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
 }
 
+/* ─── Enemy header: centered, clean, text clips gracefully ─── */
 .app-shell.combat-active .combat-enemy-header {
-  min-height: 54px;
-  max-height: 96px;
-  overflow: hidden;
-}
-
-.app-shell.combat-active .combat-enemy-header h2,
-.app-shell.combat-active .combat-enemy-header p,
-.app-shell.combat-active .depth-kicker,
-.app-shell.combat-active .combat-district-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.app-shell.combat-active .combat-enemy-header h2,
-.app-shell.combat-active .combat-enemy-header p {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
+  gap: 3px;
+  padding: 0 4px;
 }
 
 .app-shell.combat-active .combat-enemy-header h2 {
+  font-size: clamp(1.05rem, 4.8vw, 1.34rem);
+  line-height: 1.08;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .app-shell.combat-active .combat-enemy-header p {
-  -webkit-line-clamp: 1;
-}
-
-.app-shell.combat-active .elite-identity-panel,
-.app-shell.combat-active .combat-threat-brief {
-  max-height: 42px;
+  font-size: .7rem;
+  margin: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.app-shell.combat-active .combat-monster-stage,
-.app-shell.combat-active .combat-monster-stage.stage-boss {
-  min-height: 0 !important;
-  height: auto;
+.app-shell.combat-active .depth-kicker {
+  font-size: .66rem;
+  letter-spacing: .08em;
 }
 
-.app-shell.combat-active .combat-hp-card {
-  min-height: 52px;
-}
-
-.app-shell.combat-active .combat-hp-card,
-.app-shell.combat-active .run-stat-grid,
-.app-shell.combat-active .combat-device-actions {
+/* ─── Monster stage: visible and proportional, not locked to zero ─── */
+.app-shell.combat-active .combat-monster-stage {
+  min-height: clamp(110px, 20dvh, 160px);
+  border-radius: 18px;
   flex-shrink: 0;
 }
 
-.app-shell.combat-active .combat-device-actions {
-  align-self: end;
-  position: relative;
-  z-index: 2;
+.app-shell.combat-active .combat-monster-stage.stage-boss {
+  min-height: clamp(120px, 22dvh, 174px);
 }
 
+.app-shell.combat-active .monster-silhouette {
+  width: clamp(74px, 19vw, 92px);
+  height: clamp(72px, 18vw, 88px);
+  bottom: clamp(22px, 5dvh, 32px);
+}
+
+.app-shell.combat-active .monster-silhouette::before,
+.app-shell.combat-active .monster-silhouette::after {
+  height: clamp(38px, 9vw, 48px);
+  width: clamp(18px, 4.5vw, 24px);
+}
+
+/* ─── HP cards: stable height, no jumping ─── */
+.app-shell.combat-active .combat-hp-card {
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 15px;
+  flex-shrink: 0;
+}
+
+.app-shell.combat-active .hp-label-row {
+  font-size: .7rem;
+  line-height: 1.15;
+}
+
+.app-shell.combat-active .hpbar {
+  height: 7px;
+}
+
+.app-shell.combat-active .boss-hp .hpbar {
+  height: 9px;
+}
+
+.app-shell.combat-active .combat-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.app-shell.combat-active .combat-stat-row .pill {
+  padding: 3px 7px;
+  font-size: .63rem;
+}
+
+/* ─── Stat grid: compact 4-up ─── */
+.app-shell.combat-active .run-stat-grid {
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box {
+  min-height: 42px;
+  padding: 6px 4px;
+  border-radius: 13px;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box .small {
+  font-size: .56rem;
+}
+
+.app-shell.combat-active .run-stat-grid .stat-box strong {
+  font-size: .86rem;
+}
+
+/* ─── Action buttons: anchored and stable ─── */
+.app-shell.combat-active .combat-device-actions {
+  gap: 7px;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  padding: 6px 0 4px;
+  background: linear-gradient(180deg, transparent, rgba(8,10,15,0.96) 28%);
+  border-radius: 0 0 16px 16px;
+  margin: 0 -2px -2px;
+}
+
+.app-shell.combat-active .combat-device-actions button {
+  min-height: 48px;
+  padding: 10px 4px;
+  font-size: .74rem;
+  border-radius: 13px;
+}
+
+/* Suppress button movement on spam-tap so thumb target stays fixed */
 .app-shell.combat-active .combat-device-actions button,
 .app-shell.combat-active .combat-device-actions button:active,
 .app-shell.combat-active .combat-btn.tap-now {
   transform: none !important;
 }
 
+/* ─── Combat log: scrolls internally, never pushes buttons ─── */
+.app-shell.combat-active .run-log-head {
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.app-shell.combat-active .run-log-head h2 {
+  font-size: .93rem;
+  color: #fff1c9;
+}
+
 .app-shell.combat-active .run-log-list {
-  height: 100%;
-  max-height: none !important;
+  max-height: clamp(134px, 23dvh, 182px);
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  gap: 6px;
+  padding-right: 2px;
+  padding-bottom: 3px;
 }
 
 .app-shell.combat-active .run-log-list .combat-feed-line {
-  min-height: 46px;
+  padding: 7px 9px;
+  grid-template-columns: 24px minmax(0,1fr);
+  border-radius: 14px;
+}
+
+.app-shell.combat-active .feed-icon {
+  width: 23px;
+  height: 23px;
 }
 
 .app-shell.combat-active .feed-body {
-  -webkit-line-clamp: 2;
+  font-size: .73rem;
+  line-height: 1.36;
 }
 
+/* ─── Elite info: readable but compact during combat ─── */
+.app-shell.combat-active .elite-identity-panel {
+  padding: 5px 7px;
+  margin-top: 4px;
+}
+
+.app-shell.combat-active .elite-modifier-row {
+  gap: 4px;
+}
+
+.app-shell.combat-active .elite-modifier {
+  min-height: 18px;
+  padding: 1px 6px;
+  font-size: .58rem;
+}
+
+/* ─── Mobile: phone-sized viewport refinements ─── */
 @media (max-width: 560px) {
-  .app-shell.combat-active {
-    height: 100dvh;
-    max-height: 100dvh;
-    padding-bottom: calc(8px + var(--safe-bottom));
-  }
-
-  .app-shell.combat-active #screen-run.active {
-    height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 16px);
-    max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 16px);
-  }
-
-  .app-shell.combat-active #screen-run .stack-8 {
-    grid-template-rows: auto minmax(0, 1fr) clamp(92px, 16dvh, 122px);
-  }
-
   .app-shell.combat-active .combat-device-shell {
-    gap: 5px;
-    grid-template-rows: minmax(44px, auto) minmax(64px, 0.9fr) minmax(49px, auto) minmax(49px, auto) minmax(34px, auto) minmax(44px, auto);
-  }
-
-  .app-shell.combat-active .combat-enemy-header {
-    min-height: 48px;
-    max-height: 78px;
-  }
-
-  .app-shell.combat-active .elite-identity-panel,
-  .app-shell.combat-active .combat-threat-brief {
-    max-height: 30px;
-  }
-
-  .app-shell.combat-active .combat-hp-card {
-    min-height: 49px;
-  }
-
-  .app-shell.combat-active .run-stat-grid .stat-box {
-    min-height: 32px;
-  }
-
-  .app-shell.combat-active .run-log-head {
-    margin-bottom: 4px;
-  }
-
-  .app-shell.combat-active .run-log-head h2 {
-    font-size: 0.78rem;
-  }
-
-  .app-shell.combat-active .run-log-head .pill {
-    font-size: 0.56rem;
-    padding: 2px 6px;
-  }
-
-  .app-shell.combat-active .run-log-list .combat-feed-line {
-    min-height: 40px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-
-  .app-shell.combat-active .feed-body {
-    font-size: 0.68rem;
-    line-height: 1.24;
-  }
-}
-
-@media (max-width: 380px) {
-  .app-shell.combat-active .combat-device-shell {
-    gap: 4px;
-    padding: 6px;
-  }
-
-  .app-shell.combat-active .combat-enemy-header {
-    min-height: 42px;
-    max-height: 64px;
+    gap: 7px;
+    padding: 9px;
   }
 
   .app-shell.combat-active .combat-monster-stage {
-    display: none;
+    min-height: clamp(96px, 18dvh, 138px);
   }
 
-  .app-shell.combat-active .run-log-head {
-    display: none;
+  .app-shell.combat-active .combat-monster-stage.stage-boss {
+    min-height: clamp(106px, 20dvh, 152px);
   }
 
-  .app-shell.combat-active #screen-run .stack-8 {
-    grid-template-rows: auto minmax(0, 1fr) clamp(74px, 14dvh, 102px);
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 46px;
+    font-size: .7rem;
+  }
+
+  .app-shell.combat-active .run-log-list {
+    max-height: clamp(118px, 20dvh, 158px);
+  }
+
+  .app-shell.combat-active .run-log-head h2 {
+    font-size: .84rem;
+  }
+
+  .app-shell.combat-active .run-log-head .pill {
+    font-size: .58rem;
+    padding: 2px 6px;
+  }
+
+  .app-shell.combat-active .feed-body {
+    font-size: .69rem;
+    line-height: 1.28;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell.combat-active .combat-device-shell {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .app-shell.combat-active .run-stat-grid {
+    gap: 5px;
+  }
+
+  .app-shell.combat-active .run-stat-grid .stat-box {
+    min-height: 38px;
+    padding: 5px 3px;
+  }
+
+  .app-shell.combat-active .run-stat-grid .stat-box strong {
+    font-size: .8rem;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 44px;
+    font-size: .68rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell.combat-active .combat-device-shell {
+    gap: 5px;
+    padding: 7px;
+  }
+
+  .app-shell.combat-active .combat-device-actions {
+    gap: 5px;
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 44px;
+    font-size: .62rem;
+  }
+
+  .app-shell.combat-active .run-stat-grid .stat-box strong {
+    font-size: .76rem;
   }
 }
