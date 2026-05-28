@@ -1,0 +1,33 @@
+DungeonDex v1.3.48 - Split File Regression Guard
+
+Purpose
+- Safety pass after splitting the old monolithic app.js into ordered js/systems files.
+- Confirm the split-file runtime can boot, bind controls, save, reload, and cache without adding gameplay systems or redesigning UI.
+
+Changed
+- Updated visible build copy to DungeonDex v1.3.48.
+- Updated index.html asset query strings to v1.3.48-split-file-guard.
+- Made local index.html asset references explicitly relative with ./ paths for browser-hosted builds.
+- Updated the app.js pointer comment to v1.3.48. It remains a stub only.
+- Updated sw.js cache name to dungeon-dex-v1.3.48-split-file-guard.
+- Expanded sw.js cache assets into a readable explicit list containing every js/systems file.
+- Changed service worker install precaching to cache.addAll so a missing split file fails the install instead of being silently ignored.
+- Added fresh-first fetch behavior for scripts, styles, workers, and manifests so stale cache entries do not hide a bad split-file deploy.
+
+Load Order
+- index.html loads js/systems/00 through js/systems/12 in numeric order.
+- No app.js runtime script is loaded by index.html.
+- sw.js caches the same ordered split-file set.
+
+No Gameplay Changes
+- Combat math unchanged.
+- Loot/scaling unchanged.
+- Economy unchanged.
+- Loadout unchanged.
+- Lore/content unchanged.
+- UI layout unchanged beyond the short visible v1.3.48 title/build copy.
+
+Validation
+- node --check passed for all 13 split system files.
+- node --check passed for sw.js.
+- Headless Chrome smoke test passed through boot, intro, combat controls, reward flow, extraction, town render, archive render, service worker cache registration, and save/load refresh.
