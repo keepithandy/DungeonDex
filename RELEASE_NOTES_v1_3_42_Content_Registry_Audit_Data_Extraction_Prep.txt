@@ -1,0 +1,37 @@
+DungeonDex v1.3.42 - Content Registry Audit & Data Extraction Prep
+
+Summary
+- Documentation and tooling pass only.
+- No gameplay changes.
+- No combat math changes.
+- No enemy, item, mythic, elite, boss, merchant, gold, or Deep Stair Charter behavior changes.
+- No save format, save migration, localStorage key, or progress reset changes.
+- No CSS or mobile layout changes.
+
+Added
+- Added tools/audit_content_registries.py.
+- Added DATA_EXTRACTION_PLAN_v1_3_42_Content_Registry_Audit.txt.
+- Added release and smoke-test notes for v1.3.42.
+- Added a short v1.3.42 note to data/schema-notes.md.
+- Updated the deep-scaling simulator report title/context to v1.3.42; formulas remain unchanged.
+
+Content registry audit tool
+- Reads app.js as text only.
+- Uses Python standard library only.
+- Does not import, evaluate, or execute the game.
+- Does not modify project files.
+- Prints detected content-like registry areas, likely names, line numbers, extraction readiness notes, and coupling warnings.
+
+Data extraction prep
+- Identifies safer future extraction candidates such as district display copy, rarity display labels/colors, affix display labels, static lore strings, and non-runtime documentation tables.
+- Identifies risky or not-yet candidates such as item power formulas, enemy scaling formulas, merchant stock generation, reward logic, save-state shaping, combat logic, localStorage compatibility, and Deep Stair Charter behavior.
+
+Runtime boundary
+- No runtime JSON loading was added.
+- No fetch() calls were added.
+- app.js was not split.
+- No build step, npm dependency, or TypeScript conversion was added.
+
+Version/cache
+- Advanced internal build/cache labels to v1.3.42.
+- The visible label remains short: DungeonDex v1.3.42.

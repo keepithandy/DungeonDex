@@ -1,0 +1,40 @@
+DungeonDex v1.3.41 - Scaling Report Polish & Release Cleanup Smoke Test Notes
+
+Required smoke coverage
+- App loads.
+- Enter Dungeon path remains wired.
+- Combat buttons remain present in the render path: Attack, Guard, Skill, Extract.
+- Merchant opens/renders.
+- Item generation path remains present.
+- Mythic generation path remains present.
+- Boss and elite generation paths remain present.
+- Package checker passes.
+- Deep scaling simulator runs.
+- No save migration required.
+
+Automated checks performed
+- PASS: python tools/check_dungeondex_package.py
+  - Summary: PASS (14 paths checked, 0 warnings)
+- PASS: python tools/simulate_deep_scaling.py
+  - Report title: DungeonDex v1.3.41 Deep Scaling Report
+  - Static formula scan: 19/19 searched helper or constant names detected
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: headless Chrome DOM load rendered DungeonDex v1.3.41, Enter Dungeon, Lowfire Market, town panels, idle combat panel, merchant stock, and System Notes.
+- PASS: static source check found startRunBtn, runFromIdleBtn, combatAction, data-action combat buttons, merchantPanel, generateGear, generateMythicSetPiece, mythicSetDropChance, generateMonster, Boss, and Elite paths.
+
+Notes
+- The package checker was rerun with approval after the first sandboxed spawn failed before the script started.
+- Manual interactive browser clicking was not performed in this pass.
+- The checked smoke coverage is static plus headless DOM render coverage, matching the documentation/tooling-only scope.
+
+Regression boundaries
+- No gameplay changes.
+- No combat math changes.
+- No item scaling changes.
+- No mythic scaling changes.
+- No elite scaling changes.
+- No boss scaling changes.
+- No merchant behavior changes.
+- No save format, save migration, localStorage key, or progress reset changes.
+- No CSS, mobile layout, or UI behavior changes.

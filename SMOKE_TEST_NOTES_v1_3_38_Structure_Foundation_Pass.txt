@@ -1,0 +1,24 @@
+DungeonDex v1.3.38 - Structure Foundation Pass Smoke Test Notes
+
+Required checks
+- App loads from index.html.
+- Enter Dungeon starts a run.
+- Continue/Save path still works with the existing localStorage key.
+- Combat buttons still work: Attack, Guard, Skill, Extract.
+- Merchant and town panels still open.
+- No console-breaking syntax errors appear.
+- Python package checker script runs without pip or internet.
+
+Expected technical checks
+- node --check app.js
+- node --check sw.js
+- python tools/check_dungeondex_package.py
+
+Regression boundaries
+- Gameplay math intentionally untouched.
+- Enemy scaling intentionally untouched.
+- Item scaling intentionally untouched.
+- Merchant stock behavior intentionally untouched.
+- Dungeon progression intentionally untouched.
+- Save format and localStorage keys intentionally untouched.
+- Mobile layout intentionally untouched.

@@ -1,0 +1,24 @@
+DungeonDex v1.3.40 - Mythic/Elite Deep Scaling Alignment
+
+Summary
+- Applied a small deep-floor mythic/elite/boss scaling alignment pass based on the v1.3.39 simulator baseline.
+- Mythic deep scaling now begins tapering after D500 and reaches the existing deep softener floor by D1,000.
+- Elite and boss deep pressure now receives a bounded post-D800 bump so marked fights stay credible around D1,000+.
+- Floors 1-40 are intentionally protected; D1 through D500 checkpoint estimates are unchanged by this pass.
+
+Untouched areas
+- Merchant stock was intentionally untouched.
+- Normal loot, rare loot, legendary loot, drop rates, and mythic set drop chances were intentionally untouched.
+- Deep Stair Charter milestone spacing was intentionally not redesigned; simulator wording now calls out the configured post-D800 gap.
+- Gold income and early-game rewards were intentionally untouched.
+- Save format and localStorage keys were intentionally untouched.
+- Mobile layout, CSS, UI systems, and app structure were intentionally untouched.
+
+Simulator reporting
+- The deep scaling simulator now separates common enemy, elite enemy, boss enemy, merchant stock, rare loot, legendary loot, mythic estimate, and mythic softener columns.
+- Warning language now distinguishes Mythic outruns elite pressure, Mythic outruns boss pressure, Merchant trails enemies, Charter cost high vs common gold, and configured post-D800 charter milestone gaps.
+
+Runtime notes
+- Updated internal build/cache labels to v1.3.40.
+- The visible player-facing label remains short: DungeonDex v1.3.40.
+- No dependencies, npm packages, build step, TypeScript conversion, runtime JSON fetch, app.js split, save migration, or progress reset were added.

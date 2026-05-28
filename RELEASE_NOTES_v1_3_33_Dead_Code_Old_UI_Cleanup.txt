@@ -1,0 +1,9 @@
+DungeonDex v1.3.33 - Dead Code / Old UI Cleanup
+
+- Cleaned dead UI leftovers from the recent Lowfire town cleanup line.
+- Removed stale intro-panel wiring that no longer had a rendered panel.
+- Removed an orphaned combat utility CSS block from an older removed UI row.
+- Updated runtime build/cache labels to the internal v1.3.33 line.
+- Tightened visible town/archive/objective copy and removed misleading vow wording.
+- Prepared the build for the final mobile readability and regression passes.
+- No new systems, balance changes, economy changes, save-format changes, or item-scaling changes were added.

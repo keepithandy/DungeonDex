@@ -1,0 +1,23 @@
+DungeonDex v1.3.44b — Combat Spam Stability Hotfix
+
+Scope:
+- Narrow CSS/layout hotfix for active combat.
+- Goal: reduce combat UI jumping so low-level fights can be clicked rapidly without the action buttons moving around.
+
+Changed:
+- Locked the active run screen into a fixed-height combat layout while combat is active.
+- Stabilized the run status, combat panel, and combat feed grid rows.
+- Gave the combat log a fixed/scrolling region so reward/combat text does not push the action buttons.
+- Capped enemy header and feed text height during active combat.
+- Kept combat action buttons anchored at the bottom of the combat panel.
+- Disabled tiny combat-button transform movement during active combat for steadier spam tapping/clicking.
+- Added extra narrow-phone rules to hide the monster stage only on very small screens where button stability matters more.
+
+Not changed:
+- No combat formulas.
+- No enemy scaling.
+- No reward amounts.
+- No loot/drop rates.
+- No merchant behavior.
+- No save/localStorage key changes.
+- No new dependencies or build step.

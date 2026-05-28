@@ -1,0 +1,47 @@
+DungeonDex v1.3.36 - Emberfall Identity Polish Smoke Notes
+
+Scope:
+Static/runtime syntax checks plus a headless local DOM load were performed. Manual interactive browser testing was not performed.
+
+Validation performed:
+- JavaScript syntax check: PASS
+  Command: node --check app.js
+- Service worker syntax check: PASS
+  Command: node --check sw.js
+- Manifest JSON parse: PASS
+  Command: node -e "const fs=require('fs'); JSON.parse(fs.readFileSync('manifest.json','utf8')); console.log('manifest.json parsed');"
+- Static asset reference check: PASS
+  index.html references manifest.json, styles.css, sw.js, and app.js; those files exist in the repo root.
+- Stale v1.3.35 runtime label search: PASS
+  app.js, index.html, sw.js, and manifest.json have no v1.3.35 runtime labels after the update.
+- Long visible build-banner search: PASS
+  No EMBERFALL BUILD all-caps banner was found. The visible label is DungeonDex v1.3.36.
+- Level/floor wording search: PASS
+  Player level and item ilvl references remain intentional. Hollow Stair progression continues to use floor/room/chapter labels.
+- Generic copy review: PASS
+  Lowfire, Hollow Stair, Emberfall, Warden, archive, and system-note wording were tightened without adding lore dumps.
+- Headless local DOM load: PASS
+  Chrome headless rendered the app shell, Lowfire town screen, intro modal, and visible label DungeonDex v1.3.36.
+
+Manual/static smoke checklist:
+- App shell loads: PASS via headless DOM load.
+- Visible label is short, DungeonDex v1.3.36: PASS by source search and headless DOM.
+- Intro modal still works if present: STATIC PASS. Intro modal buttons remain rendered and bound through existing guarded handlers.
+- Enter Dungeon remains available: STATIC PASS. startRunBtn and introModalEnterDungeonBtn still use Enter Dungeon.
+- Continue Run remains available when appropriate: STATIC PASS. Existing Continue Run labels and continueRun wiring remain.
+- Merchant opens: STATIC PASS. merchantPanel render and refresh/buy bindings remain.
+- Inventory opens: STATIC PASS. Gear/inventory screen render and bindings remain.
+- Archive opens: STATIC PASS. archivePanel/settingsPanel render remains.
+- Combat actions remain present: STATIC PASS. Attack, Skill, Guard, and Extract buttons remain with data-action wiring.
+- Extract remains present: STATIC PASS. Extract button and combat action route remain.
+- Text changes are visible but not cluttered: PASS by source review and headless DOM load.
+- Service worker cache label is current: PASS. Cache name is dungeon-dex-v1.3.36-emberfall-identity-polish.
+
+Checks not performed:
+- Manual interactive click-through in a visible browser was not performed.
+- Full gameplay balance, scaling, economy, and save migration testing were not performed because this pass intentionally avoids those systems.
+- Installed-PWA service worker cache migration was not manually exercised.
+
+Remaining risks:
+- Static checks verify syntax and wiring by source, not touch behavior or a full run/extract/death play session.
+- Existing saves may still contain older archived log text until new entries replace it naturally.

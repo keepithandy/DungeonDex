@@ -1,0 +1,44 @@
+DungeonDex v1.3.34 - Mobile Readability Final Smoke Test Notes
+
+1. Syntax checks run
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: manifest.json parsed with JSON.parse
+
+2. Runtime checks performed
+- PASS: Chrome headless DOM render completed with the current index.html.
+- PASS: Build label rendered as DungeonDex v1.3.34 - Mobile Readability Final.
+- PASS: Lowfire District rendered.
+- PASS: Dungeon entry area rendered with Enter Dungeon, Rest, and rest cost.
+- PASS: Merchant rendered with Lowfire Market and refresh control.
+- PASS: District Wares rendered.
+- PASS: Relic Forge rendered.
+- PASS: Deep Stair Charters rendered.
+- PASS: Elite Contract Board rendered.
+- PASS: Gear, Dex, Archive, Save, and Reset controls rendered.
+- PASS: Intro modal rendered with Enter Dungeon and Close actions.
+- PASS: Idle Run screen rendered with Combat Feed.
+- PASS: Combat action buttons remain present in the active run renderer: Attack, Skill, Guard, Extract.
+
+3. Mobile UI checks
+- Reviewed mobile CSS for town stacking, merchant card density, district wares, forge, elite contracts, inventory cards, nav tabs, intro modal, combat HP rows, combat feed, and action buttons.
+- Added final mobile rules for clearer line-height, safer wrapping, card spacing, button grids, modal scroll containment, and combat action/feed spacing.
+- Preserved the existing app-shell scrolling model for iOS/Itch-style embedded browsers.
+
+4. Overflow/touch concerns
+- No new fixed footer or sticky action layer was added.
+- No new hidden scroll region was added.
+- Existing active combat remains intentionally compact; labels can still be tight below 370px.
+- Long generated item names and large currency values should be watched in regression saves.
+
+5. Untested areas
+- No physical iOS Safari or Itch iframe device test was run.
+- No live screenshot click-through was run for starting combat; combat actions were confirmed in renderer markup and covered by parse/runtime render checks.
+- Saved games with very large inventories, many charters, and claimed elite contracts still need the next regression pass.
+
+Search checks
+- PASS: Runtime files contain no accidental legacy public version label.
+- PASS: Runtime files contain no accidental next-major public label.
+- PASS: Runtime files contain no removed dungeon-entry title text.
+- PASS: Runtime files contain no known truncated-title typo.
+- PASS: Runtime files contain no stale developer text.

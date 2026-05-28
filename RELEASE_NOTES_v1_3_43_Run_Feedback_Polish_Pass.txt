@@ -1,0 +1,27 @@
+DungeonDex v1.3.43 - Run Feedback Polish Pass
+
+Summary
+- Copy and player-feedback polish pass only.
+- Improved run, combat, and reward feedback text.
+- Improved elite and boss result clarity.
+- Improved extraction, death, room-cleared, and floor-cleared wording.
+- No gameplay changes.
+- No combat math changes.
+- No enemy, item, mythic, elite, boss, merchant, gold, or Deep Stair Charter behavior changes.
+- No save format, save migration, localStorage key, or progress reset changes.
+- No CSS or mobile layout changes.
+
+Run feedback
+- Run entry now states the current district/floor context more clearly.
+- Normal encounters, elite encounters, and boss encounters now have more distinct combat-feed lines.
+- Guard, Ashburst, extraction, death, and reward messages were tightened for mobile readability.
+
+Reward/result clarity
+- Victory lines now identify whether a reward came from a room, elite, or boss.
+- Loot lines now identify found gear, elite drops, boss relics, bounty relics, and mythic pieces more clearly.
+- Extraction now emphasizes that the haul was banked.
+- Defeat now emphasizes that unsecured rewards were lost while banked progress stayed safe.
+
+Version/cache
+- Advanced internal build/cache labels to v1.3.43.
+- The visible label remains short: DungeonDex v1.3.43.

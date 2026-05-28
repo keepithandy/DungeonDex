@@ -1,0 +1,21 @@
+DungeonDex v1.3.44b — Combat Spam Stability Hotfix
+
+Recommended smoke test:
+1. Open index.html locally or on itch.
+2. Confirm visible label is DungeonDex v1.3.44b.
+3. Enter Dungeon.
+4. Rapid-click/tap Attack against early low-level enemies.
+5. Confirm the action buttons stay in the same area and do not jump down/up when:
+   - a normal enemy dies,
+   - reward text appears,
+   - the next encounter starts,
+   - the combat feed updates.
+6. Confirm Guard, Skill, and Extract buttons are still visible and clickable.
+7. Confirm combat feed scrolls internally rather than pushing the whole combat layout.
+8. Confirm extraction/death still returns to the correct flow.
+9. Refresh and confirm save still loads.
+
+Checks:
+- CSS/layout-only functional hotfix.
+- Save key intentionally untouched.
+- No balance/math changes intended.

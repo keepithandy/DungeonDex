@@ -1,0 +1,39 @@
+DungeonDex v1.3.31b - Town Cleanup Regression Check Smoke Notes
+
+Scope:
+- Verification and tiny-fix pass after the Lowfire town cleanup.
+- No combat, loot, merchant economy, forge behavior, charter logic, save data, inventory, archive, or scaling logic was changed.
+
+Checks run:
+- PASS: full-workspace search found no removed descent label text or slug variants.
+- PASS: no duplicate town entry panel remains.
+- PASS: no town-only intro progress render path remains.
+- PASS: Lowfire District hub markup remains in index.html.
+- PASS: Town still has a single in-page dungeon entry button id: startRunBtn.
+- PASS: headless Chrome rendered the Town panel with one in-page town entry button.
+- NOTE: headless Chrome also showed the existing first-load intro modal with its own Enter Dungeon button; this is outside the Town panel and was left unchanged.
+- PASS: startRunBtn label still changes between Enter Dungeon and Continue Run based on run state.
+- PASS: startRunBtn handler still starts a run when no run is active.
+- PASS: startRunBtn handler still switches to the Run screen when a run is active.
+- PASS: restBtn remains present and wired through restPlayer(S).
+- PASS: merchantPanel renders Lowfire Market and the refresh button remains wired through rollMerchant(S).
+- PASS: District Wares render inside merchantPanel.
+- PASS: forgePanel renders Relic Forge and forgeBtn remains wired through forgeItem(S).
+- PASS: Deep Stair Charters render through districtCharterSlot and charter buttons remain wired through startCharterRun(S).
+- PASS: Elite Contract Board renders inside questPanel and contract buttons remain wired through startEliteContract(S) / claimEliteContract(S).
+- PASS: Gear, Dex, and Archive tab buttons remain in index.html.
+- PASS: Save and Reset controls remain in index.html and remain wired in app.js.
+- PASS: app.js passes node --check.
+- PASS: sw.js passes node --check.
+- PASS: manifest.json parses through ConvertFrom-Json.
+- PASS: index.html references app.js and styles.css with the v1.3.31b cache query.
+- PASS: sw.js caches app.js and styles.css with the same v1.3.31b cache query.
+- PASS: mobile spacing CSS still collapses market/forge to one column under 560px, keeps the Lowfire action row flexible, and keeps the charter block attached to the hub panel.
+- PASS: headless Chrome rendered Lowfire Market, District Wares, Relic Forge, Deep Stair Charters, Elite Contract Board, Gear, Dex, and Archive content.
+
+Fixes applied:
+- Updated build/cache metadata to DungeonDex v1.3.31b - Town Cleanup Regression Check.
+- Removed leftover removed-label mentions from a prior smoke note so full-workspace string search is clean.
+
+Notes:
+- Browser automation libraries were not available in the local Node environment, so click automation was checked by handler wiring and rendered DOM inspection.

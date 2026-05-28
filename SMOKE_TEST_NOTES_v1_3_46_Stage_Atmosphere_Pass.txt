@@ -1,0 +1,41 @@
+DungeonDex v1.3.46 — Stage Atmosphere Pass — Smoke Test Notes
+
+─── Core load ───────────────────────────────────────────────
+[ ] App loads without console errors.
+[ ] Version label reads: DungeonDex v1.3.46
+[ ] Town screen renders normally.
+
+─── Stage atmosphere checks ─────────────────────────────────
+[ ] Enter Dungeon at D1 (Lowfire) — stage has warm amber/ember tones.
+[ ] Advance to D11+ (Ashgate) — stage shifts to cooler grey/blue tones.
+[ ] Boss fight — stage has red/crimson overlay on top of district colour.
+[ ] Elite fight — stage has purple overlay on top of district colour.
+[ ] Stage floor glows on boss fights (bossGroundFlare animation visible).
+[ ] Stage floor shimmers on elite fights (eliteGroundShimmer visible).
+[ ] Monster silhouette and aura are visible and unobstructed (z-index correct).
+[ ] No stage content clipped or hidden by the ::after overlay.
+
+─── Combat functionality ────────────────────────────────────
+[ ] Attack works and resolves correctly.
+[ ] Guard works.
+[ ] Skill works if available.
+[ ] Extract works if available.
+[ ] Combat log updates without pushing buttons.
+[ ] Rewards appear after kills.
+
+─── Layout / mobile ─────────────────────────────────────────
+[ ] No horizontal overflow.
+[ ] Stage visible on iPhone-sized viewport.
+[ ] Stage backgrounds display correctly on mobile Safari.
+
+─── Town / navigation ───────────────────────────────────────
+[ ] All five tabs function.
+[ ] Merchant opens.
+[ ] Inventory/Gear accessible.
+
+─── Tool checks ─────────────────────────────────────────────
+[ ] python tools/check_dungeondex_package.py — PASS
+[ ] python tools/simulate_deep_scaling.py — runs without error
+[ ] node --check app.js — PASS
+[ ] No save migration required.
+[ ] Existing saves load without errors.

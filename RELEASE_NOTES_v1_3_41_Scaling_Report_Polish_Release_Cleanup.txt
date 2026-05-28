@@ -1,0 +1,37 @@
+DungeonDex v1.3.41 - Scaling Report Polish & Release Cleanup
+
+Summary
+- Documentation and tooling cleanup pass only.
+- No gameplay changes.
+- No save format, save migration, localStorage key, or progress reset changes.
+- No combat math, item scaling, mythic scaling, elite scaling, boss scaling, merchant behavior, gold economy, charter spacing, CSS, mobile layout, or UI behavior changes.
+
+Tooling polish
+- Updated tools/simulate_deep_scaling.py terminal output title to DungeonDex v1.3.41 Deep Scaling Report.
+- Added a Version Context section explaining:
+  - v1.3.39 introduced the read-only deep-scaling simulator/report.
+  - v1.3.40 applied the bounded mythic/elite/boss deep-scaling alignment.
+  - v1.3.41 only polishes report readability and release documentation.
+- Renamed the economy table label from Common Wins to Common Wins To Charter for clearer terminal output.
+- Added docstring context in the simulator so future audits can distinguish the measurement pass from the balance pass.
+
+Release cleanup
+- Added BALANCE_NOTES_v1_3_41_Deep_Scaling_Arc.txt.
+- Added RELEASE_NOTES_v1_3_41_Scaling_Report_Polish_Release_Cleanup.txt.
+- Added SMOKE_TEST_NOTES_v1_3_41_Scaling_Report_Polish_Release_Cleanup.txt.
+- Advanced the short visible label to DungeonDex v1.3.41.
+- Advanced internal build/cache labels to the v1.3.41 release cleanup slug.
+
+Verification
+- PASS: python tools/check_dungeondex_package.py
+- PASS: python tools/simulate_deep_scaling.py
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: headless Chrome DOM load rendered DungeonDex v1.3.41, Enter Dungeon, Lowfire Market, town panels, idle combat panel, merchant stock, and System Notes.
+
+Boundary confirmation
+- Gameplay unchanged.
+- Save format and localStorage keys unchanged.
+- Scaling formulas unchanged from v1.3.40.
+- Merchant behavior unchanged.
+- CSS and mobile layout unchanged.

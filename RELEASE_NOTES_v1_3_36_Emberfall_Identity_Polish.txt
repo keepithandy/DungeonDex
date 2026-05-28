@@ -1,0 +1,41 @@
+DungeonDex v1.3.36 - Emberfall Identity Polish
+
+Purpose:
+This is a safe identity and copy pass for DungeonDex before larger 1.4 work. It strengthens Emberfall, Lowfire, Hollow Stair, and Warden language without adding gameplay systems or changing balance.
+
+Player-facing identity updates:
+- Updated the quiet visible version label to DungeonDex v1.3.36.
+- Renamed the town tab to Lowfire while keeping the existing town screen and core loop intact.
+- Tightened the hero copy, intro threshold copy, Lowfire district copy, market copy, Warden objective copy, and idle run copy around the Warden returning to Lowfire between Hollow Stair descents.
+- Replaced generic dungeon wording with Hollow Stair wording where it improved clarity.
+- Updated archive labels from generic run/archive language to Descent History and Emberfall Notes.
+- Added concise System Notes that identify DungeonDex v1.3.36, Emberfall, Lowfire, the Hollow Stair, and the Warden while stating that combat, economy, and scaling are unchanged.
+- Replaced a dev-style starting log line with in-world Lowfire market wording.
+
+Internal/runtime updates:
+- Updated internal build label to DungeonDex v1.3.36 - Emberfall Identity Polish.
+- Updated index.html cache-busting strings for app.js and styles.css.
+- Updated the service worker cache name and cached asset URLs to v1.3.36.
+- Updated manifest description to reflect Emberfall, Lowfire, and the Hollow Stair.
+
+No systems changed:
+- No combat math changes.
+- No enemy scaling changes.
+- No item, merchant stock, forge, or economy tuning changes.
+- No save format change.
+- No file reorganization.
+- No new faction, vow, roadmap, or 1.4 feature work.
+
+Files updated:
+- app.js
+- index.html
+- styles.css
+- sw.js
+- manifest.json
+
+Documentation added:
+- RELEASE_NOTES_v1_3_36_Emberfall_Identity_Polish.txt
+- SMOKE_TEST_NOTES_v1_3_36_Emberfall_Identity_Polish.txt
+
+Visible label:
+- DungeonDex v1.3.36
