@@ -119,79 +119,269 @@
       <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Latest ×${format(logLines.length)}</span></div></div>
       <div class="run-log-list">${logLines.length ? logLines.map(renderCombatFeedLine).join('') : '<div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Quiet</div><div class="feed-body">No combat messages yet.</div></div></div>'}</div>`;
   }
-  function renderGear() {
-    if (!el('equipmentPanel') || !el('filtersPanel') || !el('inventoryPanel')) return;
-    el('equipmentPanel').innerHTML = `
-      <h2>Loadout</h2>
-      <div class="list">${EQUIPMENT_DISPLAY_SLOTS.map(slot => {
-        const item = S.player.equipment[slot];
-        const levelLine = item ? `<div class="item-level">${getItemLevelLabel(item)}</div>` : '';
-        const setMini = item ? setBonusMiniMarkup(item, S) : '';
-        const cardClass = item ? getRarityCardClass(item) : '';
-        const filledClass = item ? ' equip-slot-filled' : '';
-        const statLine = item ? `<div class="tag-row" style="margin-top:3px"><span class="pill">PWR ${item.rating}</span><span class="pill">Atk ${item.stats.power}</span><span class="pill">Guard ${item.stats.guard}</span><span class="pill">HP ${item.stats.hp}</span></div>` : '';
-        return `<div class="equip-slot ${cardClass}${filledClass}"><div class="split"><div><div class="item-name">${slot}</div><div class="item-meta gear-equipped-name ${item ? rarityClass(item.rarity) : ''}"><span class="${item ? rarityClass(item.rarity) : ''}">${item ? item.name : 'Empty slot'}</span></div>${levelLine}${statLine}${setMini}</div>${item ? `<span class="pill ${rarityClass(item.rarity)}">${item.rarity}</span>` : ''}</div></div>`;
-      }).join('')}</div>`;
+  const LOADOUT_SLOT_GROUPS = [
+    { label:'Weapon', slots:['weapon','offhand'] },
+    { label:'Armor', slots:['helm','armor','gloves','boots'] },
+    { label:'Jewelry', slots:['ring','amulet'] },
+    { label:'Special', slots:['cloak','charm'] }
+  ];
 
-    el('filtersPanel').innerHTML = `
-      <h2>Inventory Filters</h2>
-      <div class="filter-grid">
-        <select id="slotFilter">${['all', ...FUTURE_EQUIPMENT_SLOTS].map(x => `<option value="${x}" ${S.filters.slot===x?'selected':''}>${x}</option>`).join('')}</select>
-        <select id="rarityFilter">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${x}" ${S.filters.rarity===x?'selected':''}>${x}</option>`).join('')}</select>
-        <select id="sortFilter">
-          <option value="power" ${S.filters.sort==='power'?'selected':''}>power first</option>
-          <option value="level" ${S.filters.sort==='level'?'selected':''}>ilvl first</option>
-          <option value="rarity" ${S.filters.sort==='rarity'?'selected':''}>rarity first</option>
-          <option value="value" ${S.filters.sort==='value'?'selected':''}>value first</option>
-          <option value="slot" ${S.filters.sort==='slot'?'selected':''}>slot order</option>
-          <option value="newest" ${S.filters.sort==='newest'?'selected':''}>newest first</option>
+  const LOADOUT_STAT_LABELS = {
+    power: 'Atk',
+    guard: 'Guard',
+    hp: 'HP',
+    speed: 'Spd',
+    wit: 'Wit',
+    luck: 'Luck'
+  };
+
+  const LOADOUT_SLOT_STAT_PRIORITY = {
+    weapon: ['power','speed','luck'],
+    offhand: ['guard','wit','power'],
+    helm: ['hp','guard','wit'],
+    armor: ['guard','hp','power'],
+    gloves: ['power','speed','luck'],
+    boots: ['speed','guard','hp'],
+    ring: ['hp','luck','wit'],
+    amulet: ['wit','hp','luck'],
+    cloak: ['speed','luck','guard'],
+    charm: ['luck','wit','power']
+  };
+
+  function slotDisplayName(slot) {
+    const key = String(slot || 'gear').replace(/[-_]+/g, ' ').trim().toLowerCase() || 'gear';
+    return key.replace(/\b[a-z]/g, ch => ch.toUpperCase());
+  }
+
+  function loadoutFilters() {
+    if (!isPlainObject(S.filters)) S.filters = {};
+    return {
+      slot: S.filters.slot || 'all',
+      rarity: S.filters.rarity || 'all',
+      sort: S.filters.sort || 'power',
+      search: String(S.filters.search || '')
+    };
+  }
+
+  function loadoutDisplaySlots() {
+    return asArray(EQUIPMENT_DISPLAY_SLOTS, SLOT_ORDER).filter(Boolean);
+  }
+
+  function loadoutSlotGroups() {
+    const displaySlots = loadoutDisplaySlots();
+    const grouped = new Set(LOADOUT_SLOT_GROUPS.flatMap(group => group.slots));
+    const groups = LOADOUT_SLOT_GROUPS
+      .map(group => ({ ...group, slots: group.slots.filter(slot => displaySlots.includes(slot)) }))
+      .filter(group => group.slots.length);
+    const overflow = displaySlots.filter(slot => !grouped.has(slot));
+    if (overflow.length) groups.push({ label:'Other', slots: overflow });
+    return groups;
+  }
+
+  function cleanGearText(value, fallback = '') {
+    return cleanDisplayText(value, fallback);
+  }
+
+  function safeGearStats(item) {
+    const stats = isPlainObject(item?.stats) ? item.stats : {};
+    return {
+      power: Math.floor(numberOr(stats.power, 0, 0, 99999)),
+      guard: Math.floor(numberOr(stats.guard, 0, 0, 99999)),
+      wit: Math.floor(numberOr(stats.wit, 0, 0, 99999)),
+      luck: Math.floor(numberOr(stats.luck, 0, 0, 99999)),
+      speed: Math.floor(numberOr(stats.speed, 0, 0, 99999)),
+      hp: Math.floor(numberOr(stats.hp, 0, 0, 99999))
+    };
+  }
+
+  function gearPowerValue(item) {
+    return Math.floor(numberOr(item?.rating, getItemLevelValue(item) || 0, 0, 999999));
+  }
+
+  function gearPrimaryStat(item, fallbackSlot = 'weapon') {
+    const stats = safeGearStats(item);
+    const slot = baseSlotForSlot(item?.slot || fallbackSlot, 'weapon');
+    const preferred = LOADOUT_SLOT_STAT_PRIORITY[slot] || ['power','guard','hp','speed','wit','luck'];
+    const orderedKeys = preferred.concat(Object.keys(LOADOUT_STAT_LABELS).filter(key => !preferred.includes(key)));
+    const key = orderedKeys.find(statKey => stats[statKey] > 0);
+    if (!key) return null;
+    return { key, label: LOADOUT_STAT_LABELS[key] || slotDisplayName(key), value: stats[key] };
+  }
+
+  function gearScoreMarkup(item, fallbackSlot = 'weapon') {
+    const power = gearPowerValue(item);
+    const primary = gearPrimaryStat(item, fallbackSlot);
+    const statMarkup = primary
+      ? `<span><b>${format(primary.value)}</b><small>${escapeHtml(primary.label)}</small></span>`
+      : '';
+    return `<div class="gear-score-grid"><span><b>${format(power)}</b><small>Power</small></span>${statMarkup}</div>`;
+  }
+
+  function gearRarityLabel(item) {
+    const key = itemRarityKey(item);
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  }
+
+  function gearUpgradeDelta(item, state) {
+    const slot = item?.slot;
+    const equipment = isPlainObject(state?.player?.equipment) ? state.player.equipment : {};
+    const equipped = slot ? equipment[slot] : null;
+    if (!equipped || equipped.id === item?.id) return 0;
+    return Math.max(0, Math.floor(gearPowerValue(item) - gearPowerValue(equipped)));
+  }
+
+  function gearStatusBadges(item) {
+    const badges = [];
+    const delta = gearUpgradeDelta(item, S);
+    if (delta > 0) badges.push(`<span class="gear-status-badge better">Better +${format(delta)}</span>`);
+    const setDef = getMythicSetDefinition(getItemSetId(item));
+    if (setDef) badges.push(`<span class="gear-status-badge set">${escapeHtml(setDef.name)}</span>`);
+    if (canQuickSellItem(S, item)) badges.push('<span class="gear-status-badge junk">Junk</span>');
+    return badges.join('');
+  }
+
+  function equippedSlotCard(slot) {
+    const equipment = isPlainObject(S.player?.equipment) ? S.player.equipment : {};
+    const item = isPlainObject(equipment[slot]) ? equipment[slot] : null;
+    const slotLabel = slotDisplayName(slot);
+    if (!item) {
+      return `<article class="equip-slot loadout-equip-card equip-slot-empty">
+        <div class="gear-card-top"><span class="gear-slot-label">${escapeHtml(slotLabel)}</span><span class="empty-slot-pill">Empty</span></div>
+        <div class="gear-card-name muted">Empty slot</div>
+        <div class="gear-card-subline"><span>${escapeHtml(slotLabel)}</span><span>Ready</span></div>
+      </article>`;
+    }
+    const rarityKey = itemRarityKey(item);
+    const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
+    const typeLabel = slotDisplayName(item.slot || slot);
+    const levelLabel = getItemLevelLabel(item);
+    const setMini = setBonusMiniMarkup(item, S);
+    return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}">
+      <div class="gear-card-top"><span class="gear-slot-label">${escapeHtml(slotLabel)}</span><span class="gear-rarity-pill ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span></div>
+      <div class="gear-card-name gear-equipped-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
+      <div class="gear-card-subline"><span>${escapeHtml(typeLabel)}</span><span>${escapeHtml(levelLabel)}</span></div>
+      ${gearScoreMarkup(item, slot)}
+      ${setMini}
+    </article>`;
+  }
+
+  function equippedGroupMarkup(group) {
+    const equipment = isPlainObject(S.player?.equipment) ? S.player.equipment : {};
+    const filled = group.slots.filter(slot => isPlainObject(equipment[slot])).length;
+    return `<section class="loadout-group">
+      <div class="loadout-group-title"><span>${escapeHtml(group.label)}</span><span>${format(filled)} / ${format(group.slots.length)}</span></div>
+      <div class="equipped-slot-grid">${group.slots.map(equippedSlotCard).join('')}</div>
+    </section>`;
+  }
+
+  function renderGear() {
+    const equipmentPanel = el('equipmentPanel');
+    const filtersPanel = el('filtersPanel');
+    const inventoryPanel = el('inventoryPanel');
+    if (!equipmentPanel || !filtersPanel || !inventoryPanel) return;
+    equipmentPanel.classList.add('loadout-panel');
+    filtersPanel.classList.add('loadout-filter-panel');
+    inventoryPanel.classList.add('loadout-inventory-panel');
+
+    const equipment = isPlainObject(S.player?.equipment) ? S.player.equipment : {};
+    const displaySlots = loadoutDisplaySlots();
+    const equippedCount = displaySlots.filter(slot => isPlainObject(equipment[slot])).length;
+    const filters = loadoutFilters();
+    equipmentPanel.innerHTML = `
+      <div class="loadout-head">
+        <div><h2>Equipped</h2><p class="small muted">Current gear by slot.</p></div>
+        <span class="pill loadout-count-pill">${format(equippedCount)} / ${format(displaySlots.length)} slots</span>
+      </div>
+      <div class="loadout-groups">${loadoutSlotGroups().map(equippedGroupMarkup).join('')}</div>`;
+
+    filtersPanel.innerHTML = `
+      <div class="filter-head"><h2>Filters</h2><span class="small muted">Inventory view</span></div>
+      <div class="filter-grid loadout-filter-grid">
+        <select id="slotFilter" aria-label="Filter inventory by slot">${['all', ...FUTURE_EQUIPMENT_SLOTS].map(x => `<option value="${escapeHtml(x)}" ${filters.slot===x?'selected':''}>${x === 'all' ? 'All slots' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
+        <select id="rarityFilter" aria-label="Filter inventory by rarity">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${escapeHtml(x)}" ${filters.rarity===x?'selected':''}>${x === 'all' ? 'All rarities' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
+        <select id="sortFilter" aria-label="Sort inventory">
+          <option value="power" ${filters.sort==='power'?'selected':''}>Best Power</option>
+          <option value="level" ${filters.sort==='level'?'selected':''}>Item level</option>
+          <option value="rarity" ${filters.sort==='rarity'?'selected':''}>Rarity</option>
+          <option value="value" ${filters.sort==='value'?'selected':''}>Sell value</option>
+          <option value="slot" ${filters.sort==='slot'?'selected':''}>Slot</option>
+          <option value="newest" ${filters.sort==='newest'?'selected':''}>Newest</option>
         </select>
       </div>
-      <div class="sep"></div>
-      <input id="searchFilter" value="${escapeHtml(S.filters.search)}" placeholder="search name, maker, theme" />`;
+      <input id="searchFilter" value="${escapeHtml(filters.search)}" placeholder="search gear" aria-label="Search inventory" />`;
 
     renderInventoryPanel();
   }
 
   function renderInventoryPanel() {
+    const inventoryPanel = el('inventoryPanel');
+    if (!inventoryPanel) return;
+    inventoryPanel.classList.add('loadout-inventory-panel');
     const inv = filteredInventory();
-    const safeSellCount = S.player.inventory.filter(item => canQuickSellItem(S, item)).length;
-    const allSellCount = S.player.inventory.filter(item => canSellAllGearItem(S, item)).length;
+    const inventory = asArray(S.player?.inventory, []);
+    const safeSellCount = inventory.filter(item => canQuickSellItem(S, item)).length;
+    const allSellCount = inventory.filter(item => canSellAllGearItem(S, item)).length;
     const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
     const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after two confirmations" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
-    el('inventoryPanel').innerHTML = `
-      <div class="split inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Rarity, upgrades, junk, and sell value at a glance.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${inv.length} items</span>${sellJunkBtn}${sellAllBtn}</div></div>
-      <div class="list">${inv.map(itemCard).join('') || '<p class="small muted">No matching gear.</p>'}</div>`;
+    inventoryPanel.innerHTML = `
+      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Unequipped gear, upgrades, and sale actions.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
+      <div class="list inventory-list">${inv.map(itemCard).join('') || '<div class="empty-inventory-card"><strong>No matching gear</strong><span>Adjust filters or keep delving.</span></div>'}</div>`;
   }
 
   function filteredInventory() {
-    const items = S.player.inventory.filter(item => {
-      if (S.filters.slot !== 'all' && item.slot !== S.filters.slot) return false;
-      if (S.filters.rarity !== 'all' && item.rarity !== S.filters.rarity) return false;
-      const q = S.filters.search.trim().toLowerCase();
+    const filters = loadoutFilters();
+    const items = asArray(S.player?.inventory, []).filter(item => {
+      if (!isPlainObject(item)) return false;
+      if (filters.slot !== 'all' && item.slot !== filters.slot) return false;
+      if (filters.rarity !== 'all' && itemRarityKey(item) !== filters.rarity) return false;
+      const q = filters.search.trim().toLowerCase();
       if (!q) return true;
-      return [item.name, item.maker, item.theme, item.slot].join(' ').toLowerCase().includes(q);
+      return [
+        cleanGearText(item.name),
+        cleanGearText(item.maker),
+        cleanGearText(item.theme),
+        cleanGearText(item.slot)
+      ].join(' ').toLowerCase().includes(q);
     });
-    if (S.filters.sort === 'newest') return items;
+    if (filters.sort === 'newest') return items;
     return items.sort((a,b) => {
-      if (S.filters.sort === 'level') return (b.level || 0) - (a.level || 0) || (b.rating || 0) - (a.rating || 0);
-      if (S.filters.sort === 'rarity') return rarityIndex(b.rarity) - rarityIndex(a.rarity) || (b.rating || 0) - (a.rating || 0);
-      if (S.filters.sort === 'value') return (b.value || 0) - (a.value || 0) || (b.rating || 0) - (a.rating || 0);
-      if (S.filters.sort === 'slot') return slotSortIndex(a.slot) - slotSortIndex(b.slot) || (b.rating || 0) - (a.rating || 0);
-      return (b.rating || 0) - (a.rating || 0);
+      if (filters.sort === 'level') return (getItemLevelValue(b) || 0) - (getItemLevelValue(a) || 0) || gearPowerValue(b) - gearPowerValue(a);
+      if (filters.sort === 'rarity') return rarityIndex(itemRarityKey(b)) - rarityIndex(itemRarityKey(a)) || gearPowerValue(b) - gearPowerValue(a);
+      if (filters.sort === 'value') return (b.value || 0) - (a.value || 0) || gearPowerValue(b) - gearPowerValue(a);
+      if (filters.sort === 'slot') return slotSortIndex(a.slot) - slotSortIndex(b.slot) || gearPowerValue(b) - gearPowerValue(a);
+      return gearPowerValue(b) - gearPowerValue(a);
     });
   }
 
   function itemCard(item) {
-    const isJunk = canQuickSellItem(S, item);
-    const junkPill = isJunk ? '<span class="pill junk-pill">Junk</span>' : '';
-    const setDef = getMythicSetDefinition(getItemSetId(item));
-    const setPill = setDef ? `<span class="pill rarity-mythic">${escapeHtml(setDef.name)}</span>` : '';
-    const setBonusPreview = setBonusPreviewMarkup(item, S);
-    const upgradeMark = upgradeMarkup(item, S);
-    const rarityLabel = item.rarity ? item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1) : '';
-    const rarityEyebrow = rarityLabel ? `<div class="rarity-eyebrow ${rarityClass(item.rarity)}">${rarityLabel}</div>` : '';
-    return `<div class="loot-card ${getRarityCardClass(item)}"><div class="split"><div>${rarityEyebrow}<div class="item-name ${rarityClass(item.rarity)}">${item.name}</div><div class="item-level">${getItemLevelLabel(item)}</div><div class="item-meta">${item.slot} • ${item.maker}</div></div><div class="tag-row right-tags">${upgradeMark}${setPill}${junkPill}</div></div><div class="tag-row"><span class="pill stat-pill primary-stat">Power ${item.rating}</span><span class="pill stat-pill">Atk ${item.stats.power}</span><span class="pill stat-pill">Guard ${item.stats.guard}</span><span class="pill stat-pill">HP ${item.stats.hp}</span>${item.stats.speed > 0 ? `<span class="pill">Spd ${item.stats.speed}</span>` : ''}${item.stats.wit > 0 ? `<span class="pill">Wit ${item.stats.wit}</span>` : ''}</div><p class="small">${item.summary}</p>${setBonusPreview}<div class="item-actions polished-actions"><button class="primary mini" data-equip="${item.id}">${upgradeMark ? 'Equip ↑' : 'Equip'}</button><button class="ghost mini sell-value-btn" data-sell="${item.id}">Sell ${formatMoney(sellValue(item))}</button></div></div>`;
+    if (!isPlainObject(item)) return '';
+    const itemId = cleanGearText(item.id);
+    const safeItemId = escapeHtml(itemId);
+    const rarityKey = itemRarityKey(item);
+    const slotLabel = slotDisplayName(item.slot);
+    const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
+    const maker = cleanGearText(item.maker);
+    const summary = cleanGearText(item.summary);
+    const delta = gearUpgradeDelta(item, S);
+    const statusBadges = gearStatusBadges(item);
+    const setBonusPreview = setBonusPreviewMarkup(item, S, true);
+    const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
+    const sellAttrs = itemId ? `data-sell="${safeItemId}"` : 'disabled';
+    const rarityEyebrow = `<span class="rarity-eyebrow ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span>`;
+    return `<article class="loot-card inventory-card ${getRarityCardClass(item)}">
+      <div class="inventory-card-main">
+        <div class="inventory-title-block">
+          <div class="inventory-title-row">${rarityEyebrow}<span class="gear-slot-label">${escapeHtml(slotLabel)}</span></div>
+          <div class="item-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
+          <div class="gear-card-subline"><span>${escapeHtml(getItemLevelLabel(item))}</span>${maker ? `<span>${escapeHtml(maker)}</span>` : ''}</div>
+        </div>
+        <div class="gear-badge-row">${statusBadges}</div>
+      </div>
+      ${gearScoreMarkup(item)}
+      ${summary ? `<p class="small inventory-card-summary">${escapeHtml(summary)}</p>` : ''}
+      ${setBonusPreview}
+      <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button></div>
+    </article>`;
   }
 
   function renderDex() {

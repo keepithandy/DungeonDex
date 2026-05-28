@@ -1,0 +1,38 @@
+DungeonDex v1.3.50 - Loadout Section Redesign Smoke Test Notes
+
+Static Checks
+- PASS: node --check js/systems/11_ui_run_gear_dex_archive.js
+- PASS: node --check js/systems/00_core_constants_data.js
+- PASS: live source search found no remaining v1.3.48, split-file-guard, or long loadout pass labels in index.html, sw.js, app.js, js/systems, or styles.css.
+
+Browser Smoke Setup
+- The in-app Browser connector was attempted first, but the local node-backed browser session exited with a Windows sandbox spawn setup refresh error.
+- Fallback smoke testing used isolated headless Chrome with a temporary user data directory, so the test did not touch the normal browser profile or local save.
+
+390px Mobile Smoke
+- PASS: Game booted from index.html.
+- PASS: Title and header build label rendered as DungeonDex v1.3.50.
+- PASS: Town shell rendered with merchant panel present.
+- PASS: Gear screen opened through state/render path.
+- PASS: Equipped panel rendered with the Equipped header.
+- PASS: Empty equipment slots rendered safely: 10 empty slot cards in the seeded empty-equipment fixture.
+- PASS: Inventory rendered correctly: 3 seeded inventory cards.
+- PASS: Equip action worked: inventory count changed 3 -> 2 and weapon became equipped.
+- PASS: Direct sell action worked after tap-guard spacing: inventory count changed 2 -> 1.
+- PASS: Sell Junk action worked after tap-guard spacing: inventory count changed 1 -> 0.
+- PASS: Sell All action worked with confirmation stub in isolated smoke profile: inventory count changed 2 -> 0.
+- PASS: Save/load worked: save existed in localStorage, load returned a player object, and the gear screen re-rendered.
+- PASS: Mobile/narrow viewport had no detected gear-screen horizontal overflow at 390px.
+- PASS: Combat still opened after loadout actions: startRun returned true, screen became run, active monster existed, 4 combat actions rendered.
+- PASS: Runtime console/exception capture reported no problems.
+
+320px Narrow Layout Check
+- PASS: Gear screen rendered at 320px width.
+- PASS: document scrollWidth matched viewport width: 320px.
+- PASS: Equipped cards rendered: 10.
+- PASS: Inventory cards rendered: 2.
+- PASS: No gear-screen overflow offenders detected.
+
+Remaining Loadout Issues
+- None found in smoke testing.
+- Visual inspection through the in-app Browser plugin was blocked by the local sandbox issue, so layout validation used headless Chrome DOM metrics instead.

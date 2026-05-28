@@ -1,0 +1,29 @@
+DungeonDex v1.3.50 - Loadout Section Redesign
+
+Summary
+- Redesigned the Gear screen loadout area around a compact Equipped panel.
+- Equipped gear is now grouped by Weapon, Armor, Jewelry, and Special slots.
+- Equipped slot cards now show item name, rarity, slot/type, item level, Power, and one key stat instead of a full repeated stat row.
+- Empty equipment slots render as compact dashed cards so old or empty saves still show every slot safely.
+- Inventory now uses visually distinct cards from equipped gear, with clearer rarity, slot, Power, key stat, and action placement.
+- Inventory cards now surface existing comparison support with a Better badge when rating beats the equipped item in the same slot.
+- Junk and mythic set badges remain visible without using the older loud inventory pill stack.
+- Long item summary text is clamped to keep inventory scanning fast on mobile.
+- Filters were tightened and relabeled with shorter player-facing copy.
+- Visible build label updated to DungeonDex v1.3.50.
+
+Behavior Notes
+- No item generation, loot scaling, rarity math, sell values, save format, combat, fame, or tempering systems were changed.
+- Existing equip, direct sell, Sell Junk, and Sell All bindings were kept.
+- Existing Sell All confirmation behavior was kept.
+- Existing split-file runtime structure under js/systems/ was preserved.
+
+Files Touched
+- app.js
+- index.html
+- styles.css
+- sw.js
+- js/systems/00_core_constants_data.js
+- js/systems/11_ui_run_gear_dex_archive.js
+- RELEASE_NOTES_v1_3_50_Loadout_Section_Redesign.txt
+- SMOKE_TEST_NOTES_v1_3_50_Loadout_Section_Redesign.txt
