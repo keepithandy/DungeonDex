@@ -1,0 +1,972 @@
+'use strict';
+
+// Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge
+  function calcDerived(state) {
+    if (!isPlainObject(state?.player)) return { ...DEFAULT_PLAYER_STATS, hpBonus: 0 };
+    if (!isPlainObject(state.player.stats)) state.player.stats = { ...DEFAULT_PLAYER_STATS };
+    const base = { ...DEFAULT_PLAYER_STATS, ...state.player.stats };
+    Object.keys(DEFAULT_PLAYER_STATS).forEach(k => {
+      base[k] = Math.floor(numberOr(base[k], DEFAULT_PLAYER_STATS[k], 0, 99999));
+      state.player.stats[k] = base[k];
+    });
+    const equip = { power:0, guard:0, wit:0, speed:0, luck:0, hp:0 };
+    const seen = new Set();
+    Object.values(state.player.equipment || {}).forEach(item => {
+      if (!item) return;
+      const key = item.id || item.name || JSON.stringify(item);
+      if (seen.has(key)) return;
+      seen.add(key);
+      Object.keys(equip).forEach(k => equip[k] += item.stats[k] || 0);
+    });
+    const ashboundCount = getEquippedSetCount(state, 'ashbound_warden');
+    const bellforgeCount = getEquippedSetCount(state, 'veyruhn_bellforge');
+    if (ashboundCount >= 2) equip.hp += 24 + Math.floor(numberOr(state.player.level, 1, 1, 999) * 3);
+    if (bellforgeCount >= 2) equip.power += 4 + Math.floor(numberOr(state.player.level, 1, 1, 999) / 3);
+
+    const total = {
+      power: base.power + equip.power,
+      guard: base.guard + equip.guard,
+      wit: base.wit + equip.wit,
+      speed: base.speed + equip.speed,
+      luck: base.luck + equip.luck,
+      hpBonus: equip.hp
+    };
+    state.player.level = Math.floor(numberOr(state.player.level, 1, 1, 999));
+    state.player.maxHp = 100 + total.hpBonus + state.player.level * 10;
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
+    return total;
+  }
+
+  function xpGain(state, amount) {
+    state.player.xp += amount;
+    while (state.player.xp >= state.player.xpNext) {
+      state.player.xp -= state.player.xpNext;
+      state.player.level += 1;
+      state.player.xpNext = Math.round(state.player.xpNext * 1.22);
+      state.player.stats.power += rand(2,3);
+      state.player.stats.guard += rand(1,3);
+      state.player.stats.wit += rand(1,2);
+      state.player.stats.speed += rand(1,2);
+      state.player.stats.luck += rand(0,2);
+      state.player.hp = state.player.maxHp;
+      pushLog(state, `Level up → ${state.player.level}. The warden hardens.`);
+    }
+  }
+
+  function pushCombat(state, line) {
+    if (!state.run) return;
+    state.run.combatLog = asArray(state.run.combatLog);
+    state.run.combatLog.unshift(String(line || ''));
+    state.run.combatLog = state.run.combatLog.slice(0, COMBAT_LOG_STORE_LIMIT);
+  }
+  function pushLog(state, line) {
+    if (!state?.player) return;
+    state.player.log = asArray(state.player.log, []);
+    state.player.log.unshift(line);
+    state.player.log = state.player.log.slice(0, 60);
+  }
+  function stripHtml(text) {
+    return String(text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  // v1.3.22f final lock: every Archive, feed, and popup summary should render as clean player-facing text.
+  function cleanDisplayText(text, fallback = '') {
+    const stripped = stripHtml(text);
+    const decoded = stripped
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+    return decoded || fallback;
+  }
+
+  function moneyText(copper) {
+    return cleanDisplayText(formatMoney(copper), '0c');
+  }
+
+  function runRewardSummaryText(pending) {
+    const p = createPendingRunRewards(pending);
+    const parts = [];
+    if (p.gold) parts.push(moneyText(p.gold));
+    if (p.shards) parts.push(`${format(p.shards)} shards`);
+    if (p.ember) parts.push(`${format(p.ember)} ember`);
+    if (p.xp) parts.push(`${format(p.xp)} XP`);
+    if (p.loot.length) parts.push(`${format(p.loot.length)} loot`);
+    return parts.length ? parts.join(' • ') : 'no unsecured rewards';
+  }
+
+  function runHistoryRewardText(entry) {
+    const r = isPlainObject(entry) ? entry : {};
+    const saved = cleanDisplayText(r.rewards || '');
+    if (saved && saved !== 'no unsecured rewards') return saved;
+    const parts = [];
+    const gold = sanitizeCurrencyValue(r.gold, 0);
+    const shards = sanitizeCurrencyValue(r.shards, 0);
+    const ember = sanitizeCurrencyValue(r.ember, 0);
+    const xp = sanitizeCurrencyValue(r.xp, 0);
+    const lootCount = sanitizeCurrencyValue(r.lootCount, 0);
+    if (gold) parts.push(moneyText(gold));
+    if (shards) parts.push(`${format(shards)} shards`);
+    if (ember) parts.push(`${format(ember)} ember`);
+    if (xp) parts.push(`${format(xp)} XP`);
+    if (lootCount) parts.push(`${format(lootCount)} loot`);
+    return parts.length ? parts.join(' • ') : (saved || 'no unsecured rewards');
+  }
+
+  function normalizeRunHistoryReason(reason) {
+    const clean = String(reason || 'ended').toLowerCase().trim();
+    if (clean === 'extract' || clean === 'extracted' || clean === 'success') return 'extract';
+    if (clean === 'defeat' || clean === 'defeated' || clean === 'death' || clean === 'died') return 'defeat';
+    return clean || 'ended';
+  }
+
+  function safeRunHistoryDate(entry) {
+    const r = isPlainObject(entry) ? entry : {};
+    return cleanDisplayText(r.date || r.stamp || r.time || '');
+  }
+
+  function combatFeedKind(line) {
+    const raw = String(line || '');
+    const lower = stripHtml(raw).toLowerCase();
+    if (!lower) return 'empty';
+    if (lower.includes('hardcore') || lower.includes('death') || lower.startsWith('defeated.') || lower.startsWith('defeated in ') || lower.includes('forfeit') || lower.includes('descent claimed') || lower.includes('run failed')) return 'death';
+    if (/\b(extract|extracted|extraction|escaped)\b/.test(lower) || lower.includes('extraction secured')) return 'escape';
+    if (lower.includes('boss') || lower.includes('warning') || lower.includes('enraged')) return 'boss';
+    if (lower.includes('elite') || lower.includes('frenzied') || lower.includes('ironhide') || lower.includes('venomous') || lower.includes('swift') || lower.includes('hollow-eyed') || lower.includes('ash-fed') || lower.includes('gravebound') || lower.includes('wardmarked')) return 'elite';
+    if (lower.includes('floor secured') || lower.includes('floor cleared') || lower.includes('floor reached') || lower.startsWith('floor ')) return 'floor';
+    if (lower.includes('room secured') || lower.includes('room cleared') || lower.includes('room reached')) return 'milestone';
+    if (lower.includes('recovered') || lower.includes('healed') || lower.includes('returns') || lower.includes('regen')) return 'heal';
+    if (lower.includes('loot') || lower.includes('found:') || lower.includes('relic') || lower.includes('drop') || lower.includes('cache')) return 'loot';
+    if (lower.includes('gold') || lower.includes('shard') || lower.includes('reward')) return 'reward';
+    if (lower.includes('you hit') || lower.includes('ashburst') || lower.includes('critical') || lower.includes('strike')) return 'player-hit';
+    if (lower.includes('hits for') || lower.includes('misses') || lower.includes('takes') || lower.includes('poison') || lower.includes('bleed') || lower.includes('pierces for') || lower.includes('seeps for') || lower.includes('lingers for')) return 'enemy-hit';
+    if (lower.includes('guard') || lower.includes('brace')) return 'guard';
+    if (lower.includes('descent continues') || lower.includes('entering ') || lower.includes('contract')) return 'progress';
+    return 'action';
+  }
+
+  function combatFeedIcon(kind) {
+    switch (kind) {
+      case 'reward': return '✦';
+      case 'loot': return '◈';
+      case 'milestone': return '◆';
+      case 'floor': return '▲';
+      case 'progress': return '➜';
+      case 'heal': return '✚';
+      case 'boss': return '⚠';
+      case 'elite': return '◇';
+      case 'death': return '✕';
+      case 'escape': return '⇡';
+      case 'player-hit': return '⚔';
+      case 'enemy-hit': return '!';
+      case 'guard': return '▣';
+      case 'empty': return '·';
+      default: return '•';
+    }
+  }
+
+  function combatFeedLabel(kind) {
+    switch (kind) {
+      case 'reward': return 'Reward';
+      case 'loot': return 'Loot';
+      case 'milestone': return 'Room';
+      case 'floor': return 'Floor';
+      case 'progress': return 'Progress';
+      case 'heal': return 'Recovery';
+      case 'boss': return 'Boss';
+      case 'elite': return 'Elite';
+      case 'death': return 'Defeat';
+      case 'escape': return 'Extract';
+      case 'player-hit': return 'Strike';
+      case 'enemy-hit': return 'Damage';
+      case 'guard': return 'Guard';
+      case 'empty': return 'No Drop';
+      default: return 'Action';
+    }
+  }
+
+  function renderCombatFeedLine(line) {
+    const raw = String(line || '');
+    const kind = combatFeedKind(raw);
+    let normalized = escapeHtml(cleanDisplayText(raw))
+      .replace(/\(\+gold charm\)/gi, '<span class="feed-chip feed-chip-gold">Gold Charm</span>')
+      .replace(/\+(\d+)\s*gold/gi, '<span class="feed-chip feed-chip-gold">+$1 gold</span>')
+      .replace(/\+(\d+)\s*shards?/gi, '<span class="feed-chip feed-chip-shard">+$1 shards</span>')
+      .replace(/recovered\s+(\d+)\s+hp/gi, '<span class="feed-chip feed-chip-heal">recovered $1 HP</span>')
+      .replace(/healed\s+(\d+)/gi, '<span class="feed-chip feed-chip-heal">healed $1</span>')
+      .replace(/returns\s+(\d+)/gi, '<span class="feed-chip feed-chip-heal">returns $1</span>')
+      .replace(/hits for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">hits for $1</span>')
+      .replace(/you hit/gi, '<span class="feed-chip feed-chip-player">You hit</span>')
+      .replace(/ashburst/gi, '<span class="feed-chip feed-chip-skill">Ashburst</span>')
+      .replace(/critical/gi, '<span class="feed-chip feed-chip-crit">Critical</span>')
+      .replace(/seeps for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">seeps for $1</span>')
+      .replace(/lingers for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">lingers for $1</span>')
+      .replace(/pierces for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">pierces for $1</span>')
+      .replace(/Boss Spoils/gi, '<span class="feed-chip feed-chip-boss">Boss Spoils</span>')
+      .replace(/Elite Spoils/gi, '<span class="feed-chip feed-chip-elite">Elite Spoils</span>')
+      .replace(/Room Reward/gi, '<span class="feed-chip feed-chip-floor">Room Reward</span>')
+      .replace(/Milestone Reward/gi, '<span class="feed-chip feed-chip-floor">Milestone Reward</span>')
+      .replace(/Mythic Find/gi, '<span class="feed-chip rarity-mythic">Mythic Find</span>')
+      .replace(/Boss relic/gi, '<span class="feed-chip feed-chip-boss">Boss relic</span>')
+      .replace(/Bounty relic/gi, '<span class="feed-chip feed-chip-boss">Bounty relic</span>')
+      .replace(/Elite warning/gi, '<span class="feed-chip feed-chip-elite feed-chip-threat">Elite warning</span>')
+      .replace(/Elite read/gi, '<span class="feed-chip feed-chip-elite feed-chip-read">Elite read</span>')
+      .replace(/Elite plan/gi, '<span class="feed-chip feed-chip-elite feed-chip-read">Elite plan</span>')
+      .replace(/Dangerous elite defeated/gi, '<span class="feed-chip feed-chip-elite">Dangerous elite defeated</span>')
+      .replace(/Elite drop/gi, '<span class="feed-chip feed-chip-elite">Elite drop</span>')
+      .replace(/Elite bonus loot/gi, '<span class="feed-chip feed-chip-elite">Elite bonus loot</span>')
+      .replace(/Frenzied/gi, '<span class="feed-chip feed-chip-elite feed-mod-frenzied">Frenzied</span>')
+      .replace(/Ironhide/gi, '<span class="feed-chip feed-chip-elite feed-mod-ironhide">Ironhide</span>')
+      .replace(/Venomous/gi, '<span class="feed-chip feed-chip-elite feed-mod-venomous">Venomous</span>')
+      .replace(/Swift/gi, '<span class="feed-chip feed-chip-elite feed-mod-swift">Swift</span>')
+      .replace(/Hollow-Eyed/gi, '<span class="feed-chip feed-chip-elite feed-mod-hollow-eyed">Hollow-Eyed</span>')
+      .replace(/Ash-fed/gi, '<span class="feed-chip feed-chip-elite feed-mod-ash-fed">Ash-fed</span>')
+      .replace(/Gravebound/gi, '<span class="feed-chip feed-chip-elite feed-mod-gravebound">Gravebound</span>')
+      .replace(/Wardmarked/gi, '<span class="feed-chip feed-chip-elite feed-mod-wardmarked">Wardmarked</span>')
+      .replace(/Floor cleared/gi, '<span class="feed-chip feed-chip-floor">Floor cleared</span>')
+      .replace(/Floor secured/gi, '<span class="feed-chip feed-chip-floor">Floor secured</span>')
+      .replace(/Room cleared/gi, '<span class="feed-chip feed-chip-floor">Room cleared</span>')
+      .replace(/Room secured/gi, '<span class="feed-chip feed-chip-floor">Room secured</span>')
+      .replace(/\bUnsecured\b/gi, '<span class="feed-chip feed-chip-unsecured">Unsecured</span>')
+      .replace(/\b(Extraction|Extracted|Extract)\b/gi, match => `<span class="feed-chip feed-chip-extract">${match}</span>`)
+      .replace(/Death forfeits(?: all)?(?: unextracted)? rewards?/gi, match => `<span class="feed-chip feed-chip-death">${match}</span>`)
+      .replace(/Death forfeits loot/gi, '<span class="feed-chip feed-chip-death">Death forfeits loot</span>')
+      .replace(/Hardcore/gi, '<span class="feed-chip feed-chip-death">Hardcore</span>');
+    return `<div class="log-line small combat-feed-line feed-${kind}">
+      <span class="feed-icon">${combatFeedIcon(kind)}</span>
+      <div class="feed-copy">
+        <div class="feed-kicker">${combatFeedLabel(kind)}</div>
+        <div class="feed-body">${normalized}</div>
+      </div>
+    </div>`;
+  }
+  function spawnQuestLore(state, text) {
+    if (!state) return;
+    state.archive = asArray(state.archive, []);
+    state.archive.unshift({ stamp: new Date().toLocaleString(), text });
+    state.archive = state.archive.slice(0, 40);
+  }
+
+  function startRun(state, startDepth = null) {
+    if (!isPlainObject(state) || !isPlainObject(state.player)) return false;
+    const run = ensureRunShell(state);
+    if (run.active && run.monster) {
+      state.screen = 'run';
+      return true;
+    }
+    if (run.active && !run.monster) {
+      recoverRunToTown(state, 'Recovered from an incomplete active descent before starting a new descent.');
+    }
+    calcDerived(state);
+    const sink = ensureGoldSinkState(state);
+    const hasExplicitStart = startDepth !== null && startDepth !== undefined;
+    const requestedDepth = hasExplicitStart
+      ? progressDepthValue(startDepth, 1)
+      : defaultRunStartDepth(state);
+    const allowedCharterStart = requestedDepth > 1 && canUseCharterStart(state, requestedDepth);
+    const allowedSafeReturnStart = !hasExplicitStart && canUseSafeReturnStart(state, requestedDepth);
+    const actualStartDepth = requestedDepth === 1 || allowedCharterStart || allowedSafeReturnStart ? requestedDepth : 1;
+    run.active = true;
+    run.floor = actualStartDepth;
+    run.startedFromCharter = allowedCharterStart;
+    run.charterStartFloor = allowedCharterStart ? run.floor : 0;
+    run.setBonuses = { ashboundLethalUsed: false, bellforgeHits: 0 };
+    run.chain = 0;
+    run.roomsCleared = 0;
+    run.encounters = 0;
+    run.goldBonusPct = Math.floor(numberOr(sink.nextRunGoldBonusPct, 0, 0, 50));
+    sink.nextRunGoldBonusPct = 0;
+    run.pendingRewards = createPendingRunRewards();
+    run.zone = zoneName(run.floor);
+    run.danger = dangerRatingForDepth(run.floor);
+    run.combatLog = [];
+    if (!state.ui) state.ui = { combatLogExpanded:false };
+    state.ui.combatLogExpanded = false;
+    // Hollow Stair entry preserves current HP; only clamp invalid saved/runtime values.
+    state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 1, state.player.maxHp));
+    nextEncounter(state);
+    if (!state.run.monster) {
+      recoverRunToTown(state, 'The Hollow Stair failed to raise a threat; returned safely to Lowfire.');
+      return false;
+    }
+    state.screen = 'run';
+    pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The Hollow Stair seals behind you.`);
+    if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this descent.`);
+    return true;
+  }
+
+
+  function startCharterRun(state, depth) {
+    const startDepth = normalizeCharterMilestoneDepth(depth);
+    if (state.run?.active) {
+      state.screen = 'run';
+      return pushLog(state, 'A descent is already active. Continue it before using a charter.');
+    }
+    const alreadyOwned = ownsPermanentCharter(state, startDepth);
+    if (!alreadyOwned && !isCharterDepthUnlocked(state, startDepth)) return pushLog(state, 'That Hollow Stair Charter is not unlocked yet.');
+    const cost = charterStartCost(startDepth);
+    if (!alreadyOwned) {
+      if (state.player.gold < cost) return pushLog(state, `Need ${formatMoney(cost)} to permanently buy the ${charterDepthLabel(startDepth)} charter.`);
+      state.player.gold -= cost;
+      grantPermanentCharter(state, startDepth);
+      pushLog(state, `Permanent Hollow Stair Charter bought: ${charterDepthLabel(startDepth)} for ${formatMoney(cost)}.`);
+    }
+    startRun(state, startDepth);
+    pushLog(state, `Hollow Stair Charter used: bypassed the upper stair and entered at ${charterDepthLabel(startDepth)}.`);
+  }
+
+  function zoneName(floor) {
+    return districtByDepth(floor).name;
+  }
+
+  function nextEncounter(state) {
+    const run = ensureRunShell(state);
+    if (!run.active) return;
+    run.floor = progressDepthValue(run.floor, defaultRunStartDepth(state));
+    run.zone = zoneName(run.floor);
+    run.monster = generateMonster(run.floor, state);
+    if (!run.monster) {
+      recoverRunToTown(state, 'Recovered from a failed encounter roll and returned to Lowfire.');
+      return;
+    }
+    state.run.encounters += 1;
+    state.run.choices = ['attack','guard','skill','extract'];
+    state.player.discoveredMonsters = asArray(state.player.discoveredMonsters, []);
+    if (!state.player.discoveredMonsters.includes(state.run.monster.name)) state.player.discoveredMonsters.push(state.run.monster.name);
+    const monster = state.run.monster;
+    if (monster.tier === 'Boss') {
+      pushCombat(state, `Boss pressure locks the stair: ${monster.name}.`);
+    } else if (monster.tier === 'Elite') {
+      pushCombat(state, `Elite pressure rises: ${monster.name}.`);
+    } else {
+      pushCombat(state, `Encounter: ${monster.name} rises in ${state.run.zone}.`);
+    }
+    const modifiers = eliteModifiersForMonster(monster);
+    if (monster.tier === 'Elite' && modifiers.length) {
+      pushCombat(state, `Elite read: ${eliteModifierNames(modifiers)}. ${eliteModifierDangerSummary(modifiers)}`);
+      pushCombat(state, `Elite plan: ${eliteModifierPlanLine(modifiers)}`);
+    }
+  }
+
+  function damageRoll(offense, defense, swing = 1) {
+    return Math.max(1, Math.round((offense * swing) - defense * 0.33 + rand(-4, 5)));
+  }
+
+  function combatAction(state, action) {
+    const result = { saveNow: false, fullRender: false };
+    ensureRunShell(state);
+    action = String(action || '');
+    if (!CORE_COMBAT_ACTIONS.includes(action)) return result;
+    if (!hasActiveCombat(state)) {
+      if (state?.run?.active && !state.run.monster) {
+        recoverRunToTown(state, 'Recovered from an incomplete combat state and returned to Lowfire.');
+        result.saveNow = true;
+        result.fullRender = true;
+      }
+      return result;
+    }
+    const monster = state.run.monster;
+    if (numberOr(monster.hp, 0, 0, Number.MAX_SAFE_INTEGER) <= 0) {
+      winEncounter(state);
+      result.saveNow = true;
+      return result;
+    }
+    const stats = calcDerived(state);
+    let playerSwing = 1;
+    let playerShield = 0;
+
+    if (action === 'attack') {
+      playerSwing = 1.0 + stats.speed * 0.008;
+      if (Math.random() < (state.player.crit + stats.luck * 0.18) / 100) playerSwing += 0.7;
+      if (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss') playerSwing += 0.14;
+      if (hasEquippedSetBonus(state, 'veyruhn_bellforge', 5)) {
+        const setRun = ensureRunSetBonusState(state);
+        setRun.bellforgeHits += 1;
+        if (setRun.bellforgeHits % 5 === 0) {
+          playerSwing += 0.55;
+          pushCombat(state, 'Bellforge toll rings: the fifth strike lands heavy.');
+        }
+      }
+      if (consumeDebtbrandCombatBoost(state)) playerSwing += 0.20;
+      const dealt = damageRoll(stats.power, monster.guard, playerSwing);
+      monster.hp -= dealt;
+      pushCombat(state, `You strike for ${dealt}.`);
+    } else if (action === 'guard') {
+      playerShield = Math.round(stats.guard * 0.65 + stats.wit * 0.25);
+      const recovered = Math.max(1, Math.round(stats.guard * 0.09));
+      state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+      pushCombat(state, `You brace and recover ${recovered} HP.`);
+    } else if (action === 'skill') {
+      if (state.player.ember <= 0) {
+        pushCombat(state, 'No ember left. Ashburst fizzles.');
+      } else {
+        state.player.ember -= 1;
+        const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
+        const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
+        monster.hp -= dealt;
+        const siphon = Math.max(1, Math.round(stats.wit * 0.18));
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
+        pushCombat(state, `Ashburst burns for ${dealt} and returns ${siphon} HP.`);
+      }
+    } else if (action === 'extract') {
+      const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
+      if (Math.random() * 100 <= odds) {
+        pushCombat(state, `You extract safely from ${state.run.zone} at ${runDepthLabel(state)}.`);
+        finishRun(state, 'extract');
+        result.saveNow = true;
+        result.fullRender = true;
+        return result;
+      } else {
+        pushCombat(state, 'Extraction failed. The haul stays unsecured; guard or finish the fight.');
+      }
+    } else {
+      return result;
+    }
+
+    if (monster.hp <= 0) {
+      if (hasEliteModifier(monster, 'Gravebound') && !monster.reviveUsed) {
+        monster.reviveUsed = true;
+        monster.hp = Math.max(1, Math.round(monster.maxHp * 0.22));
+        pushCombat(state, `Gravebound refuses death. ${monster.name} rises again.`);
+      } else {
+        winEncounter(state);
+        result.saveNow = true;
+        return result;
+      }
+    }
+
+    if (hasEliteModifier(monster, 'Ash-fed') && !monster.ashFedTriggered && monster.hp <= monster.maxHp * 0.35) {
+      monster.ashFedTriggered = true;
+      monster.power = Math.round(monster.power * 1.06);
+      pushCombat(state, `Ash-fed surge. ${monster.name} burns hotter near defeat.`);
+    }
+
+    if (hasEquippedSetBonus(state, 'ashbound_warden', 3) && monster.tier === 'Boss') {
+      playerShield += Math.max(2, Math.round(stats.guard * 0.22));
+    }
+    const swing = monster.tier === 'Boss' ? 1.3 : monster.tier === 'Elite' ? 1.16 : 1;
+    const incoming = Math.max(1, damageRoll(monster.power, stats.guard + playerShield, swing));
+    const dodged = Math.random() * 100 < clamp(state.player.dodge + stats.speed * 0.25, 3, 38);
+    if (dodged) {
+      pushCombat(state, `${monster.name} misses through the gloom.`);
+    } else {
+      state.player.hp -= incoming;
+      pushCombat(state, `${monster.name} hits for ${incoming}.`);
+      if (hasEliteModifier(monster, 'Venomous')) {
+        const venom = Math.max(1, Math.round(threatDepthFromDepth(monster.level) * 0.7));
+        const venomNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Venomous poison follows clean hits'));
+        state.player.hp -= venom;
+        pushCombat(state, venomNoted ? `Venom seeps for ${venom}.` : `Venom seeps for ${venom}. Venomous poison follows clean hits.`);
+      }
+      if (hasEliteModifier(monster, 'Hollow-Eyed') && Math.random() < 0.18) {
+        const pierce = Math.max(2, Math.round(threatDepthFromDepth(monster.level) * 1.1));
+        const hollowNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Hollow-Eyed can pierce guard'));
+        state.player.hp -= pierce;
+        pushCombat(state, hollowNoted ? `Hollow-Eyed precision pierces for ${pierce}.` : `Hollow-Eyed precision pierces for ${pierce}. Hollow-Eyed can pierce guard.`);
+      }
+    }
+
+    if (monster.skill === 'Burn' && Math.random() < 0.2) {
+      const dot = Math.round(threatDepthFromDepth(monster.level) * 1.2);
+      state.player.hp -= dot;
+      pushCombat(state, `Burn lingers for ${dot}.`);
+    }
+
+    if (state.player.hp <= 0) {
+      if (tryAshboundLethalWard(state)) {
+        result.saveNow = true;
+      } else {
+        defeat(state);
+        result.saveNow = true;
+        result.fullRender = true;
+      }
+    }
+    return result;
+  }
+
+  function winEncounter(state) {
+    ensureRunShell(state);
+    const m = state.run.monster;
+    if (!m) {
+      recoverRunToTown(state, 'Recovered from a cleared encounter with no active threat.');
+      return;
+    }
+    const source = m.tier === 'Boss' ? 'boss' : m.tier === 'Elite' ? 'elite' : 'normal';
+    const eliteModifiers = source === 'elite' ? eliteModifiersForMonster(m) : [];
+    const eliteReward = source === 'elite' ? normalizeEliteRewardProfile(m.eliteReward, eliteModifiers, state.run.floor) : null;
+    const runGoldBonus = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
+    const debtbrandGoldBonus = hasEquippedSetBonus(state, 'lowfire_debtbrand', 2) ? 7 : 0;
+    const eliteContractGoldBonus = source === 'elite' ? Math.round(activeEliteContractRisk(state).coinBonus * 100) : 0;
+    const totalGoldBonus = runGoldBonus + debtbrandGoldBonus + eliteContractGoldBonus;
+    const earnedGold = sanitizeCurrencyValue(totalGoldBonus > 0 ? Math.max(1, Math.round(m.rewardGold * (1 + totalGoldBonus / 100))) : m.rewardGold, 0);
+    addPendingRunGold(state, earnedGold);
+    addPendingRunShards(state, m.rewardShard);
+    addPendingRunXp(state, m.rewardXp);
+    addPendingRunKill(state, 1);
+    state.run.roomsCleared += 1;
+    state.run.chain += 1;
+    const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
+    const rewardLead = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward';
+    const victoryVerb = source === 'boss' ? 'cleared' : source === 'elite' ? 'defeated' : 'secured';
+    pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
+    pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
+    updateQuest(state, 'kill', 1);
+
+    const lootRolls = source === 'boss' ? 2 : 1;
+    let drops = 0;
+    for (let i = 0; i < lootRolls; i++) {
+      if (!shouldDropLoot(state.run.floor, source, i, state)) continue;
+      const loot = shouldDropMythicSetPiece(state, source, state.run.floor)
+        ? generateMythicSetPiece(state.run.floor, source, state)
+        : generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source, depthRaw: state.run.floor, state });
+      addPendingRunLoot(state, loot);
+      drops += 1;
+      const lootLabel = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward loot';
+      const lootLine = loot.rarity === 'mythic'
+        ? `Mythic Find from ${lootLabel}`
+        : lootLabel;
+      pushCombat(state, `${lootLine}: ${loot.name} (${loot.rarity}) added to the unsecured haul.`);
+      updateQuest(state, 'loot', 1);
+    }
+    if (source === 'elite' && eliteReward?.modifierCount) {
+      const bonusPct = Math.round(eliteReward.bonusLootChance * 100);
+      pushCombat(state, `Elite Spoils: elite risk adds a +${bonusPct}% bonus loot roll.`);
+      if (Math.random() < eliteReward.bonusLootChance) {
+        const bonusLoot = generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source:'elite', depthRaw:state.run.floor, state });
+        bonusLoot.tags = asArray(bonusLoot.tags, []).concat(['elite-risk-bonus']);
+        addPendingRunLoot(state, bonusLoot);
+        drops += 1;
+        pushCombat(state, `Elite Spoils bonus loot: ${bonusLoot.name} (${bonusLoot.rarity}) added to the unsecured haul.`);
+        updateQuest(state, 'loot', 1);
+      }
+    }
+    if (source === 'boss') {
+      const sink = ensureGoldSinkState(state);
+      if (sink.nextBossBounty) {
+        const bountyDepth = threatDepthFromDepth(state.run.floor);
+        const forcedRarity = bountyDepth >= 50 ? 'legendary' : bountyDepth >= 30 ? 'epic' : 'rare';
+        const bounty = generateGear(pick(SLOT_ORDER), bountyDepth + 1, { source:'boss', forcedRarity });
+        bounty.name = `Bounty ${bounty.name}`;
+        bounty.summary = 'Extra boss relic paid for by a Sootveil bounty writ.';
+        bounty.tags = asArray(bounty.tags, []).concat(['bounty-writ']);
+        addPendingRunLoot(state, bounty);
+        sink.nextBossBounty = false;
+        drops += 1;
+        pushCombat(state, `Boss Spoils bounty relic: ${bounty.name} (${bounty.rarity}) added to the unsecured haul.`);
+        updateQuest(state, 'loot', 1);
+      }
+    }
+    if (!drops && source === 'normal') pushCombat(state, 'No gear found. You pocket the coin and move on.');
+    if (!drops && source === 'elite') pushCombat(state, 'Elite Spoils: no gear found. Coin, shards, and XP stay in the unsecured haul.');
+
+    if (source === 'elite' && !m.eliteContractCounted) {
+      m.eliteContractCounted = true;
+      recordEliteContractKill(state);
+    }
+
+    const pending = ensurePendingRunRewards(state);
+    const hasMeaningfulGear = state.player.inventory.some(item => item && !item.tags?.includes('starter'))
+      || pending.loot.some(item => item && !item.tags?.includes('starter'))
+      || Object.values(state.player.equipment || {}).some(item => item && !item.tags?.includes('starter'));
+    const currentThreatDepth = threatDepthFromDepth(state.run.floor);
+    if (currentThreatDepth >= 4 && currentThreatDepth <= 5 && !state.player.earlyAidGiven && !hasMeaningfulGear) {
+      const aidSlot = pick(['weapon','offhand','armor','helm','boots','gloves']);
+      const aid = generateGear(aidSlot, Math.max(1, currentThreatDepth), { source:'normal', forcedRarity:'common' });
+      aid.value = Math.max(aid.value, coins(0, 1, 80));
+      aid.tags = asArray(aid.tags, []).concat(['early-aid-cache']);
+      addPendingRunLoot(state, aid);
+      pushCombat(state, `Room Reward cache: ${aid.name} added to the unsecured haul.`);
+      pushLog(state, `A last-resort Lowfire cache produced basic gear: ${aid.name}.`);
+      updateQuest(state, 'loot', 1);
+    }
+
+    const beforeDepth = depthStageValue(state.run.floor);
+    state.run.floor = beforeDepth + 1;
+    state.run.zone = zoneName(state.run.floor);
+    state.run.danger = dangerRatingForDepth(state.run.floor);
+    state.player.depth = Math.max(state.player.depth, state.run.floor);
+    if (state.run.floor % 4 === 0) addPendingRunEmber(state, 1);
+
+    const enteredDistrict = districtByDepth(state.run.floor);
+    if (isDistrictEntryDepth(state.run.floor, enteredDistrict)) {
+      pushCombat(state, `Entering ${enteredDistrict.name}: ${districtArrivalLine(enteredDistrict)}`);
+    }
+    pushCombat(state, `Descent continues: ${runDepthLabel(state)}.`);
+    const milestone = depthMilestoneNotice(state.run.floor);
+    if (milestone) pushCombat(state, milestone);
+    applyRoomMilestoneReward(state, beforeDepth, state.run.floor);
+    applyFloorMilestoneReward(state, beforeDepth, state.run.floor);
+
+    nextEncounter(state);
+  }
+
+  function updateQuest(state, type, amount) {
+    if (state?.run?.active) {
+      addPendingQuestProgress(state, type, amount);
+      return;
+    }
+    applyQuestProgressNow(state, type, amount);
+  }
+
+  function applyQuestProgressNow(state, type, amount) {
+    const progress = sanitizeCurrencyValue(amount, 0);
+    if (progress <= 0) return;
+    state.player.quests.forEach(q => {
+      if (q.type === type && q.progress < q.goal) {
+        q.progress = Math.min(q.goal, q.progress + progress);
+        if (q.progress >= q.goal) rewardQuest(state, q);
+      }
+    });
+  }
+
+  function rewardQuest(state, q) {
+    if (q.claimed) return;
+    q.claimed = true;
+    if (q.id === 'q1') { addPlayerGold(state, coins(0, 2, 50)); state.player.ember += 1; }
+    if (q.id === 'q2') { state.player.forgeSpark += 1; }
+    if (q.id === 'q3') { state.player.shards += 80; }
+    pushLog(state, `Objective complete: ${q.title}. Reward: ${q.reward}.`);
+  }
+
+  function finishRun(state, reason) {
+    ensureRunShell(state);
+    let runResultDetail = '';
+    const endedAtFloor = progressDepthValue(state.run.floor, state.player?.returnDepth || 1);
+    const endedAtZone = state.run.zone || currentStagingDistrict(state).name;
+    const endedRunLabel = runDepthLabel(state);
+    const nextReturnDepth = reason === 'extract'
+      ? progressDepthValue(endedAtFloor, 1)
+      : hardcoreDeathCheckpointDepth(state, endedAtFloor);
+    const returnLabel = hardcoreDepthReturnLabel(nextReturnDepth);
+    const rewardSnapshot = runHistoryRewardSnapshot(state.run.pendingRewards);
+    if (reason === 'extract') {
+      const secured = bankPendingRunRewards(state);
+      const securedText = cleanDisplayText(secured, 'no unsecured rewards');
+      runResultDetail = `Extraction Haul secured: ${securedText}. Lowfire marks the run complete. Next descent can start from ${returnLabel}.`;
+      pushCombat(state, `Extraction Haul secured. Banked: ${securedText}.`);
+      pushLog(state, `Extraction Haul secured. Banked: ${securedText}. Next start: ${returnLabel}.`);
+      showExtractionPopup(`${extractionPopupSummary(rewardSnapshot, securedText)} • Next: ${returnLabel}`);
+      recordSafeExtractionProgress(state);
+    } else if (reason === 'defeat') {
+      const lost = discardPendingRunRewards(state);
+      const lostText = cleanDisplayText(lost, 'no unsecured rewards');
+      runResultDetail = `The run ends here. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`;
+      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`);
+      showDefeatPopup(`Run ended. Lost unsecured: ${lostText}. Restart: ${returnLabel}.`);
+    } else {
+      clearPendingRunRewards(state);
+      runResultDetail = 'Descent ended without unsecured rewards.';
+    }
+    const summaryLine = extractionSummaryLine(state, reason);
+    if (summaryLine) pushLog(state, summaryLine);
+    state.player.returnDepth = nextReturnDepth;
+    if (reason === 'extract') state.player.safeExtractDepth = Math.max(state.player.safeExtractDepth || 1, nextReturnDepth);
+    state.run.active = false;
+    state.run.monster = null;
+    state.run.choices = [];
+    state.run.chain = 0;
+    state.run.goldBonusPct = 0;
+    state.player.debtbrandBoostReady = false;
+    state.run.startedFromCharter = false;
+    state.run.charterStartFloor = 0;
+    state.player.runHistory.unshift({
+      floor: endedAtFloor,
+      reason,
+      zone: endedAtZone,
+      runLabel: endedRunLabel,
+      detail: runResultDetail,
+      summary: summaryLine || '',
+      restartDepth: nextReturnDepth,
+      restartLabel: returnLabel,
+      checkpointLabel: returnLabel,
+      rewards: rewardSnapshot.rewards,
+      gold: rewardSnapshot.gold,
+      shards: rewardSnapshot.shards,
+      ember: rewardSnapshot.ember,
+      xp: rewardSnapshot.xp,
+      kills: rewardSnapshot.kills,
+      eliteMarks: rewardSnapshot.eliteMarks,
+      lootCount: rewardSnapshot.lootCount,
+      questProgress: rewardSnapshot.questProgress,
+      lootPreview: rewardSnapshot.lootPreview,
+      date: new Date().toLocaleString()
+    });
+    state.player.runHistory = state.player.runHistory.slice(0, 12);
+    state.screen = 'town';
+  }
+
+  function defeat(state) {
+    state.player.hp = Math.round(state.player.maxHp * 0.55);
+    pushCombat(state, 'The run ends here. Lowfire records the floor. Unsecured rewards were lost; banked gear and wallet stayed safe.');
+    spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
+    finishRun(state, 'defeat');
+  }
+
+  function equipItem(state, id, silent = false) {
+    const idx = state.player.inventory.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const item = normalizeItem(state.player.inventory[idx]);
+    if (!item) return;
+    state.player.inventory[idx] = item;
+    const conflicts = equipmentConflictSlots(item.slot);
+    conflicts.forEach(slot => {
+      const prev = state.player.equipment[slot];
+      if (prev && prev.id !== item.id) state.player.inventory.push(prev);
+      delete state.player.equipment[slot];
+    });
+    state.player.equipment[item.slot] = item;
+    state.player.inventory.splice(idx, 1);
+    calcDerived(state);
+    if (!silent) {
+      pushLog(state, `Equipped ${item.name}.`);
+      updateQuest(state, 'equip', 1);
+    }
+  }
+
+  function sellItem(state, id) {
+    const idx = state.player.inventory.findIndex(x => x.id === id);
+    if (idx === -1) return 0;
+    const item = state.player.inventory[idx];
+    const bonusUsed = ensureGoldSinkState(state).junkSaleBonusCharges > 0 && isJunkSaleBonusItem(item);
+    const paid = sellValueWithGoldSink(state, item, true);
+    consumeJunkSaleBonus(state, bonusUsed);
+    addPlayerGold(state, paid);
+    state.player.inventory.splice(idx, 1);
+    pushLog(state, `Sold ${item.name} for ${formatMoney(paid)}${bonusUsed ? ' with a Junker bonus' : ''}.`);
+    return paid;
+  }
+
+  function sellAllQuickSafeGear(state) {
+    const inventory = asArray(state.player.inventory, []);
+    const keep = [];
+    let soldCount = 0;
+    let paidTotal = 0;
+    let bonusUsed = false;
+    inventory.forEach(item => {
+      if (canQuickSellItem(state, item)) {
+        soldCount += 1;
+        const useBonus = ensureGoldSinkState(state).junkSaleBonusCharges > 0 && isJunkSaleBonusItem(item);
+        paidTotal += sellValueWithGoldSink(state, item, useBonus);
+        bonusUsed = bonusUsed || useBonus;
+      } else {
+        keep.push(item);
+      }
+    });
+    if (!soldCount) return { count: 0, paid: 0 };
+    consumeJunkSaleBonus(state, bonusUsed);
+    state.player.inventory = keep;
+    addPlayerGold(state, paidTotal);
+    pushLog(state, `Sold ${soldCount} junk-marked gear pieces for ${formatMoney(paidTotal)}${bonusUsed ? ' with a Junker bonus' : ''}.`);
+    return { count: soldCount, paid: paidTotal };
+  }
+
+  function sellAllGear(state) {
+    const inventory = asArray(state.player.inventory, []);
+    const keep = [];
+    let soldCount = 0;
+    let paidTotal = 0;
+    let bonusUsed = false;
+    inventory.forEach(item => {
+      if (canSellAllGearItem(state, item)) {
+        soldCount += 1;
+        const useBonus = ensureGoldSinkState(state).junkSaleBonusCharges > 0 && isJunkSaleBonusItem(item);
+        paidTotal += sellValueWithGoldSink(state, item, useBonus);
+        bonusUsed = bonusUsed || useBonus;
+      } else {
+        keep.push(item);
+      }
+    });
+    if (!soldCount) return { count: 0, paid: 0 };
+    consumeJunkSaleBonus(state, bonusUsed);
+    state.player.inventory = keep;
+    addPlayerGold(state, paidTotal);
+    pushLog(state, `Sold all unequipped sellable gear: ${soldCount} pieces for ${formatMoney(paidTotal)}${bonusUsed ? ' with a Junker bonus' : ''}.`);
+    return { count: soldCount, paid: paidTotal };
+  }
+
+  function hasNonStarterWeapon(state) {
+    const equipped = state.player.equipment && state.player.equipment.weapon;
+    const inventoryHit = state.player.inventory.some(item => item && item.slot === 'weapon' && !(item.tags || []).includes('starter'));
+    return !!(equipped && !(equipped.tags || []).includes('starter')) || inventoryHit;
+  }
+
+  function merchantGear(slot, level, rarity, tag, rawDepth = level) {
+    const itemLevel = Math.max(1, Math.floor(numberOr(level, 1, 1, 999999)));
+    const item = generateGear(slot, itemLevel, { source:'merchant', forcedRarity:rarity, depthRaw:rawDepth });
+    item.shopRole = tag || 'stock';
+    item.summary = tag === 'core'
+      ? 'Core shop stock: practical, affordable, and meant to fill weak equipment slots.'
+      : tag === 'upgrade'
+      ? 'Featured upgrade: stronger than baseline stock, priced to make the choice matter.'
+      : tag === 'rare'
+      ? 'Rare shelf item: expensive, uncommon, and not guaranteed to appear.'
+      : item.summary;
+    return item;
+  }
+
+  function buildMerchantStock(state) {
+    const rawDepth = Math.max(1, Math.floor(numberOr(state?.player?.depth || state?.player?.level || 1, 1, 1, 999999)));
+    const shopThreatDepth = threatDepthFromDepth(rawDepth);
+    const stock = [];
+    const coreSlots = ['weapon','armor','offhand','boots','gloves','helm'];
+    const accessorySlots = ['ring','amulet','cloak','charm'];
+    const used = new Set();
+    const takeSlot = (pool) => {
+      const options = pool.filter(slot => !used.has(slot));
+      const slot = pick(options.length ? options : pool);
+      used.add(slot);
+      return slot;
+    };
+
+    // Emergency shop fairness: if the player reaches floor 4 without a real weapon, show one.
+    if (rawDepth >= 4 && !hasNonStarterWeapon(state)) {
+      stock.push(merchantGear('weapon', shopThreatDepth, 'common', 'core', rawDepth));
+      used.add('weapon');
+    }
+
+    while (stock.length < 2) stock.push(merchantGear(takeSlot(coreSlots), shopThreatDepth + rand(-1, 0), 'common', 'core', rawDepth));
+
+    stock.push(merchantGear(takeSlot(coreSlots), shopThreatDepth + rand(0, 1), 'uncommon', 'upgrade', rawDepth));
+
+    const flexRarity = Math.random() < 0.7 ? 'common' : 'uncommon';
+    stock.push(merchantGear(takeSlot(accessorySlots.concat(coreSlots)), shopThreatDepth + rand(-1, 1), flexRarity, 'stock', rawDepth));
+
+    if (Math.random() < 0.10) stock.push(merchantGear(takeSlot(coreSlots.concat(accessorySlots)), shopThreatDepth + rand(0, 2), 'rare', 'rare', rawDepth));
+
+    return stock.slice(0, 5);
+  }
+
+
+  function findCursedRerollTarget(state) {
+    const items = asArray(state.player.inventory, [])
+      .filter(item => item && item.kind !== 'special' && item.slot && !item.locked && !item.favorite && !item.protected && !itemIsEquipped(state, item));
+    if (!items.length) return null;
+    return items.slice().sort((a, b) => (a.rating || 0) - (b.rating || 0) || (a.level || 0) - (b.level || 0))[0];
+  }
+
+  function buyDistrictWare(state, id) {
+    const ware = unlockedDistrictWares(state).find(entry => entry.id === id);
+    if (!ware) return pushLog(state, 'That district ware is not unlocked yet.');
+    const blocked = goldSinkCannotBuyReason(state, ware);
+    if (blocked) return pushLog(state, `${ware.name}: ${blocked}.`);
+
+    const sink = ensureGoldSinkState(state);
+    const paidCost = merchantCostWithSetBonus(state, ware.cost);
+    if (state.player.gold < paidCost) return pushLog(state, `Not enough coin for ${ware.name}.`);
+    state.player.gold = Math.max(0, state.player.gold - paidCost);
+    grantDebtbrandMerchantBoost(state);
+
+    if (ware.id === 'junkers_token') {
+      sink.junkSaleBonusCharges = Math.min(3, sink.junkSaleBonusCharges + 1);
+      pushLog(state, `Bought ${ware.name}. Your next junk/common sell action pays more.`);
+      return;
+    }
+
+    if (ware.id === 'small_debt_charm') {
+      sink.nextRunGoldBonusPct = 10;
+      pushLog(state, `Bought ${ware.name}. Your next descent earns +10% gold.`);
+      return;
+    }
+
+    if (ware.id === 'black_market_key') {
+      const rawDepth = Math.max(1, reachedDistrictFloor(state));
+      const shopThreatDepth = threatDepthFromDepth(rawDepth);
+      const shelfRarity = rawDepth >= 25 ? 'epic' : 'rare';
+      const item = merchantGear(pick(SLOT_ORDER), shopThreatDepth + rand(0, 2), shelfRarity, 'rare', rawDepth);
+      item.name = `Black Market ${item.name}`;
+      item.value = Math.max(coins(0, 75, 0), Math.round(item.value * 0.82));
+      item.summary = 'Unlocked by a Black Market Key. Stronger shelf stock, still priced like a risk.';
+      item.tags = asArray(item.tags, []).concat(['black-market']);
+      state.merchantStock.unshift(item);
+      state.merchantStock = state.merchantStock.slice(0, 6);
+      pushLog(state, `Bought ${ware.name}. A shady item was added to the merchant shelf.`);
+      return;
+    }
+
+    if (ware.id === 'cursed_reroll_token') {
+      const target = findCursedRerollTarget(state);
+      if (!target) {
+        addPlayerGold(state, paidCost);
+        return pushLog(state, 'No safe unequipped gear exists to reroll. Purchase refunded.');
+      }
+      const idx = state.player.inventory.findIndex(item => item && item.id === target.id);
+      const nextRarity = Math.random() < 0.2
+        ? (RARITIES[Math.min(RARITIES.length - 1, rarityIndex(target.rarity) + 1)]?.key || target.rarity)
+        : target.rarity;
+      const rawDepth = Math.max(1, reachedDistrictFloor(state));
+      const shopThreatDepth = threatDepthFromDepth(rawDepth);
+      const rerollLevel = Math.max(Math.floor(numberOr(target.level, 1, 1, 999999)), shopThreatDepth);
+      const rerolled = generateGear(target.slot, rerollLevel, { source:'merchant', forcedRarity:nextRarity, depthRaw:rawDepth });
+      rerolled.name = `Cursed ${rerolled.name}`;
+      rerolled.summary = `Rerolled from ${target.name} by an Ember Debtworks token.`;
+      rerolled.tags = asArray(rerolled.tags, []).concat(['cursed-reroll']);
+      if (idx >= 0) state.player.inventory.splice(idx, 1, rerolled);
+      pushLog(state, `Bought ${ware.name}. ${target.name} became ${rerolled.name}.`);
+      return;
+    }
+
+    if (ware.id === 'legendary_bounty_writ') {
+      sink.nextBossBounty = true;
+      pushLog(state, `Bought ${ware.name}. The next boss carries an extra relic.`);
+      return;
+    }
+
+    if (ware.id === 'golden_coffin') {
+      sink.goldenCoffin = true;
+      pushLog(state, `Bought ${ware.name}. Defeat insurance is armed.`);
+    }
+  }
+
+  function buyMerchantItem(state, id) {
+    const idx = state.merchantStock.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const item = state.merchantStock[idx];
+    const itemCost = merchantCostWithSetBonus(state, item.value);
+    if (state.player.gold < itemCost) return pushLog(state, `Not enough coin for ${item.name}.`);
+    state.player.gold = Math.max(0, state.player.gold - itemCost);
+    state.player.inventory.unshift(item);
+    state.merchantStock.splice(idx, 1);
+    grantDebtbrandMerchantBoost(state);
+    pushLog(state, `Bought ${item.name}.`);
+  }
+
+  function rollMerchant(state, first = false) {
+    if (!first && state.player.gold < state.town.merchantRefreshCost) return pushLog(state, 'Not enough coin to refresh Lowfire stock.');
+    if (!first) state.player.gold -= state.town.merchantRefreshCost;
+    state.merchantStock = buildMerchantStock(state);
+    pushLog(state, 'Lowfire market stock updated.');
+  }
+
+  function forgeItem(state) {
+    if (state.player.forgeSpark <= 0 || state.player.shards < 40) return pushLog(state, 'Need 1 forge spark and 40 shards.');
+    state.player.forgeSpark -= 1;
+    state.player.shards -= 40;
+    // Forge scaling: use threat-depth item level, not raw chapter depth, to prevent deep-floor forged items from outpacing the monster ladder.
+    const crafted = generateGear(pick(SLOT_ORDER), Math.max(1, threatDepthFromDepth(state.player.depth) + rand(1, 2)), { source:'forge', depthRaw:state.player.depth });
+    crafted.value += coins(0, 16, 0);
+    state.player.inventory.unshift(crafted);
+    pushLog(state, `Forged ${crafted.name}.`);
+    if (!state.player.discoveredGear.includes(crafted.name)) state.player.discoveredGear.push(crafted.name);
+  }
+
+  function restCost(state) {
+    // Rest cost display: shared by town UI and rest action so the visible price cannot drift from the charged price.
+    const player = state?.player || {};
+    const earlyDiscount = player.depth <= 2 ? 35 : 0;
+    return Math.max(coins(0, 0, 85), coins(0, 0, 95 + player.level * 42 - earlyDiscount));
+  }
+
+  function restPlayer(state) {
+    const cost = restCost(state);
+    if (state.player.gold < cost) return pushLog(state, `Need ${formatMoney(cost)} to rest.`);
+    state.player.gold -= cost;
+    calcDerived(state);
+    state.player.hp = state.player.maxHp;
+    state.player.ember = Math.max(state.player.ember, 2);
+    pushLog(state, `Rested at the Lowfire bunks for ${formatMoney(cost)}. HP restored, 2 ember minimum assured.`);
+  }
+

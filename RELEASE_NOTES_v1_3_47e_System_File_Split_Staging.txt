@@ -1,0 +1,34 @@
+DungeonDex v1.3.47e — System File Split Staging
+
+Purpose
+- Split the former monolithic app.js into major system files for easier review and future targeted improvement passes.
+- Keep the runtime behavior as close as possible to v1.3.47d by preserving classic script load order instead of converting to ES modules.
+
+Changed
+- Added js/systems/ folder.
+- Added js/systems/README.md with a system map.
+- Split runtime into:
+  - 00_core_constants_data.js
+  - 01_state_recovery.js
+  - 02_currency_pending_rewards.js
+  - 03_town_contracts_market.js
+  - 04_depth_progression_charters.js
+  - 05_elite_modifiers.js
+  - 06_scaling_generation_audits.js
+  - 07_player_combat_runtime.js
+  - 08_normalization_save.js
+  - 09_ui_common_intro.js
+  - 10_ui_town_shop.js
+  - 11_ui_run_gear_dex_archive.js
+  - 12_render_bindings_boot.js
+- Updated index.html to load the system files directly in numeric order.
+- Updated sw.js cache name and asset list for the split files.
+- Replaced app.js with a small pointer file to prevent future edits against the stale monolith.
+
+Validation
+- Ran syntax checks on every split JS file and sw.js.
+- Ran a lightweight Node VM smoke test with DOM/storage stubs to confirm the ordered split loads and boots through render/binding code.
+
+Notes
+- This is a staging/refactor organization pass, not a full architecture conversion.
+- Keep files loaded in numeric order unless a future pass deliberately converts DungeonDex to modules/imports.
