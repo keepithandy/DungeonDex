@@ -5556,7 +5556,7 @@ button:focus-visible,
 
 .app-shell.combat-active .combat-enemy-header h2 {
   font-size: clamp(.82rem, 3.4vw, .98rem);
-  line-height: 1.12;
+  line-height: 1.4;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
