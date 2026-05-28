@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-v1.3.44b-combat-spam-stability-hotfix';
-const ASSETS = ['./','./index.html','./styles.css?build=1.3.44b-combat-spam-stability-hotfix','./app.js?build=1.3.44b-combat-spam-stability-hotfix','./manifest.json'];
+const CACHE_NAME = 'dungeon-dex-v1.3.47d-version-label-copy-cleanup';
+const ASSETS = ['./','./index.html','./styles.css?build=1.3.47d-version-label-copy-cleanup','./app.js?build=1.3.47d-version-label-copy-cleanup','./manifest.json'];
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)

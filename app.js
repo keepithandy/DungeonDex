@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.46';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.46';
+  const BUILD = 'DungeonDex v1.3.47d';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.47d';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -3831,7 +3831,7 @@
     const subtitle = S.player.runHistory.length || S.player.depth > 0
       ? stagingDistrict.line
       : 'The Hollow Stair descends below Emberfall. Only debt is free here.';
-    const kicker = S.run.active ? 'Active Descent' : 'Lowfire Return';
+    const kicker = S.run.active ? 'Active Descent' : 'Safe Return';
     const metaMarkup = `<span><b>Best Floor</b> ${escapeHtml(depthShortLabel(bestDepth))}</span>
           <span><b>Safe Return</b> ${escapeHtml(depthShortLabel(safeDepth))}</span>
           <span><b>Next Boss</b> ${bossText}</span>`;
@@ -3973,16 +3973,16 @@
 
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
-    const lowfireDistrict = DISTRICT_DATA.find(district => district.id === 'lowfire') || stagingDistrict;
+    const stagedStartDepth = defaultRunStartDepth(S);
     const questPanel = el('questPanel');
     const merchantPanel = el('merchantPanel');
     const forgePanel = el('forgePanel');
     const districtPanel = el('districtName')?.closest('.panel');
     if (districtPanel) {
-      districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(lowfireDistrict)}`;
+      districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
     }
-    if (el('districtName')) el('districtName').textContent = 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `Lowfire return: rest, improve gear, claim work, then descend again.<br><span class="district-mood">${escapeHtml(lowfireDistrict.mood || '')}</span>`;
+    if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
+    if (el('districtLine')) el('districtLine').innerHTML = `Next descent starts at ${escapeHtml(depthShortLabel(stagedStartDepth))}. Lowfire banks the haul; the Stair opens back into ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {
@@ -4317,8 +4317,8 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System Notes</h2>
-      <p class="small">DungeonDex v1.3.46</p>
-      <div class="tag-row"><span class="pill">Lowfire return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
+      <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
+      <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
