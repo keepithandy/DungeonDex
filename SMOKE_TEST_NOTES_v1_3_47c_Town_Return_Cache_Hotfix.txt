@@ -1,0 +1,32 @@
+DungeonDex v1.3.47c — Smoke Test Notes
+
+Static checks:
+- node --check app.js: PASS
+- manifest.json parse: PASS
+- tools/check_dungeondex_package.py: PASS
+
+Manual checks to perform in-browser/on-phone:
+1. New save / D1:
+   - Town return panel should show Lowfire District.
+   - Enter Dungeon should start at the normal early Lowfire start.
+
+2. Safe extract from Ashgate Warrens:
+   - Reach/extract from a staged Ashgate depth such as D15 / displayed Floor 5 Boss Floor.
+   - Return to town.
+   - Town return panel should show Ashgate Warrens instead of Lowfire District.
+   - District banner tone should match Ashgate.
+   - Enter Dungeon should resume from the same staged start depth shown in the panel.
+
+3. Intro modal:
+   - When no run is active, kicker should say Safe Return, not Lowfire Return.
+   - Current District card should still show the staged district.
+
+4. Cache behavior:
+   - index.html references styles.css/app.js with 1.3.47c-town-return-cache-hotfix query strings.
+   - sw.js uses CACHE_NAME dungeon-dex-v1.3.47c-town-return-cache-hotfix.
+   - Old v1.3.44b cached app/style query strings are gone.
+
+5. Regression check:
+   - Start combat and confirm v1.3.47b compact combat layout still appears.
+   - Attack/Skill/Guard/Extract still work.
+   - No save/load reset observed.

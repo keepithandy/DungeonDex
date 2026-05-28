@@ -1,0 +1,34 @@
+DungeonDex v1.3.47c — Town Return + Cache Cleanup Hotfix
+
+Scope:
+- Small app.js town display fix.
+- Service worker/cache cleanup.
+- No combat CSS, combat math, loot, scaling, saves, merchant stock, or extraction math changed.
+
+What changed:
+
+1. Town return district sync:
+   - renderTown() now uses currentStagingDistrict(S) and defaultRunStartDepth(S) for the town return panel.
+   - The district banner tone now uses the staged district instead of always using Lowfire.
+   - The town district title now displays the staged return district name.
+   - The district line now states the next descent start and names the district the Stair opens into.
+   - Lowfire hub copy remains in the board/merchant/forge areas where appropriate.
+
+2. Intro modal wording:
+   - Non-active intro kicker changed from "Lowfire Return" to "Safe Return" so deeper staged returns do not imply the player is always returning to Lowfire.
+
+3. Cache cleanup:
+   - sw.js CACHE_NAME updated to dungeon-dex-v1.3.47c-town-return-cache-hotfix.
+   - sw.js cached app/style asset query strings updated to 1.3.47c-town-return-cache-hotfix.
+   - index.html cache busters updated to 1.3.47c-town-return-cache-hotfix.
+
+4. Notes correction:
+   - v1.3.47b release notes now clarify that app.js was touched only for version labels during that pass.
+
+Files changed:
+- app.js
+- index.html
+- sw.js
+- RELEASE_NOTES_v1_3_47b_Combat_Compact_CSS_Follow_Up.txt
+- RELEASE_NOTES_v1_3_47c_Town_Return_Cache_Hotfix.txt
+- SMOKE_TEST_NOTES_v1_3_47c_Town_Return_Cache_Hotfix.txt

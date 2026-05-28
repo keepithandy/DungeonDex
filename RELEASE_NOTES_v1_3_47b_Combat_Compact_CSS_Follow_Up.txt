@@ -1,0 +1,52 @@
+DungeonDex v1.3.47b — Combat Compact CSS Follow-Up
+
+Scope:
+- CSS-first pass. app.js was touched only for version labels during this pass; no gameplay logic changed.
+- Goal: full combat loop (status, enemy, stage, HP cards, stats, buttons, feed) fits
+  on one iPhone portrait screen without vertical page scrolling.
+
+What changed:
+
+1. Monster header h2 — no longer a large display headline:
+   - Reduced from clamp(1.05rem–1.34rem) to clamp(0.82rem–0.98rem).
+   - Changed to single-line (nowrap + ellipsis). Monster name is already shown in
+     the enemy HP card, so the header h2 is now a compact secondary label.
+   - Family/skill line reduced to 0.64rem with reduced opacity.
+   - Enemy header gap reduced from 3px to 2px.
+
+2. Two new compact portrait media queries added at end of styles.css:
+
+   @media (max-width: 430px) and (max-height: 950px)
+   — Covers normal iPhone portrait with browser chrome.
+   Tightens: shell padding/gap, enemy header, stage height (84px/96px boss),
+   silhouette size, HP card padding, stat box height (32px), action button padding,
+   feed height (72px max).
+
+   @media (max-width: 430px) and (max-height: 820px)
+   — Covers shorter iPhones or when browser chrome eats more height.
+   Further reduces: stage height (72px/82px boss), smaller silhouette, thinner HP bars,
+   30px stat boxes, feed height (58px max, 1-line feed body), hides family/skill p line.
+
+3. Action buttons:
+   - Minimum tap height maintained at 44px in both queries.
+   - transform: none !important preserved (no layout jump on spam tap).
+
+4. Preserved from prior passes:
+   - v1.3.46 district stage atmosphere backgrounds: untouched.
+   - Boss/elite stage overlays and animations: untouched.
+   - Monster silhouette visual pass (v1.3.45): untouched except proportional size reduce.
+   - Combat math, rewards, scaling, save schema: untouched.
+
+CSS consolidation approach:
+- Did not rewrite the existing v1.3.45 or v1.3.46 blocks.
+- Edited two property values in the v1.3.45 block (h2 font-size, enemy-header gap/p).
+- Appended one clean v1.3.47b block at the end of styles.css with the two portrait queries.
+- The v1.3.47b rules override the earlier cascade cleanly by specificity + source order.
+
+Version labels:
+- BUILD and VISIBLE_VERSION_LABEL updated to DungeonDex v1.3.47b.
+- Cache busters updated to 1.3.47b-combat-compact.
+
+Not changed:
+- app.js gameplay logic: untouched during v1.3.47b.
+- Combat formulas, enemy scaling, rewards, drop rates, merchant, saves: untouched.

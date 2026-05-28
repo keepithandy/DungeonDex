@@ -1,0 +1,64 @@
+DungeonDex v1.3.47b — Combat Compact CSS Follow-Up — Smoke Test Notes
+
+Priority: test on iPhone portrait (physical device or DevTools 390×844 viewport).
+
+─── Core load ───────────────────────────────────────────────
+[ ] App loads without console errors.
+[ ] Version label reads: DungeonDex v1.3.47b
+
+─── Combat compact fit (main goal) ──────────────────────────
+Set DevTools to 390x844 or 375x667 (iPhone portrait).
+
+[ ] 1. Start a normal combat encounter.
+    Visible without scrolling:
+    [ ] Top run status strip (district, floor, room info)
+    [ ] Compact enemy header (small h2, not a large headline)
+    [ ] Monster stage (visible, not oversized)
+    [ ] Enemy HP card with name + HP bar
+    [ ] Player HP card with HP bar
+    [ ] All 4 stat boxes (PWR / GRD / SPD / LCK) in one row
+    [ ] All 4 action buttons (Attack / Skill / Guard / Extract) in one row
+    [ ] Combat Feed header + at least one feed line
+
+[ ] 2. Start an elite combat encounter.
+    [ ] Elite stage atmosphere (purple overlay) still visible.
+    [ ] Elite modifier tags present.
+    [ ] Same compact fit as above.
+
+[ ] 3. Start a boss combat encounter.
+    [ ] Boss stage atmosphere (red overlay) still visible.
+    [ ] Boss HP bar slightly taller (7px).
+    [ ] Same compact fit as above.
+
+─── Monster title check ─────────────────────────────────────
+[ ] Monster h2 is small and does not dominate the screen.
+[ ] Monster h2 is single-line (truncates with ellipsis if long name).
+[ ] Enemy name in HP card still shows clearly.
+[ ] Not the same large name displayed twice as large headlines.
+
+─── Button stability ────────────────────────────────────────
+[ ] Attack button tappable (minimum 44px height).
+[ ] Rapid spam-tapping Attack does not cause layout shift.
+[ ] Guard / Skill / Extract buttons all tappable.
+
+─── Feed ────────────────────────────────────────────────────
+[ ] Combat feed does not push action buttons off-screen.
+[ ] Feed scrolls internally when entries accumulate.
+[ ] Feed body text clamped to 1–2 lines in compact mode.
+
+─── District atmosphere preserved ───────────────────────────
+[ ] At D1 (Lowfire) — warm amber stage background visible.
+[ ] At D11+ (Ashgate) — cooler grey/blue stage background visible.
+[ ] Boss stage: red overlay on top of district colour visible.
+[ ] Elite stage: purple overlay visible.
+
+─── Combat mechanics (regression) ──────────────────────────
+[ ] Attack resolves correctly.
+[ ] Guard resolves correctly.
+[ ] Rewards appear after kills.
+[ ] No save/load errors.
+
+─── Tool checks ─────────────────────────────────────────────
+[ ] python tools/check_dungeondex_package.py — PASS
+[ ] node --check app.js — PASS
+[ ] No save migration required.
