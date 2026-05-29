@@ -1,0 +1,15 @@
+DungeonDex v1.4.3 — Trophy Hall First Look Smoke Test
+
+Checks run:
+- node --check passed for app.js, sw.js, and all js/systems/*.js files.
+- tools/check_dungeondex_package.py passed with no missing files and no warnings.
+- index.html now references the v1.4.3 cache-busted files.
+- sw.js cache name and asset URLs were updated to v1.4.3-trophy-hall-first-look.
+- app.js is referenced and cached again so the package checker passes cleanly.
+
+Manual focus points for playtest:
+- Open the Trophy Hall tab from the main navigation.
+- Confirm Boss Trophies render as a grid.
+- Confirm locked trophies are greyed out on a fresh save.
+- Defeat boss milestones and confirm trophies unlock / log correctly.
+- Confirm Retired Relics shows as a placeholder only.

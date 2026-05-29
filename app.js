@@ -1,9 +1,9 @@
-// DungeonDex v1.4.2 Sootveil Mythic Set runtime pointer.
+// DungeonDex v1.4.3 Trophy Hall First Look runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
 
-// v1.4.2 Sootveil Mythic Set Pass
+// v1.4.3 Trophy Hall First Look Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"
@@ -20,7 +20,7 @@ window.ddGetMonsterCue = function(name){
 };
 
 
-// v1.4.2 — Sootveil Mythic Set Pass
+// v1.4.3 — Trophy Hall First Look Pass
 (function(){
   if (window.DD_IMPACT_142) return;
   window.DD_IMPACT_142 = true;

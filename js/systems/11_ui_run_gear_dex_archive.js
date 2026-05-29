@@ -609,14 +609,51 @@
     </article>`;
   }
 
+  function trophyIconMarkup(trophy, unlocked) {
+    const iconClass = trophy?.icon ? ` trophy-icon--${escapeHtml(trophy.icon)}` : '';
+    return `<div class="trophy-prestige-icon${iconClass}${unlocked ? ' is-unlocked' : ' is-locked'}" aria-hidden="true">
+      <span class="trophy-pixel-horn trophy-pixel-horn-left"></span>
+      <span class="trophy-pixel-horn trophy-pixel-horn-right"></span>
+      <span class="trophy-pixel-skull"></span>
+      <span class="trophy-pixel-mark"></span>
+      <span class="trophy-pixel-drip trophy-pixel-drip-a"></span>
+      <span class="trophy-pixel-drip trophy-pixel-drip-b"></span>
+    </div>`;
+  }
+
+  function isBossTrophyUnlocked(trophy, bestDepth) {
+    const unlockedIds = asArray(S.player.bossTrophies, []);
+    const requiredDepth = numberOr(trophy?.requiredDepth, 999999, 1, 999999);
+    return unlockedIds.includes(trophy.id) || bestDepth > requiredDepth;
+  }
+
+  function bossTrophyCard(trophy, bestDepth) {
+    const unlocked = isBossTrophyUnlocked(trophy, bestDepth);
+    const stateLabel = unlocked ? 'Unlocked' : `Locked until ${trophy.source}`;
+    return `<article class="boss-trophy-card ${unlocked ? 'is-unlocked' : 'is-locked'}">
+      ${trophyIconMarkup(trophy, unlocked)}
+      <div class="boss-trophy-copy">
+        <div class="trophy-kicker">${escapeHtml(trophy.source)} • ${escapeHtml(trophy.tone || 'Trophy')}</div>
+        <h3>${unlocked ? escapeHtml(trophy.name) : 'Unknown Trophy'}</h3>
+        <p>${unlocked ? escapeHtml(trophy.flavor) : 'A greyed-out boss trophy waits in the case. Beat this boss to reveal the icon.'}</p>
+        <div class="tag-row"><span class="pill ${unlocked ? 'trophy-pill-unlocked' : 'trophy-pill-locked'}">${escapeHtml(stateLabel)}</span></div>
+      </div>
+    </article>`;
+  }
+
   function renderDex() {
     if (!el('dexSummary') || !el('monsterDex') || !el('gearDex')) return;
+    S.player.bossTrophies = asArray(S.player.bossTrophies, []);
+    S.player.retiredRelics = asArray(S.player.retiredRelics, []);
     const bestDepth = Math.max(1, S.player.depth || S.player.safeExtractDepth || 1);
+    const trophies = asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []);
+    const unlockedCount = trophies.filter(trophy => isBossTrophyUnlocked(trophy, bestDepth)).length;
     el('dexSummary').innerHTML = `
-      <div class="split"><div><h2>Emberfall Index</h2><p>Relics and sightings logged by the Warden across the Hollow Stair.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
-      <div class="tag-row"><span class="pill">Seen gear: ${S.player.discoveredGear.length}</span><span class="pill">Seen monsters: ${S.player.discoveredMonsters.length}</span></div>`;
-    el('monsterDex').innerHTML = `<h2>Monster Register</h2><div class="list">${S.player.discoveredMonsters.slice(0, 40).map(n => `<div class="monster-card small">${n}</div>`).join('') || '<p class="small muted">No sightings yet.</p>'}</div>`;
-    el('gearDex').innerHTML = `<h2>Relic Register</h2><div class="list">${S.player.discoveredGear.slice(0, 40).map(n => `<div class="monster-card small">${n}</div>`).join('') || '<p class="small muted">No relics logged yet.</p>'}</div>`;
+      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. The deeper the Stair gets, the nastier the case becomes.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
+      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
+      <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>`;
+    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">First-look 1.4.3 trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
+    el('gearDex').innerHTML = `<h2>Retired Relics</h2><p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p><div class="empty-relic-shelf"><span>Relic shelf sealed</span><small>Retire-item system not active yet.</small></div>`;
   }
 
   function renderArchive() {

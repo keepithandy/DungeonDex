@@ -153,6 +153,8 @@
     });
     state.player.discoveredMonsters = asArray(savedPlayer.discoveredMonsters, []).map(String).slice(0, 200);
     state.player.discoveredGear = asArray(savedPlayer.discoveredGear, []).map(String).slice(0, 200);
+    state.player.bossTrophies = asArray(savedPlayer.bossTrophies, []).map(String).slice(0, 80);
+    state.player.retiredRelics = asArray(savedPlayer.retiredRelics, []).filter(isPlainObject).slice(0, 80);
     state.player.log = asArray(savedPlayer.log, base.player.log).map(String).slice(0, 60);
     state.player.loreSeen = asArray(savedPlayer.loreSeen, base.player.loreSeen).map(String).slice(0, 80);
     state.player.runHistory = asArray(savedPlayer.runHistory, []).filter(isPlainObject).slice(0, 12);

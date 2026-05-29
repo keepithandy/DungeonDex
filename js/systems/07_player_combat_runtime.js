@@ -500,6 +500,24 @@
     return result;
   }
 
+
+  function bossTrophyForRawDepth(rawDepth) {
+    const depth = depthStageValue(rawDepth);
+    return asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], [])
+      .find(trophy => depth >= numberOr(trophy.requiredDepth, 0, 0, 999999) && depth < numberOr(trophy.requiredDepth, 0, 0, 999999) + DEPTH_CHAPTERS_PER_THREAT_STEP);
+  }
+
+  function recordBossTrophyUnlock(state, rawDepth, monsterName) {
+    if (!state?.player) return null;
+    state.player.bossTrophies = asArray(state.player.bossTrophies, []);
+    const trophy = bossTrophyForRawDepth(rawDepth);
+    if (!trophy || !trophy.id || state.player.bossTrophies.includes(trophy.id)) return null;
+    state.player.bossTrophies.push(trophy.id);
+    pushCombat(state, `Trophy Hall: ${trophy.name} unlocked from ${monsterName || 'the boss'}.`);
+    pushLog(state, `Boss Trophy earned: ${trophy.name}.`);
+    return trophy;
+  }
+
   function winEncounter(state) {
     ensureRunShell(state);
     const m = state.run.monster;
@@ -526,6 +544,7 @@
     const victoryVerb = source === 'boss' ? 'cleared' : source === 'elite' ? 'defeated' : 'secured';
     pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
     pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
+    if (source === 'boss') recordBossTrophyUnlock(state, state.run.floor, m.name);
     updateQuest(state, 'kill', 1);
 
     const lootRolls = source === 'boss' ? 2 : 1;

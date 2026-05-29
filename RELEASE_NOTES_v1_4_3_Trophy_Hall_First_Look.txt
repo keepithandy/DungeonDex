@@ -1,0 +1,21 @@
+DungeonDex v1.4.3 — Trophy Hall First Look
+
+Public itch note:
+This update gives the old Dex screen its first real identity pass. The section is now the Trophy Hall: a darker collection room for boss trophies first, with space reserved for retired relics in a later pass.
+
+What changed:
+- Renamed the Dex navigation tab to Trophy Hall.
+- Replaced the old Monster Register / Relic Register presentation with a Boss Trophies tab.
+- Added the first 10 boss trophy definitions, covering Boss Floors 5 through 50.
+- Added locked and unlocked trophy states.
+- Locked boss trophies now appear greyed out until the matching boss milestone has been cleared.
+- Added small CSS-built prestige-style trophy icons with skull, horn, drip, and sigil details.
+- Added Trophy Hall save support through player.bossTrophies.
+- Boss victories now record matching trophy unlocks and log a Trophy Hall message.
+- Added a Retired Relics placeholder shelf so the future retired-item system has a natural home.
+- Updated cache/build labels to DungeonDex v1.4.3.
+
+Notes:
+- The Sootveil Mythic Set from v1.4.2 was already present in this package and was preserved.
+- No new 1.4.4 mythic pass was needed yet because the requested mythic set appears to already be implemented.
+- This is intentionally a first look: the Trophy Hall can be expanded later with true retired items, richer trophy art, trophy stats, and custom boss identity.
