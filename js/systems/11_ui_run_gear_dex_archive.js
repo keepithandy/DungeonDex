@@ -222,6 +222,12 @@
     return key.charAt(0).toUpperCase() + key.slice(1);
   }
 
+  function gearSlotTypeText(slotLabel, typeLabel) {
+    const slot = cleanGearText(slotLabel, 'Gear');
+    const type = cleanGearText(typeLabel);
+    return type && type !== slot ? `${slot} / ${type}` : slot;
+  }
+
   function gearUpgradeDelta(item, state) {
     const slot = item?.slot;
     const equipment = isPlainObject(state?.player?.equipment) ? state.player.equipment : {};
@@ -247,18 +253,18 @@
     if (!item) {
       return `<article class="equip-slot loadout-equip-card equip-slot-empty">
         <div class="gear-card-top"><span class="gear-slot-label">${escapeHtml(slotLabel)}</span><span class="empty-slot-pill">Empty</span></div>
-        <div class="gear-card-name muted">No item</div>
       </article>`;
     }
     const rarityKey = itemRarityKey(item);
     const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
     const typeLabel = slotDisplayName(item.slot || slot);
+    const slotTypeLabel = gearSlotTypeText(slotLabel, typeLabel);
     const levelLabel = getItemLevelLabel(item);
     const setMini = setBonusMiniMarkup(item, S);
-    return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}">
-      <div class="gear-card-top"><span class="gear-slot-label">${escapeHtml(slotLabel)}</span><span class="gear-rarity-pill ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span></div>
+    return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}" aria-label="${escapeHtml(slotLabel)} equipped: ${escapeHtml(itemName)}">
       <div class="gear-card-name gear-equipped-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
-      <div class="gear-card-subline"><span>${escapeHtml(typeLabel)}</span><span>${escapeHtml(levelLabel)}</span></div>
+      <div class="gear-card-top gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span><span class="gear-rarity-pill ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span></div>
+      <div class="gear-card-subline gear-card-level-line"><span>${escapeHtml(levelLabel)}</span></div>
       ${gearScoreMarkup(item, slot)}
       ${setMini}
     </article>`;
@@ -288,7 +294,7 @@
     const filters = loadoutFilters();
     equipmentPanel.innerHTML = `
       <div class="loadout-head">
-        <div><h2>Equipped</h2><p class="small muted">Current gear by slot.</p></div>
+        <div><h2>Equipped</h2><p class="small muted">Worn gear by slot.</p></div>
         <span class="pill loadout-count-pill">${format(equippedCount)} / ${format(displaySlots.length)} slots</span>
       </div>
       <div class="loadout-groups">${loadoutSlotGroups().map(equippedGroupMarkup).join('')}</div>`;
@@ -323,7 +329,7 @@
     const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
     const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after two confirmations" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
     inventoryPanel.innerHTML = `
-      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Unequipped gear, upgrades, and sale actions.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
+      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Gear you can equip or sell.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
       <div class="list inventory-list">${inv.map(itemCard).join('') || '<div class="empty-inventory-card"><strong>No matching gear</strong><span>Adjust filters or keep delving.</span></div>'}</div>`;
   }
 
@@ -358,6 +364,7 @@
     const safeItemId = escapeHtml(itemId);
     const rarityKey = itemRarityKey(item);
     const slotLabel = slotDisplayName(item.slot);
+    const slotTypeLabel = gearSlotTypeText(slotLabel, slotDisplayName(item.slot));
     const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
     const maker = cleanGearText(item.maker);
     const summary = cleanGearText(item.summary);
@@ -370,11 +377,11 @@
     return `<article class="loot-card inventory-card ${getRarityCardClass(item)}">
       <div class="inventory-card-main">
         <div class="inventory-title-block">
-          <div class="inventory-title-row">${rarityEyebrow}<span class="gear-slot-label">${escapeHtml(slotLabel)}</span></div>
           <div class="item-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
+          <div class="inventory-title-row gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span>${rarityEyebrow}</div>
           <div class="gear-card-subline"><span>${escapeHtml(getItemLevelLabel(item))}</span>${maker ? `<span>${escapeHtml(maker)}</span>` : ''}</div>
         </div>
-        <div class="gear-badge-row">${statusBadges}</div>
+        ${statusBadges ? `<div class="gear-badge-row">${statusBadges}</div>` : ''}
       </div>
       ${gearScoreMarkup(item)}
       ${summary ? `<p class="small inventory-card-summary">${escapeHtml(summary)}</p>` : ''}
