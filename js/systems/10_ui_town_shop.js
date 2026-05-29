@@ -66,6 +66,7 @@
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
     const stagedStartDepth = defaultRunStartDepth(S);
+    const questPanel = el('questPanel');
     const merchantPanel = el('merchantPanel');
     const forgePanel = el('forgePanel');
     const districtPanel = el('districtName')?.closest('.panel');
@@ -84,10 +85,20 @@
       restCostNode.title = affordable ? 'Cost to rest and restore HP' : `Need ${cleanDisplayText(formatMoney(cost))} to rest`;
     }
     if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
-
-    
-    if (questPanel) questPanel.innerHTML = eliteContractBoardMarkup(S);
-
+    if (questPanel) questPanel.innerHTML = `
+      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and Warden Objectives tracked from the safe district.</p></div></div>
+      <div class="warden-ledger">
+        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short Lowfire orders paid after descent work.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
+      </div>
+      <div class="list warden-objective-list">
+        ${S.player.quests.map(q => `
+          <div class="quest-card warden-objective-card">
+            <div class="split"><strong>${q.title}</strong><span class="small muted">${q.progress}/${q.goal}</span></div>
+            <p class="small">${q.reward}${q.claimed ? ' - claimed' : ''}</p>
+            <div class="xpbar"><div class="xpfill" style="width:${(q.progress/q.goal)*100}%"></div></div>
+          </div>`).join('')}
+      </div>
+      ${eliteContractBoardMarkup(S)}`;
 
     const districtWares = unlockedDistrictWares(S);
     const activeSinkPills = activeGoldSinkPills(S);

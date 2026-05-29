@@ -1,0 +1,28 @@
+DungeonDex v1.3.53 - Monster District Backdrop Pass - Review Notes
+
+Scope:
+- Visual polish only for the combat monster stage backdrop.
+- No save schema, combat math, enemy stats, rewards, loot generation, economy, merchant stock, or progression changes.
+- Visible player-facing title remains short: DungeonDex v1.3.53.
+
+Code changes:
+- js/systems/11_ui_run_gear_dex_archive.js
+  - Added combatStageDistrictClass(state, district, depth).
+  - The helper defensively maps existing district, tone, name, run zone, and depth data into safe stage classes:
+    district-lowsteps, district-lowfire, district-veyruhn, district-mireglass, district-redchapel, district-saltforge, district-sunkencourt, district-noctis, district-generic.
+  - Added the resolved class to the existing combat-monster-stage element.
+
+- styles.css
+  - Added CSS-only district backdrop treatments for the safe district classes.
+  - Uses static gradients, inset shadows, borders, and subtle pseudo-element texture layers.
+  - Keeps boss and elite visual emphasis by preserving tier-specific border and glow overrides.
+
+- index.html, js/systems/00_core_constants_data.js, app.js, sw.js
+  - Updated version/cache labels to v1.3.53.
+  - The visible header and document title use only DungeonDex v1.3.53.
+
+Review focus:
+- Confirm the added class is always from the hardcoded allow-list.
+- Confirm the stage class helper does not mutate state.
+- Confirm CSS only affects .combat-monster-stage and does not change layout dimensions.
+- Confirm the cache labels line up across index.html and sw.js.

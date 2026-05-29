@@ -1,6 +1,30 @@
 'use strict';
 
 // Run, gear, inventory, Dex, archive renderers
+  function combatStageDistrictClass(state, district, depth) {
+    const safeDepth = Math.max(1, Math.floor(numberOr(depth, state?.run?.floor || state?.player?.returnDepth || 1, 1, 999999)));
+    const source = [district?.id, district?.tone, district?.name, state?.run?.zone].filter(Boolean).join(' ');
+    const key = String(source || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+    if (safeDepth <= 4 || key.includes('lowsteps') || key.includes('ashgate')) return 'district-lowsteps';
+    if (key.includes('lowfire')) return 'district-lowfire';
+    if (key.includes('veyruhn') || key.includes('bellforge') || key.includes('debtworks') || key.includes('cinderbone')) return 'district-veyruhn';
+    if (key.includes('mireglass') || key.includes('mire') || key.includes('sootveil')) return 'district-mireglass';
+    if (key.includes('redchapel') || key.includes('chapel') || key.includes('blacktithe')) return 'district-redchapel';
+    if (key.includes('saltforge') || key.includes('salt') || key.includes('hunger') || key.includes('kiln')) return 'district-saltforge';
+    if (key.includes('sunkencourt') || key.includes('sunken') || key.includes('redwake') || key.includes('catacomb')) return 'district-sunkencourt';
+    if (key.includes('noctis') || key.includes('atelier') || key.includes('lanternless') || key.includes('lowflame')) return 'district-noctis';
+
+    if (safeDepth <= 10) return 'district-lowfire';
+    if (safeDepth <= 25) return 'district-veyruhn';
+    if (safeDepth <= 38) return 'district-mireglass';
+    if (safeDepth <= 50) return 'district-saltforge';
+    if (safeDepth <= 62) return 'district-redchapel';
+    if (safeDepth <= 78) return 'district-sunkencourt';
+    if (safeDepth <= 100) return 'district-noctis';
+    return 'district-generic';
+  }
+
   function renderRun() {
     const runStatus = el('runStatus');
     const combatPanel = el('combatPanel');
@@ -26,6 +50,7 @@
     const hasUnsecured = hasPendingRunRewards(pendingRewards);
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
+    const stageDistrictClass = combatStageDistrictClass(S, runDistrict, depth);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
     const eliteMarkup = monster ? eliteModifierMarkup(monster) : '';
@@ -70,7 +95,7 @@
           ${threatBrief}
         </section>
 
-        <section class="combat-monster-stage ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
+        <section class="combat-monster-stage ${stageDistrictClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
           <div class="monster-aura"></div>
           <div class="monster-silhouette">
             <span class="monster-horns" aria-hidden="true"></span>

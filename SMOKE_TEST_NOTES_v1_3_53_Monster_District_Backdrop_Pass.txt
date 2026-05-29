@@ -1,0 +1,34 @@
+DungeonDex v1.3.53 - Monster District Backdrop Pass - Smoke Test Notes
+
+Automated checks to run:
+- node --check js/systems/00_core_constants_data.js
+- node --check js/systems/11_ui_run_gear_dex_archive.js
+- node --check sw.js
+
+Automated checks run for this pass:
+- PASS: node --check js/systems/00_core_constants_data.js
+- PASS: node --check js/systems/11_ui_run_gear_dex_archive.js
+- PASS: node --check sw.js
+- PASS: local Chrome DOM load showed DungeonDex v1.3.53 in the document title and visible header.
+- PASS: temporary-profile Chrome smoke entered combat, found combat-monster-stage district-lowsteps, confirmed a non-empty backdrop background, confirmed monster readability, clicked Attack, and confirmed the combat feed stayed readable.
+- PASS: Gear and Inventory opened from town state in the temporary profile.
+- Note: Gear is still locked out during active combat by the pre-existing switchScreen run guard; this pass did not change that behavior.
+- Note: Chrome reported only a mobile meta deprecation warning and a favicon 404 during smoke; no runtime exception or undefined-break error was reported.
+- Save safety: browser smoke used a temporary Chrome profile and did not touch the user's normal browser save.
+
+Manual smoke test checklist:
+- [ ] Town loads.
+- [ ] Visible title reads DungeonDex v1.3.53.
+- [ ] Enter Dungeon works.
+- [ ] Combat loads.
+- [ ] Monster area has a dungeon-style district/depth backdrop.
+- [ ] Monster remains readable over the backdrop.
+- [ ] Attack button works.
+- [ ] Combat log remains readable.
+- [ ] Gear tab still opens.
+- [ ] Inventory still opens.
+- [ ] Existing save remains present; no save wipe.
+- [ ] No console-breaking undefined errors.
+
+Expected technical signal:
+- The combat monster stage should include one safe backdrop class such as district-lowsteps, district-lowfire, district-veyruhn, district-mireglass, district-redchapel, district-saltforge, district-sunkencourt, district-noctis, or district-generic.

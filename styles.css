@@ -6787,3 +6787,183 @@ button:focus-visible,
     grid-template-columns: 1fr;
   }
 }
+
+/* v1.3.53 - Monster District Backdrop Pass */
+.combat-monster-stage[class*="district-"] {
+  border-color: var(--stage-district-border, rgba(255,190,105,0.16));
+  box-shadow:
+    inset 0 -20px 42px rgba(0,0,0,0.66),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 26px var(--stage-district-glow, rgba(255,120,54,0.055));
+}
+
+.combat-monster-stage[class*="district-"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--stage-district-texture-opacity, 0.72);
+  background: var(--stage-district-texture, linear-gradient(180deg, transparent, rgba(0,0,0,0.18)));
+}
+
+.combat-monster-stage.district-lowsteps {
+  --stage-district-border: rgba(255,162,78,0.15);
+  --stage-district-glow: rgba(255,112,44,0.06);
+  --stage-district-texture-opacity: 0.62;
+  --stage-district-texture:
+    repeating-linear-gradient(18deg, transparent 0 18px, rgba(255,232,190,0.018) 19px 20px),
+    repeating-linear-gradient(104deg, transparent 0 28px, rgba(0,0,0,0.16) 29px 30px),
+    radial-gradient(circle at 18% 72%, rgba(255,120,42,0.08), transparent 24%),
+    radial-gradient(circle at 78% 24%, rgba(255,212,128,0.045), transparent 22%);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.72), transparent 28%, transparent 72%, rgba(0,0,0,0.72)),
+    radial-gradient(ellipse at 50% 92%, rgba(255,134,48,0.16), transparent 44%),
+    radial-gradient(circle at 50% 16%, rgba(255,218,148,0.05), transparent 40%),
+    linear-gradient(180deg, rgba(22,18,15,0.96), rgba(6,6,8,0.99));
+}
+
+.combat-monster-stage.district-lowfire {
+  --stage-district-border: rgba(255,178,84,0.18);
+  --stage-district-glow: rgba(255,146,60,0.07);
+  --stage-district-texture-opacity: 0.68;
+  --stage-district-texture:
+    radial-gradient(ellipse at 24% 58%, rgba(146,84,38,0.12), transparent 34%),
+    radial-gradient(ellipse at 76% 34%, rgba(212,142,74,0.08), transparent 30%),
+    linear-gradient(115deg, transparent 0 38%, rgba(158,94,45,0.07) 39% 42%, transparent 43%),
+    repeating-linear-gradient(0deg, rgba(255,230,174,0.018) 0 1px, transparent 1px 18px);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.66), transparent 27%, transparent 73%, rgba(0,0,0,0.66)),
+    radial-gradient(ellipse at 50% 90%, rgba(255,150,58,0.22), transparent 46%),
+    radial-gradient(circle at 50% 10%, rgba(255,214,138,0.07), transparent 42%),
+    linear-gradient(180deg, rgba(32,20,12,0.94), rgba(8,6,5,0.99));
+}
+
+.combat-monster-stage.district-veyruhn {
+  --stage-district-border: rgba(255,134,62,0.18);
+  --stage-district-glow: rgba(255,92,38,0.075);
+  --stage-district-texture-opacity: 0.68;
+  --stage-district-texture:
+    repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,226,172,0.022) 31px 32px),
+    radial-gradient(circle at 18% 24%, rgba(255,174,74,0.08), transparent 7%),
+    radial-gradient(circle at 82% 30%, rgba(255,126,46,0.075), transparent 6%),
+    linear-gradient(180deg, rgba(255,106,35,0.06), transparent 38%);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.70), transparent 24%, transparent 76%, rgba(0,0,0,0.70)),
+    radial-gradient(ellipse at 50% 88%, rgba(255,98,34,0.22), transparent 44%),
+    radial-gradient(ellipse at 34% 62%, rgba(120,66,42,0.14), transparent 34%),
+    radial-gradient(circle at 70% 18%, rgba(255,202,116,0.065), transparent 34%),
+    linear-gradient(180deg, rgba(27,17,13,0.96), rgba(6,5,5,0.99));
+}
+
+.combat-monster-stage.district-mireglass {
+  --stage-district-border: rgba(98,176,132,0.17);
+  --stage-district-glow: rgba(80,190,132,0.05);
+  --stage-district-texture-opacity: 0.66;
+  --stage-district-texture:
+    linear-gradient(180deg, transparent 0 54%, rgba(122,220,174,0.035) 55% 57%, transparent 58%),
+    radial-gradient(ellipse at 25% 68%, rgba(78,138,96,0.12), transparent 32%),
+    radial-gradient(ellipse at 70% 34%, rgba(138,196,168,0.06), transparent 28%),
+    repeating-linear-gradient(170deg, transparent 0 24px, rgba(0,0,0,0.20) 25px 26px);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.74), transparent 24%, transparent 76%, rgba(0,0,0,0.74)),
+    radial-gradient(ellipse at 50% 92%, rgba(52,132,92,0.17), transparent 46%),
+    radial-gradient(circle at 46% 14%, rgba(150,210,174,0.045), transparent 40%),
+    linear-gradient(180deg, rgba(8,24,20,0.96), rgba(3,7,8,0.99));
+}
+
+.combat-monster-stage.district-redchapel {
+  --stage-district-border: rgba(205,58,70,0.18);
+  --stage-district-glow: rgba(190,32,50,0.07);
+  --stage-district-texture-opacity: 0.68;
+  --stage-district-texture:
+    radial-gradient(ellipse at 50% -18%, transparent 0 34%, rgba(0,0,0,0.30) 35% 41%, transparent 42%),
+    linear-gradient(90deg, transparent 0 18%, rgba(120,16,28,0.16) 19% 21%, transparent 22% 78%, rgba(120,16,28,0.16) 79% 81%, transparent 82%),
+    radial-gradient(circle at 50% 18%, rgba(255,80,92,0.075), transparent 24%),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(255,184,160,0.018) 35px 36px);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.72), transparent 24%, transparent 76%, rgba(0,0,0,0.72)),
+    radial-gradient(ellipse at 50% 90%, rgba(170,24,38,0.22), transparent 46%),
+    radial-gradient(circle at 50% 10%, rgba(255,92,100,0.055), transparent 40%),
+    linear-gradient(180deg, rgba(26,8,12,0.96), rgba(5,2,4,0.99));
+}
+
+.combat-monster-stage.district-saltforge {
+  --stage-district-border: rgba(226,206,164,0.17);
+  --stage-district-glow: rgba(255,188,92,0.055);
+  --stage-district-texture-opacity: 0.62;
+  --stage-district-texture:
+    repeating-linear-gradient(12deg, rgba(255,248,218,0.024) 0 1px, transparent 1px 19px),
+    radial-gradient(ellipse at 68% 26%, rgba(236,224,188,0.09), transparent 28%),
+    radial-gradient(ellipse at 28% 72%, rgba(194,146,72,0.10), transparent 32%),
+    linear-gradient(90deg, transparent 0 45%, rgba(255,230,174,0.05) 46% 49%, transparent 50%);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.66), transparent 24%, transparent 76%, rgba(0,0,0,0.66)),
+    radial-gradient(ellipse at 50% 92%, rgba(228,174,90,0.18), transparent 48%),
+    radial-gradient(circle at 50% 12%, rgba(255,244,210,0.06), transparent 38%),
+    linear-gradient(180deg, rgba(30,25,19,0.94), rgba(8,6,4,0.99));
+}
+
+.combat-monster-stage.district-sunkencourt {
+  --stage-district-border: rgba(78,144,190,0.18);
+  --stage-district-glow: rgba(62,154,210,0.055);
+  --stage-district-texture-opacity: 0.70;
+  --stage-district-texture:
+    linear-gradient(180deg, transparent 0 56%, rgba(84,176,220,0.08) 57% 59%, transparent 60%),
+    radial-gradient(ellipse at 50% 82%, rgba(62,132,172,0.14), transparent 40%),
+    radial-gradient(circle at 24% 28%, rgba(118,192,218,0.055), transparent 22%),
+    repeating-linear-gradient(96deg, transparent 0 24px, rgba(142,204,226,0.018) 25px 26px);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.76), transparent 22%, transparent 78%, rgba(0,0,0,0.76)),
+    radial-gradient(ellipse at 50% 92%, rgba(42,116,162,0.18), transparent 46%),
+    radial-gradient(circle at 50% 12%, rgba(126,188,226,0.05), transparent 40%),
+    linear-gradient(180deg, rgba(7,18,28,0.97), rgba(2,5,9,0.99));
+}
+
+.combat-monster-stage.district-noctis {
+  --stage-district-border: rgba(164,112,232,0.18);
+  --stage-district-glow: rgba(132,78,228,0.065);
+  --stage-district-texture-opacity: 0.66;
+  --stage-district-texture:
+    linear-gradient(112deg, transparent 0 36%, rgba(186,142,255,0.07) 37% 39%, transparent 40%),
+    linear-gradient(70deg, transparent 0 60%, rgba(104,190,220,0.045) 61% 63%, transparent 64%),
+    radial-gradient(circle at 70% 18%, rgba(190,126,255,0.07), transparent 22%),
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(255,255,255,0.015) 23px 24px);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.78), transparent 22%, transparent 78%, rgba(0,0,0,0.78)),
+    radial-gradient(ellipse at 50% 90%, rgba(104,62,180,0.18), transparent 44%),
+    radial-gradient(circle at 50% 12%, rgba(182,128,255,0.06), transparent 40%),
+    linear-gradient(180deg, rgba(12,9,24,0.97), rgba(3,3,8,0.99));
+}
+
+.combat-monster-stage.district-generic {
+  --stage-district-border: rgba(255,170,94,0.14);
+  --stage-district-glow: rgba(255,112,54,0.05);
+  --stage-district-texture-opacity: 0.60;
+  --stage-district-texture:
+    repeating-linear-gradient(90deg, transparent 0 28px, rgba(255,255,255,0.014) 29px 30px),
+    radial-gradient(ellipse at 50% 86%, rgba(255,104,48,0.11), transparent 42%),
+    linear-gradient(180deg, transparent, rgba(0,0,0,0.22));
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.74), transparent 24%, transparent 76%, rgba(0,0,0,0.74)),
+    radial-gradient(ellipse at 50% 92%, rgba(255,108,48,0.14), transparent 44%),
+    radial-gradient(circle at 50% 12%, rgba(255,210,142,0.04), transparent 40%),
+    linear-gradient(180deg, rgba(19,16,15,0.96), rgba(5,5,7,0.99));
+}
+
+.combat-monster-stage.stage-elite[class*="district-"] {
+  border-color: rgba(190,120,255,0.24);
+  box-shadow:
+    inset 0 -20px 42px rgba(0,0,0,0.66),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 28px rgba(160,90,255,0.10);
+}
+
+.combat-monster-stage.stage-boss[class*="district-"] {
+  border-color: rgba(255,90,60,0.26);
+  box-shadow:
+    inset 0 -22px 46px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 36px rgba(255,70,40,0.12);
+}
