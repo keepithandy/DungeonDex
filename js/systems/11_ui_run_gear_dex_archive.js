@@ -611,13 +611,9 @@
 
   function trophyIconMarkup(trophy, unlocked) {
     const iconClass = trophy?.icon ? ` trophy-icon--${escapeHtml(trophy.icon)}` : '';
-    return `<div class="trophy-prestige-icon${iconClass}${unlocked ? ' is-unlocked' : ' is-locked'}" aria-hidden="true">
-      <span class="trophy-pixel-horn trophy-pixel-horn-left"></span>
-      <span class="trophy-pixel-horn trophy-pixel-horn-right"></span>
-      <span class="trophy-pixel-skull"></span>
-      <span class="trophy-pixel-mark"></span>
-      <span class="trophy-pixel-drip trophy-pixel-drip-a"></span>
-      <span class="trophy-pixel-drip trophy-pixel-drip-b"></span>
+    const imageSrc = trophy?.image || 'assets/trophies/hollow_stair_skull_trophy.png';
+    return `<div class="trophy-prestige-icon trophy-prestige-icon--asset${iconClass}${unlocked ? ' is-unlocked' : ' is-locked'}" aria-hidden="true">
+      <img class="trophy-prestige-img" src="${escapeHtml(imageSrc)}" alt="" loading="lazy" decoding="async" />
     </div>`;
   }
 

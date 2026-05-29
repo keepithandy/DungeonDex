@@ -1,0 +1,9 @@
+DungeonDex v1.4.3a — Smoke Test Notes
+
+Checks performed:
+- Confirmed trophy image asset exists in assets/trophies/.
+- Confirmed Boss Trophy markup references the real image asset.
+- Confirmed locked/unlocked CSS states apply filters to the real image.
+- Confirmed service worker cache list includes the trophy image.
+- Ran node --check over all JavaScript files.
+- Ran package checker.

@@ -1,0 +1,7 @@
+DungeonDex v1.4.3a — Trophy Hall Real Icon Asset
+
+- Added the generated skull trophy art as a real browser asset at assets/trophies/hollow_stair_skull_trophy.png.
+- Updated Boss Trophy cards to render the actual trophy image instead of only the CSS fallback badge.
+- Locked trophies now use the same real trophy image with grayscale/dimmed treatment until unlocked.
+- Added the trophy image to the service worker cache list for itch/browser play.
+- Preserved the v1.4.3 Trophy Hall structure, Boss Trophies tab, save unlock tracking, and v1.4.2 Sootveil Mythic Set.

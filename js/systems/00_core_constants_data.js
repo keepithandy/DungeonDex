@@ -249,16 +249,16 @@
   };
 
   const BOSS_TROPHY_DEFINITIONS = [
-    { id:'lowfire_fang', boss:1, requiredDepth:15, name:'Lowfire Fang', source:'Boss Floor 5', tone:'Starter Relic', icon:'fang', flavor:'A smoke-black tooth pulled from the first real thing that tried to end the descent.' },
-    { id:'cinder_crown', boss:2, requiredDepth:30, name:'Cinder Crown', source:'Boss Floor 10', tone:'Charred Iron', icon:'crown', flavor:'A bent crown of furnace metal, still warm where the skull met flame.' },
-    { id:'gravetoll_bell', boss:3, requiredDepth:45, name:'Gravetoll Bell', source:'Boss Floor 15', tone:'Bone Chime', icon:'bell', flavor:'A cracked bell with a pale clapper. It rings once for every room owed.' },
-    { id:'mireglass_eye', boss:4, requiredDepth:60, name:'Mireglass Eye', source:'Boss Floor 20', tone:'Wet Glass', icon:'eye', flavor:'A green-black eye sealed behind broken glass. It does not blink anymore.' },
-    { id:'butchers_moon', boss:5, requiredDepth:75, name:'Butcher’s Moon', source:'Boss Floor 25', tone:'Blood Crescent', icon:'moon', flavor:'A crescent blade trophy dried dark at the edge. The handle still twitches.' },
-    { id:'red_chapel_thorn', boss:6, requiredDepth:90, name:'Red Chapel Thorn', source:'Boss Floor 30', tone:'Ritual Thorn', icon:'thorn', flavor:'A chapel barb wrapped through a small skull, polished by prayer and violence.' },
-    { id:'salt_forge_maw', boss:7, requiredDepth:105, name:'Salt Forge Maw', source:'Boss Floor 35', tone:'Kiln Jaw', icon:'maw', flavor:'A metal jawplate split by orange furnace cracks and old bite marks.' },
-    { id:'ivory_span_halo', boss:8, requiredDepth:120, name:'Ivory Span Halo', source:'Boss Floor 40', tone:'Broken Sanctum', icon:'halo', flavor:'A holy ring snapped around teeth. Whatever wore it died badly.' },
-    { id:'noctis_sigil', boss:9, requiredDepth:135, name:'Noctis Sigil', source:'Boss Floor 45', tone:'Black Rite', icon:'sigil', flavor:'A hooked occult crest. The dark around it looks carved, not cast.' },
-    { id:'hollow_stair_skull', boss:10, requiredDepth:150, name:'Hollow Stair Skull', source:'Boss Floor 50', tone:'Gore Prestige', icon:'skull', flavor:'A horned skull marked with the stair. Blood gathers under it even when dry.' }
+    { id:'lowfire_fang', boss:1, requiredDepth:15, name:'Lowfire Fang', source:'Boss Floor 5', tone:'Starter Relic', icon:'fang', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A smoke-black tooth pulled from the first real thing that tried to end the descent.' },
+    { id:'cinder_crown', boss:2, requiredDepth:30, name:'Cinder Crown', source:'Boss Floor 10', tone:'Charred Iron', icon:'crown', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A bent crown of furnace metal, still warm where the skull met flame.' },
+    { id:'gravetoll_bell', boss:3, requiredDepth:45, name:'Gravetoll Bell', source:'Boss Floor 15', tone:'Bone Chime', icon:'bell', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A cracked bell with a pale clapper. It rings once for every room owed.' },
+    { id:'mireglass_eye', boss:4, requiredDepth:60, name:'Mireglass Eye', source:'Boss Floor 20', tone:'Wet Glass', icon:'eye', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A green-black eye sealed behind broken glass. It does not blink anymore.' },
+    { id:'butchers_moon', boss:5, requiredDepth:75, name:'Butcher’s Moon', source:'Boss Floor 25', tone:'Blood Crescent', icon:'moon', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A crescent blade trophy dried dark at the edge. The handle still twitches.' },
+    { id:'red_chapel_thorn', boss:6, requiredDepth:90, name:'Red Chapel Thorn', source:'Boss Floor 30', tone:'Ritual Thorn', icon:'thorn', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A chapel barb wrapped through a small skull, polished by prayer and violence.' },
+    { id:'salt_forge_maw', boss:7, requiredDepth:105, name:'Salt Forge Maw', source:'Boss Floor 35', tone:'Kiln Jaw', icon:'maw', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A metal jawplate split by orange furnace cracks and old bite marks.' },
+    { id:'ivory_span_halo', boss:8, requiredDepth:120, name:'Ivory Span Halo', source:'Boss Floor 40', tone:'Broken Sanctum', icon:'halo', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A holy ring snapped around teeth. Whatever wore it died badly.' },
+    { id:'noctis_sigil', boss:9, requiredDepth:135, name:'Noctis Sigil', source:'Boss Floor 45', tone:'Black Rite', icon:'sigil', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A hooked occult crest. The dark around it looks carved, not cast.' },
+    { id:'hollow_stair_skull', boss:10, requiredDepth:150, name:'Hollow Stair Skull', source:'Boss Floor 50', tone:'Gore Prestige', icon:'skull', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A horned skull marked with the stair. Blood gathers under it even when dry.' }
   ];
 
 
