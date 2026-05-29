@@ -1,28 +1,80 @@
 'use strict';
 
 // Run, gear, inventory, Dex, archive renderers
-  function combatStageDistrictClass(state, district, depth) {
-    const safeDepth = Math.max(1, Math.floor(numberOr(depth, state?.run?.floor || state?.player?.returnDepth || 1, 1, 999999)));
-    const source = [district?.id, district?.tone, district?.name, state?.run?.zone].filter(Boolean).join(' ');
-    const key = String(source || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  function combatBackdropToken(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  }
 
-    if (safeDepth <= 4 || key.includes('lowsteps') || key.includes('ashgate')) return 'district-lowsteps';
-    if (key.includes('lowfire')) return 'district-lowfire';
-    if (key.includes('veyruhn') || key.includes('bellforge') || key.includes('debtworks') || key.includes('cinderbone')) return 'district-veyruhn';
-    if (key.includes('mireglass') || key.includes('mire') || key.includes('sootveil')) return 'district-mireglass';
-    if (key.includes('redchapel') || key.includes('chapel') || key.includes('blacktithe')) return 'district-redchapel';
-    if (key.includes('saltforge') || key.includes('salt') || key.includes('hunger') || key.includes('kiln')) return 'district-saltforge';
-    if (key.includes('sunkencourt') || key.includes('sunken') || key.includes('redwake') || key.includes('catacomb')) return 'district-sunkencourt';
-    if (key.includes('noctis') || key.includes('atelier') || key.includes('lanternless') || key.includes('lowflame')) return 'district-noctis';
+  function combatBackdropHas(key, terms) {
+    return terms.some(term => key.includes(term));
+  }
 
-    if (safeDepth <= 10) return 'district-lowfire';
-    if (safeDepth <= 25) return 'district-veyruhn';
-    if (safeDepth <= 38) return 'district-mireglass';
-    if (safeDepth <= 50) return 'district-saltforge';
-    if (safeDepth <= 62) return 'district-redchapel';
-    if (safeDepth <= 78) return 'district-sunkencourt';
-    if (safeDepth <= 100) return 'district-noctis';
-    return 'district-generic';
+  function combatBackdropKind(state, district, depth, monster) {
+    const rawDepth = depth ?? state?.run?.floor ?? state?.player?.returnDepth;
+    const hasDepth = Number.isFinite(Number(rawDepth));
+    const safeDepth = Math.max(1, Math.floor(numberOr(rawDepth, 1, 1, 999999)));
+    const districtKey = combatBackdropToken([district?.id, district?.tone, district?.name, state?.run?.zone].filter(Boolean).join(' '));
+    const monsterKey = combatBackdropToken([
+      monster?.id,
+      monster?.name,
+      monster?.family,
+      monster?.type,
+      monster?.affix,
+      monster?.skill
+    ].filter(Boolean).join(' '));
+
+    if (!districtKey && !monsterKey && !hasDepth) return 'generic';
+
+    if (safeDepth <= 4 || combatBackdropHas(districtKey, ['lowsteps', 'lowfire', 'ashgate'])) return 'lowfire';
+    if (combatBackdropHas(districtKey, ['veyruhn', 'bellforge', 'debtworks', 'cinderbone', 'forge', 'furnace'])) return 'veyruhn';
+    if (combatBackdropHas(districtKey, ['mireglass', 'mire', 'sootveil', 'swamp'])) return 'mireglass';
+    if (combatBackdropHas(districtKey, ['redchapel', 'chapel', 'blacktithe', 'ritual'])) return 'red-chapel';
+    if (combatBackdropHas(districtKey, ['saltforge', 'salt', 'hunger', 'kiln', 'mineral'])) return 'salt-forge';
+    if (combatBackdropHas(districtKey, ['sunkencourt', 'sunken', 'redwake', 'catacomb', 'drowned'])) return 'sunken-court';
+    if (combatBackdropHas(districtKey, ['rookery', 'rafter'])) return 'rookery';
+    if (combatBackdropHas(districtKey, ['noctis', 'atelier', 'lanternless', 'lowflame', 'vault'])) return 'noctis';
+
+    if (combatBackdropHas(monsterKey, ['harpy', 'silkbound', 'rookery', 'feather', 'wing'])) return 'rookery';
+    if (combatBackdropHas(monsterKey, ['mireborn', 'venom', 'spitter', 'frostbit', 'mireglass'])) return 'mireglass';
+    if (combatBackdropHas(monsterKey, ['bloodlit', 'cultist', 'gravesworn', 'revenant', 'bleed'])) return 'red-chapel';
+    if (combatBackdropHas(monsterKey, ['sunken', 'knight', 'warden', 'chill', 'drain'])) return 'sunken-court';
+    if (combatBackdropHas(monsterKey, ['blacksalt', 'starved', 'construct', 'guardbreak', 'rage'])) return 'salt-forge';
+    if (combatBackdropHas(monsterKey, ['ashwake', 'burn', 'ghoul', 'husk', 'beast'])) return 'lowfire';
+    if (combatBackdropHas(monsterKey, ['shade', 'watcher', 'dreadmarked', 'lanterneyed', 'seer', 'hex'])) return 'noctis';
+
+    if (hasDepth) {
+      if (safeDepth <= 10) return 'lowfire';
+      if (safeDepth <= 25) return 'veyruhn';
+      if (safeDepth <= 38) return 'mireglass';
+      if (safeDepth <= 50) return 'salt-forge';
+      if (safeDepth <= 62) return 'red-chapel';
+      if (safeDepth <= 78) return 'sunken-court';
+      if (safeDepth <= 100) return 'noctis';
+    }
+    return 'generic';
+  }
+
+  function combatBackdropClasses(state, district, depth, monster) {
+    const rawDepth = depth ?? state?.run?.floor ?? state?.player?.returnDepth;
+    const safeDepth = Math.max(1, Math.floor(numberOr(rawDepth, 1, 1, 999999)));
+    const kind = combatBackdropKind(state, district, depth, monster);
+    const legacyClass = {
+      lowfire: safeDepth <= 4 ? 'district-lowsteps' : 'district-lowfire',
+      veyruhn: 'district-veyruhn',
+      mireglass: 'district-mireglass',
+      'red-chapel': 'district-redchapel',
+      'salt-forge': 'district-saltforge',
+      'sunken-court': 'district-sunkencourt',
+      rookery: 'district-rookery',
+      noctis: 'district-noctis',
+      generic: 'district-generic'
+    }[kind] || 'district-generic';
+    const tierClass = monster?.tier === 'Boss'
+      ? 'combat-backdrop--boss'
+      : monster?.tier === 'Elite'
+        ? 'combat-backdrop--elite'
+        : '';
+    return ['combat-backdrop', `combat-backdrop--${kind}`, legacyClass, tierClass].filter(Boolean).join(' ');
   }
 
   function renderRun() {
@@ -50,7 +102,7 @@
     const hasUnsecured = hasPendingRunRewards(pendingRewards);
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
-    const stageDistrictClass = combatStageDistrictClass(S, runDistrict, depth);
+    const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
     const eliteMarkup = monster ? eliteModifierMarkup(monster) : '';
@@ -95,7 +147,7 @@
           ${threatBrief}
         </section>
 
-        <section class="combat-monster-stage ${stageDistrictClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
+        <section class="combat-monster-stage ${stageBackdropClasses} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
           <div class="monster-aura"></div>
           <div class="monster-silhouette">
             <span class="monster-horns" aria-hidden="true"></span>

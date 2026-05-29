@@ -1,0 +1,44 @@
+DungeonDex v1.3.54 - District Monster Backdrop Pass
+
+Summary:
+- Added a v1.3.54 combat-backdrop class layer for stronger district/dungeon atmosphere behind the combat monster stage.
+- Kept the existing split JS structure under js/systems/ and extended the run renderer instead of moving code back into app.js.
+- Preserved the v1.3.53 district-* compatibility classes while adding clearer combat-backdrop modifiers.
+- No combat math, monster stats, loot odds, economy, save format, progression scaling, monster generation, boss rules, or elite rules changed.
+
+Runtime selection:
+- The combat renderer now uses combatBackdropClasses(state, district, depth, monster).
+- Selection checks known district id/tone/name and current run zone first.
+- If district data is not enough, it checks existing monster identity fields such as name, family, type, affix, and skill.
+- If those are still not enough, it uses safe depth bands.
+- If no usable district, monster, or depth signal exists, it falls back to combat-backdrop--generic and district-generic.
+
+Backdrop classes:
+- combat-backdrop
+- combat-backdrop--lowfire
+- combat-backdrop--veyruhn
+- combat-backdrop--mireglass
+- combat-backdrop--red-chapel
+- combat-backdrop--salt-forge
+- combat-backdrop--sunken-court
+- combat-backdrop--rookery
+- combat-backdrop--noctis
+- combat-backdrop--generic
+- combat-backdrop--elite
+- combat-backdrop--boss
+
+Visual coverage:
+- Lowfire / early dungeon: soot, ember, cracked stone, dim torchlight.
+- Veyruhn / forge district: iron, heat, furnace glow, ash.
+- Mireglass / wet district: murky green-black stone and slick reflections.
+- Red Chapel: dark red stone, candlelight glow, ritual-like marks.
+- Salt Forge: pale mineral grit, harsh dust, white-gray stone.
+- Sunken Court: drowned masonry, old banner shapes, blue-black dampness.
+- Rookery: rafters, feather-like scratches, high shadows.
+- Noctis Atelier: ink-dark violet, velvet shadow, arcane glass texture.
+- Generic: dark stairwell / dungeon stone.
+
+Versioning:
+- Visible title/header advanced to DungeonDex v1.3.54.
+- Cache/build query strings advanced to 1.3.54-district-monster-backdrop.
+- app.js remains only the split-file runtime pointer.

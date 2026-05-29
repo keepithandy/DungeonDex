@@ -1,0 +1,40 @@
+DungeonDex v1.3.54 - District Monster Backdrop Pass - Smoke Test Notes
+
+Automated checks run:
+- PASS: node --check js/systems/00_core_constants_data.js
+- PASS: node --check js/systems/11_ui_run_gear_dex_archive.js
+- PASS: node --check sw.js
+- PASS: active runtime label search found no stale v1.3.53 runtime/cache label outside the historical v1.3.53 CSS comment.
+
+Headless Chrome smoke:
+- PASS: incognito local Chrome run at 360x760 booted the app and rendered DungeonDex v1.3.54.
+- PASS: Enter Dungeon started an active run and rendered the combat screen.
+- PASS: combat monster stage had combat-backdrop plus combat-backdrop--lowfire and a non-empty gradient backdrop.
+- PASS: an initial smoke roll rendered an elite stage with combat-backdrop--elite; the final runner also forced a boss render with combat-backdrop--boss and stage-boss.
+- PASS: Attack, Skill, Guard, and Extract action buttons remained present and clear.
+- PASS: follow-up incognito Chrome runner clicked Attack 3 times; all 3 attempts logged strikes and no errors.
+- PASS: Guard updated player HP in the smoke state.
+- PASS: Skill/Attack updated enemy HP or encounter state.
+- PASS: Extract returned to town.
+- PASS: Save/load survived a page reload in the incognito smoke session.
+- PASS: generic fallback returned combat-backdrop--generic when no district, monster, or depth signal existed.
+- PASS: 360px viewport reported no horizontal overflow.
+- PASS: no missing-field, runtime, or console errors were captured during smoke.
+
+Manual checklist status:
+- Game boots: PASS.
+- Enter Dungeon works: PASS.
+- Combat screen renders: PASS.
+- Monster backdrop appears: PASS.
+- Attack works repeatedly: PASS by automated action smoke.
+- Skill / Guard / Extract still work: PASS.
+- Enemy HP updates: PASS.
+- Player HP updates: PASS.
+- Elite/boss fights still render if testable: PASS.
+- Return to town works: PASS.
+- Save/load survives refresh: PASS.
+- Mobile/narrow viewport has no horizontal overflow: PASS at 360x760.
+- No console errors from missing district/monster fields: PASS.
+
+Smoke note:
+- The in-app browser connector could not start because the local Windows sandbox reported a spawn setup refresh error, so verification used local headless Chrome with incognito storage instead.

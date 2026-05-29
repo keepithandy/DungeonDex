@@ -6967,3 +6967,245 @@ button:focus-visible,
     inset 0 1px 0 rgba(255,255,255,0.04),
     0 0 36px rgba(255,70,40,0.12);
 }
+
+/* v1.3.54 - District Monster Backdrop Pass */
+.combat-monster-stage.combat-backdrop {
+  --combat-backdrop-accent: 255,150,70;
+  --combat-backdrop-border: rgba(255,178,96,0.17);
+  --combat-backdrop-glow: rgba(255,120,54,0.06);
+  --combat-backdrop-texture-opacity: 0.68;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.74), transparent 24%, transparent 76%, rgba(0,0,0,0.74)),
+    radial-gradient(ellipse at 50% 92%, rgba(255,112,48,0.15), transparent 44%),
+    radial-gradient(circle at 50% 12%, rgba(255,210,142,0.045), transparent 40%),
+    linear-gradient(180deg, rgba(18,16,15,0.96), rgba(5,5,7,0.99));
+  --combat-backdrop-texture:
+    repeating-linear-gradient(90deg, transparent 0 28px, rgba(255,255,255,0.014) 29px 30px),
+    linear-gradient(180deg, transparent, rgba(0,0,0,0.22));
+  --combat-backdrop-floor:
+    radial-gradient(ellipse at center, rgba(var(--combat-backdrop-accent),0.20), rgba(255,255,255,0.035) 52%, transparent 76%);
+  --combat-backdrop-aura:
+    radial-gradient(circle, rgba(var(--combat-backdrop-accent),0.12), transparent 72%);
+  --combat-backdrop-aura-shadow: 0 0 42px 15px rgba(var(--combat-backdrop-accent),0.10);
+  border-color: var(--combat-backdrop-border);
+  background: var(--combat-backdrop-bg);
+  box-shadow:
+    inset 0 -20px 42px rgba(0,0,0,0.66),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 28px var(--combat-backdrop-glow);
+}
+
+.combat-monster-stage.combat-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--combat-backdrop-texture-opacity);
+  background: var(--combat-backdrop-texture);
+}
+
+.combat-monster-stage.combat-backdrop .stage-floor {
+  background: var(--combat-backdrop-floor);
+}
+
+.combat-monster-stage.combat-backdrop .monster-aura {
+  background: var(--combat-backdrop-aura);
+  box-shadow: var(--combat-backdrop-aura-shadow);
+}
+
+.combat-monster-stage.combat-backdrop--lowfire {
+  --combat-backdrop-accent: 255,142,54;
+  --combat-backdrop-border: rgba(255,176,84,0.19);
+  --combat-backdrop-glow: rgba(255,130,48,0.08);
+  --combat-backdrop-texture-opacity: 0.72;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.68), transparent 26%, transparent 74%, rgba(0,0,0,0.68)),
+    radial-gradient(ellipse at 50% 92%, rgba(255,138,45,0.24), transparent 46%),
+    radial-gradient(ellipse at 22% 64%, rgba(136,74,38,0.12), transparent 34%),
+    radial-gradient(circle at 50% 10%, rgba(255,218,148,0.07), transparent 42%),
+    linear-gradient(180deg, rgba(31,20,13,0.95), rgba(8,6,5,0.99));
+  --combat-backdrop-texture:
+    repeating-linear-gradient(18deg, transparent 0 18px, rgba(255,232,190,0.018) 19px 20px),
+    repeating-linear-gradient(104deg, transparent 0 28px, rgba(0,0,0,0.16) 29px 30px),
+    radial-gradient(circle at 82% 72%, rgba(255,110,40,0.08), transparent 25%);
+}
+
+.combat-monster-stage.combat-backdrop--veyruhn {
+  --combat-backdrop-accent: 255,98,34;
+  --combat-backdrop-border: rgba(255,132,62,0.19);
+  --combat-backdrop-glow: rgba(255,82,28,0.08);
+  --combat-backdrop-texture-opacity: 0.70;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.70), transparent 24%, transparent 76%, rgba(0,0,0,0.70)),
+    radial-gradient(ellipse at 50% 90%, rgba(255,90,30,0.24), transparent 45%),
+    radial-gradient(ellipse at 33% 58%, rgba(110,62,42,0.16), transparent 34%),
+    radial-gradient(circle at 74% 18%, rgba(255,205,116,0.07), transparent 34%),
+    linear-gradient(180deg, rgba(28,17,13,0.96), rgba(6,5,5,0.99));
+  --combat-backdrop-texture:
+    repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,226,172,0.024) 31px 32px),
+    repeating-linear-gradient(0deg, transparent 0 20px, rgba(0,0,0,0.14) 21px 22px),
+    radial-gradient(circle at 18% 24%, rgba(255,174,74,0.09), transparent 8%),
+    radial-gradient(circle at 82% 30%, rgba(255,126,46,0.08), transparent 7%);
+}
+
+.combat-monster-stage.combat-backdrop--mireglass {
+  --combat-backdrop-accent: 86,188,130;
+  --combat-backdrop-border: rgba(98,176,132,0.18);
+  --combat-backdrop-glow: rgba(70,180,122,0.055);
+  --combat-backdrop-texture-opacity: 0.70;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.76), transparent 23%, transparent 77%, rgba(0,0,0,0.76)),
+    radial-gradient(ellipse at 50% 92%, rgba(52,132,92,0.20), transparent 46%),
+    radial-gradient(circle at 44% 14%, rgba(150,210,174,0.05), transparent 40%),
+    linear-gradient(180deg, rgba(8,24,20,0.97), rgba(3,7,8,0.99));
+  --combat-backdrop-texture:
+    linear-gradient(180deg, transparent 0 54%, rgba(122,220,174,0.04) 55% 57%, transparent 58%),
+    radial-gradient(ellipse at 25% 68%, rgba(78,138,96,0.13), transparent 32%),
+    radial-gradient(ellipse at 70% 34%, rgba(138,196,168,0.065), transparent 28%),
+    repeating-linear-gradient(170deg, transparent 0 24px, rgba(0,0,0,0.20) 25px 26px);
+}
+
+.combat-monster-stage.combat-backdrop--red-chapel {
+  --combat-backdrop-accent: 210,48,64;
+  --combat-backdrop-border: rgba(205,58,70,0.20);
+  --combat-backdrop-glow: rgba(190,32,50,0.075);
+  --combat-backdrop-texture-opacity: 0.72;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.72), transparent 24%, transparent 76%, rgba(0,0,0,0.72)),
+    radial-gradient(ellipse at 50% 91%, rgba(170,24,38,0.24), transparent 46%),
+    radial-gradient(circle at 50% 10%, rgba(255,92,100,0.06), transparent 40%),
+    linear-gradient(180deg, rgba(26,8,12,0.97), rgba(5,2,4,0.99));
+  --combat-backdrop-texture:
+    radial-gradient(ellipse at 50% -18%, transparent 0 34%, rgba(0,0,0,0.30) 35% 41%, transparent 42%),
+    linear-gradient(90deg, transparent 0 18%, rgba(120,16,28,0.16) 19% 21%, transparent 22% 78%, rgba(120,16,28,0.16) 79% 81%, transparent 82%),
+    linear-gradient(115deg, transparent 0 47%, rgba(255,190,160,0.04) 48% 49%, transparent 50%),
+    repeating-linear-gradient(90deg, transparent 0 34px, rgba(255,184,160,0.018) 35px 36px);
+}
+
+.combat-monster-stage.combat-backdrop--salt-forge {
+  --combat-backdrop-accent: 228,205,162;
+  --combat-backdrop-border: rgba(226,206,164,0.20);
+  --combat-backdrop-glow: rgba(255,188,92,0.06);
+  --combat-backdrop-texture-opacity: 0.66;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.66), transparent 24%, transparent 76%, rgba(0,0,0,0.66)),
+    radial-gradient(ellipse at 50% 92%, rgba(228,174,90,0.20), transparent 48%),
+    radial-gradient(circle at 50% 12%, rgba(255,244,210,0.065), transparent 38%),
+    linear-gradient(180deg, rgba(30,25,19,0.95), rgba(8,6,4,0.99));
+  --combat-backdrop-texture:
+    repeating-linear-gradient(12deg, rgba(255,248,218,0.026) 0 1px, transparent 1px 19px),
+    radial-gradient(ellipse at 68% 26%, rgba(236,224,188,0.10), transparent 28%),
+    radial-gradient(ellipse at 28% 72%, rgba(194,146,72,0.11), transparent 32%),
+    linear-gradient(90deg, transparent 0 45%, rgba(255,230,174,0.055) 46% 49%, transparent 50%);
+}
+
+.combat-monster-stage.combat-backdrop--sunken-court {
+  --combat-backdrop-accent: 72,154,206;
+  --combat-backdrop-border: rgba(78,144,190,0.20);
+  --combat-backdrop-glow: rgba(62,154,210,0.06);
+  --combat-backdrop-texture-opacity: 0.74;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.78), transparent 22%, transparent 78%, rgba(0,0,0,0.78)),
+    radial-gradient(ellipse at 50% 92%, rgba(42,116,162,0.20), transparent 46%),
+    radial-gradient(circle at 50% 12%, rgba(126,188,226,0.055), transparent 40%),
+    linear-gradient(180deg, rgba(7,18,28,0.98), rgba(2,5,9,0.99));
+  --combat-backdrop-texture:
+    linear-gradient(180deg, transparent 0 56%, rgba(84,176,220,0.085) 57% 59%, transparent 60%),
+    linear-gradient(90deg, transparent 0 12%, rgba(52,74,92,0.16) 13% 16%, transparent 17% 76%, rgba(52,74,92,0.14) 77% 80%, transparent 81%),
+    radial-gradient(ellipse at 50% 82%, rgba(62,132,172,0.14), transparent 40%),
+    repeating-linear-gradient(96deg, transparent 0 24px, rgba(142,204,226,0.018) 25px 26px);
+}
+
+.combat-monster-stage.combat-backdrop--rookery {
+  --combat-backdrop-accent: 176,162,132;
+  --combat-backdrop-border: rgba(190,172,132,0.18);
+  --combat-backdrop-glow: rgba(170,140,96,0.055);
+  --combat-backdrop-texture-opacity: 0.70;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.78), transparent 21%, transparent 79%, rgba(0,0,0,0.78)),
+    radial-gradient(ellipse at 50% 88%, rgba(126,102,72,0.18), transparent 44%),
+    radial-gradient(circle at 50% 8%, rgba(210,190,150,0.052), transparent 34%),
+    linear-gradient(180deg, rgba(20,17,14,0.97), rgba(5,5,6,0.99));
+  --combat-backdrop-texture:
+    linear-gradient(90deg, transparent 0 18%, rgba(88,68,48,0.28) 19% 22%, transparent 23% 77%, rgba(88,68,48,0.24) 78% 81%, transparent 82%),
+    repeating-linear-gradient(8deg, transparent 0 34px, rgba(214,204,178,0.022) 35px 36px),
+    radial-gradient(ellipse at 28% 28%, rgba(210,196,166,0.055), transparent 22%),
+    radial-gradient(ellipse at 76% 68%, rgba(144,124,94,0.10), transparent 26%);
+}
+
+.combat-monster-stage.combat-backdrop--noctis {
+  --combat-backdrop-accent: 154,104,232;
+  --combat-backdrop-border: rgba(164,112,232,0.20);
+  --combat-backdrop-glow: rgba(132,78,228,0.07);
+  --combat-backdrop-texture-opacity: 0.70;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.80), transparent 21%, transparent 79%, rgba(0,0,0,0.80)),
+    radial-gradient(ellipse at 50% 90%, rgba(104,62,180,0.20), transparent 44%),
+    radial-gradient(circle at 50% 12%, rgba(182,128,255,0.065), transparent 40%),
+    linear-gradient(180deg, rgba(12,9,24,0.98), rgba(3,3,8,0.99));
+  --combat-backdrop-texture:
+    linear-gradient(112deg, transparent 0 36%, rgba(186,142,255,0.075) 37% 39%, transparent 40%),
+    linear-gradient(70deg, transparent 0 60%, rgba(104,190,220,0.05) 61% 63%, transparent 64%),
+    radial-gradient(circle at 70% 18%, rgba(190,126,255,0.075), transparent 22%),
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(255,255,255,0.016) 23px 24px);
+}
+
+.combat-monster-stage.combat-backdrop--generic {
+  --combat-backdrop-accent: 150,132,110;
+  --combat-backdrop-border: rgba(172,150,124,0.16);
+  --combat-backdrop-glow: rgba(255,112,54,0.045);
+  --combat-backdrop-texture-opacity: 0.64;
+  --combat-backdrop-bg:
+    linear-gradient(90deg, rgba(0,0,0,0.78), transparent 23%, transparent 77%, rgba(0,0,0,0.78)),
+    radial-gradient(ellipse at 50% 92%, rgba(112,92,72,0.16), transparent 44%),
+    radial-gradient(circle at 50% 12%, rgba(220,188,142,0.04), transparent 40%),
+    linear-gradient(180deg, rgba(17,16,16,0.97), rgba(4,4,6,0.99));
+  --combat-backdrop-texture:
+    repeating-linear-gradient(90deg, transparent 0 28px, rgba(255,255,255,0.014) 29px 30px),
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(0,0,0,0.16) 23px 24px),
+    linear-gradient(180deg, transparent, rgba(0,0,0,0.22));
+}
+
+.combat-monster-stage.combat-backdrop.combat-backdrop--elite {
+  border-color: var(--combat-backdrop-border);
+  box-shadow:
+    inset 0 -20px 42px rgba(0,0,0,0.66),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 28px var(--combat-backdrop-glow),
+    0 0 24px rgba(164,100,255,0.075);
+}
+
+.combat-monster-stage.combat-backdrop.combat-backdrop--boss {
+  border-color: var(--combat-backdrop-border);
+  box-shadow:
+    inset 0 -22px 46px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 0 34px var(--combat-backdrop-glow),
+    0 0 30px rgba(255,70,40,0.08);
+}
+
+.combat-monster-stage.combat-backdrop.combat-backdrop--elite::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 82%, rgba(var(--combat-backdrop-accent),0.12), transparent 54%),
+    radial-gradient(circle at 50% 12%, rgba(200,140,255,0.055), transparent 40%);
+}
+
+.combat-monster-stage.combat-backdrop.combat-backdrop--boss::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 84%, rgba(var(--combat-backdrop-accent),0.14), transparent 54%),
+    radial-gradient(circle at 50% 10%, rgba(255,92,64,0.055), transparent 40%);
+}
