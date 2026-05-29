@@ -8,7 +8,7 @@
       item.name = String(item.name || 'Special Charter');
       item.rarity = RARITIES.some(r => r.key === item.rarity) ? item.rarity : 'legendary';
       item.slot = item.slot || 'scroll';
-      item.level = Math.floor(numberOr(item.level, 1, 1, 999));
+      item.level = normalizeItemLevel(item.level);
       item.rating = Math.floor(numberOr(item.rating, item.level, 1, 99999));
       item.value = Math.floor(numberOr(item.value, coins(1, 25, 0), 1, Number.MAX_SAFE_INTEGER));
       item.summary = String(item.summary || 'A rare Lowfire special.');
@@ -22,7 +22,7 @@
     item.id = item.id || makeId('gear');
     item.slot = baseSlot;
     item.rarity = RARITIES.some(r => r.key === item.rarity) ? item.rarity : 'common';
-    item.level = Math.floor(numberOr(item.level, 1, 1, 999));
+    item.level = normalizeItemLevel(item.level);
     item.rating = Math.floor(numberOr(item.rating, 3, 1, 99999));
     item.value = Math.floor(numberOr(item.value, coins(0, 0, 25), 1, Number.MAX_SAFE_INTEGER));
     item.name = String(item.name || `${BASES[baseSlot][0]} of Lowfire`);
@@ -191,7 +191,7 @@
     state.run.startedFromCharter = !!state.run.startedFromCharter;
     state.run.charterStartFloor = Math.floor(numberOr(state.run.charterStartFloor, 0, 0, 999999));
     ensureRunSetBonusState(state);
-    if (!state.run.active) { state.run.startedFromCharter = false; state.run.charterStartFloor = 0; state.run.setBonuses = { ashboundLethalUsed:false, bellforgeHits:0 }; clearPendingRunRewards(state); }
+    if (!state.run.active) { state.run.startedFromCharter = false; state.run.charterStartFloor = 0; state.run.setBonuses = { ashboundLethalUsed:false, bellforgeHits:0, sootveilEscapeUsed:false, sootveilGuard:0 }; clearPendingRunRewards(state); }
     state.run.choices = asArray(state.run.choices, CORE_COMBAT_ACTIONS).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     state.run.combatLog = asArray(state.run.combatLog, base.run.combatLog).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.monster = state.run.active ? normalizeMonster(state.run.monster, state.run.floor) : null;
@@ -227,6 +227,7 @@
       : Math.floor(numberOr(state.run.floor, 0, 0, 999999));
     state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
     state.run.pendingRewards = state.run.active ? createPendingRunRewards(state.run.pendingRewards) : createPendingRunRewards();
+    ensureRunSetBonusState(state);
     state.run.combatLog = asArray(state.run.combatLog, []).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.choices = asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     if (state.run.active && !state.run.choices.length) state.run.choices = CORE_COMBAT_ACTIONS.slice();

@@ -95,8 +95,9 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.4.1';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.4.1';
+  const BUILD = 'DungeonDex v1.4.2';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.4.2';
+  const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -225,6 +226,25 @@
         3: 'Small merchant discount',
         5: 'Buying from a merchant grants a temporary combat bonus next floor'
       }
+    },
+    sootveil_regalia: {
+      id: 'sootveil_regalia',
+      name: 'Sootveil Regalia',
+      theme: 'ashglass / deep survival / run-event salvage',
+      role: 'Living Dungeon deep-run survival',
+      slots: MYTHIC_SET_SLOTS,
+      pieceNames: {
+        helm: 'Sootveil Crown',
+        armor: 'Sootveil Vest',
+        boots: 'Sootveil Boots',
+        gloves: 'Sootveil Gloves',
+        cloak: 'Sootveil Mantle'
+      },
+      bonuses: {
+        2: 'Elite critical strikes deal 25% less damage',
+        3: '+15% Run Event gold and ember; improved shard salvage',
+        5: 'Ignore the first lethal strike each run'
+      }
     }
   };
 
@@ -289,9 +309,10 @@
     const n = Number(value);
     return clamp(Number.isFinite(n) ? n : fallback, min, max);
   };
+  const normalizeItemLevel = (value, fallback = 1) => Math.max(1, Math.floor(numberOr(value, fallback, 1, MAX_ITEM_LEVEL)));
 
 
-// v1.4.1 Monster Identity & Elite Behavior Pass
+// v1.4.2 Sootveil Mythic Set Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"

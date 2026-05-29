@@ -4,6 +4,7 @@
   function rarityIndex(key) { return Math.max(0, RARITIES.findIndex(r => r.key === key)); }
 
   function cappedRarityForLevel(level, source = 'normal') {
+    level = normalizeItemLevel(level);
     if (source === 'forge') {
       if (level < 10) return 'rare';
       if (level < 15) return 'epic';
@@ -31,6 +32,7 @@
   }
 
   function weightedRarityForLevel(level, source = 'normal', opts = {}) {
+    level = normalizeItemLevel(level);
     let table;
     if (source === 'merchant') {
       table = level < 6
@@ -93,7 +95,7 @@
   // v1.3.40 tuning note: Mythics should still beat Legendaries at deep floors. The softener
   // begins after depth 500 and reaches the existing 0.86 deep floor by depth 1000.
   function mythicDepthSoftener(level, rawDepth = 0) {
-    const itemLevel = Math.max(1, Math.floor(numberOr(level, 1, 1, 999999)));
+    const itemLevel = normalizeItemLevel(level);
     const depth = Math.max(itemLevel, Math.floor(numberOr(rawDepth, 0, 0, 999999)));
     if (depth <= 500) return 1;
     const band = clamp((depth - 500) / 500, 0, 1);
@@ -121,7 +123,7 @@
   }
 
   function expectedGearRating(level, rarityKey = 'common', source = 'normal', rawDepth = 0) {
-    const safeLevel = Math.max(1, Math.floor(numberOr(level, 1, 1, 999999)));
+    const safeLevel = normalizeItemLevel(level);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
     const baseRollAverage = safeLevel * 7.5 + 5;
     return Math.max(3, Math.round(baseRollAverage * rarityStatMultiplier(rarityKey, safeLevel, rawDepth) * earlyStatScale(safeLevel) * sourceScale));
@@ -257,7 +259,7 @@
         pendingRewards: createPendingRunRewards(),
         startedFromCharter: false,
         charterStartFloor: 0,
-        setBonuses: { ashboundLethalUsed: false, bellforgeHits: 0 }
+        setBonuses: { ashboundLethalUsed: false, bellforgeHits: 0, sootveilEscapeUsed: false, sootveilGuard: 0 }
       },
       merchantStock: [],
       archive: [],
@@ -272,21 +274,22 @@
   }
 
   function generateGear(slot, level, opts = {}) {
+    const itemLevel = normalizeItemLevel(level);
     const source = opts.source || 'normal';
-    const rarity = opts.forcedRarity ? RARITIES.find(r => r.key === opts.forcedRarity) : weightedRarityForLevel(level, source, opts);
+    const rarity = opts.forcedRarity ? RARITIES.find(r => r.key === opts.forcedRarity) : weightedRarityForLevel(itemLevel, source, opts);
     const base = pick(BASES[slot]);
     const prefix = pick(PREFIXES);
     const suffix = pick(slot === 'charm' ? SUFFIXES.concat(TRINKET_SUFFIXES) : SUFFIXES);
     const maker = pick(MAKERS);
     const theme = pick(THEMES);
-    const rawDepth = Math.floor(numberOr(opts.depthRaw || opts.depth, level, 1, 999999));
-    const lowFloorScale = source === 'starter' ? 0.5 : earlyStatScale(level);
+    const rawDepth = Math.floor(numberOr(opts.depthRaw || opts.depth, itemLevel, 1, 999999));
+    const lowFloorScale = source === 'starter' ? 0.5 : earlyStatScale(itemLevel);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
     const brokenScale = opts.broken ? 0.55 : 1;
     // Item power score calculation: base item level roll × rarity scaling × source scaling.
     // Mythic rarity uses rarityStatMultiplier() so deep floors apply a soft cap instead of
     // compounding full Mythic multiplier forever.
-    const rating = Math.max(3, Math.round((level * rand(6, 9) + rand(1, 9)) * rarityStatMultiplier(rarity.key, level, rawDepth) * lowFloorScale * sourceScale * brokenScale));
+    const rating = Math.max(3, Math.round((itemLevel * rand(6, 9) + rand(1, 9)) * rarityStatMultiplier(rarity.key, itemLevel, rawDepth) * lowFloorScale * sourceScale * brokenScale));
     const stats = {
       power: slot === 'weapon' ? rating + rand(1, 5) : Math.round(rating * 0.22),
       guard: ['armor','offhand','helm','boots'].includes(slot) ? rating + rand(0, 4) : Math.round(rating * 0.18),
@@ -302,9 +305,9 @@
       theme,
       maker,
       name: `${prefix} ${base} ${suffix}`,
-      level,
+      level: itemLevel,
       rating,
-      value: gearPriceFromRating(rating, level, rarity.key, source),
+      value: gearPriceFromRating(rating, itemLevel, rarity.key, source),
       stats,
       tags: [theme, maker, slot, source],
       summary: `${maker} ${slot === 'charm' ? 'trinket' : slot} attuned for ${theme} paths.`

@@ -1,0 +1,33 @@
+DungeonDex v1.4.2 - Sootveil Mythic Set
+
+Focus:
+- Adds Sootveil Regalia, a Living Dungeon mythic set themed around ashglass scavengers and unsafe deep delves.
+- Raises the real gear item level cap from 999 to 3250 for future progression.
+- Keeps the pass scoped to mythic progression, deep-run survivability, and compact mobile-first presentation.
+
+New Mythic Set: Sootveil Regalia
+- Sootveil Crown
+- Sootveil Mantle
+- Sootveil Vest
+- Sootveil Gloves
+- Sootveil Boots
+
+Set Bonuses:
+- 2-piece: Sootveil Footwork. Elite critical strikes deal 25% less damage and show compact combat feedback.
+- 3-piece: Ashglass Scavenger. Run Events grant +15% gold, +15% ember through integer reward rounding, and a small improved shard salvage chance.
+- 5-piece: Sootveil Escape. The first lethal combat strike each run is ignored, leaves the Warden at 1 HP, restores a small Guard buffer, and triggers once per run.
+
+Item Level Cap:
+- Added MAX_ITEM_LEVEL = 3250.
+- Gear generation now clamps item levels to the new cap.
+- Save/load normalization now preserves item levels above 999 up to 3250.
+- Display formatting continues to show high item levels with compact ilvl labels.
+
+Compatibility:
+- Uses the existing mythic set framework, rarity styling, set-piece recognition, and loadout/archive display paths.
+- Existing Ashbound, Bellforge, and Debtbrand sets remain unchanged.
+- Run Event salvage bonuses do not affect standard combat rewards, merchant systems, or forge systems.
+
+Versioning:
+- Visible build labels updated to DungeonDex v1.4.2.
+- Service worker cache and asset query labels updated to v1.4.2-sootveil-mythic-set.

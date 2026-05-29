@@ -1,0 +1,26 @@
+DungeonDex v1.4.2 - Smoke Test Notes
+
+Scope:
+- Sootveil Regalia mythic set.
+- Sootveil set bonuses.
+- Item level cap raised to 3250.
+- Version/cache references updated to v1.4.2.
+
+Checks:
+1. Confirm title/build label reads DungeonDex v1.4.2.
+2. Reach deep loot eligibility, then verify mythic set drops can include Sootveil Crown, Mantle, Vest, Gloves, or Boots.
+3. Equip two Sootveil pieces and fight elites until an elite critical occurs. Confirm damage is reduced and compact feedback appears, such as "Sootveil softens the blow."
+4. Confirm the 2-piece bonus does not reduce normal elite hits, boss hits, poison, burn, or standard combat damage.
+5. Equip three Sootveil pieces and resolve Run Events that grant gold, ember, or shards. Confirm gold is boosted by 15%, ember uses 15% integer reward rounding, and shard events can gain a small extra salvage bump.
+6. Confirm Sootveil Run Event salvage does not affect combat rewards, merchant prices, forge output, or elite contract payouts.
+7. Equip five Sootveil pieces and take lethal combat strike damage. Confirm Sootveil Escape leaves the Warden at exactly 1 HP, adds a small Guard buffer, and logs compact feedback.
+8. In the same run, take another lethal strike. Confirm Sootveil Escape does not trigger again.
+9. Start a new run. Confirm Sootveil Escape is reset and can trigger once again.
+10. Generate or load gear above ilvl 999. Confirm ilvl values above 999 persist through save/load and display correctly in inventory/loadout cards.
+11. Confirm generated gear does not exceed ilvl 3250.
+12. Check combat still supports attack, skill, guard, extract, loot drops, elite modifiers, boss rewards, and Run Events without regression.
+13. Save, reload, equip Sootveil pieces, and verify no save corruption or set recognition loss.
+
+Notes:
+- Sootveil shard and ember improvements are chance/rounding based because those rewards are integer currencies.
+- This pass intentionally does not add currencies, tabs, modal flows, dodge/evasion stats, or inventory redesigns.

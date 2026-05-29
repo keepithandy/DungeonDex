@@ -1,9 +1,9 @@
-// DungeonDex v1.4.1 Living Dungeon release runtime pointer.
+// DungeonDex v1.4.2 Sootveil Mythic Set runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
 
-// v1.4.1 Monster Identity & Elite Behavior Pass
+// v1.4.2 Sootveil Mythic Set Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"
@@ -20,10 +20,10 @@ window.ddGetMonsterCue = function(name){
 };
 
 
-// v1.4.1 — Living Dungeon Release
+// v1.4.2 — Sootveil Mythic Set Pass
 (function(){
-  if (window.DD_IMPACT_1359) return;
-  window.DD_IMPACT_1359 = true;
+  if (window.DD_IMPACT_142) return;
+  window.DD_IMPACT_142 = true;
 
   function ddQueryAny(selectors){
     for (var i = 0; i < selectors.length; i++){
@@ -76,8 +76,8 @@ window.ddGetMonsterCue = function(name){
       if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       var Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
-      window.__ddAudioCtx1359 = window.__ddAudioCtx1359 || new Ctx();
-      var ctx = window.__ddAudioCtx1359;
+      window.__ddAudioCtx142 = window.__ddAudioCtx142 || new Ctx();
+      var ctx = window.__ddAudioCtx142;
       if (ctx.state === "suspended") return;
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();

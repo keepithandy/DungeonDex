@@ -458,6 +458,8 @@
     if (!isPlainObject(state.run.setBonuses)) state.run.setBonuses = {};
     state.run.setBonuses.ashboundLethalUsed = !!state.run.setBonuses.ashboundLethalUsed;
     state.run.setBonuses.bellforgeHits = Math.floor(numberOr(state.run.setBonuses.bellforgeHits, 0, 0, 999999));
+    state.run.setBonuses.sootveilEscapeUsed = !!state.run.setBonuses.sootveilEscapeUsed;
+    state.run.setBonuses.sootveilGuard = Math.floor(numberOr(state.run.setBonuses.sootveilGuard, 0, 0, 999999));
     return state.run.setBonuses;
   }
 
@@ -494,6 +496,35 @@
     return true;
   }
 
+  function resolveEliteCriticalDamage(state, monster, baseDamage) {
+    const damage = Math.max(1, Math.floor(numberOr(baseDamage, 1, 1, 999999)));
+    if (monster?.tier !== 'Elite') return { damage, critical: false, softened: false, feedback: '' };
+    const threat = threatDepthFromDepth(monster.level || state?.run?.floor || 1);
+    const critChance = clamp(0.08 + threat * 0.0015, 0.08, 0.16);
+    if (Math.random() >= critChance) return { damage, critical: false, softened: false, feedback: '' };
+
+    let criticalDamage = Math.max(damage + 1, Math.round(damage * 1.32));
+    if (!hasEquippedSetBonus(state, 'sootveil_regalia', 2)) {
+      return { damage: criticalDamage, critical: true, softened: false, feedback: '' };
+    }
+
+    criticalDamage = Math.max(1, Math.round(criticalDamage * 0.75));
+    return {
+      damage: criticalDamage,
+      critical: true,
+      softened: true,
+      feedback: pick(['Sootveil softens the blow.', 'Ashglass footing absorbs part of the strike.'])
+    };
+  }
+
+  function consumeSootveilGuard(state) {
+    const setRun = ensureRunSetBonusState(state);
+    const guard = Math.floor(numberOr(setRun.sootveilGuard, 0, 0, 999999));
+    if (guard <= 0) return 0;
+    setRun.sootveilGuard = 0;
+    return guard;
+  }
+
   function tryAshboundLethalWard(state) {
     if (!hasEquippedSetBonus(state, 'ashbound_warden', 5)) return false;
     const setRun = ensureRunSetBonusState(state);
@@ -501,6 +532,19 @@
     setRun.ashboundLethalUsed = true;
     state.player.hp = 1;
     pushCombat(state, 'Ashbound Warden refuses the death-bell. You stand at 1 HP.');
+    return true;
+  }
+
+  function trySootveilEscape(state, stats = null) {
+    if (!hasEquippedSetBonus(state, 'sootveil_regalia', 5)) return false;
+    const setRun = ensureRunSetBonusState(state);
+    if (setRun.sootveilEscapeUsed) return false;
+    setRun.sootveilEscapeUsed = true;
+    state.player.hp = 1;
+    const guardStat = Math.floor(numberOr(stats?.guard, 0, 0, 999999));
+    const restoredGuard = Math.max(2, Math.round(Math.min(120, 8 + Math.sqrt(guardStat) * 1.5)));
+    setRun.sootveilGuard = Math.max(setRun.sootveilGuard, restoredGuard);
+    pushCombat(state, `Sootveil Escape triggers. Ash scatters. Guard +${format(restoredGuard)}.`);
     return true;
   }
 
@@ -578,7 +622,7 @@
     const setDef = randomMythicSetDefinition();
     const setSlot = pick(MYTHIC_SET_SLOTS);
     const baseSlot = baseSlotForSlot(setSlot, 'armor');
-    const level = Math.max(15, threatDepthFromDepth(rawDepth) + rand(0, 2));
+    const level = normalizeItemLevel(Math.max(15, threatDepthFromDepth(rawDepth) + rand(0, 2)));
     const item = generateGear(baseSlot, level, { source, forcedRarity:'mythic', depthRaw: rawDepth, state, skipMythicSet:true });
     item.slot = baseSlot;
     item.setSlot = setSlot;

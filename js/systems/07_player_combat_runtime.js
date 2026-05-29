@@ -274,7 +274,7 @@
     run.floor = actualStartDepth;
     run.startedFromCharter = allowedCharterStart;
     run.charterStartFloor = allowedCharterStart ? run.floor : 0;
-    run.setBonuses = { ashboundLethalUsed: false, bellforgeHits: 0 };
+    run.setBonuses = { ashboundLethalUsed: false, bellforgeHits: 0, sootveilEscapeUsed: false, sootveilGuard: 0 };
     run.chain = 0;
     run.roomsCleared = 0;
     run.encounters = 0;
@@ -378,6 +378,7 @@
     const stats = calcDerived(state);
     let playerSwing = 1;
     let playerShield = 0;
+    let lethalStrikeTaken = false;
 
     if (action === 'attack') {
       playerSwing = 1.0 + stats.speed * 0.008;
@@ -445,17 +446,26 @@
       pushCombat(state, `Ash-fed surge. ${monster.name} burns hotter near defeat.`);
     }
 
+    const sootveilGuard = consumeSootveilGuard(state);
+    if (sootveilGuard > 0) {
+      playerShield += sootveilGuard;
+      pushCombat(state, `Sootveil guard holds: +${format(sootveilGuard)} Guard.`);
+    }
+
     if (hasEquippedSetBonus(state, 'ashbound_warden', 3) && monster.tier === 'Boss') {
       playerShield += Math.max(2, Math.round(stats.guard * 0.22));
     }
     const swing = monster.tier === 'Boss' ? 1.3 : monster.tier === 'Elite' ? 1.16 : 1;
-    const incoming = Math.max(1, damageRoll(monster.power, stats.guard + playerShield, swing));
+    const eliteCritical = resolveEliteCriticalDamage(state, monster, Math.max(1, damageRoll(monster.power, stats.guard + playerShield, swing)));
+    const incoming = eliteCritical.damage;
     const dodged = Math.random() * 100 < clamp(state.player.dodge + stats.speed * 0.25, 3, 38);
     if (dodged) {
       pushCombat(state, `${monster.name} misses through the gloom.`);
     } else {
       state.player.hp -= incoming;
-      pushCombat(state, `${monster.name} hits for ${incoming}.`);
+      if (state.player.hp <= 0) lethalStrikeTaken = true;
+      pushCombat(state, eliteCritical.critical ? `${monster.name} lands an elite critical for ${incoming}.` : `${monster.name} hits for ${incoming}.`);
+      if (eliteCritical.feedback) pushCombat(state, eliteCritical.feedback);
       if (hasEliteModifier(monster, 'Venomous')) {
         const venom = Math.max(1, Math.round(threatDepthFromDepth(monster.level) * 0.7));
         const venomNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Venomous poison follows clean hits'));
@@ -477,7 +487,9 @@
     }
 
     if (state.player.hp <= 0) {
-      if (tryAshboundLethalWard(state)) {
+      if (lethalStrikeTaken && trySootveilEscape(state, stats)) {
+        result.saveNow = true;
+      } else if (tryAshboundLethalWard(state)) {
         result.saveNow = true;
       } else {
         defeat(state);
@@ -605,7 +617,7 @@
   }
 
 
-  // v1.4.1 — Living Dungeon Release: quick dungeon incidents between fights.
+  // v1.4.2 Sootveil Mythic Set: quick dungeon incidents between fights.
   const RUN_EVENT_REGISTRY = [
     {
       id: 'wounded_delver',
@@ -685,6 +697,49 @@
     return true;
   }
 
+  function applySootveilRunEventSalvage(state, rewards = {}) {
+    const result = {
+      gold: sanitizeCurrencyValue(rewards.gold, 0),
+      shards: sanitizeCurrencyValue(rewards.shards, 0),
+      ember: sanitizeCurrencyValue(rewards.ember, 0),
+      sootveilBonus: false
+    };
+    if (!hasEquippedSetBonus(state, 'sootveil_regalia', 3)) return result;
+
+    if (result.gold > 0) {
+      const boostedGold = Math.max(result.gold + 1, Math.round(result.gold * 1.15));
+      result.sootveilBonus = result.sootveilBonus || boostedGold > result.gold;
+      result.gold = boostedGold;
+    }
+    if (result.ember > 0) {
+      const emberBonus = result.ember * 0.15;
+      const boostedEmber = result.ember + Math.floor(emberBonus) + (Math.random() < (emberBonus % 1) ? 1 : 0);
+      result.sootveilBonus = result.sootveilBonus || boostedEmber > result.ember;
+      result.ember = boostedEmber;
+    }
+    if (result.shards > 0 && Math.random() < 0.22) {
+      result.shards += Math.max(1, Math.round(result.shards * 0.08));
+      result.sootveilBonus = true;
+    }
+    return result;
+  }
+
+  function grantRunEventSalvage(state, rewards = {}) {
+    const result = applySootveilRunEventSalvage(state, rewards);
+    if (result.gold) addPendingRunGold(state, result.gold);
+    if (result.shards) addPendingRunShards(state, result.shards);
+    if (result.ember) addPendingRunEmber(state, result.ember);
+    return result;
+  }
+
+  function runEventSalvageText(rewards) {
+    const parts = [];
+    if (rewards.gold) parts.push(`+${formatMoney(rewards.gold)}`);
+    if (rewards.ember) parts.push(`+${format(rewards.ember)} ember`);
+    if (rewards.shards) parts.push(`+${format(rewards.shards)} shards`);
+    return `${parts.join(', ') || 'no salvage'}${rewards.sootveilBonus ? ' (+Sootveil)' : ''}`;
+  }
+
   function resolveRunEvent(state, optionId) {
     ensureRunShell(state);
     const event = state.run.event;
@@ -700,25 +755,24 @@
       if (choice === 'help') {
         const cost = Math.min(state.player.gold || 0, Math.max(coins(0, 1, 0), Math.round(coin * 0.6)));
         state.player.gold = Math.max(0, (state.player.gold || 0) - cost);
-        addPendingRunEmber(state, 1);
-        pushCombat(state, `Event resolved: you help the delver. Spent ${formatMoney(cost)}. Unsecured +1 ember.`);
+        const salvage = grantRunEventSalvage(state, { ember: 1 });
+        pushCombat(state, `Event resolved: you help the delver. Spent ${formatMoney(cost)}. Unsecured ${runEventSalvageText(salvage)}.`);
       } else if (choice === 'search') {
-        addPendingRunGold(state, coin);
+        const salvage = grantRunEventSalvage(state, { gold: coin });
         if (Math.random() < 0.45) state.player.hp -= hit;
-        pushCombat(state, `Event resolved: you search the packs. Unsecured +${formatMoney(coin)}${state.player.hp <= 0 ? '' : ' and the stair bites back.'}`);
+        pushCombat(state, `Event resolved: you search the packs. Unsecured ${runEventSalvageText(salvage)}${state.player.hp <= 0 ? '' : ' and the stair bites back.'}`);
       } else {
         pushCombat(state, 'Event resolved: you leave the wounded delver behind. The stair stays quiet.');
       }
     } else if (event.id === 'cursed_shrine') {
       if (choice === 'offer' && state.player.ember > 0) {
         state.player.ember -= 1;
-        addPendingRunGold(state, Math.round(coin * 1.8));
-        addPendingRunShards(state, shard + 3);
-        pushCombat(state, `Event resolved: ember paid. Unsecured +${formatMoney(Math.round(coin * 1.8))}, +${shard + 3} shards.`);
+        const salvage = grantRunEventSalvage(state, { gold: Math.round(coin * 1.8), shards: shard + 3 });
+        pushCombat(state, `Event resolved: ember paid. Unsecured ${runEventSalvageText(salvage)}.`);
       } else if (choice === 'touch' || choice === 'offer') {
         state.player.hp -= hit;
-        addPendingRunShards(state, shard + 6);
-        pushCombat(state, `Event resolved: the shrine burns your hand. Took ${hit}. Unsecured +${shard + 6} shards.`);
+        const salvage = grantRunEventSalvage(state, { shards: shard + 6 });
+        pushCombat(state, `Event resolved: the shrine burns your hand. Took ${hit}. Unsecured ${runEventSalvageText(salvage)}.`);
       } else {
         pushCombat(state, 'Event resolved: the cursed shrine remains sealed.');
       }
@@ -731,9 +785,8 @@
         pushCombat(state, `Event resolved: cache forced. Took ${Math.max(1, Math.round(hit * 0.7))}. ${loot.name} added to the unsecured haul.`);
         updateQuest(state, 'loot', 1);
       } else if (choice === 'careful') {
-        addPendingRunGold(state, coin);
-        addPendingRunShards(state, shard);
-        pushCombat(state, `Event resolved: cache opened carefully. Unsecured +${formatMoney(coin)}, +${shard} shards.`);
+        const salvage = grantRunEventSalvage(state, { gold: coin, shards: shard });
+        pushCombat(state, `Event resolved: cache opened carefully. Unsecured ${runEventSalvageText(salvage)}.`);
       } else {
         pushCombat(state, 'Event resolved: you leave the lockbox untouched.');
       }
@@ -747,9 +800,8 @@
         state.player.depth = Math.max(state.player.depth, state.run.floor);
         pushCombat(state, `Event resolved: you push through the ember storm. Took ${hit}. Advanced to ${runDepthLabel(state)}.`);
       } else if (choice === 'harvest') {
-        addPendingRunEmber(state, 1);
-        addPendingRunShards(state, shard + 2);
-        pushCombat(state, `Event resolved: sparks harvested. Unsecured +1 ember, +${shard + 2} shards.`);
+        const salvage = grantRunEventSalvage(state, { ember: 1, shards: shard + 2 });
+        pushCombat(state, `Event resolved: sparks harvested. Unsecured ${runEventSalvageText(salvage)}.`);
       } else {
         const heal = Math.max(2, Math.round(stats.guard * 0.12 + 4));
         state.player.hp = Math.min(state.player.maxHp, state.player.hp + heal);
@@ -955,7 +1007,7 @@
   }
 
   function merchantGear(slot, level, rarity, tag, rawDepth = level) {
-    const itemLevel = Math.max(1, Math.floor(numberOr(level, 1, 1, 999999)));
+    const itemLevel = normalizeItemLevel(level);
     const item = generateGear(slot, itemLevel, { source:'merchant', forcedRarity:rarity, depthRaw:rawDepth });
     item.shopRole = tag || 'stock';
     item.summary = tag === 'core'
