@@ -1,0 +1,26 @@
+DungeonDex v1.3.51 - GitHub Morning Baseline Polish Review Notes
+
+Scope checked
+- Loadout readability and spacing on the Gear screen.
+- Combat page compactness, action binding paths, and recent compact CSS overrides.
+- Town page consistency across district hub, market, forge, and quest board panels.
+- Mobile/iPhone Safari basics: safe-area use, fixed bottom tabs, tap target sizing, and obvious overflow risks.
+- Visible title/build labels in index.html, runtime constants, settings copy, and service worker cache keys.
+- Recent CSS clutter with a focus on visible duplicate rules, not a broad stylesheet rewrite.
+
+Findings and fixes
+- The current package was already at v1.3.50, so this pass advances to v1.3.51 instead of downgrading to the suggested v1.3.48.
+- The top game header showed two title labels: a version eyebrow plus a plain DungeonDex h1. It now shows one short player-facing title: DungeonDex v1.3.51.
+- Empty loadout slots repeated slot/status copy inside each card. Empty cards now use the shorter No item label.
+- styles.css had an exact duplicate combat-active tabs rule. One duplicate was removed.
+
+No gameplay or persistence changes
+- Combat math unchanged.
+- Loot generation unchanged.
+- Economy unchanged.
+- Dungeon progression unchanged.
+- Merchant inventory generation unchanged.
+- Save/load behavior and storage key unchanged.
+
+Residual notes
+- styles.css still contains many historical polish blocks. I only removed the exact duplicate rule found during this pass to avoid a risky cleanup sweep.

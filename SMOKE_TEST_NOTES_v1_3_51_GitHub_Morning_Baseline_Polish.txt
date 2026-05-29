@@ -1,0 +1,35 @@
+DungeonDex v1.3.51 - GitHub Morning Baseline Polish Smoke Test Notes
+
+Static checks to run
+- node --check js/systems/00_core_constants_data.js
+- node --check js/systems/11_ui_run_gear_dex_archive.js
+- node --check js/systems/12_render_bindings_boot.js
+- node --check sw.js
+- Headless Chrome DOM boot from index.html.
+
+Static check results
+- PASS: node --check js/systems/00_core_constants_data.js
+- PASS: node --check js/systems/11_ui_run_gear_dex_archive.js
+- PASS: node --check js/systems/12_render_bindings_boot.js
+- PASS: node --check sw.js
+- PASS: live source search found no v1.3.50, loadout-redesign, duplicate h1 title, or span buildTag markers in active HTML/runtime/cache files.
+- PASS: headless Chrome DOM boot rendered DungeonDex v1.3.51 in the title, top header, and System Notes.
+- PASS: headless Chrome DOM boot rendered Gear empty loadout cards with No item copy.
+
+Manual smoke test steps
+- Open index.html in a fresh browser session.
+- Confirm the visible top header shows only DungeonDex v1.3.51.
+- Confirm the intro modal opens, Close works, and Enter Dungeon starts a run.
+- On Town, tap Enter Dungeon, Rest, Refresh, Forge Item, Buy, and Take Mark where enabled.
+- Confirm Town panels stay aligned: district hub, Lowfire Market, Relic Forge, and Lowfire Board.
+- Open Gear and confirm Equipped, Filters, and Inventory render without horizontal scrolling.
+- Confirm empty equipment cards show slot name, Empty, and No item without repeated Ready text.
+- Change slot, rarity, sort, and search filters.
+- Equip an item, sell one item, and test Sell Junk. Test Sell All only with a disposable save.
+- Start a run and confirm Attack, Skill, Guard, and Extract buttons remain tappable and compact.
+- On an iPhone-width Safari viewport, confirm bottom tabs, topbar, combat actions, and inventory buttons are reachable without sideways scrolling.
+
+Expected results
+- Visible build/title copy remains DungeonDex v1.3.51.
+- No long internal pass name appears in the visible game header.
+- No combat, loot, economy, dungeon progression, merchant generation, or save/load behavior changes are observed.

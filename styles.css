@@ -48,7 +48,6 @@ p { color: var(--soft); line-height: 1.35; }
 
 .app-shell.run-focus .hero { display: none; }
 .app-shell.run-focus .tabs { bottom: 0; }
-.app-shell.combat-active .tabs { display: none; }
 .app-shell.combat-active { padding-top: calc(6px + var(--safe-top)); }
 .app-shell.combat-active #screen-run .stack-8 { gap: 6px; }
 .hero-main { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }

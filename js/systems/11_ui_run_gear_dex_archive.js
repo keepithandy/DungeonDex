@@ -247,8 +247,7 @@
     if (!item) {
       return `<article class="equip-slot loadout-equip-card equip-slot-empty">
         <div class="gear-card-top"><span class="gear-slot-label">${escapeHtml(slotLabel)}</span><span class="empty-slot-pill">Empty</span></div>
-        <div class="gear-card-name muted">Empty slot</div>
-        <div class="gear-card-subline"><span>${escapeHtml(slotLabel)}</span><span>Ready</span></div>
+        <div class="gear-card-name muted">No item</div>
       </article>`;
     }
     const rarityKey = itemRarityKey(item);
