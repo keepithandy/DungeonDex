@@ -200,4 +200,3 @@
     if (coin || !parts.length) parts.push(`<span class="money-part coin-copper">${coin}c</span>`);
     return `<span class="money money-wow">${parts.join(' ')}</span>`;
   }
-

@@ -1,9 +1,9 @@
-// DungeonDex v1.4.0 Living Dungeon release runtime pointer.
+// DungeonDex v1.4.1 Living Dungeon release runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
 
-// v1.4.0 Monster Identity & Elite Behavior Pass
+// v1.4.1 Monster Identity & Elite Behavior Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"
@@ -20,7 +20,7 @@ window.ddGetMonsterCue = function(name){
 };
 
 
-// v1.4.0 — Living Dungeon Release
+// v1.4.1 — Living Dungeon Release
 (function(){
   if (window.DD_IMPACT_1359) return;
   window.DD_IMPACT_1359 = true;
@@ -94,4 +94,3 @@ window.ddGetMonsterCue = function(name){
     }catch(e){}
   };
 })();
-

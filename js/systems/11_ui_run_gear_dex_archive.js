@@ -127,7 +127,6 @@
     const lines = {
       lowfire: ['Lowfire soot drifts through the stairwell.', 'Old lamps pop in the ash behind you.', 'Warm dust settles on the weapon grip.'],
       veyruhn: ['Forge heat leaks through the stone ribs.', 'A chain ticks somewhere below the landing.', 'Red iron light crawls over the floor.'],
-      mireglass: ['Wet glass haze beads along the walls.', 'The stair sounds softer than it should.', 'Black water reflects the monster before you move.'],
       'red-chapel': ['Prayer smoke gathers around the arena edge.', 'The stone tastes of rust and candle-wax.', 'A red hush presses against the fight.'],
       'salt-forge': ['Salt ash scratches across the platform.', 'Kiln breath rolls under the floor.', 'White mineral dust cuts the torchlight.'],
       'sunken-court': ['Cold water knocks under the old court stones.', 'Drowned banners shift without wind.', 'Blue-black damp crawls up the walls.'],
@@ -157,7 +156,6 @@
 
   function dungeonAtmosphereMarkup(profile, depth) {
     const meta = depthProgressMeta(depth);
-    return `<div class="run-atmosphere-strip ${dungeonAtmosphereClasses(profile)}" aria-label="Dungeon atmosphere">
       <span class="atmosphere-sigil" aria-hidden="true">✦</span>
       <div><strong>${escapeHtml(profile.districtName)}</strong><p>${escapeHtml(profile.line)}</p></div>
       <span class="pill">F${format(meta.floor)} R${format(meta.room)} C${format(meta.chapter)}</span>
@@ -691,4 +689,3 @@
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
-

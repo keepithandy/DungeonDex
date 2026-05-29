@@ -147,7 +147,7 @@
 
 
 
-// v1.4.0 Monster Identity & Elite Behavior Pass
+// v1.4.1 Monster Identity & Elite Behavior Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"

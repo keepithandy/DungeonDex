@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.4.0';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.4.0';
+  const BUILD = 'DungeonDex v1.4.1';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.4.1';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -245,7 +245,6 @@
     { id:'lowfire', min:1, max:10, name:'Lowfire District', line:'Where every debt starts warm.', tone:'lowfire', mood:'Warm embers, close markets, shallow debts.' },
     { id:'ashgate', min:11, max:20, name:'Ashgate Warrens', line:'The walls remember every retreat.', tone:'ashgate', mood:'Coal smoke, narrow paths, bargain lanterns.' },
     { id:'ember-debtworks', min:21, max:30, name:'Ember Debtworks', line:'Nothing burns here unless it owes.', tone:'debtworks', mood:'Chains, ledgers, red worklight.' },
-    { id:'sootveil', min:31, max:40, name:'Sootveil Descent', line:'Light thins. Breath gets expensive.', tone:'sootveil', mood:'Thin air, black dust, guarded silence.' },
     { id:'cinderbone', min:41, max:50, name:'Cinderbone Halls', line:'Old champions become architecture.', tone:'cinderbone', mood:'Bone pillars and furnace glow.' },
     { id:'blacktithe', min:51, max:60, name:'Blacktithe Deep', line:'Every step is counted twice.', tone:'blacktithe', mood:'Gold shadow, sealed doors, heavy tolls.' },
     { id:'lanternless', min:61, max:70, name:'Lanternless Vault', line:'Hope is stored here, unpaid.', tone:'lanternless', mood:'Dim vaults and dead lampglass.' },
@@ -292,7 +291,7 @@
   };
 
 
-// v1.4.0 Monster Identity & Elite Behavior Pass
+// v1.4.1 Monster Identity & Elite Behavior Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"

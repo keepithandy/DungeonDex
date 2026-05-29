@@ -273,4 +273,3 @@
     modal.hidden = false;
     bindIntroModalActions();
   }
-

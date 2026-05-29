@@ -605,7 +605,7 @@
   }
 
 
-  // v1.4.0 — Living Dungeon Release: quick dungeon incidents between fights.
+  // v1.4.1 — Living Dungeon Release: quick dungeon incidents between fights.
   const RUN_EVENT_REGISTRY = [
     {
       id: 'wounded_delver',
@@ -1129,4 +1129,3 @@
     state.player.ember = Math.max(state.player.ember, 2);
     pushLog(state, `Rested at the Lowfire bunks for ${formatMoney(cost)}. HP restored, 2 ember minimum assured.`);
   }
-

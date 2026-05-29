@@ -155,7 +155,6 @@
       </div>
       <div class="milestone-bar"><div style="width:${roomPct}%"></div></div>
     </div>
-    <div class="atmosphere-strip">
       <span class="pill district-pill">${escapeHtml(district.name)}</span>
       <span class="pill boss-pill">${escapeHtml(bossFloorLabel(nextBoss.floor))} in ${format(bossChaptersAway)} chapters</span>
       <span class="pill">${escapeHtml(nextDistrictText)}</span>

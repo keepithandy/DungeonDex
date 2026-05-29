@@ -1001,12 +1001,7 @@ button:disabled {
 .district-banner > *,
 .run-command-strip > * { position: relative; z-index: 1; }
 .district-mood { color: rgba(243,245,250,0.72); font-size: 0.78rem; }
-.atmosphere-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
+
 .district-pill { border-color: rgba(122,232,178,0.26); color: var(--accent); }
 .boss-pill { border-color: rgba(255,141,141,0.28); color: var(--warn); }
 .district-tone-lowfire { --district-a: rgba(255,196,99,0.13); --district-b: rgba(122,232,178,0.08); }
