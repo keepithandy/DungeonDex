@@ -3,6 +3,7 @@ DungeonDex v1.3.52 - Loadout Interaction Polish
 Summary
 - Polished the Gear screen loadout without changing gameplay systems.
 - Kept the visible game title short: DungeonDex v1.3.52.
+- Added a compact Gear-only Warden Loadout summary card with equipped count, Power, Guard, HP, best floor, wallet, and open slot status.
 - Made equipped gear easier to distinguish from inventory gear with a stronger ember accent and quieter inventory card treatment.
 - Reordered loadout and inventory card hierarchy so item names lead, followed by slot/type, rarity, level, Power, key stat, and actions.
 - Removed redundant empty-slot wording from equipped cards.

@@ -6269,6 +6269,17 @@ button:focus-visible,
   padding: 10px;
 }
 
+.gear-player-panel {
+  padding: 10px;
+  border-color: rgba(255,190,104,0.32);
+  background:
+    linear-gradient(180deg, rgba(255,158,72,0.075), rgba(255,255,255,0.018)),
+    rgba(8,9,12,0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255,238,205,0.045),
+    0 0 0 1px rgba(255,126,54,0.045);
+}
+
 .loadout-head,
 .filter-head,
 .loadout-inventory-head {
@@ -6298,6 +6309,74 @@ button:focus-visible,
   font-size: 0.66rem;
   line-height: 1.15;
   white-space: nowrap;
+}
+
+.gear-player-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gear-player-title {
+  min-width: 0;
+  color: rgba(255,238,205,0.95);
+  font-size: 0.96rem;
+  font-weight: 850;
+  line-height: 1.12;
+}
+
+.gear-player-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.gear-player-stat {
+  min-width: 0;
+  padding: 6px 7px;
+  border: 1px solid rgba(255,210,128,0.11);
+  border-radius: 7px;
+  background: rgba(0,0,0,0.16);
+}
+
+.gear-player-stat span,
+.gear-player-stat strong {
+  display: block;
+  min-width: 0;
+  line-height: 1.08;
+}
+
+.gear-player-stat span {
+  color: rgba(243,238,228,0.54);
+  font-family: var(--font-ui, Inter, ui-sans-serif, system-ui, sans-serif);
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.gear-player-stat strong {
+  margin-top: 3px;
+  color: rgba(255,238,205,0.95);
+  font-size: 0.84rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.gear-player-stat .money {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px 5px;
+}
+
+.gear-player-open-slots {
+  margin-top: 7px;
+  color: rgba(243,238,228,0.58);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .loadout-groups {
@@ -6633,12 +6712,14 @@ button:focus-visible,
 }
 
 @media (max-width: 560px) {
+  .gear-player-panel,
   #equipmentPanel.loadout-panel,
   #filtersPanel.loadout-filter-panel,
   #inventoryPanel.loadout-inventory-panel {
     padding: 8px;
   }
 
+  .gear-player-head,
   .loadout-head,
   .loadout-inventory-head {
     align-items: flex-start;
@@ -6685,6 +6766,12 @@ button:focus-visible,
   .loadout-inventory-head .tiny-sell-all {
     min-height: 36px;
     padding: 6px 8px;
+  }
+}
+
+@media (min-width: 620px) {
+  .gear-player-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

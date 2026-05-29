@@ -279,7 +279,34 @@
     </section>`;
   }
 
+  function renderGearPlayerPanel(panel, equipment, displaySlots, equippedCount) {
+    const d = calcDerived(S);
+    const bestDepth = Math.max(
+      1,
+      Math.floor(numberOr(S.player?.depth, 0, 0, 999999)),
+      Math.floor(numberOr(S.player?.safeExtractDepth, 1, 1, 999999))
+    );
+    const openSlots = displaySlots.filter(slot => !isPlainObject(equipment[slot]));
+    const openSlotLabel = openSlots.length
+      ? `Open: ${openSlots.map(slot => escapeHtml(slotDisplayName(slot))).join(', ')}`
+      : 'All slots filled';
+    panel.innerHTML = `
+      <div class="gear-player-head">
+        <div class="gear-player-title">Warden Loadout</div>
+        <span class="pill loadout-count-pill">Equipped ${format(equippedCount)} / ${format(displaySlots.length)}</span>
+      </div>
+      <div class="gear-player-stat-grid">
+        <div class="gear-player-stat"><span>Power</span><strong>${format(d.power)}</strong></div>
+        <div class="gear-player-stat"><span>Guard</span><strong>${format(d.guard)}</strong></div>
+        <div class="gear-player-stat"><span>HP</span><strong>${format(S.player.hp)} / ${format(S.player.maxHp)}</strong></div>
+        <div class="gear-player-stat"><span>Best Floor</span><strong>${escapeHtml(depthShortLabel(bestDepth))}</strong></div>
+        <div class="gear-player-stat"><span>Wallet</span><strong>${formatMoney(S.player.gold || 0)}</strong></div>
+      </div>
+      <div class="gear-player-open-slots">${openSlotLabel}</div>`;
+  }
+
   function renderGear() {
+    const gearPlayerPanel = el('gearPlayerPanel');
     const equipmentPanel = el('equipmentPanel');
     const filtersPanel = el('filtersPanel');
     const inventoryPanel = el('inventoryPanel');
@@ -292,6 +319,7 @@
     const displaySlots = loadoutDisplaySlots();
     const equippedCount = displaySlots.filter(slot => isPlainObject(equipment[slot])).length;
     const filters = loadoutFilters();
+    if (gearPlayerPanel) renderGearPlayerPanel(gearPlayerPanel, equipment, displaySlots, equippedCount);
     equipmentPanel.innerHTML = `
       <div class="loadout-head">
         <div><h2>Equipped</h2><p class="small muted">Worn gear by slot.</p></div>

@@ -16,17 +16,20 @@ Static check results
 - PASS: active source search found no v1.3.51, 1.3.51-baseline-polish, v1.3.50, or loadout-redesign labels in active HTML/runtime/cache files.
 - PASS: headless Chrome DOM boot rendered DungeonDex v1.3.52 in the page title, top header, and System Notes.
 - PASS: headless Chrome DOM boot rendered Town, Enter Dungeon, idle Run/Combat panels, Gear, Equipped, Filters, and Inventory.
+- PASS: headless Chrome DOM boot rendered the Gear-only Warden Loadout card with equipped count and clean open slot text.
 - PASS: Gear DOM rendered empty equipped slots with slot name plus Empty state only.
 - PASS: Inventory DOM rendered the name-first card hierarchy with rarity/slot metadata, Power/key stat summary, Equip, and Sell actions.
 
 Automation note
-- In-app browser automation was attempted for interactive click checks, but the browser connector could not start in this sandbox session because of a spawn refresh failure. The headless Chrome boot check passed; the remaining interaction checks below should be run manually.
+- In-app browser automation was attempted for interactive click checks, but the browser connector could not start in this sandbox session because of a Windows sandbox spawn refresh failure. The headless Chrome boot check passed; the remaining interaction checks below should be run manually.
 
 Manual smoke test steps
 - Open index.html in a fresh browser session.
 - Confirm the visible top header shows only DungeonDex v1.3.52.
 - Confirm Town loads and the intro modal can be closed.
 - Open Gear and confirm the Loadout section renders without horizontal scrolling.
+- Confirm the compact Warden Loadout card appears at the top of Gear only.
+- Confirm the equipped count, HP, best floor, wallet, and open slot line update cleanly.
 - Confirm equipped items are visually distinct from inventory items.
 - Confirm inventory items still render with name, slot/type, rarity, Power/key stat summary, and action buttons.
 - Equip an item and confirm it moves into the correct equipped slot.
