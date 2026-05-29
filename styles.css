@@ -7209,3 +7209,333 @@ button:focus-visible,
     radial-gradient(ellipse at 50% 84%, rgba(var(--combat-backdrop-accent),0.14), transparent 54%),
     radial-gradient(circle at 50% 10%, rgba(255,92,64,0.055), transparent 40%);
 }
+
+/* v1.4.0 — Living Dungeon Release Pass */
+@keyframes ddxStageDrift {
+  0% { transform: translate3d(-3%, 2%, 0) scale(1); opacity: .34; }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.04); opacity: .52; }
+  100% { transform: translate3d(-3%, 2%, 0) scale(1); opacity: .34; }
+}
+@keyframes ddxMoteRise {
+  0% { background-position: 0 30px, 42px 80px, 80px 10px; opacity: .18; }
+  50% { opacity: .36; }
+  100% { background-position: 0 -80px, 42px -30px, 80px -100px; opacity: .18; }
+}
+@keyframes ddxMonsterIdleStalker {
+  0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+  50% { transform: translateX(-50%) translateY(-2px) scale(1.012); }
+}
+@keyframes ddxMonsterIdleBrute {
+  0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+  35% { transform: translateX(-50%) translateY(1px) scale(1.018, .99); }
+  70% { transform: translateX(-50%) translateY(-1px) scale(.996, 1.012); }
+}
+@keyframes ddxMonsterIdleRitual {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.18) saturate(1.28); }
+}
+@keyframes ddxMonsterIdleConstruct {
+  0%, 86%, 100% { transform: translateX(-50%); }
+  90% { transform: translateX(calc(-50% - 1px)); }
+  94% { transform: translateX(calc(-50% + 1px)); }
+}
+@keyframes ddxMonsterIdleMire {
+  0%, 100% { transform: translateX(-50%) skewX(0deg); border-radius: 40% 40% 34% 34% / 44% 44% 32% 32%; }
+  50% { transform: translateX(-50%) skewX(-1.5deg); border-radius: 46% 38% 38% 34% / 48% 40% 34% 32%; }
+}
+@keyframes ddxMonsterIdleShade {
+  0%, 100% { opacity: .98; transform: translateX(-50%); }
+  45% { opacity: .82; transform: translateX(calc(-50% - 2px)); }
+  52% { opacity: 1; transform: translateX(calc(-50% + 2px)); }
+}
+@keyframes ddxMonsterIdleWinged {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+.app-shell.combat-active #screen-run .stack-8 { max-width: 430px; margin-inline: auto; }
+.app-shell.combat-active #runStatus { padding: 7px 8px 5px; }
+.app-shell.combat-active #combatPanel { padding: 0 8px 6px; }
+.app-shell.combat-active #combatLog { padding: 6px 8px 8px; }
+.combat-device-shell { gap: 6px; }
+.combat-enemy-header { gap: 2px; padding-top: 1px; }
+.combat-enemy-header h2,
+.combat-monster-name { font-size: clamp(.92rem, 3.7vw, 1.02rem); line-height: 1; }
+.combat-enemy-header .small { font-size: .64rem; line-height: 1.15; }
+.combat-personality-cue {
+  margin: 0;
+  max-width: 100%;
+  color: rgba(255, 224, 166, .72);
+  font-size: .62rem;
+  line-height: 1.12;
+  letter-spacing: .015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.combat-monster-stage {
+  min-height: 132px;
+  transform: translateZ(0);
+}
+.combat-monster-stage.stage-boss { min-height: 142px; }
+.stage-atmosphere-grain,
+.stage-motes {
+  position: absolute;
+  inset: -16%;
+  pointer-events: none;
+  z-index: 0;
+}
+.stage-atmosphere-grain {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255,255,255,.08), transparent 1.5px),
+    radial-gradient(circle at 72% 36%, rgba(255,213,128,.09), transparent 1.2px),
+    radial-gradient(circle at 42% 72%, rgba(255,255,255,.055), transparent 1.4px);
+  background-size: 72px 72px, 96px 96px, 118px 118px;
+  filter: blur(.15px);
+  mix-blend-mode: screen;
+  animation: ddxStageDrift 7.5s ease-in-out infinite;
+}
+.stage-motes {
+  background:
+    radial-gradient(circle, rgba(255,190,106,.38) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255,255,255,.16) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,116,76,.24) 0 1px, transparent 1.7px);
+  background-size: 52px 90px, 72px 120px, 92px 130px;
+  animation: ddxMoteRise 9s linear infinite;
+  opacity: .26;
+}
+.combat-monster-stage > .monster-aura,
+.combat-monster-stage > .monster-silhouette,
+.combat-monster-stage > .stage-floor,
+.combat-monster-stage > .stage-torch { z-index: 1; }
+.combat-personality--stalker .monster-silhouette { animation: ddxMonsterIdleStalker 3.2s ease-in-out infinite; }
+.combat-personality--brute .monster-silhouette { animation: ddxMonsterIdleBrute 2.7s ease-in-out infinite; }
+.combat-personality--ritualist .monster-silhouette { animation: ddxMonsterIdleStalker 3.4s ease-in-out infinite, ddxMonsterIdleRitual 2.4s ease-in-out infinite; }
+.combat-personality--construct .monster-silhouette { animation: ddxMonsterIdleConstruct 2.2s steps(2, end) infinite; }
+.combat-personality--mireborn .monster-silhouette { animation: ddxMonsterIdleMire 3.8s ease-in-out infinite; }
+.combat-personality--shade .monster-silhouette { animation: ddxMonsterIdleShade 3.1s ease-in-out infinite; }
+.combat-personality--winged .monster-silhouette { animation: ddxMonsterIdleWinged 2.8s ease-in-out infinite; }
+.combat-personality--ritualist .monster-core { color: rgba(255,108,132,.94); background: rgba(255,64,92,.15); }
+.combat-personality--construct .monster-core { color: rgba(255,216,142,.94); background: rgba(255,184,76,.14); }
+.combat-personality--mireborn .monster-core { color: rgba(143,245,198,.92); background: rgba(94,220,170,.12); }
+.combat-personality--shade .monster-core { color: rgba(170,190,255,.92); background: rgba(112,126,255,.13); }
+.combat-personality--winged .monster-core { color: rgba(225,230,255,.92); background: rgba(175,190,255,.12); }
+.combat-backdrop--lowfire .stage-motes { opacity: .34; }
+.combat-backdrop--mireglass .stage-motes { filter: blur(.9px) hue-rotate(72deg); opacity: .28; }
+.combat-backdrop--salt-forge .stage-motes,
+.combat-backdrop--veyruhn .stage-motes { opacity: .38; filter: saturate(1.25); }
+.combat-backdrop--red-chapel .stage-atmosphere-grain { filter: hue-rotate(315deg) saturate(1.35); opacity: .44; }
+.combat-backdrop--noctis .stage-atmosphere-grain { opacity: .28; filter: hue-rotate(190deg) saturate(1.2); }
+.combat-hp-card { padding: 7px 8px; border-radius: 13px; background: rgba(0,0,0,.23); }
+.combat-hp-card .combat-stat-row { min-height: 28px; padding: 4px 0 0; border: 0; background: transparent; }
+.combat-hud.run-stat-grid { gap: 5px; }
+.combat-hud.run-stat-grid .stat-box { padding: 5px 4px; }
+.combat-device-actions { gap: 5px; }
+.combat-device-actions button { min-height: 42px; padding: 7px 4px; }
+.app-shell.combat-active .run-log-list { max-height: 126px; }
+.app-shell.combat-active .run-log-list .combat-feed-line { padding: 5px 6px; }
+@media (max-width: 380px) {
+  .combat-personality-cue { display: none; }
+  .combat-monster-stage { min-height: 118px; }
+  .combat-monster-stage.stage-boss { min-height: 130px; }
+  .combat-device-actions button { min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-atmosphere-grain,
+  .stage-motes,
+  .combat-personality--stalker .monster-silhouette,
+  .combat-personality--brute .monster-silhouette,
+  .combat-personality--ritualist .monster-silhouette,
+  .combat-personality--construct .monster-silhouette,
+  .combat-personality--mireborn .monster-silhouette,
+  .combat-personality--shade .monster-silhouette,
+  .combat-personality--winged .monster-silhouette {
+    animation: none !important;
+  }
+}
+
+
+/* v1.4.0 — Living Dungeon Release */
+.run-atmosphere-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 6px 7px;
+  border: 1px solid rgba(255,255,255,0.075);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 0% 0%, var(--atmo-a, rgba(255,180,98,0.11)), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.16));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+}
+.run-atmosphere-strip strong {
+  display: block;
+  color: rgba(255,225,161,0.94);
+  font-size: .69rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.run-atmosphere-strip p {
+  margin: 1px 0 0;
+  color: rgba(243,245,250,0.68);
+  font-size: .66rem;
+  line-height: 1.2;
+}
+.run-atmosphere-strip .pill { font-size: .58rem; padding: 3px 5px; }
+.atmosphere-sigil {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: rgba(255,213,128,0.82);
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,213,128,0.12);
+  box-shadow: 0 0 16px var(--atmo-glow, rgba(255,140,80,0.10));
+}
+.living-dungeon--lowfire { --atmo-a: rgba(255,128,70,0.15); --atmo-glow: rgba(255,92,52,0.18); }
+.living-dungeon--veyruhn { --atmo-a: rgba(255,82,48,0.14); --atmo-glow: rgba(255,70,40,0.16); }
+.living-dungeon--mireglass { --atmo-a: rgba(84,191,168,0.13); --atmo-glow: rgba(70,210,178,0.13); }
+.living-dungeon--red-chapel { --atmo-a: rgba(255,46,78,0.14); --atmo-glow: rgba(255,54,84,0.17); }
+.living-dungeon--salt-forge { --atmo-a: rgba(238,218,166,0.14); --atmo-glow: rgba(235,214,154,0.14); }
+.living-dungeon--sunken-court { --atmo-a: rgba(88,143,210,0.13); --atmo-glow: rgba(72,124,210,0.14); }
+.living-dungeon--rookery { --atmo-a: rgba(184,180,160,0.13); --atmo-glow: rgba(198,190,168,0.12); }
+.living-dungeon--noctis { --atmo-a: rgba(126,116,255,0.13); --atmo-glow: rgba(116,102,255,0.16); }
+.dungeon-pressure--deep .atmosphere-sigil,
+.dungeon-pressure--grave .atmosphere-sigil,
+.dungeon-pressure--abyssal .atmosphere-sigil { animation: dungeonSigilPulse 2.8s ease-in-out infinite; }
+.dungeon-pressure--grave.run-atmosphere-strip,
+.dungeon-pressure--abyssal.run-atmosphere-strip { border-color: rgba(255,91,91,0.13); }
+.stage-depth-veil,
+.stage-drift {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.stage-depth-veil {
+  opacity: .72;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at 18% 12%, var(--atmo-a, rgba(255,180,98,0.11)), transparent 34%),
+    radial-gradient(circle at 82% 8%, var(--atmo-glow, rgba(255,120,70,0.08)), transparent 28%);
+}
+.stage-drift {
+  opacity: .42;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.18) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255,213,128,0.15) 0 1px, transparent 1.5px);
+  background-size: 43px 27px, 67px 41px;
+  animation: dungeonDrift 9s linear infinite;
+}
+.living-dungeon--mireglass.stage-depth-veil { filter: blur(.4px); }
+.living-dungeon--mireglass + .stage-motes,
+.living-dungeon--sunken-court + .stage-motes { opacity: .62; }
+.living-dungeon--red-chapel.stage-depth-veil { opacity: .82; }
+.living-dungeon--noctis.stage-depth-veil { opacity: .58; }
+.dungeon-floor--floor-edge.stage-depth-veil,
+.dungeon-floor--near-floor.stage-depth-veil { opacity: .9; }
+.dungeon-chapter--last-chapter.stage-depth-veil { box-shadow: inset 0 0 34px rgba(255,213,128,0.055); }
+.combat-monster-stage .monster-aura,
+.combat-monster-stage .monster-silhouette,
+.combat-monster-stage .stage-floor { z-index: 2; }
+@keyframes dungeonDrift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 43px -54px, -67px -82px; }
+}
+@keyframes dungeonSigilPulse {
+  0%, 100% { transform: scale(1); opacity: .82; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+@media (max-width: 380px) {
+  .run-atmosphere-strip { grid-template-columns: auto minmax(0,1fr); }
+  .run-atmosphere-strip .pill { display: none; }
+}
+
+/* v1.4.0 Monster Identity & Elite Behavior */
+.monster-archetype-line{
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  opacity:.72;
+  margin-top:2px;
+}
+
+.enemy-elite-presence{
+  box-shadow:0 0 18px rgba(255,120,60,.22);
+  border-color:rgba(255,140,70,.42);
+}
+
+.enemy-cue-line{
+  font-size:12px;
+  opacity:.82;
+  font-style:italic;
+  margin-top:4px;
+}
+
+.depth-threat-high{
+  animation:ddexThreatPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes ddexThreatPulse{
+  0%{transform:translateY(0px);}
+  50%{transform:translateY(-1px);}
+  100%{transform:translateY(0px);}
+}
+
+
+/* v1.4.0 — Living Dungeon Release */
+.run-event-shell{
+  padding:12px;
+}
+.run-event-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(145deg, rgba(22,18,16,.94), rgba(10,9,8,.96));
+  box-shadow:0 18px 42px rgba(0,0,0,.32), inset 0 0 28px rgba(255,120,50,.06);
+}
+.run-event-card::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle at 20% 20%, rgba(255,128,54,.16), transparent 32%), radial-gradient(circle at 80% 10%, rgba(255,255,255,.06), transparent 28%);
+  pointer-events:none;
+}
+.run-event-card > *{position:relative;z-index:1;}
+.run-event-card h2{
+  margin:4px 0 6px;
+  font-size:20px;
+}
+.run-event-card p{
+  margin:0 0 12px;
+  color:rgba(255,255,255,.78);
+  line-height:1.35;
+}
+.run-event-choices{
+  display:grid;
+  gap:8px;
+}
+.run-event-choice{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+  padding:11px 12px;
+  text-align:left;
+  border-radius:14px;
+}
+.run-event-choice strong{
+  font-size:13px;
+  letter-spacing:.02em;
+}
+.run-event-choice span{
+  font-size:11px;
+  opacity:.72;
+  line-height:1.25;
+}

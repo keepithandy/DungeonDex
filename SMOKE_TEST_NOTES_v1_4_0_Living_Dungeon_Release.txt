@@ -1,0 +1,23 @@
+DungeonDex v1.4.0 — Smoke Test Notes
+
+Automated packaging checks:
+- Package extracted successfully.
+- Old scattered note files removed.
+- Consolidated 1.4 patch notes created.
+- Version/cache references swept to v1.4.0 where found.
+- Service worker cache label normalized to dungeon-dex-v1.4.0-living-dungeon.
+
+Manual verification checklist:
+1. Open index.html in a clean/private browser session.
+2. Confirm visible build/title reads DungeonDex v1.4.0.
+3. Start a new run.
+4. Enter combat and confirm the stage still renders.
+5. Fight several enemies and confirm combat buttons remain usable.
+6. Confirm district atmosphere/stage effects do not block controls.
+7. Trigger or play long enough to observe Run Events from v1.3.58.
+8. Confirm event choices resolve without trapping the player.
+9. Confirm reward/impact presentation does not cause layout jumping.
+10. Reload once to confirm service worker/cache update behaves normally.
+
+Known scope:
+This is a release consolidation pass, not a large new gameplay rewrite. It packages the final 1.3.53–1.3.59 work as the v1.4.0 Living Dungeon Release.

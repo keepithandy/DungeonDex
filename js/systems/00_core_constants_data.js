@@ -95,8 +95,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = 'DungeonDex v1.3.54';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.3.54';
+  const BUILD = 'DungeonDex v1.4.0';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.4.0';
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
   const DEPTH_ROOMS_PER_FLOOR = 15;
@@ -290,3 +290,20 @@
     const n = Number(value);
     return clamp(Number.isFinite(n) ? n : fallback, min, max);
   };
+
+
+// v1.4.0 Monster Identity & Elite Behavior Pass
+window.DD_MONSTER_ARCHETYPES = [
+  "Brute","Ritualist","Skulker","Ashbound",
+  "Mireborn","Furnace Spawn","Hollowed","Warden"
+];
+
+window.ddGetMonsterCue = function(name){
+  const cues = [
+    "The creature watches silently.",
+    "Ash drifts from the enemy's armor.",
+    "A hostile presence fills the chamber.",
+    "The monster prepares to strike."
+  ];
+  return cues[Math.floor(Math.random()*cues.length)];
+};

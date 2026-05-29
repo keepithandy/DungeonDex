@@ -604,6 +604,166 @@
     nextEncounter(state);
   }
 
+
+  // v1.4.0 — Living Dungeon Release: quick dungeon incidents between fights.
+  const RUN_EVENT_REGISTRY = [
+    {
+      id: 'wounded_delver',
+      kicker: 'Run Event',
+      title: 'Wounded Delver',
+      text: 'A collapsed warden grips a cracked lantern and asks for enough coin to reach Lowfire.',
+      options: [
+        { id:'help', label:'Help them', detail:'Spend a little coin for ember and goodwill.' },
+        { id:'search', label:'Search the packs', detail:'Risk a hostile scramble for loose rewards.' },
+        { id:'leave', label:'Move on', detail:'No risk. No reward.' }
+      ]
+    },
+    {
+      id: 'cursed_shrine',
+      kicker: 'Run Event',
+      title: 'Cursed Shrine',
+      text: 'A black chapel niche exhales warm ash. Something valuable is sealed under the soot.',
+      options: [
+        { id:'offer', label:'Offer ember', detail:'Trade 1 ember for a stronger unsecured haul.' },
+        { id:'touch', label:'Touch the shrine', detail:'Gain shards, but take damage.' },
+        { id:'leave', label:'Leave it sealed', detail:'Keep the run moving.' }
+      ]
+    },
+    {
+      id: 'gear_cache',
+      kicker: 'Run Event',
+      title: 'Abandoned Gear Cache',
+      text: 'A rusted lockbox sits under a stairwell marker. The seal is old, but not dead.',
+      options: [
+        { id:'force', label:'Force it open', detail:'Chance at gear. Take a small hit.' },
+        { id:'careful', label:'Open carefully', detail:'Take coins and shards safely.' },
+        { id:'leave', label:'Leave it', detail:'Avoid delay.' }
+      ]
+    },
+    {
+      id: 'ember_storm',
+      kicker: 'Run Event',
+      title: 'Ember Storm',
+      text: 'The corridor fills with furnace sparks. The next steps could buy speed or scars.',
+      options: [
+        { id:'push', label:'Push through', detail:'Skip ahead, but lose HP.' },
+        { id:'harvest', label:'Harvest sparks', detail:'Gain ember and shards.' },
+        { id:'wait', label:'Wait it out', detail:'Recover a little HP.' }
+      ]
+    }
+  ];
+
+  function runEventChance(state) {
+    const floor = progressDepthValue(state?.run?.floor, 1);
+    const base = floor < 3 ? 0.08 : floor < 12 ? 0.15 : 0.20;
+    const chainBonus = Math.min(0.08, numberOr(state?.run?.chain, 0, 0, 999) * 0.01);
+    return clamp(base + chainBonus, 0.06, 0.28);
+  }
+
+  function createRunEvent(state) {
+    const depth = progressDepthValue(state?.run?.floor, 1);
+    const event = pick(RUN_EVENT_REGISTRY);
+    return {
+      id: event.id,
+      kicker: event.kicker,
+      title: event.title,
+      text: event.text,
+      floor: depth,
+      zone: state?.run?.zone || zoneName(depth),
+      options: event.options.map(option => ({ ...option }))
+    };
+  }
+
+  function maybeTriggerRunEvent(state) {
+    if (!state?.run?.active || state.run.event) return false;
+    const floor = progressDepthValue(state.run.floor, 1);
+    if (floor <= 1 || floor % 5 === 0) return false;
+    if (Math.random() > runEventChance(state)) return false;
+    state.run.event = createRunEvent(state);
+    state.run.choices = ['event'];
+    pushCombat(state, `Run Event: ${state.run.event.title} interrupts the descent.`);
+    return true;
+  }
+
+  function resolveRunEvent(state, optionId) {
+    ensureRunShell(state);
+    const event = state.run.event;
+    if (!state.run.active || !event) return { saveNow:false, fullRender:false };
+    const choice = String(optionId || 'leave');
+    const stats = calcDerived(state);
+    const depthThreat = threatDepthFromDepth(state.run.floor);
+    const coin = coins(0, rand(1, 3), rand(10, 90)) + depthThreat * rand(2, 7);
+    const shard = Math.max(1, Math.round(depthThreat * 1.5 + rand(1, 5)));
+    const hit = Math.max(2, Math.round(depthThreat * 1.4 + rand(2, 8) - stats.guard * 0.04));
+
+    if (event.id === 'wounded_delver') {
+      if (choice === 'help') {
+        const cost = Math.min(state.player.gold || 0, Math.max(coins(0, 1, 0), Math.round(coin * 0.6)));
+        state.player.gold = Math.max(0, (state.player.gold || 0) - cost);
+        addPendingRunEmber(state, 1);
+        pushCombat(state, `Event resolved: you help the delver. Spent ${formatMoney(cost)}. Unsecured +1 ember.`);
+      } else if (choice === 'search') {
+        addPendingRunGold(state, coin);
+        if (Math.random() < 0.45) state.player.hp -= hit;
+        pushCombat(state, `Event resolved: you search the packs. Unsecured +${formatMoney(coin)}${state.player.hp <= 0 ? '' : ' and the stair bites back.'}`);
+      } else {
+        pushCombat(state, 'Event resolved: you leave the wounded delver behind. The stair stays quiet.');
+      }
+    } else if (event.id === 'cursed_shrine') {
+      if (choice === 'offer' && state.player.ember > 0) {
+        state.player.ember -= 1;
+        addPendingRunGold(state, Math.round(coin * 1.8));
+        addPendingRunShards(state, shard + 3);
+        pushCombat(state, `Event resolved: ember paid. Unsecured +${formatMoney(Math.round(coin * 1.8))}, +${shard + 3} shards.`);
+      } else if (choice === 'touch' || choice === 'offer') {
+        state.player.hp -= hit;
+        addPendingRunShards(state, shard + 6);
+        pushCombat(state, `Event resolved: the shrine burns your hand. Took ${hit}. Unsecured +${shard + 6} shards.`);
+      } else {
+        pushCombat(state, 'Event resolved: the cursed shrine remains sealed.');
+      }
+    } else if (event.id === 'gear_cache') {
+      if (choice === 'force') {
+        state.player.hp -= Math.max(1, Math.round(hit * 0.7));
+        const loot = generateGear(pick(SLOT_ORDER), depthThreat + rand(0, 1), { source:'event', depthRaw: state.run.floor, state });
+        loot.tags = asArray(loot.tags, []).concat(['run-event-cache']);
+        addPendingRunLoot(state, loot);
+        pushCombat(state, `Event resolved: cache forced. Took ${Math.max(1, Math.round(hit * 0.7))}. ${loot.name} added to the unsecured haul.`);
+        updateQuest(state, 'loot', 1);
+      } else if (choice === 'careful') {
+        addPendingRunGold(state, coin);
+        addPendingRunShards(state, shard);
+        pushCombat(state, `Event resolved: cache opened carefully. Unsecured +${formatMoney(coin)}, +${shard} shards.`);
+      } else {
+        pushCombat(state, 'Event resolved: you leave the lockbox untouched.');
+      }
+    } else if (event.id === 'ember_storm') {
+      if (choice === 'push') {
+        state.player.hp -= hit;
+        const beforeDepth = depthStageValue(state.run.floor);
+        state.run.floor = beforeDepth + 1;
+        state.run.zone = zoneName(state.run.floor);
+        state.run.danger = dangerRatingForDepth(state.run.floor);
+        state.player.depth = Math.max(state.player.depth, state.run.floor);
+        pushCombat(state, `Event resolved: you push through the ember storm. Took ${hit}. Advanced to ${runDepthLabel(state)}.`);
+      } else if (choice === 'harvest') {
+        addPendingRunEmber(state, 1);
+        addPendingRunShards(state, shard + 2);
+        pushCombat(state, `Event resolved: sparks harvested. Unsecured +1 ember, +${shard + 2} shards.`);
+      } else {
+        const heal = Math.max(2, Math.round(stats.guard * 0.12 + 4));
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + heal);
+        pushCombat(state, `Event resolved: you wait out the storm and recover ${heal} HP.`);
+      }
+    }
+
+    state.run.event = null;
+    state.run.choices = ['attack','guard','skill','extract'];
+    if (state.player.hp <= 0) defeat(state);
+    else nextEncounter(state);
+    return { saveNow:true, fullRender:true };
+  }
+
   function updateQuest(state, type, amount) {
     if (state?.run?.active) {
       addPendingQuestProgress(state, type, amount);

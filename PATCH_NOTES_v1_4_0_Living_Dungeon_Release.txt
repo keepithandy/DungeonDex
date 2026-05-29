@@ -1,0 +1,31 @@
+DungeonDex v1.4.0 — Living Dungeon Release
+
+Release theme:
+The dungeon now feels more alive, more readable, and more presentation-complete. This release consolidates the last seven polish/system passes into one clean 1.4 milestone package instead of shipping a folder full of scattered pass notes.
+
+Consolidated passes:
+- v1.3.53 — Monster District Backdrop Pass
+- v1.3.54 — District Monster Backdrop / New Player Card Polish
+- v1.3.55 — Combat Presence & Encounter Identity
+- v1.3.56 — Dungeon Atmosphere Pass
+- v1.3.57 — Monster Identity & Elite Behavior
+- v1.3.58 — Run Event System
+- v1.3.59 — Audio & Impact Polish
+
+Major additions:
+- District-driven combat atmosphere and backdrop direction.
+- Stronger monster-stage presentation and encounter mood.
+- Combat presence hooks for enemy cues, elite presence, and threat readability.
+- Dungeon atmosphere strip with mood language and depth-pressure styling.
+- Monster archetype hooks for Brute, Ritualist, Skulker, Ashbound, Mireborn, Furnace Spawn, Hollowed, and Warden-style identity.
+- Lightweight Run Event System with quick choices, rewards, risks, and dungeon incidents.
+- Optional impact/audio helper hooks for hit feedback, elite stingers, reward reveals, and heavy-impact polish.
+- Reduced-motion safeguards for newer animation hooks.
+
+Player-facing summary:
+DungeonDex now has a clearer 1.4 identity: descend, survive, make quick dungeon decisions, read enemy threats faster, and feel the district atmosphere shift as the run deepens.
+
+Cleanup:
+- Removed old scattered release/smoke/review/audit notes from prior 1.3.x passes.
+- Replaced them with this consolidated 1.4.0 patch note.
+- Updated visible version/cache references to v1.4.0.

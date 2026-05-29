@@ -145,3 +145,20 @@
     return `<div class="shop-item"><div class="split"><div><div class="item-name ${rarityClass(item.rarity)}">${item.name}</div><div class="item-meta">${meta}</div></div><span class="pill ${rarityClass(item.rarity)}">${item.rarity}</span></div><div class="tag-row">${tags}</div><p class="small">${item.summary || ''}</p><div class="item-actions"><button class="primary mini" data-buy="${item.id}">Buy</button></div></div>`;
   }
 
+
+
+// v1.4.0 Monster Identity & Elite Behavior Pass
+window.DD_MONSTER_ARCHETYPES = [
+  "Brute","Ritualist","Skulker","Ashbound",
+  "Mireborn","Furnace Spawn","Hollowed","Warden"
+];
+
+window.ddGetMonsterCue = function(name){
+  const cues = [
+    "The creature watches silently.",
+    "Ash drifts from the enemy's armor.",
+    "A hostile presence fills the chamber.",
+    "The monster prepares to strike."
+  ];
+  return cues[Math.floor(Math.random()*cues.length)];
+};

@@ -77,6 +77,93 @@
     return ['combat-backdrop', `combat-backdrop--${kind}`, legacyClass, tierClass].filter(Boolean).join(' ');
   }
 
+
+
+  function combatPersonalityKind(monster, district, depth) {
+    const key = combatBackdropToken([
+      monster?.id,
+      monster?.name,
+      monster?.family,
+      monster?.type,
+      monster?.affix,
+      monster?.skill,
+      district?.id,
+      district?.name,
+      district?.tone,
+      depth
+    ].filter(Boolean).join(' '));
+    if (combatBackdropHas(key, ['cultist', 'chapel', 'blood', 'ritual', 'blacktithe', 'hex'])) return 'ritualist';
+    if (combatBackdropHas(key, ['construct', 'forge', 'furnace', 'salt', 'kiln', 'guardbreak'])) return 'construct';
+    if (combatBackdropHas(key, ['mire', 'venom', 'spitter', 'slime', 'swamp', 'frostbit'])) return 'mireborn';
+    if (combatBackdropHas(key, ['shade', 'watcher', 'dread', 'lantern', 'seer', 'noctis'])) return 'shade';
+    if (combatBackdropHas(key, ['harpy', 'wing', 'feather', 'rookery', 'rafter'])) return 'winged';
+    if (combatBackdropHas(key, ['boss', 'warden', 'knight', 'brute', 'rage', 'beast', 'husk', 'ghoul'])) return 'brute';
+    return 'stalker';
+  }
+
+  function combatPersonalityLine(kind, monster) {
+    const skill = monster?.skill ? escapeHtml(monster.skill) : 'basic strike';
+    const lines = {
+      ritualist: `Chants under the hit window • ${skill}`,
+      construct: `Gears lock before impact • ${skill}`,
+      mireborn: `Wet movement, delayed bite • ${skill}`,
+      shade: `Lantern-flicker evasive rhythm • ${skill}`,
+      winged: `Airborne feint pattern • ${skill}`,
+      brute: `Heavy wind-up, hard contact • ${skill}`,
+      stalker: `Low stance, quick pressure • ${skill}`
+    };
+    return lines[kind] || lines.stalker;
+  }
+
+
+  function dungeonAtmosphereProfile(state, district, depth, monster) {
+    const safeDepth = Math.max(1, Math.floor(numberOr(depth ?? state?.run?.floor, 1, 1, 999999)));
+    const meta = depthProgressMeta(safeDepth);
+    const kind = combatBackdropKind(state, district, safeDepth, monster);
+    const pressure = safeDepth >= 120 ? 'abyssal' : safeDepth >= 80 ? 'grave' : safeDepth >= 40 ? 'deep' : safeDepth >= 15 ? 'pressured' : 'fresh';
+    const chapterMood = meta.chapter >= DEPTH_CHAPTERS_PER_ROOM - 1 ? 'last-chapter' : meta.chapter <= 2 ? 'fresh-room' : 'mid-room';
+    const floorMood = meta.room === DEPTH_ROOMS_PER_FLOOR && meta.chapter >= DEPTH_CHAPTERS_PER_ROOM - 1 ? 'floor-edge' : meta.room >= DEPTH_ROOMS_PER_FLOOR - 1 ? 'near-floor' : 'normal-floor';
+    const districtName = district?.name || 'The Hollow Stair';
+    const lines = {
+      lowfire: ['Lowfire soot drifts through the stairwell.', 'Old lamps pop in the ash behind you.', 'Warm dust settles on the weapon grip.'],
+      veyruhn: ['Forge heat leaks through the stone ribs.', 'A chain ticks somewhere below the landing.', 'Red iron light crawls over the floor.'],
+      mireglass: ['Wet glass haze beads along the walls.', 'The stair sounds softer than it should.', 'Black water reflects the monster before you move.'],
+      'red-chapel': ['Prayer smoke gathers around the arena edge.', 'The stone tastes of rust and candle-wax.', 'A red hush presses against the fight.'],
+      'salt-forge': ['Salt ash scratches across the platform.', 'Kiln breath rolls under the floor.', 'White mineral dust cuts the torchlight.'],
+      'sunken-court': ['Cold water knocks under the old court stones.', 'Drowned banners shift without wind.', 'Blue-black damp crawls up the walls.'],
+      rookery: ['Rafters creak above the landing.', 'Loose feathers spin in the stale updraft.', 'The ceiling answers every footstep.'],
+      noctis: ['Lanternless glass drinks the light.', 'The dark narrows into a listening shape.', 'Noctis dust floats like spent stars.'],
+      generic: ['The Hollow Stair folds another chamber into place.', 'The dungeon air tightens around the fight.', 'Loose stone dust falls into the dark.']
+    };
+    const pool = lines[kind] || lines.generic;
+    const line = pool[(safeDepth + meta.room + meta.chapter) % pool.length];
+    const pressureLine = pressure === 'abyssal' ? 'Abyssal pressure: every victory feels borrowed.'
+      : pressure === 'grave' ? 'Grave pressure: the descent is actively pushing back.'
+      : pressure === 'deep' ? 'Deep pressure: rewards improve, but breathing room is thinner.'
+      : pressure === 'pressured' ? 'Pressure rising: rooms start to feel less forgiving.'
+      : 'Fresh descent: the Stair is still measuring you.';
+    return { kind, pressure, chapterMood, floorMood, districtName, line, pressureLine };
+  }
+
+  function dungeonAtmosphereClasses(profile) {
+    return [
+      'living-dungeon',
+      `living-dungeon--${profile.kind}`,
+      `dungeon-pressure--${profile.pressure}`,
+      `dungeon-chapter--${profile.chapterMood}`,
+      `dungeon-floor--${profile.floorMood}`
+    ].join(' ');
+  }
+
+  function dungeonAtmosphereMarkup(profile, depth) {
+    const meta = depthProgressMeta(depth);
+    return `<div class="run-atmosphere-strip ${dungeonAtmosphereClasses(profile)}" aria-label="Dungeon atmosphere">
+      <span class="atmosphere-sigil" aria-hidden="true">✦</span>
+      <div><strong>${escapeHtml(profile.districtName)}</strong><p>${escapeHtml(profile.line)}</p></div>
+      <span class="pill">F${format(meta.floor)} R${format(meta.room)} C${format(meta.chapter)}</span>
+    </div>`;
+  }
+
   function renderRun() {
     const runStatus = el('runStatus');
     const combatPanel = el('combatPanel');
@@ -103,6 +190,10 @@
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
     const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
+    const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
+    const personalityClass = `combat-personality--${personalityKind}`;
+    const personalityLine = combatPersonalityLine(personalityKind, monster);
+    const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
     const eliteMarkup = monster ? eliteModifierMarkup(monster) : '';
@@ -122,6 +213,29 @@
       return;
     }
 
+
+    if (S.run.event) {
+      const event = S.run.event;
+      const options = asArray(event.options, []).map(option => `
+        <button class="ghost run-event-choice" data-run-event="${escapeHtml(option.id)}">
+          <strong>${escapeHtml(option.label)}</strong>
+          <span>${escapeHtml(option.detail || '')}</span>
+        </button>`).join('');
+      combatPanel.innerHTML = `
+        <div class="combat-device-shell run-event-shell ${shellTone}" aria-label="Run event">
+          <section class="run-event-card ${dungeonAtmosphereClasses(atmosphereProfile)}">
+            <div class="depth-kicker">${escapeHtml(event.kicker || 'Run Event')} • ${escapeHtml(event.zone || runDistrict.name)}</div>
+            <h2>${escapeHtml(event.title || 'Dungeon Incident')}</h2>
+            <p>${escapeHtml(event.text || 'The Hollow Stair interrupts the descent.')}</p>
+            <div class="run-event-choices">${options}</div>
+          </section>
+        </div>`;
+      combatLog.innerHTML = `
+        <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Decision</span></div></div>
+        <div class="run-log-list">${asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT).map(renderCombatFeedLine).join('')}</div>`;
+      return;
+    }
+
     runStatus.innerHTML = `
       <div class="combat-device-top ${shellTone}">
         <div class="combat-top-strip run-shell-top" aria-label="Run status">
@@ -135,19 +249,25 @@
           </div>
           <div class="depth-meter"><div style="width:${depthMeta.chapterPct.toFixed(1)}%"></div></div>
         </div>
+        ${dungeonAtmosphereMarkup(atmosphereProfile, depth)}
       </div>`;
 
     combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
-        <section class="combat-enemy-header">
+        <section class="combat-enemy-header ${personalityClass}">
           <div class="depth-kicker">${escapeHtml(enemyKicker)}</div>
           <h2>${escapeHtml(monster.name || 'Unknown Threat')}</h2>
           <p class="small muted">${escapeHtml(monster.family || 'Depthborn')} · ${escapeHtml(monster.skill || 'Basic attack')}</p>
+          <p class="combat-personality-cue">${personalityLine}</p>
           ${eliteMarkup}
           ${threatBrief}
         </section>
 
-        <section class="combat-monster-stage ${stageBackdropClasses} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
+        <section class="combat-monster-stage ${stageBackdropClasses} ${personalityClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
+          <div class="stage-atmosphere-grain" aria-hidden="true"></div>
+          <div class="stage-depth-veil ${dungeonAtmosphereClasses(atmosphereProfile)}" aria-hidden="true"></div>
+          <div class="stage-motes" aria-hidden="true"></div>
+          <div class="stage-drift" aria-hidden="true"></div>
           <div class="monster-aura"></div>
           <div class="monster-silhouette">
             <span class="monster-horns" aria-hidden="true"></span>

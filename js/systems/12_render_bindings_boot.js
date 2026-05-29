@@ -131,6 +131,23 @@
   }
 
   function bindCombatActions() {
+    $$('[data-run-event]').forEach(btn => {
+      const handler = (e) => {
+        if (e) e.preventDefault();
+        if (!S.run?.event) return;
+        btn.classList.add('tap-now');
+        window.setTimeout(() => btn.classList.remove('tap-now'), 90);
+        runCombatGuardedAction(() => {
+          const result = resolveRunEvent(S, btn.dataset.runEvent) || {};
+          if (result.fullRender || !S.run.active) render();
+          else renderCombatTick(!!result.saveNow);
+        });
+      };
+      btn.disabled = !S.run?.event;
+      btn.onclick = (e) => { if (e && e.detail !== 0) return; handler(e); };
+      btn.onpointerdown = handler;
+    });
+
     $$('[data-action]').forEach(btn => {
       const handler = (e) => {
         if (e) e.preventDefault();
@@ -293,3 +310,20 @@
   bindStatic();
   render();
   showIntroModalOnce();
+
+
+// v1.4.0 Monster Identity & Elite Behavior Pass
+window.DD_MONSTER_ARCHETYPES = [
+  "Brute","Ritualist","Skulker","Ashbound",
+  "Mireborn","Furnace Spawn","Hollowed","Warden"
+];
+
+window.ddGetMonsterCue = function(name){
+  const cues = [
+    "The creature watches silently.",
+    "Ash drifts from the enemy's armor.",
+    "A hostile presence fills the chamber.",
+    "The monster prepares to strike."
+  ];
+  return cues[Math.floor(Math.random()*cues.length)];
+};
