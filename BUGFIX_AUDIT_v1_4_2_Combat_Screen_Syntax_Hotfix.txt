@@ -1,0 +1,26 @@
+DungeonDex v1.4.2 — Combat Screen Syntax Hotfix Audit
+
+Issue found:
+- js/systems/11_ui_run_gear_dex_archive.js failed JavaScript syntax validation.
+- The function dungeonAtmosphereMarkup(profile, depth) contained leftover raw HTML after the atmosphere strip removal pass.
+- Browser error:
+  SyntaxError: Unexpected token '<'
+
+Impact:
+- The UI/render system file stops loading.
+- renderRun() never becomes available.
+- Combat screen appears missing/broken even though the rest of the package may load.
+
+Fix applied:
+- Replaced dungeonAtmosphereMarkup(profile, depth) with a safe empty return:
+  function dungeonAtmosphereMarkup(profile, depth) { return ''; }
+
+Why this is correct:
+- v1.4.1 intentionally removed the top atmosphere strip.
+- Existing combat backgrounds, run events, and Living Dungeon systems do not need this markup.
+- Returning an empty string preserves caller compatibility without reintroducing the removed panel.
+
+Checks:
+- node --check passed for all JavaScript files after the fix.
+- sw.js syntax passed.
+- No package restructure was performed.

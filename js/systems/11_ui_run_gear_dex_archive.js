@@ -155,11 +155,7 @@
   }
 
   function dungeonAtmosphereMarkup(profile, depth) {
-    const meta = depthProgressMeta(depth);
-      <span class="atmosphere-sigil" aria-hidden="true">✦</span>
-      <div><strong>${escapeHtml(profile.districtName)}</strong><p>${escapeHtml(profile.line)}</p></div>
-      <span class="pill">F${format(meta.floor)} R${format(meta.room)} C${format(meta.chapter)}</span>
-    </div>`;
+    return '';
   }
 
   function renderRun() {

@@ -1,0 +1,9 @@
+DungeonDex v1.4.2a — Combat Screen Syntax Hotfix
+
+Fixed:
+- Combat screen could disappear because the run UI system failed to parse.
+- Removed leftover raw atmosphere-strip HTML from dungeonAtmosphereMarkup().
+- Preserved v1.4.2 Sootveil Mythic Set work and item level cap changes.
+
+Verification:
+- All JavaScript files pass syntax checks.
