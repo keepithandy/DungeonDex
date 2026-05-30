@@ -1,0 +1,16 @@
+DungeonDex v1.4.5 - DevTools Foundation Pass
+
+Visible title:
+- DungeonDex v1.4.5
+
+Summary:
+- Added a hidden internal DevTools overlay for faster system testing.
+- DevTools stays hidden for normal players unless enabled with ?dev=1 or the version-label gesture.
+- Added Save Inspector, Run Controls, Economy Tools, Loot Tools, Player Tools, Debug Snapshot, and Error Log sections.
+- DevTools actions are guarded and rerender/save through existing game paths where available.
+- Added compact snapshot export for version, floor, district, player stats, currency, gear level, enemy/drop context, screen state, and recent DevTools warnings/errors.
+
+Safety notes:
+- Existing save key is preserved.
+- DevTools enablement uses session-only state and does not alter the save format.
+- Missing optional hooks log warnings inside DevTools and to the console instead of crashing the normal UI.

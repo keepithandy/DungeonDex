@@ -1,0 +1,21 @@
+DungeonDex v1.4.5 - DevTools Foundation Pass Smoke Test Notes
+
+Checklist:
+- can enter dungeon
+- can open DevTools with ?dev=1
+- can jump floors
+- can add gold
+- can full heal
+- can spawn test item
+- can export snapshot
+- normal players do not see DevTools by default
+
+Suggested checks:
+1. Load index.html without query params and confirm no DevTools panel appears.
+2. Load index.html?dev=1 and confirm the dark DevTools panel appears.
+3. Start or continue a run, then use +1 floor and Next Boss to verify run state rerenders.
+4. Use Add 1g and confirm wallet values update.
+5. Damage the player or set HP low, then use Full Heal.
+6. Spawn one rare or better item and confirm it appears in inventory.
+7. Use Copy Snapshot or Display Snapshot and confirm a compact report is shown.
+8. Use Hide, reload without ?dev=1, and confirm DevTools stays hidden.

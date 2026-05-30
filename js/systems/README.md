@@ -16,6 +16,7 @@ It preserves classic browser script load order instead of converting the game to
 - `10_ui_town_shop.js` — Elite contract board, town panels, district wares, shop cards.
 - `11_ui_run_gear_dex_archive.js` — Run, gear, inventory, Dex, archive renderers.
 - `12_render_bindings_boot.js` — Sticky bar, render loop, guarded actions, bindings, audits, boot.
+- `13_devtools_overlay.js` — Hidden internal DevTools overlay for save inspection, run controls, test loot, snapshots, and error logs.
 
 Notes:
 - `index.html` now loads these files directly in order.
