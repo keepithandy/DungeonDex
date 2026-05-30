@@ -63,6 +63,26 @@
     </div>`;
   }
 
+
+  function districtWalletMarkup(state) {
+    const wallet = formatMoney(state.player.gold || 0);
+    const pending = state.run?.active ? pendingRunRewardSummary(ensurePendingRunRewards(state)) : '';
+    const pendingLine = pending ? `<span class="district-wallet-pending">Run haul held: ${pending}</span>` : '<span class="district-wallet-pending muted">No unsecured haul banked.</span>';
+    return `<div class="district-wallet-card" aria-label="Warden currency wallet">
+      <div class="district-wallet-head">
+        <div>
+          <span class="district-wallet-title">Warden's Purse</span>
+          <small>Lowfire tender</small>
+        </div>
+        <strong class="district-wallet-money">${wallet}</strong>
+      </div>
+      <div class="district-wallet-meta">
+        ${pendingLine}
+        <span class="district-wallet-extra">Shards ${format(state.player.shards || 0)} • Ember ${format(state.player.ember || 0)}</span>
+      </div>
+    </div>`;
+  }
+
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
     const stagedStartDepth = defaultRunStartDepth(S);
@@ -75,6 +95,7 @@
     }
     if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
     if (el('districtLine')) el('districtLine').innerHTML = `Next descent starts at ${escapeHtml(depthShortLabel(stagedStartDepth))}. Lowfire banks the haul; the Stair opens back into ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
+    if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {

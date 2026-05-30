@@ -1,0 +1,8 @@
+DungeonDex v1.4.3b — Smoke Test Notes
+
+Checked:
+- Town loads with Lowfire District banner.
+- Warden's Purse card renders inside the district panel.
+- Wallet uses formatMoney() instead of hardcoded coin logic.
+- Run pending reward summary remains optional and only appears while active.
+- Trophy Hall asset path remains unchanged.

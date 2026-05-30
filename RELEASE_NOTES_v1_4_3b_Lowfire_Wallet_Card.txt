@@ -1,0 +1,11 @@
+DungeonDex v1.4.3b — Lowfire Wallet Card
+
+Added a compact Warden's Purse currency card to the Lowfire District town banner.
+
+Changes:
+- Added a Lowfire District wallet slot under the district flavor line.
+- Displays secured coin using the existing gold/silver/copper formatter.
+- Shows current run held rewards when a run is active.
+- Shows shards and ember in the same compact card.
+- Updated cache/build labels for the itch HTML package.
+- Preserved v1.4.3a Trophy Hall real icon asset work.
