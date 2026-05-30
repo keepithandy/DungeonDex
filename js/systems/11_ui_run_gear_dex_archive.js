@@ -654,7 +654,6 @@
 
   function renderArchive() {
     if (!el('archivePanel') || !el('settingsPanel')) return;
-    const buildSlug = typeof BUILD !== 'undefined' ? BUILD : 'Unavailable';
     const history = asArray(S.player.runHistory, []).filter(isPlainObject).slice(0, 12);
     const historyMarkup = history.map(rawEntry => {
       const r = rawEntry || {};
@@ -713,20 +712,11 @@
       <div class="list archive-log-list">${archiveLines}</div>`;
 
     el('settingsPanel').innerHTML = `
-      <div class="build-tools-panel">
-        <h2>Build Tools</h2>
-        <div class="tag-row">
-          <span class="pill">${escapeHtml(VISIBLE_VERSION_LABEL)}</span>
-          <span class="pill mono build-slug-pill">${escapeHtml(buildSlug)}</span>
-        </div>
-        <p class="small muted">Useful for itch cache fixes, bug reports, and quick recovery.</p>
-        <div class="tag-row build-tool-actions">
-          <button class="ghost mini" id="clearCacheReloadBtn" type="button">Clear Cache & Reload</button>
-          <button class="ghost mini" id="exportSaveBtn" type="button">Export Save</button>
-          <button class="ghost mini" id="copyBuildInfoBtn" type="button">Copy Build Info</button>
-        </div>
-      </div>
+      <h2>System Notes</h2>
+      <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
+      <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
-      <h3>System Log</h3>
+      <button class="ghost mini" id="clearCacheReloadBtn" type="button">Clear Cache & Reload</button>
+      <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }

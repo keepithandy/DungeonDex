@@ -430,21 +430,6 @@ select, input {
 }
 .small { font-size: 0.76rem; }
 .sep { height: 1px; background: var(--line); margin: 8px 0; }
-.build-tools-panel { display: grid; gap: 8px; }
-.build-slug-pill { max-width: 100%; white-space: normal; overflow-wrap: anywhere; line-height: 1.25; }
-.build-tool-actions .mini { flex: 1 1 140px; min-width: 0; }
-.build-info-fallback {
-  width: 100%;
-  min-height: 150px;
-  margin-top: 8px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: rgba(0,0,0,0.28);
-  color: var(--text);
-  padding: 10px;
-  font: 0.72rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
-  resize: vertical;
-}
 @media (max-width: 720px) {
   .hero-main, .grid-2, .compact-grid { grid-template-columns: 1fr 1fr; }
   .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
