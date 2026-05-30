@@ -218,6 +218,27 @@
     if (el('searchFilter')) el('searchFilter').oninput = (e) => { S.filters.search = e.target.value; refreshInventoryOnly(); };
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startCharterRun(S, btn.dataset.charterStart); render(); }));
     if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { startRun(S); render(); });
+    if (el('clearCacheReloadBtn')) el('clearCacheReloadBtn').onclick = clearCacheAndReload;
+  }
+
+  function clearCacheAndReload() {
+    const tasks = [];
+    const reload = () => window.location.reload();
+    const btn = el('clearCacheReloadBtn');
+    if (btn) btn.disabled = true;
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      tasks.push(navigator.serviceWorker.getRegistrations()
+        .then(registrations => Promise.all(registrations.map(registration => registration.unregister()))));
+    }
+    if (window.caches && window.caches.keys) {
+      tasks.push(window.caches.keys()
+        .then(keys => Promise.all(keys.map(key => window.caches.delete(key)))));
+    }
+    if (!tasks.length) {
+      reload();
+      return;
+    }
+    Promise.allSettled(tasks).finally(reload);
   }
 
   function escapeHtml(s) {

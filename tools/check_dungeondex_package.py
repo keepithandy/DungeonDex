@@ -14,6 +14,36 @@ from urllib.parse import unquote, urlsplit
 REQUIRED_FILES = ("index.html", "app.js", "styles.css")
 LOCAL_ATTRS = {"href", "src"}
 SKIP_SCHEMES = {"data", "blob", "mailto", "tel", "javascript", "http", "https"}
+OLD_VERSION_RE = re.compile(
+    r"(?:dungeon-dex-v?1[.]4[.]3b|v1[.]4[.]3b|1[.]4[.]3b(?:-[a-z0-9-]+)?)",
+    re.IGNORECASE,
+)
+VERSION_SCAN_IGNORED_DIRS = {
+    ".git",
+    ".cache",
+    ".mypy_cache",
+    ".parcel-cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".vite",
+    "__pycache__",
+    "node_modules",
+}
+VERSION_SCAN_IGNORED_SUFFIXES = {
+    ".zip",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".ico",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".pyc",
+}
+NOTE_FILE_PREFIXES = ("RELEASE_NOTES_", "SMOKE_TEST_NOTES_", "PATCH_NOTES_", "BUGFIX_AUDIT_")
 
 
 class LocalReferenceParser(HTMLParser):
@@ -117,6 +147,42 @@ def sw_asset_refs(sw_text: str) -> list[tuple[str, str]]:
     return [(ref, "sw.js ASSETS") for ref in re.findall(r"['\"]([^'\"]+)['\"]", match.group(1))]
 
 
+def is_index_script_or_style(rel_path: str, source: str) -> bool:
+    suffix = Path(rel_path).suffix.lower()
+    return source.startswith("index.html <script") or suffix in {".js", ".css"}
+
+
+def skip_version_scan(path: Path) -> bool:
+    if any(part in VERSION_SCAN_IGNORED_DIRS for part in path.parts):
+        return True
+    if path.suffix.lower() in VERSION_SCAN_IGNORED_SUFFIXES:
+        return True
+    if path.suffix.lower() == ".txt" and path.name.startswith(NOTE_FILE_PREFIXES):
+        return True
+    return False
+
+
+def old_version_warnings(root: Path) -> list[str]:
+    warnings: list[str] = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or skip_version_scan(path):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        except OSError as exc:
+            warnings.append(f"could not scan {path.relative_to(root).as_posix()}: {exc}")
+            continue
+        rel_path = path.relative_to(root).as_posix()
+        for line_no, line in enumerate(text.splitlines(), 1):
+            match = OLD_VERSION_RE.search(line)
+            if match:
+                warnings.append(f"{rel_path}:{line_no} contains stale pre-1.4.3c string: {match.group(0)}")
+                break
+    return warnings
+
+
 def main() -> int:
     root = project_root()
     checked: list[tuple[str, str, bool]] = []
@@ -145,7 +211,9 @@ def main() -> int:
             if Path(rel_path).name == "sw.js":
                 sw_referenced = True
             ok = add_checked(checked, seen, root, rel_path, source)
-            if not ok and Path(rel_path).name not in {"manifest.json", "sw.js"}:
+            if not ok and is_index_script_or_style(rel_path, source):
+                missing_required.append(f"{source} references missing script/style: {rel_path}")
+            elif not ok and Path(rel_path).name not in {"manifest.json", "sw.js"}:
                 warnings.append(f"{source} references missing local asset: {rel_path}")
 
         if "app.js" not in {Path(ref).name for ref in normalized_index_refs}:
@@ -180,7 +248,9 @@ def main() -> int:
         for raw_ref, source in sw_asset_refs(sw_path.read_text(encoding="utf-8")):
             rel_path = normalize_local_ref(raw_ref)
             if rel_path and not add_checked(checked, seen, root, rel_path, source):
-                warnings.append(f"{source} references missing local asset: {rel_path}")
+                missing_required.append(f"{source} references missing local asset: {rel_path}")
+
+    warnings.extend(old_version_warnings(root))
 
     print("DungeonDex package check")
     print(f"Root: {root}")

@@ -1,0 +1,16 @@
+DungeonDex v1.4.3c - Release Guard & Cache Cleanup
+
+Scope:
+- Updated the visible version label to DungeonDex v1.4.3c.
+- Updated the build/cache slug to 1.4.3c-release-guard-cache-cleanup across index.html and sw.js.
+- Cleaned sw.js so it only handles install, activate, fetch, and cache behavior.
+- Added a small Archive/Settings button labeled Clear Cache & Reload.
+- Added release zip tooling for DungeonDex_v1_4_3c_Release_Guard_Cache_Cleanup.zip.
+- Improved the package guard so it verifies index scripts/styles, sw.js cached assets, and stale pre-1.4.3c strings outside historical notes.
+
+Preserved:
+- Trophy Hall, boss trophy unlocks, and trophy image asset wiring.
+- Lowfire wallet card.
+- Sootveil mythic set.
+- Current item level cap and depth progression behavior.
+- Save data structure and gameplay balance.

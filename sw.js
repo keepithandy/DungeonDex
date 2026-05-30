@@ -1,23 +1,23 @@
-const CACHE_NAME = 'dungeon-dex-v1.4.3b-trophy-hall-wallet';
+const CACHE_NAME = 'dungeon-dex-1.4.3c-release-guard-cache-cleanup';
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?build=1.4.3b-trophy-hall-wallet',
-  './app.js?build=1.4.3b-trophy-hall-wallet',
+  './styles.css?build=1.4.3c-release-guard-cache-cleanup',
+  './app.js?build=1.4.3c-release-guard-cache-cleanup',
   './manifest.json',
-  './js/systems/00_core_constants_data.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/01_state_recovery.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/02_currency_pending_rewards.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/03_town_contracts_market.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/04_depth_progression_charters.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/05_elite_modifiers.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/06_scaling_generation_audits.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/07_player_combat_runtime.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/08_normalization_save.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/09_ui_common_intro.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/10_ui_town_shop.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/11_ui_run_gear_dex_archive.js?build=1.4.3b-trophy-hall-wallet',
-  './js/systems/12_render_bindings_boot.js?build=1.4.3b-trophy-hall-wallet',
+  './js/systems/00_core_constants_data.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/01_state_recovery.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/02_currency_pending_rewards.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/03_town_contracts_market.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/04_depth_progression_charters.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/05_elite_modifiers.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/06_scaling_generation_audits.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/07_player_combat_runtime.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/08_normalization_save.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/09_ui_common_intro.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/10_ui_town_shop.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/11_ui_run_gear_dex_archive.js?build=1.4.3c-release-guard-cache-cleanup',
+  './js/systems/12_render_bindings_boot.js?build=1.4.3c-release-guard-cache-cleanup',
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
@@ -44,21 +44,3 @@ self.addEventListener('fetch', (event) => {
   }
   event.respondWith(caches.match(event.request).then(found => found || fetch(event.request)));
 });
-
-
-// v1.4.3 Trophy Hall First Look Pass
-const DD_SW_GLOBAL = typeof window !== 'undefined' ? window : self;
-DD_SW_GLOBAL.DD_MONSTER_ARCHETYPES = [
-  "Brute","Ritualist","Skulker","Ashbound",
-  "Mireborn","Furnace Spawn","Hollowed","Warden"
-];
-
-DD_SW_GLOBAL.ddGetMonsterCue = function(name){
-  const cues = [
-    "The creature watches silently.",
-    "Ash drifts from the enemy's armor.",
-    "A hostile presence fills the chamber.",
-    "The monster prepares to strike."
-  ];
-  return cues[Math.floor(Math.random()*cues.length)];
-};

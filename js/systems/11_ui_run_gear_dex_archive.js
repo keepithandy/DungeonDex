@@ -648,7 +648,7 @@
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. The deeper the Stair gets, the nastier the case becomes.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
       <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>`;
-    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">First-look 1.4.3 trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
+    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Boss trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
     el('gearDex').innerHTML = `<h2>Retired Relics</h2><p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p><div class="empty-relic-shelf"><span>Relic shelf sealed</span><small>Retire-item system not active yet.</small></div>`;
   }
 
@@ -715,6 +715,8 @@
       <h2>System Notes</h2>
       <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
       <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
+      <div class="sep"></div>
+      <button class="ghost mini" id="clearCacheReloadBtn" type="button">Clear Cache & Reload</button>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }
