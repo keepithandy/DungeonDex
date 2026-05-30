@@ -219,6 +219,8 @@
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startCharterRun(S, btn.dataset.charterStart); render(); }));
     if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { startRun(S); render(); });
     if (el('clearCacheReloadBtn')) el('clearCacheReloadBtn').onclick = clearCacheAndReload;
+    if (el('exportSaveBtn')) el('exportSaveBtn').onclick = exportSavePayload;
+    if (el('copyBuildInfoBtn')) el('copyBuildInfoBtn').onclick = copyBuildInfo;
   }
 
   function clearCacheAndReload() {
@@ -239,6 +241,145 @@
       return;
     }
     Promise.allSettled(tasks).finally(reload);
+  }
+
+  function readLocalSavePayload() {
+    try {
+      if (typeof localStorage === 'undefined') return '';
+      return localStorage.getItem(STORAGE_KEY) || '';
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function safePlainMoney(value) {
+    try {
+      return stripHtml(formatMoney(value || 0));
+    } catch (err) {
+      return `${Math.max(0, Math.floor(Number(value) || 0))} copper`;
+    }
+  }
+
+  function diagnosticDepthText(value) {
+    const depth = Math.floor(Number(value) || 0);
+    if (depth <= 0) return 'Unavailable';
+    try {
+      return depthWithRawLabel(depth);
+    } catch (err) {
+      return `Depth ${depth}`;
+    }
+  }
+
+  function setTemporaryButtonText(id, text) {
+    const btn = el(id);
+    if (!btn) return;
+    const original = btn.dataset.originalText || btn.textContent;
+    btn.dataset.originalText = original;
+    btn.textContent = text;
+    window.setTimeout(() => {
+      if (btn.dataset.originalText) btn.textContent = btn.dataset.originalText;
+    }, 1800);
+  }
+
+  function showManualTextFallback(title, text) {
+    const host = el('settingsPanel') || document.body;
+    let box = el('buildInfoFallback');
+    if (!box && document.createElement) {
+      box = document.createElement('textarea');
+      box.id = 'buildInfoFallback';
+      box.className = 'build-info-fallback';
+      box.readOnly = true;
+      host.appendChild(box);
+    }
+    if (box) {
+      box.value = text;
+      box.hidden = false;
+      box.focus();
+      box.select();
+      if (window.alert) window.alert(`${title} is shown below for manual copy.`);
+      return;
+    }
+    if (window.prompt) window.prompt(title, text);
+  }
+
+  function copyTextWithFallback(text, title, buttonId) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => setTemporaryButtonText(buttonId, 'Copied'))
+        .catch(() => {
+          showManualTextFallback(title, text);
+          setTemporaryButtonText(buttonId, 'Shown Below');
+        });
+      return;
+    }
+    showManualTextFallback(title, text);
+    setTemporaryButtonText(buttonId, 'Shown Below');
+  }
+
+  function exportSavePayload() {
+    const payload = readLocalSavePayload();
+    if (!payload) {
+      showManualTextFallback('DungeonDex save export', 'No localStorage save payload was found for this browser profile.');
+      setTemporaryButtonText('exportSaveBtn', 'No Save Found');
+      return;
+    }
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = `dungeondex-save-${stamp}.json`;
+    try {
+      if (typeof Blob !== 'undefined' && window.URL && window.URL.createObjectURL && document.createElement) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => window.URL.revokeObjectURL(url), 0);
+        setTemporaryButtonText('exportSaveBtn', 'Downloaded');
+        return;
+      }
+    } catch (err) {
+      console.warn('DungeonDex save download fallback used:', err);
+    }
+    copyTextWithFallback(payload, 'DungeonDex save export', 'exportSaveBtn');
+  }
+
+  function buildDiagnosticReport() {
+    const payload = readLocalSavePayload();
+    const player = isPlainObject(S?.player) ? S.player : {};
+    const run = isPlainObject(S?.run) ? S.run : {};
+    const currentDepth = run.active ? run.floor : 0;
+    const bestDepth = Math.max(
+      Math.floor(Number(player.depth) || 0),
+      Math.floor(Number(player.safeExtractDepth) || 0),
+      Math.floor(Number(player.returnDepth) || 0)
+    );
+    const inventoryCount = Array.isArray(player.inventory) ? player.inventory.length : 'Unavailable';
+    const wallet = [
+      `Gold ${safePlainMoney(player.gold)}`,
+      `Shards ${format(Math.max(0, Math.floor(Number(player.shards) || 0)))}`,
+      `Ember ${format(Math.max(0, Math.floor(Number(player.ember) || 0)))}`,
+      `Forge Spark ${format(Math.max(0, Math.floor(Number(player.forgeSpark) || 0)))}`
+    ].join('; ');
+
+    return [
+      'DungeonDex Build Info',
+      `Version: ${VISIBLE_VERSION_LABEL}`,
+      `Cache/build slug: ${typeof BUILD !== 'undefined' ? BUILD : 'Unavailable'}`,
+      `Save exists: ${payload ? 'Yes' : 'No'}`,
+      `Current floor: ${diagnosticDepthText(currentDepth)}`,
+      `Best floor: ${bestDepth > 0 ? diagnosticDepthText(bestDepth) : 'Unavailable'}`,
+      `Inventory item count: ${inventoryCount}`,
+      `Wallet/currency: ${wallet}`,
+      `User agent: ${navigator.userAgent || 'Unavailable'}`,
+      `Timestamp: ${new Date().toISOString()}`
+    ].join('\n');
+  }
+
+  function copyBuildInfo() {
+    copyTextWithFallback(buildDiagnosticReport(), 'DungeonDex build info', 'copyBuildInfoBtn');
   }
 
   function escapeHtml(s) {
