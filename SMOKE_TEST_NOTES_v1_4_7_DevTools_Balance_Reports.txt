@@ -1,0 +1,41 @@
+DungeonDex v1.4.7 — DevTools Balance Reports QA Notes
+
+Checklist:
+1. Pull latest repo changes.
+2. Open the game normally.
+   Expected: DevTools remains hidden.
+3. Open with the dev query parameter enabled.
+   Expected: DevTools opens.
+4. Confirm these internal sections appear:
+   - Scenario Presets
+   - Balance Reports
+5. Apply a scenario preset, then run:
+   - Run 10-Fight Report
+   - Run 100-Fight Report
+   - Loot 100 Rolls
+   - Economy Snapshot
+   - Scaling Snapshot
+   - Boss Check
+6. Confirm each report displays readable text in the Balance Reports panel.
+7. Use Copy Report.
+   Expected: latest report is copied when browser clipboard access is available.
+8. Recheck existing DevTools controls:
+   - floor jump
+   - add currency
+   - spawn item
+   - display snapshot
+9. Recheck Scenario Presets:
+   - Fresh Lowfire
+   - Floor 40 Mythic Unlock
+   - Deep Scaling Floor 1000
+   - Restore Last Backup
+10. Recheck normal gameplay:
+   - enter dungeon
+   - use combat controls
+   - open gear screen
+   - save and reload
+
+Notes:
+- Balance reports are approximate probes, not exact combat engine replays.
+- Use reports to compare presets against each other, not as final mathematical truth.
+- Reports are internal only and should not appear in the normal player flow.
