@@ -1,0 +1,16 @@
+DungeonDex v1.4.8 — Relic Forge Crafting Smoke Test
+
+Manual checks:
+1. Hard refresh / clear cache after deployment.
+2. Town should show DungeonDex v1.4.8.
+3. Relic Forge panel should show Spark, Shards, Ember, Favor, and Tier.
+4. Random forge should still use the old Forge button binding and produce a rare-or-better item when the player has 1 spark and 40 shards.
+5. Focused Forge slot buttons should create gear for the selected slot when the player has 1 spark, 75 shards, and 1 ember.
+6. Salvage Junk should only affect safe common/uncommon unequipped items and should not touch equipped, favorite, locked, protected, or special items.
+7. Temper buttons should appear only for equipped items.
+8. Tempering should consume shards and ember, add +temper count, raise level/rating/stats/value, and write a log entry.
+9. Save/reload should preserve forgeTier, relicFavor, crafted items, and tempered items.
+10. Run, Gear, Trophy Hall, Archive, market buying, rest, and elite contracts should still render.
+
+Known note:
+The service worker cache was bumped and simplified for this pass. If itch shows stale content, use the in-game cache clear button or browser hard refresh.
