@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.4.8b - Relic Forge clarity/lore overlay.
+// DungeonDex v1.4.9a - Relic Forge clarity/lore overlay.
 (function(){
   if (window.DDRelicForgeClarity) return;
   window.DDRelicForgeClarity = true;
@@ -42,18 +42,6 @@
     return { shards: 50 + tier * 10 + count * 22, ember: 1 + Math.floor(count / 2) };
   }
 
-  function materialGuideMarkup(){
-    return `<div class="forge-help forge-material-guide">
-      <strong>How to farm forge materials</strong>
-      <ul>
-        <li><b>Spark</b> - ignition key. Earn from Warden Objectives and special forge rewards.</li>
-        <li><b>Shards</b> - broken relic metal. Salvage spare gear or collect shard rewards from runs.</li>
-        <li><b>Ember</b> - heat for dangerous work. Earn from deeper rewards, bosses, objectives, and Lowfire support.</li>
-        <li><b>Favor</b> - Forge reputation. Gained by forging, salvaging, and tempering; raises Forge Tier.</li>
-      </ul>
-    </div>`;
-  }
-
   function temperButtonsMarkup(state){
     const rows = slotList().map(slot => ({ slot, item: state.player.equipment && state.player.equipment[slot] })).filter(row => row.item);
     if (!rows.length) return '<p class="small muted">Equip gear first. Tempering only works on worn items.</p>';
@@ -76,7 +64,6 @@
     <div class="tag-row forge-wallet">
       <span class="pill">Spark ${fmt(state.player.forgeSpark)}</span><span class="pill">Shards ${fmt(state.player.shards)}</span><span class="pill">Ember ${fmt(state.player.ember)}</span><span class="pill">Favor ${fmt(state.town.relicFavor)}</span>
     </div>
-    ${materialGuideMarkup()}
     <div class="sep"></div>
     <div class="forge-grid"><button class="primary" id="forgeBtn">Forge Random Relic<br><span>1 spark + 40 shards</span></button><button class="ghost" id="salvageForgeBtn">Salvage Junk<br><span>${safe} safe items</span></button></div>
     <p class="small muted forge-note">Random Forge is the cheap option: spend a spark and shards to roll a rare-or-better relic from any slot.</p>
@@ -84,16 +71,16 @@
     <p class="small forge-explain"><strong>Focused Forge:</strong> choose the gear slot before the relic is made. The exact name, rarity, and stats still roll randomly. Costs 1 spark + 75 shards + 1 ember because you are forcing the shape of the relic.</p>
     <div class="forge-grid forge-slot-grid">${slotList().map(slot => `<button class="ghost mini" data-forge-slot="${esc(slot)}">${esc(NAMES[slot] || slot)}</button>`).join('')}</div>
     <div class="sep"></div>
-    <p class="small forge-explain"><strong>Tempering:</strong> permanently improves equipped gear by +1 temper. It raises item level, rating, stats, and value. Costs rise each time, and higher Forge Tier raises the temper cap.</p>
+    <p class="small forge-explain"><strong>Tempering:</strong> permanently upgrades equipped gear. Each use adds +1 temper and raises item level, rating, stats, and value. Costs rise each time; higher Forge Tier raises the temper cap.</p>
     ${temperButtonsMarkup(state)}
-    <div class="sep"></div><p class="small muted">Simple loop: run dungeon -> keep good gear -> salvage weak gear -> focus or temper the pieces you care about.</p>`;
+    <div class="sep"></div><p class="small muted">Simple loop: run dungeon -> keep good gear -> salvage weak gear -> focus or temper the pieces you care about. Material farming is tracked on the Lowfire Board.</p>`;
   }
 
   function injectStyles(){
     if (document.getElementById('ddForgeClarityCss')) return;
     const style = document.createElement('style');
     style.id = 'ddForgeClarityCss';
-    style.textContent = '#forgePanel .forge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}#forgePanel button span{font-size:11px;opacity:.78}#forgePanel .forge-help{margin:8px 0 2px;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035)}#forgePanel .forge-help ul{margin:6px 0 0;padding-left:17px}#forgePanel .forge-help li{margin:3px 0}#forgePanel .forge-explain,#forgePanel .forge-note{line-height:1.45}@media(max-width:560px){#forgePanel .forge-grid{grid-template-columns:1fr}}';
+    style.textContent = '#forgePanel .forge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}#forgePanel button span{font-size:11px;opacity:.78}#forgePanel .forge-explain,#forgePanel .forge-note{line-height:1.45}@media(max-width:560px){#forgePanel .forge-grid{grid-template-columns:1fr}}';
     document.head.appendChild(style);
   }
 
