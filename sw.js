@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.9a-town-currency-cleanup';
-const BUILD_QS = '1.4.9a-town-currency-cleanup';
+const CACHE_NAME = 'dungeon-dex-1.4.9a-build-label-guard';
+const BUILD_QS = '1.4.9a-build-label-guard';
 const ASSETS = [
   './',
   './index.html',
@@ -25,6 +25,7 @@ const ASSETS = [
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
   `./js/systems/19_warden_talents_lowfire_board.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
+  `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
