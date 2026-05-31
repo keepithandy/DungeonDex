@@ -1,0 +1,57 @@
+DungeonDex v1.4.9b — Interface Density Cleanup
+
+Purpose:
+A broad, low-risk cleanup pass before moving deeper toward v1.5. This pass avoids core combat/scaling rewrites and focuses on visual density, wording, readability, cache consistency, and small UX cleanup.
+
+Added:
+- js/systems/27_interface_density_cleanup.js
+
+Changed:
+- Visible build label remains clean: DungeonDex v1.4.9b.
+- Updated index.html cache query strings to 1.4.9b-interface-density-cleanup.
+- Updated app.js runtime pointer to 1.4.9b-interface-density-cleanup.
+- Updated sw.js cache name and asset list to include the formal Interface Density Cleanup file.
+
+Town / Wallet:
+- Tightened compact Town wallet chip spacing.
+- Kept the clean Coin / Spark / Shards / Ember / Favor strip.
+- Preserved centered bottom nav behavior.
+
+Relic Forge:
+- Reduced tutorial bulk in Forge text.
+- Kept Forge focused on actions: Forge Random, Salvage, Focused Forge, Temper.
+- Kept material farming pointed toward the Lowfire Board instead of repeating a farm guide in the Forge panel.
+- Made Forge helper text smaller and more compact.
+
+Lowfire Board:
+- Tightened Board headings, objective spacing, writ cards, and material-source boxes.
+- Removed the redundant Spark Source pill if any earlier cleanup missed it.
+- Changed New Writ button copy to Draw Writ.
+- Changed Claim Spark Writ to Claim Writ.
+- Improved repeatable writ copy.
+- Clarified temper objective copy to: Upgrade equipped gear with Tempering 3 times.
+
+Warden Objectives:
+- Objective cards are more compact.
+- Progress bars are slightly tighter.
+- Objective detail text is smaller and more secondary.
+
+Warden Talents:
+- Reduced talent panel text size and card spacing.
+- Made talent tree blocks denser without removing information.
+
+Boss Header:
+- Keeps the cleaned boss-floor title direction.
+- Keeps boss headers compact and avoids reintroducing monster-name clutter.
+
+Smoke test checklist:
+1. Pull latest.
+2. Restart Live Server.
+3. Confirm the top label says DungeonDex v1.4.9b.
+4. Open Town.
+5. Check wallet strip layout.
+6. Check Relic Forge text is shorter.
+7. Check Lowfire Board has Draw Writ / Claim Writ copy and no Spark Source bubble.
+8. Check Gear > Warden Talents still renders.
+9. Check a boss floor header still only shows the boss-floor identity line.
+10. Check Run, Gear, Trophy Hall, Archive tabs still switch normally.
