@@ -1,0 +1,15 @@
+DungeonDex v1.4.8 — Relic Forge Crafting Foundation
+
+Added the first real crafting layer on top of the existing Relic Forge concept.
+
+Changes:
+- New Forge panel structure: spark, shards, ember, favor, and tier display.
+- Random forge now guarantees rare-or-better crafted relics.
+- Focused forge allows crafting toward a chosen gear slot.
+- Salvage action converts safe common/uncommon unequipped gear into shards and forge favor.
+- Tempering action upgrades equipped gear with shard and ember costs.
+- Forge favor gradually raises Forge Tier up to Tier 5.
+- Implemented as an extension file so the core runtime stays stable.
+
+Player-facing intent:
+Bad loot now has a use. The Forge starts becoming a long-term system instead of a single random-item button.
