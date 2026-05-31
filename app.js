@@ -2,8 +2,8 @@
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = window.DUNGEONDEX_BUILD || '1.4.9a';
-window.DUNGEONDEX_BUILD_QS = window.DUNGEONDEX_BUILD_QS || '1.4.9a-town-currency-cleanup';
+window.DUNGEONDEX_BUILD = '1.4.9a';
+window.DUNGEONDEX_BUILD_QS = '1.4.9a-build-label-guard';
 
 // v1.4.3 Trophy Hall First Look Pass
 window.DD_MONSTER_ARCHETYPES = [
@@ -21,11 +21,9 @@ window.ddGetMonsterCue = function(name){
   return cues[Math.floor(Math.random()*cues.length)];
 };
 
-// DevTools extension loader.
-// Kept here because app.js is already loaded before the system files.
 (function(){
-  if (window.DD_DEVTOOLS_EXTENSION_LOADER) return;
-  window.DD_DEVTOOLS_EXTENSION_LOADER = true;
+  if (window.DD_EXTRA_EXTENSION_LOADER) return;
+  window.DD_EXTRA_EXTENSION_LOADER = true;
   function loadModule(src, globalName, label){
     if (globalName && window[globalName]) return;
     var script = document.createElement('script');
@@ -34,13 +32,14 @@ window.ddGetMonsterCue = function(name){
     script.onerror = function(){ console.warn('[DungeonDex] ' + label + ' failed to load.'); };
     document.head.appendChild(script);
   }
-  function loadDevToolsExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9a-town-currency-cleanup';
+  function loadExtensions(){
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9a-build-label-guard';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
+    window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadDevToolsExtensions);
-  else loadDevToolsExtensions();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
+  else loadExtensions();
 })();
 
 // v1.4.3 — Trophy Hall First Look Pass
@@ -93,7 +92,6 @@ window.ddGetMonsterCue = function(name){
     }
   };
 
-  // Safe, optional audio stub. No autoplay loops; only short oscillator blips after user interaction.
   window.ddPlayImpactTone = function(kind){
     try{
       if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
