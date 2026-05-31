@@ -1,0 +1,38 @@
+DungeonDex v1.4.7 — DevTools Balance Reports
+
+Added an internal balance report layer to the hidden DevTools overlay.
+
+New DevTools section:
+- Balance Reports
+
+New report buttons:
+- Run 10-Fight Report
+- Run 100-Fight Report
+- Loot 100 Rolls
+- Loot 1000 Rolls
+- Economy Snapshot
+- Scaling Snapshot
+- Boss Check
+- Copy Report
+
+What the reports measure:
+- Current scenario or current manual state
+- Simulated win/loss pressure
+- Average fight length
+- Average HP lost
+- Approximate reward pressure
+- Loot rarity spread
+- Average loot ilvl/value
+- Economy pressure
+- Enemy scaling at nearby and deeper depth points
+- Boss pressure using the same current baseline
+
+Implementation notes:
+- Added js/systems/15_devtools_balance_reports.js.
+- Updated app.js extension loader to load both scenario presets and balance reports.
+- Kept v1.4.5 DevTools foundation untouched.
+- Kept v1.4.6 scenario presets untouched.
+- Normal player UI remains clean; reports only appear inside hidden DevTools.
+
+Purpose:
+This pass turns DevTools into a rough balance lab. It is intended to support larger systems such as talents, debt collector events, famous gear, tempering, rival monsters, faction expansion, and deep scaling work.
