@@ -1,4 +1,4 @@
-// DungeonDex v1.4.5 runtime pointer.
+// DungeonDex v1.4.6 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
@@ -18,6 +18,23 @@ window.ddGetMonsterCue = function(name){
   ];
   return cues[Math.floor(Math.random()*cues.length)];
 };
+
+// v1.4.6 DevTools Scenario Presets loader.
+// Kept here because app.js is already loaded before the system files.
+(function(){
+  if (window.DD_DEVTOOLS_SCENARIOS_LOADER) return;
+  window.DD_DEVTOOLS_SCENARIOS_LOADER = true;
+  function loadScenarioModule(){
+    if (window.DungeonDexScenarioDevTools) return;
+    var script = document.createElement('script');
+    script.src = './js/systems/14_devtools_scenarios.js?build=1.4.6-devtools-scenario-presets';
+    script.defer = true;
+    script.onerror = function(){ console.warn('[DungeonDex] DevTools scenario presets failed to load.'); };
+    document.head.appendChild(script);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadScenarioModule);
+  else loadScenarioModule();
+})();
 
 
 // v1.4.3 — Trophy Hall First Look Pass
@@ -78,19 +95,16 @@ window.ddGetMonsterCue = function(name){
       if (!Ctx) return;
       window.__ddAudioCtx142 = window.__ddAudioCtx142 || new Ctx();
       var ctx = window.__ddAudioCtx142;
-      if (ctx.state === "suspended") return;
+      if (!ctx) return;
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
-      var freq = kind === "reward" ? 620 : kind === "hurt" ? 150 : kind === "elite" ? 220 : 330;
-      osc.frequency.value = freq;
       osc.type = "triangle";
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.035, ctx.currentTime + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.09);
+      osc.frequency.value = kind === "heavy" ? 92 : kind === "reward" ? 520 : 180;
+      gain.gain.value = 0.018;
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.1);
-    }catch(e){}
+      osc.stop(ctx.currentTime + 0.04);
+    } catch(e) {}
   };
 })();
