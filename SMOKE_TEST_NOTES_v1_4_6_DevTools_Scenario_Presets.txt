@@ -1,0 +1,52 @@
+DungeonDex v1.4.6 — DevTools Scenario Presets QA Notes
+
+Checklist:
+1. Load the game normally without the dev query parameter.
+   Expected: DevTools is hidden.
+
+2. Load the game with the dev query parameter enabled.
+   Expected: DevTools appears.
+   Expected: Scenario Presets section appears after Run Controls.
+
+3. Apply each preset once:
+   - Fresh Lowfire
+   - Floor 10 Starter Check
+   - Floor 40 Mythic Unlock
+   - Floor 80 Charter Check
+   - Gold Starved
+   - Undergeared
+   - Overpowered Mythic
+   - Late Scaling Floor 500
+   - Deep Scaling Floor 1000
+
+4. Confirm after each preset:
+   - no runtime crash
+   - run screen opens
+   - stats update
+   - currency updates
+   - gear updates
+   - scenario log records the change
+
+5. Use Copy Scenario Snapshot.
+   Expected: snapshot includes scenario name, build, floor or depth, HP, stats, currency, average ilvl, charters, and recent scenario log.
+
+6. Use Restore Last Backup after applying a preset.
+   Expected: pre-scenario state returns.
+
+7. Recheck v1.4.5 DevTools controls:
+   - floor jump
+   - add currency
+   - full heal
+   - spawn test item
+   - display snapshot
+
+8. Recheck normal gameplay:
+   - enter dungeon
+   - use combat controls
+   - open gear screen
+   - save and reload
+
+Notes:
+- Scenario presets intentionally overwrite the current test state.
+- A backup is captured automatically before a preset applies.
+- DevTools remains internal only and should not appear in normal player flow.
