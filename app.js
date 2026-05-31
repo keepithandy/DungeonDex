@@ -3,7 +3,7 @@
 // See ./js/systems/README.md for the system map.
 
 window.DUNGEONDEX_BUILD = '1.4.9a';
-window.DUNGEONDEX_BUILD_QS = '1.4.9a-build-label-guard';
+window.DUNGEONDEX_BUILD_QS = '1.4.9a-spark-writ-pill-cleanup';
 
 // v1.4.3 Trophy Hall First Look Pass
 window.DD_MONSTER_ARCHETYPES = [
@@ -33,10 +33,11 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9a-build-label-guard';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9a-spark-writ-pill-cleanup';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
+    window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
   else loadExtensions();
