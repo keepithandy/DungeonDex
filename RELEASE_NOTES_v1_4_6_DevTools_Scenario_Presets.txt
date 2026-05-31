@@ -1,0 +1,31 @@
+DungeonDex v1.4.6 — DevTools Scenario Presets
+
+Added a hidden DevTools scenario preset layer for faster deep progression testing.
+
+New internal tools:
+- Fresh Lowfire preset
+- Floor 10 Starter Check preset
+- Floor 40 Mythic Unlock preset
+- Floor 80 Charter Check preset
+- Gold Starved preset
+- Undergeared preset
+- Overpowered Mythic preset
+- Late Scaling Floor 500 preset
+- Deep Scaling Floor 1000 preset
+
+Support features:
+- Automatic backup before applying a scenario preset
+- Manual Backup Current State button
+- Restore Last Backup button
+- Copy Scenario Snapshot button
+- Scenario log inside DevTools
+- Scenario snapshot includes active scenario, depth, stats, currency, average ilvl, charters, and recent scenario log
+
+Implementation notes:
+- Scenario presets live in js/systems/14_devtools_scenarios.js.
+- app.js loads the scenario preset module without changing normal player UI.
+- DevTools remains hidden unless the existing ?dev=1 or version-label toggle is used.
+- Normal player-facing title remains clean.
+
+Why this matters:
+This pass turns DevTools from a basic state inspector into a repeatable testing layer. It should help future large systems like talents, debt collector events, famous gear, tempering, rival monsters, faction expansion, and deep scaling balance.
