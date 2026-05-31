@@ -1,0 +1,35 @@
+DungeonDex v1.4.1 — Itch Upload Ready
+
+Purpose
+- Public-facing upload pass for the current DungeonDex build.
+- Re-labels the current GitHub package as DungeonDex v1.4.1 so the itch upload can move quickly while traffic is active.
+- This is a momentum-preserving release pass, not a new feature expansion pass.
+
+What changed
+- Updated visible browser title to DungeonDex v1.4.1.
+- Updated the top build label to DungeonDex v1.4.1.
+- Updated runtime build constants to 1.4.1.
+- Updated cache-busting query string to 1.4.1-itch-upload-ready.
+- Updated service worker cache name so itch players receive the fresh package instead of stale cached files.
+- Updated build label guard to prevent old render helpers from restoring stale v1.4.9 labels.
+
+What did not change
+- No combat math rewrite.
+- No loot table rewrite.
+- No save reset.
+- No progression reset.
+- No system scope expansion.
+
+Upload note
+- Package the repo root contents with index.html at the top level of the zip.
+- Upload to itch as the current browser-playable DungeonDex build.
+- Recommended public changelog wording: DungeonDex v1.4.1 is a cleaned upload build focused on making the current free-to-play browser version easier to access, with compact UI polish, cache refresh fixes, Trophy Hall visibility, Lowfire town clarity, relic forge improvements, and general mobile/browser readiness.
+
+Smoke test before publishing
+1. Open index.html locally.
+2. Confirm the visible title says DungeonDex v1.4.1.
+3. Start a run from Lowfire District.
+4. Fight at least one enemy.
+5. Open Gear, Trophy Hall, Archive, and Town.
+6. Refresh the page and confirm the game still loads.
+7. Upload the zip to itch.
