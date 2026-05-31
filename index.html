@@ -98,6 +98,23 @@
   </div>
 
   <script>
+    window.DUNGEONDEX_BUILD = '1.4.9a';
+    window.DUNGEONDEX_BUILD_QS = '1.4.9a-town-currency-cleanup';
+    (function(){
+      function forceBuildLabel(){
+        var tag = document.getElementById('buildTag');
+        if (tag) tag.textContent = 'DungeonDex v' + window.DUNGEONDEX_BUILD;
+        document.title = 'DungeonDex v' + window.DUNGEONDEX_BUILD;
+      }
+      forceBuildLabel();
+      window.addEventListener('DOMContentLoaded', forceBuildLabel);
+      window.addEventListener('load', forceBuildLabel);
+      window.setTimeout(forceBuildLabel, 250);
+      window.setTimeout(forceBuildLabel, 1000);
+    })();
+  </script>
+
+  <script>
     // Itch/mobile iframe scroll fallback: keep the app shell tied to the visible viewport.
     (function(){
       function fit(){
@@ -111,7 +128,32 @@
       if(window.visualViewport){ window.visualViewport.addEventListener('resize', fit, { passive: true }); }
     })();
   </script>
-  <script>if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{})); }</script>
+
+  <script>
+    (function(){
+      if (!('serviceWorker' in navigator)) return;
+      var host = window.location.hostname;
+      var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
+      if (isLocalDev) {
+        window.addEventListener('load', function(){
+          navigator.serviceWorker.getRegistrations().then(function(registrations){
+            registrations.forEach(function(reg){ reg.unregister(); });
+          }).catch(function(){});
+          if (window.caches && caches.keys) {
+            caches.keys().then(function(keys){
+              keys.filter(function(key){ return key.indexOf('dungeon') !== -1 || key.indexOf('Dungeon') !== -1; })
+                .forEach(function(key){ caches.delete(key); });
+            }).catch(function(){});
+          }
+        });
+        return;
+      }
+      window.addEventListener('load', function(){
+        navigator.serviceWorker.register('./sw.js?build=1.4.9a-town-currency-cleanup').catch(function(){});
+      });
+    })();
+  </script>
+
   <script src="./app.js?build=1.4.9a-town-currency-cleanup"></script>
   <script src="./js/systems/00_core_constants_data.js?build=1.4.9a-town-currency-cleanup"></script>
   <script src="./js/systems/01_state_recovery.js?build=1.4.9a-town-currency-cleanup"></script>
