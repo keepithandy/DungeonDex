@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.9b-bedtime-polish';
-const BUILD_QS = '1.4.9b-bedtime-polish';
+const CACHE_NAME = 'dungeon-dex-1.4.9b-interface-density-cleanup';
+const BUILD_QS = '1.4.9b-interface-density-cleanup';
 const ASSETS = [
   './',
   './index.html',
@@ -31,7 +31,7 @@ const ASSETS = [
   `./js/systems/24_lowfire_spark_board.js?build=${BUILD_QS}`,
   `./js/systems/25_town_wallet_chip_fix.js?build=${BUILD_QS}`,
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
-  `./js/systems/27_bedtime_polish_pass.js?build=${BUILD_QS}`,
+  `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
