@@ -1,0 +1,21 @@
+DungeonDex v1.4.9a — Build Label Guard
+
+Problem:
+The app could load as v1.4.9a, then switch the visible top label back to v1.4.5 when changing screens. The cause was renderStatBoxes writing the old VISIBLE_VERSION_LABEL from js/systems/00_core_constants_data.js during render and tab switching.
+
+Fix:
+- Added js/systems/21_build_label_guard.js.
+- The guard reasserts DungeonDex v1.4.9a after render, switchScreen, syncScreenState, and renderStatBoxes.
+- Added a MutationObserver on #buildTag so stale label writes are immediately corrected.
+- app.js now dynamically loads the build label guard.
+- sw.js now caches the build label guard asset and uses the new build query string.
+
+Note:
+The underlying old constant still exists in 00_core_constants_data.js, but the guard prevents it from affecting the visible player-facing label. A later structure cleanup should replace that constant directly when we consolidate build metadata.
+
+Smoke test:
+- Pull latest.
+- Stop and restart Live Server.
+- Open the game.
+- Switch Town, Run, Gear, Trophy Hall, Archive.
+- The top label should remain DungeonDex v1.4.9a without needing refresh.
