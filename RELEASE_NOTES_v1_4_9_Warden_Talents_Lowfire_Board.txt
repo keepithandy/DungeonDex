@@ -1,0 +1,49 @@
+DungeonDex v1.4.9 — Warden Talents + Lowfire Board Utility Pass
+
+Summary
+- Adds the first compact Warden Talent system as a foundation for the road toward 1.5.
+- Expands the Lowfire Board with a paid Random Board shuffle.
+- Replaces the larger town purse block with a small comparison-focused currency strip.
+
+Warden Talents
+- New Gear tab panel: Warden Talents.
+- Talent points are earned from level-ups and secured descent progress.
+- Three compact trees:
+  - Blade: Deep Cut, Quick Footing, Relic Instinct.
+  - Ward: Iron Breath, Shield Memory, Lamp Luck.
+  - Forge: Scrapper's Eye, Ember Sense, Forge Hand.
+- Talent bonuses apply immediately to derived stats, loot chance, shard gains, ember drops, and crafting-adjacent wit.
+- Includes a reset button for testing and future tuning.
+
+Lowfire Board
+- Adds a Random Board button with a coin price.
+- Random Board shuffles visible elite contract offers when no mark is active.
+- Active contracts still freeze the board until completed or claimed.
+- Board copy was rewritten to explain paid marks in clearer player-facing terms.
+
+Town Currency Strip
+- Adds a smaller town strip for quick comparison:
+  - Coin
+  - Spark
+  - Shards
+  - Ember
+  - Favor
+  - Rest cost
+  - Board shuffle cost
+- Each material has short tooltip copy explaining what it does and how to farm/use it.
+
+Files changed
+- index.html
+- sw.js
+- js/systems/19_warden_talents_lowfire_board.js
+
+Smoke Test Checklist
+- Open game and confirm visible label says DungeonDex v1.4.9.
+- Open Town and confirm compact currency strip appears below the district text.
+- Confirm Random Board button appears inside the Lowfire Elite Board.
+- Click Random Board with enough coin and verify coin cost is spent and offers shuffle.
+- Accept one elite mark and confirm Random Board no longer offers a shuffle while active.
+- Open Gear and confirm Warden Talents panel appears below the player card.
+- Spend a talent point on an eligible save and confirm the rank increases and stats update.
+- Reset talents and confirm points return.
+- Enter combat and verify Attack / Guard / Skill / Extract still function.
