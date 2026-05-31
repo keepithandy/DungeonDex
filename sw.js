@@ -22,6 +22,7 @@ const ASSETS = [
   './js/systems/16_relic_forge_crafting.js?build=1.4.8-relic-forge-crafting',
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
+const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -29,4 +30,18 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const network = () => globalThis.fetch(event.request);
+  if (event.request.mode === 'navigate') {
+    event.respondWith(network().catch(() => caches.match('./index.html')));
+    return;
+  }
+  if (FRESH_FIRST_DESTINATIONS.has(event.request.destination)) {
+    event.respondWith(network().catch(() => caches.match(event.request)));
+    return;
+  }
+  event.respondWith(caches.match(event.request).then(hit => hit || network()));
 });
