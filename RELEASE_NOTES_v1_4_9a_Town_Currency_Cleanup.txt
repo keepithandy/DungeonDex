@@ -1,0 +1,19 @@
+DungeonDex v1.4.9a — Town Currency Cleanup
+
+Purpose:
+The compact Town currency strip was useful, but Rest and Board costs were redundant inside the Lowfire panel.
+
+Changes:
+- Removed Rest cost from the compact Town currency strip.
+- Removed Board cost from the compact Town currency strip.
+- Kept Coin, Spark, Shards, Ember, and Favor visible as small reference chips.
+- Rest price still appears on the Rest action chip.
+- Random Board price still appears directly on the Random Board button.
+- Added a small overlay script instead of rewriting the larger v1.4.9 talent/board system.
+
+Smoke test:
+- Open Town.
+- Confirm the top label says DungeonDex v1.4.9a.
+- Confirm the small currency strip only shows Coin, Spark, Shards, Ember, and Favor.
+- Confirm Rest cost still appears near the Rest button.
+- Confirm Random Board still shows its price on the board button.
