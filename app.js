@@ -1,4 +1,4 @@
-// DungeonDex v1.4.6 runtime pointer.
+// DungeonDex v1.4.7 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
@@ -19,21 +19,25 @@ window.ddGetMonsterCue = function(name){
   return cues[Math.floor(Math.random()*cues.length)];
 };
 
-// v1.4.6 DevTools Scenario Presets loader.
+// v1.4.6+ DevTools extension loader.
 // Kept here because app.js is already loaded before the system files.
 (function(){
-  if (window.DD_DEVTOOLS_SCENARIOS_LOADER) return;
-  window.DD_DEVTOOLS_SCENARIOS_LOADER = true;
-  function loadScenarioModule(){
-    if (window.DungeonDexScenarioDevTools) return;
+  if (window.DD_DEVTOOLS_EXTENSION_LOADER) return;
+  window.DD_DEVTOOLS_EXTENSION_LOADER = true;
+  function loadModule(src, globalName, label){
+    if (globalName && window[globalName]) return;
     var script = document.createElement('script');
-    script.src = './js/systems/14_devtools_scenarios.js?build=1.4.6-devtools-scenario-presets';
+    script.src = src;
     script.defer = true;
-    script.onerror = function(){ console.warn('[DungeonDex] DevTools scenario presets failed to load.'); };
+    script.onerror = function(){ console.warn('[DungeonDex] ' + label + ' failed to load.'); };
     document.head.appendChild(script);
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadScenarioModule);
-  else loadScenarioModule();
+  function loadDevToolsExtensions(){
+    loadModule('./js/systems/14_devtools_scenarios.js?build=1.4.7-devtools-balance-reports', 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
+    loadModule('./js/systems/15_devtools_balance_reports.js?build=1.4.7-devtools-balance-reports', 'DungeonDexBalanceReports', 'DevTools balance reports');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadDevToolsExtensions);
+  else loadDevToolsExtensions();
 })();
 
 
