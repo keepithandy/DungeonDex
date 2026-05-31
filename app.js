@@ -1,7 +1,9 @@
-// DungeonDex v1.4.7 runtime pointer.
+// DungeonDex v1.4.9a runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
+window.DUNGEONDEX_BUILD = window.DUNGEONDEX_BUILD || '1.4.9a';
+window.DUNGEONDEX_BUILD_QS = window.DUNGEONDEX_BUILD_QS || '1.4.9a-town-currency-cleanup';
 
 // v1.4.3 Trophy Hall First Look Pass
 window.DD_MONSTER_ARCHETYPES = [
@@ -19,7 +21,7 @@ window.ddGetMonsterCue = function(name){
   return cues[Math.floor(Math.random()*cues.length)];
 };
 
-// v1.4.6+ DevTools extension loader.
+// DevTools extension loader.
 // Kept here because app.js is already loaded before the system files.
 (function(){
   if (window.DD_DEVTOOLS_EXTENSION_LOADER) return;
@@ -33,13 +35,13 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadDevToolsExtensions(){
-    loadModule('./js/systems/14_devtools_scenarios.js?build=1.4.7-devtools-balance-reports', 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
-    loadModule('./js/systems/15_devtools_balance_reports.js?build=1.4.7-devtools-balance-reports', 'DungeonDexBalanceReports', 'DevTools balance reports');
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9a-town-currency-cleanup';
+    loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
+    loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadDevToolsExtensions);
   else loadDevToolsExtensions();
 })();
-
 
 // v1.4.3 — Trophy Hall First Look Pass
 (function(){
