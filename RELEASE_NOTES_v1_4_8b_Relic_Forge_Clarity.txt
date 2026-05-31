@@ -1,0 +1,17 @@
+DungeonDex v1.4.8b — Relic Forge Clarity Pass
+
+Purpose:
+The v1.4.8 crafting foundation worked mechanically, but the Forge did not explain itself well enough. This pass adds short player-facing copy so the system makes sense in town.
+
+Changes:
+- Added a clearer Relic Forge header and lore line.
+- Added a compact material guide for Spark, Shards, Ember, and Favor.
+- Explained how each material is generally farmed.
+- Clarified Random Forge as the cheaper any-slot option.
+- Clarified Focused Forge as the slot-choice option where rarity/name/stats still roll randomly.
+- Clarified Tempering as a permanent +1 equipped-gear upgrade that raises item level, rating, stats, and value.
+- Added a simple loop line: run dungeon, keep good gear, salvage weak gear, focus or temper chosen pieces.
+- Loaded as a small overlay file after the existing v1.4.8 crafting file to avoid touching the core mechanics.
+
+Smoke test:
+Open Town, check the Relic Forge panel, and confirm the new material guide and explanation text appear above the Forge buttons.
