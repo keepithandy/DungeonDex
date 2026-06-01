@@ -17,7 +17,7 @@
 
 ## Player-Facing Labels
 - Keep visible labels short and clean.
-- Use labels like “DungeonDex v1.4.10”.
+- Use labels like “DungeonDex v1.4.11”.
 - Do not show long internal pass names in the game UI.
 - Long names belong only in changelog notes, commit messages, or internal comments.
 
