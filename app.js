@@ -1,11 +1,11 @@
-// DungeonDex v1.4.1 runtime pointer.
+// DungeonDex v1.4.2 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.4.1';
-window.DUNGEONDEX_BUILD_QS = '1.4.1-itch-upload-ready';
+window.DUNGEONDEX_BUILD = '1.4.2';
+window.DUNGEONDEX_BUILD_QS = '1.4.2-small-town-readability-pass';
 
-// v1.4.1 Trophy Hall First Look Pass
+// v1.4.2 Small Town Readability Pass
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"
@@ -33,7 +33,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.1-itch-upload-ready';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.2-small-town-readability-pass';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
@@ -44,7 +44,7 @@ window.ddGetMonsterCue = function(name){
   else loadExtensions();
 })();
 
-// v1.4.1 — Trophy Hall First Look Pass
+// v1.4.2 — Small Town Readability Pass
 (function(){
   if (window.DD_IMPACT_142) return;
   window.DD_IMPACT_142 = true;
