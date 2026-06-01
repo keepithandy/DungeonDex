@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.1`
-* Current local package baseline: `v1.4.9b`
-* Current development target: `v1.4.10`
+* Public/live itch version: `v1.4.11`
+* Current local package baseline: `v1.4.11`
+* Current development target: `v1.4.11`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,22 +57,22 @@ Use `VERSION.md` for the current active version.
 
 ## Active 1.4.x Notes
 
-Add new notes below this section, starting with `v1.4.10`.
+Add new notes below this section.
 
 ---
 
-### v1.4.10 — Pending
+### v1.4.11 - App Feel Polish Pass
 
-Status: In development
+Status: Complete
 
-Planned focus:
+Finished changes:
 
-* Confirm `VERSION.md` matches the current development target
-* Clean up changelog structure
-* Remove temporary patch-note naming
-* Keep visible player-facing build labels short
-* Improve Codex/GitHub workflow consistency
-* Continue small, safe mobile-first polish passes
+* Aligned stale runtime build guards with `VERSION.md` so loaded UI keeps the short `DungeonDex v1.4.11` label.
+* Updated the cache-busting label to `1.4.11-app-feel-polish`.
+* Shortened town, run-feed, gear, and archive copy to reduce panel height.
+* Compressed repeated combat-feed wording at render time without changing stored combat logs or rewards.
+* Added compact mobile combat CSS through the existing density cleanup module.
+* Improved gear upgrade and archive note scanability with small CSS hooks.
 
 ---
 
@@ -84,7 +84,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.10`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.11`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.

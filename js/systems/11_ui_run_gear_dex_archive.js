@@ -206,7 +206,7 @@
       runStatus.innerHTML = `
         <div class="split"><div><h2>No active descent</h2><p>Rest in Lowfire, then return to the Hollow Stair when ready.</p></div><button class="primary mini" id="runFromIdleBtn">Enter Dungeon</button></div>`;
       combatPanel.innerHTML = `<p>No Hollow Stair threat detected.</p>`;
-      combatLog.innerHTML = `<div class="run-log-head split"><h2>Combat Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">Lowfire is quiet.</div></div></div></div>`;
+      combatLog.innerHTML = `<div class="run-log-head split"><h2>Feed</h2><span class="pill">Idle</span></div><div class="run-log-list"><div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Resting</div><div class="feed-body">Lowfire is quiet.</div></div></div></div>`;
       return;
     }
 
@@ -228,7 +228,7 @@
           </section>
         </div>`;
       combatLog.innerHTML = `
-        <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Decision</span></div></div>
+        <div class="run-log-head split"><h2>Feed</h2><div class="tag-row"><span class="pill">Decision</span></div></div>
         <div class="run-log-list">${asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT).map(renderCombatFeedLine).join('')}</div>`;
       return;
     }
@@ -310,7 +310,7 @@
 
     const logLines = asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT);
     combatLog.innerHTML = `
-      <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Recent ×${format(logLines.length)}</span></div></div>
+      <div class="run-log-head split"><h2>Feed</h2><div class="tag-row"><span class="pill">${format(logLines.length)} recent</span></div></div>
       <div class="run-log-list">${logLines.length ? logLines.map(renderCombatFeedLine).join('') : '<div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Quiet</div><div class="feed-body">No combat messages yet.</div></div></div>'}</div>`;
     if (combatLog) {
       combatLog.style.overflowAnchor = 'none';
@@ -521,13 +521,13 @@
     if (gearPlayerPanel) renderGearPlayerPanel(gearPlayerPanel, equipment, displaySlots, equippedCount);
     equipmentPanel.innerHTML = `
       <div class="loadout-head">
-        <div><h2>Equipped</h2><p class="small muted">Worn gear by slot.</p></div>
+        <div><h2>Equipped</h2><p class="small muted">Gear by slot.</p></div>
         <span class="pill loadout-count-pill">${format(equippedCount)} / ${format(displaySlots.length)} slots</span>
       </div>
       <div class="loadout-groups">${loadoutSlotGroups().map(equippedGroupMarkup).join('')}</div>`;
 
     filtersPanel.innerHTML = `
-      <div class="filter-head"><h2>Filters</h2><span class="small muted">Inventory view</span></div>
+      <div class="filter-head"><h2>Filters</h2><span class="small muted">Inventory</span></div>
       <div class="filter-grid loadout-filter-grid">
         <select id="slotFilter" aria-label="Filter inventory by slot">${['all', ...FUTURE_EQUIPMENT_SLOTS].map(x => `<option value="${escapeHtml(x)}" ${filters.slot===x?'selected':''}>${x === 'all' ? 'All slots' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
         <select id="rarityFilter" aria-label="Filter inventory by rarity">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${escapeHtml(x)}" ${filters.rarity===x?'selected':''}>${x === 'all' ? 'All rarities' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
@@ -556,7 +556,7 @@
     const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
     const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after two confirmations" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
     inventoryPanel.innerHTML = `
-      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Gear you can equip or sell.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
+      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Equip, sell, or filter.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
       <div class="list inventory-list">${inv.map(itemCard).join('') || '<div class="empty-inventory-card"><strong>No matching gear</strong><span>Adjust filters or keep delving.</span></div>'}</div>`;
   }
 
@@ -601,7 +601,7 @@
     const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
     const sellAttrs = itemId ? `data-sell="${safeItemId}"` : 'disabled';
     const rarityEyebrow = `<span class="rarity-eyebrow ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span>`;
-    return `<article class="loot-card inventory-card ${getRarityCardClass(item)}">
+    return `<article class="loot-card inventory-card ${delta > 0 ? 'inventory-upgrade-card' : ''} ${getRarityCardClass(item)}">
       <div class="inventory-card-main">
         <div class="inventory-title-block">
           <div class="item-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
@@ -672,7 +672,7 @@
       const outcomeClass = isWin ? 'outcome-win' : isDefeat ? 'outcome-loss' : 'outcome-neutral';
       const icon = isWin ? '✓' : isDefeat ? '✕' : '•';
       const zone = cleanDisplayText(r.zone || r.district || 'Hollow Stair', 'Hollow Stair');
-      const fallbackDetail = isWin ? 'Extraction Haul secured. Lowfire marked the run complete.' : isDefeat ? 'The run ended here. Unsecured rewards were lost; banked gear and wallet stayed safe.' : 'Descent ended.';
+      const fallbackDetail = isWin ? 'Haul banked. Lowfire marked the run complete.' : isDefeat ? 'Unsecured rewards lost; banked gear and wallet stayed safe.' : 'Descent ended.';
       const detail = cleanDisplayText(r.detail || r.summary || fallbackDetail, fallbackDetail);
       const runLabel = cleanDisplayText(r.runLabel || depthWithRawLabel(r.floor || 1), depthWithRawLabel(1));
       const lootPreview = asArray(r.lootPreview, []).slice(0, 3)
@@ -706,12 +706,12 @@
     const archiveLines = asArray(S.archive, []).filter(isPlainObject).map(a => {
       const stamp = cleanDisplayText(a.stamp || '');
       const text = cleanDisplayText(a.text || '', 'Archive note unavailable.');
-      return `<div class="archive-line"><div class="small muted">${escapeHtml(stamp)}</div><div>${escapeHtml(text)}</div></div>`;
+      return `<div class="archive-line archive-note-line"><div class="small muted archive-note-stamp">${escapeHtml(stamp)}</div><div>${escapeHtml(text)}</div></div>`;
     }).join('') || '<p class="small muted">No Emberfall notes yet.</p>';
 
     el('archivePanel').innerHTML = `
       <div class="archive-history-head">
-        <div><h2>Descent History</h2><p class="small muted">Lowfire records what was banked, what was lost, and where the next descent starts.</p></div>
+        <div><h2>Descent History</h2><p class="small muted">Banked, lost, and next-start records.</p></div>
         <span class="pill">Latest ${format(history.length)}</span>
       </div>
       <div class="list run-history-list">${historyMarkup}</div>
@@ -720,7 +720,7 @@
       <div class="list archive-log-list">${archiveLines}</div>`;
 
     el('settingsPanel').innerHTML = `
-      <h2>System Notes</h2>
+      <h2>System</h2>
       <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
       <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>

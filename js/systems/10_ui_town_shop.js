@@ -67,7 +67,7 @@
   function districtWalletMarkup(state) {
     const wallet = formatMoney(state.player.gold || 0);
     const pending = state.run?.active ? pendingRunRewardSummary(ensurePendingRunRewards(state)) : '';
-    const pendingLine = pending ? `<span class="district-wallet-pending">Run haul held: ${pending}</span>` : '<span class="district-wallet-pending muted">No unsecured haul banked.</span>';
+    const pendingLine = pending ? `<span class="district-wallet-pending">Held haul: ${pending}</span>` : '<span class="district-wallet-pending muted">No held haul.</span>';
     return `<div class="district-wallet-card" aria-label="Warden currency wallet">
       <div class="district-wallet-head">
         <div>
@@ -94,7 +94,7 @@
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
     }
     if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `Next descent starts at ${escapeHtml(depthShortLabel(stagedStartDepth))}. Lowfire banks the haul; the Stair opens back into ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
+    if (el('districtLine')) el('districtLine').innerHTML = `Next descent: ${escapeHtml(depthShortLabel(stagedStartDepth))}. Lowfire banks the haul and returns you to ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
@@ -107,9 +107,9 @@
     }
     if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
     if (questPanel) questPanel.innerHTML = `
-      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and Warden objectives.</p></div></div>
+      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and objectives.</p></div></div>
       <div class="warden-ledger">
-        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short orders paid after descent work.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
+        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short orders paid after runs.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
       </div>
       <div class="list warden-objective-list">
         ${S.player.quests.map(q => `
@@ -124,7 +124,7 @@
     const districtWares = unlockedDistrictWares(S);
     const activeSinkPills = activeGoldSinkPills(S);
     if (merchantPanel) merchantPanel.innerHTML = `
-      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Gear, district wares, and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
+      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Gear and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
       ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
       <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
       <div class="sep"></div>

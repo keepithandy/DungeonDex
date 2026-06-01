@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.9b — Interface Density Cleanup.
+// DungeonDex v1.4.11 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.9b';
+  const BUILD = '1.4.11';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.9b-interface-density-cleanup';
+  const BUILD_QS = '1.4.11-app-feel-polish';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -85,6 +85,16 @@
       #talentPanel .talent-card{padding:7px!important;margin-bottom:5px!important;border-radius:11px!important}
       #talentPanel .talent-effect,#talentPanel .talent-lore{font-size:10.5px!important}
 
+      /* Gear and archive scanability */
+      #screen-gear .inventory-upgrade-card{border-color:rgba(122,232,178,.20)!important;background:linear-gradient(180deg,rgba(122,232,178,.040),rgba(255,255,255,.014))!important}
+      #screen-gear .inventory-upgrade-card .gear-status-badge.better{border-color:rgba(122,232,178,.28)!important;background:rgba(122,232,178,.08)!important;color:#baf6d8!important}
+      #screen-gear .loadout-inventory-head{gap:6px!important}
+      #screen-gear .inventory-subline{font-size:10.75px!important;line-height:1.15!important}
+      #screen-archive .archive-history-head p{font-size:10.75px!important;line-height:1.2!important}
+      #screen-archive .archive-note-line{display:grid!important;gap:3px!important;padding:7px 8px!important;line-height:1.28!important}
+      #screen-archive .archive-note-stamp{font-size:10px!important;line-height:1!important}
+      #screen-archive .archive-note-line>div:last-child{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.28}
+
       /* Boss header remains clean and intentional */
       .combat-device-boss .combat-enemy-header{padding:7px 9px!important;min-height:auto!important}
       .combat-device-boss .combat-enemy-header .depth-kicker{font-size:11.5px!important;line-height:1.2!important}
@@ -99,6 +109,39 @@
       @media(max-width:560px){
         #questPanel .spark-source-strip span{min-height:auto!important}
         .town-wallet-chips>span{font-size:10.5px!important;padding:3px 6px!important}
+      }
+
+      /* App feel polish: keep combat playable inside the mobile viewport. */
+      .app-shell.combat-active #screen-run .stack-8{gap:5px!important}
+      .app-shell.combat-active .run-log-head{margin-bottom:4px!important}
+      .app-shell.combat-active .run-log-head h2{font-size:.82rem!important;color:#fff1c9!important}
+      .app-shell.combat-active .run-log-head .pill{font-size:.6rem!important;padding:3px 6px!important}
+      .app-shell.combat-active .run-log-list{min-height:0!important;max-height:clamp(82px,15dvh,124px)!important;gap:4px!important;padding-bottom:3px!important}
+      .app-shell.combat-active .run-log-list .combat-feed-line{grid-template-columns:21px minmax(0,1fr)!important;gap:6px!important;padding:5px 6px!important;border-radius:12px!important}
+      .app-shell.combat-active .feed-icon{width:20px!important;height:20px!important;font-size:.62rem!important}
+      .app-shell.combat-active .feed-body{-webkit-line-clamp:2!important;font-size:.68rem!important;line-height:1.24!important}
+      .app-shell.combat-active .feed-chip{font-size:.58rem!important;padding:1px 5px!important}
+      .app-shell.combat-active .combat-personality-cue{display:none!important}
+
+      @media(max-width:560px){
+        .app-shell.combat-active #runStatus,
+        .app-shell.combat-active #combatPanel,
+        .app-shell.combat-active #combatLog{padding:7px!important}
+        .app-shell.combat-active .combat-device-shell{gap:6px!important;padding:7px!important}
+        .app-shell.combat-active .combat-enemy-header{padding:7px 8px!important}
+        .app-shell.combat-active .combat-monster-stage{min-height:clamp(92px,16dvh,132px)!important}
+        .app-shell.combat-active .combat-monster-stage.stage-boss{min-height:clamp(104px,18dvh,146px)!important}
+        .app-shell.combat-active .combat-hp-card{gap:4px!important;padding:6px 8px!important}
+        .app-shell.combat-active .combat-hud.run-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+        .app-shell.combat-active .combat-hud.run-stat-grid .stat-box{min-height:36px!important;padding:5px 4px!important}
+        .app-shell.combat-active .combat-device-actions{gap:5px!important}
+        .app-shell.combat-active .combat-device-actions button{min-height:44px!important;padding:7px 3px!important;font-size:.66rem!important}
+      }
+
+      @media(max-width:380px){
+        .app-shell.combat-active .run-log-list{max-height:clamp(64px,12dvh,92px)!important}
+        .app-shell.combat-active .combat-monster-stage{min-height:clamp(78px,14dvh,112px)!important}
+        .app-shell.combat-active .combat-device-actions button{font-size:.62rem!important}
       }
     `;
     document.head.appendChild(style);

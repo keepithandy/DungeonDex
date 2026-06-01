@@ -189,10 +189,28 @@
     }
   }
 
+  function compactCombatFeedText(line) {
+    let text = cleanDisplayText(line);
+    if (!text) return '';
+    text = text
+      .replace(/^(Room Reward|Elite Spoils|Boss Spoils):\s+(.+?)\s+(secured|defeated|cleared)\.\s+Unsecured\s+/i, '$1: ')
+      .replace(/^(Room Reward loot|Room Reward cache):\s+/i, 'Loot: ')
+      .replace(/\s+added to the unsecured haul\.?/gi, '')
+      .replace(/The haul stays unsecured;\s*/gi, '')
+      .replace(/^Descent continues:\s*/i, 'Next: ')
+      .replace(/^Encounter:\s+(.+?)\s+rises in\s+.+\.?$/i, 'Encounter: $1')
+      .replace(/^Elite pressure rises:\s*/i, 'Elite: ')
+      .replace(/^Boss pressure locks the stair:\s*/i, 'Boss: ')
+      .replace(/^No gear found\. You pocket the coin and move on\.?$/i, 'No gear. Coin added to haul.')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return text;
+  }
+
   function renderCombatFeedLine(line) {
     const raw = String(line || '');
     const kind = combatFeedKind(raw);
-    let normalized = escapeHtml(cleanDisplayText(raw))
+    let normalized = escapeHtml(compactCombatFeedText(raw))
       .replace(/\(\+gold charm\)/gi, '<span class="feed-chip feed-chip-gold">Gold Charm</span>')
       .replace(/\+(\d+)\s*gold/gi, '<span class="feed-chip feed-chip-gold">+$1 gold</span>')
       .replace(/\+(\d+)\s*shards?/gi, '<span class="feed-chip feed-chip-shard">+$1 shards</span>')
