@@ -1,0 +1,19 @@
+DungeonDex v1.4.10 - Smoke Test Notes (Package Hygiene Hotfix)
+
+Scope:
+- Packaging-only hotfix. No gameplay or balance changes expected.
+
+Checks run:
+1. `python tools/check_dungeondex_package.py .`
+2. `node --check app.js`
+3. `Get-ChildItem js/systems/*.js | ForEach-Object { node --check $_.FullName }`
+4. `python tools/make_release_zip.py .`
+
+Manual verification checklist:
+1. Open `index.html` in browser and confirm boot to title/town succeeds.
+2. Start a run, perform one combat, return to town.
+3. Refresh page and verify save loads cleanly.
+4. Open produced zip and verify no `.git/`, `node_modules/`, cache folders, temp/log files, or `ion*` artifacts are present.
+
+Result target:
+- Package is clean for release upload and preserves save compatibility.

@@ -8,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 
-OUTPUT_NAME = "DungeonDex_v1_4_3c_Release_Guard_Cache_Cleanup.zip"
+OUTPUT_NAME = "DungeonDex_v1_4_10_Package_Hygiene_Hotfix.zip"
 EXCLUDED_DIRS = {
     ".git",
     ".cache",
@@ -32,6 +32,10 @@ def project_root() -> Path:
 
 def should_include(path: Path, root: Path) -> bool:
     rel = path.relative_to(root)
+    if rel.name.lower().startswith("ion"):
+        return False
+    if any("cache" in part.lower() for part in rel.parts):
+        return False
     if any(part in EXCLUDED_DIRS for part in rel.parts):
         return False
     if path.name in EXCLUDED_NAMES:

@@ -1,0 +1,15 @@
+DungeonDex v1.4.10 - Package Hygiene Hotfix
+
+- Fixed release packaging hygiene for itch/browser distribution.
+- Removed an accidental root artifact file (`ion*`) that contained diff noise and was not game content.
+- Updated the release zip output name to:
+  DungeonDex_v1_4_10_Package_Hygiene_Hotfix.zip
+- Hardened release zip exclusions to prevent shipping:
+  - `.git` metadata
+  - `node_modules`
+  - cache folders
+  - generated `.zip` files
+  - temporary/log/bytecode files (`.tmp`, `.temp`, `.log`, `.pyc`, `.pyo`)
+  - accidental root artifact files beginning with `ion`
+
+Gameplay, balance, save format, and core systems were not changed in this hotfix.
