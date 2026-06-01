@@ -1,0 +1,24 @@
+DungeonDex v1.4.1a - Smoke Test Notes
+
+Date: 2026-06-01
+
+Checklist target:
+- Load game fresh
+- Enter dungeon
+- Fight one enemy
+- Win one fight
+- Return to town
+- Open major existing panel(s)
+- Confirm no obvious console errors
+
+Result:
+- Partial pass completed in this environment.
+- Static/syntax checks passed for edited JS files.
+- Headless browser smoke execution could not be completed due to intermittent sandbox process spawn errors.
+
+Observed:
+- No syntax-level regressions found in edited files.
+- Version and cache/build references now align to v1.4.1a.
+
+Follow-up:
+- Run one manual in-browser smoke pass on local machine to confirm runtime interaction flow and console cleanliness.

@@ -1,0 +1,7 @@
+DungeonDex v1.4.1a - Tiny Stability Cleanup
+
+- Kept visible title/build label short and consistent: "DungeonDex v1.4.1a".
+- Aligned build query strings and cache keys to v1.4.1a for safer asset refresh.
+- Corrected stale core version constants that could show outdated labels.
+- Kept UI adjustments minimal: tiny mini-button padding tweak to reduce cramped text.
+- No gameplay systems redesigned, no save format changes, no feature removals.

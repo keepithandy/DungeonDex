@@ -6,9 +6,9 @@
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.9b';
+  const BUILD = '1.4.1a';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.9b-interface-density-cleanup';
+  const BUILD_QS = '1.4.1a-tiny-stability-cleanup';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -32,7 +32,7 @@
       .card-head h2,.card-head h3{line-height:1.05}
       .small{line-height:1.25}
       .pill{line-height:1!important;min-height:20px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
-      button.mini,.mini{min-height:28px}
+      button.mini,.mini{min-height:28px;padding-inline:9px}
 
       /* Top Town wallet chips */
       .district-wallet-slot{margin-top:6px!important}
