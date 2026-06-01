@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.9b-interface-density-cleanup';
-const BUILD_QS = '1.4.9b-interface-density-cleanup';
+const CACHE_NAME = 'dungeon-dex-1.4.11-stability-review-player-polish';
+const BUILD_QS = '1.4.11-stability-review-player-polish';
 const ASSETS = [
   './',
   './index.html',

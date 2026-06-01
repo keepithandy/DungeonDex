@@ -1,0 +1,30 @@
+DungeonDex v1.4.11 - Smoke Test Notes
+
+Build/Version Consistency Checks
+- Confirm title bar reads: DungeonDex v1.4.11.
+- Confirm in-app header reads: DungeonDex v1.4.11.
+- Confirm runtime query id is: 1.4.11-stability-review-player-polish.
+- Confirm service worker cache key includes: dungeon-dex-1.4.11-stability-review-player-polish.
+
+Start-to-Combat Flow Checklist
+- Fresh load shows Town without stuck overlay.
+- Enter Dungeon starts a run and shows combat panel.
+- Continue Run returns to active run state.
+- Fight action resolves combat and updates run state.
+- Reward/extract flow returns cleanly to town.
+
+Town Panel Checklist
+- Warden/loadout panels render without overlap.
+- Lowfire District header and actions are readable on mobile width.
+- Merchant and Forge panels populate and remain interactive.
+- Archive panel loads and stays navigable.
+- DevTools panel remains present (when enabled) and does not block primary actions.
+
+Command Validation
+- `git status` ran successfully.
+- `node --check app.js` ran successfully (no syntax errors).
+- `python tools/check_dungeondex_package.py .` pending retry due to intermittent sandbox command refresh error.
+- `Get-ChildItem js/systems/*.js | ForEach-Object { node --check $_.FullName }` pending retry due to intermittent sandbox command refresh error.
+
+Risk Notes
+- Functional flow checklist should be re-run in-browser once command runner stability returns, to fully confirm no modal/button dead states.

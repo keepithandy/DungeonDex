@@ -1,0 +1,27 @@
+DungeonDex v1.4.11 - Stability Review & Player-Facing Polish
+
+Summary
+- Aligned visible and runtime version pointers to v1.4.11.
+- Updated build query strings and service worker cache key to prevent stale asset mix.
+- Audited active player-facing copy for stale internal pass naming.
+
+Scope
+- No new gameplay systems.
+- No combat redesign.
+- No scaling rebalance.
+- No DevTools removal.
+- No broad CSS rewrite.
+
+Files Updated
+- VERSION.md
+- index.html
+- app.js
+- sw.js
+
+Player-Facing Notes
+- Title/build label now consistently shows DungeonDex v1.4.11.
+- Runtime asset pointers now share one build id: 1.4.11-stability-review-player-polish.
+
+Safety Notes
+- Save schema and system load order were not changed.
+- Existing system scripts remain intact; only build/version pointers were touched.
