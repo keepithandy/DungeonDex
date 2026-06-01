@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.2 — DevTools Balance Reports
+// DungeonDex v1.4.9b — DevTools Balance Reports
 // Internal-only measurement layer. It injects into the hidden DevTools overlay and does not touch normal UI.
 (function(){
-  const REPORT_VERSION = 'DungeonDex v1.4.2';
-  const REPORT_BUILD = '1.4.2-devtools-balance-reports';
+  const REPORT_VERSION = 'DungeonDex v1.4.9b';
+  const REPORT_BUILD = '1.4.9b-devtools-balance-reports';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsBalanceReports';

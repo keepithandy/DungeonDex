@@ -2,7 +2,7 @@
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.4.2';
+window.DUNGEONDEX_BUILD = '1.4.9b';
 window.DUNGEONDEX_BUILD_QS = '1.4.9b-interface-density-cleanup';
 
 // v1.4.9b Interface Density Cleanup

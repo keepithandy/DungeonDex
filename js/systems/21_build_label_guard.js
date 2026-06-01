@@ -6,7 +6,7 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.4.2';
+  const BUILD = '1.4.9b';
   const LABEL = 'DungeonDex v' + BUILD;
   const BUILD_QS = '1.4.9b-interface-density-cleanup';
 
