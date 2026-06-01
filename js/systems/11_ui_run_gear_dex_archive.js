@@ -187,6 +187,9 @@
     const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
     const personalityClass = `combat-personality--${personalityKind}`;
     const personalityLine = combatPersonalityLine(personalityKind, monster);
+    const monsterFamily = escapeHtml(monster?.family || 'Depthborn');
+    const monsterSkill = escapeHtml(monster?.skill || 'Basic attack');
+    const monsterSubline = monsterFamily === monsterSkill ? monsterFamily : `${monsterFamily} · ${monsterSkill}`;
     const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
@@ -251,7 +254,7 @@
         <section class="combat-enemy-header ${personalityClass}">
           <div class="depth-kicker">${escapeHtml(enemyKicker)}</div>
           <h2>${escapeHtml(monster.name || 'Unknown Threat')}</h2>
-          <p class="small muted">${escapeHtml(monster.family || 'Depthborn')} · ${escapeHtml(monster.skill || 'Basic attack')}</p>
+          <p class="small muted">${monsterSubline}</p>
           <p class="combat-personality-cue">${personalityLine}</p>
           ${eliteMarkup}
           ${threatBrief}
@@ -307,8 +310,13 @@
 
     const logLines = asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT);
     combatLog.innerHTML = `
-      <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Latest ×${format(logLines.length)}</span></div></div>
+      <div class="run-log-head split"><h2>Combat Feed</h2><div class="tag-row"><span class="pill">Recent ×${format(logLines.length)}</span></div></div>
       <div class="run-log-list">${logLines.length ? logLines.map(renderCombatFeedLine).join('') : '<div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Quiet</div><div class="feed-body">No combat messages yet.</div></div></div>'}</div>`;
+    if (combatLog) {
+      combatLog.style.overflowAnchor = 'none';
+      const runLogList = combatLog.querySelector('.run-log-list');
+      if (runLogList) runLogList.style.overflowAnchor = 'auto';
+    }
   }
   const LOADOUT_SLOT_GROUPS = [
     { label:'Weapon', slots:['weapon','offhand'] },

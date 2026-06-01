@@ -7251,6 +7251,13 @@ button:focus-visible,
 .app-shell.combat-active #runStatus { padding: 7px 8px 5px; }
 .app-shell.combat-active #combatPanel { padding: 0 8px 6px; }
 .app-shell.combat-active #combatLog { padding: 6px 8px 8px; }
+.app-shell.combat-active #screen-town .panel { padding: 9px 10px; }
+.app-shell.combat-active #screen-town .panel h2,
+.app-shell.combat-active #screen-town .panel h3 { margin: 0 0 4px; line-height: 1.1; }
+.app-shell.combat-active #screen-town .panel p { margin: 0 0 6px; line-height: 1.24; }
+.app-shell.combat-active #screen-town .shop-item,
+.app-shell.combat-active #screen-town .quest-card,
+.app-shell.combat-active #screen-town .elite-contract-card { padding: 8px; }
 .combat-device-shell { gap: 6px; }
 .combat-enemy-header { gap: 2px; padding-top: 1px; }
 .combat-enemy-header h2,
@@ -7325,14 +7332,15 @@ button:focus-visible,
 .combat-hud.run-stat-grid { gap: 5px; }
 .combat-hud.run-stat-grid .stat-box { padding: 5px 4px; }
 .combat-device-actions { gap: 5px; }
-.combat-device-actions button { min-height: 42px; padding: 7px 4px; }
-.app-shell.combat-active .run-log-list { max-height: 126px; }
+.combat-device-actions button { min-height: 44px; padding: 8px 6px; font-size: .83rem; }
+.app-shell.combat-active .run-log-list { max-height: 128px; min-height: 128px; overflow-y: auto; overscroll-behavior: contain; }
 .app-shell.combat-active .run-log-list .combat-feed-line { padding: 5px 6px; }
+.combat-enemy-header .depth-kicker { font-size: .62rem; line-height: 1.08; }
 @media (max-width: 380px) {
   .combat-personality-cue { display: none; }
   .combat-monster-stage { min-height: 118px; }
   .combat-monster-stage.stage-boss { min-height: 130px; }
-  .combat-device-actions button { min-height: 40px; }
+  .combat-device-actions button { min-height: 42px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .stage-atmosphere-grain,
