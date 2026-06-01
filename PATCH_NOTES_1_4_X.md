@@ -2,7 +2,8 @@
 
 ## Version Source of Truth
 - Public/live itch version: v1.4.1
-- Current development target: v1.4.2
+- Current local package baseline: v1.4.9b
+- Current development target: v1.4.10
 - Version authority file: VERSION.md
 
 ## 1.4.x Direction
@@ -26,7 +27,7 @@ DungeonDex 1.4.x is the cleanup, polish, and foundation branch after the major 1
 - Old smoke-test notes
 
 ## Active 1.4.x Notes
-Create a fresh section for new notes starting at v1.4.2.
+Create a fresh section for new notes starting at v1.4.10.
 
-### v1.4.2
+### v1.4.10
 - Pending

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.2-small-town-readability-pass';
-const BUILD_QS = '1.4.2-small-town-readability-pass';
+const CACHE_NAME = 'dungeon-dex-1.4.9b-interface-density-cleanup';
+const BUILD_QS = '1.4.9b-interface-density-cleanup';
 const ASSETS = [
   './',
   './index.html',
@@ -20,6 +20,8 @@ const ASSETS = [
   `./js/systems/11_ui_run_gear_dex_archive.js?build=${BUILD_QS}`,
   `./js/systems/12_render_bindings_boot.js?build=${BUILD_QS}`,
   `./js/systems/13_devtools_overlay.js?build=${BUILD_QS}`,
+  `./js/systems/14_devtools_scenarios.js?build=${BUILD_QS}`,
+  `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`,
   `./js/systems/16_relic_forge_crafting.js?build=${BUILD_QS}`,
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,

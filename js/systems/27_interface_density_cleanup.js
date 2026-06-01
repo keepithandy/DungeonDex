@@ -8,7 +8,7 @@
 
   const BUILD = '1.4.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.2-small-town-readability-pass';
+  const BUILD_QS = '1.4.9b-interface-density-cleanup';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

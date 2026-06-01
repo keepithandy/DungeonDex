@@ -1,10 +1,13 @@
 # DungeonDex Version Authority
 
-## Current Public Version
+## Current Public/Live Version
 v1.4.1
 
+## Current Local Package Version
+v1.4.9b
+
 ## Current Development Target
-v1.4.2
+v1.4.10
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
@@ -13,5 +16,5 @@ v1.4.2
 - Do not infer the current version from patch-log history.
 - Do not bump the version unless the user explicitly asks.
 - If version strings conflict, report the conflict before changing anything.
-- Keep the visible player-facing game label short, like: DungeonDex v1.4.2
+- Keep the visible player-facing game label short, like: DungeonDex v1.4.9b
 - Long update names belong only in release notes, smoke-test notes, patch logs, or internal notes.

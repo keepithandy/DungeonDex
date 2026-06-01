@@ -1,11 +1,11 @@
-// DungeonDex v1.4.2 runtime pointer.
+// DungeonDex v1.4.9b runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
 window.DUNGEONDEX_BUILD = '1.4.2';
-window.DUNGEONDEX_BUILD_QS = '1.4.2-small-town-readability-pass';
+window.DUNGEONDEX_BUILD_QS = '1.4.9b-interface-density-cleanup';
 
-// v1.4.2 Small Town Readability Pass
+// v1.4.9b Interface Density Cleanup
 window.DD_MONSTER_ARCHETYPES = [
   "Brute","Ritualist","Skulker","Ashbound",
   "Mireborn","Furnace Spawn","Hollowed","Warden"
@@ -33,7 +33,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.2-small-town-readability-pass';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.4.9b-interface-density-cleanup';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
@@ -44,7 +44,7 @@ window.ddGetMonsterCue = function(name){
   else loadExtensions();
 })();
 
-// v1.4.2 — Small Town Readability Pass
+// v1.4.9b — Interface Density Cleanup
 (function(){
   if (window.DD_IMPACT_142) return;
   window.DD_IMPACT_142 = true;
