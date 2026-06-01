@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.1a-tiny-stability-cleanup';
-const BUILD_QS = '1.4.1a-tiny-stability-cleanup';
+const CACHE_NAME = 'dungeon-dex-1.4.2-small-town-readability-pass';
+const BUILD_QS = '1.4.2-small-town-readability-pass';
 const ASSETS = [
   './',
   './index.html',

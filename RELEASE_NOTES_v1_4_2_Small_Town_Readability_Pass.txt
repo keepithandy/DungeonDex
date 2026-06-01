@@ -1,0 +1,17 @@
+DungeonDex v1.4.2 — Small Town Readability Pass
+
+Scope
+- Updated visible version label/title to DungeonDex v1.4.2.
+- Updated active build/cache query strings to 1.4.2-small-town-readability-pass.
+- Applied a light readability cleanup in Town panel copy and button labels.
+
+Town Readability Adjustments
+- Tightened Elite Board helper copy and shortened claim action text.
+- Shortened Lowfire Board objective copy.
+- Renamed Market refresh button label to "Refresh Stock" for faster scanning.
+- Shortened Relic Forge subtitle and renamed primary action to "Forge Relic".
+
+Safety Notes
+- No save schema/data structure changes.
+- No panel additions or major layout rewrites.
+- No new systems added.

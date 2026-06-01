@@ -6,9 +6,9 @@
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.1a';
+  const BUILD = '1.4.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.1a-tiny-stability-cleanup';
+  const BUILD_QS = '1.4.2-small-town-readability-pass';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

@@ -16,8 +16,8 @@
       const riskLevel = eliteContractRiskLevel(contract);
       const objective = eliteContractObjective(contract);
       return `<div class="elite-contract-board">
-        <div class="elite-contract-head">
-          <div><h3>Lowfire Elite Board</h3><p>Clear paid marks for wardens taking extra elite risk.</p></div>
+      <div class="elite-contract-head">
+        <div><h3>Lowfire Elite Board</h3><p>Take elite marks for clean payout.</p></div>
           <span class="pill ${ready ? 'rarity-rare' : ''}">${statusLabel}</span>
         </div>
         <div class="elite-contract-card ${ready ? 'ready' : 'active'}">
@@ -32,7 +32,7 @@
           <div class="elite-contract-meter"><div style="width:${pct}%"></div></div>
           <div class="elite-contract-actions">
             <span class="pill">${ready ? 'Ready to Claim' : 'Payment held'}: ${formatMoney(rewardAmount)}</span>
-            ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>' : '<span class="small muted">Finish the elite mark, then claim in Lowfire.</span>'}
+            ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim</button>' : '<span class="small muted">Finish the mark to claim.</span>'}
           </div>
         </div>
       </div>`;
@@ -56,7 +56,7 @@
 
     return `<div class="elite-contract-board">
       <div class="elite-contract-head">
-        <div><h3>Lowfire Elite Board</h3><p>Take marked danger for a clear payout.</p></div>
+        <div><h3>Lowfire Elite Board</h3><p>Take marked danger, earn clear payout.</p></div>
         <span class="pill">No Active (${contracts.claimed.length}/${ELITE_CONTRACTS.length})</span>
       </div>
       <div class="elite-contract-list">${body}</div>
@@ -107,9 +107,9 @@
     }
     if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
     if (questPanel) questPanel.innerHTML = `
-      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and Warden Objectives tracked from the safe district.</p></div></div>
+      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and Warden objectives.</p></div></div>
       <div class="warden-ledger">
-        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short Lowfire orders paid after descent work.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
+        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short orders paid after descent work.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
       </div>
       <div class="list warden-objective-list">
         ${S.player.quests.map(q => `
@@ -124,7 +124,7 @@
     const districtWares = unlockedDistrictWares(S);
     const activeSinkPills = activeGoldSinkPills(S);
     if (merchantPanel) merchantPanel.innerHTML = `
-      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Stair gear, district wares, and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
+      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Gear, district wares, and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
       ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
       <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
       <div class="sep"></div>
@@ -134,10 +134,10 @@
       </div>`;
 
     if (forgePanel) forgePanel.innerHTML = `
-      <div class="card-head"><div><h2>Relic Forge</h2><p>Sparks, shards, and salvage work.</p></div></div>
+      <div class="card-head"><div><h2>Relic Forge</h2><p>Craft and salvage relic gear.</p></div></div>
       <div class="tag-row"><span class="pill">Forge spark: ${S.player.forgeSpark}</span><span class="pill">Shards: ${S.player.shards}</span></div>
       <div class="sep"></div>
-      <button class="primary" id="forgeBtn">Forge Item (1 spark + 40 shards)</button>
+      <button class="primary" id="forgeBtn">Forge Relic (1 spark + 40 shards)</button>
       <div class="sep"></div>
       <p class="small">Every crafted relic rolls at least rare quality.</p>`;
   }

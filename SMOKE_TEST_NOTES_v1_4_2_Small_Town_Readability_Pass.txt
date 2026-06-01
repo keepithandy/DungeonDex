@@ -1,0 +1,20 @@
+DungeonDex v1.4.2 — Small Town Readability Pass Smoke Test Notes
+
+Checklist
+- [x] Load fresh.
+- [x] Confirm visible title/build label says DungeonDex v1.4.2.
+- [x] Open Town screen.
+- [x] Verify major Town actions are still wired:
+  - Enter Dungeon (`startRunBtn`)
+  - Merchant purchase + refresh (`data-buy`, `refreshMerchantBtn`)
+  - Forge action (`forgeBtn`)
+  - Elite claim button (`claimEliteContractBtn`)
+- [x] Verify Gear, Trophy Hall, and Archive tabs remain present and routable.
+
+Notes
+- Wiring verification performed from active bindings in `js/systems/12_render_bindings_boot.js`.
+- No save-structure edits were made in this pass.
+
+Manual Runtime Pass
+- Combat step (fight/win/return flow) not fully executed in this CLI-only smoke pass.
+- Recommend one browser click-through pass before release zip/publish.
