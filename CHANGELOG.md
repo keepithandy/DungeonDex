@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.13`
-* Current local package baseline: `v1.4.13`
-* Current development target: `v1.4.13`
+* Public/live itch version: `v1.4.14`
+* Current local package baseline: `v1.4.14`
+* Current development target: `v1.4.14`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.14 - Combat Page Framing & Text Cleanup Pass
+
+Status: Complete
+
+Finished changes:
+
+* Updated active build labels and cache query strings to `DungeonDex v1.4.14` with build query `1.4.14-combat-page-framing-cleanup`.
+* Removed the heavy outer combat frame so the run screen reads as the actual combat screen instead of a phone-shaped card.
+* Removed the top objective/status text line, including `Win this fight to continue deeper`, while keeping the Haul display.
+* Removed the duplicate giant monster-name header and kept the monster name near the enemy HP bar.
+* Shifted the enemy-card header to compact rarity/type/tag metadata.
+* Cleaned combat status copy spacing/capitalization, including room and boss-distance labels.
+* No combat balance, reward logic, save format, or progression logic changed.
 
 ---
 
@@ -123,7 +139,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.13`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.14`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.

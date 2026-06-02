@@ -8239,3 +8239,109 @@ button.dd-devtools-btn-danger {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* v1.4.14 Combat Page Framing & Text Cleanup */
+.app-shell.combat-active {
+  max-width: min(100vw, 760px);
+  padding-inline: clamp(8px, 2vw, 18px);
+}
+
+.app-shell.combat-active #screen-run .stack-8 {
+  width: 100%;
+  max-width: min(100%, 700px);
+  margin-inline: auto;
+  gap: 8px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell.combat-active #runStatus,
+.app-shell.combat-active #combatPanel,
+.app-shell.combat-active #combatLog {
+  border-color: rgba(255, 210, 128, 0.10);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(18, 20, 26, 0.72), rgba(9, 10, 13, 0.78));
+}
+
+.app-shell.combat-active #combatPanel {
+  padding-top: 8px;
+}
+
+.app-shell.combat-active .combat-device-top,
+.app-shell.combat-active .combat-device-shell {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell.combat-active .combat-device-shell {
+  overflow: visible;
+}
+
+.app-shell.combat-active .combat-device-shell:has(.extract-btn.tap-now) {
+  box-shadow: none;
+}
+
+.app-shell.combat-active .combat-haul-row {
+  padding-top: 4px;
+}
+
+.app-shell.combat-active .combat-haul-row .run-progress-copy {
+  justify-content: flex-end;
+  color: rgba(244, 246, 252, 0.90);
+}
+
+.app-shell.combat-active .combat-haul-row .run-progress-copy span:first-child {
+  display: none;
+}
+
+.app-shell.combat-active .combat-haul-row .run-progress-copy span:last-child {
+  min-width: 0;
+  text-align: right;
+}
+
+.app-shell.combat-active .combat-enemy-header {
+  gap: 3px;
+  padding: 2px 4px 3px;
+}
+
+.app-shell.combat-active .combat-enemy-header .depth-kicker {
+  color: rgba(255, 214, 150, 0.84);
+}
+
+.app-shell.combat-active .combat-enemy-header .small,
+.app-shell.combat-active .combat-enemy-header .combat-personality-cue {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell.combat-active .combat-enemy-header .small {
+  color: rgba(244, 246, 252, 0.82);
+  font-size: 0.68rem;
+}
+
+.app-shell.combat-active .combat-enemy-header .combat-personality-cue {
+  display: block !important;
+  color: rgba(255, 224, 166, 0.70);
+  font-size: 0.64rem;
+  line-height: 1.15;
+}
+
+@media (min-width: 720px) {
+  .app-shell.combat-active #screen-run .stack-8 {
+    max-width: min(100%, 720px);
+  }
+}
+
+@media (max-width: 430px) and (max-height: 820px) {
+  .app-shell.combat-active .combat-enemy-header .combat-personality-cue {
+    display: none !important;
+  }
+}

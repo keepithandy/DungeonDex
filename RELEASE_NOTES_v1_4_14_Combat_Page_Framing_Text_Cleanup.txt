@@ -1,0 +1,35 @@
+DungeonDex v1.4.14
+Combat Page Framing & Text Cleanup Pass
+
+Build query:
+1.4.14-combat-page-framing-cleanup
+
+Summary:
+
+- Removed the heavy outer combat frame so the combat page feels less like a phone mockup.
+- Removed the "Win this fight to continue deeper" objective text and related top-line clutter.
+- Kept the Haul display.
+- Removed the duplicate giant monster name header.
+- Moved the enemy card header focus to rarity/type metadata.
+- Cleaned combat text spacing/capitalization.
+- No combat balance or reward logic changed.
+
+Files of note:
+
+- VERSION.md
+- index.html
+- app.js
+- sw.js
+- styles.css
+- js/systems/00_core_constants_data.js
+- js/systems/11_ui_run_gear_dex_archive.js
+- js/systems/14_devtools_scenarios.js
+- js/systems/21_build_label_guard.js
+- js/systems/27_interface_density_cleanup.js
+- CHANGELOG.md
+
+Compatibility:
+
+- Save data format was not changed.
+- Combat mechanics were not tuned or rewritten.
+- Enemy, reward, and progression logic were not changed.

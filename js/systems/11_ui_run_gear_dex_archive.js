@@ -101,21 +101,6 @@
     return 'stalker';
   }
 
-  function combatPersonalityLine(kind, monster) {
-    const skill = monster?.skill ? escapeHtml(monster.skill) : 'basic strike';
-    const lines = {
-      ritualist: `Chants under the hit window • ${skill}`,
-      construct: `Gears lock before impact • ${skill}`,
-      mireborn: `Wet movement, delayed bite • ${skill}`,
-      shade: `Lantern-flicker evasive rhythm • ${skill}`,
-      winged: `Airborne feint pattern • ${skill}`,
-      brute: `Heavy wind-up, hard contact • ${skill}`,
-      stalker: `Low stance, quick pressure • ${skill}`
-    };
-    return lines[kind] || lines.stalker;
-  }
-
-
   function dungeonAtmosphereProfile(state, district, depth, monster) {
     const safeDepth = Math.max(1, Math.floor(numberOr(depth ?? state?.run?.floor, 1, 1, 999999)));
     const meta = depthProgressMeta(safeDepth);
@@ -175,36 +160,29 @@
     const currentFloorText = floorNumberLabel(depth);
     const nextBoss = nextBossFloorFromDepth(depth);
     const bossChaptersAway = Math.max(0, depthStageValue(nextBoss.floor) - depthStageValue(depth));
+    const bossRoomsAway = Math.max(0, Math.ceil(bossChaptersAway / DEPTH_CHAPTERS_PER_ROOM));
     const bossStatusText = isBossFight
-      ? `${bossFloorLabel(depth)} active`
-      : `${bossFloorLabel(nextBoss.floor)} in ${format(bossChaptersAway)} chapter${bossChaptersAway === 1 ? '' : 's'}`;
-    const bossTitle = isBossFight ? (bossFloorNameByDepth(depth) || bossFloorLabel(depth)) : '';
-    const enemyKicker = isContractTarget
-      ? `Contract Elite • ${monster.contractModifierName || eliteModifierNames(eliteModifiersForMonster(monster)) || 'Marked'}`
-      : isBossFight ? `${bossFloorLabel(depth)} active • ${bossTitle}` : (monster?.tier || 'Enemy');
+      ? 'Boss active'
+      : `Boss in ${format(bossRoomsAway)} room${bossRoomsAway === 1 ? '' : 's'}`;
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
     const monsterHpPct = monster ? Math.max(0, Math.min(100, (monster.hp / Math.max(1, monster.maxHp)) * 100)) : 0;
     const pendingRewards = ensurePendingRunRewards(S);
     const hasUnsecured = hasPendingRunRewards(pendingRewards);
     const haulSummary = hasUnsecured ? runRewardSummaryText(pendingRewards) : 'No haul yet';
-    const nextActionText = S.run.event
-      ? 'Choose an event outcome'
-      : isBossFight
-        ? 'Boss active: survive or extract'
-        : isEliteFight
-          ? 'Elite active: manage risk or extract'
-          : 'Win this fight to continue deeper';
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
     const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
     const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
     const personalityClass = `combat-personality--${personalityKind}`;
-    const personalityLine = combatPersonalityLine(personalityKind, monster);
     const monsterFamily = escapeHtml(monster?.family || 'Depthborn');
     const monsterSkill = escapeHtml(monster?.skill || 'Basic attack');
+    const monsterTier = escapeHtml(monster?.tier || 'Enemy');
     const monsterSubline = isContractTarget
-      ? `Active Hunt • Target Floor ${format(monster.contractTargetFloor || threatDepthFromDepth(depth))}`
-      : monsterFamily === monsterSkill ? monsterFamily : `${monsterFamily} · ${monsterSkill}`;
+      ? `Contract • ${monsterFamily}`
+      : monsterFamily;
+    const monsterTagline = isContractTarget
+      ? escapeHtml(monster.contractModifierName || eliteModifierNames(eliteModifiersForMonster(monster)) || monster?.skill || 'Marked')
+      : monsterSkill;
     const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
@@ -234,16 +212,15 @@
             <small>${escapeHtml(runDistrict.name)}</small>
           </div>
           <div class="run-flow-secondary">
-            <span>Room ${format(depthMeta.room)}/${format(DEPTH_ROOMS_PER_FLOOR)} • Chapter ${format(depthMeta.chapter)}</span>
+            <span>Room ${format(depthMeta.room)} / ${format(DEPTH_ROOMS_PER_FLOOR)}</span>
             <strong>${escapeHtml(bossStatusText)}</strong>
           </div>
         </div>
-        <div class="run-progress-only" aria-label="Run progress">
+        <div class="run-progress-only combat-haul-row" aria-label="Run haul">
           <div class="split run-progress-copy run-flow-next">
-            <span>${escapeHtml(nextActionText)}</span>
+            <span></span>
             <span>Haul: ${escapeHtml(haulSummary)}</span>
           </div>
-          <div class="depth-meter"><div style="width:${depthMeta.chapterPct.toFixed(1)}%"></div></div>
         </div>
         ${dungeonAtmosphereMarkup(atmosphereProfile, depth)}
       </div>`;
@@ -273,10 +250,9 @@
     combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
         <section class="combat-enemy-header ${personalityClass}">
-          <div class="depth-kicker">${escapeHtml(enemyKicker)}</div>
-          <h2>${escapeHtml(monster.name || 'Unknown Threat')}</h2>
+          <div class="depth-kicker">${monsterTier}</div>
           <p class="small muted">${monsterSubline}</p>
-          <p class="combat-personality-cue">${personalityLine}</p>
+          <p class="combat-personality-cue">${monsterTagline}</p>
           ${eliteMarkup}
           ${threatBrief}
         </section>

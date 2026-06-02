@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.13 - Interface density and app-feel cleanup.
+// DungeonDex v1.4.14 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.13';
+  const BUILD = '1.4.14';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.13-elite-board-contract-identity';
+  const BUILD_QS = '1.4.14-combat-page-framing-cleanup';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -112,7 +112,12 @@
       }
 
       /* App feel polish: keep combat playable inside the mobile viewport. */
-      .app-shell.combat-active #screen-run .stack-8{gap:5px!important}
+      .app-shell.combat-active{max-width:min(100vw,760px)!important}
+      .app-shell.combat-active #screen-run .stack-8{gap:5px!important;max-width:min(100%,700px)!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+      .app-shell.combat-active .combat-device-top,
+      .app-shell.combat-active .combat-device-shell{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+      .app-shell.combat-active .combat-haul-row .run-progress-copy{justify-content:flex-end!important}
+      .app-shell.combat-active .combat-haul-row .run-progress-copy span:first-child{display:none!important}
       .app-shell.combat-active .run-log-head{margin-bottom:4px!important}
       .app-shell.combat-active .run-log-head h2{font-size:.82rem!important;color:#fff1c9!important}
       .app-shell.combat-active .run-log-head .pill{font-size:.6rem!important;padding:3px 6px!important}
@@ -121,7 +126,7 @@
       .app-shell.combat-active .feed-icon{width:20px!important;height:20px!important;font-size:.62rem!important}
       .app-shell.combat-active .feed-body{-webkit-line-clamp:2!important;font-size:.68rem!important;line-height:1.24!important}
       .app-shell.combat-active .feed-chip{font-size:.58rem!important;padding:1px 5px!important}
-      .app-shell.combat-active .combat-personality-cue{display:none!important}
+      .app-shell.combat-active .combat-personality-cue{display:block!important}
 
       @media(max-width:560px){
         .app-shell.combat-active #runStatus,

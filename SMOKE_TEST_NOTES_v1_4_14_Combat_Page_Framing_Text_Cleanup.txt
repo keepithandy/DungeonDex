@@ -1,0 +1,41 @@
+DungeonDex v1.4.14 Smoke Test Notes
+Combat Page Framing & Text Cleanup Pass
+
+Build query:
+1.4.14-combat-page-framing-cleanup
+
+Required checks:
+
+1. Run node --check app.js.
+2. Run node --check sw.js.
+3. Run node --check for every file in js/systems.
+4. Confirm manifest.json parses as JSON.
+5. Open the game normally.
+6. Confirm visible label says DungeonDex v1.4.14.
+7. Enter Dungeon.
+8. Confirm combat page loads.
+9. Confirm the outermost heavy combat border is gone or significantly reduced.
+10. Confirm "Win this fight to continue deeper" no longer appears.
+11. Confirm no similar top objective/tutorial text appears in that location.
+12. Confirm Haul: No haul yet or the current haul state still appears.
+13. Confirm the giant monster name header is removed.
+14. Confirm the monster name still appears near the HP bar.
+15. Confirm the top enemy-card header now shows rarity/type/tag metadata.
+16. Confirm Attack works.
+17. Confirm Skill/Ashburst works.
+18. Confirm Guard works.
+19. Confirm Extract works.
+20. Confirm the feed still updates.
+21. Confirm the layout works on narrow/mobile width.
+22. Confirm the layout looks better on desktop/wider width.
+23. Confirm no console errors.
+24. Confirm no save wipe.
+
+Result:
+
+- Syntax checks passed for app.js, sw.js, and every file in js/systems.
+- manifest.json parsed successfully.
+- Headless Chrome desktop load completed and showed active labels as DungeonDex v1.4.14.
+- Headless Chrome mobile-width load completed and showed active labels as DungeonDex v1.4.14.
+- Static combat render inspection confirmed the removed objective text is no longer in combat code, Haul remains, the giant monster-name header was removed, the monster name remains in the enemy HP row, and Attack/Ashburst/Guard/Extract controls are still rendered.
+- Interactive click smoke was not completed because in-app browser tooling and a local Node/Playwright harness were unavailable under the current sandbox.

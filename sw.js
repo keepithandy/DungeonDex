@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.13-elite-board-contract-identity';
-const BUILD_QS = '1.4.13-elite-board-contract-identity';
+const CACHE_NAME = 'dungeon-dex-1.4.14-combat-page-framing-cleanup';
+const BUILD_QS = '1.4.14-combat-page-framing-cleanup';
 const ASSETS = [
   './',
   './index.html',
