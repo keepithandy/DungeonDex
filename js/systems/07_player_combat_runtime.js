@@ -426,12 +426,14 @@
       playerShield = Math.round(stats.guard * 0.65 + stats.wit * 0.25);
       const recovered = Math.max(1, Math.round(stats.guard * 0.09));
       state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+      if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractGuard) window.DungeonDexEliteContracts.markEliteContractGuard(state);
       pushCombat(state, `You brace and recover ${recovered} HP.`);
     } else if (action === 'skill') {
       if (state.player.ember <= 0) {
         pushCombat(state, 'No ember left. Ashburst fizzles.');
       } else {
         state.player.ember -= 1;
+        if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractSkill) window.DungeonDexEliteContracts.markEliteContractSkill(state);
         const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
         const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
         monster.hp -= dealt;
@@ -442,6 +444,7 @@
     } else if (action === 'extract') {
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
       if (Math.random() * 100 <= odds) {
+        if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractExtract) window.DungeonDexEliteContracts.markEliteContractExtract(state);
         pushCombat(state, `You extract safely from ${state.run.zone} at ${runDepthLabel(state)}.`);
         finishRun(state, 'extract');
         result.saveNow = true;
@@ -883,6 +886,7 @@
       } else if (reason === 'extract') {
         const endedThreatFloor = Math.floor(threatDepthFromDepth(endedAtFloor));
         const targetFloor = Math.floor(numberOr(activeHunt.targetFloor, endedThreatFloor + 1, 1, 999999));
+        if (window.DungeonDexEliteContracts?.markEliteContractExtract) window.DungeonDexEliteContracts.markEliteContractExtract(state);
         if (activeHunt.targetSpawned || activeHunt.status === 'active') failEliteContract(state, 'failed');
         else if (endedThreatFloor > targetFloor) failEliteContract(state, 'expired');
       }
@@ -1191,5 +1195,6 @@
     calcDerived(state);
     state.player.hp = state.player.maxHp;
     state.player.ember = Math.max(state.player.ember, 2);
+    if (window.DungeonDexEliteContracts?.markEliteContractRest) window.DungeonDexEliteContracts.markEliteContractRest(state);
     pushLog(state, `Rested at the Lowfire bunks for ${formatMoney(cost)}. HP restored, 2 ember minimum assured.`);
   }

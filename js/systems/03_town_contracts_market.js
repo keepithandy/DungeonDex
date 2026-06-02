@@ -39,6 +39,7 @@
       modifierKey:'',
       contractText:'Defeat Glassfang Brute when it appears.',
       bonusWrit:'Defeat it before resting.',
+      bonusWritType:'rest',
       rewardPreview:'+silver, +rare chance',
       flavor:'A Lowfire enforcer dragging broken blades behind it.'
     },
@@ -62,6 +63,7 @@
       modifierKey:'',
       contractText:'Defeat Ash-Crowned Marauder when it appears.',
       bonusWrit:'Defeat it without extracting first.',
+      bonusWritType:'extract',
       rewardPreview:'+silver, +elite loot',
       flavor:'An old stair raider wearing trophy armor from failed Wardens.'
     },
@@ -85,6 +87,7 @@
       modifierKey:'',
       contractText:'Defeat Cinderjaw Bailiff when it appears.',
       bonusWrit:'Defeat it after guarding at least once.',
+      bonusWritType:'guard',
       rewardPreview:'+silver, +board rep soon',
       flavor:'A debt-court brute sent to collect from the living.'
     },
@@ -108,6 +111,7 @@
       modifierKey:'',
       contractText:'Defeat Mireglass Collector when it appears.',
       bonusWrit:'Defeat it before using Ashburst twice.',
+      bonusWritType:'skill',
       rewardPreview:'+silver, +mythic hint',
       flavor:'It remembers every Warden who ran.'
     }
@@ -207,6 +211,7 @@
       modifierKey: '',
       contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
       bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
+      bonusWritType: seed?.bonusWritType || contract.bonusWritType || 'rest',
       rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
       flavor: seed?.flavor || contract.flavor || contract.summary || 'A paid mark for wardens willing to face elite danger.',
       accepted: !!accepted,
@@ -233,6 +238,9 @@
       modifierKey: '',
       contractText: active.contractText || '',
       bonusWrit: active.bonusWrit || '',
+      bonusWritType: active.bonusWritType || '',
+      bonusWritCompleted: !!active.bonusWritCompleted,
+      bonusWritMissed: !!active.bonusWritMissed,
       rewardPreview: active.rewardPreview || '',
       flavor: active.flavor || '',
       status: status || active.status || 'pending',
@@ -366,6 +374,13 @@
             modifierKey: '',
             contractText: savedActive.contractText || def.contractText || `Defeat ${savedActive.eliteName || def.eliteName || def.name} when it appears.`,
             bonusWrit: savedActive.bonusWrit || def.bonusWrit || 'Defeat it before resting.',
+            bonusWritType: savedActive.bonusWritType || def.bonusWritType || 'rest',
+            bonusWritCompleted: !!savedActive.bonusWritCompleted,
+            bonusWritMissed: !!savedActive.bonusWritMissed,
+            bonusRested: !!savedActive.bonusRested,
+            bonusExtracted: !!savedActive.bonusExtracted,
+            bonusGuardUses: Math.floor(numberOr(savedActive.bonusGuardUses, 0, 0, 999)),
+            bonusSkillUses: Math.floor(numberOr(savedActive.bonusSkillUses, 0, 0, 999)),
             rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
             flavor: savedActive.flavor || def.flavor || def.summary || '',
             accepted: true,
@@ -434,6 +449,7 @@
       modifierKey: '',
       contractText: model.contractText,
       bonusWrit: model.bonusWrit,
+      bonusWritType: model.bonusWritType,
       rewardPreview: model.rewardPreview,
       flavor: model.flavor,
       accepted: true,
@@ -449,7 +465,13 @@
       rewardAmount: calculateContractReward(contract, state),
       complete: false,
       claimable: false,
-      claimed: false
+      claimed: false,
+      bonusRested: false,
+      bonusExtracted: false,
+      bonusGuardUses: 0,
+      bonusSkillUses: 0,
+      bonusWritCompleted: false,
+      bonusWritMissed: false
     };
     pushLog(state, `Elite contract accepted: ${model.eliteName}. Target: Floor ${format(model.targetFloor)}.`);
     return true;
@@ -473,15 +495,40 @@
     active.tier = contract.tier || '';
     active.rewardAmount = activeContractRewardAmount(active, contract, state);
     active.progress = 1;
+    active.targetDefeated = true;
+    active.bonusWritCompleted = evaluateEliteBonusWrit(active, state, options);
+    active.bonusWritMissed = !active.bonusWritCompleted;
     if (active.progress >= 1) {
       active.complete = true;
       active.completed = true;
       active.claimable = true;
       active.status = 'completed';
-      active.targetDefeated = true;
       if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
-      pushCombat(state, `Contract complete: ${active.eliteName}. Return to Lowfire to claim ${formatMoney(active.rewardAmount)}.`);
+      pushCombat(state, active.bonusWritCompleted
+        ? `Contract fulfilled: ${active.eliteName}. Bonus Writ completed.`
+        : `Contract fulfilled: ${active.eliteName}. Bonus Writ missed.`);
     }
+    return true;
+  }
+
+  function evaluateEliteBonusWrit(active, state, options = {}) {
+    if (!active) return false;
+    const type = String(active.bonusWritType || '').toLowerCase();
+    const count = name => Math.floor(numberOr(active[name], 0, 0, 999));
+    const playerHp = numberOr(state?.player?.hp, 0, 0, Number.MAX_SAFE_INTEGER);
+    const playerMaxHp = Math.max(1, numberOr(state?.player?.maxHp, 1, 1, Number.MAX_SAFE_INTEGER));
+    if (type === 'rest') return !active.bonusRested;
+    if (type === 'extract') return !active.bonusExtracted;
+    if (type === 'guard') return count('bonusGuardUses') <= 2;
+    if (type === 'skill') return count('bonusSkillUses') <= 1;
+    if (type === 'boss') {
+      const targetFloor = Math.max(1, Math.floor(numberOr(active.targetFloor, 1, 1, 999999)));
+      const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
+      return targetFloor % bossInterval !== 0;
+    }
+    if (type === 'hp') return playerHp > playerMaxHp * 0.5;
+    if (String(options.action || '').toLowerCase() === 'rest') return !active.bonusRested;
+    if (String(options.action || '').toLowerCase() === 'extract') return !active.bonusExtracted;
     return true;
   }
 
@@ -544,7 +591,7 @@
     const targetFloor = Math.max(1, Math.floor(numberOr(active?.targetFloor, 1, 1, 999999)));
     const early = targetFloor < 20;
     return {
-      hp: early ? 1.25 : 1.30,
+      hp: early ? 1.25 : 1.35,
       power: 1,
       reward: 1.35
     };
@@ -566,6 +613,7 @@
     monster.contractId = hunt.id;
     monster.contractEliteName = hunt.eliteName;
     monster.contractModifierName = '';
+    monster.bonusWritType = hunt.bonusWritType || '';
     monster.contractTargetFloor = hunt.targetFloor;
     monster.contractHpMult = scaling.hp;
     monster.contractPowerMult = scaling.power;
@@ -594,13 +642,16 @@
     }
 
     const rewardAmount = activeContractRewardAmount(active, contract, state);
-    if (!isValidRewardNumber(rewardAmount) || rewardAmount <= 0) return false;
+    const bonusAmount = active.bonusWritCompleted ? Math.max(1, Math.round(rewardAmount * 0.25)) : 0;
+    if (!isValidRewardNumber(rewardAmount) || rewardAmount + bonusAmount <= 0) return false;
     active.claimed = true;
-    if (!addPlayerGold(state, rewardAmount)) return false;
+    if (!addPlayerGold(state, rewardAmount + bonusAmount)) return false;
     if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
     if (!contracts.claimed.includes(contract.id)) contracts.claimed.push(contract.id);
     contracts.active = null;
-    pushLog(state, `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))}.`);
+    pushLog(state, bonusAmount > 0
+      ? `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount + bonusAmount))} with Bonus Writ.`
+      : `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))}.`);
     return true;
   }
 
@@ -712,6 +763,9 @@
         const first = list[0];
         return first ? startEliteContract(state, first.id) : false;
       },
+      acceptById(state = S, id = '') {
+        return startEliteContract(state, id);
+      },
       jumpToTargetFloor(state = S) {
         const active = activeEliteContractHunt(state);
         if (!active) return false;
@@ -721,6 +775,30 @@
         state.run.zone = zoneName(state.run.floor);
         state.run.monster = null;
         state.run.choices = ['attack','guard','skill','extract'];
+        return true;
+      },
+      markEliteContractRest(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        active.bonusRested = true;
+        return true;
+      },
+      markEliteContractExtract(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        active.bonusExtracted = true;
+        return true;
+      },
+      markEliteContractGuard(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        active.bonusGuardUses = Math.floor(numberOr(active.bonusGuardUses, 0, 0, 999)) + 1;
+        return true;
+      },
+      markEliteContractSkill(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        active.bonusSkillUses = Math.floor(numberOr(active.bonusSkillUses, 0, 0, 999)) + 1;
         return true;
       },
       forceTargetEncounter(state = S) {

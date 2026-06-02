@@ -1,0 +1,10 @@
+DungeonDex v1.4.15 - Elite Board Hunt Contracts
+
+Elite Board contracts now create real named hunt targets.
+Accepted contracts store a target monster and target floor.
+Contract targets appear in-run as HP-scaled Elite Hunts.
+Bonus Writs add simple optional objectives and small extra payout.
+Combat remains simplified around Common, Elite, Boss, and Board Hunt tiers.
+No monster affixes, status effects, or special enemy mechanics were reintroduced.
+Save compatibility was preserved.
+No save wipe.

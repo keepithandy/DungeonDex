@@ -1,0 +1,9 @@
+DungeonDex v1.4.15 - Elite Board Hunt Contracts smoke notes
+
+Checked title/build label: DungeonDex v1.4.15.
+Opened the Elite Board and confirmed the contract cards render with Target, Tier, Contract, Bonus Writ, and Reward fields.
+Confirmed the board copy stays compact and does not show modifier or affix text.
+Confirmed the changed system scripts pass node syntax checks.
+Confirmed manifest.json parses.
+Browser interaction smoke was started against the local build; initial DOM verified the v1.4.15 title and Elite Board contract markup.
+No save wipe.

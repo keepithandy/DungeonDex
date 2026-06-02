@@ -9,27 +9,24 @@
       const contract = eliteContractDef(active.id);
       if (!contract) return '';
       const progress = Math.min(contract.goal, Math.floor(numberOr(active.progress, 0, 0, contract.goal)));
-      const pct = Math.min(100, Math.round((progress / contract.goal) * 100));
       const ready = active.complete || progress >= contract.goal;
       const statusLabel = ready ? 'Ready to Claim' : 'Active';
       const rewardAmount = activeContractRewardAmount(active, contract, state);
-      const riskLevel = eliteContractRiskLevel(contract);
-      const objective = eliteContractObjective(contract);
       return `<div class="elite-contract-board">
       <div class="elite-contract-head">
         <div><h3>Lowfire Elite Board</h3><p>Take elite marks for clean payout.</p></div>
           <span class="pill ${ready ? 'rarity-rare' : ''}">${statusLabel}</span>
         </div>
         <div class="elite-contract-card ${ready ? 'ready' : 'active'}">
-          <div class="split"><strong>Active Contract: ${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(active.tier || contract.tier || '')}</span></div>
+          <div class="split"><strong>Active Hunt: ${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(active.tier || contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
-            <span><b>Progress:</b> ${progress} / ${contract.goal} elites defeated</span>
-            <span><b>Objective:</b> ${escapeHtml(objective)}</span>
-            <span><b>Risk:</b> ${escapeHtml(riskLevel)}</span>
+            <span><b>Target:</b> Floor ${escapeHtml(active.targetFloor || '?')}</span>
+            <span><b>Tier:</b> Elite Hunt</span>
+            <span><b>Contract:</b> ${escapeHtml(active.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
+            <span><b>Bonus Writ:</b> ${escapeHtml(active.bonusWrit || contract.bonusWrit || '')}</span>
             <span><b>Reward:</b> ${formatMoney(rewardAmount)}</span>
-            <span><b>Completion:</b> ${ready ? 'Ready to Claim' : 'In progress'}</span>
+            <span><b>Bonus:</b> ${active.bonusWritCompleted ? 'Completed' : active.bonusWritMissed ? 'Missed' : 'Pending'}</span>
           </div>
-          <div class="elite-contract-meter"><div style="width:${pct}%"></div></div>
           <div class="elite-contract-actions">
             <span class="pill">${ready ? 'Ready to Claim' : 'Payment held'}: ${formatMoney(rewardAmount)}</span>
             ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim</button>' : '<span class="small muted">Finish the mark to claim.</span>'}
@@ -41,10 +38,12 @@
     const available = availableEliteContracts(state);
     const body = available.length
       ? available.map(contract => `<div class="elite-contract-card">
-          <div class="split"><strong>${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
+          <div class="split"><strong>${escapeHtml(contract.title || contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
-            <span><b>Objective:</b> ${escapeHtml(eliteContractObjective(contract))}</span>
-            <span><b>Risk:</b> ${escapeHtml(eliteContractRiskLevel(contract))}</span>
+            <span><b>Target:</b> Floor ${escapeHtml(contract.targetFloor || '?')}</span>
+            <span><b>Tier:</b> Elite Hunt</span>
+            <span><b>Contract:</b> ${escapeHtml(contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
+            <span><b>Bonus Writ:</b> ${escapeHtml(contract.bonusWrit || '')}</span>
             <span><b>Reward:</b> ${formatMoney(calculateContractReward(contract, state))}</span>
           </div>
           <div class="elite-contract-actions">

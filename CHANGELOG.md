@@ -77,6 +77,21 @@ Finished changes:
 
 ---
 
+### v1.4.15 - Elite Board Hunt Contracts Pass
+
+Status: Complete
+
+Finished changes:
+
+* Made Elite Board contracts create real named hunts with stored target floor, tier, district, contract text, Bonus Writ, and reward preview.
+* Injected accepted contract targets into the run flow at the target floor and kept the exact elite name stable through save/load.
+* Added simple Bonus Writ tracking and payout bonuses without bringing back affixes or special enemy mechanics.
+* Updated Elite Board UI to show the active hunt summary and the contract's Target, Tier, Contract, Bonus Writ, and Reward fields.
+* Added safe contract test helpers for accept, jump, force encounter, complete, fail, and expire flows.
+* Preserved save compatibility and left the existing simplified Common/Elite/Boss combat model intact.
+
+---
+
 ### v1.4.14 - Combat Page Framing & Text Cleanup Pass
 
 Status: Complete
