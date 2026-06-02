@@ -60,12 +60,12 @@
   function pendingRunRewardSummary(pending) {
     const p = createPendingRunRewards(pending);
     const parts = [];
-    if (p.gold) parts.push(formatMoney(p.gold));
-    if (p.shards) parts.push(`${format(p.shards)} shards`);
-    if (p.ember) parts.push(`${format(p.ember)} ember`);
-    if (p.xp) parts.push(`${format(p.xp)} XP`);
-    if (p.loot.length) parts.push(`${format(p.loot.length)} loot`);
-    return parts.length ? parts.join(', ') : 'no unsecured rewards';
+    if (p.gold) parts.push(`Gold ${formatMoney(p.gold)}`);
+    if (p.shards) parts.push(`Shards ${format(p.shards)}`);
+    if (p.ember) parts.push(`Ember ${format(p.ember)}`);
+    if (p.xp) parts.push(`XP ${format(p.xp)}`);
+    if (p.loot.length) parts.push(`Loot ${format(p.loot.length)}`);
+    return parts.length ? parts.join(' • ') : 'no unsecured rewards';
   }
 
   function addPendingRunGold(state, amount) {

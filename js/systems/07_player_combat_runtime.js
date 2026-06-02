@@ -91,11 +91,11 @@
   function runRewardSummaryText(pending) {
     const p = createPendingRunRewards(pending);
     const parts = [];
-    if (p.gold) parts.push(moneyText(p.gold));
-    if (p.shards) parts.push(`${format(p.shards)} shards`);
-    if (p.ember) parts.push(`${format(p.ember)} ember`);
-    if (p.xp) parts.push(`${format(p.xp)} XP`);
-    if (p.loot.length) parts.push(`${format(p.loot.length)} loot`);
+    if (p.gold) parts.push(`Gold ${moneyText(p.gold)}`);
+    if (p.shards) parts.push(`Shards ${format(p.shards)}`);
+    if (p.ember) parts.push(`Ember ${format(p.ember)}`);
+    if (p.xp) parts.push(`XP ${format(p.xp)}`);
+    if (p.loot.length) parts.push(`Loot ${format(p.loot.length)}`);
     return parts.length ? parts.join(' • ') : 'no unsecured rewards';
   }
 
@@ -194,14 +194,17 @@
     if (!text) return '';
     text = text
       .replace(/^(Room Reward|Elite Spoils|Boss Spoils):\s+(.+?)\s+(secured|defeated|cleared)\.\s+Unsecured\s+/i, '$1: ')
+      .replace(/^Room cleared:\s*floor\s*(\d+),\s*room\s*(\d+)\.\s*Room Reward unsecured\s+/i, 'Room cleared: F$1 R$2 - Reward ')
+      .replace(/^Floor cleared:\s*Hollow Stair floor\s*(\d+)\.\s*Milestone Reward unsecured\s+/i, 'Floor cleared: Floor $1 - Reward ')
       .replace(/^(Room Reward loot|Room Reward cache):\s+/i, 'Loot: ')
       .replace(/\s+added to the unsecured haul\.?/gi, '')
       .replace(/The haul stays unsecured;\s*/gi, '')
-      .replace(/^Descent continues:\s*/i, 'Next: ')
-      .replace(/^Encounter:\s+(.+?)\s+rises in\s+.+\.?$/i, 'Encounter: $1')
+      .replace(/^Descent continues:\s*/i, 'Next fight: ')
+      .replace(/^Encounter:\s+(.+?)\s+rises in\s+.+\.?$/i, 'Now fighting: $1')
       .replace(/^Elite pressure rises:\s*/i, 'Elite: ')
       .replace(/^Boss pressure locks the stair:\s*/i, 'Boss: ')
-      .replace(/^No gear found\. You pocket the coin and move on\.?$/i, 'No gear. Coin added to haul.')
+      .replace(/^No gear found\. You pocket the coin and move on\.?$/i, 'No gear drop. Currency added to haul.')
+      .replace(/^Elite Spoils:\s*no gear found\.\s*Coin,\s*shards,\s*and XP stay in the unsecured haul\.?$/i, 'Elite Spoils: no gear drop. Currency and XP held.')
       .replace(/\s+/g, ' ')
       .trim();
     return text;
@@ -560,7 +563,8 @@
     const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
     const rewardLead = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward';
     const victoryVerb = source === 'boss' ? 'cleared' : source === 'elite' ? 'defeated' : 'secured';
-    pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured +${formatMoney(earnedGold)}, +${m.rewardShard} shards, +${format(m.rewardXp)} XP${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
+    const rewardParts = [`Gold +${formatMoney(earnedGold)}`, `Shards +${m.rewardShard}`, `XP +${format(m.rewardXp)}`];
+    pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured ${rewardParts.join(' • ')}${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
     pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
     if (source === 'boss') recordBossTrophyUnlock(state, state.run.floor, m.name);
     updateQuest(state, 'kill', 1);

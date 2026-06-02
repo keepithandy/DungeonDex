@@ -61,6 +61,20 @@ Add new notes below this section.
 
 ---
 
+### v1.4.11 - Dungeon Flow Clarity Pass
+
+Status: Complete
+
+Finished changes:
+
+* Reworked the active-run header into compact current floor, district, room/chapter, boss status, next-action, and haul lines.
+* Kept boss-floor state visible with a clearer active boss label while preserving the existing boss encounter layout.
+* Improved reward summaries with labeled Gold, Shards, Ember, XP, and Loot values.
+* Tightened rendered combat-feed wording for post-fight rewards, next-fight flow, room/floor milestones, and no-drop outcomes.
+* Renamed the vague combat action label from `Skill` to `Ashburst` without changing the underlying action.
+
+---
+
 ### v1.4.11 - App Feel Polish Pass
 
 Status: Complete

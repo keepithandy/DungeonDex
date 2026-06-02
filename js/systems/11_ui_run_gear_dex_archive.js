@@ -173,14 +173,24 @@
     const isEliteFight = monster && monster.tier === 'Elite';
     const currentFloorText = floorNumberLabel(depth);
     const nextBoss = nextBossFloorFromDepth(depth);
-    const nextBossText = isBossFight ? `${bossFloorLabel(depth)} now` : `Next boss: ${bossFloorLabel(nextBoss.floor)}`;
-    const encounterLabel = isBossFight ? 'Boss Floor' : isEliteFight ? 'Elite Encounter' : 'Hollow Stair Encounter';
+    const bossChaptersAway = Math.max(0, depthStageValue(nextBoss.floor) - depthStageValue(depth));
+    const bossStatusText = isBossFight
+      ? `${bossFloorLabel(depth)} active`
+      : `${bossFloorLabel(nextBoss.floor)} in ${format(bossChaptersAway)} chapter${bossChaptersAway === 1 ? '' : 's'}`;
     const bossTitle = isBossFight ? (bossFloorNameByDepth(depth) || bossFloorLabel(depth)) : '';
-    const enemyKicker = isBossFight ? `${bossFloorLabel(depth)} • ${bossTitle}` : (monster?.tier || 'Enemy');
+    const enemyKicker = isBossFight ? `${bossFloorLabel(depth)} active • ${bossTitle}` : (monster?.tier || 'Enemy');
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
     const monsterHpPct = monster ? Math.max(0, Math.min(100, (monster.hp / Math.max(1, monster.maxHp)) * 100)) : 0;
     const pendingRewards = ensurePendingRunRewards(S);
     const hasUnsecured = hasPendingRunRewards(pendingRewards);
+    const haulSummary = hasUnsecured ? runRewardSummaryText(pendingRewards) : 'No haul yet';
+    const nextActionText = S.run.event
+      ? 'Choose an event outcome'
+      : isBossFight
+        ? 'Boss active: survive or extract'
+        : isEliteFight
+          ? 'Elite active: manage risk or extract'
+          : 'Win this fight to continue deeper';
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
     const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
@@ -210,6 +220,28 @@
       return;
     }
 
+    runStatus.innerHTML = `
+      <div class="combat-device-top ${shellTone}">
+        <div class="run-flow-summary ${isBossFight ? 'is-boss-floor' : ''}" aria-label="Run status">
+          <div class="run-flow-primary">
+            <span>Current</span>
+            <strong>${escapeHtml(currentFloorText)}</strong>
+            <small>${escapeHtml(runDistrict.name)}</small>
+          </div>
+          <div class="run-flow-secondary">
+            <span>Room ${format(depthMeta.room)}/${format(DEPTH_ROOMS_PER_FLOOR)} • Chapter ${format(depthMeta.chapter)}</span>
+            <strong>${escapeHtml(bossStatusText)}</strong>
+          </div>
+        </div>
+        <div class="run-progress-only" aria-label="Run progress">
+          <div class="split run-progress-copy run-flow-next">
+            <span>${escapeHtml(nextActionText)}</span>
+            <span>Haul: ${escapeHtml(haulSummary)}</span>
+          </div>
+          <div class="depth-meter"><div style="width:${depthMeta.chapterPct.toFixed(1)}%"></div></div>
+        </div>
+        ${dungeonAtmosphereMarkup(atmosphereProfile, depth)}
+      </div>`;
 
     if (S.run.event) {
       const event = S.run.event;
@@ -232,22 +264,6 @@
         <div class="run-log-list">${asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT).map(renderCombatFeedLine).join('')}</div>`;
       return;
     }
-
-    runStatus.innerHTML = `
-      <div class="combat-device-top ${shellTone}">
-        <div class="combat-top-strip run-shell-top" aria-label="Run status">
-          <span class="combat-district-title">${escapeHtml(runDistrict.name)}</span>
-          <span>${escapeHtml(currentFloorText)} • ${escapeHtml(encounterLabel)}</span>
-        </div>
-        <div class="run-progress-only" aria-label="Run progress">
-          <div class="split run-progress-copy">
-            <span>Room ${format(depthMeta.room)}/${format(DEPTH_ROOMS_PER_FLOOR)} • C${format(depthMeta.chapter)}</span>
-            <span>${escapeHtml(nextBossText)}</span>
-          </div>
-          <div class="depth-meter"><div style="width:${depthMeta.chapterPct.toFixed(1)}%"></div></div>
-        </div>
-        ${dungeonAtmosphereMarkup(atmosphereProfile, depth)}
-      </div>`;
 
     combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
@@ -302,7 +318,7 @@
 
         <section class="combat-device-actions" aria-label="Combat actions">
           <button class="primary combat-btn attack-btn" data-action="attack" aria-label="Attack enemy">Attack</button>
-          <button class="ghost combat-btn skill-btn" data-action="skill" aria-label="Use Ashburst skill">Skill</button>
+          <button class="ghost combat-btn skill-btn" data-action="skill" aria-label="Use Ashburst skill">Ashburst</button>
           <button class="ghost combat-btn guard-btn" data-action="guard" aria-label="Guard and recover HP">Guard</button>
           <button class="ghost combat-btn danger-btn extract-btn" data-action="extract" aria-label="Attempt to extract from the Hollow Stair">Extract</button>
         </section>
