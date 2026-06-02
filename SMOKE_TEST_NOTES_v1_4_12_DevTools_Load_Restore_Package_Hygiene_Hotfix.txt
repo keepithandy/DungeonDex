@@ -1,0 +1,37 @@
+DungeonDex v1.4.12 — Smoke Test Notes
+
+Scope
+- DevTools load restore and package hygiene hotfix validation.
+
+Checks
+1) JS syntax checks
+- node --check app.js
+- node --check sw.js
+- node --check on all js/systems/*.js
+
+2) JSON parse check
+- manifest.json parse verification
+
+3) index.html script order check
+- 13_devtools_overlay.js
+- 14_devtools_scenarios.js
+- 15_devtools_balance_reports.js
+- 16_relic_forge_crafting.js
+
+4) sw.js cache list/build query check
+- systems 13/14/15/16 present
+- build query 1.4.12-devtools-load-hygiene
+
+5) Browser smoke check
+- Title/build label shows DungeonDex v1.4.12
+- Town loads
+- Enter Dungeon works
+- Combat buttons work
+- ?dev=1 overlay appears
+- Scenario presets and balance reports available where expected
+
+6) Save compatibility
+- No save wipe/migration introduced
+
+7) Gameplay tuning
+- No gameplay tuning changes in this pass

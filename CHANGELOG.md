@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.11`
-* Current local package baseline: `v1.4.11`
-* Current development target: `v1.4.11`
+* Public/live itch version: `v1.4.12`
+* Current local package baseline: `v1.4.12`
+* Current development target: `v1.4.12`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -60,6 +60,16 @@ Use `VERSION.md` for the current active version.
 Add new notes below this section.
 
 ---
+
+### v1.4.12 - DevTools Load Restore & Package Hygiene Hotfix
+
+Status: Complete
+
+Finished changes:
+
+* Restored `14_devtools_scenarios.js` and `15_devtools_balance_reports.js` in `index.html` load order between systems 13 and 16.
+* Aligned `index.html`, `app.js`, `sw.js`, and build-label guards to `DungeonDex v1.4.12` with build query `1.4.12-devtools-load-hygiene`.
+* Removed accidental tracked file `tatus --short` and added a minimal `.gitignore` hygiene baseline.
 
 ### v1.4.11 - Dungeon Flow Clarity Pass
 

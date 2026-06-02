@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.11-app-feel-polish';
-const BUILD_QS = '1.4.11-app-feel-polish';
+const CACHE_NAME = 'dungeon-dex-1.4.12-devtools-load-hygiene';
+const BUILD_QS = '1.4.12-devtools-load-hygiene';
 const ASSETS = [
   './',
   './index.html',

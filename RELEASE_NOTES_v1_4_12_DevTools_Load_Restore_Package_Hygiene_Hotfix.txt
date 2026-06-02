@@ -1,0 +1,23 @@
+DungeonDex v1.4.12 — DevTools Load Restore & Package Hygiene Hotfix
+
+Summary
+- Restored missing DevTools system script loading in page order.
+- Synced version/build query labels to v1.4.12 across runtime and cache surfaces.
+- Removed accidental tracked terminal output artifact from repo.
+
+Details
+- index.html now loads:
+  13_devtools_overlay.js
+  14_devtools_scenarios.js
+  15_devtools_balance_reports.js
+  16_relic_forge_crafting.js
+  in exact sequence with build query:
+  1.4.12-devtools-load-hygiene
+- sw.js cache name/build query updated to:
+  dungeon-dex-1.4.12-devtools-load-hygiene
+  1.4.12-devtools-load-hygiene
+- VERSION.md updated to v1.4.12 as source-of-truth.
+
+Compatibility
+- No save wipe or migration behavior introduced.
+- No gameplay tuning/balance changes included in this hotfix.

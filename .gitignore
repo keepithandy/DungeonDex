@@ -1,0 +1,6 @@
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+tatus --short
+status --short
