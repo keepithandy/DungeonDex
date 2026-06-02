@@ -10,6 +10,46 @@
     return DISTRICT_DATA.find(district => safeDepth >= district.min && safeDepth <= district.max) || DISTRICT_DATA[DISTRICT_DATA.length - 1] || DISTRICT_DATA[0];
   }
 
+  function getLoreDepthProgress(absoluteChapter) {
+    const CHAPTERS_PER_ROOM = 10;
+    const ROOMS_PER_FLOOR = 5;
+    const CHAPTERS_PER_FLOOR = CHAPTERS_PER_ROOM * ROOMS_PER_FLOOR;
+    const BOSS_EVERY_CHAPTERS = 5;
+    const safeChapter = Math.max(1, Math.floor(numberOr(absoluteChapter, 1, 1, 999999)));
+    const floorNumber = Math.floor((safeChapter - 1) / CHAPTERS_PER_FLOOR) + 1;
+    const chapterWithinFloor = ((safeChapter - 1) % CHAPTERS_PER_FLOOR) + 1;
+    const roomWithinFloor = Math.floor((chapterWithinFloor - 1) / CHAPTERS_PER_ROOM) + 1;
+    const chapterWithinRoom = ((chapterWithinFloor - 1) % CHAPTERS_PER_ROOM) + 1;
+    const isBossChapter = safeChapter % BOSS_EVERY_CHAPTERS === 0;
+    const chaptersUntilBoss = isBossChapter ? 0 : BOSS_EVERY_CHAPTERS - (safeChapter % BOSS_EVERY_CHAPTERS);
+
+    return {
+      absoluteChapter: safeChapter,
+      floorNumber,
+      roomWithinFloor,
+      roomsPerFloor: ROOMS_PER_FLOOR,
+      chapterWithinRoom,
+      chaptersPerRoom: CHAPTERS_PER_ROOM,
+      chapterWithinFloor,
+      chaptersPerFloor: CHAPTERS_PER_FLOOR,
+      isBossChapter,
+      chaptersUntilBoss
+    };
+  }
+
+  function getLoreFloorDistrict(floorNumber) {
+    const safeFloor = Math.max(1, Math.floor(numberOr(floorNumber, 1, 1, 999999)));
+    return districtByDepth(safeFloor);
+  }
+
+  function getLoreFloorName(floorNumber) {
+    const safeFloor = Math.max(1, Math.floor(numberOr(floorNumber, 1, 1, 999999)));
+    if (typeof getFloorNameForFloor === 'function') return getFloorNameForFloor(safeFloor);
+    if (typeof getDistrictNameForFloor === 'function') return getDistrictNameForFloor(safeFloor);
+    const district = getLoreFloorDistrict(safeFloor);
+    return district?.name || 'Lowfire District';
+  }
+
   function defaultRunStartDepth(state) {
     const fallback = progressDepthValue(state?.player?.safeExtractDepth, 1);
     return progressDepthValue(state?.player?.returnDepth, fallback);

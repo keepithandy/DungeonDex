@@ -1,0 +1,32 @@
+DungeonDex v1.4.16 - Lore Depth Counter & Floor Naming Fix Smoke Test Notes
+
+Build query:
+1.4.16-lore-depth-counter-floor-names
+
+Syntax and manifest checks:
+- PASS: node --check app.js
+- PASS: node --check sw.js
+- PASS: node --check js/systems/*.js
+- PASS: manifest.json parses as JSON
+
+Browser smoke:
+- In-app browser startup failed in this environment with a Windows sandbox process-start error.
+- PASS: Headless Chrome CDP smoke over local HTTP served from the current DungeonDex folder.
+- PASS: Visible build label showed DungeonDex v1.4.16.
+- PASS: Enter Dungeon opened an active run with a monster.
+- PASS: Combat header showed Floor as the main value.
+- PASS: Chapter 1 header showed Floor 1, Room 1 / 5, Chapter 1 / 10, Boss in 4 chapters.
+- PASS: Chapter 5 header showed Boss Chapter.
+- PASS: Chapter 10 header showed Boss Chapter.
+- PASS: Chapter 11 header showed Room 2 / 5 and Chapter 1 / 10.
+- PASS: Chapter 50 header showed Floor 1, Room 5 / 5, Chapter 10 / 10.
+- PASS: Chapter 51 header showed Floor 2, Room 1 / 5, Chapter 1 / 10.
+- PASS: Chapter 302 header showed Floor 7, Room 1 / 5, Chapter 2 / 10, Boss in 3 chapters.
+- PASS: Floor names were resolved from computed floorNumber. Chapter 302 resolved floorName from Floor 7, not raw depth 302.
+- PASS: Header did not show Room 15, Boss Floor, or room-based boss countdowns.
+- PASS: Attack, Skill/Ashburst, Guard, Extract, Haul text, and Lowfire Elite Board presence were verified.
+- PASS: No browser console errors were reported in the final local HTTP smoke.
+
+Compatibility notes:
+- Save data was not wiped. Browser smoke used a temporary Chrome profile.
+- Combat mechanics were not expanded. No affixes, statuses, modifier popups, or special monster mechanics were added.

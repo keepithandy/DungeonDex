@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.4.15 - Warden Talents + Lowfire Board.
+// DungeonDex v1.4.16 - Warden Talents + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.4.15-combat-affix-removal';
+  const SCRIPT_BUILD = '1.4.16-lore-depth-counter-floor-names';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.15-combat-affix-removal';
-const BUILD_QS = '1.4.15-combat-affix-removal';
+const CACHE_NAME = 'dungeon-dex-1.4.16-lore-depth-counter-floor-names';
+const BUILD_QS = '1.4.16-lore-depth-counter-floor-names';
 const ASSETS = [
   './',
   './index.html',

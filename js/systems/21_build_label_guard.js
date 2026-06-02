@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.15 - Build label guard.
+// DungeonDex v1.4.16 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.4.15';
+  const BUILD = '1.4.16';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.15-combat-affix-removal';
+  const BUILD_QS = '1.4.16-lore-depth-counter-floor-names';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

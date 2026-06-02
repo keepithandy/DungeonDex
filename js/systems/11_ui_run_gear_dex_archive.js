@@ -99,11 +99,11 @@
 
   function dungeonAtmosphereProfile(state, district, depth, monster) {
     const safeDepth = Math.max(1, Math.floor(numberOr(depth ?? state?.run?.floor, 1, 1, 999999)));
-    const meta = depthProgressMeta(safeDepth);
+    const meta = getLoreDepthProgress(safeDepth);
     const kind = combatBackdropKind(state, district, safeDepth, monster);
     const pressure = safeDepth >= 120 ? 'abyssal' : safeDepth >= 80 ? 'grave' : safeDepth >= 40 ? 'deep' : safeDepth >= 15 ? 'pressured' : 'fresh';
-    const chapterMood = meta.chapter >= DEPTH_CHAPTERS_PER_ROOM - 1 ? 'last-chapter' : meta.chapter <= 2 ? 'fresh-room' : 'mid-room';
-    const floorMood = meta.room === DEPTH_ROOMS_PER_FLOOR && meta.chapter >= DEPTH_CHAPTERS_PER_ROOM - 1 ? 'floor-edge' : meta.room >= DEPTH_ROOMS_PER_FLOOR - 1 ? 'near-floor' : 'normal-floor';
+    const chapterMood = meta.chapterWithinRoom >= meta.chaptersPerRoom - 1 ? 'last-chapter' : meta.chapterWithinRoom <= 2 ? 'fresh-room' : 'mid-room';
+    const floorMood = meta.roomWithinFloor === meta.roomsPerFloor && meta.chapterWithinRoom >= meta.chaptersPerRoom - 1 ? 'floor-edge' : meta.roomWithinFloor >= meta.roomsPerFloor - 1 ? 'near-floor' : 'normal-floor';
     const districtName = district?.name || 'The Hollow Stair';
     const lines = {
       lowfire: ['Lowfire soot drifts through the stairwell.', 'Old lamps pop in the ash behind you.', 'Warm dust settles on the weapon grip.'],
@@ -116,7 +116,7 @@
       generic: ['The Hollow Stair folds another chamber into place.', 'The dungeon air tightens around the fight.', 'Loose stone dust falls into the dark.']
     };
     const pool = lines[kind] || lines.generic;
-    const line = pool[(safeDepth + meta.room + meta.chapter) % pool.length];
+    const line = pool[(safeDepth + meta.roomWithinFloor + meta.chapterWithinRoom) % pool.length];
     const pressureLine = pressure === 'abyssal' ? 'Abyssal pressure: every victory feels borrowed.'
       : pressure === 'grave' ? 'Grave pressure: the descent is actively pushing back.'
       : pressure === 'deep' ? 'Deep pressure: rewards improve, but breathing room is thinner.'
@@ -148,18 +148,17 @@
     const monster = S.run.monster;
     if (!S.ui) S.ui = { combatLogExpanded:false };
     const depth = S.run.floor || 1;
-    const depthMeta = depthProgressMeta(depth);
-    const runDistrict = currentStagingDistrict(S);
+    const loreDepth = getLoreDepthProgress(depth);
+    const runDistrict = getLoreFloorDistrict(loreDepth.floorNumber);
+    const floorName = getLoreFloorName(loreDepth.floorNumber);
     const isBossFight = monster && monster.tier === 'Boss';
     const isEliteFight = monster && monster.tier === 'Elite';
     const isContractTarget = !!(monster && monster.contractTarget);
-    const currentFloorText = floorNumberLabel(depth);
-    const nextBoss = nextBossFloorFromDepth(depth);
-    const bossChaptersAway = Math.max(0, depthStageValue(nextBoss.floor) - depthStageValue(depth));
-    const bossRoomsAway = Math.max(0, Math.ceil(bossChaptersAway / DEPTH_CHAPTERS_PER_ROOM));
-    const bossStatusText = isBossFight
-      ? 'Boss active'
-      : `Boss in ${format(bossRoomsAway)} room${bossRoomsAway === 1 ? '' : 's'}`;
+    const currentFloorText = `Floor ${format(loreDepth.floorNumber)}`;
+    const currentProgressText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)} • Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
+    const bossStatusText = loreDepth.isBossChapter
+      ? 'Boss Chapter'
+      : `Boss in ${format(loreDepth.chaptersUntilBoss)} chapter${loreDepth.chaptersUntilBoss === 1 ? '' : 's'}`;
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
     const monsterHpPct = monster ? Math.max(0, Math.min(100, (monster.hp / Math.max(1, monster.maxHp)) * 100)) : 0;
     const pendingRewards = ensurePendingRunRewards(S);
@@ -189,14 +188,15 @@
 
     runStatus.innerHTML = `
       <div class="combat-device-top ${shellTone}">
-        <div class="run-flow-summary ${isBossFight ? 'is-boss-floor' : ''}" aria-label="Run status">
+        <div class="run-flow-summary ${loreDepth.isBossChapter ? 'is-boss-floor' : ''}" aria-label="Run status">
           <div class="run-flow-primary">
             <span>Current</span>
             <strong>${escapeHtml(currentFloorText)}</strong>
-            <small>${escapeHtml(runDistrict.name)}</small>
+            <small>${escapeHtml(currentProgressText)}</small>
+            <small>${escapeHtml(floorName)}</small>
           </div>
           <div class="run-flow-secondary">
-            <span>Room ${format(depthMeta.room)} / ${format(DEPTH_ROOMS_PER_FLOOR)}</span>
+            <span>Boss</span>
             <strong>${escapeHtml(bossStatusText)}</strong>
           </div>
         </div>

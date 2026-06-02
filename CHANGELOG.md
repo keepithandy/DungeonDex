@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.15`
-* Current local package baseline: `v1.4.15`
-* Current development target: `v1.4.15`
+* Public/live itch version: `v1.4.16`
+* Current local package baseline: `v1.4.16`
+* Current development target: `v1.4.16`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.16 - Lore Depth Counter & Floor Naming Fix
+
+Status: Complete
+
+Finished changes:
+
+* Updated active build labels and cache query strings to `DungeonDex v1.4.16` with build query `1.4.16-lore-depth-counter-floor-names`.
+* Added a lore-depth helper that derives visible Floor, Room, Chapter, and boss countdown values from the absolute chapter counter.
+* Updated the combat header so the left panel shows `Floor X`, `Room X / 5`, `Chapter X / 10`, and the computed floor district name.
+* Updated the boss panel so it only shows chapter-based boss distance or `Boss Chapter`.
+* Resolved combat-header floor names from computed `floorNumber`, not raw absolute depth/chapter.
+* Removed the confusing header mix of raw depth floors, `Room X / 15`, room-based boss countdowns, and extra boss-panel room labels.
+* Preserved simple combat tiers, Elite Board hunt logic, save data, and combat actions.
 
 ---
 
@@ -170,7 +186,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.15`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.16`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.
