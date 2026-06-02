@@ -32,6 +32,7 @@
       chaptersPerRoom: CHAPTERS_PER_ROOM,
       chapterWithinFloor,
       chaptersPerFloor: CHAPTERS_PER_FLOOR,
+      floorName: getLoreFloorName(floorNumber),
       isBossChapter,
       chaptersUntilBoss
     };
@@ -245,8 +246,8 @@
   }
 
   function depthShortLabel(depth) {
-    const d = depthStructureFromRawDepth(depth);
-    return `F${format(threatDepthFromDepth(depth))} • R${format(d.room)} • C${format(d.chapter)}`;
+    const d = getLoreDepthProgress(depth);
+    return `F${format(d.floorNumber)} • R${format(d.roomWithinFloor)} • C${format(d.chapterWithinRoom)}`;
   }
 
   function depthLabel(depth) {

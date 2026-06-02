@@ -68,12 +68,14 @@ Status: Complete
 Finished changes:
 
 * Updated active build labels and cache query strings to `DungeonDex v1.4.16` with build query `1.4.16-lore-depth-counter-floor-names`.
-* Added a lore-depth helper that derives visible Floor, Room, Chapter, and boss countdown values from the absolute chapter counter.
-* Updated the combat header so the left panel shows `Floor X`, `Room X / 5`, `Chapter X / 10`, and the computed floor district name.
-* Updated the boss panel so it only shows chapter-based boss distance or `Boss Chapter`.
-* Resolved combat-header floor names from computed `floorNumber`, not raw absolute depth/chapter.
-* Removed the confusing header mix of raw depth floors, `Room X / 15`, room-based boss countdowns, and extra boss-panel room labels.
-* Preserved simple combat tiers, Elite Board hunt logic, save data, and combat actions.
+* Town and combat now share the same lore-depth helper.
+* The combat header now displays Floor, Room, and Chapter more clearly.
+* `10` Chapters display as `1` Room.
+* `5` Rooms display as `1` Floor.
+* Boss distance now displays in chapters.
+* Floor names resolve through the shared lore-depth display helper.
+* No save data, combat mechanics, rewards, Elite Board behavior, or enemy mechanics were changed.
+* Monster affixes/status effects were not reintroduced.
 
 ---
 

@@ -155,7 +155,8 @@
     const isEliteFight = monster && monster.tier === 'Elite';
     const isContractTarget = !!(monster && monster.contractTarget);
     const currentFloorText = `Floor ${format(loreDepth.floorNumber)}`;
-    const currentProgressText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)} • Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
+    const currentProgressRoomText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)}`;
+    const currentProgressChapterText = `Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
     const bossStatusText = loreDepth.isBossChapter
       ? 'Boss Chapter'
       : `Boss in ${format(loreDepth.chaptersUntilBoss)} chapter${loreDepth.chaptersUntilBoss === 1 ? '' : 's'}`;
@@ -192,7 +193,8 @@
           <div class="run-flow-primary">
             <span>Current</span>
             <strong>${escapeHtml(currentFloorText)}</strong>
-            <small>${escapeHtml(currentProgressText)}</small>
+            <small>${escapeHtml(currentProgressRoomText)}</small>
+            <small>${escapeHtml(currentProgressChapterText)}</small>
             <small>${escapeHtml(floorName)}</small>
           </div>
           <div class="run-flow-secondary">

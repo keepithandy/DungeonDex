@@ -1,16 +1,10 @@
 DungeonDex v1.4.16 - Lore Depth Counter & Floor Naming Fix
 
-Build query:
-1.4.16-lore-depth-counter-floor-names
-
-Summary:
-- Fixed the combat header lore-depth display so raw absolute chapter depth is converted into one clear Floor / Room / Chapter counter.
-- The combat header now shows Floor X as the main value, with Room X / 5 and Chapter X / 10 beneath it.
-- The boss panel now only shows Boss plus chapter-based boss distance, or Boss Chapter on boss chapters.
-- Floor names are resolved from computed floorNumber, not raw absolute depth.
-- Removed confusing header labels such as Room X / 15, room-based boss countdowns, and extra room labels under the boss panel.
-- Preserved save data, combat actions, haul/extraction flow, and simple Common / Elite / Boss / Elite Board Hunt combat identity.
-
-Notes:
-- This is a targeted header and label fix. It does not reintroduce monster affixes, status effects, modifier popups, or special monster mechanics.
-- The existing district table remains the source for floor/district names.
+Town and combat now share the same lore-depth helper.
+The combat header now displays Floor, Room, and Chapter more clearly.
+10 Chapters display as 1 Room.
+5 Rooms display as 1 Floor.
+Boss distance now displays in chapters.
+Floor names resolve through the shared lore-depth display helper.
+No save data, combat mechanics, rewards, Elite Board behavior, or enemy mechanics were changed.
+Monster affixes/status effects were not reintroduced.

@@ -7994,6 +7994,9 @@ button:focus-visible,
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.app-shell.combat-active .run-flow-primary small + small {
+  margin-top: -1px;
+}
 .app-shell.combat-active .run-flow-next {
   align-items: center;
   padding: 0 1px;
