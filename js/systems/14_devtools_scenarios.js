@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.17 - DevTools Scenario Presets
+// DungeonDex v1.4.18 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.17';
-  const SCENARIO_BUILD = '1.4.17-elite-board-bonus-writ-polish';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.18';
+  const SCENARIO_BUILD = '1.4.18-elite-trophy-reward-ladder';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -199,6 +199,53 @@
     log(scenarioState.lastMessage, 'info');
     saveAndRender();
   }
+  function eliteContractApi(){ return window.DungeonDexEliteContracts || null; }
+  function eliteTrophyStateText(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return 'Elite trophy state unavailable.';
+    const summary = typeof api.trophySummary === 'function' ? api.trophySummary(S) : { totalFound:0, uniqueFound:0, latestLabel:'none yet', bonus:0 };
+    return [
+      `Elite trophies`,
+      `unique: ${summary.uniqueFound}`,
+      `total found: ${summary.totalFound}`,
+      `latest: ${summary.latestLabel}`,
+      `bonus: +${summary.bonus}%`
+    ].join('\n');
+  }
+  function forceEliteTrophy(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return false;
+    const active = api.ensure ? api.ensure(S).active : null;
+    const target = active || (typeof ELITE_CONTRACTS !== 'undefined' && ELITE_CONTRACTS && ELITE_CONTRACTS[0]) || null;
+    const contract = active || target;
+    if (!contract) return false;
+    const result = api.forceTrophy ? api.forceTrophy(S, contract.id || contract.eliteName || '') : null;
+    saveAndRender();
+    log(result?.awarded ? `Forced elite trophy: ${result.trophy.name}.` : 'Forced elite trophy produced a duplicate or no-op.', result?.awarded ? 'info' : 'warn');
+    return !!result;
+  }
+  function simulateEliteCompletion(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return false;
+    const active = api.activeSummaryText ? api.ensure(S).active : null;
+    if (!active) return false;
+    if (api.complete) {
+      api.complete(S);
+      saveAndRender();
+      return true;
+    }
+    return false;
+  }
+  function clearTrophyState(){
+    const api = eliteContractApi();
+    if (!api || !hasState() || !api.clearTrophies) return false;
+    const ok = api.clearTrophies(S);
+    if (ok) {
+      log('Elite trophy state cleared for testing.', 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
   function restoreBackup(){
     if (!scenarioState.lastBackup || !hasState()) { log('No scenario backup available.', 'warn'); return; }
     restoreObject(S, scenarioState.lastBackup);
@@ -257,6 +304,11 @@
         ${button('Restore Last Backup', 'restore', '', true)}
         ${button('Copy Scenario Snapshot', 'snapshot')}
       </div>
+      <div class="dd-devtools-button-grid">
+        ${button('Force Trophy', 'force-trophy')}
+        ${button('Simulate Completion', 'simulate-complete')}
+        ${button('Clear Trophy State', 'clear-trophies', '', true)}
+      </div>
       ${message}
       <div class="dd-devtools-log-list">${logs}</div>
     </section>`;
@@ -288,6 +340,9 @@
     if (action === 'backup') { scenarioState.lastBackup = cloneState(); scenarioState.lastMessage = 'Manual backup captured.'; log('Manual backup captured.', 'info'); return; }
     if (action === 'restore') return restoreBackup();
     if (action === 'snapshot') return copyScenarioSnapshot();
+    if (action === 'force-trophy') return forceEliteTrophy();
+    if (action === 'simulate-complete') return simulateEliteCompletion();
+    if (action === 'clear-trophies') return clearTrophyState();
   });
   function init(){
     try { document.title = SCENARIO_VERSION; } catch (err) {}
@@ -304,6 +359,7 @@
     backup: function(){ scenarioState.lastBackup = cloneState(); return !!scenarioState.lastBackup; },
     restore: restoreBackup,
     snapshot: scenarioSnapshot,
+    eliteTrophyStateText,
     state: scenarioState
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

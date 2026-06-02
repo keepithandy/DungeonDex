@@ -261,6 +261,28 @@
     { id:'hollow_stair_skull', boss:10, requiredDepth:150, name:'Hollow Stair Skull', source:'Boss Floor 50', tone:'Gore Prestige', icon:'skull', image:'assets/trophies/hollow_stair_skull_trophy.png', flavor:'A horned skull marked with the stair. Blood gathers under it even when dry.' }
   ];
 
+  const ELITE_TROPHY_DEFINITIONS = [
+    { id:'glassfang_blade_chip', sourceElite:'Glassfang Brute', floorName:'Lowfire District', name:'Glassfang Blade Chip', bonusText:'+1% Elite Board payout', flavor:'A sliver of cracked blade glass from a contract target that never stayed still.' },
+    { id:'ash_crowned_buckle', sourceElite:'Ash-Crowned Marauder', floorName:'Ashgate Warrens', name:'Ash-Crowned Buckle', bonusText:'+1% Elite Board payout', flavor:'A scorched buckle pried from a marauder wrapped in old authority.' },
+    { id:'mireglass_ledger_shard', sourceElite:'Mireglass Collector', floorName:'Mireglass District', name:'Mireglass Ledger Shard', bonusText:'+1% Elite Board payout', flavor:'A green shard etched with a broken tally line and a wet ink stain.' },
+    { id:'rook_eater_pin', sourceElite:'Rook-Eater Venn', floorName:'Rookery', name:'Cracked Guild Pin', bonusText:'+1% Elite Board payout', flavor:'A bent pin that still smells faintly of feathers and office smoke.' },
+    { id:'cinderjaw_writ_seal', sourceElite:'Cinderjaw Bailiff', floorName:'Lowfire District', name:'Cinderjaw Writ Seal', bonusText:'+1% Elite Board payout', flavor:'A broken seal once used to stamp debts onto living hands.' },
+    { id:'saltgrave_hook', sourceElite:'Saltgrave Hookman', floorName:'Saltgrave', name:'Saltgrave Hook', bonusText:'+1% Elite Board payout', flavor:'A hooked tool with a blade edge polished by salt and rope.' },
+    { id:'ivory_span_plate', sourceElite:'Ivory Span Oathbreaker', floorName:'Ivory Span', name:'Broken Oath Plate', bonusText:'+1% Elite Board payout', flavor:'A pale plate snapped from ceremonial armor that could not hold its promise.' },
+    { id:'red_chapel_hymn_scrap', sourceElite:'Red Chapel Hex-Singer', floorName:'Red Chapel', name:'Red Chapel Hymn Scrap', bonusText:'+1% Elite Board payout', flavor:'A torn hymn fragment that still carries a low, ugly vibration.' }
+  ];
+
+  const ELITE_TROPHY_BY_ELITE = {
+    'glassfang brute': 'glassfang_blade_chip',
+    'ash-crowned marauder': 'ash_crowned_buckle',
+    'mireglass collector': 'mireglass_ledger_shard',
+    'rook-eater venn': 'rook_eater_pin',
+    'cinderjaw bailiff': 'cinderjaw_writ_seal',
+    'saltgrave hookman': 'saltgrave_hook',
+    'ivory span oathbreaker': 'ivory_span_plate',
+    'red chapel hex-singer': 'red_chapel_hymn_scrap'
+  };
+
 
   const MONSTER_FAMILIES = ['Ghoul','Wyrm','Construct','Cultist','Husk','Beast','Harpy','Watcher','Knight','Mireborn','Shade','Revenant'];
   const MONSTER_TYPES = ['Maw','Stalker','Herald','Spitter','Warden','Lurker','Devourer','Drummer','Seer','Ravager','Hound','Colossus'];

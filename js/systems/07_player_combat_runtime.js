@@ -157,6 +157,7 @@
     if (/\b(extract|extracted|extraction|escaped)\b/.test(lower) || lower.includes('extraction secured')) return 'escape';
     if (lower.includes('boss') || lower.includes('warning') || lower.includes('enraged')) return 'boss';
     if (lower.includes('elite') || lower.includes('frenzied') || lower.includes('ironhide') || lower.includes('venomous') || lower.includes('swift') || lower.includes('hollow-eyed') || lower.includes('ash-fed') || lower.includes('gravebound') || lower.includes('wardmarked')) return 'elite';
+    if (lower.includes('trophy found') || lower.includes('trophy duplicate found') || lower.includes('elite reward ladder')) return 'reward';
     if (lower.includes('floor secured') || lower.includes('floor cleared') || lower.includes('floor reached') || lower.startsWith('floor ')) return 'floor';
     if (lower.includes('room secured') || lower.includes('room cleared') || lower.includes('room reached')) return 'milestone';
     if (lower.includes('recovered') || lower.includes('healed') || lower.includes('returns') || lower.includes('regen')) return 'heal';

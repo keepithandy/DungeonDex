@@ -414,6 +414,131 @@
     };
   }
 
+  function createEliteTrophyState(seed = {}) {
+    const source = isPlainObject(seed) ? seed : {};
+    const collected = {};
+    const rawCollected = isPlainObject(source.collected) ? source.collected : {};
+    Object.keys(rawCollected).forEach(id => {
+      const entry = rawCollected[id];
+      if (!isPlainObject(entry)) return;
+      const trophyId = String(entry.id || id || '').trim();
+      if (!trophyId) return;
+      collected[trophyId] = {
+        id: trophyId,
+        name: String(entry.name || 'Elite Trophy'),
+        sourceElite: String(entry.sourceElite || entry.source || ''),
+        floorName: String(entry.floorName || ''),
+        earnedAt: Math.floor(numberOr(entry.earnedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER)),
+        count: Math.max(1, Math.floor(numberOr(entry.count, 1, 1, 9999)))
+      };
+    });
+    return {
+      collected,
+      totalFound: Math.max(0, Math.floor(numberOr(source.totalFound, Object.keys(collected).reduce((sum, id) => sum + Math.max(1, Math.floor(numberOr(collected[id]?.count, 1, 1, 9999))), 0), 0, Number.MAX_SAFE_INTEGER))),
+      latestId: String(source.latestId || '')
+    };
+  }
+
+  function ensureEliteTrophyState(state) {
+    if (!state.player) state.player = {};
+    state.player.eliteTrophies = createEliteTrophyState(state.player.eliteTrophies);
+    return state.player.eliteTrophies;
+  }
+
+  function getEliteTrophyCollection(state) {
+    return ensureEliteTrophyState(state).collected;
+  }
+
+  function eliteTrophyDefinitions() {
+    return Array.isArray(window?.ELITE_TROPHY_DEFINITIONS) ? window.ELITE_TROPHY_DEFINITIONS : [];
+  }
+
+  function eliteTrophyByEliteName(name) {
+    const key = String(name || '').trim().toLowerCase();
+    if (!key) return null;
+    const map = window?.ELITE_TROPHY_BY_ELITE || {};
+    const id = map[key];
+    return eliteTrophyDefinitions().find(trophy => trophy.id === id) || null;
+  }
+
+  function eliteTrophyDefinitionForContract(contract) {
+    if (!contract) return null;
+    return eliteTrophyByEliteName(contract.eliteName) || eliteTrophyDefinitions().find(trophy => trophy.sourceElite === contract.eliteName) || null;
+  }
+
+  function eliteTrophyFallback(contract) {
+    const eliteName = String(contract?.eliteName || contract?.name || 'Elite').trim();
+    const clean = eliteName.replace(/\s+/g, ' ');
+    return {
+      id: clean.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `elite_trophy_${Date.now()}`,
+      name: `${clean} Trophy`,
+      sourceElite: eliteName,
+      floorName: String(contract?.district || contract?.targetLocation || '').trim() || 'Elite Board',
+      bonusText: '+1% Elite Board payout',
+      flavor: `A collected sign of victory over ${clean}.`
+    };
+  }
+
+  function getEliteTrophyPayoutBonus(state) {
+    const trophies = ensureEliteTrophyState(state);
+    const uniqueCount = Object.keys(trophies.collected || {}).length;
+    return Math.min(5, Math.max(0, uniqueCount));
+  }
+
+  function eliteTrophyRollChance(active, contract, state = null) {
+    const base = 0.12;
+    const bonus = active?.bonusWritCompleted ? 0.08 : 0;
+    return Math.min(0.20, base + bonus);
+  }
+
+  function awardEliteTrophy(state, contract, options = {}) {
+    const trophies = ensureEliteTrophyState(state);
+    const def = eliteTrophyDefinitionForContract(contract) || eliteTrophyFallback(contract);
+    if (!def || !def.id) return null;
+    const existing = trophies.collected[def.id];
+    if (existing) {
+      existing.count = Math.max(1, Math.floor(numberOr(existing.count, 1, 1, 9999)) + 1);
+      existing.earnedAt = existing.earnedAt || Date.now();
+      trophies.totalFound = Math.max(0, Math.floor(numberOr(trophies.totalFound, 0, 0, Number.MAX_SAFE_INTEGER))) + 1;
+      trophies.latestId = def.id;
+      const line = `Trophy duplicate found: ${existing.name} x${existing.count}`;
+      if (options.log !== false) pushCombat(state, line);
+      if (options.log !== false) pushLog(state, line);
+      return { trophy: existing, duplicate: true, awarded: false };
+    }
+    const trophy = {
+      id: def.id,
+      name: String(def.name || 'Elite Trophy'),
+      sourceElite: String(def.sourceElite || contract?.eliteName || ''),
+      floorName: String(def.floorName || contract?.district || ''),
+      earnedAt: Date.now(),
+      count: 1
+    };
+    trophies.collected[trophy.id] = trophy;
+    trophies.totalFound = Math.max(0, Math.floor(numberOr(trophies.totalFound, 0, 0, Number.MAX_SAFE_INTEGER))) + 1;
+    trophies.latestId = trophy.id;
+    if (options.log !== false) {
+      const bonusText = def.bonusText || '+1% Elite Board payout';
+      pushCombat(state, `Trophy found: ${trophy.name}.`);
+      pushLog(state, `Trophy found: ${trophy.name}. ${bonusText}.`);
+    }
+    return { trophy, duplicate: false, awarded: true };
+  }
+
+  function eliteTrophySummary(state) {
+    const trophies = ensureEliteTrophyState(state);
+    const collected = Object.values(trophies.collected || {});
+    const latest = trophies.latestId && trophies.collected[trophies.latestId];
+    const bonus = getEliteTrophyPayoutBonus(state);
+    const latestLabel = latest ? latest.name : 'None yet';
+    return {
+      totalFound: Math.max(0, Math.floor(numberOr(trophies.totalFound, 0, 0, Number.MAX_SAFE_INTEGER))),
+      uniqueFound: collected.length,
+      latestLabel,
+      bonus
+    };
+  }
+
   function ensureEliteContractState(state) {
     if (!state.player) state.player = {};
     state.player.eliteContracts = createEliteContractState(state.player.eliteContracts, state);
@@ -510,9 +635,17 @@
       active.claimable = true;
       active.status = 'completed';
       if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
-      pushCombat(state, active.bonusWritCompleted
-        ? `Contract fulfilled: ${active.eliteName}. Bonus Writ completed.`
-        : `Contract fulfilled: ${active.eliteName}. Bonus Writ missed.`);
+      const trophyChance = eliteTrophyRollChance(active, contract, state);
+      const trophyRolled = Math.random() < trophyChance;
+      const trophyResult = trophyRolled ? awardEliteTrophy(state, contract) : null;
+      const writLine = active.bonusWritCompleted ? 'Bonus Writ completed.' : 'Bonus Writ missed.';
+      const trophyLine = trophyResult?.awarded
+        ? `Trophy found: ${trophyResult.trophy.name}.`
+        : trophyRolled && trophyResult?.duplicate
+          ? `Trophy duplicate found: ${trophyResult.trophy.name} x${trophyResult.trophy.count}.`
+          : 'No trophy found this time.';
+      pushCombat(state, `Contract fulfilled: ${active.eliteName}. ${writLine} ${trophyLine}`);
+      pushLog(state, `Elite reward ladder: ${active.eliteName}. ${writLine} ${trophyLine}`);
     }
     return true;
   }
@@ -638,10 +771,14 @@
 
   function resolveEliteContractCompletion(state, active, contract) {
     if (!active || !contract || active.bonusWritRewardPaid) return 0;
+    const trophyBonus = getEliteTrophyPayoutBonus(state);
     const bonusAmount = active.bonusWritCompleted ? eliteContractBonusWritReward(active, contract, state) : 0;
     active.bonusWritRewardPaid = true;
     if (bonusAmount > 0 && addPlayerGold(state, bonusAmount)) {
       pushLog(state, `Bonus Writ payout: ${contract.name} paid ${stripHtml(formatMoney(bonusAmount))}.`);
+      if (trophyBonus > 0) {
+        pushLog(state, `Elite Trophy Bonus: +${trophyBonus}% Elite Board payout from ${Object.keys(ensureEliteTrophyState(state).collected || {}).length} unique trophies.`);
+      }
       return bonusAmount;
     }
     return 0;
@@ -775,6 +912,11 @@
   if (typeof window !== 'undefined') {
     window.DungeonDexEliteContracts = {
       ensure: ensureEliteContractState,
+      ensureTrophies: ensureEliteTrophyState,
+      trophyCollection: getEliteTrophyCollection,
+      awardTrophy: awardEliteTrophy,
+      trophyBonus: getEliteTrophyPayoutBonus,
+      trophySummary: eliteTrophySummary,
       activeSummaryText(state = S) {
         const active = activeEliteContractHunt(state);
         if (!active) return '';
@@ -829,6 +971,15 @@
         const active = activeEliteContractHunt(state);
         if (!active) return false;
         return recordEliteContractKill(state, { contractTarget:true });
+      },
+      forceTrophy(state = S, contractId = '') {
+        const contract = contractId ? eliteContractDef(contractId) : activeEliteContractDef(state);
+        return contract ? awardEliteTrophy(state, contract) : null;
+      },
+      clearTrophies(state = S) {
+        if (!state?.player) return false;
+        state.player.eliteTrophies = createEliteTrophyState();
+        return true;
       },
       expire(state = S) {
         return failEliteContract(state, 'expired');

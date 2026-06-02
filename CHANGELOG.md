@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.17`
-* Current local package baseline: `v1.4.17`
-* Current development target: `v1.4.17`
+* Public/live itch version: `v1.4.18`
+* Current local package baseline: `v1.4.18`
+* Current development target: `v1.4.18`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.18 - Elite Trophy & Reward Ladder
+
+Status: Complete
+
+Finished changes:
+
+* Added Elite Trophy collection hooks for completed Elite Board hunts.
+* Elite Board targets can now drop collectible trophies.
+* Duplicate trophies are tracked safely.
+* Reward feedback now separates contract reward, Bonus Writ reward, and trophy results.
+* Added a lightweight trophy summary to the board/archive area.
+* Trophy bonuses are tiny, capped, and limited to Elite Board rewards if implemented.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
 
 ---
 

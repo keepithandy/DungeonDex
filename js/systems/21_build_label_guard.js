@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.17 - Build label guard.
+// DungeonDex v1.4.18 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.4.17';
+  const BUILD = '1.4.18';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.17-elite-board-bonus-writ-polish';
+  const BUILD_QS = '1.4.18-elite-trophy-reward-ladder';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

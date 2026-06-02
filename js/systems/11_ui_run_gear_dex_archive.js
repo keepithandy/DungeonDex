@@ -629,15 +629,30 @@
     if (!el('dexSummary') || !el('monsterDex') || !el('gearDex')) return;
     S.player.bossTrophies = asArray(S.player.bossTrophies, []);
     S.player.retiredRelics = asArray(S.player.retiredRelics, []);
+    const eliteTrophies = typeof ensureEliteTrophyState === 'function' ? ensureEliteTrophyState(S) : { collected:{}, totalFound:0, latestId:'' };
     const bestDepth = Math.max(1, S.player.depth || S.player.safeExtractDepth || 1);
     const trophies = asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []);
     const unlockedCount = trophies.filter(trophy => isBossTrophyUnlocked(trophy, bestDepth)).length;
+    const eliteEntries = Object.values(eliteTrophies.collected || {}).sort((a, b) => String(b.earnedAt || '').localeCompare(String(a.earnedAt || '')));
+    const latestElite = eliteTrophies.latestId && eliteTrophies.collected[eliteTrophies.latestId] ? eliteTrophies.collected[eliteTrophies.latestId] : eliteEntries[0] || null;
+    const eliteBonus = typeof getEliteTrophyPayoutBonus === 'function' ? getEliteTrophyPayoutBonus(S) : Math.min(5, eliteEntries.length);
     el('dexSummary').innerHTML = `
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. The deeper the Stair gets, the nastier the case becomes.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
-      <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>`;
+      <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
+      <div class="elite-trophy-summary">
+        <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Bonus +${format(eliteBonus)}%</span></div>
+        <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
+      </div>`;
     el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Boss trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
-    el('gearDex').innerHTML = `<h2>Retired Relics</h2><p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p><div class="empty-relic-shelf"><span>Relic shelf sealed</span><small>Retire-item system not active yet.</small></div>`;
+    el('gearDex').innerHTML = `
+      <h2>Retired Relics</h2>
+      <p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p>
+      <div class="empty-relic-shelf"><span>Relic shelf sealed</span><small>Retire-item system not active yet.</small></div>
+      <div class="sep"></div>
+      <h3>Elite Trophy Collection</h3>
+      <p class="small muted">Tiny, capped board reward bonus. Collection only unless a contract payout uses it.</p>
+      <div class="list elite-trophy-list">${eliteEntries.length ? eliteEntries.map(entry => `<div class="archive-line elite-trophy-line"><div class="small muted">${escapeHtml(entry.sourceElite || 'Elite Board')}</div><div><strong>${escapeHtml(entry.name)}</strong> x${format(entry.count || 1)}${entry.floorName ? ` <span class="small muted">• ${escapeHtml(entry.floorName)}</span>` : ''}</div></div>`).join('') : '<p class="small muted">No elite trophies found yet.</p>'}</div>`;
   }
 
   function renderArchive() {

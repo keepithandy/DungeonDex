@@ -1,0 +1,12 @@
+Smoke test notes for DungeonDex v1.4.18 — Elite Trophy & Reward Ladder
+
+Expected checks:
+
+* Visible label shows `DungeonDex v1.4.18`.
+* Elite Board still renders 3 contracts.
+* Trophy summary area appears in the board/archive area.
+* Contract reward and Bonus Writ reward still separate cleanly.
+* Trophy roll feedback appears after elite hunt completion.
+* Duplicate trophies increment count safely.
+* No monster affixes, status effects, or special enemy mechanics return.
+* No save wipe.

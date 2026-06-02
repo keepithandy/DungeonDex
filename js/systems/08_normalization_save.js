@@ -134,6 +134,9 @@
     state.player.earlyAidGiven = !!state.player.earlyAidGiven;
     state.player.goldSink = createGoldSinkState(isPlainObject(savedPlayer.goldSink) ? savedPlayer.goldSink : {});
     state.player.eliteContracts = createEliteContractState(isPlainObject(savedPlayer.eliteContracts) ? savedPlayer.eliteContracts : {}, state);
+    state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
+      ? createEliteTrophyState(isPlainObject(savedPlayer.eliteTrophies) ? savedPlayer.eliteTrophies : {})
+      : { collected:{}, totalFound:0, latestId:'' };
     state.player.deepStairCharters = normalizeCharterDepthList(savedPlayer.deepStairCharters);
     if (state.player.permanentStartFloor >= 40) state.player.goldSink.boughtStart40Charter = true;
     ensurePermanentCharters(state);
@@ -232,6 +235,9 @@
     state.player.forgeSpark = sanitizeCurrencyValue(state.player.forgeSpark, 0);
     state.player.log = asArray(state.player.log, []).map(String).slice(0, 60);
     state.player.eliteContracts = createEliteContractState(isPlainObject(state.player.eliteContracts) ? state.player.eliteContracts : {}, state);
+    state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
+      ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})
+      : { collected:{}, totalFound:0, latestId:'' };
     if (!isPlainObject(state.run)) state.run = {};
     ensureRunShell(state);
     state.run.active = !!state.run.active;

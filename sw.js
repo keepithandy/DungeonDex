@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.17-elite-board-bonus-writ-polish';
-const BUILD_QS = '1.4.17-elite-board-bonus-writ-polish';
+const CACHE_NAME = 'dungeon-dex-1.4.18-elite-trophy-reward-ladder';
+const BUILD_QS = '1.4.18-elite-trophy-reward-ladder';
 const ASSETS = [
   './',
   './index.html',
