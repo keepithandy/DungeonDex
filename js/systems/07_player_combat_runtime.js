@@ -493,7 +493,7 @@
       } else if (tryAshboundLethalWard(state)) {
         result.saveNow = true;
       } else {
-        defeat(state);
+        defeat(state, monster);
         result.saveNow = true;
         result.fullRender = true;
       }
@@ -819,7 +819,7 @@
 
     state.run.event = null;
     state.run.choices = ['attack','guard','skill','extract'];
-    if (state.player.hp <= 0) defeat(state);
+    if (state.player.hp <= 0) defeat(state, null);
     else nextEncounter(state);
     return { saveNow:true, fullRender:true };
   }
@@ -852,7 +852,7 @@
     pushLog(state, `Objective complete: ${q.title}. Reward: ${q.reward}.`);
   }
 
-  function finishRun(state, reason) {
+  function finishRun(state, reason, context = {}) {
     ensureRunShell(state);
     let runResultDetail = '';
     const endedAtFloor = progressDepthValue(state.run.floor, state.player?.returnDepth || 1);
@@ -886,7 +886,8 @@
     const activeHunt = typeof activeEliteContractHunt === 'function' ? activeEliteContractHunt(state) : null;
     if (activeHunt && !activeHunt.completed && !activeHunt.complete) {
       if (reason === 'defeat') {
-        failEliteContract(state, 'failed');
+        if (typeof failActiveEliteContractOnDeath === 'function') failActiveEliteContractOnDeath(state, context.killer || null);
+        else failEliteContract(state, 'failed');
       } else if (reason === 'extract') {
         const endedThreatFloor = Math.floor(threatDepthFromDepth(endedAtFloor));
         const targetFloor = Math.floor(numberOr(activeHunt.targetFloor, endedThreatFloor + 1, 1, 999999));
@@ -931,11 +932,11 @@
     state.screen = 'town';
   }
 
-  function defeat(state) {
+  function defeat(state, killer = null) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
     pushCombat(state, 'The run ends here. Lowfire records the floor. Unsecured rewards were lost; banked gear and wallet stayed safe.');
     spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
-    finishRun(state, 'defeat');
+    finishRun(state, 'defeat', { killer });
   }
 
   function equipItem(state, id, silent = false) {

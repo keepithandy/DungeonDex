@@ -74,6 +74,8 @@
       contractTarget: !!monster.contractTarget,
       contractId: String(monster.contractId || ''),
       contractEliteName: String(monster.contractEliteName || ''),
+      rivalTarget: !!monster.rivalTarget,
+      rivalId: String(monster.rivalId || ''),
       contractModifierName: '',
       contractTargetFloor: Math.floor(numberOr(monster.contractTargetFloor, 0, 0, 999999)),
       contractHpMult: numberOr(monster.contractHpMult, 1, 0, 9),

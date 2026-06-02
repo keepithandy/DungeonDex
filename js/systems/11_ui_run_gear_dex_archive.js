@@ -630,12 +630,16 @@
     S.player.bossTrophies = asArray(S.player.bossTrophies, []);
     S.player.retiredRelics = asArray(S.player.retiredRelics, []);
     const eliteTrophies = typeof ensureEliteTrophyState === 'function' ? ensureEliteTrophyState(S) : { collected:{}, totalFound:0, latestId:'' };
+    const rivals = typeof ensureEliteRivalState === 'function' ? ensureEliteRivalState(S) : [];
     const bestDepth = Math.max(1, S.player.depth || S.player.safeExtractDepth || 1);
     const trophies = asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []);
     const unlockedCount = trophies.filter(trophy => isBossTrophyUnlocked(trophy, bestDepth)).length;
     const eliteEntries = Object.values(eliteTrophies.collected || {}).sort((a, b) => String(b.earnedAt || '').localeCompare(String(a.earnedAt || '')));
     const latestElite = eliteTrophies.latestId && eliteTrophies.collected[eliteTrophies.latestId] ? eliteTrophies.collected[eliteTrophies.latestId] : eliteEntries[0] || null;
     const eliteBonus = typeof getEliteTrophyPayoutBonus === 'function' ? getEliteTrophyPayoutBonus(S) : Math.min(5, eliteEntries.length);
+    const rivalActive = rivals.filter(rival => rival.revengeAvailable && !rival.completed);
+    const rivalDefeated = rivals.filter(rival => rival.completed);
+    const latestRival = rivals.slice().sort((a, b) => numberOr(b.updatedAt || b.createdAt, 0) - numberOr(a.updatedAt || a.createdAt, 0))[0] || null;
     el('dexSummary').innerHTML = `
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. The deeper the Stair gets, the nastier the case becomes.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
@@ -643,6 +647,10 @@
       <div class="elite-trophy-summary">
         <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Bonus +${format(eliteBonus)}%</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
+      </div>
+      <div class="elite-trophy-summary rival-summary">
+        <div class="elite-trophy-summary-head"><h3>Rivals Remembered</h3><span class="pill">${format(rivalActive.length)} active</span></div>
+        <div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div>
       </div>`;
     el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Boss trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
     el('gearDex').innerHTML = `

@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.4.18 - Warden Talents + Lowfire Board.
+// DungeonDex v1.4.19 - Warden Talents + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.4.18-elite-trophy-reward-ladder';
+  const SCRIPT_BUILD = '1.4.19-named-rival-elite-contracts';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -152,6 +152,7 @@
   function contractObj(contract){ return typeof eliteContractObjective === 'function' ? eliteContractObjective(contract) : `${contract.goal || 3} marked elites`; }
   function contractRisk(contract){ return typeof eliteContractRiskLevel === 'function' ? eliteContractRiskLevel(contract) : 'Medium'; }
   function contractDef(id){ return typeof eliteContractDef === 'function' ? eliteContractDef(id) : null; }
+  function rivalContracts(state){ return typeof availableEliteRivals === 'function' ? availableEliteRivals(state) : []; }
   function activeReward(active,contract,state){ return typeof activeContractRewardAmount === 'function' ? activeContractRewardAmount(active,contract,state) : contractReward(contract,state); }
   function threatStars(threat){
     if (typeof eliteContractThreatStars === 'function') return eliteContractThreatStars(threat);
@@ -197,12 +198,15 @@
   }
   function contractCard(model,contract,state,active=null){
     const accepted = !!model.accepted;
+    const rival = !!(model.rivalContract || active?.rivalContract);
     const completed = !!(model.completed || active?.completed || active?.complete);
     const expired = !!(model.expired || active?.expired);
     const failed = !!(model.failed || active?.failed);
     const button = active
       ? (completed ? '<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>' : `<span class="small muted">${active.status === 'active' ? 'Contract target engaged.' : 'Reach the target floor to draw out the hunt.'}</span>`)
-      : `<button class="primary mini" data-start-contract="${H(model.id)}">${accepted ? 'Accepted' : 'Accept Contract'}</button>`;
+      : rival
+        ? `<button class="primary mini" data-start-rival="${H(model.rivalId)}">${accepted ? 'Accepted' : 'Accept Rival Hunt'}</button>`
+        : `<button class="primary mini" data-start-contract="${H(model.id)}">${accepted ? 'Accepted' : 'Accept Contract'}</button>`;
     const reward = contract ? M(contractReward(contract,state)) : '';
     const progress = active ? Math.min(1, Math.floor(N(active.progress,0,0,1))) : 0;
     const pct = active ? Math.min(100, Math.round(progress * 100)) : 0;
@@ -212,16 +216,43 @@
       <div class="elite-contract-detail-grid contract-identity-grid small">
         <span><b>District:</b> ${H(model.district)}</span>
         <span><b>Target:</b> Floor ${H(model.targetFloor || '?')}</span>
-        <span><b>Tier:</b> Elite Hunt</span>
+        <span><b>Tier:</b> ${rival ? 'Rival Elite' : 'Elite Hunt'}</span>
         <span><b>Threat:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
         <span><b>Contract:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
         <span><b>Bonus Writ:</b> ${H(model.bonusWrit || 'Display-only for now.')}</span>
+        ${rival ? `<span><b>Last seen:</b> ${H(model.killedPlayerAtLocation || 'Unknown floor')}</span>` : ''}
         <span><b>Reward:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
       </div>
       <p class="small muted contract-flavor">${H(model.flavor)}</p>
       ${active && contract ? `<div class="elite-contract-meter"><div style="width:${pct}%"></div></div>` : ''}
-      <div class="elite-contract-actions"><span class="pill">${accepted?'Active Contract':'Contract Writ'}</span>${button}</div>
+      <div class="elite-contract-actions"><span class="pill">${accepted ? (rival ? 'Active Rival' : 'Active Contract') : (rival ? 'Rival Writ' : 'Contract Writ')}</span>${button}</div>
     </div>`;
+  }
+
+  function rivalCard(rival,state){
+    const contract = contractDef(rival.sourceContractId) || contractDef('lowfire_bounty');
+    const model = {
+      id: contract?.id || rival.sourceContractId || 'lowfire_bounty',
+      rivalId: rival.id,
+      rivalContract: true,
+      eliteName: rival.eliteName,
+      title: `RIVAL SIGHTED: ${rival.eliteName}`,
+      district: rival.floorName || 'Elite Board',
+      targetFloor: '?',
+      threat: 3,
+      contractText: `Defeat ${rival.eliteName} and reclaim the writ.`,
+      bonusWrit: contract?.bonusWrit || 'Defeat it before resting.',
+      rewardPreview: '+silver, +rare chance, trophy chance',
+      killedPlayerAtLocation: rival.killedPlayerAtLocation || '',
+      flavor: `Killed you ${F(rival.defeats || 1)} time${(rival.defeats || 1) === 1 ? '' : 's'}.`
+    };
+    return contractCard(model, contract, state, null);
+  }
+
+  function rivalSection(state){
+    const rivals = rivalContracts(state);
+    if (!rivals.length) return '';
+    return `<div class="rival-writ-section"><div class="split rival-writ-head"><strong>Rival Writ</strong><span class="pill">${F(rivals.length)} sighted</span></div>${rivals.slice(0,1).map(rival => rivalCard(rival,state)).join('')}</div>`;
   }
 
   function boardMarkup(state){
@@ -232,12 +263,12 @@
         const c = contractDef(active.id); if (!c) return '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
         const ready = active.complete || active.completed, reward = activeReward(active,c,state);
         const model = contractModel({...c, ...active}, state, true);
-        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':'Active Hunt'}</span></div><div class="active-contract-summary small"><b>Active Hunt:</b> ${H(model.eliteName)} <span>${H(model.targetLocation || `Floor ${model.targetFloor || '?'}`)}</span><span>${ready?'Completed':'Status ' + H(active.status || 'pending')}</span><span>Bonus Writ ${H(model.bonusWrit || 'none')}</span><span>Held pay ${M(reward)}</span></div><div class="elite-trophy-strip"><div><strong>Elite Trophies</strong><p>${F(trophySummary.uniqueFound)} found${trophySummary.totalFound ? ` • ${F(trophySummary.totalFound)} total` : ''}</p></div><span class="pill">Bonus +${F(trophySummary.bonus)}%</span><span class="small muted">${H(trophySummary.latestLabel ? `Latest: ${trophySummary.latestLabel}` : 'Latest: none yet')}</span></div>${contractCard(model,c,state,active)}</div>`;
+        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':active.rivalContract?'Rival Hunt':'Active Hunt'}</span></div><div class="active-contract-summary small"><b>${active.rivalContract?'Rival Hunt':'Active Hunt'}:</b> ${H(model.eliteName)} <span>${H(model.targetLocation || `Floor ${model.targetFloor || '?'}`)}</span>${active.rivalContract ? `<span>Last seen ${H(model.killedPlayerAtLocation || 'unknown')}</span>` : ''}<span>${ready?'Completed':'Status ' + H(active.status || 'pending')}</span><span>Bonus Writ ${H(model.bonusWrit || 'none')}</span><span>Held pay ${M(reward)}</span></div><div class="elite-trophy-strip"><div><strong>Elite Trophies</strong><p>${F(trophySummary.uniqueFound)} found${trophySummary.totalFound ? ` • ${F(trophySummary.totalFound)} total` : ''}</p></div><span class="pill">Bonus +${F(trophySummary.bonus)}%</span><span class="small muted">${H(trophySummary.latestLabel ? `Latest: ${trophySummary.latestLabel}` : 'Latest: none yet')}</span></div>${contractCard(model,c,state,active)}</div>`;
       }
       const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : filteredContracts(state, contractPool(state));
       const models = generatedContracts(state, list, '');
       const cards = models.length ? models.map(model => contractCard(model, contractDef(model.id), state)).join('') : '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
-      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div><div class="lowfire-board-note small muted">Three readable contracts are posted at a time. Rewards are previews. Bonus Writs are short optional goals.</div><div class="elite-trophy-strip"><div><strong>Elite Trophies</strong><p>${F(trophySummary.uniqueFound)} found${trophySummary.totalFound ? ` • ${F(trophySummary.totalFound)} total` : ''}</p></div><span class="pill">Bonus +${F(trophySummary.bonus)}%</span><span class="small muted">${H(trophySummary.latestLabel ? `Latest: ${trophySummary.latestLabel}` : 'Latest: none yet')}</span></div><div class="elite-contract-list contract-identity-list">${cards}</div></div>`;
+      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div><div class="lowfire-board-note small muted">Three readable contracts are posted at a time. Rewards are previews. Bonus Writs are short optional goals.</div><div class="elite-trophy-strip"><div><strong>Elite Trophies</strong><p>${F(trophySummary.uniqueFound)} found${trophySummary.totalFound ? ` • ${F(trophySummary.totalFound)} total` : ''}</p></div><span class="pill">Bonus +${F(trophySummary.bonus)}%</span><span class="small muted">${H(trophySummary.latestLabel ? `Latest: ${trophySummary.latestLabel}` : 'Latest: none yet')}</span></div>${rivalSection(state)}<div class="elite-contract-list contract-identity-list">${cards}</div></div>`;
     } catch (_) {
       return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div></div><p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p></div>`;
     }
@@ -271,7 +302,7 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-learn-talent]').forEach(btn => btn.onclick = () => guard(() => { learn(S, btn.dataset.learnTalent); render(); })); const resetBtn = document.getElementById('resetTalentsBtn'); if (resetBtn) resetBtn.onclick = () => guard(() => { if (window.confirm && !window.confirm('Reset all Warden talents?')) return; reset(S); render(); }); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-learn-talent]').forEach(btn => btn.onclick = () => guard(() => { learn(S, btn.dataset.learnTalent); render(); })); const resetBtn = document.getElementById('resetTalentsBtn'); if (resetBtn) resetBtn.onclick = () => guard(() => { if (window.confirm && !window.confirm('Reset all Warden talents?')) return; reset(S); render(); }); };
 
   window.DungeonDexWardenTalents = { build:SCRIPT_BUILD, defs:TALENTS, ensure:ensureTalents, effects, learn, reset, refreshLowfireBoard:refreshBoard };
   injectCss();

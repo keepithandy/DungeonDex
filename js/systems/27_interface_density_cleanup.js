@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.18 - Interface density and app-feel cleanup.
+// DungeonDex v1.4.19 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.18';
+  const BUILD = '1.4.19';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.18-elite-trophy-reward-ladder';
+  const BUILD_QS = '1.4.19-named-rival-elite-contracts';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -78,6 +78,8 @@
       #questPanel .elite-trophy-strip,#screen-dex .elite-trophy-summary{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:7px 0 9px;padding:7px 8px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(255,255,255,.025)}
       #questPanel .elite-trophy-strip strong,#screen-dex .elite-trophy-summary-head h3{font-size:13px!important;margin:0}
       #questPanel .elite-trophy-strip p,#screen-dex .elite-trophy-summary-copy{margin:2px 0 0;font-size:10.75px!important;line-height:1.2!important;color:rgba(231,221,205,.72)!important}
+      #questPanel .rival-writ-section{margin:8px 0 10px;padding:8px;border:1px solid rgba(255,100,80,.16);border-radius:14px;background:linear-gradient(180deg,rgba(140,28,20,.08),rgba(255,255,255,.018))}
+      #questPanel .rival-writ-head{margin-bottom:6px}
       #questPanel .elite-contract-card{padding:9px!important;border-radius:14px!important}
       #questPanel .elite-contract-detail-grid{gap:5px 10px!important}
       #questPanel .refresh-compact strong{font-size:10px!important}

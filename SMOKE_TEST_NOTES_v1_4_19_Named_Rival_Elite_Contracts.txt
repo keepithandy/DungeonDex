@@ -1,0 +1,14 @@
+Smoke test notes for DungeonDex v1.4.19 - Named Rival Elite Contracts
+
+Expected checks:
+
+* Visible label shows `DungeonDex v1.4.19`.
+* Active Elite Board contracts fail if the player dies before completion.
+* Dying to the active contract target creates or updates rival memory.
+* Rival Writ appears on the Elite Board when a rival is available.
+* Rival Contract accepts, spawns the exact remembered elite name, and resolves on defeat.
+* Rival Elite scaling remains HP-only with no special mechanics.
+* Bonus Writs do not pay on death.
+* Trophy rolls do not occur on death and still use the existing completion path.
+* No monster affixes, status effects, or special enemy mechanics return.
+* No save wipe.

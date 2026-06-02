@@ -178,15 +178,18 @@
     const status = String(seed?.status || '').toLowerCase();
     return {
       id: contract.id,
+      rivalId: seed?.rivalId || contract.rivalId || '',
+      rivalContract: !!(seed?.rivalContract || contract.rivalContract || seed?.rivalId || contract.rivalId),
       eliteName,
-      title: seed?.title || contract.title || `WANTED: ${eliteName}`,
+      title: seed?.title || contract.title || (seed?.rivalId || contract.rivalId ? `RIVAL SIGHTED: ${eliteName}` : `WANTED: ${eliteName}`),
       district,
       targetFloor,
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
+      killedPlayerAtLocation: seed?.killedPlayerAtLocation || contract.killedPlayerAtLocation || '',
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
       modifier: '',
       modifierKey: '',
-      contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
+      contractText: seed?.contractText || contract.contractText || (seed?.rivalId || contract.rivalId ? `Defeat ${eliteName} and reclaim the writ.` : `Defeat ${eliteName} when it appears.`),
       bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
       bonusWritType: seed?.bonusWritType || contract.bonusWritType || 'rest',
       rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
@@ -207,10 +210,13 @@
     if (!active) return null;
     return {
       id: active.id,
+      rivalId: active.rivalId || '',
+      rivalContract: !!active.rivalContract,
       eliteName: active.eliteName || active.name || '',
       district: active.district || '',
       targetFloor: active.targetFloor || 0,
       targetLocation: active.targetLocation || '',
+      killedPlayerAtLocation: active.killedPlayerAtLocation || '',
       threat: active.threat || 1,
       modifier: '',
       modifierKey: '',
@@ -329,18 +335,45 @@
     return Array.from(ids);
   }
 
+  function eliteRivalId(eliteName) {
+    const base = String(eliteName || 'rival_elite').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'rival_elite';
+    return `rival_${base}_${Date.now().toString(36)}`;
+  }
+
+  function createEliteRivalState(seed = []) {
+    return asArray(seed, []).filter(isPlainObject).map(entry => {
+      const eliteName = String(entry.eliteName || '').trim();
+      if (!eliteName) return null;
+      const sourceContractId = normalizeEliteContractId(entry.sourceContractId || entry.contractId);
+      return {
+        id: String(entry.id || eliteRivalId(eliteName)),
+        eliteName,
+        floorName: String(entry.floorName || entry.district || 'Elite Board'),
+        sourceContractId: sourceContractId || 'lowfire_bounty',
+        killedPlayerAtChapter: Math.max(0, Math.floor(numberOr(entry.killedPlayerAtChapter, 0, 0, 999999))),
+        killedPlayerAtLocation: String(entry.killedPlayerAtLocation || 'Unknown floor'),
+        defeats: Math.max(1, Math.floor(numberOr(entry.defeats, 1, 1, 9999))),
+        revengeAvailable: entry.revengeAvailable !== false && !entry.completed,
+        completed: !!entry.completed,
+        createdAt: Math.max(0, Math.floor(numberOr(entry.createdAt, Date.now(), 0, Number.MAX_SAFE_INTEGER))),
+        updatedAt: Math.max(0, Math.floor(numberOr(entry.updatedAt, entry.createdAt || Date.now(), 0, Number.MAX_SAFE_INTEGER)))
+      };
+    }).filter(Boolean).slice(0, 12);
+  }
+
   function createEliteContractState(seed = {}, state = null) {
     const source = isPlainObject(seed) ? seed : {};
     const claimed = normalizeEliteContractIds(source.claimed);
     const completedSet = new Set([...normalizeEliteContractIds(source.completed), ...claimed]);
     const expired = asArray(source.expired, []).filter(isPlainObject).slice(0, 20);
     const failed = asArray(source.failed, []).filter(isPlainObject).slice(0, 20);
+    const rivals = createEliteRivalState(source.rivals);
     const savedActive = isPlainObject(source.active) ? source.active : null;
     let active = null;
 
     if (savedActive) {
       const def = eliteContractDef(normalizeEliteContractId(savedActive.id));
-      if (def && !claimed.includes(def.id)) {
+      if (def && (!claimed.includes(def.id) || savedActive.rivalId)) {
         const progress = Math.floor(numberOr(savedActive.progress, 0, 0, 1));
         const complete = !!savedActive.completed || !!savedActive.complete || progress >= 1 || completedSet.has(def.id);
         const expiredActive = !!savedActive.expired || String(savedActive.status || '').toLowerCase() === 'expired';
@@ -349,7 +382,7 @@
         const rewardAmount = Object.prototype.hasOwnProperty.call(savedActive, 'rewardAmount') && savedActive.rewardAmount != null
           ? sanitizeContractReward(def, savedActive.rewardAmount)
           : calculateContractReward(def, state);
-        if (alreadyClaimed) {
+        if (alreadyClaimed && !savedActive.rivalId) {
           completedSet.add(def.id);
           if (!claimed.includes(def.id)) claimed.push(def.id);
         } else if (expiredActive || failedActive) {
@@ -363,6 +396,9 @@
         } else {
           active = {
             id: def.id,
+            rivalId: String(savedActive.rivalId || ''),
+            rivalContract: !!savedActive.rivalContract || !!savedActive.rivalId,
+            sourceContractId: String(savedActive.sourceContractId || def.id),
             name: def.name,
             tier: def.tier || '',
             eliteName: savedActive.eliteName || def.eliteName || def.name,
@@ -384,6 +420,7 @@
             bonusBossReached: !!savedActive.bonusBossReached,
             bonusGuardUses: Math.floor(numberOr(savedActive.bonusGuardUses, 0, 0, 999)),
             rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
+            killedPlayerAtLocation: String(savedActive.killedPlayerAtLocation || ''),
             flavor: savedActive.flavor || def.flavor || def.summary || '',
             accepted: true,
             completed: complete,
@@ -400,7 +437,7 @@
             claimable: complete,
             claimed: false
           };
-          if (complete) completedSet.add(def.id);
+          if (complete && !active.rivalContract) completedSet.add(def.id);
         }
       }
     }
@@ -410,7 +447,8 @@
       completed: Array.from(completedSet),
       claimed,
       expired,
-      failed
+      failed,
+      rivals
     };
   }
 
@@ -545,6 +583,60 @@
     return state.player.eliteContracts;
   }
 
+  function ensureEliteRivalState(state) {
+    const contracts = ensureEliteContractState(state);
+    contracts.rivals = createEliteRivalState(contracts.rivals);
+    return contracts.rivals;
+  }
+
+  function availableEliteRivals(state) {
+    return ensureEliteRivalState(state).filter(rival => rival.revengeAvailable && !rival.completed).slice(0, 3);
+  }
+
+  function rivalDeathLocation(state, active) {
+    const rawDepth = Math.max(1, Math.floor(numberOr(state?.run?.floor, active?.targetFloor || 1, 1, 999999)));
+    if (typeof getLoreDepthProgress === 'function') {
+      const lore = getLoreDepthProgress(rawDepth);
+      return `Floor ${format(lore.floorNumber)} • Room ${format(lore.roomWithinFloor)} • Chapter ${format(lore.chapterWithinRoom)}`;
+    }
+    return active?.targetLocation || `Floor ${format(rawDepth)}`;
+  }
+
+  function rememberEliteRivalDeath(state, activeContract, killer = null) {
+    if (!activeContract || !killer?.contractTarget || killer.contractId !== activeContract.id) return null;
+    const rivals = ensureEliteRivalState(state);
+    const eliteName = String(activeContract.eliteName || killer.name || 'Rival Elite').trim();
+    const location = rivalDeathLocation(state, activeContract);
+    const rawDepth = Math.max(0, Math.floor(numberOr(state?.run?.floor, activeContract.targetFloor || 0, 0, 999999)));
+    let rival = rivals.find(entry => !entry.completed && String(entry.eliteName || '').toLowerCase() === eliteName.toLowerCase());
+    if (rival) {
+      rival.defeats = Math.max(1, Math.floor(numberOr(rival.defeats, 1, 1, 9999)) + 1);
+      rival.killedPlayerAtChapter = rawDepth;
+      rival.killedPlayerAtLocation = location;
+      rival.floorName = activeContract.district || rival.floorName || 'Elite Board';
+      rival.revengeAvailable = true;
+      rival.updatedAt = Date.now();
+    } else {
+      rival = {
+        id: eliteRivalId(eliteName),
+        eliteName,
+        floorName: activeContract.district || 'Elite Board',
+        sourceContractId: normalizeEliteContractId(activeContract.sourceContractId || activeContract.id) || activeContract.id,
+        killedPlayerAtChapter: rawDepth,
+        killedPlayerAtLocation: location,
+        defeats: 1,
+        revengeAvailable: true,
+        completed: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      rivals.unshift(rival);
+      rivals.splice(12);
+    }
+    pushLog(state, `Rival remembered: ${eliteName} killed you at ${location}.`);
+    return rival;
+  }
+
   function isEliteContractAvailable(contract, contracts, state = null) {
     if (!contract || contracts.claimed.includes(contract.id)) return false;
     if (contract.unlockFloor && state && reachedDistrictFloor(state) < contract.unlockFloor) return false;
@@ -565,6 +657,9 @@
     const model = eliteBoardContractModel(contract, state, true, offer);
     contracts.active = {
       id: contract.id,
+      rivalId: '',
+      rivalContract: false,
+      sourceContractId: contract.id,
       name: contract.name,
       tier: contract.tier || '',
       eliteName: model.eliteName,
@@ -607,6 +702,78 @@
     return true;
   }
 
+  function startEliteRivalContract(state, rivalId) {
+    const contracts = ensureEliteContractState(state);
+    if (contracts.active) return false;
+    contracts.rivals = createEliteRivalState(contracts.rivals);
+    const rival = contracts.rivals.find(entry => entry.id === rivalId && entry.revengeAvailable && !entry.completed);
+    if (!rival) return false;
+    const contract = eliteContractDef(normalizeEliteContractId(rival.sourceContractId)) || eliteContractDef('lowfire_bounty') || ELITE_CONTRACTS[0];
+    if (!contract) return false;
+    const targetFloor = eliteContractTargetFloor(state);
+    const baseReward = calculateContractReward(contract, state);
+    const rewardAmount = sanitizeContractReward(contract, Math.round(baseReward * 1.10));
+    contracts.active = {
+      id: contract.id,
+      rivalId: rival.id,
+      rivalContract: true,
+      sourceContractId: contract.id,
+      name: contract.name,
+      tier: 'Rival Writ',
+      eliteName: rival.eliteName,
+      title: `RIVAL SIGHTED: ${rival.eliteName}`,
+      district: rival.floorName || contract.district || '',
+      targetFloor,
+      threat: Math.max(1, Math.min(3, Math.floor(numberOr(contract.threat, 1, 1, 3)) + 1)),
+      modifier: '',
+      modifierKey: '',
+      contractText: `Defeat ${rival.eliteName} and reclaim the writ.`,
+      bonusWrit: contract.bonusWrit || 'Defeat it before resting.',
+      bonusWritType: contract.bonusWritType || 'rest',
+      targetLocation: eliteContractTargetLocationLabel(targetFloor),
+      killedPlayerAtLocation: rival.killedPlayerAtLocation || '',
+      rewardPreview: '+silver, +rare chance, trophy chance',
+      flavor: `This rival killed you at ${rival.killedPlayerAtLocation || 'an unknown floor'}. Lowfire has reposted the name.`,
+      accepted: true,
+      completed: false,
+      expired: false,
+      failed: false,
+      status: 'pending',
+      targetSpawned: false,
+      targetDefeated: false,
+      spawnedAtFloor: 0,
+      progress: 0,
+      goal: 1,
+      rewardAmount,
+      complete: false,
+      claimable: false,
+      claimed: false,
+      bonusRested: false,
+      bonusExtracted: false,
+      bonusGuardUses: 0,
+      bonusWritCompleted: false,
+      bonusWritMissed: false,
+      bonusWritFailed: false,
+      bonusWritRewardPaid: false,
+      bonusBossReached: false
+    };
+    pushLog(state, `Rival contract accepted: ${rival.eliteName}. Last seen: ${rival.killedPlayerAtLocation || 'unknown floor'}.`);
+    return true;
+  }
+
+  function resolveEliteRivalContract(state, active) {
+    if (!active?.rivalId) return false;
+    const rivals = ensureEliteRivalState(state);
+    const rival = rivals.find(entry => entry.id === active.rivalId);
+    if (!rival) return false;
+    rival.completed = true;
+    rival.revengeAvailable = false;
+    rival.updatedAt = Date.now();
+    pushCombat(state, `Rival defeated: ${active.eliteName}. The board scratches its name from the writ.`);
+    pushLog(state, `Rival defeated: ${active.eliteName}.`);
+    return true;
+  }
+
   function recordEliteContractKill(state, options = {}) {
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
@@ -634,16 +801,18 @@
       active.completed = true;
       active.claimable = true;
       active.status = 'completed';
-      if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
+      if (!active.rivalContract && !contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
       const trophyChance = eliteTrophyRollChance(active, contract, state);
       const trophyRolled = Math.random() < trophyChance;
-      const trophyResult = trophyRolled ? awardEliteTrophy(state, contract) : null;
+      const trophyContract = active.rivalContract ? { ...contract, eliteName: active.eliteName, district: active.district } : contract;
+      const trophyResult = trophyRolled ? awardEliteTrophy(state, trophyContract) : null;
       const writLine = active.bonusWritCompleted ? 'Bonus Writ completed.' : 'Bonus Writ missed.';
       const trophyLine = trophyResult?.awarded
         ? `Trophy found: ${trophyResult.trophy.name}.`
         : trophyRolled && trophyResult?.duplicate
           ? `Trophy duplicate found: ${trophyResult.trophy.name} x${trophyResult.trophy.count}.`
           : 'No trophy found this time.';
+      if (active.rivalContract) resolveEliteRivalContract(state, active);
       pushCombat(state, `Contract fulfilled: ${active.eliteName}. ${writLine} ${trophyLine}`);
       pushLog(state, `Elite reward ladder: ${active.eliteName}. ${writLine} ${trophyLine}`);
     }
@@ -696,6 +865,14 @@
     return true;
   }
 
+  function failActiveEliteContractOnDeath(state, killer = null) {
+    const contracts = ensureEliteContractState(state);
+    const active = contracts.active;
+    if (!active || active.completed || active.complete) return false;
+    if (killer?.contractTarget && killer.contractId === active.id) rememberEliteRivalDeath(state, active, killer);
+    return failEliteContract(state, 'failed');
+  }
+
   function expireOverdueEliteContract(state) {
     const active = ensureEliteContractState(state).active;
     if (!active || active.completed || active.complete || active.targetSpawned) return false;
@@ -728,8 +905,9 @@
   function eliteContractTargetScaling(active) {
     const targetFloor = Math.max(1, Math.floor(numberOr(active?.targetFloor, 1, 1, 999999)));
     const early = targetFloor < 20;
+    const rivalHpBonus = active?.rivalContract ? 1.15 : 1;
     return {
-      hp: early ? 1.25 : 1.35,
+      hp: (early ? 1.25 : 1.35) * rivalHpBonus,
       power: 1,
       reward: 1.35
     };
@@ -744,13 +922,15 @@
     hunt.targetLocation = eliteContractTargetLocationLabel(hunt.targetFloor);
     hunt.spawnedAtFloor = Math.floor(threatDepthFromDepth(monster.level || state?.run?.floor || 1));
     monster.name = hunt.eliteName;
-    monster.family = 'Elite Hunt';
-    monster.type = 'Contract';
+    monster.family = hunt.rivalContract ? 'Rival Elite' : 'Elite Hunt';
+    monster.type = hunt.rivalContract ? 'Rival Contract' : 'Contract';
     monster.affix = '';
     monster.tier = 'Elite';
     monster.contractTarget = true;
     monster.contractId = hunt.id;
     monster.contractEliteName = hunt.eliteName;
+    monster.rivalTarget = !!hunt.rivalContract;
+    monster.rivalId = hunt.rivalId || '';
     monster.contractModifierName = '';
     monster.bonusWritType = hunt.bonusWritType || '';
     monster.contractTargetFloor = hunt.targetFloor;
@@ -765,7 +945,7 @@
     monster.rewardGold = Math.max(0, Math.round(numberOr(monster.rewardGold, 0, 0, Number.MAX_SAFE_INTEGER) * scaling.reward));
     monster.rewardXp = Math.max(0, Math.round(numberOr(monster.rewardXp, 0, 0, 999999) * 1.18));
     monster.rewardShard = Math.max(1, Math.round(numberOr(monster.rewardShard, 1, 0, 999999) + 2));
-    monster.lore = `Contract Elite: ${hunt.contractText || `Defeat ${hunt.eliteName}.`}`;
+    monster.lore = `${hunt.rivalContract ? 'Rival Elite' : 'Contract Elite'}: ${hunt.contractText || `Defeat ${hunt.eliteName}.`}`;
     return monster;
   }
 
@@ -800,12 +980,13 @@
     active.claimed = true;
     if (!addPlayerGold(state, rewardAmount)) return false;
     resolveEliteContractCompletion(state, active, contract);
-    if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
-    if (!contracts.claimed.includes(contract.id)) contracts.claimed.push(contract.id);
+    if (!active.rivalContract && !contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
+    if (!active.rivalContract && !contracts.claimed.includes(contract.id)) contracts.claimed.push(contract.id);
     contracts.active = null;
+    const paymentName = active.rivalContract ? `Rival ${active.eliteName}` : contract.name;
     pushLog(state, active.bonusWritCompleted
-      ? `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))} plus Bonus Writ.`
-      : `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))}.`);
+      ? `Payment claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))} plus Bonus Writ.`
+      : `Payment claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))}.`);
     return true;
   }
 
@@ -912,6 +1093,10 @@
   if (typeof window !== 'undefined') {
     window.DungeonDexEliteContracts = {
       ensure: ensureEliteContractState,
+      ensureRivals: ensureEliteRivalState,
+      availableRivals: availableEliteRivals,
+      rememberRival: rememberEliteRivalDeath,
+      startRival: startEliteRivalContract,
       ensureTrophies: ensureEliteTrophyState,
       trophyCollection: getEliteTrophyCollection,
       awardTrophy: awardEliteTrophy,
@@ -979,6 +1164,20 @@
       clearTrophies(state = S) {
         if (!state?.player) return false;
         state.player.eliteTrophies = createEliteTrophyState();
+        return true;
+      },
+      clearRivals(state = S) {
+        const contracts = ensureEliteContractState(state);
+        contracts.rivals = [];
+        return true;
+      },
+      completeRival(state = S, rivalId = '') {
+        const rivals = ensureEliteRivalState(state);
+        const rival = rivals.find(entry => entry.id === rivalId) || rivals.find(entry => entry.revengeAvailable && !entry.completed);
+        if (!rival) return false;
+        rival.completed = true;
+        rival.revengeAvailable = false;
+        rival.updatedAt = Date.now();
         return true;
       },
       expire(state = S) {

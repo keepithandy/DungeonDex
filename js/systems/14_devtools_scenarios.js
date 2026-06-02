@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.18 - DevTools Scenario Presets
+// DungeonDex v1.4.19 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.18';
-  const SCENARIO_BUILD = '1.4.18-elite-trophy-reward-ladder';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.19';
+  const SCENARIO_BUILD = '1.4.19-named-rival-elite-contracts';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -212,6 +212,67 @@
       `bonus: +${summary.bonus}%`
     ].join('\n');
   }
+  function eliteRivalStateText(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return 'Elite rival state unavailable.';
+    const rivals = api.ensureRivals ? api.ensureRivals(S) : [];
+    return [
+      'Elite rivals',
+      `remembered: ${rivals.length}`,
+      `available: ${rivals.filter(function(rival){ return rival.revengeAvailable && !rival.completed; }).length}`,
+      `defeated: ${rivals.filter(function(rival){ return rival.completed; }).length}`,
+      `latest: ${rivals[0] ? rivals[0].eliteName : 'none'}`
+    ].join('\n');
+  }
+  function createTestRival(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return false;
+    const active = api.ensure ? api.ensure(S).active : null;
+    const source = active || (typeof ELITE_CONTRACTS !== 'undefined' && ELITE_CONTRACTS && ELITE_CONTRACTS[0]) || null;
+    if (!source) return false;
+    const fakeKiller = { contractTarget:true, contractId:source.id, name:source.eliteName || source.name || 'Rival Elite' };
+    const rival = api.rememberRival ? api.rememberRival(S, source, fakeKiller) : null;
+    if (rival) {
+      scenarioState.lastMessage = eliteRivalStateText();
+      log(`Created test rival: ${rival.eliteName}.`, 'info');
+      saveAndRender();
+    }
+    return !!rival;
+  }
+  function forceRivalContract(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return false;
+    const rivals = api.availableRivals ? api.availableRivals(S) : [];
+    const rival = rivals[0];
+    if (!rival || !api.startRival) return false;
+    const ok = api.startRival(S, rival.id);
+    if (ok) {
+      log(`Forced rival contract: ${rival.eliteName}.`, 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
+  function completeTestRival(){
+    const api = eliteContractApi();
+    if (!api || !hasState() || !api.completeRival) return false;
+    const ok = api.completeRival(S);
+    if (ok) {
+      scenarioState.lastMessage = eliteRivalStateText();
+      log('Marked one rival completed.', 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
+  function clearRivalState(){
+    const api = eliteContractApi();
+    if (!api || !hasState() || !api.clearRivals) return false;
+    const ok = api.clearRivals(S);
+    if (ok) {
+      log('Elite rival state cleared for testing.', 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
   function forceEliteTrophy(){
     const api = eliteContractApi();
     if (!api || !hasState()) return false;
@@ -309,6 +370,12 @@
         ${button('Simulate Completion', 'simulate-complete')}
         ${button('Clear Trophy State', 'clear-trophies', '', true)}
       </div>
+      <div class="dd-devtools-button-grid">
+        ${button('Create Rival', 'create-rival')}
+        ${button('Force Rival Contract', 'force-rival')}
+        ${button('Complete Rival', 'complete-rival')}
+        ${button('Clear Rival State', 'clear-rivals', '', true)}
+      </div>
       ${message}
       <div class="dd-devtools-log-list">${logs}</div>
     </section>`;
@@ -343,6 +410,10 @@
     if (action === 'force-trophy') return forceEliteTrophy();
     if (action === 'simulate-complete') return simulateEliteCompletion();
     if (action === 'clear-trophies') return clearTrophyState();
+    if (action === 'create-rival') return createTestRival();
+    if (action === 'force-rival') return forceRivalContract();
+    if (action === 'complete-rival') return completeTestRival();
+    if (action === 'clear-rivals') return clearRivalState();
   });
   function init(){
     try { document.title = SCENARIO_VERSION; } catch (err) {}
@@ -360,6 +431,7 @@
     restore: restoreBackup,
     snapshot: scenarioSnapshot,
     eliteTrophyStateText,
+    eliteRivalStateText,
     state: scenarioState
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

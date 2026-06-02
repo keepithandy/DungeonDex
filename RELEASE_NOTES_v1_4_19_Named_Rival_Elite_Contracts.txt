@@ -1,0 +1,9 @@
+DungeonDex v1.4.19 - Named Rival Elite Contracts
+
+* Active Elite Board contracts now fail safely if the player dies before completing them.
+* Dying to an active contract target can create a named Rival Elite memory.
+* Rival Elites can return later as revenge contracts.
+* Rival contracts use HP-only scaling and simple reward hooks.
+* Rival state is save-safe and defensive for old saves.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.

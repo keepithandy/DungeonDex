@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.18`
-* Current local package baseline: `v1.4.18`
-* Current development target: `v1.4.18`
+* Public/live itch version: `v1.4.19`
+* Current local package baseline: `v1.4.19`
+* Current development target: `v1.4.19`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.19 - Named Rival Elite Contracts
+
+Status: Complete
+
+Finished changes:
+
+* Active Elite Board contracts now fail safely if the player dies before completing them.
+* Dying to an active contract target can create a named Rival Elite memory.
+* Rival Elites can return later as revenge contracts.
+* Rival contracts use HP-only scaling and simple reward hooks.
+* Rival state is save-safe and defensive for old saves.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
 
 ---
 

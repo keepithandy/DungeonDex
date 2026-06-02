@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.18-elite-trophy-reward-ladder';
-const BUILD_QS = '1.4.18-elite-trophy-reward-ladder';
+const CACHE_NAME = 'dungeon-dex-1.4.19-named-rival-elite-contracts';
+const BUILD_QS = '1.4.19-named-rival-elite-contracts';
 const ASSETS = [
   './',
   './index.html',
