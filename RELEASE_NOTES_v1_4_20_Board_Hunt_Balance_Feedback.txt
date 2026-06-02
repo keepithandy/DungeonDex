@@ -1,0 +1,25 @@
+DungeonDex v1.4.20 - Board Hunt Balance & Feedback Pass
+
+This GitHub/dev pass tightens the Elite Board hunt ecosystem after the recent Bonus Writ, trophy, and rival contract updates.
+
+Changes:
+
+- Improved Elite Board hunt state clarity for available, active, completed, failed, expired, rival, and trophy states.
+- Improved compact feedback for active, completed, failed, and rival contracts.
+- Reviewed HP-only scaling for contract and rival targets.
+- Kept Contract Elite targets at 1.25x HP before threat floor 20 and 1.35x HP after that.
+- Kept Rival Elite targets at 1.15x HP over Contract Elite targets.
+- Clarified main contract reward, Bonus Writ reward, trophy roll, and rival reward feedback.
+- Clarified trophy summary wording with Trophy Bonus Preview language.
+- Death/failure messaging is clearer.
+- Death now resets normal descent progress back to the default start.
+- Deep Stair Charters remain the way to return to deeper unlocked starts after death.
+- Safe extraction still preserves earned return progress.
+- No monster affixes, status effects, modifier popups, special enemy behaviors, aura mechanics, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+- No save wipe.
+
+Notes:
+
+- Trophy payout bonus remains display-only in this pass.
+- Long-term unlocks, trophies, archive data, rival memories, charters, highest reached records, settings, and save data are preserved.
+- No itch package or zip was created.

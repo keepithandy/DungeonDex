@@ -63,12 +63,23 @@
     return requested > 1 && requested <= Math.max(safeDepth, returnDepth);
   }
 
-  // v1.3.26 Checkpoint & Charter QA: one safe source for death restart math.
+  // v1.4.20: death resets the normal return start; charters stay available separately.
   function hardcoreDeathCheckpointDepth(state, depth = null) {
-    const endedDepth = progressDepthValue(depth ?? state?.run?.floor ?? state?.player?.returnDepth ?? 1, 1);
-    const unlockedDepth = getUnlockedCharterDepth(state);
-    const deathCheckpoint = Math.min(normalizeCharterMilestoneDepth(endedDepth), unlockedDepth);
-    return deathCheckpoint >= 40 ? deathCheckpoint : 1;
+    return 1;
+  }
+
+  function resetDescentProgressOnDeath(state) {
+    if (!state || !state.player) return 1;
+    const resetDepth = 1;
+    state.player.returnDepth = resetDepth;
+    if (state.run && typeof state.run === 'object') {
+      state.run.floor = resetDepth;
+      state.run.zone = typeof zoneName === 'function' ? zoneName(resetDepth) : districtByDepth(resetDepth).name;
+      state.run.danger = typeof dangerRatingForDepth === 'function' ? dangerRatingForDepth(resetDepth) : 1;
+      state.run.startedFromCharter = false;
+      state.run.charterStartFloor = 0;
+    }
+    return resetDepth;
   }
 
   function hardcoreDepthReturnLabel(depth) {

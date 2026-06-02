@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.19-named-rival-elite-contracts';
-const BUILD_QS = '1.4.19-named-rival-elite-contracts';
+const CACHE_NAME = 'dungeon-dex-1.4.20-board-hunt-balance-feedback';
+const BUILD_QS = '1.4.20-board-hunt-balance-feedback';
 const ASSETS = [
   './',
   './index.html',

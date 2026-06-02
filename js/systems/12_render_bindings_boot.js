@@ -278,7 +278,7 @@
       checkpointLabel: hardcoreDepthReturnLabel(nextReturn),
       note: reason === 'extract'
         ? 'extract keeps earned return depth'
-        : (nextReturn >= 40 ? 'death returns to unlocked charter checkpoint' : 'death returns to Lowfire')
+        : 'death resets normal start; owned charters stay available'
     };
   }
 
@@ -294,7 +294,7 @@
       checkpointAuditRow('death before first mega-charter', 4000, 4000, 4100, 'defeat'),
       checkpointAuditRow('death after D5800 mega-charter', 5800, 5800, 6110, 'defeat')
     ];
-    console.info('DungeonDex checkpoint/charter QA: extraction keeps the earned return depth; death returns to Lowfire or the best unlocked charter milestone. Use these rows to verify return flow without mutating your save.');
+    console.info('DungeonDex checkpoint/charter QA: extraction keeps the earned return depth; death resets normal descent to Lowfire while Deep Stair Charters stay available. Use these rows to verify return flow without mutating your save.');
     console.table(rows);
     return rows;
   }

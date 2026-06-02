@@ -186,6 +186,7 @@
       targetFloor,
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
       killedPlayerAtLocation: seed?.killedPlayerAtLocation || contract.killedPlayerAtLocation || '',
+      rivalDefeats: Math.max(1, Math.floor(numberOr(seed?.rivalDefeats || seed?.defeats || contract.rivalDefeats, 1, 1, 9999))),
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
       modifier: '',
       modifierKey: '',
@@ -217,6 +218,7 @@
       targetFloor: active.targetFloor || 0,
       targetLocation: active.targetLocation || '',
       killedPlayerAtLocation: active.killedPlayerAtLocation || '',
+      rivalDefeats: Math.max(1, Math.floor(numberOr(active.rivalDefeats, 1, 1, 9999))),
       threat: active.threat || 1,
       modifier: '',
       modifierKey: '',
@@ -225,6 +227,8 @@
       bonusWritType: active.bonusWritType || '',
       bonusWritCompleted: !!active.bonusWritCompleted,
       bonusWritMissed: !!active.bonusWritMissed,
+      failureNote: active.failureNote || '',
+      failureKind: active.failureKind || '',
       rewardPreview: active.rewardPreview || '',
       flavor: active.flavor || '',
       status: status || active.status || 'pending',
@@ -250,9 +254,10 @@
     return typeof value === 'number' && Number.isFinite(value) && value >= 0;
   }
 
-  function sanitizeContractReward(contract, value) {
+  function sanitizeContractReward(contract, value, options = {}) {
     const base = contractBaseReward(contract);
-    const cap = contractRewardCap(contract);
+    const capMultiplier = isPlainObject(options) ? numberOr(options.capMultiplier, 1, 1, 2) : 1;
+    const cap = Math.max(base, Math.round(contractRewardCap(contract) * capMultiplier));
     if (!isValidRewardNumber(value)) return base;
     return clamp(Math.floor(value), 0, cap);
   }
@@ -295,11 +300,14 @@
 
   function activeContractRewardAmount(active, contract, state = null) {
     if (!active || !contract) return 0;
+    const capMultiplier = active.rivalContract ? 1.10 : 1;
     if (!Object.prototype.hasOwnProperty.call(active, 'rewardAmount') || active.rewardAmount == null) {
-      active.rewardAmount = calculateContractReward(contract, state);
+      const baseReward = calculateContractReward(contract, state);
+      active.rewardAmount = active.rivalContract ? Math.round(baseReward * 1.10) : baseReward;
     } else {
-      active.rewardAmount = sanitizeContractReward(contract, active.rewardAmount);
+      active.rewardAmount = sanitizeContractReward(contract, active.rewardAmount, { capMultiplier });
     }
+    active.rewardAmount = sanitizeContractReward(contract, active.rewardAmount, { capMultiplier });
     return active.rewardAmount;
   }
 
@@ -379,9 +387,10 @@
         const expiredActive = !!savedActive.expired || String(savedActive.status || '').toLowerCase() === 'expired';
         const failedActive = !!savedActive.failed || String(savedActive.status || '').toLowerCase() === 'failed';
         const alreadyClaimed = !!savedActive.claimed;
+        const rewardCapMultiplier = savedActive.rivalContract || savedActive.rivalId ? 1.10 : 1;
         const rewardAmount = Object.prototype.hasOwnProperty.call(savedActive, 'rewardAmount') && savedActive.rewardAmount != null
-          ? sanitizeContractReward(def, savedActive.rewardAmount)
-          : calculateContractReward(def, state);
+          ? sanitizeContractReward(def, savedActive.rewardAmount, { capMultiplier: rewardCapMultiplier })
+          : sanitizeContractReward(def, calculateContractReward(def, state) * rewardCapMultiplier, { capMultiplier: rewardCapMultiplier });
         if (alreadyClaimed && !savedActive.rivalId) {
           completedSet.add(def.id);
           if (!claimed.includes(def.id)) claimed.push(def.id);
@@ -415,12 +424,15 @@
             bonusWritMissed: !!savedActive.bonusWritMissed,
             bonusWritFailed: !!savedActive.bonusWritFailed || !!savedActive.bonusWritMissed,
             bonusWritRewardPaid: !!savedActive.bonusWritRewardPaid,
+            failureNote: String(savedActive.failureNote || ''),
+            failureKind: String(savedActive.failureKind || ''),
             bonusRested: !!savedActive.bonusRested,
             bonusExtracted: !!savedActive.bonusExtracted,
             bonusBossReached: !!savedActive.bonusBossReached,
             bonusGuardUses: Math.floor(numberOr(savedActive.bonusGuardUses, 0, 0, 999)),
             rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
             killedPlayerAtLocation: String(savedActive.killedPlayerAtLocation || ''),
+            rivalDefeats: Math.max(1, Math.floor(numberOr(savedActive.rivalDefeats, 1, 1, 9999))),
             flavor: savedActive.flavor || def.flavor || def.summary || '',
             accepted: true,
             completed: complete,
@@ -633,7 +645,7 @@
       rivals.unshift(rival);
       rivals.splice(12);
     }
-    pushLog(state, `Rival remembered: ${eliteName} killed you at ${location}.`);
+    pushLog(state, `Rival remembered: ${eliteName}. Killed you ${format(rival.defeats)} time${rival.defeats === 1 ? '' : 's'}. Last seen: ${location}.`);
     return rival;
   }
 
@@ -679,7 +691,7 @@
       completed: false,
       expired: false,
       failed: false,
-      status: 'pending',
+      status: 'active',
       targetSpawned: false,
       targetDefeated: false,
       spawnedAtFloor: 0,
@@ -712,7 +724,7 @@
     if (!contract) return false;
     const targetFloor = eliteContractTargetFloor(state);
     const baseReward = calculateContractReward(contract, state);
-    const rewardAmount = sanitizeContractReward(contract, Math.round(baseReward * 1.10));
+    const rewardAmount = sanitizeContractReward(contract, Math.round(baseReward * 1.10), { capMultiplier: 1.10 });
     contracts.active = {
       id: contract.id,
       rivalId: rival.id,
@@ -732,13 +744,14 @@
       bonusWritType: contract.bonusWritType || 'rest',
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
       killedPlayerAtLocation: rival.killedPlayerAtLocation || '',
+      rivalDefeats: Math.max(1, Math.floor(numberOr(rival.defeats, 1, 1, 9999))),
       rewardPreview: '+silver, +rare chance, trophy chance',
       flavor: `This rival killed you at ${rival.killedPlayerAtLocation || 'an unknown floor'}. Lowfire has reposted the name.`,
       accepted: true,
       completed: false,
       expired: false,
       failed: false,
-      status: 'pending',
+      status: 'active',
       targetSpawned: false,
       targetDefeated: false,
       spawnedAtFloor: 0,
@@ -805,13 +818,13 @@
       const trophyChance = eliteTrophyRollChance(active, contract, state);
       const trophyRolled = Math.random() < trophyChance;
       const trophyContract = active.rivalContract ? { ...contract, eliteName: active.eliteName, district: active.district } : contract;
-      const trophyResult = trophyRolled ? awardEliteTrophy(state, trophyContract) : null;
-      const writLine = active.bonusWritCompleted ? 'Bonus Writ completed.' : 'Bonus Writ missed.';
+      const trophyResult = trophyRolled ? awardEliteTrophy(state, trophyContract, { log:false }) : null;
+      const writLine = active.bonusWritCompleted ? 'Bonus Writ completed. Extra pay ready.' : 'Bonus Writ missed. No extra pay.';
       const trophyLine = trophyResult?.awarded
         ? `Trophy found: ${trophyResult.trophy.name}.`
         : trophyRolled && trophyResult?.duplicate
           ? `Trophy duplicate found: ${trophyResult.trophy.name} x${trophyResult.trophy.count}.`
-          : 'No trophy found this time.';
+          : 'Trophy roll: no trophy found.';
       if (active.rivalContract) resolveEliteRivalContract(state, active);
       pushCombat(state, `Contract fulfilled: ${active.eliteName}. ${writLine} ${trophyLine}`);
       pushLog(state, `Elite reward ladder: ${active.eliteName}. ${writLine} ${trophyLine}`);
@@ -845,22 +858,27 @@
     return recordEliteContractKill(state, { contractTarget:true });
   }
 
-  function failEliteContract(state, reason = 'failed') {
+  function failEliteContract(state, reason = 'failed', options = {}) {
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
     if (!active || active.completed || active.complete) return false;
     active.failed = reason === 'failed';
     active.expired = reason === 'expired';
     active.status = reason === 'expired' ? 'expired' : 'failed';
+    if (options.note) active.failureNote = String(options.note);
+    if (options.kind) active.failureKind = String(options.kind);
     const snapshot = eliteContractSnapshot(active, active.status);
     if (snapshot) {
       const list = active.expired ? contracts.expired : contracts.failed;
       list.unshift(snapshot);
       list.splice(20);
     }
-    pushLog(state, active.expired
-      ? `Elite contract expired: ${active.eliteName}.`
-      : `Elite contract failed: ${active.eliteName}.`);
+    const note = active.failureNote ? ` ${active.failureNote}` : '';
+    const logLine = active.expired
+      ? `Contract expired: ${active.eliteName}.`
+      : `Contract failed: ${active.eliteName}.${note}`;
+    pushLog(state, logLine);
+    if (options.combatLine) pushCombat(state, String(options.combatLine));
     contracts.active = null;
     return true;
   }
@@ -869,8 +887,12 @@
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
     if (!active || active.completed || active.complete) return false;
-    if (killer?.contractTarget && killer.contractId === active.id) rememberEliteRivalDeath(state, active, killer);
-    return failEliteContract(state, 'failed');
+    const rival = killer?.contractTarget && killer.contractId === active.id ? rememberEliteRivalDeath(state, active, killer) : null;
+    const note = rival
+      ? `The board reclaimed the writ after your fall. Rival remembered: ${rival.eliteName}.`
+      : 'The board reclaimed the writ after your fall. No rival was recorded.';
+    const combatLine = `Contract failed: ${active.eliteName}. ${rival ? `Rival remembered: ${rival.eliteName}.` : 'No rival was recorded.'}`;
+    return failEliteContract(state, 'failed', { note, kind:'death', combatLine });
   }
 
   function expireOverdueEliteContract(state) {
@@ -957,7 +979,7 @@
     if (bonusAmount > 0 && addPlayerGold(state, bonusAmount)) {
       pushLog(state, `Bonus Writ payout: ${contract.name} paid ${stripHtml(formatMoney(bonusAmount))}.`);
       if (trophyBonus > 0) {
-        pushLog(state, `Elite Trophy Bonus: +${trophyBonus}% Elite Board payout from ${Object.keys(ensureEliteTrophyState(state).collected || {}).length} unique trophies.`);
+        pushLog(state, `Trophy Bonus Preview: +${trophyBonus}% board payout from ${Object.keys(ensureEliteTrophyState(state).collected || {}).length} unique trophies (display only).`);
       }
       return bonusAmount;
     }
@@ -979,14 +1001,20 @@
     if (!isValidRewardNumber(rewardAmount) || rewardAmount <= 0) return false;
     active.claimed = true;
     if (!addPlayerGold(state, rewardAmount)) return false;
-    resolveEliteContractCompletion(state, active, contract);
+    const bonusAmount = resolveEliteContractCompletion(state, active, contract);
     if (!active.rivalContract && !contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
     if (!active.rivalContract && !contracts.claimed.includes(contract.id)) contracts.claimed.push(contract.id);
     contracts.active = null;
-    const paymentName = active.rivalContract ? `Rival ${active.eliteName}` : contract.name;
-    pushLog(state, active.bonusWritCompleted
-      ? `Payment claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))} plus Bonus Writ.`
-      : `Payment claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))}.`);
+    const paymentName = active.rivalContract ? `Rival ${active.eliteName}` : active.eliteName || contract.name;
+    const mainLine = active.rivalContract
+      ? `Rival reward claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))}.`
+      : `Main contract reward claimed: ${paymentName} paid ${stripHtml(formatMoney(rewardAmount))}.`;
+    const bonusLine = active.bonusWritCompleted
+      ? ` Bonus Writ completed. Lowfire paid extra ${stripHtml(formatMoney(bonusAmount))}.`
+      : active.bonusWritMissed
+        ? ' Bonus Writ missed. No extra pay.'
+        : '';
+    pushLog(state, `${mainLine}${bonusLine}`);
     return true;
   }
 
@@ -1105,8 +1133,24 @@
       activeSummaryText(state = S) {
         const active = activeEliteContractHunt(state);
         if (!active) return '';
-        const status = active.bonusWritCompleted ? 'Completed' : active.bonusWritMissed ? 'Missed' : 'Pending';
-        return `Contract target sighted: ${active.eliteName}. Bonus Writ active: ${active.bonusWrit || 'None'}. Bonus status: ${status}.`;
+        const status = active.failed ? 'Failed' : active.expired ? 'Expired' : active.completed ? 'Completed' : 'Active';
+        const label = active.rivalContract ? 'Rival Writ' : 'Active Hunt';
+        const writ = String(active.bonusWrit || 'None').replace(/[.]+$/g, '');
+        return `${label}: ${active.eliteName}. Target: ${active.targetLocation || eliteContractTargetLocationLabel(active.targetFloor)}. Bonus Writ: ${writ}. Status: ${status}.`;
+      },
+      inspectBoardState(state = S) {
+        const contracts = ensureEliteContractState(state);
+        const trophies = ensureEliteTrophyState(state);
+        return {
+          active: contracts.active ? eliteContractSnapshot(contracts.active, contracts.active.status || 'pending') : null,
+          completed: contracts.completed.slice(),
+          claimed: contracts.claimed.slice(),
+          failed: contracts.failed.slice(0, 3),
+          expired: contracts.expired.slice(0, 3),
+          rivals: contracts.rivals.slice(0, 5),
+          trophies: eliteTrophySummary(state),
+          trophyIds: Object.keys(trophies.collected || {})
+        };
       },
       acceptFirst(state = S) {
         const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : [];
@@ -1156,6 +1200,40 @@
         const active = activeEliteContractHunt(state);
         if (!active) return false;
         return recordEliteContractKill(state, { contractTarget:true });
+      },
+      failActive(state = S, killedByTarget = false) {
+        const active = activeEliteContractHunt(state);
+        const monster = killedByTarget && active
+          ? { contractTarget:true, contractId:active.id, name:active.eliteName }
+          : null;
+        return failActiveEliteContractOnDeath(state, monster);
+      },
+      rememberRivalFromActive(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return null;
+        return rememberEliteRivalDeath(state, active, { contractTarget:true, contractId:active.id, name:active.eliteName });
+      },
+      simulateBonusWrit(state = S, completed = true) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        const type = String(active.bonusWritType || '').toLowerCase();
+        if (completed) {
+          active.bonusRested = false;
+          active.bonusExtracted = false;
+          active.bonusGuardUses = Math.min(Math.floor(numberOr(active.bonusGuardUses, 0, 0, 999)), 2);
+          if (type === 'hp' && state?.player) state.player.hp = Math.max(Math.ceil(numberOr(state.player.maxHp, 1, 1, Number.MAX_SAFE_INTEGER) * 0.75), 1);
+          if (type === 'boss' && state?.run) state.run.floor = Math.min(numberOr(state.run.floor, 1, 1, Number.MAX_SAFE_INTEGER), eliteContractRawDepthForThreatFloor(active.targetFloor));
+        } else {
+          if (type === 'rest') active.bonusRested = true;
+          if (type === 'extract') active.bonusExtracted = true;
+          if (type === 'guard') active.bonusGuardUses = Math.max(3, Math.floor(numberOr(active.bonusGuardUses, 0, 0, 999)));
+          if (type === 'hp' && state?.player) state.player.hp = Math.max(1, Math.floor(numberOr(state.player.maxHp, 1, 1, Number.MAX_SAFE_INTEGER) * 0.5));
+          if (type === 'boss' && state?.run) state.run.floor = eliteContractRawDepthForThreatFloor(eliteContractNextBossFloor(active.targetFloor));
+        }
+        active.bonusWritCompleted = !!completed;
+        active.bonusWritMissed = !completed;
+        active.bonusWritFailed = !completed;
+        return true;
       },
       forceTrophy(state = S, contractId = '') {
         const contract = contractId ? eliteContractDef(contractId) : activeEliteContractDef(state);

@@ -874,9 +874,9 @@
     } else if (reason === 'defeat') {
       const lost = discardPendingRunRewards(state);
       const lostText = cleanDisplayText(lost, 'no unsecured rewards');
-      runResultDetail = `The run ends here. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`;
-      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Restart: ${returnLabel}. Banked gear and wallet stayed safe.`);
-      showDefeatPopup(`Run ended. Lost unsecured: ${lostText}. Restart: ${returnLabel}.`);
+      runResultDetail = `Death reset your descent. Lost unsecured rewards: ${lostText}. Normal descent restarts at ${returnLabel}. Deep Stair Charters stay available.`;
+      pushLog(state, `Run failed. Lost unsecured rewards: ${lostText}. Death reset your descent; charters can reopen deeper stairs.`);
+      showDefeatPopup(`Run ended. Lost unsecured: ${lostText}. Death reset your descent.`);
     } else {
       clearPendingRunRewards(state);
       runResultDetail = 'Descent ended without unsecured rewards.';
@@ -896,7 +896,11 @@
         else if (endedThreatFloor > targetFloor) failEliteContract(state, 'expired');
       }
     }
-    state.player.returnDepth = nextReturnDepth;
+    if (reason === 'defeat' && typeof resetDescentProgressOnDeath === 'function') {
+      resetDescentProgressOnDeath(state);
+    } else {
+      state.player.returnDepth = nextReturnDepth;
+    }
     if (reason === 'extract') state.player.safeExtractDepth = Math.max(state.player.safeExtractDepth || 1, nextReturnDepth);
     state.run.active = false;
     state.run.monster = null;
@@ -934,7 +938,7 @@
 
   function defeat(state, killer = null) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
-    pushCombat(state, 'The run ends here. Lowfire records the floor. Unsecured rewards were lost; banked gear and wallet stayed safe.');
+    pushCombat(state, 'You fell. The descent resets. Use a Deep Stair Charter to return deeper.');
     spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
     finishRun(state, 'defeat', { killer });
   }

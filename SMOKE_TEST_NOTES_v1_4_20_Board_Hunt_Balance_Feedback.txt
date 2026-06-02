@@ -1,0 +1,77 @@
+DungeonDex v1.4.20 - Board Hunt Balance & Feedback Pass Smoke Notes
+
+Build query:
+1.4.20-board-hunt-balance-feedback
+
+Syntax checks:
+
+- node --check app.js
+- node --check sw.js
+- node --check js/systems/*.js
+- manifest.json JSON parse
+
+Result:
+
+- Syntax checks passed.
+- Browser smoke passed in headless Chrome on a clean local port.
+- The first browser probe on the reused 127.0.0.1:8765 origin exposed stale service worker cache showing v1.4.3c; the clean-port smoke verified the current v1.4.20 files.
+- No browser console errors were reported during the board lifecycle smoke.
+
+Browser smoke checklist:
+
+- Confirm visible label says DungeonDex v1.4.20.
+- Open Elite Board.
+- Confirm available contracts render.
+- Accept a contract.
+- Confirm active contract summary shows Active Hunt, Target, Bonus Writ, Bonus Status, Status, and Held Pay.
+- Confirm Bonus Writ status is clear.
+- Enter Dungeon.
+- Confirm Floor / Room / Chapter display still works.
+- Confirm contract target appears by exact name.
+- Confirm no affix, status, or modifier text appears.
+- Defeat target with Bonus Writ completed.
+- Confirm main reward, Bonus Writ reward, and trophy roll feedback are clear.
+- Defeat target with Bonus Writ missed.
+- Confirm main contract still completes.
+- Confirm missed Bonus Writ does not pay.
+- Die during an active contract.
+- Confirm contract fails.
+- Confirm no reward, Bonus Writ payout, or trophy roll pays.
+- Die to active contract target or simulate it.
+- Confirm rival memory is created.
+- Confirm duplicate rival death increments defeat count.
+- Accept rival contract.
+- Confirm exact rival name appears.
+- Confirm rival uses HP-only scaling.
+- Defeat rival.
+- Confirm rival resolves cleanly.
+- Confirm trophy summary still opens.
+- Confirm Trophy Hall / Archive still opens.
+- Confirm Attack, Skill, Guard, Extract, Haul, and Elite Board still work.
+- Confirm no save wipe.
+- Confirm no console errors.
+
+Death reset smoke additions:
+
+- Start a run and progress past the starting depth.
+- Die.
+- Confirm active run ends.
+- Confirm normal next descent/start point resets to the default beginning.
+- Confirm Deep Stair Charters remain unlocked/available.
+- Confirm using a Deep Stair Charter can still start deeper.
+- Confirm safe extraction still behaves differently from death.
+- Confirm highest reached/best records are preserved.
+- Confirm trophies, rivals, and archive data are preserved.
+- Confirm no save wipe.
+- Confirm no console errors.
+
+Expected player-facing rule:
+
+Safe extraction preserves progress. Death sends you back to the start. Deep Stair Charters let you return deeper.
+
+Scaling notes:
+
+- Contract Elite target HP: 1.25x before threat floor 20, 1.35x after threat floor 20.
+- Rival Elite target HP: Contract Elite HP x 1.15.
+- Contract target power scaling: 1.00x.
+- No monster affixes, status effects, or special enemy mechanics are active.

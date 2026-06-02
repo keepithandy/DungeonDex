@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.19`
-* Current local package baseline: `v1.4.19`
-* Current development target: `v1.4.19`
+* Public/live itch version: `v1.4.20`
+* Current local package baseline: `v1.4.20`
+* Current development target: `v1.4.20`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,25 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.20 - Board Hunt Balance & Feedback Pass
+
+Status: Complete
+
+Finished changes:
+
+* Improved Elite Board hunt state clarity for available, active, completed, failed, expired, rival, and trophy states.
+* Improved compact feedback for active hunts, completed contracts, failed contracts, and rival contracts.
+* Reviewed contract and rival target scaling; HP-only scaling remains the active behavior.
+* Kept contract targets at 1.25x HP before threat floor 20 and 1.35x HP after that.
+* Kept Rival Elites at 1.15x HP over Contract Elite targets.
+* Clarified Bonus Writ, trophy roll, main reward, and rival reward feedback.
+* Clarified trophy summary wording so the board payout bonus is labeled as a preview-only collection bonus.
+* Death now resets normal descent progress back to the default start while preserving Deep Stair Charters, records, trophies, rivals, archive data, and save progress.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
 
 ---
 
