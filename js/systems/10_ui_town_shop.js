@@ -20,7 +20,7 @@
         <div class="elite-contract-card ${ready ? 'ready' : 'active'}">
           <div class="split"><strong>Active Hunt: ${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(active.tier || contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
-            <span><b>Target:</b> Floor ${escapeHtml(active.targetFloor || '?')}</span>
+            <span><b>Target:</b> ${escapeHtml(active.targetLocation || `Floor ${active.targetFloor || '?'}`)}</span>
             <span><b>Tier:</b> Elite Hunt</span>
             <span><b>Contract:</b> ${escapeHtml(active.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
             <span><b>Bonus Writ:</b> ${escapeHtml(active.bonusWrit || contract.bonusWrit || '')}</span>
@@ -38,13 +38,14 @@
     const available = availableEliteContracts(state);
     const body = available.length
       ? available.map(contract => `<div class="elite-contract-card">
-          <div class="split"><strong>${escapeHtml(contract.title || contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
+        <div class="split"><strong>${escapeHtml(contract.title || contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
-            <span><b>Target:</b> Floor ${escapeHtml(contract.targetFloor || '?')}</span>
+            <span><b>Target:</b> ${escapeHtml(contract.targetLocation || `Floor ${contract.targetFloor || '?'}`)}</span>
             <span><b>Tier:</b> Elite Hunt</span>
             <span><b>Contract:</b> ${escapeHtml(contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
             <span><b>Bonus Writ:</b> ${escapeHtml(contract.bonusWrit || '')}</span>
             <span><b>Reward:</b> ${formatMoney(calculateContractReward(contract, state))}</span>
+            <span><b>Bonus Preview:</b> +small silver</span>
           </div>
           <div class="elite-contract-actions">
             <span class="pill">Reward Preview</span>

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.16-lore-depth-counter-floor-names';
-const BUILD_QS = '1.4.16-lore-depth-counter-floor-names';
+const CACHE_NAME = 'dungeon-dex-1.4.17-elite-board-bonus-writ-polish';
+const BUILD_QS = '1.4.17-elite-board-bonus-writ-polish';
 const ASSETS = [
   './',
   './index.html',

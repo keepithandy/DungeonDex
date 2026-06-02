@@ -1,0 +1,12 @@
+DungeonDex v1.4.17 - Elite Board Bonus Writ Polish & Rewards
+
+Smoke test focus:
+1. Confirm visible label says DungeonDex v1.4.17.
+2. Open town and confirm Elite Board renders three contracts.
+3. Accept a contract and confirm the active hunt summary shows the target location and Bonus Writ.
+4. Reach the target and confirm combat shows the contract target sighted message plus the Bonus Writ status.
+5. Complete a Bonus Writ and confirm the bonus payout is granted once.
+6. Miss a Bonus Writ and confirm the main hunt still completes.
+7. Reload or revisit the board and confirm the bonus reward does not double-pay.
+8. Confirm rest, extract, death, and floor/lore-depth displays still behave normally.
+9. Confirm no save wipe and no console errors.

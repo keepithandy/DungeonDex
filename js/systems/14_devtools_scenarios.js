@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.16 - DevTools Scenario Presets
+// DungeonDex v1.4.17 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.16';
-  const SCENARIO_BUILD = '1.4.16-lore-depth-counter-floor-names';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.17';
+  const SCENARIO_BUILD = '1.4.17-elite-board-bonus-writ-polish';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';

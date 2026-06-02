@@ -369,6 +369,10 @@
     const monster = state.run.monster;
     if (monster.contractTarget) {
       pushCombat(state, `Contract target sighted: ${monster.name}.`);
+      if (window.DungeonDexEliteContracts?.activeSummaryText) {
+        const writText = window.DungeonDexEliteContracts.activeSummaryText(state);
+        if (writText) pushCombat(state, writText);
+      }
     } else if (monster.tier === 'Boss') {
       pushCombat(state, `Boss pressure locks the stair: ${monster.name}.`);
     } else if (monster.tier === 'Elite') {
@@ -433,7 +437,6 @@
         pushCombat(state, 'No ember left. Ashburst fizzles.');
       } else {
         state.player.ember -= 1;
-        if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractSkill) window.DungeonDexEliteContracts.markEliteContractSkill(state);
         const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
         const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
         monster.hp -= dealt;

@@ -1,0 +1,10 @@
+DungeonDex v1.4.17 - Elite Board Bonus Writ Polish & Rewards
+
+Polished Elite Board Bonus Writs.
+Bonus Writs are optional objectives attached to active hunt contracts.
+Completing a Bonus Writ grants a small extra payout.
+Missing a Bonus Writ does not fail the main hunt.
+Board and combat feedback now explain Bonus Writ status more clearly.
+Bonus Writs use simple HP/run-action tracking only.
+No monster affixes, status effects, or special enemy mechanics were reintroduced.
+No save wipe.

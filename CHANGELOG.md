@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.16`
-* Current local package baseline: `v1.4.16`
-* Current development target: `v1.4.16`
+* Public/live itch version: `v1.4.17`
+* Current local package baseline: `v1.4.17`
+* Current development target: `v1.4.17`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.17 - Elite Board Bonus Writ Polish & Rewards
+
+Status: Complete
+
+Finished changes:
+
+* Polished Elite Board Bonus Writs.
+* Bonus Writs are optional objectives attached to active hunt contracts.
+* Completing a Bonus Writ grants a small extra payout.
+* Missing a Bonus Writ does not fail the main hunt.
+* Board and combat feedback now explain Bonus Writ status more clearly.
+* Bonus Writs use simple HP and run-action tracking only.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
 
 ---
 
@@ -188,7 +205,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.16`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.17`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.

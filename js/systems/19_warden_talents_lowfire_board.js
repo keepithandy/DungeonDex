@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.4.16 - Warden Talents + Lowfire Board.
+// DungeonDex v1.4.17 - Warden Talents + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.4.16-lore-depth-counter-floor-names';
+  const SCRIPT_BUILD = '1.4.17-elite-board-bonus-writ-polish';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -231,7 +231,7 @@
         const c = contractDef(active.id); if (!c) return '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
         const ready = active.complete || active.completed, reward = activeReward(active,c,state);
         const model = contractModel({...c, ...active}, state, true);
-        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':'Active Hunt'}</span></div><div class="active-contract-summary small"><b>Active Hunt:</b> ${H(model.eliteName)} <span>Target Floor ${H(model.targetFloor || '?')}</span><span>${ready?'Completed':'Status ' + H(active.status || 'pending')}</span><span>Bonus Writ ${H(model.bonusWrit || 'none')}</span><span>Held pay ${M(reward)}</span></div>${contractCard(model,c,state,active)}</div>`;
+        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':'Active Hunt'}</span></div><div class="active-contract-summary small"><b>Active Hunt:</b> ${H(model.eliteName)} <span>${H(model.targetLocation || `Floor ${model.targetFloor || '?'}`)}</span><span>${ready?'Completed':'Status ' + H(active.status || 'pending')}</span><span>Bonus Writ ${H(model.bonusWrit || 'none')}</span><span>Held pay ${M(reward)}</span></div>${contractCard(model,c,state,active)}</div>`;
       }
       const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : filteredContracts(state, contractPool(state));
       const models = generatedContracts(state, list, '');

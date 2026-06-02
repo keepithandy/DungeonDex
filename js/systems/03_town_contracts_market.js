@@ -91,36 +91,12 @@
       rewardPreview:'+silver, +board rep soon',
       flavor:'A debt-court brute sent to collect from the living.'
     },
-    {
-      id:'blood_stamped_order',
-      name:'Blood-Stamped Order',
-      tier:'Tier III',
-      goal:10,
-      reward:coins(125,0,0),
-      maxReward:coins(325,0,0),
-      floorBonusPerDepth:coins(0,75,0),
-      requiresClaimed:null,
-      unlockFloor:11,
-      risk:{ level:'High', label:'High risk', spawnBonus:0.08, hpBonus:0.12, damageBonus:0.08, coinBonus:0.08 },
-      summary:'Defeat Mireglass Collector on a deeper, blood-stamped writ.',
-      eliteName:'Mireglass Collector',
-      title:'WANTED: Mireglass Collector',
-      district:'Ember Debtworks',
-      threat:3,
-      modifier:'',
-      modifierKey:'',
-      contractText:'Defeat Mireglass Collector when it appears.',
-      bonusWrit:'Defeat it before using Ashburst twice.',
-      bonusWritType:'skill',
-      rewardPreview:'+silver, +mythic hint',
-      flavor:'It remembers every Warden who ran.'
-    }
   ];
 
   const ELITE_CONTRACT_ID_ALIASES = {
     elite_hunter_i: 'lowfire_bounty',
     elite_hunter_ii: 'hazard_contract',
-    dangerous_work: 'blood_stamped_order'
+    dangerous_work: 'hazard_contract'
   };
 
   const DISTRICT_MARKET_WARES = [
@@ -206,6 +182,7 @@
       title: seed?.title || contract.title || `WANTED: ${eliteName}`,
       district,
       targetFloor,
+      targetLocation: eliteContractTargetLocationLabel(targetFloor),
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
       modifier: '',
       modifierKey: '',
@@ -233,6 +210,7 @@
       eliteName: active.eliteName || active.name || '',
       district: active.district || '',
       targetFloor: active.targetFloor || 0,
+      targetLocation: active.targetLocation || '',
       threat: active.threat || 1,
       modifier: '',
       modifierKey: '',
@@ -278,6 +256,28 @@
       Math.floor(numberOr(state?.player?.safeExtractDepth, 1, 1, 999999)),
       Math.floor(numberOr(state?.player?.permanentStartFloor, 1, 1, 999999))
     );
+  }
+
+  function eliteContractTargetLocationLabel(targetFloor) {
+    const rawDepth = eliteContractRawDepthForThreatFloor(targetFloor);
+    if (typeof getLoreDepthProgress === 'function') {
+      const lore = getLoreDepthProgress(rawDepth);
+      return `Floor ${format(lore.floorNumber)} • Room ${format(lore.roomWithinFloor)} • Chapter ${format(lore.chapterWithinRoom)}`;
+    }
+    return `Floor ${format(Math.max(1, Math.floor(numberOr(targetFloor, 1, 1, 999999))))}`;
+  }
+
+  function eliteContractNextBossFloor(targetFloor) {
+    const floor = Math.max(1, Math.floor(numberOr(targetFloor, 1, 1, 999999)));
+    const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
+    return Math.ceil(floor / bossInterval) * bossInterval;
+  }
+
+  function eliteContractBonusWritReward(active, contract, state = null) {
+    if (!active || !contract) return 0;
+    const base = activeContractRewardAmount(active, contract, state);
+    const depthBonus = Math.max(1, Math.floor(numberOr(active.targetFloor, 1, 1, 999999) / 2));
+    return Math.max(1, Math.min(Math.round(base * 0.15), 24 + depthBonus));
   }
 
   function calculateContractReward(contract, state = null) {
@@ -377,10 +377,12 @@
             bonusWritType: savedActive.bonusWritType || def.bonusWritType || 'rest',
             bonusWritCompleted: !!savedActive.bonusWritCompleted,
             bonusWritMissed: !!savedActive.bonusWritMissed,
+            bonusWritFailed: !!savedActive.bonusWritFailed || !!savedActive.bonusWritMissed,
+            bonusWritRewardPaid: !!savedActive.bonusWritRewardPaid,
             bonusRested: !!savedActive.bonusRested,
             bonusExtracted: !!savedActive.bonusExtracted,
+            bonusBossReached: !!savedActive.bonusBossReached,
             bonusGuardUses: Math.floor(numberOr(savedActive.bonusGuardUses, 0, 0, 999)),
-            bonusSkillUses: Math.floor(numberOr(savedActive.bonusSkillUses, 0, 0, 999)),
             rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
             flavor: savedActive.flavor || def.flavor || def.summary || '',
             accepted: true,
@@ -450,6 +452,7 @@
       contractText: model.contractText,
       bonusWrit: model.bonusWrit,
       bonusWritType: model.bonusWritType,
+      targetLocation: model.targetLocation,
       rewardPreview: model.rewardPreview,
       flavor: model.flavor,
       accepted: true,
@@ -469,9 +472,11 @@
       bonusRested: false,
       bonusExtracted: false,
       bonusGuardUses: 0,
-      bonusSkillUses: 0,
       bonusWritCompleted: false,
-      bonusWritMissed: false
+      bonusWritMissed: false,
+      bonusWritFailed: false,
+      bonusWritRewardPaid: false,
+      bonusBossReached: false
     };
     pushLog(state, `Elite contract accepted: ${model.eliteName}. Target: Floor ${format(model.targetFloor)}.`);
     return true;
@@ -498,6 +503,7 @@
     active.targetDefeated = true;
     active.bonusWritCompleted = evaluateEliteBonusWrit(active, state, options);
     active.bonusWritMissed = !active.bonusWritCompleted;
+    active.bonusWritFailed = active.bonusWritMissed;
     if (active.progress >= 1) {
       active.complete = true;
       active.completed = true;
@@ -520,11 +526,10 @@
     if (type === 'rest') return !active.bonusRested;
     if (type === 'extract') return !active.bonusExtracted;
     if (type === 'guard') return count('bonusGuardUses') <= 2;
-    if (type === 'skill') return count('bonusSkillUses') <= 1;
     if (type === 'boss') {
       const targetFloor = Math.max(1, Math.floor(numberOr(active.targetFloor, 1, 1, 999999)));
-      const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
-      return targetFloor % bossInterval !== 0;
+      const currentFloor = Math.max(1, Math.floor(threatDepthFromDepth(state?.run?.floor || reachedDistrictFloor(state))));
+      return currentFloor < eliteContractNextBossFloor(targetFloor);
     }
     if (type === 'hp') return playerHp > playerMaxHp * 0.5;
     if (String(options.action || '').toLowerCase() === 'rest') return !active.bonusRested;
@@ -603,6 +608,7 @@
     const scaling = eliteContractTargetScaling(hunt);
     hunt.targetSpawned = true;
     hunt.status = 'active';
+    hunt.targetLocation = eliteContractTargetLocationLabel(hunt.targetFloor);
     hunt.spawnedAtFloor = Math.floor(threatDepthFromDepth(monster.level || state?.run?.floor || 1));
     monster.name = hunt.eliteName;
     monster.family = 'Elite Hunt';
@@ -630,6 +636,17 @@
     return monster;
   }
 
+  function resolveEliteContractCompletion(state, active, contract) {
+    if (!active || !contract || active.bonusWritRewardPaid) return 0;
+    const bonusAmount = active.bonusWritCompleted ? eliteContractBonusWritReward(active, contract, state) : 0;
+    active.bonusWritRewardPaid = true;
+    if (bonusAmount > 0 && addPlayerGold(state, bonusAmount)) {
+      pushLog(state, `Bonus Writ payout: ${contract.name} paid ${stripHtml(formatMoney(bonusAmount))}.`);
+      return bonusAmount;
+    }
+    return 0;
+  }
+
   function claimEliteContract(state) {
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
@@ -642,15 +659,15 @@
     }
 
     const rewardAmount = activeContractRewardAmount(active, contract, state);
-    const bonusAmount = active.bonusWritCompleted ? Math.max(1, Math.round(rewardAmount * 0.25)) : 0;
-    if (!isValidRewardNumber(rewardAmount) || rewardAmount + bonusAmount <= 0) return false;
+    if (!isValidRewardNumber(rewardAmount) || rewardAmount <= 0) return false;
     active.claimed = true;
-    if (!addPlayerGold(state, rewardAmount + bonusAmount)) return false;
+    if (!addPlayerGold(state, rewardAmount)) return false;
+    resolveEliteContractCompletion(state, active, contract);
     if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
     if (!contracts.claimed.includes(contract.id)) contracts.claimed.push(contract.id);
     contracts.active = null;
-    pushLog(state, bonusAmount > 0
-      ? `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount + bonusAmount))} with Bonus Writ.`
+    pushLog(state, active.bonusWritCompleted
+      ? `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))} plus Bonus Writ.`
       : `Payment claimed: ${contract.name} paid ${stripHtml(formatMoney(rewardAmount))}.`);
     return true;
   }
@@ -758,6 +775,12 @@
   if (typeof window !== 'undefined') {
     window.DungeonDexEliteContracts = {
       ensure: ensureEliteContractState,
+      activeSummaryText(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return '';
+        const status = active.bonusWritCompleted ? 'Completed' : active.bonusWritMissed ? 'Missed' : 'Pending';
+        return `Contract target sighted: ${active.eliteName}. Bonus Writ active: ${active.bonusWrit || 'None'}. Bonus status: ${status}.`;
+      },
       acceptFirst(state = S) {
         const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : [];
         const first = list[0];
@@ -793,12 +816,6 @@
         const active = activeEliteContractHunt(state);
         if (!active) return false;
         active.bonusGuardUses = Math.floor(numberOr(active.bonusGuardUses, 0, 0, 999)) + 1;
-        return true;
-      },
-      markEliteContractSkill(state = S) {
-        const active = activeEliteContractHunt(state);
-        if (!active) return false;
-        active.bonusSkillUses = Math.floor(numberOr(active.bonusSkillUses, 0, 0, 999)) + 1;
         return true;
       },
       forceTargetEncounter(state = S) {
