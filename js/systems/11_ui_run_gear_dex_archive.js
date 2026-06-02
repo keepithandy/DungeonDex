@@ -18,9 +18,7 @@
       monster?.id,
       monster?.name,
       monster?.family,
-      monster?.type,
-      monster?.affix,
-      monster?.skill
+      monster?.type
     ].filter(Boolean).join(' '));
 
     if (!districtKey && !monsterKey && !hasDepth) return 'generic';
@@ -85,8 +83,6 @@
       monster?.name,
       monster?.family,
       monster?.type,
-      monster?.affix,
-      monster?.skill,
       district?.id,
       district?.name,
       district?.tone,
@@ -175,25 +171,13 @@
     const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
     const personalityClass = `combat-personality--${personalityKind}`;
     const monsterFamily = escapeHtml(monster?.family || 'Depthborn');
-    const monsterSkill = escapeHtml(monster?.skill || 'Basic attack');
-    const monsterTier = escapeHtml(monster?.tier || 'Enemy');
+    const monsterTier = escapeHtml(String(monster?.tier || 'Enemy').toUpperCase());
     const monsterSubline = isContractTarget
-      ? `Contract • ${monsterFamily}`
+      ? `Elite Hunt • ${monsterFamily}`
       : monsterFamily;
-    const monsterTagline = isContractTarget
-      ? escapeHtml(monster.contractModifierName || eliteModifierNames(eliteModifiersForMonster(monster)) || monster?.skill || 'Marked')
-      : monsterSkill;
     const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
-    const eliteMarkup = monster ? eliteModifierMarkup(monster) : '';
-    const threatBrief = monster
-      ? isBossFight
-        ? `<div class="combat-threat-brief boss-threat-brief"><b>Boss floor:</b> heavier pressure, better stakes. Guard before risky bursts.</div>`
-        : isEliteFight
-          ? `<div class="combat-threat-brief elite-threat-brief"><b>${isContractTarget ? 'Contract target' : 'Elite plan'}:</b> ${escapeHtml(isContractTarget ? `Defeat ${monster.name} to complete the active hunt.` : eliteModifierPlanLine(eliteModifiersForMonster(monster)))}</div>`
-          : ''
-      : '';
 
     if (!S.run.active || !monster) {
       runStatus.innerHTML = `
@@ -252,9 +236,6 @@
         <section class="combat-enemy-header ${personalityClass}">
           <div class="depth-kicker">${monsterTier}</div>
           <p class="small muted">${monsterSubline}</p>
-          <p class="combat-personality-cue">${monsterTagline}</p>
-          ${eliteMarkup}
-          ${threatBrief}
         </section>
 
         <section class="combat-monster-stage ${stageBackdropClasses} ${personalityClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
@@ -305,7 +286,7 @@
         </section>
       </div>`;
 
-    const logLines = asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT);
+    const logLines = asArray(S.run.combatLog).filter(line => typeof isDisabledCombatEffectLine !== 'function' || !isDisabledCombatEffectLine(line)).slice(0, COMBAT_LOG_RENDER_LIMIT);
     combatLog.innerHTML = `
       <div class="run-log-head split"><h2>Feed</h2><div class="tag-row"><span class="pill">${format(logLines.length)} recent</span></div></div>
       <div class="run-log-list">${logLines.length ? logLines.map(renderCombatFeedLine).join('') : '<div class="log-line small muted combat-feed-line"><span class="feed-icon">·</span><div class="feed-copy"><div class="feed-kicker">Quiet</div><div class="feed-body">No combat messages yet.</div></div></div>'}</div>`;

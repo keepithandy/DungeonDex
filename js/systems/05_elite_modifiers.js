@@ -35,22 +35,11 @@
   }
 
   function eliteModifiersForMonster(monster) {
-    if (!monster || monster.tier !== 'Elite') return [];
-    const found = [];
-    const seen = new Set();
-    asArray(monster.modifiers, []).concat(monster.modifier ? [monster.modifier] : []).forEach(raw => {
-      const modifier = normalizeEliteModifier(raw);
-      if (!modifier || seen.has(modifier.id)) return;
-      seen.add(modifier.id);
-      found.push(modifier);
-    });
-    return found.sort((a, b) => (b.displayPriority || 0) - (a.displayPriority || 0)).slice(0, ELITE_STACKED_MODIFIER_MAX_COUNT);
+    return [];
   }
 
   function hasEliteModifier(monster, value) {
-    const def = eliteModifierDef(value);
-    if (!def) return false;
-    return eliteModifiersForMonster(monster).some(modifier => modifier.id === def.id);
+    return false;
   }
 
   function eliteModifierLabel(modifier) {
@@ -117,65 +106,19 @@
   }
 
   function selectEliteModifiers(rawDepth, state = null) {
-    const count = eliteModifierCountForDepth(rawDepth);
-    const pool = eligibleEliteModifiers(rawDepth);
-    const selected = [];
-    for (let i = 0; i < count && selected.length < ELITE_STACKED_MODIFIER_MAX_COUNT; i++) {
-      const candidates = pool.filter(candidate => !selected.some(chosen => chosen.id === candidate.id || eliteModifiersConflict(chosen, candidate)));
-      const picked = weightedPick(candidates);
-      if (!picked) break;
-      selected.push({ ...picked });
-    }
-    return selected.length ? selected : [normalizeEliteModifier('Frenzied')].filter(Boolean);
+    return [];
   }
 
   function eliteModifierStatProfile(modifiers) {
-    const list = asArray(modifiers, []).map(normalizeEliteModifier).filter(Boolean);
-    const profile = list.reduce((acc, modifier) => {
-      acc.power *= numberOr(modifier.power, 1, 0.75, 2);
-      acc.hp *= numberOr(modifier.hp, 1, 0.75, 2);
-      acc.guard *= numberOr(modifier.guard, 1, 0.75, 2);
-      acc.speed *= numberOr(modifier.speed, 1, 0.75, 2);
-      acc.reward *= numberOr(modifier.reward, 1, 0.75, 2);
-      return acc;
-    }, { power:1, hp:1, guard:1, speed:1, reward:1 });
-    return {
-      power: clamp(profile.power, 0.85, 1.36),
-      hp: clamp(profile.hp, 0.85, 1.34),
-      guard: clamp(profile.guard, 0.85, 1.32),
-      speed: clamp(profile.speed, 0.85, 1.30),
-      reward: clamp(profile.reward, 1, 1.62)
-    };
+    return { power:1, hp:1, guard:1, speed:1, reward:1 };
   }
 
   function eliteRewardProfile(modifiers, rawDepth) {
-    const list = asArray(modifiers, []).map(normalizeEliteModifier).filter(Boolean);
-    if (!list.length) return null;
-    const tierScore = list.reduce((sum, modifier) => sum + Math.floor(numberOr(modifier.tier, 1, 1, 4)), 0);
-    const rewardWeight = list.reduce((sum, modifier) => sum + numberOr(modifier.rewardWeight, 1, 0, 3), 0);
-    const depthBonus = depthStageValue(rawDepth) >= 75 ? 0.035 : depthStageValue(rawDepth) >= 45 ? 0.025 : depthStageValue(rawDepth) >= 24 ? 0.012 : 0;
-    const bonusLootChance = clamp(0.025 + tierScore * 0.016 + Math.max(0, list.length - 1) * 0.035 + depthBonus, 0.04, 0.16);
-    return {
-      modifierCount: list.length,
-      tierScore,
-      rewardWeight: Math.round(rewardWeight * 100) / 100,
-      bonusLootChance,
-      shardBonus: tierScore >= 4 ? 1 : 0,
-      label: list.length > 1 ? 'stacked elite risk' : `${eliteModifierTierLabel(list[0]).toLowerCase()} elite risk`
-    };
+    return null;
   }
 
   function normalizeEliteRewardProfile(value, modifiers = [], rawDepth = 1) {
-    const fallback = eliteRewardProfile(modifiers, rawDepth);
-    if (!isPlainObject(value)) return fallback;
-    return {
-      modifierCount: Math.floor(numberOr(value.modifierCount, fallback?.modifierCount || 0, 0, ELITE_STACKED_MODIFIER_MAX_COUNT)),
-      tierScore: Math.floor(numberOr(value.tierScore, fallback?.tierScore || 0, 0, 12)),
-      rewardWeight: numberOr(value.rewardWeight, fallback?.rewardWeight || 0, 0, 12),
-      bonusLootChance: clamp(numberOr(value.bonusLootChance, fallback?.bonusLootChance || 0, 0, 0.2), 0, 0.2),
-      shardBonus: Math.floor(numberOr(value.shardBonus, fallback?.shardBonus || 0, 0, 5)),
-      label: String(value.label || fallback?.label || 'elite risk')
-    };
+    return null;
   }
 
   function eliteModifierNames(modifiers) {
@@ -224,24 +167,5 @@
   }
 
   function eliteModifierMarkup(monster) {
-    const modifiers = eliteModifiersForMonster(monster);
-    if (!modifiers.length) return '';
-    return `<div class="elite-identity-panel" aria-label="Elite modifiers and threat readout">
-      <div class="elite-threat-head">
-        <span class="elite-threat-label">${escapeHtml(eliteModifierThreatRating(modifiers))}</span>
-        <span class="elite-threat-count">${format(modifiers.length)} mod${modifiers.length === 1 ? '' : 's'}</span>
-      </div>
-      <div class="elite-modifier-row">
-        ${modifiers.map(modifier => {
-          const label = escapeHtml(modifier.name || modifier.key || 'Modifier');
-          const mini = escapeHtml(eliteModifierMiniText(modifier));
-          const key = String(modifier.key || modifier.name || 'modifier').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          const tier = Math.floor(numberOr(modifier.tier, 1, 1, 4));
-          const title = escapeHtml(`${modifier.name || modifier.key || 'Modifier'}: ${modifier.danger || modifier.description || 'Elite threat.'} ${modifier.callout || ''}`.trim());
-          return `<span class="elite-modifier elite-mod-${key} elite-tier-${tier}" title="${title}" aria-label="${title}"><span class="elite-mod-name">${label}</span><span class="elite-mod-note">${mini}</span></span>`;
-        }).join('')}
-      </div>
-      <div class="elite-danger-line"><b>Danger:</b> ${escapeHtml(eliteModifierDangerSummary(modifiers))}</div>
-      <div class="elite-danger-line muted"><b>Plan:</b> ${escapeHtml(eliteModifierPlanLine(modifiers))}</div>
-    </div>`;
+    return '';
   }

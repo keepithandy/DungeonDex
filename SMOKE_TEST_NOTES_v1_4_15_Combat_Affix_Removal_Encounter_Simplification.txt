@@ -1,0 +1,34 @@
+DungeonDex v1.4.15 Smoke Test Notes
+Combat Affix Removal & Encounter Simplification Pass
+
+Build query:
+1.4.15-combat-affix-removal
+
+Planned smoke test:
+1. Open the game normally.
+2. Confirm visible label says DungeonDex v1.4.15.
+3. Enter Dungeon.
+4. Confirm combat loads.
+5. Confirm enemy display shows only tier/rarity and monster type/family.
+6. Confirm no affix/status labels appear.
+7. Confirm no Burn/Bleed/Poison/etc. text appears.
+8. Confirm no affix popups appear.
+9. Confirm no affix-triggered feed messages appear.
+10. Confirm Common fights work.
+11. Confirm Elite fights work.
+12. Confirm Boss fights work.
+13. Confirm Elites have higher HP than comparable common enemies.
+14. Confirm Bosses have higher HP than comparable elites.
+15. Confirm Attack works.
+16. Confirm Skill works.
+17. Confirm Guard works.
+18. Confirm Extract works.
+19. Confirm Haul still works.
+20. Confirm Elite Board/contract page does not crash if it previously expected modifiers.
+21. Confirm old saves with affix/status/modifier fields do not crash.
+22. Confirm no console errors.
+23. Confirm no save wipe.
+
+Implementation notes:
+- Syntax checks and manifest parse results should be recorded in the final Codex report.
+- Browser smoke results should be recorded in the final Codex report.

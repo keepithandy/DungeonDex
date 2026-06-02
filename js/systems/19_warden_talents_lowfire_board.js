@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.4.9a — Warden Talents + Lowfire Board.
+// DungeonDex v1.4.15 - Warden Talents + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.4.9a-town-currency-cleanup';
+  const SCRIPT_BUILD = '1.4.15-combat-affix-removal';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -170,8 +170,8 @@
       district: seed?.district || contract.district || 'Lowfire District',
       targetFloor,
       threat: Math.max(1, Math.min(3, Math.floor(+seed?.threat || +contract.threat || 1))),
-      modifier: seed?.modifier || contract.modifier || contractRisk(contract),
-      modifierKey: seed?.modifierKey || contract.modifierKey || '',
+      modifier: '',
+      modifierKey: '',
       contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
       bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
       rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
@@ -212,8 +212,8 @@
       <div class="elite-contract-detail-grid contract-identity-grid small">
         <span><b>District:</b> ${H(model.district)}</span>
         <span><b>Target:</b> Floor ${H(model.targetFloor || '?')}</span>
+        <span><b>Tier:</b> Elite Hunt</span>
         <span><b>Threat:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
-        <span><b>Modifier:</b> ${H(model.modifier)}</span>
         <span><b>Contract:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
         <span><b>Bonus Writ:</b> ${H(model.bonusWrit || 'Display-only for now.')}</span>
         <span><b>Reward:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>

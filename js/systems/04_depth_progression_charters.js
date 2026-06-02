@@ -498,23 +498,7 @@
 
   function resolveEliteCriticalDamage(state, monster, baseDamage) {
     const damage = Math.max(1, Math.floor(numberOr(baseDamage, 1, 1, 999999)));
-    if (monster?.tier !== 'Elite') return { damage, critical: false, softened: false, feedback: '' };
-    const threat = threatDepthFromDepth(monster.level || state?.run?.floor || 1);
-    const critChance = clamp(0.08 + threat * 0.0015, 0.08, 0.16);
-    if (Math.random() >= critChance) return { damage, critical: false, softened: false, feedback: '' };
-
-    let criticalDamage = Math.max(damage + 1, Math.round(damage * 1.32));
-    if (!hasEquippedSetBonus(state, 'sootveil_regalia', 2)) {
-      return { damage: criticalDamage, critical: true, softened: false, feedback: '' };
-    }
-
-    criticalDamage = Math.max(1, Math.round(criticalDamage * 0.75));
-    return {
-      damage: criticalDamage,
-      critical: true,
-      softened: true,
-      feedback: pick(['Sootveil softens the blow.', 'Ashglass footing absorbs part of the strike.'])
-    };
+    return { damage, critical: false, softened: false, feedback: '' };
   }
 
   function consumeSootveilGuard(state) {

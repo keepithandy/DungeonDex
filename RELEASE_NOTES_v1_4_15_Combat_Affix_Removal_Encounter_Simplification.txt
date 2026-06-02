@@ -1,0 +1,20 @@
+DungeonDex v1.4.15
+Combat Affix Removal & Encounter Simplification Pass
+
+Build query:
+1.4.15-combat-affix-removal
+
+Release notes:
+- Removed active monster affixes and combat modifier effects for now.
+- Removed affix/status labels and popups from combat.
+- Simplified encounters into Common, Elite, and Boss tiers.
+- Elites and bosses now rely primarily on HP scaling instead of special effects.
+- Cleaned combat feed noise caused by status/modifier effects.
+- Preserved monster names, families, HP bars, haul, feed, and action buttons.
+- Preserved save compatibility with old affix/status data.
+- No save wipe.
+
+Scoped notes:
+- Old affix, status, and modifier fields may still exist in older saves, but the runtime now ignores them.
+- Dormant elite modifier helpers remain available to avoid breaking older save shapes and references.
+- Elite Board contracts remain named hunts, but modifier labels are no longer shown or applied.

@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.14-combat-page-framing-cleanup';
-const BUILD_QS = '1.4.14-combat-page-framing-cleanup';
+const CACHE_NAME = 'dungeon-dex-1.4.15-combat-affix-removal';
+const BUILD_QS = '1.4.15-combat-affix-removal';
 const ASSETS = [
   './',
   './index.html',

@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.14`
-* Current local package baseline: `v1.4.14`
-* Current development target: `v1.4.14`
+* Public/live itch version: `v1.4.15`
+* Current local package baseline: `v1.4.15`
+* Current development target: `v1.4.15`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.15 - Combat Affix Removal & Encounter Simplification Pass
+
+Status: Complete
+
+Finished changes:
+
+* Updated active build labels and cache query strings to `DungeonDex v1.4.15` with build query `1.4.15-combat-affix-removal`.
+* Removed active monster affix and elite modifier generation for now.
+* Disabled affix/status combat behavior, including modifier readouts, poison, burn ticks, pierce hooks, revive/surge hooks, elite critical specials, and modifier bonus loot.
+* Simplified enemy headers to Common, Elite, and Boss tier identity with monster family/contract hunt language.
+* Kept Common, Elite, and Boss tier scaling, with elites and bosses relying primarily on HP scaling.
+* Updated Elite Board cards to stop advertising modifier fields while preserving named hunt contracts and save compatibility.
+* Preserved save compatibility by ignoring old affix/status/modifier fields instead of wiping or migrating progress.
 
 ---
 
@@ -139,7 +155,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.14`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.15`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.

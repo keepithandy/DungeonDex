@@ -53,8 +53,28 @@
     }
   }
 
+  function isDisabledCombatEffectLine(line) {
+    const lower = String(line || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+    if (!lower) return false;
+    return [
+      'elite read:',
+      'elite plan:',
+      'venom seeps',
+      'poison follows',
+      'hollow-eyed precision',
+      'pierces for',
+      'burn lingers',
+      'gravebound refuses',
+      'ash-fed surge',
+      'modifier activates',
+      'aura pulses',
+      'status applied'
+    ].some(token => lower.includes(token));
+  }
+
   function pushCombat(state, line) {
     if (!state.run) return;
+    if (isDisabledCombatEffectLine(line)) return;
     state.run.combatLog = asArray(state.run.combatLog);
     state.run.combatLog.unshift(String(line || ''));
     state.run.combatLog = state.run.combatLog.slice(0, COMBAT_LOG_STORE_LIMIT);
@@ -143,7 +163,7 @@
     if (lower.includes('loot') || lower.includes('found:') || lower.includes('relic') || lower.includes('drop') || lower.includes('cache')) return 'loot';
     if (lower.includes('gold') || lower.includes('shard') || lower.includes('reward')) return 'reward';
     if (lower.includes('you hit') || lower.includes('ashburst') || lower.includes('critical') || lower.includes('strike')) return 'player-hit';
-    if (lower.includes('hits for') || lower.includes('misses') || lower.includes('takes') || lower.includes('poison') || lower.includes('bleed') || lower.includes('pierces for') || lower.includes('seeps for') || lower.includes('lingers for')) return 'enemy-hit';
+    if (lower.includes('hits for') || lower.includes('misses') || lower.includes('takes')) return 'enemy-hit';
     if (lower.includes('guard') || lower.includes('brace')) return 'guard';
     if (lower.includes('descent continues') || lower.includes('entering ') || lower.includes('contract')) return 'progress';
     return 'action';
@@ -224,9 +244,6 @@
       .replace(/you hit/gi, '<span class="feed-chip feed-chip-player">You hit</span>')
       .replace(/ashburst/gi, '<span class="feed-chip feed-chip-skill">Ashburst</span>')
       .replace(/critical/gi, '<span class="feed-chip feed-chip-crit">Critical</span>')
-      .replace(/seeps for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">seeps for $1</span>')
-      .replace(/lingers for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">lingers for $1</span>')
-      .replace(/pierces for\s+(\d+)/gi, '<span class="feed-chip feed-chip-hurt">pierces for $1</span>')
       .replace(/Boss Spoils/gi, '<span class="feed-chip feed-chip-boss">Boss Spoils</span>')
       .replace(/Elite Spoils/gi, '<span class="feed-chip feed-chip-elite">Elite Spoils</span>')
       .replace(/Room Reward/gi, '<span class="feed-chip feed-chip-floor">Room Reward</span>')
@@ -235,19 +252,9 @@
       .replace(/Boss relic/gi, '<span class="feed-chip feed-chip-boss">Boss relic</span>')
       .replace(/Bounty relic/gi, '<span class="feed-chip feed-chip-boss">Bounty relic</span>')
       .replace(/Elite warning/gi, '<span class="feed-chip feed-chip-elite feed-chip-threat">Elite warning</span>')
-      .replace(/Elite read/gi, '<span class="feed-chip feed-chip-elite feed-chip-read">Elite read</span>')
-      .replace(/Elite plan/gi, '<span class="feed-chip feed-chip-elite feed-chip-read">Elite plan</span>')
       .replace(/Dangerous elite defeated/gi, '<span class="feed-chip feed-chip-elite">Dangerous elite defeated</span>')
       .replace(/Elite drop/gi, '<span class="feed-chip feed-chip-elite">Elite drop</span>')
       .replace(/Elite bonus loot/gi, '<span class="feed-chip feed-chip-elite">Elite bonus loot</span>')
-      .replace(/Frenzied/gi, '<span class="feed-chip feed-chip-elite feed-mod-frenzied">Frenzied</span>')
-      .replace(/Ironhide/gi, '<span class="feed-chip feed-chip-elite feed-mod-ironhide">Ironhide</span>')
-      .replace(/Venomous/gi, '<span class="feed-chip feed-chip-elite feed-mod-venomous">Venomous</span>')
-      .replace(/Swift/gi, '<span class="feed-chip feed-chip-elite feed-mod-swift">Swift</span>')
-      .replace(/Hollow-Eyed/gi, '<span class="feed-chip feed-chip-elite feed-mod-hollow-eyed">Hollow-Eyed</span>')
-      .replace(/Ash-fed/gi, '<span class="feed-chip feed-chip-elite feed-mod-ash-fed">Ash-fed</span>')
-      .replace(/Gravebound/gi, '<span class="feed-chip feed-chip-elite feed-mod-gravebound">Gravebound</span>')
-      .replace(/Wardmarked/gi, '<span class="feed-chip feed-chip-elite feed-mod-wardmarked">Wardmarked</span>')
       .replace(/Floor cleared/gi, '<span class="feed-chip feed-chip-floor">Floor cleared</span>')
       .replace(/Floor secured/gi, '<span class="feed-chip feed-chip-floor">Floor secured</span>')
       .replace(/Room cleared/gi, '<span class="feed-chip feed-chip-floor">Room cleared</span>')
@@ -369,11 +376,6 @@
     } else {
       pushCombat(state, `Encounter: ${monster.name} rises in ${state.run.zone}.`);
     }
-    const modifiers = eliteModifiersForMonster(monster);
-    if (monster.tier === 'Elite' && modifiers.length) {
-      pushCombat(state, `Elite read: ${eliteModifierNames(modifiers)}. ${eliteModifierDangerSummary(modifiers)}`);
-      pushCombat(state, `Elite plan: ${eliteModifierPlanLine(modifiers)}`);
-    }
   }
 
   function damageRoll(offense, defense, swing = 1) {
@@ -435,7 +437,7 @@
         monster.hp -= dealt;
         const siphon = Math.max(1, Math.round(stats.wit * 0.18));
         state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
-        pushCombat(state, `Ashburst burns for ${dealt} and returns ${siphon} HP.`);
+        pushCombat(state, `Ashburst hits for ${dealt} and returns ${siphon} HP.`);
       }
     } else if (action === 'extract') {
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
@@ -453,21 +455,9 @@
     }
 
     if (monster.hp <= 0) {
-      if (hasEliteModifier(monster, 'Gravebound') && !monster.reviveUsed) {
-        monster.reviveUsed = true;
-        monster.hp = Math.max(1, Math.round(monster.maxHp * 0.22));
-        pushCombat(state, `Gravebound refuses death. ${monster.name} rises again.`);
-      } else {
-        winEncounter(state);
-        result.saveNow = true;
-        return result;
-      }
-    }
-
-    if (hasEliteModifier(monster, 'Ash-fed') && !monster.ashFedTriggered && monster.hp <= monster.maxHp * 0.35) {
-      monster.ashFedTriggered = true;
-      monster.power = Math.round(monster.power * 1.06);
-      pushCombat(state, `Ash-fed surge. ${monster.name} burns hotter near defeat.`);
+      winEncounter(state);
+      result.saveNow = true;
+      return result;
     }
 
     const sootveilGuard = consumeSootveilGuard(state);
@@ -480,34 +470,14 @@
       playerShield += Math.max(2, Math.round(stats.guard * 0.22));
     }
     const swing = monster.tier === 'Boss' ? 1.3 : monster.tier === 'Elite' ? 1.16 : 1;
-    const eliteCritical = resolveEliteCriticalDamage(state, monster, Math.max(1, damageRoll(monster.power, stats.guard + playerShield, swing)));
-    const incoming = eliteCritical.damage;
+    const incoming = Math.max(1, damageRoll(monster.power, stats.guard + playerShield, swing));
     const dodged = Math.random() * 100 < clamp(state.player.dodge + stats.speed * 0.25, 3, 38);
     if (dodged) {
       pushCombat(state, `${monster.name} misses through the gloom.`);
     } else {
       state.player.hp -= incoming;
       if (state.player.hp <= 0) lethalStrikeTaken = true;
-      pushCombat(state, eliteCritical.critical ? `${monster.name} lands an elite critical for ${incoming}.` : `${monster.name} hits for ${incoming}.`);
-      if (eliteCritical.feedback) pushCombat(state, eliteCritical.feedback);
-      if (hasEliteModifier(monster, 'Venomous')) {
-        const venom = Math.max(1, Math.round(threatDepthFromDepth(monster.level) * 0.7));
-        const venomNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Venomous poison follows clean hits'));
-        state.player.hp -= venom;
-        pushCombat(state, venomNoted ? `Venom seeps for ${venom}.` : `Venom seeps for ${venom}. Venomous poison follows clean hits.`);
-      }
-      if (hasEliteModifier(monster, 'Hollow-Eyed') && Math.random() < 0.18) {
-        const pierce = Math.max(2, Math.round(threatDepthFromDepth(monster.level) * 1.1));
-        const hollowNoted = asArray(state.run.combatLog, []).some(line => String(line).includes('Hollow-Eyed can pierce guard'));
-        state.player.hp -= pierce;
-        pushCombat(state, hollowNoted ? `Hollow-Eyed precision pierces for ${pierce}.` : `Hollow-Eyed precision pierces for ${pierce}. Hollow-Eyed can pierce guard.`);
-      }
-    }
-
-    if (monster.skill === 'Burn' && Math.random() < 0.2) {
-      const dot = Math.round(threatDepthFromDepth(monster.level) * 1.2);
-      state.player.hp -= dot;
-      pushCombat(state, `Burn lingers for ${dot}.`);
+      pushCombat(state, `${monster.name} hits for ${incoming}.`);
     }
 
     if (state.player.hp <= 0) {
@@ -550,8 +520,7 @@
       return;
     }
     const source = m.tier === 'Boss' ? 'boss' : m.tier === 'Elite' ? 'elite' : 'normal';
-    const eliteModifiers = source === 'elite' ? eliteModifiersForMonster(m) : [];
-    const eliteReward = source === 'elite' ? normalizeEliteRewardProfile(m.eliteReward, eliteModifiers, state.run.floor) : null;
+    const eliteReward = null;
     const runGoldBonus = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
     const debtbrandGoldBonus = hasEquippedSetBonus(state, 'lowfire_debtbrand', 2) ? 7 : 0;
     const eliteContractGoldBonus = source === 'elite' ? Math.round(activeEliteContractRisk(state).coinBonus * 100) : 0;
@@ -587,18 +556,6 @@
         : lootLabel;
       pushCombat(state, `${lootLine}: ${loot.name} (${loot.rarity}) added to the unsecured haul.`);
       updateQuest(state, 'loot', 1);
-    }
-    if (source === 'elite' && eliteReward?.modifierCount) {
-      const bonusPct = Math.round(eliteReward.bonusLootChance * 100);
-      pushCombat(state, `Elite Spoils: elite risk adds a +${bonusPct}% bonus loot roll.`);
-      if (Math.random() < eliteReward.bonusLootChance) {
-        const bonusLoot = generateGear(pick(SLOT_ORDER), threatDepthFromDepth(state.run.floor) + rand(0, 1), { source:'elite', depthRaw:state.run.floor, state });
-        bonusLoot.tags = asArray(bonusLoot.tags, []).concat(['elite-risk-bonus']);
-        addPendingRunLoot(state, bonusLoot);
-        drops += 1;
-        pushCombat(state, `Elite Spoils bonus loot: ${bonusLoot.name} (${bonusLoot.rarity}) added to the unsecured haul.`);
-        updateQuest(state, 'loot', 1);
-      }
     }
     if (source === 'boss') {
       const sink = ensureGoldSinkState(state);

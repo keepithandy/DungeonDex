@@ -50,17 +50,20 @@
     const level = Math.floor(numberOr(monster.level, Math.max(1, floor || 1), 1, 999));
     const maxHp = Math.floor(numberOr(monster.maxHp, Math.max(12, level * 18), 1, 999999));
     const tier = ['Common','Elite','Boss'].includes(monster.tier) ? monster.tier : 'Common';
-    const normalizedModifiers = tier === 'Elite'
-      ? eliteModifiersForMonster({ tier, modifier:monster.modifier, modifiers:monster.modifiers })
-      : [];
-    const eliteReward = tier === 'Elite' ? normalizeEliteRewardProfile(monster.eliteReward, normalizedModifiers, level) : null;
+    const normalizedModifiers = [];
+    const eliteReward = null;
+    const family = String(monster.family || (monster.contractTarget ? 'Elite Hunt' : 'Husk'));
+    const type = String(monster.type || (monster.contractTarget ? 'Contract' : 'Stalker'));
+    const name = monster.contractTarget
+      ? String(monster.contractEliteName || monster.name || 'Recovered Elite Hunt')
+      : `${family} ${type}`.trim();
     return {
       id: monster.id || makeId('monster'),
-      name: String(monster.name || 'Recovered Hollow Threat'),
-      family: String(monster.family || 'Husk'),
-      type: String(monster.type || 'Stalker'),
-      affix: String(monster.affix || 'Ashwake'),
-      skill: MONSTER_SKILLS.includes(monster.skill) ? monster.skill : 'Bleed',
+      name: name || 'Recovered Hollow Threat',
+      family,
+      type,
+      affix: '',
+      skill: 'Basic attack',
       tier,
       modifier: normalizedModifiers[0] || null,
       modifiers: normalizedModifiers,
@@ -71,7 +74,7 @@
       contractTarget: !!monster.contractTarget,
       contractId: String(monster.contractId || ''),
       contractEliteName: String(monster.contractEliteName || ''),
-      contractModifierName: String(monster.contractModifierName || ''),
+      contractModifierName: '',
       contractTargetFloor: Math.floor(numberOr(monster.contractTargetFloor, 0, 0, 999999)),
       contractHpMult: numberOr(monster.contractHpMult, 1, 0, 9),
       contractPowerMult: numberOr(monster.contractPowerMult, 1, 0, 9),

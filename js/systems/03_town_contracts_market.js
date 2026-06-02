@@ -35,8 +35,8 @@
       title:'WANTED: Glassfang Brute',
       district:'Lowfire District',
       threat:2,
-      modifier:'Bleeding Edge',
-      modifierKey:'bleeding_edge',
+      modifier:'',
+      modifierKey:'',
       contractText:'Defeat Glassfang Brute when it appears.',
       bonusWrit:'Defeat it before resting.',
       rewardPreview:'+silver, +rare chance',
@@ -58,8 +58,8 @@
       title:'WANTED: Ash-Crowned Marauder',
       district:'Ashgate Warrens',
       threat:2,
-      modifier:'Cinder Oath',
-      modifierKey:'cinder_oath',
+      modifier:'',
+      modifierKey:'',
       contractText:'Defeat Ash-Crowned Marauder when it appears.',
       bonusWrit:'Defeat it without extracting first.',
       rewardPreview:'+silver, +elite loot',
@@ -81,8 +81,8 @@
       title:'WANTED: Cinderjaw Bailiff',
       district:'Lowfire District',
       threat:2,
-      modifier:'Debt Court',
-      modifierKey:'debt_court',
+      modifier:'',
+      modifierKey:'',
       contractText:'Defeat Cinderjaw Bailiff when it appears.',
       bonusWrit:'Defeat it after guarding at least once.',
       rewardPreview:'+silver, +board rep soon',
@@ -104,8 +104,8 @@
       title:'WANTED: Mireglass Collector',
       district:'Ember Debtworks',
       threat:3,
-      modifier:'Mirror Debt',
-      modifierKey:'mirror_debt',
+      modifier:'',
+      modifierKey:'',
       contractText:'Defeat Mireglass Collector when it appears.',
       bonusWrit:'Defeat it before using Ashburst twice.',
       rewardPreview:'+silver, +mythic hint',
@@ -203,8 +203,8 @@
       district,
       targetFloor,
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
-      modifier: seed?.modifier || contract.modifier || eliteContractRiskLevel(contract),
-      modifierKey: seed?.modifierKey || contract.modifierKey || contract.modifier || '',
+      modifier: '',
+      modifierKey: '',
       contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
       bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
       rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
@@ -229,8 +229,8 @@
       district: active.district || '',
       targetFloor: active.targetFloor || 0,
       threat: active.threat || 1,
-      modifier: active.modifier || '',
-      modifierKey: active.modifierKey || '',
+      modifier: '',
+      modifierKey: '',
       contractText: active.contractText || '',
       bonusWrit: active.bonusWrit || '',
       rewardPreview: active.rewardPreview || '',
@@ -307,7 +307,6 @@
     const parts = [
       `+${Math.round(risk.spawnBonus * 100)}% elite spawn`,
       `+${Math.round(risk.hpBonus * 100)}% elite HP`,
-      `+${Math.round(risk.damageBonus * 100)}% elite damage`,
       `+${Math.round(risk.coinBonus * 100)}% elite coins`
     ];
     return `${risk.label}: ${parts.join(', ')} while active.`;
@@ -363,8 +362,8 @@
             district: savedActive.district || def.district || '',
             targetFloor: Math.max(1, Math.floor(numberOr(savedActive.targetFloor, eliteContractTargetFloor(state), 1, 999999))),
             threat: Math.max(1, Math.min(3, Math.floor(numberOr(savedActive.threat ?? def.threat, 1, 1, 3)))),
-            modifier: savedActive.modifier || def.modifier || '',
-            modifierKey: savedActive.modifierKey || def.modifierKey || def.modifier || '',
+            modifier: '',
+            modifierKey: '',
             contractText: savedActive.contractText || def.contractText || `Defeat ${savedActive.eliteName || def.eliteName || def.name} when it appears.`,
             bonusWrit: savedActive.bonusWrit || def.bonusWrit || 'Defeat it before resting.',
             rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
@@ -431,8 +430,8 @@
       district: model.district,
       targetFloor: model.targetFloor,
       threat: model.threat,
-      modifier: model.modifier,
-      modifierKey: model.modifierKey,
+      modifier: '',
+      modifierKey: '',
       contractText: model.contractText,
       bonusWrit: model.bonusWrit,
       rewardPreview: model.rewardPreview,
@@ -546,7 +545,7 @@
     const early = targetFloor < 20;
     return {
       hp: early ? 1.25 : 1.30,
-      power: early ? 1.15 : 1.20,
+      power: 1,
       reward: 1.35
     };
   }
@@ -555,32 +554,27 @@
     const hunt = active || activeEliteContractHunt(state);
     if (!hunt || !monster) return monster;
     const scaling = eliteContractTargetScaling(hunt);
-    const modifier = typeof normalizeEliteModifier === 'function'
-      ? normalizeEliteModifier(hunt.modifierKey || hunt.modifier)
-      : null;
     hunt.targetSpawned = true;
     hunt.status = 'active';
     hunt.spawnedAtFloor = Math.floor(threatDepthFromDepth(monster.level || state?.run?.floor || 1));
     monster.name = hunt.eliteName;
-    monster.family = 'Contract';
-    monster.type = 'Elite';
-    monster.affix = hunt.modifier || monster.affix || 'Marked';
+    monster.family = 'Elite Hunt';
+    monster.type = 'Contract';
+    monster.affix = '';
     monster.tier = 'Elite';
     monster.contractTarget = true;
     monster.contractId = hunt.id;
     monster.contractEliteName = hunt.eliteName;
-    monster.contractModifierName = hunt.modifier || '';
+    monster.contractModifierName = '';
     monster.contractTargetFloor = hunt.targetFloor;
     monster.contractHpMult = scaling.hp;
     monster.contractPowerMult = scaling.power;
     monster.contractRewardMult = scaling.reward;
-    monster.modifier = modifier || monster.modifier || null;
-    monster.modifiers = modifier ? [modifier] : eliteModifiersForMonster(monster);
-    monster.eliteReward = normalizeEliteRewardProfile(monster.eliteReward, monster.modifiers, monster.level || state?.run?.floor || 1);
-    monster.power = Math.max(1, Math.round(numberOr(monster.power, 1, 1, 999999) * scaling.power));
+    monster.modifier = null;
+    monster.modifiers = [];
+    monster.eliteReward = null;
     monster.maxHp = Math.max(1, Math.round(numberOr(monster.maxHp, monster.hp || 1, 1, 999999) * scaling.hp));
     monster.hp = monster.maxHp;
-    monster.guard = Math.max(0, Math.round(numberOr(monster.guard, 0, 0, 999999) * 1.08));
     monster.rewardGold = Math.max(0, Math.round(numberOr(monster.rewardGold, 0, 0, Number.MAX_SAFE_INTEGER) * scaling.reward));
     monster.rewardXp = Math.max(0, Math.round(numberOr(monster.rewardXp, 0, 0, 999999) * 1.18));
     monster.rewardShard = Math.max(1, Math.round(numberOr(monster.rewardShard, 1, 0, 999999) + 2));

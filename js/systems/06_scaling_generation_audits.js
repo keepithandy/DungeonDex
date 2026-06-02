@@ -321,8 +321,8 @@
     const contractRisk = activeEliteContractRisk(state);
     const family = pick(MONSTER_FAMILIES);
     const type = pick(MONSTER_TYPES);
-    const affix = pick(MONSTER_AFFIXES);
-    const skill = pick(MONSTER_SKILLS);
+    const affix = '';
+    const skill = 'Basic attack';
     const boss = rawDepth > 0 && rawDepth % (BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP) === 0;
     const contractTarget = !boss && typeof eliteContractTargetDue === 'function' ? eliteContractTargetDue(state, rawDepth) : null;
     const eliteChance = clamp(eliteChanceForFloor(threatDepth) + ladder.eliteBonus + contractRisk.spawnBonus, 0.04, 0.43);
@@ -339,17 +339,8 @@
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;
-    let name = `${affix} ${family} ${type}`;
+    let name = `${family} ${type}`;
     let reviveUsed = false;
-    if (modifiers.length) {
-      const statProfile = eliteModifierStatProfile(modifiers);
-      name = `${modifiers.map(entry => entry.key).join(' ')} ${name}`;
-      power = Math.round(power * statProfile.power);
-      hp = Math.round(hp * statProfile.hp);
-      guard = Math.round(guard * statProfile.guard);
-      speed = Math.round(speed * statProfile.speed);
-      rewardMult *= statProfile.reward;
-    }
     const eliteReward = elite ? eliteRewardProfile(modifiers, rawDepth) : null;
     const rewardPower = power;
     const rewardGold = encounterCoinReward(threatDepth, rewardPower, tier, rewardMult);
@@ -380,7 +371,7 @@
       rewardGold,
       rewardXp: Math.max(6, Math.round(power * 1.05 * rewardMult)),
       rewardShard: boss ? rand(22, 34) : elite ? rand(7, 12) + (eliteReward?.shardBonus || 0) : rand(1, 4),
-      lore: boss ? 'A named ruin-lord waits deeper than prayer.' : modifiers.length ? `${modifiers.map(entry => entry.text).join('; ')}. ${skill} follows every opening.` : `A ${tier.toLowerCase()} threat shaped by ${skill.toLowerCase()} and the ruin-depths.`
+      lore: boss ? 'A named ruin-lord waits deeper than prayer.' : `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
     };
     return contractTarget && typeof applyEliteContractTargetMonster === 'function'
       ? applyEliteContractTargetMonster(state, monster, contractTarget)
