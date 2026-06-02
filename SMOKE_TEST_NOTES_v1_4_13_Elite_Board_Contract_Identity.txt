@@ -1,0 +1,44 @@
+DungeonDex v1.4.13 - Elite Board Contract Identity Smoke Test Notes
+
+Syntax checks
+- node --check app.js
+- node --check sw.js
+- Get-ChildItem .\js\systems\*.js | ForEach-Object { Write-Host "Checking $($_.Name)"; node --check $_.FullName }
+- python -c "import json; json.load(open('manifest.json', encoding='utf-8')); print('manifest ok')"
+
+Browser smoke
+- Open the game normally.
+- Confirm visible label says DungeonDex v1.4.13.
+- Confirm town loads.
+- Open the Elite Board.
+- Confirm 3 contract cards appear.
+- Confirm each card has name, district, target floor, threat, modifier, contract text, bonus writ, reward preview, and flavor.
+- Accept/select one contract.
+- Confirm accepted state is visible.
+- Leave and return to town if possible.
+- Confirm the board does not duplicate, vanish, or crash.
+- Enter Dungeon.
+- Confirm combat still starts.
+- Confirm Attack, Skill, Guard, and Extract still work.
+- Confirm no save wipe.
+- Confirm no console errors.
+
+Hunt target smoke additions
+- Confirm each contract has a named elite and target floor.
+- Confirm the main objective says to defeat that named elite.
+- Confirm unrelated/random conditions are not used as the main contract objective.
+- Confirm active hunt summary appears with the exact elite name and target floor.
+- Reach, simulate, or force the target floor.
+- Confirm the exact named elite appears.
+- Confirm it is marked as a Contract Elite.
+- Confirm it uses the listed modifier.
+- Confirm it uses conservative scaling.
+- Defeat it and confirm the contract completes cleanly.
+- Confirm extracting before target floor does not crash.
+- Confirm dying before target completion does not crash.
+
+Focused diff review
+- git status --short
+- git diff --stat
+- git diff -- VERSION.md index.html app.js sw.js CHANGELOG.md
+- Inspect modified elite, town, render, and style files before commit.

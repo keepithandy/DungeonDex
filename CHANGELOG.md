@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.12`
-* Current local package baseline: `v1.4.12`
-* Current development target: `v1.4.12`
+* Public/live itch version: `v1.4.13`
+* Current local package baseline: `v1.4.13`
+* Current development target: `v1.4.13`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -61,6 +61,21 @@ Add new notes below this section.
 
 ---
 
+### v1.4.13 - Elite Board Contract Identity Pass
+
+Status: Complete
+
+Finished changes:
+
+* Expanded the Lowfire Elite Board into a three-contract choice system.
+* Added real named hunt targets with exact elite names, target floors, contract text, bonus writ copy, modifiers, reward previews, and flavor.
+* Injected accepted contract targets into the run encounter flow with conservative Contract Elite scaling.
+* Added accepted-contract visual state, completion/failure/expiration state handling, and a compact active-hunt summary.
+* Kept trophy rewards out of this pass and avoided broad combat or economy rebalance.
+* Aligned active build labels and cache query strings to `DungeonDex v1.4.13` with build query `1.4.13-elite-board-contract-identity`.
+
+---
+
 ### v1.4.12 - DevTools Load Restore & Package Hygiene Hotfix
 
 Status: Complete
@@ -108,7 +123,7 @@ These rules apply to future DungeonDex updates:
 * Treat the GitHub folder as the source of truth.
 * Use `VERSION.md` as the active version authority.
 * Use `CHANGELOG.md` for ongoing update history.
-* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.11`.
+* Keep visible in-game labels short and player-facing, such as `DungeonDex v1.4.13`.
 * Keep long internal pass names out of player-facing UI.
 * Preserve save compatibility whenever possible.
 * Prefer small, reviewable updates over large rewrites.

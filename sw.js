@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dungeon-dex-1.4.12-devtools-load-hygiene';
-const BUILD_QS = '1.4.12-devtools-load-hygiene';
+const CACHE_NAME = 'dungeon-dex-1.4.13-elite-board-contract-identity';
+const BUILD_QS = '1.4.13-elite-board-contract-identity';
 const ASSETS = [
   './',
   './index.html',

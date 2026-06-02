@@ -324,8 +324,9 @@
     const affix = pick(MONSTER_AFFIXES);
     const skill = pick(MONSTER_SKILLS);
     const boss = rawDepth > 0 && rawDepth % (BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP) === 0;
+    const contractTarget = !boss && typeof eliteContractTargetDue === 'function' ? eliteContractTargetDue(state, rawDepth) : null;
     const eliteChance = clamp(eliteChanceForFloor(threatDepth) + ladder.eliteBonus + contractRisk.spawnBonus, 0.04, 0.43);
-    const elite = !boss && Math.random() < eliteChance;
+    const elite = !boss && (contractTarget || Math.random() < eliteChance);
     const modifiers = elite && !boss ? selectEliteModifiers(rawDepth, state) : [];
     const modifier = modifiers[0] || null;
     const tier = boss ? 'Boss' : elite ? 'Elite' : 'Common';
@@ -356,7 +357,7 @@
       power = Math.round(power * (1 + contractRisk.damageBonus));
       hp = Math.round(hp * (1 + contractRisk.hpBonus));
     }
-    return {
+    const monster = {
       id: makeId('monster'),
       name,
       family,
@@ -381,6 +382,9 @@
       rewardShard: boss ? rand(22, 34) : elite ? rand(7, 12) + (eliteReward?.shardBonus || 0) : rand(1, 4),
       lore: boss ? 'A named ruin-lord waits deeper than prayer.' : modifiers.length ? `${modifiers.map(entry => entry.text).join('; ')}. ${skill} follows every opening.` : `A ${tier.toLowerCase()} threat shaped by ${skill.toLowerCase()} and the ruin-depths.`
     };
+    return contractTarget && typeof applyEliteContractTargetMonster === 'function'
+      ? applyEliteContractTargetMonster(state, monster, contractTarget)
+      : monster;
   }
 
   function runDeepScalingAudit(state = S) {

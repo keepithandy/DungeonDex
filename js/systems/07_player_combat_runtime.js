@@ -349,6 +349,7 @@
     if (!run.active) return;
     run.floor = progressDepthValue(run.floor, defaultRunStartDepth(state));
     run.zone = zoneName(run.floor);
+    if (typeof expireOverdueEliteContract === 'function') expireOverdueEliteContract(state);
     run.monster = generateMonster(run.floor, state);
     if (!run.monster) {
       recoverRunToTown(state, 'Recovered from a failed encounter roll and returned to Lowfire.');
@@ -359,7 +360,9 @@
     state.player.discoveredMonsters = asArray(state.player.discoveredMonsters, []);
     if (!state.player.discoveredMonsters.includes(state.run.monster.name)) state.player.discoveredMonsters.push(state.run.monster.name);
     const monster = state.run.monster;
-    if (monster.tier === 'Boss') {
+    if (monster.contractTarget) {
+      pushCombat(state, `Contract target sighted: ${monster.name}.`);
+    } else if (monster.tier === 'Boss') {
       pushCombat(state, `Boss pressure locks the stair: ${monster.name}.`);
     } else if (monster.tier === 'Elite') {
       pushCombat(state, `Elite pressure rises: ${monster.name}.`);
@@ -616,9 +619,9 @@
     if (!drops && source === 'normal') pushCombat(state, 'No gear found. You pocket the coin and move on.');
     if (!drops && source === 'elite') pushCombat(state, 'Elite Spoils: no gear found. Coin, shards, and XP stay in the unsecured haul.');
 
-    if (source === 'elite' && !m.eliteContractCounted) {
+    if (source === 'elite' && m.contractTarget && !m.eliteContractCounted) {
       m.eliteContractCounted = true;
-      recordEliteContractKill(state);
+      completeEliteContractTarget(state, m);
     }
 
     const pending = ensurePendingRunRewards(state);
@@ -916,6 +919,17 @@
     }
     const summaryLine = extractionSummaryLine(state, reason);
     if (summaryLine) pushLog(state, summaryLine);
+    const activeHunt = typeof activeEliteContractHunt === 'function' ? activeEliteContractHunt(state) : null;
+    if (activeHunt && !activeHunt.completed && !activeHunt.complete) {
+      if (reason === 'defeat') {
+        failEliteContract(state, 'failed');
+      } else if (reason === 'extract') {
+        const endedThreatFloor = Math.floor(threatDepthFromDepth(endedAtFloor));
+        const targetFloor = Math.floor(numberOr(activeHunt.targetFloor, endedThreatFloor + 1, 1, 999999));
+        if (activeHunt.targetSpawned || activeHunt.status === 'active') failEliteContract(state, 'failed');
+        else if (endedThreatFloor > targetFloor) failEliteContract(state, 'expired');
+      }
+    }
     state.player.returnDepth = nextReturnDepth;
     if (reason === 'extract') state.player.safeExtractDepth = Math.max(state.player.safeExtractDepth || 1, nextReturnDepth);
     state.run.active = false;

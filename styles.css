@@ -7258,6 +7258,85 @@ button:focus-visible,
 .app-shell.combat-active #screen-town .shop-item,
 .app-shell.combat-active #screen-town .quest-card,
 .app-shell.combat-active #screen-town .elite-contract-card { padding: 8px; }
+
+/* v1.4.13 Elite Board Contract Identity Pass */
+.elite-contract-identity-board .contract-identity-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.elite-contract-identity-board .contract-identity-card {
+  display: grid;
+  gap: 6px;
+  border-color: rgba(255,190,110,.18);
+  background: linear-gradient(180deg, rgba(255,170,70,.055), rgba(0,0,0,.20));
+}
+
+.elite-contract-identity-board .contract-identity-card.accepted {
+  border-color: rgba(244,192,104,.46);
+  box-shadow: inset 0 0 0 1px rgba(244,192,104,.18), 0 0 16px rgba(244,152,72,.08);
+}
+
+.contract-wanted-line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contract-wanted-line strong {
+  color: #f3d79b;
+  font-size: 12.5px;
+  line-height: 1.12;
+}
+
+.contract-elite-name {
+  color: rgba(255,244,218,.92);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.contract-identity-grid {
+  grid-template-columns: 1fr;
+}
+
+.contract-identity-grid span {
+  line-height: 1.22;
+}
+
+.contract-threat {
+  color: #f5c46d;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.contract-flavor {
+  color: rgba(229,218,199,.72);
+  margin: 0;
+}
+
+.active-contract-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  margin: 6px 0 8px;
+  color: rgba(239,226,205,.82);
+}
+
+.active-contract-summary span {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  padding: 3px 7px;
+}
+
+@media(max-width:820px) {
+  .elite-contract-identity-board .contract-identity-list {
+    grid-template-columns: 1fr;
+  }
+}
 .combat-device-shell { gap: 6px; }
 .combat-enemy-header { gap: 2px; padding-top: 1px; }
 .combat-enemy-header h2,

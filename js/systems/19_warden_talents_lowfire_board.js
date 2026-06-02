@@ -114,8 +114,9 @@
   function shuffle(list){ const out=list.slice(); for(let i=out.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [out[i],out[j]]=[out[j],out[i]]; } return out; }
   function rollBoard(state){
     if (!state.town) state.town = {};
-    const pool = contractPool(state), count = Math.min(pool.length, pool.length >= 3 ? 2 : pool.length);
+    const pool = contractPool(state), count = Math.min(3, pool.length);
     state.town.lowfireBoardOffers = shuffle(pool).slice(0,count).map(c => c.id);
+    state.town.eliteBoardContracts = [];
     state.town.lowfireBoardRolledAt = Date.now();
     return state.town.lowfireBoardOffers;
   }
@@ -145,24 +146,100 @@
     const offers = Array.isArray(state?.town?.lowfireBoardOffers) ? state.town.lowfireBoardOffers : [];
     const byId = new Map(base.map(c => [c.id,c]));
     const chosen = offers.map(id => byId.get(id)).filter(Boolean);
-    return chosen.length ? chosen : base.slice(0, Math.min(2, base.length));
+    return chosen.length ? chosen : base.slice(0, Math.min(3, base.length));
   }
   function contractReward(contract,state){ return typeof calculateContractReward === 'function' ? calculateContractReward(contract,state) : C(0,2,0); }
   function contractObj(contract){ return typeof eliteContractObjective === 'function' ? eliteContractObjective(contract) : `${contract.goal || 3} marked elites`; }
   function contractRisk(contract){ return typeof eliteContractRiskLevel === 'function' ? eliteContractRiskLevel(contract) : 'Medium'; }
   function contractDef(id){ return typeof eliteContractDef === 'function' ? eliteContractDef(id) : null; }
   function activeReward(active,contract,state){ return typeof activeContractRewardAmount === 'function' ? activeContractRewardAmount(active,contract,state) : contractReward(contract,state); }
+  function threatStars(threat){
+    if (typeof eliteContractThreatStars === 'function') return eliteContractThreatStars(threat);
+    const filled = Math.max(1, Math.min(3, Math.floor(+threat || 1)));
+    return `${'★'.repeat(filled)}${'☆'.repeat(3 - filled)}`;
+  }
+  function contractModel(contract,state,accepted=false,seed=null){
+    if (typeof eliteBoardContractModel === 'function') return eliteBoardContractModel(contract,state,accepted,seed);
+    if (!contract) return null;
+    const targetFloor = Math.max(1, Math.floor(+seed?.targetFloor || +contract.targetFloor || 4));
+    const eliteName = seed?.eliteName || contract.eliteName || contract.name || 'Unlisted Elite';
+    return {
+      id: contract.id,
+      eliteName,
+      title: seed?.title || contract.title || `WANTED: ${eliteName}`,
+      district: seed?.district || contract.district || 'Lowfire District',
+      targetFloor,
+      threat: Math.max(1, Math.min(3, Math.floor(+seed?.threat || +contract.threat || 1))),
+      modifier: seed?.modifier || contract.modifier || contractRisk(contract),
+      modifierKey: seed?.modifierKey || contract.modifierKey || '',
+      contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
+      bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
+      rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
+      flavor: seed?.flavor || contract.flavor || contract.summary || 'A paid mark for wardens willing to face elite danger.',
+      accepted: !!accepted,
+      completed: !!seed?.completed,
+      expired: !!seed?.expired,
+      failed: !!seed?.failed
+    };
+  }
+  function generatedContracts(state,list,acceptedId=''){
+    if (!state.town) state.town = {};
+    const ids = list.map(c => c.id).join('|');
+    const existing = Array.isArray(state.town.eliteBoardContracts) ? state.town.eliteBoardContracts : [];
+    const existingIds = existing.map(c => c && c.id).filter(Boolean).join('|');
+    if (ids && ids === existingIds && existing.length === list.length && existing.every(model => model?.eliteName && model?.targetFloor && model?.contractText)) {
+      return existing;
+    }
+    const byId = new Map(existing.map(model => [model?.id, model]).filter(entry => entry[0]));
+    const models = list.map(c => contractModel(c,state,c.id === acceptedId,byId.get(c.id))).filter(Boolean);
+    state.town.eliteBoardContracts = models;
+    return models;
+  }
+  function contractCard(model,contract,state,active=null){
+    const accepted = !!model.accepted;
+    const completed = !!(model.completed || active?.completed || active?.complete);
+    const expired = !!(model.expired || active?.expired);
+    const failed = !!(model.failed || active?.failed);
+    const button = active
+      ? (completed ? '<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>' : `<span class="small muted">${active.status === 'active' ? 'Contract target engaged.' : 'Reach the target floor to draw out the hunt.'}</span>`)
+      : `<button class="primary mini" data-start-contract="${H(model.id)}">${accepted ? 'Accepted' : 'Accept Contract'}</button>`;
+    const reward = contract ? M(contractReward(contract,state)) : '';
+    const progress = active ? Math.min(1, Math.floor(N(active.progress,0,0,1))) : 0;
+    const pct = active ? Math.min(100, Math.round(progress * 100)) : 0;
+    return `<div class="elite-contract-card contract-identity-card ${accepted?'accepted':''} ${completed?'completed':''} ${expired?'expired':''} ${failed?'failed':''}">
+      <div class="contract-wanted-line"><strong>${H(model.title)}</strong>${accepted?'<span class="pill rarity-rare">Accepted</span>':''}</div>
+      <div class="contract-elite-name">${H(model.eliteName)}</div>
+      <div class="elite-contract-detail-grid contract-identity-grid small">
+        <span><b>District:</b> ${H(model.district)}</span>
+        <span><b>Target:</b> Floor ${H(model.targetFloor || '?')}</span>
+        <span><b>Threat:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
+        <span><b>Modifier:</b> ${H(model.modifier)}</span>
+        <span><b>Contract:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
+        <span><b>Bonus Writ:</b> ${H(model.bonusWrit || 'Display-only for now.')}</span>
+        <span><b>Reward:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
+      </div>
+      <p class="small muted contract-flavor">${H(model.flavor)}</p>
+      ${active && contract ? `<div class="elite-contract-meter"><div style="width:${pct}%"></div></div>` : ''}
+      <div class="elite-contract-actions"><span class="pill">${accepted?'Active Contract':'Contract Writ'}</span>${button}</div>
+    </div>`;
+  }
 
   function boardMarkup(state){
     const st = contractState(state), active = st.active;
-    if (active) {
-      const c = contractDef(active.id); if (!c) return '';
-      const progress = Math.min(c.goal || 1, Math.floor(N(active.progress,0,0,c.goal || 1))), pct = Math.min(100, Math.round(progress / (c.goal || 1) * 100)), ready = active.complete || progress >= (c.goal || 1), reward = activeReward(active,c,state);
-      return `<div class="elite-contract-board lowfire-board-v2"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One paid mark can be active. The board freezes until the mark is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':'Active Mark'}</span></div><div class="elite-contract-card ${ready?'ready':'active'}"><div class="split"><strong>Active: ${H(c.name)}</strong><span class="small muted">${H(active.tier || c.tier || '')}</span></div><div class="elite-contract-detail-grid small"><span><b>Goal:</b> ${progress} / ${c.goal} elites defeated</span><span><b>Risk:</b> ${H(contractRisk(c))}</span><span><b>Reward:</b> ${M(reward)}</span></div><div class="elite-contract-meter"><div style="width:${pct}%"></div></div><div class="elite-contract-actions"><span class="pill">Held pay: ${M(reward)}</span>${ready?'<button class="primary mini" id="claimEliteContractBtn">Claim Reward</button>':'<span class="small muted">Kill marked elites, extract, then claim here.</span>'}</div></div></div>`;
+    try {
+      if (active) {
+        const c = contractDef(active.id); if (!c) return '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
+        const ready = active.complete || active.completed, reward = activeReward(active,c,state);
+        const model = contractModel({...c, ...active}, state, true);
+        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':'Active Hunt'}</span></div><div class="active-contract-summary small"><b>Active Hunt:</b> ${H(model.eliteName)} <span>Target Floor ${H(model.targetFloor || '?')}</span><span>${ready?'Completed':'Status ' + H(active.status || 'pending')}</span><span>Held pay ${M(reward)}</span></div>${contractCard(model,c,state,active)}</div>`;
+      }
+      const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : filteredContracts(state, contractPool(state));
+      const models = generatedContracts(state, list, '');
+      const cards = models.length ? models.map(model => contractCard(model, contractDef(model.id), state)).join('') : '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
+      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div><div class="lowfire-board-note small muted">Three readable contracts are posted at a time. Rewards are previews; trophy rewards arrive in a later pass.</div><div class="elite-contract-list contract-identity-list">${cards}</div></div>`;
+    } catch (_) {
+      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div></div><p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p></div>`;
     }
-    const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : filteredContracts(state, contractPool(state));
-    const cards = list.length ? list.map(c => `<div class="elite-contract-card"><div class="split"><strong>${H(c.name)}</strong><span class="small muted">${H(c.tier || '')}</span></div><p class="small muted">${H(c.summary || 'Paid Lowfire work for wardens willing to fight marked elites.')}</p><div class="elite-contract-detail-grid small"><span><b>Objective:</b> ${H(contractObj(c))}</span><span><b>Risk:</b> ${H(contractRisk(c))}</span><span><b>Reward:</b> ${M(contractReward(c,state))}</span></div><div class="elite-contract-actions"><span class="pill">Paid Mark</span><button class="primary mini" data-start-contract="${H(c.id)}">Take Mark</button></div></div>`).join('') : '<p class="small muted elite-contract-empty">No paid marks are currently available.</p>';
-    return `<div class="elite-contract-board lowfire-board-v2"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Take a paid mark, or pay to shuffle the visible offers.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div><div class="lowfire-board-note small muted">Marks are optional risk. They make elites more dangerous while active, then pay coin when complete.</div><div class="elite-contract-list">${cards}</div></div>`;
   }
 
   function currencyStrip(state){

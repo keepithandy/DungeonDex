@@ -30,7 +30,17 @@
       requiresClaimed:null,
       unlockFloor:1,
       risk:{ level:'Low', label:'Low risk', spawnBonus:0.03, hpBonus:0.04, damageBonus:0.03, coinBonus:0.03 },
-      summary:'Defeat 3 elite enemies for a cautious Lowfire payout.'
+      summary:'Defeat Glassfang Brute for a cautious Lowfire payout.',
+      eliteName:'Glassfang Brute',
+      title:'WANTED: Glassfang Brute',
+      district:'Lowfire District',
+      threat:2,
+      modifier:'Bleeding Edge',
+      modifierKey:'bleeding_edge',
+      contractText:'Defeat Glassfang Brute when it appears.',
+      bonusWrit:'Defeat it before resting.',
+      rewardPreview:'+silver, +rare chance',
+      flavor:'A Lowfire enforcer dragging broken blades behind it.'
     },
     {
       id:'hazard_contract',
@@ -43,7 +53,40 @@
       requiresClaimed:null,
       unlockFloor:1,
       risk:{ level:'Medium', label:'Medium risk', spawnBonus:0.05, hpBonus:0.08, damageBonus:0.05, coinBonus:0.05 },
-      summary:'Defeat 6 elite enemies under a modest hazard clause.'
+      summary:'Defeat Ash-Crowned Marauder under a modest hazard clause.',
+      eliteName:'Ash-Crowned Marauder',
+      title:'WANTED: Ash-Crowned Marauder',
+      district:'Ashgate Warrens',
+      threat:2,
+      modifier:'Cinder Oath',
+      modifierKey:'cinder_oath',
+      contractText:'Defeat Ash-Crowned Marauder when it appears.',
+      bonusWrit:'Defeat it without extracting first.',
+      rewardPreview:'+silver, +elite loot',
+      flavor:'An old stair raider wearing trophy armor from failed Wardens.'
+    },
+    {
+      id:'cinderjaw_bailiff',
+      name:'Cinderjaw Bailiff',
+      tier:'Tier II',
+      goal:4,
+      reward:coins(42,0,0),
+      maxReward:coins(125,0,0),
+      floorBonusPerDepth:coins(0,60,0),
+      requiresClaimed:null,
+      unlockFloor:1,
+      risk:{ level:'Medium', label:'Medium risk', spawnBonus:0.04, hpBonus:0.06, damageBonus:0.04, coinBonus:0.04 },
+      summary:'Defeat Cinderjaw Bailiff for a compact Lowfire debt-court payout.',
+      eliteName:'Cinderjaw Bailiff',
+      title:'WANTED: Cinderjaw Bailiff',
+      district:'Lowfire District',
+      threat:2,
+      modifier:'Debt Court',
+      modifierKey:'debt_court',
+      contractText:'Defeat Cinderjaw Bailiff when it appears.',
+      bonusWrit:'Defeat it after guarding at least once.',
+      rewardPreview:'+silver, +board rep soon',
+      flavor:'A debt-court brute sent to collect from the living.'
     },
     {
       id:'blood_stamped_order',
@@ -56,7 +99,17 @@
       requiresClaimed:null,
       unlockFloor:11,
       risk:{ level:'High', label:'High risk', spawnBonus:0.08, hpBonus:0.12, damageBonus:0.08, coinBonus:0.08 },
-      summary:'Defeat 10 elite enemies on a deeper, blood-stamped writ.'
+      summary:'Defeat Mireglass Collector on a deeper, blood-stamped writ.',
+      eliteName:'Mireglass Collector',
+      title:'WANTED: Mireglass Collector',
+      district:'Ember Debtworks',
+      threat:3,
+      modifier:'Mirror Debt',
+      modifierKey:'mirror_debt',
+      contractText:'Defeat Mireglass Collector when it appears.',
+      bonusWrit:'Defeat it before using Ashburst twice.',
+      rewardPreview:'+silver, +mythic hint',
+      flavor:'It remembers every Warden who ran.'
     }
   ];
 
@@ -115,6 +168,81 @@
     return `Defeat ${goal} elite enemies`;
   }
 
+  function eliteContractThreatStars(threat) {
+    const filled = Math.max(1, Math.min(3, Math.floor(numberOr(threat, 1, 1, 3))));
+    return `${'★'.repeat(filled)}${'☆'.repeat(3 - filled)}`;
+  }
+
+  function eliteContractThreatFloor(state) {
+    return Math.max(1, Math.floor(threatDepthFromDepth(reachedDistrictFloor(state))));
+  }
+
+  function eliteContractRawDepthForThreatFloor(targetFloor) {
+    const floor = Math.max(1, Math.floor(numberOr(targetFloor, 1, 1, 999999)));
+    return Math.max(1, (floor - 1) * DEPTH_CHAPTERS_PER_THREAT_STEP + 1);
+  }
+
+  function eliteContractTargetFloor(state) {
+    const current = eliteContractThreatFloor(state);
+    let target = current + rand(3, 8);
+    const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
+    while (target % bossInterval === 0) target += 1;
+    return Math.max(current + 1, target);
+  }
+
+  function eliteBoardContractModel(contract, state = null, accepted = false, seed = null) {
+    if (!contract) return null;
+    const targetFloor = Math.max(1, Math.floor(numberOr(seed?.targetFloor ?? contract.targetFloor, eliteContractTargetFloor(state), 1, 999999)));
+    const eliteName = seed?.eliteName || contract.eliteName || contract.name || 'Unlisted Elite';
+    const district = seed?.district || contract.district || districtByDepth(eliteContractRawDepthForThreatFloor(targetFloor)).name || 'Lowfire District';
+    const status = String(seed?.status || '').toLowerCase();
+    return {
+      id: contract.id,
+      eliteName,
+      title: seed?.title || contract.title || `WANTED: ${eliteName}`,
+      district,
+      targetFloor,
+      threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
+      modifier: seed?.modifier || contract.modifier || eliteContractRiskLevel(contract),
+      modifierKey: seed?.modifierKey || contract.modifierKey || contract.modifier || '',
+      contractText: seed?.contractText || contract.contractText || `Defeat ${eliteName} when it appears.`,
+      bonusWrit: seed?.bonusWrit || contract.bonusWrit || 'Defeat it before resting.',
+      rewardPreview: seed?.rewardPreview || contract.rewardPreview || '+silver, +elite loot',
+      flavor: seed?.flavor || contract.flavor || contract.summary || 'A paid mark for wardens willing to face elite danger.',
+      accepted: !!accepted,
+      completed: !!(seed?.completed || status === 'completed'),
+      expired: !!(seed?.expired || status === 'expired'),
+      failed: !!(seed?.failed || status === 'failed')
+    };
+  }
+
+  function eliteContractOfferModel(state, id) {
+    const offers = asArray(state?.town?.eliteBoardContracts, []);
+    return offers.find(offer => offer && offer.id === id) || null;
+  }
+
+  function eliteContractSnapshot(active, status = '') {
+    if (!active) return null;
+    return {
+      id: active.id,
+      eliteName: active.eliteName || active.name || '',
+      district: active.district || '',
+      targetFloor: active.targetFloor || 0,
+      threat: active.threat || 1,
+      modifier: active.modifier || '',
+      modifierKey: active.modifierKey || '',
+      contractText: active.contractText || '',
+      bonusWrit: active.bonusWrit || '',
+      rewardPreview: active.rewardPreview || '',
+      flavor: active.flavor || '',
+      status: status || active.status || 'pending',
+      completed: !!active.completed,
+      expired: !!active.expired,
+      failed: !!active.failed,
+      date: new Date().toLocaleString()
+    };
+  }
+
   function contractBaseReward(contract) {
     if (!contract) return 0;
     const base = contract.baseReward ?? contract.reward;
@@ -168,6 +296,8 @@
   }
 
   function activeEliteContractRisk(state) {
+    const active = state?.player?.eliteContracts?.active;
+    if (active && active.eliteName) return { ...ELITE_CONTRACT_RISK_DEFAULTS };
     const contract = activeEliteContractDef(state);
     return contract ? eliteContractRisk(contract) : { ...ELITE_CONTRACT_RISK_DEFAULTS };
   }
@@ -196,14 +326,18 @@
     const source = isPlainObject(seed) ? seed : {};
     const claimed = normalizeEliteContractIds(source.claimed);
     const completedSet = new Set([...normalizeEliteContractIds(source.completed), ...claimed]);
+    const expired = asArray(source.expired, []).filter(isPlainObject).slice(0, 20);
+    const failed = asArray(source.failed, []).filter(isPlainObject).slice(0, 20);
     const savedActive = isPlainObject(source.active) ? source.active : null;
     let active = null;
 
     if (savedActive) {
       const def = eliteContractDef(normalizeEliteContractId(savedActive.id));
       if (def && !claimed.includes(def.id)) {
-        const progress = Math.floor(numberOr(savedActive.progress, 0, 0, def.goal));
-        const complete = !!savedActive.complete || progress >= def.goal || completedSet.has(def.id);
+        const progress = Math.floor(numberOr(savedActive.progress, 0, 0, 1));
+        const complete = !!savedActive.completed || !!savedActive.complete || progress >= 1 || completedSet.has(def.id);
+        const expiredActive = !!savedActive.expired || String(savedActive.status || '').toLowerCase() === 'expired';
+        const failedActive = !!savedActive.failed || String(savedActive.status || '').toLowerCase() === 'failed';
         const alreadyClaimed = !!savedActive.claimed;
         const rewardAmount = Object.prototype.hasOwnProperty.call(savedActive, 'rewardAmount') && savedActive.rewardAmount != null
           ? sanitizeContractReward(def, savedActive.rewardAmount)
@@ -211,13 +345,40 @@
         if (alreadyClaimed) {
           completedSet.add(def.id);
           if (!claimed.includes(def.id)) claimed.push(def.id);
+        } else if (expiredActive || failedActive) {
+          const model = eliteBoardContractModel(def, state, false, savedActive);
+          model.status = expiredActive ? 'expired' : 'failed';
+          model.expired = expiredActive;
+          model.failed = failedActive;
+          const list = expiredActive ? expired : failed;
+          list.unshift(model);
+          list.splice(20);
         } else {
           active = {
             id: def.id,
             name: def.name,
             tier: def.tier || '',
-            progress: complete ? def.goal : progress,
-            goal: def.goal,
+            eliteName: savedActive.eliteName || def.eliteName || def.name,
+            title: savedActive.title || def.title || `WANTED: ${def.eliteName || def.name}`,
+            district: savedActive.district || def.district || '',
+            targetFloor: Math.max(1, Math.floor(numberOr(savedActive.targetFloor, eliteContractTargetFloor(state), 1, 999999))),
+            threat: Math.max(1, Math.min(3, Math.floor(numberOr(savedActive.threat ?? def.threat, 1, 1, 3)))),
+            modifier: savedActive.modifier || def.modifier || '',
+            modifierKey: savedActive.modifierKey || def.modifierKey || def.modifier || '',
+            contractText: savedActive.contractText || def.contractText || `Defeat ${savedActive.eliteName || def.eliteName || def.name} when it appears.`,
+            bonusWrit: savedActive.bonusWrit || def.bonusWrit || 'Defeat it before resting.',
+            rewardPreview: savedActive.rewardPreview || def.rewardPreview || '',
+            flavor: savedActive.flavor || def.flavor || def.summary || '',
+            accepted: true,
+            completed: complete,
+            expired: expiredActive,
+            failed: failedActive,
+            status: failedActive ? 'failed' : expiredActive ? 'expired' : complete ? 'completed' : String(savedActive.status || 'pending'),
+            targetSpawned: !!savedActive.targetSpawned,
+            targetDefeated: !!savedActive.targetDefeated || complete,
+            spawnedAtFloor: Math.max(0, Math.floor(numberOr(savedActive.spawnedAtFloor, 0, 0, 999999))),
+            progress: complete ? 1 : progress,
+            goal: 1,
             rewardAmount,
             complete,
             claimable: complete,
@@ -231,7 +392,9 @@
     return {
       active,
       completed: Array.from(completedSet),
-      claimed
+      claimed,
+      expired,
+      failed
     };
   }
 
@@ -257,18 +420,39 @@
     const contracts = ensureEliteContractState(state);
     const contract = eliteContractDef(id);
     if (contracts.active || !isEliteContractAvailable(contract, contracts, state)) return false;
+    const offer = eliteContractOfferModel(state, contract.id);
+    const model = eliteBoardContractModel(contract, state, true, offer);
     contracts.active = {
       id: contract.id,
       name: contract.name,
       tier: contract.tier || '',
+      eliteName: model.eliteName,
+      title: model.title,
+      district: model.district,
+      targetFloor: model.targetFloor,
+      threat: model.threat,
+      modifier: model.modifier,
+      modifierKey: model.modifierKey,
+      contractText: model.contractText,
+      bonusWrit: model.bonusWrit,
+      rewardPreview: model.rewardPreview,
+      flavor: model.flavor,
+      accepted: true,
+      completed: false,
+      expired: false,
+      failed: false,
+      status: 'pending',
+      targetSpawned: false,
+      targetDefeated: false,
+      spawnedAtFloor: 0,
       progress: 0,
-      goal: contract.goal,
+      goal: 1,
       rewardAmount: calculateContractReward(contract, state),
       complete: false,
       claimable: false,
       claimed: false
     };
-    pushLog(state, `Elite contract accepted: ${contract.name}. Risk active until claimed.`);
+    pushLog(state, `Elite contract accepted: ${model.eliteName}. Target: Floor ${format(model.targetFloor)}.`);
     return true;
   }
 
@@ -283,22 +467,125 @@
       return false;
     }
 
-    if (state?.run?.active && !options.bank) return addPendingEliteContractKill(state);
+    if (!options.contractTarget) return false;
 
-    active.goal = contract.goal;
+    active.goal = 1;
     active.name = contract.name;
     active.tier = contract.tier || '';
     active.rewardAmount = activeContractRewardAmount(active, contract, state);
-    active.progress = Math.min(contract.goal, Math.floor(numberOr(active.progress, 0, 0, contract.goal)) + 1);
-    if (active.progress >= contract.goal) {
+    active.progress = 1;
+    if (active.progress >= 1) {
       active.complete = true;
+      active.completed = true;
       active.claimable = true;
+      active.status = 'completed';
+      active.targetDefeated = true;
       if (!contracts.completed.includes(contract.id)) contracts.completed.push(contract.id);
-      pushCombat(state, `Elite contract complete. Return to Lowfire to claim ${formatMoney(active.rewardAmount)}.`);
-    } else {
-      pushCombat(state, `Elite contract: ${active.progress} / ${contract.goal} elites defeated.`);
+      pushCombat(state, `Contract complete: ${active.eliteName}. Return to Lowfire to claim ${formatMoney(active.rewardAmount)}.`);
     }
     return true;
+  }
+
+  function completeEliteContractTarget(state, monster) {
+    const active = ensureEliteContractState(state).active;
+    if (!active || !monster?.contractTarget || monster.contractId !== active.id) return false;
+    return recordEliteContractKill(state, { contractTarget:true });
+  }
+
+  function failEliteContract(state, reason = 'failed') {
+    const contracts = ensureEliteContractState(state);
+    const active = contracts.active;
+    if (!active || active.completed || active.complete) return false;
+    active.failed = reason === 'failed';
+    active.expired = reason === 'expired';
+    active.status = reason === 'expired' ? 'expired' : 'failed';
+    const snapshot = eliteContractSnapshot(active, active.status);
+    if (snapshot) {
+      const list = active.expired ? contracts.expired : contracts.failed;
+      list.unshift(snapshot);
+      list.splice(20);
+    }
+    pushLog(state, active.expired
+      ? `Elite contract expired: ${active.eliteName}.`
+      : `Elite contract failed: ${active.eliteName}.`);
+    contracts.active = null;
+    return true;
+  }
+
+  function expireOverdueEliteContract(state) {
+    const active = ensureEliteContractState(state).active;
+    if (!active || active.completed || active.complete || active.targetSpawned) return false;
+    const current = Math.floor(threatDepthFromDepth(state?.run?.floor || reachedDistrictFloor(state)));
+    if (current <= Math.floor(numberOr(active.targetFloor, current + 1, 1, 999999))) return false;
+    return failEliteContract(state, 'expired');
+  }
+
+  function activeEliteContractHunt(state) {
+    const active = ensureEliteContractState(state).active;
+    if (!active || active.completed || active.complete || active.failed || active.expired) return null;
+    return active;
+  }
+
+  function eliteContractTargetDue(state, rawDepth) {
+    const active = activeEliteContractHunt(state);
+    if (!active || active.targetSpawned) return null;
+    const currentFloor = Math.floor(threatDepthFromDepth(rawDepth));
+    const targetFloor = Math.floor(numberOr(active.targetFloor, 0, 1, 999999));
+    if (currentFloor > targetFloor) {
+      expireOverdueEliteContract(state);
+      return null;
+    }
+    if (currentFloor !== targetFloor) return null;
+    const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
+    if (currentFloor % bossInterval === 0) return null;
+    return active;
+  }
+
+  function eliteContractTargetScaling(active) {
+    const targetFloor = Math.max(1, Math.floor(numberOr(active?.targetFloor, 1, 1, 999999)));
+    const early = targetFloor < 20;
+    return {
+      hp: early ? 1.25 : 1.30,
+      power: early ? 1.15 : 1.20,
+      reward: 1.35
+    };
+  }
+
+  function applyEliteContractTargetMonster(state, monster, active = null) {
+    const hunt = active || activeEliteContractHunt(state);
+    if (!hunt || !monster) return monster;
+    const scaling = eliteContractTargetScaling(hunt);
+    const modifier = typeof normalizeEliteModifier === 'function'
+      ? normalizeEliteModifier(hunt.modifierKey || hunt.modifier)
+      : null;
+    hunt.targetSpawned = true;
+    hunt.status = 'active';
+    hunt.spawnedAtFloor = Math.floor(threatDepthFromDepth(monster.level || state?.run?.floor || 1));
+    monster.name = hunt.eliteName;
+    monster.family = 'Contract';
+    monster.type = 'Elite';
+    monster.affix = hunt.modifier || monster.affix || 'Marked';
+    monster.tier = 'Elite';
+    monster.contractTarget = true;
+    monster.contractId = hunt.id;
+    monster.contractEliteName = hunt.eliteName;
+    monster.contractModifierName = hunt.modifier || '';
+    monster.contractTargetFloor = hunt.targetFloor;
+    monster.contractHpMult = scaling.hp;
+    monster.contractPowerMult = scaling.power;
+    monster.contractRewardMult = scaling.reward;
+    monster.modifier = modifier || monster.modifier || null;
+    monster.modifiers = modifier ? [modifier] : eliteModifiersForMonster(monster);
+    monster.eliteReward = normalizeEliteRewardProfile(monster.eliteReward, monster.modifiers, monster.level || state?.run?.floor || 1);
+    monster.power = Math.max(1, Math.round(numberOr(monster.power, 1, 1, 999999) * scaling.power));
+    monster.maxHp = Math.max(1, Math.round(numberOr(monster.maxHp, monster.hp || 1, 1, 999999) * scaling.hp));
+    monster.hp = monster.maxHp;
+    monster.guard = Math.max(0, Math.round(numberOr(monster.guard, 0, 0, 999999) * 1.08));
+    monster.rewardGold = Math.max(0, Math.round(numberOr(monster.rewardGold, 0, 0, Number.MAX_SAFE_INTEGER) * scaling.reward));
+    monster.rewardXp = Math.max(0, Math.round(numberOr(monster.rewardXp, 0, 0, 999999) * 1.18));
+    monster.rewardShard = Math.max(1, Math.round(numberOr(monster.rewardShard, 1, 0, 999999) + 2));
+    monster.lore = `Contract Elite: ${hunt.contractText || `Defeat ${hunt.eliteName}.`}`;
+    return monster;
   }
 
   function claimEliteContract(state) {
@@ -421,6 +708,46 @@
     if (!used) return;
     const sink = ensureGoldSinkState(state);
     sink.junkSaleBonusCharges = Math.max(0, Math.floor(numberOr(sink.junkSaleBonusCharges, 0, 0, 3)) - 1);
+  }
+
+  if (typeof window !== 'undefined') {
+    window.DungeonDexEliteContracts = {
+      ensure: ensureEliteContractState,
+      acceptFirst(state = S) {
+        const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : [];
+        const first = list[0];
+        return first ? startEliteContract(state, first.id) : false;
+      },
+      jumpToTargetFloor(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        if (!state.run && typeof ensureRunShell === 'function') ensureRunShell(state);
+        state.run.active = true;
+        state.run.floor = eliteContractRawDepthForThreatFloor(active.targetFloor);
+        state.run.zone = zoneName(state.run.floor);
+        state.run.monster = null;
+        state.run.choices = ['attack','guard','skill','extract'];
+        return true;
+      },
+      forceTargetEncounter(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        this.jumpToTargetFloor(state);
+        if (typeof nextEncounter === 'function') nextEncounter(state);
+        return !!state.run?.monster?.contractTarget;
+      },
+      complete(state = S) {
+        const active = activeEliteContractHunt(state);
+        if (!active) return false;
+        return recordEliteContractKill(state, { contractTarget:true });
+      },
+      expire(state = S) {
+        return failEliteContract(state, 'expired');
+      },
+      fail(state = S) {
+        return failEliteContract(state, 'failed');
+      }
+    };
   }
 
   // v1.3.26 Checkpoint & Charter QA:

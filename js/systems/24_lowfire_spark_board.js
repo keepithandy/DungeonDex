@@ -215,6 +215,26 @@
 
   function bindBoard() {
     const guard = fn => typeof runGuardedAction === 'function' ? runGuardedAction(fn) : fn();
+    Array.from(document.querySelectorAll('[data-start-contract]')).forEach(btn => {
+      btn.onclick = () => guard(() => {
+        if (typeof startEliteContract === 'function') startEliteContract(S, btn.dataset.startContract);
+        render();
+      });
+    });
+    const eliteClaim = document.getElementById('claimEliteContractBtn');
+    if (eliteClaim) eliteClaim.onclick = () => guard(() => {
+      eliteClaim.disabled = true;
+      const claimed = typeof claimEliteContract === 'function' ? claimEliteContract(S) : false;
+      if (!claimed) eliteClaim.disabled = false;
+      render();
+    });
+    const eliteRefresh = document.getElementById('refreshLowfireBoardBtn');
+    if (eliteRefresh) eliteRefresh.onclick = () => guard(() => {
+      if (window.DungeonDexWardenTalents && typeof window.DungeonDexWardenTalents.refreshLowfireBoard === 'function') {
+        window.DungeonDexWardenTalents.refreshLowfireBoard(S);
+      }
+      render();
+    });
     const claim = document.getElementById('claimSparkWritBtn');
     if (claim) claim.onclick = () => guard(() => { claimSparkWrit(S); render(); });
     const refresh = document.getElementById('refreshSparkWritBtn');

@@ -171,6 +171,7 @@
     const runDistrict = currentStagingDistrict(S);
     const isBossFight = monster && monster.tier === 'Boss';
     const isEliteFight = monster && monster.tier === 'Elite';
+    const isContractTarget = !!(monster && monster.contractTarget);
     const currentFloorText = floorNumberLabel(depth);
     const nextBoss = nextBossFloorFromDepth(depth);
     const bossChaptersAway = Math.max(0, depthStageValue(nextBoss.floor) - depthStageValue(depth));
@@ -178,7 +179,9 @@
       ? `${bossFloorLabel(depth)} active`
       : `${bossFloorLabel(nextBoss.floor)} in ${format(bossChaptersAway)} chapter${bossChaptersAway === 1 ? '' : 's'}`;
     const bossTitle = isBossFight ? (bossFloorNameByDepth(depth) || bossFloorLabel(depth)) : '';
-    const enemyKicker = isBossFight ? `${bossFloorLabel(depth)} active • ${bossTitle}` : (monster?.tier || 'Enemy');
+    const enemyKicker = isContractTarget
+      ? `Contract Elite • ${monster.contractModifierName || eliteModifierNames(eliteModifiersForMonster(monster)) || 'Marked'}`
+      : isBossFight ? `${bossFloorLabel(depth)} active • ${bossTitle}` : (monster?.tier || 'Enemy');
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
     const monsterHpPct = monster ? Math.max(0, Math.min(100, (monster.hp / Math.max(1, monster.maxHp)) * 100)) : 0;
     const pendingRewards = ensurePendingRunRewards(S);
@@ -199,7 +202,9 @@
     const personalityLine = combatPersonalityLine(personalityKind, monster);
     const monsterFamily = escapeHtml(monster?.family || 'Depthborn');
     const monsterSkill = escapeHtml(monster?.skill || 'Basic attack');
-    const monsterSubline = monsterFamily === monsterSkill ? monsterFamily : `${monsterFamily} · ${monsterSkill}`;
+    const monsterSubline = isContractTarget
+      ? `Active Hunt • Target Floor ${format(monster.contractTargetFloor || threatDepthFromDepth(depth))}`
+      : monsterFamily === monsterSkill ? monsterFamily : `${monsterFamily} · ${monsterSkill}`;
     const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
@@ -208,7 +213,7 @@
       ? isBossFight
         ? `<div class="combat-threat-brief boss-threat-brief"><b>Boss floor:</b> heavier pressure, better stakes. Guard before risky bursts.</div>`
         : isEliteFight
-          ? `<div class="combat-threat-brief elite-threat-brief"><b>Elite plan:</b> ${escapeHtml(eliteModifierPlanLine(eliteModifiersForMonster(monster)))}</div>`
+          ? `<div class="combat-threat-brief elite-threat-brief"><b>${isContractTarget ? 'Contract target' : 'Elite plan'}:</b> ${escapeHtml(isContractTarget ? `Defeat ${monster.name} to complete the active hunt.` : eliteModifierPlanLine(eliteModifiersForMonster(monster)))}</div>`
           : ''
       : '';
 

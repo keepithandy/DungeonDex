@@ -1,0 +1,20 @@
+DungeonDex v1.4.13 - Elite Board Contract Identity Pass
+
+Overview
+- Expands the Elite Board into a three-contract choice system.
+- Adds elite names, wanted titles, districts, target floors, threat ratings, modifiers, contract text, bonus writs, reward previews, and flavor.
+- Accepted contracts now preserve a real active hunt target that can appear in the run by exact name.
+- Contract targets spawn as marked Contract Elites with conservative extra HP, power, and reward scaling.
+- Adds accepted-contract visual state, completion/failure/expiration handling, and a compact active-hunt summary.
+- Prepares the board for later objective, trophy, and rival-elite passes.
+
+What did not change
+- Does not add trophy rewards yet. Trophies are planned for v1.4.15.
+- Does not perform broad combat or economy rebalance.
+- Does not fully enforce Bonus Writ objectives yet; they are display-only in this pass.
+- Does not reset or wipe player saves.
+- Does not create a zip or package.
+
+Build
+- Visible label: DungeonDex v1.4.13
+- Build query: 1.4.13-elite-board-contract-identity
