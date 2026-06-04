@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.4.22`
-* Current local package baseline: `v1.4.22`
-* Current development target: `v1.4.22`
+* Current local package baseline: `v1.4.23`
+* Current development target: `v1.4.23`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.23 - Run Flow & Board Integration Audit
+
+Status: Complete
+
+Summary:
+
+* Audited the run flow around death, extraction, charters, and board hunts.
+* Clarified feedback around descent reset, safe extraction, and charter return.
+* Tightened Elite Board, Bonus Writ, trophy, and rival integration where needed.
+* Preserved HP-only combat and board-driven complexity.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
+* No zip/package created.
 
 ---
 

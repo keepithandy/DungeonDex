@@ -166,6 +166,7 @@
     const current = eliteContractThreatFloor(state);
     let target = current + rand(3, 8);
     const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
+    target = Math.min(target, current + 12);
     while (target % bossInterval === 0) target += 1;
     return Math.max(current + 1, target);
   }

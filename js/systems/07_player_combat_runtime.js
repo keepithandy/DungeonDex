@@ -323,7 +323,7 @@
       return false;
     }
     state.screen = 'run';
-    pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. The Hollow Stair seals behind you.`);
+    pushLog(state, `Entered ${state.run.zone}. ${runDepthLabel(state)}. Start run, fight, earn haul, then extract or continue.`);
     if (state.run.goldBonusPct > 0) pushLog(state, `Small Debt Charm active: +${state.run.goldBonusPct}% gold this descent.`);
     return true;
   }
@@ -345,7 +345,7 @@
       pushLog(state, `Permanent Hollow Stair Charter bought: ${charterDepthLabel(startDepth)} for ${formatMoney(cost)}.`);
     }
     startRun(state, startDepth);
-    pushLog(state, `Hollow Stair Charter used: bypassed the upper stair and entered at ${charterDepthLabel(startDepth)}.`);
+    pushLog(state, `Hollow Stair Charter used: return deeper at ${charterDepthLabel(startDepth)}.`);
   }
 
   function zoneName(floor) {
@@ -866,7 +866,7 @@
     if (reason === 'extract') {
       const secured = bankPendingRunRewards(state);
       const securedText = cleanDisplayText(secured, 'no unsecured rewards');
-      runResultDetail = `Extraction Haul secured: ${securedText}. Lowfire marks the run complete. Next descent can start from ${returnLabel}.`;
+      runResultDetail = `Extraction Haul secured: ${securedText}. Safe extraction preserves progress. Next descent can start from ${returnLabel}.`;
       pushCombat(state, `Extraction Haul secured. Banked: ${securedText}.`);
       pushLog(state, `Extraction Haul secured. Banked: ${securedText}. Next start: ${returnLabel}.`);
       showExtractionPopup(`${extractionPopupSummary(rewardSnapshot, securedText)} • Next: ${returnLabel}`);
@@ -938,7 +938,7 @@
 
   function defeat(state, killer = null) {
     state.player.hp = Math.round(state.player.maxHp * 0.55);
-    pushCombat(state, 'You fell. The descent resets. Use a Deep Stair Charter to return deeper.');
+    pushCombat(state, 'You fell. Death resets the descent. Use a Deep Stair Charter to return deeper.');
     spawnQuestLore(state, `The Lowfire bells rang for a warden lost at ${runDepthLabel(state)} — ${state.run.zone}.`);
     finishRun(state, 'defeat', { killer });
   }

@@ -141,8 +141,8 @@
     const district = currentStagingDistrict(state);
     const depth = state?.run?.floor || state?.player?.depth || 1;
     const bestStr = depthWithRawLabel(state.player.depth || depth);
-    if (reason === 'extract') return `Extraction Haul secured in ${district.name} at ${runDepthLabel(state)}. Lowfire banks the haul; the next descent can start there. Best: ${bestStr}.`;
-    if (reason === 'defeat') return `The run ends in ${district.name} at ${runDepthLabel(state)}. Unsecured rewards were lost; banked gear and wallet stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
+    if (reason === 'extract') return `Extraction Haul secured in ${district.name} at ${runDepthLabel(state)}. Safe extraction preserves progress. The next descent can start there. Best: ${bestStr}.`;
+    if (reason === 'defeat') return `The run ends in ${district.name} at ${runDepthLabel(state)}. Death resets the descent; unsecured rewards were lost, but banked gear and wallet stayed safe. Restart: ${hardcoreDeathCheckpointLabel(state, depth)}. Best: ${bestStr}.`;
     return `Descent ended in ${district.name} at ${runDepthLabel(state)}.`;
   }
 

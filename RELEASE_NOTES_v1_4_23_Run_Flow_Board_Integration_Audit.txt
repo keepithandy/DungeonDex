@@ -1,0 +1,9 @@
+DungeonDex v1.4.23 - Run Flow & Board Integration Audit
+
+Audited the run flow around death, extraction, charters, and board hunts.
+Clarified feedback around descent reset, safe extraction, and charter return.
+Tightened Elite Board/Bonus Writ/trophy/rival integration where needed.
+Preserved HP-only combat and board-driven complexity.
+No monster affixes, status effects, or special enemy mechanics were reintroduced.
+No save wipe.
+No zip/package created.

@@ -645,7 +645,7 @@
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
       <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
       <div class="elite-trophy-summary">
-        <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div>
+        <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout (display only)</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
       </div>
       <div class="elite-trophy-summary rival-summary">

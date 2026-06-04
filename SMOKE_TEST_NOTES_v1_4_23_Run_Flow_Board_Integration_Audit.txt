@@ -1,0 +1,11 @@
+DungeonDex v1.4.23 - Run Flow & Board Integration Audit
+
+Smoke-test focus:
+* Run start, fight flow, haul, extract, continue.
+* Death reset, safe extraction, and Deep Stair Charter return depth.
+* Elite Board hunt acceptance, target visibility, and reward resolution.
+* Bonus Writ pending/completed/missed feedback.
+* Trophy Hall / Archive readability and rival visibility.
+
+No save wipe.
+No zip/package created.
