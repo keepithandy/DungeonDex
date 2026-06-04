@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.21 - Interface density and app-feel cleanup.
+// DungeonDex v1.4.22 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.21';
+  const BUILD = '1.4.22';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.21-cache-hygiene-board-regression';
+  const BUILD_QS = '1.4.22-mobile-board-trophy-readability';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -86,7 +86,7 @@
       #questPanel .elite-contract-board{margin-top:12px!important;padding-top:10px!important;border-top:1px solid rgba(255,255,255,.06)}
       #questPanel .elite-contract-head h3{font-size:14px!important}
       #questPanel .elite-contract-head p{font-size:10.75px!important;line-height:1.22!important}
-      #questPanel .elite-trophy-strip,#screen-dex .elite-trophy-summary{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:7px 0 9px;padding:7px 8px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(255,255,255,.025)}
+      #questPanel .elite-trophy-strip,#screen-dex .elite-trophy-summary{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:7px 0 9px;padding:7px 8px;border:1px solid rgba(255,255,255,.06);border-radius:13px;background:rgba(255,255,255,.025)}
       #questPanel .elite-trophy-strip strong,#screen-dex .elite-trophy-summary-head h3{font-size:13px!important;margin:0}
       #questPanel .elite-trophy-strip p,#screen-dex .elite-trophy-summary-copy{margin:2px 0 0;font-size:10.75px!important;line-height:1.2!important;color:rgba(231,221,205,.72)!important}
       #questPanel .rival-writ-section{margin:8px 0 10px;padding:8px;border:1px solid rgba(255,100,80,.16);border-radius:14px;background:linear-gradient(180deg,rgba(140,28,20,.08),rgba(255,255,255,.018))}
@@ -107,8 +107,8 @@
       #screen-gear .loadout-inventory-head{gap:6px!important}
       #screen-gear .inventory-subline{font-size:10.75px!important;line-height:1.15!important}
       #screen-archive .archive-history-head p{font-size:10.75px!important;line-height:1.2!important}
-      #screen-dex .elite-trophy-list{display:grid;gap:5px}
-      #screen-dex .elite-trophy-line{display:grid;gap:2px;padding:7px 8px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.02)}
+      #screen-dex .elite-trophy-list{display:grid;gap:6px}
+      #screen-dex .elite-trophy-line{display:grid;gap:3px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.02)}
       #screen-archive .archive-note-line{display:grid!important;gap:3px!important;padding:7px 8px!important;line-height:1.28!important}
       #screen-archive .archive-note-stamp{font-size:10px!important;line-height:1!important}
       #screen-archive .archive-note-line>div:last-child{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.28}

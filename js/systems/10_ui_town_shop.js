@@ -21,11 +21,11 @@
           <div class="split"><strong>Active Hunt: ${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(active.tier || contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
             <span><b>Target:</b> ${escapeHtml(active.targetLocation || `Floor ${active.targetFloor || '?'}`)}</span>
-            <span><b>Tier:</b> Elite Hunt</span>
+            <span><b>Status:</b> ${ready ? 'Completed' : active.rivalContract ? 'Rival' : active.bonusWritCompleted ? 'Bonus Complete' : active.bonusWritMissed ? 'Bonus Missed' : 'Active'}</span>
             <span><b>Contract:</b> ${escapeHtml(active.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
-            <span><b>Bonus Writ:</b> ${escapeHtml(active.bonusWrit || contract.bonusWrit || '')}</span>
+            <span><b>Bonus Writ:</b> ${escapeHtml(active.bonusWrit || contract.bonusWrit || 'Pending')}</span>
             <span><b>Reward:</b> ${formatMoney(rewardAmount)}</span>
-            <span><b>Bonus:</b> ${active.bonusWritCompleted ? 'Completed' : active.bonusWritMissed ? 'Missed' : 'Pending'}</span>
+            <span><b>Bonus Status:</b> ${active.bonusWritCompleted ? 'Bonus Complete' : active.bonusWritMissed ? 'Bonus Missed' : 'Bonus Pending'}</span>
           </div>
           <div class="elite-contract-actions">
             <span class="pill">${ready ? 'Ready to Claim' : 'Payment held'}: ${formatMoney(rewardAmount)}</span>
@@ -41,11 +41,10 @@
         <div class="split"><strong>${escapeHtml(contract.title || contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
           <div class="elite-contract-detail-grid small">
             <span><b>Target:</b> ${escapeHtml(contract.targetLocation || `Floor ${contract.targetFloor || '?'}`)}</span>
-            <span><b>Tier:</b> Elite Hunt</span>
             <span><b>Contract:</b> ${escapeHtml(contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
-            <span><b>Bonus Writ:</b> ${escapeHtml(contract.bonusWrit || '')}</span>
+            <span><b>Bonus Writ:</b> ${escapeHtml(contract.bonusWrit || 'Pending')}</span>
             <span><b>Reward:</b> ${formatMoney(calculateContractReward(contract, state))}</span>
-            <span><b>Bonus Preview:</b> +small silver</span>
+            <span><b>Bonus Status:</b> Bonus Pending</span>
           </div>
           <div class="elite-contract-actions">
             <span class="pill">Reward Preview</span>

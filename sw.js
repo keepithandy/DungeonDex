@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.21-cache-hygiene-board-regression';
+const CACHE_NAME = 'dungeondex-v1.4.22-mobile-board-trophy-readability';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.21-cache-hygiene-board-regression';
+const BUILD_QS = '1.4.22-mobile-board-trophy-readability';
 const ASSETS = [
   './',
   './index.html',

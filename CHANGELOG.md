@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.21`
-* Current local package baseline: `v1.4.21`
-* Current development target: `v1.4.21`
+* Public/live itch version: `v1.4.22`
+* Current local package baseline: `v1.4.22`
+* Current development target: `v1.4.22`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.22 - Mobile Board & Trophy Hall Readability Polish
+
+Status: Complete
+
+Summary:
+
+* Improved Elite Board readability.
+* Cleaned active hunt and rival writ summaries.
+* Improved Bonus Writ status labels.
+* Clarified Trophy Hall and trophy summary wording.
+* Kept trophy payout bonus labeled as preview/display-only.
+* Made small mobile spacing improvements.
+* No gameplay systems, combat mechanics, rewards, or save data were changed.
+* No monster affixes/status effects were reintroduced.
 
 ---
 

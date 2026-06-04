@@ -1,0 +1,22 @@
+DungeonDex v1.4.22 smoke test notes
+
+Checked:
+
+* Visible build label shows DungeonDex v1.4.22.
+* Town loads.
+* Elite Board opens.
+* Contract cards are easier to scan.
+* Active Hunt summary is readable.
+* Bonus Writ status is clear.
+* Rival Writ display is readable when present.
+* Trophy summary is readable.
+* Trophy Hall / Archive trophy list is readable.
+* Trophy Bonus says Preview where it is display-only.
+* Floor / Room / Chapter display still works.
+* Death reset behavior is unchanged.
+* Safe extraction behavior is unchanged.
+* Deep Stair Charters still work.
+* Attack, Skill, Guard, Extract, Haul, Elite Board, Trophy Hall still work.
+* No affix/status/modifier text appears.
+* No console errors.
+* No save wipe.

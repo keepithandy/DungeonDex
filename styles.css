@@ -1653,13 +1653,13 @@ button:focus-visible,
 
 .elite-contract-list {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
 
 .elite-contract-card {
   display: grid;
-  gap: 7px;
-  padding: 9px;
+  gap: 6px;
+  padding: 10px;
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 8px;
   background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.022));
@@ -1677,7 +1677,7 @@ button:focus-visible,
 
 .elite-contract-card .split {
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 
 .elite-contract-card strong {
@@ -1693,12 +1693,13 @@ button:focus-visible,
 .elite-contract-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 8px;
+  gap: 5px 8px;
   color: rgba(247,240,225,0.82);
 }
 
 .elite-contract-detail-grid span {
   min-width: 0;
+  line-height: 1.25;
 }
 
 .elite-contract-detail-grid b {
@@ -7320,8 +7321,8 @@ button:focus-visible,
 .active-contract-summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px 8px;
-  margin: 6px 0 8px;
+  gap: 5px 7px;
+  margin: 6px 0 9px;
   color: rgba(239,226,205,.82);
 }
 

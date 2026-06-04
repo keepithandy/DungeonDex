@@ -645,7 +645,7 @@
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
       <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
       <div class="elite-trophy-summary">
-        <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview +${format(eliteBonus)}% board payout</span></div>
+        <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
       </div>
       <div class="elite-trophy-summary rival-summary">
@@ -660,7 +660,7 @@
       <div class="sep"></div>
       <h3>Elite Trophy Collection</h3>
       <p class="small muted">Collection-first trophy record. Board payout bonus is preview-only in this build.</p>
-      <div class="list elite-trophy-list">${eliteEntries.length ? eliteEntries.map(entry => `<div class="archive-line elite-trophy-line"><div class="small muted">${escapeHtml(entry.sourceElite || 'Elite Board')}</div><div><strong>${escapeHtml(entry.name)}</strong> x${format(entry.count || 1)}${entry.floorName ? ` <span class="small muted">• ${escapeHtml(entry.floorName)}</span>` : ''}</div></div>`).join('') : '<p class="small muted">No elite trophies found yet.</p>'}</div>`;
+      <div class="list elite-trophy-list">${eliteEntries.length ? eliteEntries.map(entry => `<div class="archive-line elite-trophy-line"><div><strong>${escapeHtml(entry.name)}</strong> x${format(entry.count || 1)}</div><div class="small muted">${escapeHtml(entry.sourceElite || 'Elite Board')}${entry.floorName ? ` • ${escapeHtml(entry.floorName)}` : ''}</div></div>`).join('') : '<p class="small muted">No elite trophies found yet.</p>'}</div>`;
   }
 
   function renderArchive() {
