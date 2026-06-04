@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.23-run-flow-board-integration-audit';
+const CACHE_NAME = 'dungeondex-v1.4.24-gear-scaling-enemy-power-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.23-run-flow-board-integration-audit';
+const BUILD_QS = '1.4.24-gear-scaling-enemy-power-audit';
 const ASSETS = [
   './',
   './index.html',

@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.4.22`
-* Current local package baseline: `v1.4.23`
-* Current development target: `v1.4.23`
+* Current local package baseline: `v1.4.24`
+* Current development target: `v1.4.24`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,21 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.24 - Gear Scaling & Enemy Power Audit
+
+Status: Complete
+
+Summary:
+
+* Audited gear scaling and enemy power at mid-depth.
+* Tuned enemy scaling so Floor 20+ enemies better keep pace with high-ilvl gear.
+* Prioritized HP-first difficulty for elites, bosses, contracts, and rivals.
+* Preserved simple combat with no affixes/status effects.
+* Did not wipe saves or delete gear.
+* Preserved death reset, extraction, charters, board hunts, Bonus Writs, trophies, and rivals.
 
 ---
 

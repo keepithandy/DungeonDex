@@ -85,6 +85,7 @@
     if (level <= 4) return 0.62;
     if (level <= 9) return 0.78;
     if (level <= 15) return 0.9;
+    if (level <= 25) return 0.96;
     return 1;
   }
 
@@ -125,7 +126,7 @@
   function expectedGearRating(level, rarityKey = 'common', source = 'normal', rawDepth = 0) {
     const safeLevel = normalizeItemLevel(level);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
-    const baseRollAverage = safeLevel * 7.5 + 5;
+    const baseRollAverage = safeLevel * 6.8 + 4;
     return Math.max(3, Math.round(baseRollAverage * rarityStatMultiplier(rarityKey, safeLevel, rawDepth) * earlyStatScale(safeLevel) * sourceScale));
   }
 
@@ -136,7 +137,8 @@
     const boss = tier === 'Boss';
     const elite = tier === 'Elite';
     const earlyPressure = threatDepth <= 3 ? 0.90 : threatDepth <= 5 ? 1.0 : threatDepth <= 10 ? 1.08 : threatDepth <= 15 ? 1.06 : 1;
-    const base = (threatDepth * 9.5 + 15 + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult;
+    const lateFloorPressure = depth <= 20 ? 1 : depth <= 40 ? 1 + (depth - 20) * 0.085 : 2.7 + Math.min(0.8, (depth - 40) * 0.015);
+    const base = (threatDepth * 9.5 + 15 + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure;
     const tierProfile = boss ? 1.22 : elite ? 1.16 : 1;
     return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile);
   }
@@ -289,14 +291,14 @@
     // Item power score calculation: base item level roll × rarity scaling × source scaling.
     // Mythic rarity uses rarityStatMultiplier() so deep floors apply a soft cap instead of
     // compounding full Mythic multiplier forever.
-    const rating = Math.max(3, Math.round((itemLevel * rand(6, 9) + rand(1, 9)) * rarityStatMultiplier(rarity.key, itemLevel, rawDepth) * lowFloorScale * sourceScale * brokenScale));
+    const rating = Math.max(3, Math.round((itemLevel * rand(5, 8) + rand(1, 7)) * rarityStatMultiplier(rarity.key, itemLevel, rawDepth) * lowFloorScale * sourceScale * brokenScale));
     const stats = {
-      power: slot === 'weapon' ? rating + rand(1, 5) : Math.round(rating * 0.22),
-      guard: ['armor','offhand','helm','boots'].includes(slot) ? rating + rand(0, 4) : Math.round(rating * 0.18),
-      wit: ['amulet','charm','cloak','offhand'].includes(slot) ? Math.round(rating * 0.38) + rand(0, 3) : Math.round(rating * 0.13),
-      speed: ['boots','gloves','weapon','cloak'].includes(slot) ? Math.round(rating * 0.34) + rand(0, 3) : Math.round(rating * 0.1),
-      luck: ['ring','amulet','charm'].includes(slot) ? Math.round(rating * 0.26) + rand(0, 2) : Math.round(rating * 0.06),
-      hp: ['armor','helm','ring','amulet'].includes(slot) ? Math.round(rating * 0.72) + rand(0, 6) : Math.round(rating * 0.22)
+      power: slot === 'weapon' ? rating + rand(1, 4) : Math.round(rating * 0.18),
+      guard: ['armor','offhand','helm','boots'].includes(slot) ? rating + rand(0, 3) : Math.round(rating * 0.15),
+      wit: ['amulet','charm','cloak','offhand'].includes(slot) ? Math.round(rating * 0.34) + rand(0, 2) : Math.round(rating * 0.11),
+      speed: ['boots','gloves','weapon','cloak'].includes(slot) ? Math.round(rating * 0.3) + rand(0, 2) : Math.round(rating * 0.09),
+      luck: ['ring','amulet','charm'].includes(slot) ? Math.round(rating * 0.22) + rand(0, 2) : Math.round(rating * 0.05),
+      hp: ['armor','helm','ring','amulet'].includes(slot) ? Math.round(rating * 0.62) + rand(0, 5) : Math.round(rating * 0.18)
     };
     return {
       id: makeId('gear'),
@@ -334,8 +336,9 @@
     // Monster scaling: threat-depth base roll × room/floor ladder × deep-floor pressure.
     // The deep multiplier is intentionally dormant before raw depth 800, then ramps so
     // normal monsters do not flatten behind deep Mythic-equipped players.
-    let power = Math.round((threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * deepMonsterPowerMultiplier(rawDepth, tier));
-    let hp = power * (boss ? 2.85 : elite ? 1.76 : 1.36) * ladder.hpMult;
+    const lateFloorPressure = rawDepth <= 20 ? 1 : rawDepth <= 40 ? 1 + (rawDepth - 20) * 0.085 : 2.7 + Math.min(0.8, (rawDepth - 40) * 0.015);
+    let power = Math.round((threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier));
+    let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * (depth <= 20 ? 1 : depth <= 40 ? 1 + (depth - 20) * 0.1 : 3);
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;

@@ -1,0 +1,10 @@
+DungeonDex v1.4.24 - Gear Scaling & Enemy Power Audit
+
+Smoke-test focus:
+* Verify visible build label is v1.4.24.
+* Confirm Floor 20+ enemy power and HP better keep pace with geared players.
+* Confirm elite, boss, contract, and rival scaling remain HP-first.
+* Confirm death reset, extraction, charters, board hunts, Bonus Writs, trophies, and rivals still work.
+
+No save wipe.
+No zip/package created.

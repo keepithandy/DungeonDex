@@ -123,7 +123,7 @@
     { key:'rare', mult:1.42, color:'rarity-rare', chance:17 },
     { key:'epic', mult:1.75, color:'rarity-epic', chance:10 },
     { key:'legendary', mult:2.15, color:'rarity-legendary', chance:5 },
-    { key:'mythic', mult:2.65, color:'rarity-mythic', chance:2 }
+    { key:'mythic', mult:2.55, color:'rarity-mythic', chance:2 }
   ];
 
   const BASES = {

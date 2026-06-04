@@ -4,10 +4,10 @@
 v1.4.22
 
 ## Current Local Package Version
-v1.4.23
+v1.4.24
 
 ## Current Development Target
-v1.4.23
+v1.4.24
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

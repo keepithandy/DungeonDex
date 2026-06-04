@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.23 - DevTools Scenario Presets
+// DungeonDex v1.4.24 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.23';
-  const SCENARIO_BUILD = '1.4.23-run-flow-board-integration-audit';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.24';
+  const SCENARIO_BUILD = '1.4.24-gear-scaling-enemy-power-audit';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -240,6 +240,32 @@
       `trophies: ${board.trophyIds.length}`
     ].join('\n');
   }
+  function scalingProbeText(){
+    if (!hasState()) return 'Scaling probe unavailable.';
+    const derived = (() => {
+      try { return typeof calcDerived === 'function' ? calcDerived(S) : null; } catch (err) { return null; }
+    })();
+    const playerPower = derived ? Math.round(derived.power || 0) : 0;
+    const depth = S.run && S.run.active ? S.run.floor : (S.player.depth || S.player.safeExtractDepth || 1);
+    const commonPower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(depth, 'Common') : 0;
+    const elitePower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(depth, 'Elite') : 0;
+    const bossDepth = Math.max(1, Math.ceil(depth / (typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5)) * (typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5));
+    const bossPower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(bossDepth, 'Boss') : 0;
+    const commonHp = commonPower ? Math.round(commonPower * 1.44) : 0;
+    const eliteHp = elitePower ? Math.round(elitePower * 1.84) : 0;
+    const bossHp = bossPower ? Math.round(bossPower * 2.95) : 0;
+    const api = eliteContractApi();
+    const board = api && api.inspectBoardState ? api.inspectBoardState(S) : null;
+    return [
+      'Scaling Probe',
+      `Player Power: ${fmt(playerPower)}`,
+      `Floor: ${fmt(depth)}`,
+      commonPower ? `Common: ${fmt(commonPower)} power / ${fmt(commonHp)} HP` : 'Common: n/a',
+      elitePower ? `Elite: ${fmt(Math.round(elitePower * 1.16))} effective threat / ${fmt(eliteHp)} HP` : 'Elite: n/a',
+      bossPower ? `Boss: ${fmt(Math.round(bossPower * 1.22))} effective threat / ${fmt(bossHp)} HP` : 'Boss: n/a',
+      board && board.active ? `Active hunt: ${board.active.eliteName}` : 'Active hunt: none'
+    ].join('\n');
+  }
   function createTestRival(){
     const api = eliteContractApi();
     if (!api || !hasState()) return false;
@@ -418,6 +444,9 @@
         ${button('Validate Board', 'validate-board')}
         ${button('Sim Death Reset', 'simulate-death-reset')}
       </div>
+      <div class="dd-devtools-button-grid">
+        ${button('Scaling Probe', 'scaling-probe')}
+      </div>
       ${message}
       <div class="dd-devtools-log-list">${logs}</div>
     </section>`;
@@ -458,6 +487,7 @@
     if (action === 'clear-rivals') return clearRivalState();
     if (action === 'validate-board') return validateBoardState();
     if (action === 'simulate-death-reset') return simulateDeathReset();
+    if (action === 'scaling-probe') { scenarioState.lastMessage = scalingProbeText(); log('Generated scaling probe.', 'info'); return renderScenarioSectionSoon(); }
   });
   function init(){
     try { document.title = SCENARIO_VERSION; } catch (err) {}

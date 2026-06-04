@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.23 - Build label guard.
+// DungeonDex v1.4.24 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.4.23';
+  const BUILD = '1.4.24';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.23-run-flow-board-integration-audit';
+  const BUILD_QS = '1.4.24-gear-scaling-enemy-power-audit';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
