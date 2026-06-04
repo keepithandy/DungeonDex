@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.20 - DevTools Scenario Presets
+// DungeonDex v1.4.21 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.20';
-  const SCENARIO_BUILD = '1.4.20-board-hunt-balance-feedback';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.21';
+  const SCENARIO_BUILD = '1.4.21-cache-hygiene-board-regression';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -224,6 +224,22 @@
       `latest: ${rivals[0] ? rivals[0].eliteName : 'none'}`
     ].join('\n');
   }
+  function eliteBoardStateText(){
+    const api = eliteContractApi();
+    if (!api || !hasState()) return 'Elite board state unavailable.';
+    const board = api.inspectBoardState ? api.inspectBoardState(S) : null;
+    if (!board) return 'Elite board state unavailable.';
+    return [
+      'Elite board',
+      `active: ${board.active ? board.active.eliteName : 'none'}`,
+      `completed: ${board.completed.length}`,
+      `claimed: ${board.claimed.length}`,
+      `failed: ${board.failed.length}`,
+      `expired: ${board.expired.length}`,
+      `rivals: ${board.rivals.length}`,
+      `trophies: ${board.trophyIds.length}`
+    ].join('\n');
+  }
   function createTestRival(){
     const api = eliteContractApi();
     if (!api || !hasState()) return false;
@@ -272,6 +288,28 @@
       saveAndRender();
     }
     return ok;
+  }
+  function simulateDeathReset(){
+    const api = eliteContractApi();
+    if (!api || !hasState() || !api.simulateDeathReset) return false;
+    const ok = api.simulateDeathReset(S);
+    if (ok) {
+      scenarioState.lastMessage = eliteBoardStateText();
+      log('Simulated death reset for Elite Board state.', 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
+  function validateBoardState(){
+    const api = eliteContractApi();
+    if (!api || !hasState() || !api.validate) return false;
+    const ok = api.validate(S);
+    if (ok) {
+      scenarioState.lastMessage = eliteBoardStateText();
+      log('Validated Elite Board state.', 'info');
+      saveAndRender();
+    }
+    return !!ok;
   }
   function forceEliteTrophy(){
     const api = eliteContractApi();
@@ -376,6 +414,10 @@
         ${button('Complete Rival', 'complete-rival')}
         ${button('Clear Rival State', 'clear-rivals', '', true)}
       </div>
+      <div class="dd-devtools-button-grid">
+        ${button('Validate Board', 'validate-board')}
+        ${button('Sim Death Reset', 'simulate-death-reset')}
+      </div>
       ${message}
       <div class="dd-devtools-log-list">${logs}</div>
     </section>`;
@@ -414,6 +456,8 @@
     if (action === 'force-rival') return forceRivalContract();
     if (action === 'complete-rival') return completeTestRival();
     if (action === 'clear-rivals') return clearRivalState();
+    if (action === 'validate-board') return validateBoardState();
+    if (action === 'simulate-death-reset') return simulateDeathReset();
   });
   function init(){
     try { document.title = SCENARIO_VERSION; } catch (err) {}

@@ -1,0 +1,12 @@
+DungeonDex v1.4.21 - Cache Hygiene & Board Regression Guard
+
+Summary:
+- Improved service worker/cache hygiene for current builds.
+- Tightened build/version consistency checks.
+- Added defensive Elite Board state regression guards.
+- Added defensive handling for Bonus Writ, trophy, rival, death, and charter state.
+- Clarified cache, death, and board feedback where safe.
+- Preserved death reset and Deep Stair Charter behavior.
+- No monster affixes, status effects, or special enemy mechanics were reintroduced.
+- No save wipe.
+

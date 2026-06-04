@@ -1,23 +1,37 @@
 'use strict';
 
-// DungeonDex v1.4.20 - Build label guard.
+// DungeonDex v1.4.21 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.4.20';
+  const BUILD = '1.4.21';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.20-board-hunt-balance-feedback';
+  const BUILD_QS = '1.4.21-cache-hygiene-board-regression';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
+  window.DUNGEONDEX_VISIBLE_LABEL = LABEL;
 
   function syncBuildLabel(){
     const tag = document.getElementById('buildTag');
     if (tag && tag.textContent !== LABEL) tag.textContent = LABEL;
     if (document.title !== LABEL) document.title = LABEL;
     if (window.S && typeof window.S === 'object') window.S.build = BUILD_QS;
+  }
+
+  function healthCheck(){
+    const tag = document.getElementById('buildTag');
+    const visible = tag ? String(tag.textContent || '').trim() : '';
+    const cacheQuery = window.DUNGEONDEX_BUILD_QS || BUILD_QS;
+    return {
+      build: BUILD,
+      expectedLabel: LABEL,
+      visibleLabel: visible,
+      cacheQuery,
+      cacheHealth: visible === LABEL && cacheQuery === BUILD_QS ? 'current' : 'mismatch'
+    };
   }
 
   function wrap(name){
@@ -47,6 +61,7 @@
     wrap('switchScreen');
     wrap('render');
     syncBuildLabel();
+    window.DUNGEONDEX_BUILD_HEALTH = healthCheck;
     installObserver();
   }
 

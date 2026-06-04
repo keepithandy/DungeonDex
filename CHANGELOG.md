@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.20`
-* Current local package baseline: `v1.4.20`
-* Current development target: `v1.4.20`
+* Public/live itch version: `v1.4.21`
+* Current local package baseline: `v1.4.21`
+* Current development target: `v1.4.21`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.21 - Cache Hygiene & Board Regression Guard
+
+Status: Complete
+
+Finished changes:
+
+* Improved service worker and cache hygiene for the current DungeonDex build.
+* Tightened build/version consistency checks across the active runtime label, cache query, and service worker assets.
+* Added defensive Elite Board state regression guards for active contracts, Bonus Writs, trophies, rivals, failures, and death resets.
+* Preserved safe extraction, death reset behavior, and Deep Stair Charter availability.
+* Added or refined dev-facing board regression helpers for board, trophy, rival, and death-state inspection.
+* Clarified cache, death, and board feedback where safe.
+* No monster affixes, status effects, or special enemy mechanics were reintroduced.
+* No save wipe.
 
 ---
 

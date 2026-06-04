@@ -349,9 +349,13 @@
   }
 
   function createEliteRivalState(seed = []) {
+    const seen = new Set();
     return asArray(seed, []).filter(isPlainObject).map(entry => {
       const eliteName = String(entry.eliteName || '').trim();
       if (!eliteName) return null;
+      const key = eliteName.toLowerCase();
+      if (seen.has(key) && !entry.completed) return null;
+      seen.add(key);
       const sourceContractId = normalizeEliteContractId(entry.sourceContractId || entry.contractId);
       return {
         id: String(entry.id || eliteRivalId(eliteName)),
@@ -367,6 +371,30 @@
         updatedAt: Math.max(0, Math.floor(numberOr(entry.updatedAt, entry.createdAt || Date.now(), 0, Number.MAX_SAFE_INTEGER)))
       };
     }).filter(Boolean).slice(0, 12);
+  }
+
+  function validateEliteBoardState(state) {
+    if (!state) return createEliteContractState({}, state);
+    if (!state.player) state.player = {};
+    const contracts = createEliteContractState(isPlainObject(state.player.eliteContracts) ? state.player.eliteContracts : {}, state);
+    contracts.completed = normalizeEliteContractIds(contracts.completed);
+    contracts.claimed = normalizeEliteContractIds(contracts.claimed);
+    contracts.failed = asArray(contracts.failed, []).filter(isPlainObject).slice(0, 20);
+    contracts.expired = asArray(contracts.expired, []).filter(isPlainObject).slice(0, 20);
+    contracts.rivals = createEliteRivalState(contracts.rivals);
+    if (contracts.active) {
+      const activeStatus = String(contracts.active.status || '').toLowerCase();
+      const isInvalid = !normalizeEliteContractId(contracts.active.id) || contracts.active.failed || contracts.active.expired || contracts.active.completed || activeStatus === 'failed' || activeStatus === 'expired';
+      if (isInvalid) contracts.active = null;
+      else {
+        contracts.active.bonusWritCompleted = !!contracts.active.bonusWritCompleted;
+        contracts.active.bonusWritMissed = !!contracts.active.bonusWritMissed;
+        contracts.active.bonusWritFailed = !!contracts.active.bonusWritFailed;
+        if (contracts.active.bonusWritFailed && !contracts.active.bonusWritCompleted) contracts.active.bonusWritMissed = true;
+      }
+    }
+    state.player.eliteContracts = contracts;
+    return contracts;
   }
 
   function createEliteContractState(seed = {}, state = null) {
@@ -591,7 +619,7 @@
 
   function ensureEliteContractState(state) {
     if (!state.player) state.player = {};
-    state.player.eliteContracts = createEliteContractState(state.player.eliteContracts, state);
+    state.player.eliteContracts = validateEliteBoardState(state);
     return state.player.eliteContracts;
   }
 
@@ -790,7 +818,7 @@
   function recordEliteContractKill(state, options = {}) {
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
-    if (!active || active.complete) return false;
+    if (!active || active.complete || active.failed || active.expired) return false;
 
     const contract = eliteContractDef(active.id);
     if (!contract) {
@@ -972,7 +1000,7 @@
   }
 
   function resolveEliteContractCompletion(state, active, contract) {
-    if (!active || !contract || active.bonusWritRewardPaid) return 0;
+    if (!active || !contract || active.bonusWritRewardPaid || active.failed || active.expired) return 0;
     const trophyBonus = getEliteTrophyPayoutBonus(state);
     const bonusAmount = active.bonusWritCompleted ? eliteContractBonusWritReward(active, contract, state) : 0;
     active.bonusWritRewardPaid = true;
@@ -1122,6 +1150,7 @@
     window.DungeonDexEliteContracts = {
       ensure: ensureEliteContractState,
       ensureRivals: ensureEliteRivalState,
+      validate: validateEliteBoardState,
       availableRivals: availableEliteRivals,
       rememberRival: rememberEliteRivalDeath,
       startRival: startEliteRivalContract,
@@ -1151,6 +1180,15 @@
           trophies: eliteTrophySummary(state),
           trophyIds: Object.keys(trophies.collected || {})
         };
+      },
+      simulateDeathReset(state = S) {
+        if (!state?.player) return false;
+        if (typeof recoverRunToTown === 'function') recoverRunToTown(state, 'Death reset your descent. Charters can reopen deeper stairs.');
+        state.player.eliteContracts = validateEliteBoardState(state);
+        return true;
+      },
+      validateChartersRemain(state = S) {
+        return !!(state?.player && Array.isArray(state.player.deepStairCharters));
       },
       acceptFirst(state = S) {
         const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : [];

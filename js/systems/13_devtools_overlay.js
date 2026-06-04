@@ -268,9 +268,11 @@
     if (!hasGameState()) return '<p class="dd-devtools-empty">Game state unavailable.</p>';
     const stats = derivedStats();
     const depth = currentDepth();
+    const health = typeof window.DUNGEONDEX_BUILD_HEALTH === 'function' ? window.DUNGEONDEX_BUILD_HEALTH() : null;
     return `<div class="dd-devtools-metrics">
       ${metric('Version', typeof VISIBLE_VERSION_LABEL !== 'undefined' ? VISIBLE_VERSION_LABEL : 'DungeonDex')}
       ${metric('Build', typeof BUILD !== 'undefined' ? BUILD : 'unknown')}
+      ${metric('Build Check', health ? `${health.cacheHealth} / ${health.cacheQuery}` : 'unavailable')}
       ${metric('Current Floor', depthText(depth))}
       ${metric('District', currentDistrictText())}
       ${metric('HP', `${safeFormat(S.player.hp || 0)} / ${safeFormat(S.player.maxHp || 0)}`)}
@@ -649,9 +651,11 @@
     const stats = derivedStats();
     const depth = currentDepth();
     const runState = S.run?.active ? (S.run.event ? 'run event' : 'active run') : 'town/idle';
+    const health = typeof window.DUNGEONDEX_BUILD_HEALTH === 'function' ? window.DUNGEONDEX_BUILD_HEALTH() : null;
     return [
       `DungeonDex version: ${typeof VISIBLE_VERSION_LABEL !== 'undefined' ? VISIBLE_VERSION_LABEL : 'unknown'}`,
       `build: ${typeof BUILD !== 'undefined' ? BUILD : 'unknown'}`,
+      `build check: ${health ? `${health.cacheHealth} / ${health.cacheQuery}` : 'unavailable'}`,
       `floor: ${localClean(depthText(depth), `D${depth}`)}`,
       `district: ${currentDistrictText()}`,
       `player: HP ${safeFormat(S.player.hp || 0)}/${safeFormat(S.player.maxHp || 0)}, power ${safeFormat(stats.power || 0)}, guard ${safeFormat(stats.guard || 0)}`,

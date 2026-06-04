@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.20 - Interface density and app-feel cleanup.
+// DungeonDex v1.4.21 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.20';
+  const BUILD = '1.4.21';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.20-board-hunt-balance-feedback';
+  const BUILD_QS = '1.4.21-cache-hygiene-board-regression';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -18,6 +18,17 @@
     if (tag) tag.textContent = LABEL;
     document.title = LABEL;
     if (window.S && typeof window.S === 'object') window.S.build = BUILD_QS;
+  }
+
+  function syncBuildHealth(){
+    const health = typeof window.DUNGEONDEX_BUILD_HEALTH === 'function' ? window.DUNGEONDEX_BUILD_HEALTH() : null;
+    if (!health) return;
+    window.DUNGEONDEX_BUILD_STATUS = health;
+    if (window.console && console.info) {
+      console.info('Build check:', health.build);
+      console.info('Cache query:', health.cacheQuery);
+      console.info('Cache hygiene:', health.cacheHealth);
+    }
   }
 
   function injectCss(){
@@ -196,6 +207,7 @@
   function run(){
     injectCss();
     syncBuild();
+    syncBuildHealth();
     polishCopy();
     improveSparkWritButtons();
   }

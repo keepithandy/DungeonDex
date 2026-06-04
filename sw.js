@@ -1,5 +1,6 @@
-const CACHE_NAME = 'dungeon-dex-1.4.20-board-hunt-balance-feedback';
-const BUILD_QS = '1.4.20-board-hunt-balance-feedback';
+const CACHE_NAME = 'dungeondex-v1.4.21-cache-hygiene-board-regression';
+const CACHE_PREFIX = 'dungeondex-';
+const BUILD_QS = '1.4.21-cache-hygiene-board-regression';
 const ASSETS = [
   './',
   './index.html',
@@ -43,7 +44,11 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', event => {

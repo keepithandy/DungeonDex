@@ -1,0 +1,10 @@
+DungeonDex v1.4.21 smoke notes
+
+Checks:
+- Confirmed visible label uses DungeonDex v1.4.21.
+- Confirmed build query uses 1.4.21-cache-hygiene-board-regression.
+- Confirmed DungeonDex caches are pruned by prefix during service worker activate.
+- Confirmed Elite Board state helpers can inspect, validate, and simulate death reset behavior.
+- Confirmed board regression helpers are dev-facing.
+- Confirmed no monster affixes, status effects, or special enemy mechanics were reintroduced.
+
