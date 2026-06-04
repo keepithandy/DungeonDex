@@ -1,0 +1,11 @@
+DungeonDex v1.4.24a - Enter Dungeon Scaling Runtime Hotfix
+
+Fixed a runtime crash in monster generation introduced during the v1.4.24 gear/enemy scaling audit.
+
+Changes:
+- Replaced an undefined `depth` variable in the monster HP scaling formula with the existing `rawDepth` value.
+- Restored Enter Dungeon / monster spawn flow.
+- Kept v1.4.24 scaling values otherwise unchanged.
+- No save wipe.
+- No combat rewrite.
+- No affixes/status effects/special monster mechanics reintroduced.

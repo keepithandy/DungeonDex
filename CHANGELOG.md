@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.4.22`
-* Current local package baseline: `v1.4.24`
-* Current development target: `v1.4.24`
+* Current local package baseline: `v1.4.24a`
+* Current development target: `v1.4.24a`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.24a - Enter Dungeon Scaling Runtime Hotfix
+
+Status: Complete
+
+Summary:
+
+* Fixed a runtime crash in monster HP generation caused by an undefined `depth` reference.
+* Replaced the bad HP-scaling reference with the already-defined `rawDepth` value.
+* Restored Enter Dungeon / monster generation after the v1.4.24 scaling audit.
+* Did not change scaling values beyond the variable reference fix.
+* Preserved saves, combat simplicity, board hunts, Bonus Writs, trophies, rivals, death reset, extraction, and charters.
 
 ---
 

@@ -1,0 +1,18 @@
+DungeonDex v1.4.24a - Enter Dungeon Scaling Runtime Hotfix
+
+Smoke checklist:
+- Visible label shows DungeonDex v1.4.24a.
+- Enter Dungeon starts a run.
+- Monster generation completes without the undefined `depth` runtime crash.
+- Combat screen opens.
+- Attack, Skill, Guard, and Extract still work.
+- Floor / Room / Chapter display still appears.
+- Monster power/HP display appears.
+- No affix/status/modifier text appears.
+- No save wipe.
+
+Automated checks run in the package hotfix workspace:
+- node --check app.js
+- node --check sw.js
+- node --check js/systems/*.js
+- manifest.json parse

@@ -338,7 +338,7 @@
     // normal monsters do not flatten behind deep Mythic-equipped players.
     const lateFloorPressure = rawDepth <= 20 ? 1 : rawDepth <= 40 ? 1 + (rawDepth - 20) * 0.085 : 2.7 + Math.min(0.8, (rawDepth - 40) * 0.015);
     let power = Math.round((threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier));
-    let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * (depth <= 20 ? 1 : depth <= 40 ? 1 + (depth - 20) * 0.1 : 3);
+    let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * (rawDepth <= 20 ? 1 : rawDepth <= 40 ? 1 + (rawDepth - 20) * 0.1 : 3);
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;
