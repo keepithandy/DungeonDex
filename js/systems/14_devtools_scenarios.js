@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.0 - DevTools Scenario Presets
+// DungeonDex v1.6.1 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.6.0';
-  const SCENARIO_BUILD = '1.6.0-boss-trophy-expansion-foundation-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.1';
+  const SCENARIO_BUILD = '1.6.1-boss-trophy-dex-identity-polish-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -695,10 +695,15 @@
     if (!hasState()) return 'Boss trophy state unavailable.';
     const records = arr(S.player.bossTrophyRecords).filter(obj);
     const latest = records.slice().sort(function(a, b){ return int(b.earnedAt, 0, 0) - int(a.earnedAt, 0, 0); })[0];
+    const summary = typeof getBossTrophyCollectionSummary === 'function'
+      ? getBossTrophyCollectionSummary(S)
+      : { recordedCount: records.length, totalDefinitions: 0, missingCount: 0, totalFound: records.reduce(function(sum, entry){ return sum + Math.max(1, int(entry.count, 1, 1)); }, 0) };
     return [
       'Boss trophy state',
       `unique: ${fmt(records.length)}`,
-      `total: ${fmt(records.reduce(function(sum, entry){ return sum + Math.max(1, int(entry.count, 1, 1)); }, 0))}`,
+      `total: ${fmt(summary.totalFound)}`,
+      `recorded: ${fmt(summary.recordedCount)}${summary.totalDefinitions > 0 ? ` / ${fmt(summary.totalDefinitions)}` : ''}`,
+      `missing: ${fmt(summary.missingCount)}`,
       `latest: ${latest ? latest.trophyName || latest.name || 'unknown' : 'none yet'}`
     ].join('\n');
   }

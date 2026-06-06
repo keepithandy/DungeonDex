@@ -8071,6 +8071,93 @@ button:focus-visible,
   margin-top: 10px;
 }
 
+.boss-trophy-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.boss-trophy-summary-card,
+.boss-trophy-empty-state,
+.boss-trophy-record-card {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(20, 18, 19, .96), rgba(8, 8, 10, .98));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 10px 28px rgba(0,0,0,.18);
+}
+
+.boss-trophy-summary-card {
+  margin-top: 10px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.boss-trophy-record-grid {
+  margin-top: 8px;
+}
+
+.boss-trophy-record-card {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 11px;
+  align-items: center;
+  min-height: 132px;
+  padding: 10px;
+}
+
+.boss-trophy-record-boss {
+  color: rgba(255, 225, 194, .9);
+  font-size: .84rem;
+  margin: 0 0 7px;
+}
+
+.boss-trophy-record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 7px;
+}
+
+.boss-trophy-empty-state {
+  padding: 16px;
+  grid-column: 1 / -1;
+}
+
+.boss-trophy-empty-state strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.boss-trophy-empty-state p {
+  margin: 0 0 6px;
+  color: rgba(237,231,219,.78);
+}
+
+.elite-trophy-summary {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  padding: 11px 12px;
+  margin-top: 10px;
+  background: linear-gradient(145deg, rgba(20, 18, 19, .96), rgba(8, 8, 10, .98));
+}
+
+.elite-trophy-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.elite-trophy-summary-head .pill,
+.elite-trophy-summary-copy {
+  overflow-wrap: anywhere;
+}
+
 .boss-trophy-card {
   display: grid;
   grid-template-columns: 74px 1fr;
@@ -8261,7 +8348,34 @@ button:focus-visible,
 @media (max-width: 520px) {
   .boss-trophy-grid { grid-template-columns: 1fr; }
   .boss-trophy-card { grid-template-columns: 64px 1fr; }
+  .boss-trophy-record-card { grid-template-columns: 64px 1fr; }
+  .boss-trophy-summary-card,
+  .boss-trophy-section-head { align-items: flex-start; flex-direction: column; }
   .trophy-prestige-icon { width: 58px; height: 58px; transform: scale(.92); transform-origin: left center; }
+}
+
+@media (max-width: 420px) {
+  .trophy-hall-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .elite-trophy-summary-head {
+    flex-direction: column;
+  }
+
+  #dexSummary .tag-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #dexSummary .tag-row .pill,
+  .elite-trophy-summary-head .pill {
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    width: 100%;
+  }
 }
 
 /* v1.4.3a — Real trophy image asset wiring */

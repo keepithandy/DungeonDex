@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.0`
-* Current local package baseline: `v1.6.0`
-* Current development target: `v1.6.0`
+* Public/live itch version: `v1.6.1`
+* Current local package baseline: `v1.6.1`
+* Current development target: `v1.6.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.1 - Boss Trophy Dex Identity Polish
+
+Status: Complete
+
+Summary:
+
+* Polished the Trophy Hall boss section into a clearer Dex-style collection with recorded and missing states, locked copy, and compact collection-only summary cards.
+* Added a defensive boss trophy collection summary layer so records can report recorded, missing, total collected, and deepest boss mark without changing the existing `bossTrophyRecords` save model.
+* Tightened boss trophy naming and display fallbacks around the existing definition list so malformed or older records still render safe boss/trophy labels.
+* Preserved Elite Board trophies, Rival memory rules, Talent behavior, and boss trophy persistence; no combat mechanics, affixes, statuses, or balance changes were added.
+* No save wipe.
 
 ---
 
