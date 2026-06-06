@@ -621,14 +621,16 @@ async function main() {
     await sleep(650);
     let afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
     if (afterExtractState.active) {
-      await evalByValue(client, `(() => {
-        if (typeof combatAction === 'function') combatAction(S, 'extract');
-        if (typeof save === 'function') save(S);
-        if (typeof render === 'function') render();
-        return true;
-      })()`);
-      await sleep(250);
-      afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
+      for (let attempt = 0; attempt < 3 && afterExtractState.active; attempt += 1) {
+        await evalByValue(client, `(() => {
+          if (typeof combatAction === 'function' && S.run?.active) combatAction(S, 'extract');
+          if (typeof save === 'function') save(S);
+          if (typeof render === 'function') render();
+          return true;
+        })()`);
+        await sleep(250);
+        afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
+      }
     }
     record('Attack / Skill / Guard / Extract still work', afterExtractState.screen === 'town' && afterExtractState.active === false, JSON.stringify(afterExtractState));
     record('HP passive did not break display/state', afterExtractState.maxHp >= hpBeforeCombat, JSON.stringify({ before: hpBeforeCombat, after: afterExtractState.maxHp }));

@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.5.2`
-* Current local package baseline: `v1.5.2`
-* Current development target: `v1.5.2`
+* Public/live itch version: `v1.5.3`
+* Current local package baseline: `v1.5.3`
+* Current development target: `v1.5.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -70,6 +70,19 @@ Summary:
 * Added display-only milestone feedback: next point depth, progress toward the next 5-depth milestone, and max points.
 * Kept the Talent System foundation unchanged: no new talents, paths, combat mechanics, monster mechanics, bonus values, or earning-rate changes were added.
 * Confirmed repaired and older-save-style talent data still displays safely.
+* No save wipe.
+
+---
+
+### v1.5.3 - Talent Release Readiness Sweep
+
+Status: Complete
+
+Summary:
+
+* Verified the `v1.5.x` Talent foundation remains release-stable across fresh-save, repaired older-save-style, unknown-id, mobile-width, and town/run regression paths.
+* Updated active version, build, and cache labels to `v1.5.3` for the readiness sweep.
+* Kept the current four talent paths and four starter talents only, with no bonus-value, point-rate, combat, affix, or status-mechanic expansion.
 * No save wipe.
 
 ---
