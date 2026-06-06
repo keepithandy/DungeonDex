@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.5.3 - DevTools Scenario Presets
+// DungeonDex v1.6.0 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.5.3';
-  const SCENARIO_BUILD = '1.5.3-talent-release-readiness-sweep-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.0';
+  const SCENARIO_BUILD = '1.6.0-boss-trophy-expansion-foundation-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -691,6 +691,42 @@
     }
     return ok;
   }
+  function bossTrophySummaryText(){
+    if (!hasState()) return 'Boss trophy state unavailable.';
+    const records = arr(S.player.bossTrophyRecords).filter(obj);
+    const latest = records.slice().sort(function(a, b){ return int(b.earnedAt, 0, 0) - int(a.earnedAt, 0, 0); })[0];
+    return [
+      'Boss trophy state',
+      `unique: ${fmt(records.length)}`,
+      `total: ${fmt(records.reduce(function(sum, entry){ return sum + Math.max(1, int(entry.count, 1, 1)); }, 0))}`,
+      `latest: ${latest ? latest.trophyName || latest.name || 'unknown' : 'none yet'}`
+    ].join('\n');
+  }
+  function grantBossTrophyForTest(){
+    if (!hasState() || typeof recordBossTrophyUnlock !== 'function') return false;
+    const defs = Array.isArray(BOSS_TROPHY_DEFINITIONS) ? BOSS_TROPHY_DEFINITIONS : [];
+    const owned = new Set(arr(S.player.bossTrophies).map(String));
+    const next = defs.find(function(def){ return def && def.id && !owned.has(def.id); }) || defs[0];
+    if (!next) return false;
+    const rawDepth = int(next.requiredDepth || 15, 15, 1);
+    const record = recordBossTrophyUnlock(S, rawDepth, next.source || next.name || 'Boss');
+    if (!record) return false;
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = bossTrophySummaryText();
+    log(`Forced boss trophy: ${record.trophyName || record.name}.`, 'info');
+    return true;
+  }
+  function clearBossTrophies(){
+    if (!hasState()) return false;
+    S.player.bossTrophies = [];
+    S.player.bossTrophyRecords = [];
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = bossTrophySummaryText();
+    log('Boss trophy state cleared for testing.', 'info');
+    return true;
+  }
   function restoreBackup(){
     if (!scenarioState.lastBackup || !hasState()) { log('No scenario backup available.', 'warn'); return; }
     restoreObject(S, scenarioState.lastBackup);
@@ -755,6 +791,11 @@
         ${button('Clear Trophy State', 'clear-trophies', '', true)}
       </div>
       <div class="dd-devtools-button-grid">
+        ${button('Force Boss Trophy', 'force-boss-trophy')}
+        ${button('Boss Trophy Summary', 'boss-trophy-summary')}
+        ${button('Clear Boss Trophies', 'clear-boss-trophies', '', true)}
+      </div>
+      <div class="dd-devtools-button-grid">
         ${button('Create Rival', 'create-rival')}
         ${button('Force Rival Contract', 'force-rival')}
         ${button('Complete Rival', 'complete-rival')}
@@ -800,6 +841,9 @@
     if (action === 'restore') return restoreBackup();
     if (action === 'snapshot') return copyScenarioSnapshot();
     if (action === 'force-trophy') return forceEliteTrophy();
+    if (action === 'force-boss-trophy') return grantBossTrophyForTest();
+    if (action === 'boss-trophy-summary') { scenarioState.lastMessage = bossTrophySummaryText(); renderScenarioSectionSoon(); return true; }
+    if (action === 'clear-boss-trophies') return clearBossTrophies();
     if (action === 'simulate-complete') return simulateEliteCompletion();
     if (action === 'clear-trophies') return clearTrophyState();
     if (action === 'create-rival') return createTestRival();
@@ -833,6 +877,9 @@
     eliteTrophyStateText,
     eliteRivalStateText,
     talentSummary: talentSummaryText,
+    bossTrophySummary: bossTrophySummaryText,
+    grantBossTrophyForTest,
+    clearBossTrophies,
     grantTalentPoint,
     resetTalents,
     unlockTalentForTest,

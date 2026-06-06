@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.5.3`
-* Current local package baseline: `v1.5.3`
-* Current development target: `v1.5.3`
+* Public/live itch version: `v1.6.0`
+* Current local package baseline: `v1.6.0`
+* Current development target: `v1.6.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.0 - Boss Trophy Expansion Foundation
+
+Status: Complete
+
+Summary:
+
+* Expanded boss trophies from a simple unlock list into save-safe trophy records with boss name, trophy name, run location, best kill depth, and count.
+* Kept the Trophy Hall compact by adding a recorded Boss Trophies section plus a separate missing-trophy case.
+* Preserved Elite Board and Rival trophy behavior; boss trophies remain collection records only and do not add combat power.
+* Added save repair and DevTools helpers for missing or malformed boss trophy data.
+* No save wipe.
 
 ---
 

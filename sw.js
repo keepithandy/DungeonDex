@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.5.3-talent-release-readiness-sweep';
+const CACHE_NAME = 'dungeondex-v1.6.0-boss-trophy-expansion-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.5.3-talent-release-readiness-sweep';
+const BUILD_QS = '1.6.0-boss-trophy-expansion-foundation';
 const ASSETS = [
   './',
   './index.html',

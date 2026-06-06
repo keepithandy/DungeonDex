@@ -607,8 +607,7 @@
 
   function isBossTrophyUnlocked(trophy, bestDepth) {
     const unlockedIds = asArray(S.player.bossTrophies, []);
-    const requiredDepth = numberOr(trophy?.requiredDepth, 999999, 1, 999999);
-    return unlockedIds.includes(trophy.id) || bestDepth > requiredDepth;
+    return unlockedIds.includes(trophy.id);
   }
 
   function bossTrophyCard(trophy, bestDepth) {
@@ -628,12 +627,14 @@
   function renderDex() {
     if (!el('dexSummary') || !el('monsterDex') || !el('gearDex')) return;
     S.player.bossTrophies = asArray(S.player.bossTrophies, []);
+    S.player.bossTrophyRecords = asArray(S.player.bossTrophyRecords, []).filter(isPlainObject);
     S.player.retiredRelics = asArray(S.player.retiredRelics, []);
     const eliteTrophies = typeof ensureEliteTrophyState === 'function' ? ensureEliteTrophyState(S) : { collected:{}, totalFound:0, latestId:'' };
     const rivals = typeof ensureEliteRivalState === 'function' ? ensureEliteRivalState(S) : [];
     const bestDepth = Math.max(1, S.player.depth || S.player.safeExtractDepth || 1);
     const trophies = asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []);
     const unlockedCount = trophies.filter(trophy => isBossTrophyUnlocked(trophy, bestDepth)).length;
+    const bossRecords = S.player.bossTrophyRecords.slice().sort((a, b) => numberOr(b.bestKillDepth, 0) - numberOr(a.bestKillDepth, 0) || numberOr(b.earnedAt, 0) - numberOr(a.earnedAt, 0));
     const eliteEntries = Object.values(eliteTrophies.collected || {}).sort((a, b) => String(b.earnedAt || '').localeCompare(String(a.earnedAt || '')));
     const latestElite = eliteTrophies.latestId && eliteTrophies.collected[eliteTrophies.latestId] ? eliteTrophies.collected[eliteTrophies.latestId] : eliteEntries[0] || null;
     const eliteBonus = typeof getEliteTrophyPayoutBonus === 'function' ? getEliteTrophyPayoutBonus(S) : Math.min(5, eliteEntries.length);
@@ -643,7 +644,7 @@
     el('dexSummary').innerHTML = `
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. The deeper the Stair gets, the nastier the case becomes.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
-      <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
+      <div class="tag-row"><span class="pill">Boss trophies: ${format(unlockedCount)} / ${format(trophies.length)}</span><span class="pill">Recorded: ${format(bossRecords.length)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
       <div class="elite-trophy-summary">
         <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout (display only)</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
@@ -652,7 +653,7 @@
         <div class="elite-trophy-summary-head"><h3>Rivals Remembered</h3><span class="pill">${format(rivalActive.length)} active</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div>
       </div>`;
-    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Boss trophy case. Locked trophies stay grey until their boss has been beaten.</p><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
+    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Boss trophy records first. Missing trophies stay grey until their boss has been beaten.</p><div class="list boss-trophy-record-list">${bossRecords.length ? bossRecords.map(entry => `<div class="archive-line boss-trophy-record-line"><div><strong>${escapeHtml(entry.trophyName || entry.name || 'Boss Trophy')}</strong> x${format(entry.count || 1)}</div><div class="small muted">${escapeHtml(entry.bossName || entry.source || 'Unknown Boss')} • Best ${escapeHtml(depthShortLabel(entry.bestKillDepth || entry.rawDepth || 1))} • F${format(entry.floor || 1)} R${format(entry.room || 1)} C${format(entry.chapter || 1)}</div></div>`).join('') : '<p class="small muted">Defeat bosses to record their trophies here.</p>'}</div><div class="sep"></div><h3>Missing Trophy Case</h3><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
     el('gearDex').innerHTML = `
       <h2>Retired Relics</h2>
       <p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p>

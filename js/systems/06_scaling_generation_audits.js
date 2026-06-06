@@ -264,6 +264,8 @@
         inventory: [],
         discoveredMonsters: [],
         discoveredGear: [],
+        bossTrophies: [],
+        bossTrophyRecords: [],
         log: [],
         loreSeen: [LORE_SNIPPETS[0]],
         runHistory: [],

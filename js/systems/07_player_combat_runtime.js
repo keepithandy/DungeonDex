@@ -508,15 +508,95 @@
       .find(trophy => depth >= numberOr(trophy.requiredDepth, 0, 0, 999999) && depth < numberOr(trophy.requiredDepth, 0, 0, 999999) + DEPTH_CHAPTERS_PER_THREAT_STEP);
   }
 
+  function ensureBossTrophyRecords(state) {
+    if (!state?.player) return [];
+    const records = asArray(state.player.bossTrophyRecords, []).filter(isPlainObject).map(raw => ({
+      id: String(raw.id || raw.trophyId || '').trim(),
+      trophyId: String(raw.trophyId || raw.id || '').trim(),
+      trophyName: String(raw.trophyName || raw.name || 'Boss Trophy'),
+      bossName: String(raw.bossName || raw.sourceBoss || 'Unknown Boss'),
+      floor: Math.max(1, Math.floor(numberOr(raw.floor, 1, 1, 999999))),
+      room: Math.max(1, Math.floor(numberOr(raw.room, 1, 1, 999999))),
+      chapter: Math.max(1, Math.floor(numberOr(raw.chapter, 1, 1, 999999))),
+      rawDepth: Math.max(0, Math.floor(numberOr(raw.rawDepth, raw.bestKillDepth, 0, 999999))),
+      securedDepth: Math.max(1, Math.floor(numberOr(raw.securedDepth, 1, 1, 999999))),
+      bestKillDepth: Math.max(0, Math.floor(numberOr(raw.bestKillDepth, raw.rawDepth, 0, 999999))),
+      count: Math.max(1, Math.floor(numberOr(raw.count, 1, 1, 9999))),
+      tone: String(raw.tone || 'Trophy'),
+      source: String(raw.source || 'Boss Floor'),
+      image: String(raw.image || 'assets/trophies/hollow_stair_skull_trophy.png'),
+      icon: String(raw.icon || ''),
+      earnedAt: Math.max(0, Math.floor(numberOr(raw.earnedAt || raw.defeatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER)))
+    })).filter(entry => entry.id);
+    state.player.bossTrophyRecords = records.slice(0, 80);
+    return state.player.bossTrophyRecords;
+  }
+
+  function bossTrophySummary(state) {
+    const records = ensureBossTrophyRecords(state);
+    const latest = records.slice().sort((a, b) => numberOr(b.earnedAt, 0) - numberOr(a.earnedAt, 0))[0] || null;
+    return {
+      totalFound: records.reduce((sum, entry) => sum + Math.max(1, Math.floor(numberOr(entry.count, 1, 1, 9999))), 0),
+      uniqueFound: records.length,
+      latestLabel: latest ? latest.trophyName : 'None yet'
+    };
+  }
+
   function recordBossTrophyUnlock(state, rawDepth, monsterName) {
     if (!state?.player) return null;
     state.player.bossTrophies = asArray(state.player.bossTrophies, []);
     const trophy = bossTrophyForRawDepth(rawDepth);
-    if (!trophy || !trophy.id || state.player.bossTrophies.includes(trophy.id)) return null;
-    state.player.bossTrophies.push(trophy.id);
-    pushCombat(state, `Trophy Hall: ${trophy.name} unlocked from ${monsterName || 'the boss'}.`);
-    pushLog(state, `Boss Trophy earned: ${trophy.name}.`);
-    return trophy;
+    if (!trophy || !trophy.id) return null;
+    const records = ensureBossTrophyRecords(state);
+    const lore = typeof getLoreDepthProgress === 'function' ? getLoreDepthProgress(rawDepth) : null;
+    const currentFloor = Math.max(1, Math.floor(numberOr(lore?.floorNumber, Math.ceil(Math.max(1, rawDepth) / Math.max(1, DEPTH_CHAPTERS_PER_FLOOR)), 1, 999999)));
+    const currentRoom = Math.max(1, Math.floor(numberOr(lore?.roomWithinFloor, 1, 1, 999999)));
+    const currentChapter = Math.max(1, Math.floor(numberOr(lore?.chapterWithinRoom, 1, 1, 999999)));
+    const securedDepth = Math.max(
+      1,
+      Math.floor(numberOr(state?.player?.safeExtractDepth, 1, 1, 999999)),
+      Math.floor(numberOr(state?.player?.returnDepth, 1, 1, 999999)),
+      Math.floor(numberOr(state?.player?.permanentStartFloor, 1, 1, 999999))
+    );
+    const existing = records.find(entry => entry.id === trophy.id || entry.trophyId === trophy.id);
+    if (existing) {
+      existing.count = Math.max(1, Math.floor(numberOr(existing.count, 1, 1, 9999)) + 1);
+      existing.bestKillDepth = Math.max(Math.floor(numberOr(existing.bestKillDepth, 0, 0, 999999)), Math.floor(numberOr(rawDepth, 0, 0, 999999)));
+      existing.rawDepth = Math.max(Math.floor(numberOr(existing.rawDepth, 0, 0, 999999)), Math.floor(numberOr(rawDepth, 0, 0, 999999)));
+      existing.securedDepth = Math.max(Math.floor(numberOr(existing.securedDepth, 1, 1, 999999)), securedDepth);
+      existing.floor = Math.max(Math.floor(numberOr(existing.floor, 1, 1, 999999)), currentFloor);
+      existing.room = currentRoom;
+      existing.chapter = currentChapter;
+      existing.earnedAt = Date.now();
+      if (!state.player.bossTrophies.includes(trophy.id)) state.player.bossTrophies.push(trophy.id);
+      pushCombat(state, `Trophy Hall: ${existing.trophyName} recorded again from ${monsterName || 'the boss'}.`);
+      pushLog(state, `Boss Trophy recorded: ${existing.trophyName} x${existing.count}.`);
+      return existing;
+    }
+    const record = {
+      id: trophy.id,
+      trophyId: trophy.id,
+      trophyName: String(trophy.name || 'Boss Trophy'),
+      bossName: String(monsterName || trophy.source || 'Unknown Boss'),
+      floor: currentFloor,
+      room: currentRoom,
+      chapter: currentChapter,
+      rawDepth: Math.max(0, Math.floor(numberOr(rawDepth, 0, 0, 999999))),
+      securedDepth,
+      bestKillDepth: Math.max(0, Math.floor(numberOr(rawDepth, 0, 0, 999999))),
+      count: 1,
+      tone: String(trophy.tone || 'Trophy'),
+      source: String(trophy.source || 'Boss Floor'),
+      image: String(trophy.image || 'assets/trophies/hollow_stair_skull_trophy.png'),
+      icon: String(trophy.icon || ''),
+      earnedAt: Date.now()
+    };
+    records.push(record);
+    state.player.bossTrophyRecords = records.slice(0, 80);
+    if (!state.player.bossTrophies.includes(trophy.id)) state.player.bossTrophies.push(trophy.id);
+    pushCombat(state, `Trophy Hall: ${record.trophyName} unlocked from ${monsterName || 'the boss'}.`);
+    pushLog(state, `Boss Trophy earned: ${record.trophyName}.`);
+    return record;
   }
 
   function winEncounter(state) {

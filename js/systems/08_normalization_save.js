@@ -109,6 +109,70 @@
     };
   }
 
+  function bossTrophyDefinitionById(id) {
+    const clean = String(id || '').trim();
+    if (!clean) return null;
+    return asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []).find(entry => String(entry?.id || '').trim() === clean) || null;
+  }
+
+  function normalizeBossTrophyRecords(source, unlockedIds = []) {
+    const records = [];
+    const seen = new Set();
+    asArray(source, []).forEach(raw => {
+      if (!isPlainObject(raw)) return;
+      const fallbackId = raw.trophyId || raw.id || raw.bossId || raw.bossName;
+      const def = bossTrophyDefinitionById(fallbackId);
+      const recordId = String(raw.id || raw.trophyId || def?.id || '').trim();
+      if (!recordId || seen.has(recordId)) return;
+      seen.add(recordId);
+      const rawDepth = Math.max(0, Math.floor(numberOr(raw.rawDepth, raw.bestKillDepth, 0, 999999)));
+      const bestKillDepth = Math.max(0, Math.floor(numberOr(raw.bestKillDepth, rawDepth, 0, 999999)));
+      const count = Math.max(1, Math.floor(numberOr(raw.count, 1, 1, 9999)));
+      records.push({
+        id: recordId,
+        trophyId: recordId,
+        trophyName: String(raw.trophyName || raw.name || def?.name || 'Boss Trophy'),
+        bossName: String(raw.bossName || raw.sourceBoss || def?.source || 'Unknown Boss'),
+        floor: Math.max(1, Math.floor(numberOr(raw.floor, 1, 1, 999999))),
+        room: Math.max(1, Math.floor(numberOr(raw.room, 1, 1, 999999))),
+        chapter: Math.max(1, Math.floor(numberOr(raw.chapter, 1, 1, 999999))),
+        rawDepth,
+        securedDepth: Math.max(1, Math.floor(numberOr(raw.securedDepth, 1, 1, 999999))),
+        bestKillDepth,
+        count,
+        tone: String(raw.tone || def?.tone || 'Trophy'),
+        source: String(raw.source || def?.source || 'Boss Floor'),
+        image: String(raw.image || def?.image || 'assets/trophies/hollow_stair_skull_trophy.png'),
+        icon: String(raw.icon || def?.icon || ''),
+        earnedAt: Math.max(0, Math.floor(numberOr(raw.earnedAt || raw.defeatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER)))
+      });
+    });
+    unlockedIds.forEach(id => {
+      const clean = String(id || '').trim();
+      if (!clean || seen.has(clean)) return;
+      const def = bossTrophyDefinitionById(clean);
+      records.push({
+        id: clean,
+        trophyId: clean,
+        trophyName: String(def?.name || 'Boss Trophy'),
+        bossName: String(def?.source || 'Unknown Boss'),
+        floor: Math.max(1, Math.floor(numberOr(def?.boss, 1, 1, 999999) * Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999999))))),
+        room: 1,
+        chapter: 1,
+        rawDepth: Math.max(0, Math.floor(numberOr(def?.requiredDepth, 0, 0, 999999))),
+        securedDepth: Math.max(1, Math.floor(numberOr(def?.requiredDepth, 1, 1, 999999))),
+        bestKillDepth: Math.max(0, Math.floor(numberOr(def?.requiredDepth, 0, 0, 999999))),
+        count: 1,
+        tone: String(def?.tone || 'Trophy'),
+        source: String(def?.source || 'Boss Floor'),
+        image: String(def?.image || 'assets/trophies/hollow_stair_skull_trophy.png'),
+        icon: String(def?.icon || ''),
+        earnedAt: 0
+      });
+    });
+    return records.slice(0, 80);
+  }
+
   function bestTalentProgressDepth(state) {
     const runDepth = Math.floor(numberOr(state?.run?.floor, 0, 0, 999999));
     const depth = Math.max(
@@ -344,7 +408,9 @@
     });
     state.player.discoveredMonsters = asArray(savedPlayer.discoveredMonsters, []).map(String).slice(0, 200);
     state.player.discoveredGear = asArray(savedPlayer.discoveredGear, []).map(String).slice(0, 200);
-    state.player.bossTrophies = asArray(savedPlayer.bossTrophies, []).map(String).slice(0, 80);
+    state.player.bossTrophies = Array.from(new Set(asArray(savedPlayer.bossTrophies, []).map(String).map(id => id.trim()).filter(Boolean))).slice(0, 80);
+    state.player.bossTrophyRecords = normalizeBossTrophyRecords(savedPlayer.bossTrophyRecords, state.player.bossTrophies);
+    state.player.bossTrophies = Array.from(new Set(state.player.bossTrophies.concat(state.player.bossTrophyRecords.map(entry => String(entry.trophyId || entry.id || '').trim()).filter(Boolean)))).slice(0, 80);
     state.player.retiredRelics = asArray(savedPlayer.retiredRelics, []).filter(isPlainObject).slice(0, 80);
     state.player.log = asArray(savedPlayer.log, base.player.log).map(String).slice(0, 60);
     state.player.loreSeen = asArray(savedPlayer.loreSeen, base.player.loreSeen).map(String).slice(0, 80);

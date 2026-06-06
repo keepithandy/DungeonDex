@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.5.3 - Interface density and app-feel cleanup.
+// DungeonDex v1.6.0 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.5.3';
+  const BUILD = '1.6.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.5.3-talent-release-readiness-sweep';
+  const BUILD_QS = '1.6.0-boss-trophy-expansion-foundation';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -124,6 +124,8 @@
       #screen-archive .archive-note-line{display:grid!important;gap:3px!important;padding:7px 8px!important;line-height:1.28!important}
       #screen-archive .archive-note-stamp{font-size:10px!important;line-height:1!important}
       #screen-archive .archive-note-line>div:last-child{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.28}
+      #screen-dex .boss-trophy-record-list{display:grid;gap:6px}
+      #screen-dex .boss-trophy-record-line{display:grid;gap:3px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.02)}
 
       /* Boss header remains clean and intentional */
       .combat-device-boss .combat-enemy-header{padding:7px 9px!important;min-height:auto!important}
