@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.26`
-* Current local package baseline: `v1.4.26`
-* Current development target: `v1.4.26`
+* Public/live itch version: `v1.4.27`
+* Current local package baseline: `v1.4.27`
+* Current development target: `v1.4.27`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.27 - Roadmap Notes & Branch Cleanup
+
+Status: Complete
+
+Summary:
+
+* Added a clean roadmap handoff note for the post-v1.4 branch transition.
+* Clarified that v1.4.x remains the stabilization, scaling, and readability branch.
+* Clarified that v1.5.x is the next progression-system branch, with `v1.5.0` pointing to the Talent System Foundation.
+* Kept `VERSION.md` as the source of truth and updated visible build labels to `v1.4.27`.
+* Kept gameplay, combat math, monster scaling, and board/rival behavior unchanged.
+* No affixes, status effects, modifier popups, special monster behavior, aura mechanics, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+* No save wipe.
 
 ---
 
