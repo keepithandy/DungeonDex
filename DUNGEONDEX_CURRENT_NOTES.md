@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.4.28a — Intro Button Smoke Hotfix
+- DungeonDex v1.4.29 — Intro Modal Mobile Spacing Audit
 
 ## Current Workflow
 - Inspect files before editing.

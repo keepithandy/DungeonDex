@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.28a`
-* Current local package baseline: `v1.4.28a`
-* Current development target: `v1.4.28a`
+* Public/live itch version: `v1.4.29`
+* Current local package baseline: `v1.4.29`
+* Current development target: `v1.4.29`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,21 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.29 - Intro Modal Mobile Spacing Audit
+
+Status: Complete
+
+Summary:
+
+* Tightened the intro/safe-return modal spacing on narrow mobile widths so the Current Roadmap card stays readable without crowding the district, progress, or footer rows.
+* Kept the `Enter Dungeon` and `Close` actions visible and tappable on mobile widths, including the 390px, 375px, 360px, and 320px checks.
+* Preserved the v1.4.28 roadmap copy and the v1.4.28a verified intro/safe-return button behavior.
+* Updated build and cache labels to `DungeonDex v1.4.29` with build query `1.4.29-intro-modal-mobile-spacing-audit`.
+* No gameplay, combat math, monster scaling, gear scaling, death/extraction/charter rules, Elite Board behavior, Bonus Writ behavior, Trophy behavior, Rival behavior, affixes, status effects, modifier popups, special monster behavior, or hidden enemy effects were changed.
+* No save wipe.
 
 ---
 
