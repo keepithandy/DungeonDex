@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.5.0b-talent-save-load-regression-guard';
+const CACHE_NAME = 'dungeondex-v1.5.1-talent-ui-readability-save-compatibility-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.5.0b-talent-save-load-regression-guard';
+const BUILD_QS = '1.5.1-talent-ui-readability-save-compatibility-polish';
 const ASSETS = [
   './',
   './index.html',

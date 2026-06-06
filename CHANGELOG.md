@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.5.0b`
-* Current local package baseline: `v1.5.0b`
-* Current development target: `v1.5.0b`
+* Public/live itch version: `v1.5.1`
+* Current local package baseline: `v1.5.1`
+* Current development target: `v1.5.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,21 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.5.1 - Talent UI Readability & Save Compatibility Polish
+
+Status: Complete
+
+Summary:
+
+* Polished the Gear tab Talent panel with a clearer Warden Talents header, passive-only note, readable point totals, and stronger locked/ready/unlocked button states.
+* Shortened starter talent copy while keeping Hardened Start, Board Regular, Stair Sense, and Appraiser unchanged mechanically.
+* Added a small defensive Talent UI summary fallback so repaired, missing, mirrored, or unknown talent data still displays safely without changing legacy alias repair.
+* Kept the existing four paths and four starter talents only.
+* No combat mechanics, monster mechanics, talent values, scaling, gear balance, death, extraction, or charter rules were changed.
+* No save wipe.
 
 ---
 

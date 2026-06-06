@@ -6450,6 +6450,7 @@ button:focus-visible,
 
 #talentPanel {
   padding: 10px;
+  overflow: hidden;
   border-color: rgba(255,188,104,0.22);
   background:
     linear-gradient(180deg, rgba(255,167,79,0.055), rgba(255,255,255,0.015)),
@@ -6459,11 +6460,55 @@ button:focus-visible,
     0 10px 24px rgba(0,0,0,0.24);
 }
 
+#talentPanel .talent-head {
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+#talentPanel .talent-head p {
+  max-width: 48ch;
+  margin-top: 2px;
+}
+
+#talentPanel .talent-passive-note {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  border: 1px solid rgba(255,188,104,0.16);
+  border-radius: 999px;
+  background: rgba(255,188,104,0.055);
+  color: rgba(245,221,177,0.86);
+  padding: 3px 7px;
+  font-weight: 700;
+}
+
+#talentPanel .talent-point-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 7px;
+  margin: 4px 0 6px;
+  border: 1px solid rgba(255,188,104,0.14);
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(255,180,84,0.052), rgba(0,0,0,0.12));
+  padding: 7px 8px;
+  color: rgba(246,232,205,0.9);
+}
+
+#talentPanel .talent-point-line b {
+  color: #f4d08b;
+}
+
+#talentPanel .talent-separator {
+  color: rgba(244,208,139,0.5);
+}
+
 #talentPanel .talent-summary-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 4px 0 10px;
+  margin: 4px 0 9px;
 }
 
 #talentPanel .talent-summary-row span {
@@ -6484,12 +6529,24 @@ button:focus-visible,
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   padding: 8px;
+  min-width: 0;
   background: rgba(255,255,255,0.025);
 }
 
+#talentPanel .talent-path-card.is-locked {
+  border-color: rgba(255,255,255,0.07);
+  background: linear-gradient(180deg, rgba(255,255,255,0.024), rgba(0,0,0,0.14));
+}
+
+#talentPanel .talent-path-card.is-ready {
+  border-color: rgba(255,188,104,0.26);
+  background: linear-gradient(180deg, rgba(255,177,88,0.07), rgba(255,255,255,0.018));
+}
+
 #talentPanel .talent-path-card.is-unlocked {
-  border-color: rgba(255,190,110,0.2);
-  background: linear-gradient(180deg, rgba(255,164,74,0.055), rgba(255,255,255,0.02));
+  border-color: rgba(122,232,178,0.24);
+  background: linear-gradient(180deg, rgba(122,232,178,0.07), rgba(255,255,255,0.02));
+  box-shadow: inset 0 1px 0 rgba(190,255,220,0.045);
 }
 
 #talentPanel .talent-path-head {
@@ -6512,6 +6569,34 @@ button:focus-visible,
   margin: 0;
   font-size: 0.96rem;
   line-height: 1.08;
+  color: rgba(255,243,220,0.96);
+}
+
+#talentPanel .talent-state-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  min-height: 20px;
+  padding: 3px 7px;
+  background: rgba(0,0,0,0.18);
+  color: rgba(231,221,205,0.7);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#talentPanel .talent-state-pill.is-ready {
+  border-color: rgba(255,188,104,0.24);
+  color: rgba(255,221,160,0.94);
+}
+
+#talentPanel .talent-state-pill.is-unlocked {
+  border-color: rgba(122,232,178,0.24);
+  color: rgba(186,246,216,0.94);
 }
 
 #talentPanel .talent-path-effect {
@@ -6529,6 +6614,28 @@ button:focus-visible,
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;
+}
+
+#talentPanel .talent-state-button {
+  width: 100%;
+  min-height: 32px;
+}
+
+#talentPanel .talent-state-button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+#talentPanel .talent-state-button.is-locked:disabled {
+  border-color: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.035);
+  color: rgba(231,221,205,0.55);
+}
+
+#talentPanel .talent-state-button.is-unlocked:disabled {
+  border-color: rgba(122,232,178,0.22);
+  background: rgba(122,232,178,0.075);
+  color: rgba(186,246,216,0.92);
 }
 
 #talentPanel .talent-footer {
@@ -6981,6 +7088,14 @@ button:focus-visible,
 
   #talentPanel .talent-grid {
     grid-template-columns: 1fr;
+  }
+
+  #talentPanel .talent-head {
+    align-items: stretch;
+  }
+
+  #talentPanel .talent-head .pill {
+    align-self: flex-start;
   }
 
   .gear-player-head,

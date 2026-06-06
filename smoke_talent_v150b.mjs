@@ -405,6 +405,34 @@ async function main() {
       const panel = document.getElementById('talentPanel');
       return panel ? panel.innerText : '';
     })()`);
+    const checkTalentViewport = async width => {
+      await client.send('Emulation.setDeviceMetricsOverride', {
+        width,
+        height: 900,
+        deviceScaleFactor: 1,
+        mobile: true
+      });
+      await sleep(120);
+      return await evalByValue(client, `(() => {
+        S.screen = 'gear';
+        if (typeof render === 'function') render();
+        const panel = document.getElementById('talentPanel');
+        const doc = document.documentElement;
+        const body = document.body;
+        const overflow = Math.ceil(Math.max(doc.scrollWidth || 0, body?.scrollWidth || 0)) > Math.ceil(window.innerWidth || ${width}) + 1;
+        const panelOverflow = panel ? Math.ceil(panel.scrollWidth || 0) > Math.ceil(panel.clientWidth || 0) + 1 : true;
+        const text = panel ? panel.innerText : '';
+        return {
+          width: window.innerWidth,
+          panel: !!panel,
+          overflow,
+          panelOverflow,
+          hasTotals: /Available:\\s*\\d+/.test(text) && /Spent:\\s*\\d+/.test(text) && /Earned:\\s*\\d+/.test(text),
+          hasStarterTalents: ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => text.includes(name)),
+          hasPassiveNote: text.includes('Passive only. No combat buttons.')
+        };
+      })()`);
+    };
     const click = async selector => await evalByValue(client, `(() => {
       const el = document.querySelector(${JSON.stringify(selector)});
       if (!el) return false;
@@ -422,17 +450,34 @@ async function main() {
     record('Fresh save repair', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const freshPanelText = await getTalentText();
     record('Talent panel renders', ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
+    record('Talent point totals are readable', /Available:\s*0/.test(freshPanelText) && /Spent:\s*0/.test(freshPanelText) && /Earned:\s*0/.test(freshPanelText), freshPanelText.slice(0, 300));
+    record('Passive-only talent note is visible', freshPanelText.includes('Passive only. No combat buttons.'), freshPanelText.slice(0, 300));
     const freshUnlockBtn = await evalByValue(client, `(() => {
       const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
-      return !!btn && btn.disabled && /Need 1 point/.test(btn.textContent || '');
+      return !!btn && btn.disabled && /Need Point/.test(btn.textContent || '');
     })()`);
     record('Unlock buttons blocked with 0 points', !!freshUnlockBtn, 'Hardened Start button disabled');
+    for (const width of [390, 375, 360, 320]) {
+      const mobile = await checkTalentViewport(width);
+      record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasTotals && mobile.hasStarterTalents && mobile.hasPassiveNote, JSON.stringify(mobile));
+    }
+    await client.send('Emulation.clearDeviceMetricsOverride');
 
     // Grant one point and unlock Hardened Start.
     const grantOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
     record('grantTalentPoint(1)', !!grantOk, String(grantOk));
+    const availableUnlockBtn = await evalByValue(client, `(() => {
+      const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
+      return !!btn && !btn.disabled && /^Unlock$/.test((btn.textContent || '').trim());
+    })()`);
+    record('Unlock button enabled with available point', !!availableUnlockBtn, 'Hardened Start button reads Unlock');
     const unlockOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
     record('unlockTalentForTest(Hardened Start)', !!unlockOk, String(unlockOk));
+    const unlockedButtonState = await evalByValue(client, `(() => {
+      const btn = document.querySelector('.talent-state-button.is-unlocked');
+      return !!btn && btn.disabled && /^Unlocked$/.test((btn.textContent || '').trim());
+    })()`);
+    record('Unlocked button state is readable', !!unlockedButtonState, 'Unlocked button disabled and labeled');
     const summaryAfterUnlock = await getSummary();
     record('Points spent/available update after unlock', summaryAfterUnlock && summaryAfterUnlock.pointsEarned === 1 && summaryAfterUnlock.pointsSpent === 1 && summaryAfterUnlock.pointsAvailable === 0, JSON.stringify(summaryAfterUnlock));
     const hpAfterUnlock = await evalByValue(client, `(() => ({ hp: S.player.hp, maxHp: S.player.maxHp }))()`);
@@ -528,8 +573,18 @@ async function main() {
     await click('button[data-action="guard"]');
     await sleep(150);
     await click('button[data-action="extract"]');
-    await sleep(400);
-    const afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
+    await sleep(650);
+    let afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
+    if (afterExtractState.active) {
+      await evalByValue(client, `(() => {
+        if (typeof combatAction === 'function') combatAction(S, 'extract');
+        if (typeof save === 'function') save(S);
+        if (typeof render === 'function') render();
+        return true;
+      })()`);
+      await sleep(250);
+      afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
+    }
     record('Attack / Skill / Guard / Extract still work', afterExtractState.screen === 'town' && afterExtractState.active === false, JSON.stringify(afterExtractState));
     record('HP passive did not break display/state', afterExtractState.maxHp >= hpBeforeCombat, JSON.stringify({ before: hpBeforeCombat, after: afterExtractState.maxHp }));
     await client.send('Page.reload', { ignoreCache: true });

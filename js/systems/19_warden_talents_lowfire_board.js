@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.5.0b - Talent System Foundation + Lowfire Board.
+// DungeonDex v1.5.1 - Talent System Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.5.0b-talent-save-load-regression-guard';
+  const SCRIPT_BUILD = '1.5.1-talent-ui-readability-save-compatibility-polish';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -22,10 +22,10 @@
   ];
 
   const TALENT_DEFS = [
-    { id:'survivor_hardened_start', path:'survivor', name:'Hardened Start', effect:'+5% max HP.', summary:'A sturdier first step into the Hollow Stair.', note:'Passive survival bonus.' },
-    { id:'hunter_board_regular', path:'hunter', name:'Board Regular', effect:'+5% Elite Board payout.', summary:'Lowfire pays a little better when the hunt is clean.', note:'Board reward bonus only.' },
-    { id:'delver_stair_sense', path:'delver', name:'Stair Sense', effect:'5% cheaper Deep Stair Charters.', summary:'The deeper routes feel a little less expensive.', note:'Charter cost reduction only.' },
-    { id:'collector_appraiser', path:'collector', name:'Appraiser', effect:'+5% sell value.', summary:'Better pricing on gear you move back into coin.', note:'Applies to normal sell value.' }
+    { id:'survivor_hardened_start', path:'survivor', name:'Hardened Start', effect:'+5% max HP', summary:'More room for early mistakes.', note:'Survivor passive.' },
+    { id:'hunter_board_regular', path:'hunter', name:'Board Regular', effect:'+5% Elite Board payout', summary:'Board contracts pay a little more.', note:'Hunter passive.' },
+    { id:'delver_stair_sense', path:'delver', name:'Stair Sense', effect:'Charters cost 5% less', summary:'Deep Stair routes are cheaper.', note:'Delver passive.' },
+    { id:'collector_appraiser', path:'collector', name:'Appraiser', effect:'+5% sell value', summary:'Unequipped gear sells for more.', note:'Collector passive.' }
   ];
 
   const TALENT_BY_ID = Object.fromEntries(TALENT_DEFS.map(def => [def.id, def]));
@@ -103,25 +103,46 @@
     return typeof el === 'function' ? el('talentPanel') : document.getElementById('talentPanel');
   }
 
+  function safeTalentSummary(state){
+    const fallback = {
+      pointsEarned: Math.max(0, Math.floor(Number(state?.player?.talentPointsEarned) || 0)),
+      pointsSpent: Math.max(0, Math.floor(Number(state?.player?.talentPointsSpent) || 0)),
+      pointsAvailable: availableTalentPoints(state),
+      unlockedIds: Object.keys(state?.player?.talents?.unlocked || {}),
+      bonuses: talentEffects(state)
+    };
+    const raw = typeof talentSummary === 'function' ? (talentSummary(state) || fallback) : fallback;
+    const unlockedIds = Array.isArray(raw.unlockedIds) ? raw.unlockedIds : fallback.unlockedIds;
+    return {
+      ...raw,
+      pointsEarned: Math.max(0, Math.floor(N(raw.pointsEarned, fallback.pointsEarned, 0, 999999))),
+      pointsSpent: Math.max(0, Math.floor(N(raw.pointsSpent, fallback.pointsSpent, 0, 999999))),
+      pointsAvailable: Math.max(0, Math.floor(N(raw.pointsAvailable, fallback.pointsAvailable, 0, 999999))),
+      unlockedIds: unlockedIds.map(id => String(id || '').trim()).filter(Boolean),
+      bonuses: raw.bonuses || fallback.bonuses
+    };
+  }
+
   function talentPathCardMarkup(state, def, summary){
     const path = TALENT_PATH_BY_ID[def.path] || { label:def.path, summary:'' };
     const unlocked = !!summary.unlockedIds.includes(def.id);
     const hasPoints = summary.pointsAvailable > 0;
-    return `<article class="talent-path-card ${unlocked ? 'is-unlocked' : 'is-locked'}">
+    const stateKey = unlocked ? 'unlocked' : hasPoints ? 'ready' : 'locked';
+    const stateLabel = unlocked ? 'Unlocked' : hasPoints ? 'Ready' : 'Locked';
+    const buttonLabel = unlocked ? 'Unlocked' : hasPoints ? 'Unlock' : 'Need Point';
+    return `<article class="talent-path-card is-${H(stateKey)}">
       <div class="talent-path-head">
         <div>
           <span class="talent-path-label">${H(path.label)}</span>
           <h3>${H(def.name)}</h3>
         </div>
-        <span class="pill ${unlocked ? 'rarity-rare' : ''}">${unlocked ? 'Unlocked' : 'Locked'}</span>
+        <span class="talent-state-pill is-${H(stateKey)}">${H(stateLabel)}</span>
       </div>
       <p class="talent-path-effect">${H(def.effect)}</p>
       <p class="small muted talent-path-summary">${H(def.summary)}</p>
       <p class="talent-path-note small muted">${H(def.note)}</p>
       <div class="talent-path-actions">
-        ${unlocked
-          ? '<span class="pill rarity-rare">Passive active</span>'
-          : `<button class="primary mini" data-learn-talent="${H(def.id)}" ${hasPoints ? '' : 'disabled'}>${hasPoints ? 'Unlock' : 'Need 1 point'}</button>`}
+        <button class="primary mini talent-state-button is-${H(stateKey)}" ${unlocked ? '' : `data-learn-talent="${H(def.id)}"`} ${unlocked || !hasPoints ? 'disabled' : ''}>${H(buttonLabel)}</button>
       </div>
     </article>`;
   }
@@ -130,32 +151,33 @@
     const panel = talentPanel();
     if (!panel || !state?.player) return;
     ensureTalents(state);
-    const summary = typeof talentSummary === 'function' ? talentSummary(state) : {
-      pointsEarned: Math.max(0, Math.floor(Number(state.player.talentPointsEarned) || 0)),
-      pointsSpent: Math.max(0, Math.floor(Number(state.player.talentPointsSpent) || 0)),
-      pointsAvailable: availableTalentPoints(state),
-      unlockedIds: Object.keys(state.player.talents?.unlocked || {}),
-      bonuses: talentEffects(state)
-    };
+    const summary = safeTalentSummary(state);
+    const visibleUnlockedCount = summary.unlockedIds.filter(id => TALENT_BY_ID[id]).length;
     const hiddenCount = summary.unlockedIds.filter(id => !TALENT_BY_ID[id]).length;
     panel.innerHTML = `
       <div class="card-head talent-head">
         <div>
-          <h2>Talent Paths</h2>
-          <p>Passive bonuses only. Points come from secured depth milestones and stay save-safe.</p>
+          <h2>Warden Talents</h2>
+          <p>Passive bonuses earned through secured depth milestones.</p>
+          <div class="talent-passive-note small">Passive only. No combat buttons.</div>
         </div>
-        <span class="pill rarity-rare">${F(summary.pointsAvailable)} points</span>
+        <span class="pill rarity-rare">${F(summary.pointsAvailable)} available</span>
+      </div>
+      <div class="talent-point-line small" aria-label="Talent point totals">
+        <span><b>Available:</b> ${F(summary.pointsAvailable)}</span>
+        <span class="talent-separator" aria-hidden="true">&bull;</span>
+        <span><b>Spent:</b> ${F(summary.pointsSpent)}</span>
+        <span class="talent-separator" aria-hidden="true">&bull;</span>
+        <span><b>Earned:</b> ${F(summary.pointsEarned)}</span>
       </div>
       <div class="talent-summary-row small muted">
-        <span>Earned ${F(summary.pointsEarned)}</span>
-        <span>Spent ${F(summary.pointsSpent)}</span>
-        <span>Available ${F(summary.pointsAvailable)}</span>
+        <span>${F(visibleUnlockedCount)} unlocked</span>
         <span>+1 point every 5 secured depths</span>
       </div>
       <div class="talent-grid">${TALENT_DEFS.map(def => talentPathCardMarkup(state, def, summary)).join('')}</div>
       <div class="talent-footer">
         <button class="ghost mini" id="resetTalentsBtn">Reset Talents</button>
-        <span class="small muted">Legacy or unknown unlock ids stay in the save and stay hidden here${hiddenCount ? ` (${hiddenCount} hidden)` : ''}.</span>
+        <span class="small muted">${hiddenCount ? `${F(hiddenCount)} legacy or unknown unlock id${hiddenCount === 1 ? '' : 's'} preserved in save and hidden here.` : 'Legacy aliases and the unlock mirror repair quietly.'}</span>
       </div>`;
   }
 
@@ -511,14 +533,7 @@
     resetTalents: reset,
     unlockForTest: learn,
     summary: state => {
-      const summary = typeof talentSummary === 'function' ? talentSummary(state) : {
-        pointsEarned: Math.max(0, Math.floor(Number(state?.player?.talentPointsEarned) || 0)),
-        pointsSpent: Math.max(0, Math.floor(Number(state?.player?.talentPointsSpent) || 0)),
-        pointsAvailable: availableTalentPoints(state),
-        unlockedIds: Object.keys(state?.player?.talents?.unlocked || {}),
-        bonuses: talentEffects(state)
-      };
-      return summary;
+      return safeTalentSummary(state);
     },
     summaryText: state => {
       const summary = api.summary(state);
