@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.29`
-* Current local package baseline: `v1.4.29`
-* Current development target: `v1.4.29`
+* Public/live itch version: `v1.5.0`
+* Current local package baseline: `v1.5.0`
+* Current development target: `v1.5.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -18,24 +18,23 @@ This changelog records what changed and why.
 
 ---
 
-## 1.4.x Direction
+## 1.5.x Direction
 
-DungeonDex `1.4.x` is the cleanup, polish, and foundation branch after the major `1.4` release.
+DungeonDex `1.5.x` is the progression identity branch after the major `1.4` release.
 
-The goal of this line is to stabilize the live app, reduce version confusion, clean up player-facing UI, improve mobile play, and prepare the project for larger `1.5+` systems.
+The goal of this line is to add deeper player progression without turning the base combat loop into a more complex system.
 
 ---
 
-## Current 1.4.x Focus
+## Current 1.5.x Focus
 
-* Clean version authority
-* Cleaner patch-note history
-* Safer Codex workflow
-* Mobile-first UI polish
-* Active app-facing label cleanup
-* Cache/build label consistency
-* Better release documentation
-* Small controlled hotfixes instead of messy version jumps
+* Talent System Foundation
+* Passive-only progression hooks
+* Save-safe unlock state
+* Mobile-first talent viewing
+* Small, readable progression steps
+* Continued build/cache label consistency
+* No combat complexity inflation
 
 ---
 
@@ -55,9 +54,26 @@ Use `VERSION.md` for the current active version.
 
 ---
 
-## Active 1.4.x Notes
+## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.5.0 - Talent System Foundation
+
+Status: Complete
+
+Summary:
+
+* Added a save-safe talent state model with `pointsEarned`, `pointsSpent`, and `unlocked` data.
+* Added four starter passive paths: Survivor, Hunter, Delver, and Collector.
+* Added a compact Talent Paths panel on the Gear screen with available/spent points and unlock buttons.
+* Added passive hooks only for max HP, Elite Board payout, charter cost, and sell value.
+* Added DevTools helpers for granting points, resetting talents, unlocking talents for testing, smoke checks, and summaries.
+* Old or missing talent data repairs safely, unknown talent ids are preserved without crashing the UI, and unlocks persist across save/load.
+* No active combat buttons, spell rotations, status effects, affixes, modifier popups, special monster behavior, or broad scaling rebalance were added.
+* No save wipe.
 
 ---
 

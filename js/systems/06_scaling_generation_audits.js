@@ -279,7 +279,8 @@
         debtbrandBoostReady: false,
         boughtStart20Scroll: false,
         goldSink: createGoldSinkState(),
-        eliteContracts: createEliteContractState()
+        eliteContracts: createEliteContractState(),
+        talents: { pointsEarned: 0, pointsSpent: 0, unlocked: {} }
       },
       town: { merchantRefreshCost: coins(0, 1, 50), forgeTier: 1, relicFavor: 0 },
       run: {

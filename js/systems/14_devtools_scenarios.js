@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.28a - DevTools Scenario Presets
+// DungeonDex v1.5.0 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.28a';
-  const SCENARIO_BUILD = '1.4.28a-intro-button-smoke-hotfix';
+  const SCENARIO_VERSION = 'DungeonDex v1.5.0';
+  const SCENARIO_BUILD = '1.5.0-talent-system-foundation-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -240,6 +240,98 @@
       `rivals: ${board.rivals.length}`,
       `trophies: ${board.trophyIds.length}`
     ].join('\n');
+  }
+
+  function talentApi(){
+    return window.DungeonDexTalents || window.DungeonDexWardenTalents || null;
+  }
+
+  function talentSummaryText(state){
+    const api = talentApi();
+    if (!api) return 'Talent state unavailable.';
+    const summary = typeof api.summary === 'function'
+      ? api.summary(state || S)
+      : { pointsEarned:0, pointsSpent:0, pointsAvailable:0, unlockedIds:[], bonuses:{ maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 } };
+    const unlockedNames = Array.isArray(summary.unlockedIds) && summary.unlockedIds.length
+      ? summary.unlockedIds.map(function(id){ return (api.defs || []).find(function(def){ return def.id === id; })?.name || id; }).join(', ')
+      : 'none';
+    return [
+      `Talent points`,
+      `earned: ${summary.pointsEarned}`,
+      `spent: ${summary.pointsSpent}`,
+      `available: ${summary.pointsAvailable}`,
+      `unlocked: ${unlockedNames}`,
+      `bonuses: HP +${Math.round((summary.bonuses?.maxHpPct || 0) * 100)}%, Board +${Math.round((summary.bonuses?.eliteBoardRewardPct || 0) * 100)}%, Charters -${Math.round((summary.bonuses?.charterCostPct || 0) * 100)}%, Sell +${Math.round((summary.bonuses?.sellValuePct || 0) * 100)}%`
+    ].join('\n');
+  }
+
+  function grantTalentPoint(count = 1){
+    const api = talentApi();
+    if (!api || !hasState()) return false;
+    const gained = typeof api.grantPoints === 'function' ? api.grantPoints(S, count) : 0;
+    if (gained) {
+      scenarioState.lastMessage = talentSummaryText();
+      log(`Granted ${count} talent point${count === 1 ? '' : 's'}.`, 'info');
+      saveAndRender();
+    }
+    return !!gained;
+  }
+
+  function resetTalents(){
+    const api = talentApi();
+    if (!api || !hasState() || typeof api.reset !== 'function') return false;
+    const ok = api.reset(S);
+    if (ok) {
+      scenarioState.lastMessage = talentSummaryText();
+      log('Talent points reset.', 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
+
+  function unlockTalentForTest(id){
+    const api = talentApi();
+    if (!api || !hasState()) return false;
+    if (typeof api.unlock !== 'function') return false;
+    if (typeof api.getAvailablePoints === 'function' && api.getAvailablePoints(S) <= 0) {
+      if (!grantTalentPoint(1)) return false;
+    }
+    const ok = api.unlock(S, id);
+    if (ok) {
+      scenarioState.lastMessage = talentSummaryText();
+      log(`Unlocked talent for test: ${id}.`, 'info');
+      saveAndRender();
+    }
+    return ok;
+  }
+
+  function talentSmoke(){
+    const api = talentApi();
+    if (!api) return 'Talent API unavailable.';
+    const snapshot = cloneState();
+    if (!snapshot) return 'Talent smoke unavailable.';
+    try {
+      if (!snapshot.player) snapshot.player = {};
+      delete snapshot.player.talents;
+      delete snapshot.player.talentPointsEarned;
+      delete snapshot.player.talentPointsSpent;
+      delete snapshot.player.talentPoints;
+      const repaired = typeof api.ensure === 'function' ? api.ensure(snapshot) : null;
+      const summary = typeof api.summary === 'function' ? api.summary(snapshot) : null;
+      let unknownSafe = true;
+      if (typeof api.unlock === 'function') {
+        try { api.unlock(snapshot, '__unknown_talent__'); } catch (err) { unknownSafe = false; }
+      }
+      return [
+        'Talent smoke',
+        `repaired: ${!!repaired}`,
+        `points: ${summary ? summary.pointsAvailable : 'n/a'}`,
+        `unlocked: ${summary ? summary.unlockedIds.length : 'n/a'}`,
+        `unknown id safe: ${unknownSafe}`
+      ].join('\n');
+    } catch (err) {
+      return `Talent smoke failed: ${err?.message || String(err)}`;
+    }
   }
   function scalingProbeDepthLabel(rawDepth){
     if (typeof getLoreDepthProgress === 'function') {
@@ -739,6 +831,11 @@
     floorBalanceSampleText,
     eliteTrophyStateText,
     eliteRivalStateText,
+    talentSummary: talentSummaryText,
+    grantTalentPoint,
+    resetTalents,
+    unlockTalentForTest,
+    talentSmoke,
     state: scenarioState
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

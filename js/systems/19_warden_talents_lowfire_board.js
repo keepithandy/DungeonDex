@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.4.20 - Warden Talents + Lowfire Board.
+// DungeonDex v1.5.0 - Talent System Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.4.20-board-hunt-balance-feedback';
+  const SCRIPT_BUILD = '1.5.0-talent-system-foundation';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -14,90 +14,143 @@
   const guard = fn => typeof runGuardedAction === 'function' ? runGuardedAction(fn) : fn();
   const log = (state, text) => { if (typeof pushLog === 'function') pushLog(state, text); };
 
-  const TALENTS = [
-    ['deep_cut','Blade','Deep Cut',5,'+3% Power per rank.','Find the last warm seam in a monster.'],
-    ['quick_footing','Blade','Quick Footing',5,'+1 Speed per rank.','Move before the room writes your debt.'],
-    ['relic_instinct','Blade','Relic Instinct',5,'+2% extra loot-roll chance per rank.','Hear the stair click around hidden relics.'],
-    ['iron_breath','Ward','Iron Breath',5,'+12 Max HP per rank.','Breathe through smoke and keep the haul moving.'],
-    ['shield_memory','Ward','Shield Memory',5,'+4% Guard per rank.','Every bad block leaves a lesson.'],
-    ['lamp_luck','Ward','Lamp Luck',5,'+1 Luck per rank.','A Lowfire lamp bends bad rooms slightly.'],
-    ['scrappers_eye','Forge',"Scrapper's Eye",5,'+8% shard gains per rank.','Junk becomes teeth, rivets, and value.'],
-    ['ember_sense','Forge','Ember Sense',5,'+8% chance per rank for +1 ember when ember drops.','The useful sparks are still trying to escape.'],
-    ['forge_hand','Forge','Forge Hand',5,'+1 Wit per rank.','The focused forge answers steadier hands.']
-  ].map(([id,tree,name,max,effect,lore]) => ({id,tree,name,max,effect,lore}));
-  const BY_ID = Object.fromEntries(TALENTS.map(t => [t.id, t]));
-  const TREES = ['Blade','Ward','Forge'];
+  const TALENT_PATHS = [
+    { id:'survivor', label:'Survivor', summary:'Staying alive, recovery, and safer runs.' },
+    { id:'hunter', label:'Hunter', summary:'Elite Board marks, rivals, and trophy flow.' },
+    { id:'delver', label:'Delver', summary:'Deep stairs, charters, and boss pressure.' },
+    { id:'collector', label:'Collector', summary:'Loot value, archive value, and careful selling.' }
+  ];
 
-  function bestDepth(state){
-    const p = state?.player || {};
-    return Math.max(1, Math.floor(+p.depth||0), Math.floor(+p.safeExtractDepth||0), Math.floor(+p.returnDepth||0), Math.floor(+p.permanentStartFloor||0));
-  }
-  function earnedPoints(state){
-    const p = state?.player || {};
-    return Math.min(60, Math.max(0, Math.floor(+p.level||1)-1) + Math.floor(bestDepth(state)/15));
-  }
+  const TALENT_DEFS = [
+    { id:'survivor_hardened_start', path:'survivor', name:'Hardened Start', effect:'+5% max HP.', summary:'A sturdier first step into the Hollow Stair.', note:'Passive survival bonus.' },
+    { id:'hunter_board_regular', path:'hunter', name:'Board Regular', effect:'+5% Elite Board payout.', summary:'Lowfire pays a little better when the hunt is clean.', note:'Board reward bonus only.' },
+    { id:'delver_stair_sense', path:'delver', name:'Stair Sense', effect:'5% cheaper Deep Stair Charters.', summary:'The deeper routes feel a little less expensive.', note:'Charter cost reduction only.' },
+    { id:'collector_appraiser', path:'collector', name:'Appraiser', effect:'+5% sell value.', summary:'Better pricing on gear you move back into coin.', note:'Applies to normal sell value.' }
+  ];
+
+  const TALENT_BY_ID = Object.fromEntries(TALENT_DEFS.map(def => [def.id, def]));
+  const TALENT_PATH_BY_ID = Object.fromEntries(TALENT_PATHS.map(path => [path.id, path]));
+
   function ensureTalents(state){
-    if (!state?.player) return {spent:{}};
-    const raw = state.player.talents && typeof state.player.talents === 'object' ? (state.player.talents.spent || state.player.talents) : {};
-    const spent = {};
-    TALENTS.forEach(t => { const r = Math.max(0, Math.min(t.max, Math.floor(+raw[t.id] || 0))); if (r) spent[t.id] = r; });
-    const used = Object.values(spent).reduce((a,b) => a+b, 0);
-    state.player.talents = {spent};
-    state.player.talentPointsEarned = earnedPoints(state);
-    state.player.talentPoints = Math.max(0, state.player.talentPointsEarned - used);
+    if (typeof repairTalentState === 'function') return repairTalentState(state);
+    if (!state?.player) return { pointsEarned:0, pointsSpent:0, unlocked:{}, spent:{} };
+    if (!state.player.talents || typeof state.player.talents !== 'object') state.player.talents = { pointsEarned:0, pointsSpent:0, unlocked:{} };
+    if (!state.player.talents.unlocked || typeof state.player.talents.unlocked !== 'object') state.player.talents.unlocked = {};
+    state.player.talents.spent = state.player.talents.unlocked;
+    state.player.talentPointsEarned = Math.max(0, Math.floor(Number(state.player.talents.pointsEarned) || 0));
+    state.player.talentPointsSpent = Math.max(0, Math.floor(Number(state.player.talents.pointsSpent) || 0));
+    state.player.talentPoints = Math.max(0, state.player.talentPointsEarned - state.player.talentPointsSpent);
     return state.player.talents;
   }
-  function rank(state,id){ return Math.max(0, Math.floor(+ensureTalents(state).spent[id] || 0)); }
-  function spentPoints(state){ return Object.keys(ensureTalents(state).spent).reduce((sum,id) => sum + rank(state,id), 0); }
-  function effects(state){
-    ensureTalents(state);
-    return {
-      powerPct: rank(state,'deep_cut')*.03,
-      speedFlat: rank(state,'quick_footing'),
-      lootPct: rank(state,'relic_instinct')*.02,
-      hpFlat: rank(state,'iron_breath')*12,
-      guardPct: rank(state,'shield_memory')*.04,
-      luckFlat: rank(state,'lamp_luck'),
-      shardPct: rank(state,'scrappers_eye')*.08,
-      emberChance: rank(state,'ember_sense')*.08,
-      witFlat: rank(state,'forge_hand')
-    };
+
+  function availableTalentPoints(state){
+    return typeof getAvailableTalentPoints === 'function'
+      ? getAvailableTalentPoints(state)
+      : Math.max(0, Math.floor(Number(state?.player?.talentPoints) || 0));
   }
-  function learn(state,id){
-    const t = BY_ID[id]; if (!t) return false;
+
+  function talentEffects(state){
+    const bonuses = typeof getTalentBonuses === 'function'
+      ? getTalentBonuses(state)
+      : { maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 };
+    return bonuses;
+  }
+
+  function learn(state, id){
+    const def = TALENT_BY_ID[id];
+    if (!def) return false;
     ensureTalents(state);
-    const r = rank(state,id);
-    if (r >= t.max || state.player.talentPoints <= 0) return false;
-    state.player.talents.spent[id] = r + 1;
-    ensureTalents(state);
+    if (typeof unlockTalent === 'function') {
+      const ok = unlockTalent(state, id);
+      if (ok && typeof calcDerived === 'function') calcDerived(state);
+      if (ok) log(state, `Talent unlocked: ${def.path === 'survivor' ? 'Survivor' : def.path === 'hunter' ? 'Hunter' : def.path === 'delver' ? 'Delver' : 'Collector'} - ${def.name}.`);
+      return ok;
+    }
+    if (availableTalentPoints(state) <= 0 || state.player.talents.unlocked[id]) return false;
+    state.player.talents.unlocked[id] = true;
+    state.player.talents.pointsSpent = Object.keys(state.player.talents.unlocked).length;
+    state.player.talentPointsSpent = state.player.talents.pointsSpent;
+    state.player.talentPoints = Math.max(0, state.player.talentPointsEarned - state.player.talentPointsSpent);
     if (typeof calcDerived === 'function') calcDerived(state);
-    log(state, `Talent learned: ${t.name} ${r+1}/${t.max}.`);
+    log(state, `Talent unlocked: ${def.name}.`);
     return true;
   }
+
   function reset(state){
     if (!state?.player) return false;
-    state.player.talents = {spent:{}};
-    ensureTalents(state);
+    if (typeof resetTalents === 'function') {
+      const ok = resetTalents(state);
+      if (ok && typeof calcDerived === 'function') calcDerived(state);
+      if (ok) log(state, 'Talent points reset. Unlocks returned to zero.');
+      return ok;
+    }
+    state.player.talents = { pointsEarned:0, pointsSpent:0, unlocked:{}, spent:{} };
+    state.player.talentPointsEarned = 0;
+    state.player.talentPointsSpent = 0;
+    state.player.talentPoints = 0;
     if (typeof calcDerived === 'function') calcDerived(state);
-    log(state, 'Warden talents reset. Points returned.');
+    log(state, 'Talent points reset. Unlocks returned to zero.');
     return true;
   }
 
   function talentPanel(){
-    const anchor = typeof el === 'function' ? el('gearPlayerPanel') : document.getElementById('gearPlayerPanel');
-    if (!anchor?.parentNode) return null;
-    let panel = document.getElementById('talentPanel');
-    if (!panel) { panel = document.createElement('section'); panel.id = 'talentPanel'; panel.className = 'panel talent-panel'; anchor.insertAdjacentElement('afterend', panel); }
-    return panel;
+    return typeof el === 'function' ? el('talentPanel') : document.getElementById('talentPanel');
   }
-  function talentCard(state,t){
-    const r = rank(state,t.id), pts = Math.floor(+state.player.talentPoints || 0), off = r >= t.max || pts <= 0 ? 'disabled' : '';
-    return `<button class="talent-card" data-learn-talent="${H(t.id)}" ${off}><span class="talent-card-top"><strong>${H(t.name)}</strong><em>${r}/${t.max}</em></span><span class="talent-effect">${H(t.effect)}</span><span class="talent-lore">${H(t.lore)}</span></button>`;
+
+  function talentPathCardMarkup(state, def, summary){
+    const path = TALENT_PATH_BY_ID[def.path] || { label:def.path, summary:'' };
+    const unlocked = !!summary.unlockedIds.includes(def.id);
+    const hasPoints = summary.pointsAvailable > 0;
+    return `<article class="talent-path-card ${unlocked ? 'is-unlocked' : 'is-locked'}">
+      <div class="talent-path-head">
+        <div>
+          <span class="talent-path-label">${H(path.label)}</span>
+          <h3>${H(def.name)}</h3>
+        </div>
+        <span class="pill ${unlocked ? 'rarity-rare' : ''}">${unlocked ? 'Unlocked' : 'Locked'}</span>
+      </div>
+      <p class="talent-path-effect">${H(def.effect)}</p>
+      <p class="small muted talent-path-summary">${H(def.summary)}</p>
+      <p class="talent-path-note small muted">${H(def.note)}</p>
+      <div class="talent-path-actions">
+        ${unlocked
+          ? '<span class="pill rarity-rare">Passive active</span>'
+          : `<button class="primary mini" data-learn-talent="${H(def.id)}" ${hasPoints ? '' : 'disabled'}>${hasPoints ? 'Unlock' : 'Need 1 point'}</button>`}
+      </div>
+    </article>`;
   }
+
   function renderTalentPanel(state){
-    const panel = talentPanel(); if (!panel || !state?.player) return;
+    const panel = talentPanel();
+    if (!panel || !state?.player) return;
     ensureTalents(state);
-    panel.innerHTML = `<div class="card-head talent-head"><div><h2>Warden Talents</h2><p>Permanent upgrades earned from level-ups and secured descent progress.</p></div><span class="pill rarity-rare">${F(state.player.talentPoints)} points</span></div><div class="talent-meter-row small muted"><span>Earned ${F(state.player.talentPointsEarned)}</span><span>Spent ${F(spentPoints(state))}</span><span>+1 point every 15 secured floors.</span></div><div class="talent-tree-grid">${TREES.map(tree => `<div class="talent-tree"><div class="split talent-tree-title"><strong>${H(tree)}</strong><span class="small muted">${tree === 'Blade' ? 'damage / drops' : tree === 'Ward' ? 'survival' : 'crafting'}</span></div>${TALENTS.filter(t => t.tree === tree).map(t => talentCard(state,t)).join('')}</div>`).join('')}</div><div class="talent-footer"><button class="ghost mini" id="resetTalentsBtn">Reset Talents</button><span class="small muted">Talents apply instantly.</span></div>`;
+    const summary = typeof talentSummary === 'function' ? talentSummary(state) : {
+      pointsEarned: Math.max(0, Math.floor(Number(state.player.talentPointsEarned) || 0)),
+      pointsSpent: Math.max(0, Math.floor(Number(state.player.talentPointsSpent) || 0)),
+      pointsAvailable: availableTalentPoints(state),
+      unlockedIds: Object.keys(state.player.talents?.unlocked || {}),
+      bonuses: talentEffects(state)
+    };
+    const hiddenCount = summary.unlockedIds.filter(id => !TALENT_BY_ID[id]).length;
+    panel.innerHTML = `
+      <div class="card-head talent-head">
+        <div>
+          <h2>Talent Paths</h2>
+          <p>Passive bonuses only. Points come from secured depth milestones and stay save-safe.</p>
+        </div>
+        <span class="pill rarity-rare">${F(summary.pointsAvailable)} points</span>
+      </div>
+      <div class="talent-summary-row small muted">
+        <span>Earned ${F(summary.pointsEarned)}</span>
+        <span>Spent ${F(summary.pointsSpent)}</span>
+        <span>Available ${F(summary.pointsAvailable)}</span>
+        <span>+1 point every 5 secured depths</span>
+      </div>
+      <div class="talent-grid">${TALENT_DEFS.map(def => talentPathCardMarkup(state, def, summary)).join('')}</div>
+      <div class="talent-footer">
+        <button class="ghost mini" id="resetTalentsBtn">Reset Talents</button>
+        <span class="small muted">Legacy or unknown unlock ids stay in the save and stay hidden here${hiddenCount ? ` (${hiddenCount} hidden)` : ''}.</span>
+      </div>`;
   }
 
   function boardCost(state){
@@ -339,15 +392,83 @@
     document.head.appendChild(st);
   }
 
-  const oldCalc = typeof calcDerived === 'function' ? calcDerived : null;
-  if (oldCalc) calcDerived = function(state){ const total = oldCalc(state); if (!state?.player || !total) return total; const e = effects(state); total.power += Math.max(rank(state,'deep_cut'), Math.floor((total.power||0)*e.powerPct)); total.guard += Math.max(rank(state,'shield_memory'), Math.floor((total.guard||0)*e.guardPct)); total.speed += e.speedFlat; total.luck += e.luckFlat; total.wit += e.witFlat; total.hpBonus += e.hpFlat; state.player.maxHp = 100 + total.hpBonus + Math.floor(N(state.player.level,1,1,999))*10; state.player.hp = Math.floor(N(state.player.hp,state.player.maxHp,0,state.player.maxHp)); total.talentBonuses = e; return total; };
+  function talentRewardDepth(state){
+    return Math.max(
+      1,
+      Math.floor(N(state?.player?.safeExtractDepth, 1, 1, 999999)),
+      Math.floor(N(state?.player?.permanentStartFloor, 1, 1, 999999))
+    );
+  }
 
-  const oldShards = typeof addPendingRunShards === 'function' ? addPendingRunShards : null;
-  if (oldShards) addPendingRunShards = function(state, amount){ let reward = Math.floor(+amount || 0), pct = effects(state).shardPct; if (reward > 0 && pct > 0) reward += Math.max(1, Math.floor(reward*pct)); return oldShards(state,reward); };
-  const oldEmber = typeof addPendingRunEmber === 'function' ? addPendingRunEmber : null;
-  if (oldEmber) addPendingRunEmber = function(state, amount){ let reward = Math.floor(+amount || 0), chance = effects(state).emberChance; if (reward > 0 && chance > 0 && Math.random() < chance) reward += 1; return oldEmber(state,reward); };
-  const oldDrop = typeof shouldDropLoot === 'function' ? shouldDropLoot : null;
-  if (oldDrop) shouldDropLoot = function(floor, source='normal', rollIndex=0, state=null){ const base = oldDrop(floor,source,rollIndex,state); if (base || !state) return base; const bonus = effects(state).lootPct; return bonus > 0 && Math.random() < Math.min(.16, bonus); };
+  function talentRewardBase(contract, state){
+    if (!contract) return 0;
+    const base = Math.max(0, Math.floor(N(contract.baseReward ?? contract.reward, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const floorBonus = Math.floor(N(contract.floorBonusPerDepth, 0, 0, Number.MAX_SAFE_INTEGER)) * talentRewardDepth(state);
+    return Math.max(0, base + floorBonus);
+  }
+
+  function talentRewardAmount(contract, state, active = null){
+    const base = talentRewardBase(contract, state);
+    if (base <= 0) return 0;
+    const bonus = getTalentBonus(state, 'eliteBoardRewardPct');
+    const rivalMultiplier = active?.rivalContract ? 1.10 : 1;
+    const boosted = Math.round(base * rivalMultiplier * (1 + bonus));
+    return Math.max(base, Math.max(1, Math.min(Math.max(base, Math.floor(N(contract.maxReward, base, base, Number.MAX_SAFE_INTEGER))), boosted)));
+  }
+
+  function talentCharterCost(depth){
+    const baseCost = typeof oldCharterCost === 'function' ? oldCharterCost(depth) : C(0, 1, 25);
+    if (baseCost <= 0) return 0;
+    const bonus = getTalentBonus(typeof S !== 'undefined' ? S : null, 'charterCostPct');
+    return bonus > 0 ? Math.max(1, Math.round(baseCost * (1 - bonus))) : baseCost;
+  }
+
+  const oldCalc = typeof calcDerived === 'function' ? calcDerived : null;
+  if (oldCalc) calcDerived = function(state){
+    const total = oldCalc(state);
+    if (!state?.player || !total) return total;
+    const bonuses = talentEffects(state);
+    if (bonuses.maxHpPct > 0) {
+      const baseMaxHp = Math.max(1, Math.floor(N(state.player.maxHp, 1, 1, 999999)));
+      const bonusHp = Math.max(1, Math.round(baseMaxHp * bonuses.maxHpPct));
+      state.player.maxHp = baseMaxHp + bonusHp;
+      state.player.hp = Math.floor(N(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
+      total.hpBonus = Math.max(0, Math.floor(N(total.hpBonus, 0, 0, 999999))) + bonusHp;
+    }
+    total.talentBonuses = bonuses;
+    return total;
+  };
+
+  const oldSellValue = typeof sellValue === 'function' ? sellValue : null;
+  if (oldSellValue) sellValue = function(item){
+    const base = Math.max(1, Math.floor(N(oldSellValue(item), 1, 1, Number.MAX_SAFE_INTEGER)));
+    const bonus = getTalentBonus(typeof S !== 'undefined' ? S : null, 'sellValuePct');
+    return bonus > 0 ? Math.max(1, Math.round(base * (1 + bonus))) : base;
+  };
+
+  const oldContractReward = typeof calculateContractReward === 'function' ? calculateContractReward : null;
+  if (oldContractReward) calculateContractReward = function(contract, state){
+    const base = Math.max(0, Math.floor(N(oldContractReward(contract, state), 0, 0, Number.MAX_SAFE_INTEGER)));
+    const bonus = getTalentBonus(state, 'eliteBoardRewardPct');
+    return bonus > 0 ? Math.max(1, Math.round(base * (1 + bonus))) : base;
+  };
+
+  const oldActiveReward = typeof activeContractRewardAmount === 'function' ? activeContractRewardAmount : null;
+  if (oldActiveReward) activeContractRewardAmount = function(active, contract, state){
+    if (!active || !contract) return 0;
+    if (!Number.isFinite(Number(active.talentRewardBase))) active.talentRewardBase = talentRewardBase(contract, state);
+    const base = Math.max(0, Math.floor(N(active.talentRewardBase, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const reward = talentRewardAmount(contract, state, active);
+    active.rewardAmount = reward;
+    active.talentRewardBonusPct = getTalentBonus(state, 'eliteBoardRewardPct');
+    return reward || base;
+  };
+
+  const oldCharterCost = typeof charterStartCost === 'function' ? charterStartCost : null;
+  if (oldCharterCost) charterStartCost = function(depth){
+    return talentCharterCost(depth);
+  };
+
   const oldAvail = typeof availableEliteContracts === 'function' ? availableEliteContracts : null;
   if (oldAvail) availableEliteContracts = function(state){ return filteredContracts(state, oldAvail(state)); };
   if (typeof eliteContractBoardMarkup === 'function') eliteContractBoardMarkup = boardMarkup;
@@ -357,9 +478,78 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-learn-talent]').forEach(btn => btn.onclick = () => guard(() => { learn(S, btn.dataset.learnTalent); render(); })); const resetBtn = document.getElementById('resetTalentsBtn'); if (resetBtn) resetBtn.onclick = () => guard(() => { if (window.confirm && !window.confirm('Reset all Warden talents?')) return; reset(S); render(); }); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-learn-talent]').forEach(btn => btn.onclick = () => guard(() => { learn(S, btn.dataset.learnTalent); render(); })); const resetBtn = document.getElementById('resetTalentsBtn'); if (resetBtn) resetBtn.onclick = () => guard(() => { if (window.confirm && !window.confirm('Reset all talent points?')) return; reset(S); render(); }); };
 
-  window.DungeonDexWardenTalents = { build:SCRIPT_BUILD, defs:TALENTS, ensure:ensureTalents, effects, learn, reset, refreshLowfireBoard:refreshBoard };
+  const api = {
+    build: SCRIPT_BUILD,
+    defs: TALENT_DEFS,
+    paths: TALENT_PATHS,
+    ensure: ensureTalents,
+    getState: ensureTalents,
+    getAvailablePoints: availableTalentPoints,
+    has: hasTalent,
+    bonus: getTalentBonus,
+    bonuses: talentEffects,
+    unlock: learn,
+    reset,
+    grantPoints: typeof grantTalentPoints === 'function' ? grantTalentPoints : (state, amount = 1) => {
+      if (!state?.player) return 0;
+      const next = Math.max(0, Math.floor(Number(amount) || 0));
+      if (!next) return 0;
+      ensureTalents(state);
+      state.player.talents.pointsEarned += next;
+      state.player.talentPointsEarned = state.player.talents.pointsEarned;
+      state.player.talentPoints = availableTalentPoints(state);
+      return state.player.talents.pointsEarned;
+    },
+    resetTalents: reset,
+    unlockForTest: learn,
+    summary: state => {
+      const summary = typeof talentSummary === 'function' ? talentSummary(state) : {
+        pointsEarned: Math.max(0, Math.floor(Number(state?.player?.talentPointsEarned) || 0)),
+        pointsSpent: Math.max(0, Math.floor(Number(state?.player?.talentPointsSpent) || 0)),
+        pointsAvailable: availableTalentPoints(state),
+        unlockedIds: Object.keys(state?.player?.talents?.unlocked || {}),
+        bonuses: talentEffects(state)
+      };
+      return summary;
+    },
+    summaryText: state => {
+      const summary = api.summary(state);
+      const unlockedNames = summary.unlockedIds
+        .map(id => TALENT_BY_ID[id]?.name || id)
+        .join(', ') || 'none';
+      const pathLabels = TALENT_PATHS.map(path => path.label).join(', ');
+      return [
+        `Talent points: ${summary.pointsAvailable} available, ${summary.pointsSpent} spent, ${summary.pointsEarned} earned.`,
+        `Unlocked: ${unlockedNames}.`,
+        `Paths: ${pathLabels}.`,
+        `Bonuses: HP +${Math.round(summary.bonuses.maxHpPct * 100)}%, Board +${Math.round(summary.bonuses.eliteBoardRewardPct * 100)}%, Charters -${Math.round(summary.bonuses.charterCostPct * 100)}%, Sell +${Math.round(summary.bonuses.sellValuePct * 100)}%.`
+      ].join(' ');
+    },
+    smoke: state => {
+      if (!state?.player) return { ok:false, reason:'no state' };
+      const snapshot = JSON.parse(JSON.stringify(state));
+      try {
+        delete snapshot.player.talents;
+        delete snapshot.player.talentPointsEarned;
+        delete snapshot.player.talentPointsSpent;
+        delete snapshot.player.talentPoints;
+        ensureTalents(snapshot);
+        const cleaned = api.summary(snapshot);
+        return {
+          ok: true,
+          available: cleaned.pointsAvailable,
+          unlocked: cleaned.unlockedIds.length,
+          summary: api.summaryText(snapshot)
+        };
+      } catch (err) {
+        return { ok:false, reason: err?.message || String(err) };
+      }
+    }
+  };
+  window.DungeonDexTalents = api;
+  window.DungeonDexWardenTalents = api;
   injectCss();
   if (typeof S !== 'undefined') { ensureTalents(S); ensureBoard(S); if (typeof calcDerived === 'function') calcDerived(S); }
   if (typeof render === 'function') render();

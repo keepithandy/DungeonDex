@@ -94,6 +94,157 @@
     };
   }
 
+  const TALENT_POINT_STEP = 5;
+  const TALENT_POINT_CAP = 20;
+  const TALENT_BONUS_KEYS = Object.freeze(['maxHpPct', 'eliteBoardRewardPct', 'charterCostPct', 'sellValuePct']);
+
+  function createTalentState() {
+    const unlocked = {};
+    return {
+      pointsEarned: 0,
+      pointsSpent: 0,
+      unlocked,
+      spent: unlocked
+    };
+  }
+
+  function bestTalentProgressDepth(state) {
+    const runDepth = Math.floor(numberOr(state?.run?.floor, 0, 0, 999999));
+    const depth = Math.max(
+      runDepth,
+      Math.floor(numberOr(state?.player?.depth, 0, 0, 999999)),
+      Math.floor(numberOr(state?.player?.safeExtractDepth, 0, 0, 999999)),
+      Math.floor(numberOr(state?.player?.returnDepth, 0, 0, 999999)),
+      Math.floor(numberOr(state?.player?.permanentStartFloor, 0, 0, 999999))
+    );
+    return Math.max(1, depth || 1);
+  }
+
+  function talentMilestonePoints(depth) {
+    return Math.max(0, Math.min(TALENT_POINT_CAP, Math.floor(Math.max(1, Math.floor(numberOr(depth, 1, 1, 999999))) / TALENT_POINT_STEP)));
+  }
+
+  function normalizeTalentUnlocks(value) {
+    const unlocked = {};
+    if (!isPlainObject(value)) return unlocked;
+    Object.keys(value).forEach(id => {
+      if (value[id]) unlocked[String(id)] = true;
+    });
+    return unlocked;
+  }
+
+  function repairTalentState(state) {
+    if (!state?.player) return createTalentState();
+    const legacy = isPlainObject(state.player.talents) ? state.player.talents : {};
+    const unlocked = normalizeTalentUnlocks(legacy.unlocked || legacy.spent);
+    const storedEarned = Math.max(
+      0,
+      Math.floor(numberOr(state.player.talentPointsEarned, legacy.pointsEarned, 0, 999999))
+    );
+    const storedAvailable = Math.max(
+      0,
+      Math.floor(numberOr(state.player.talentPoints, Math.max(0, storedEarned - Object.keys(unlocked).length), 0, 999999))
+    );
+    const storedSpent = Math.max(
+      0,
+      Math.floor(numberOr(state.player.talentPointsSpent, legacy.pointsSpent, 0, 999999)),
+      Object.keys(unlocked).length,
+      storedEarned - storedAvailable
+    );
+    const pointsEarned = Math.max(talentMilestonePoints(bestTalentProgressDepth(state)), storedEarned);
+    const pointsSpent = Math.min(pointsEarned, Math.max(0, storedSpent));
+    const talentState = {
+      pointsEarned,
+      pointsSpent,
+      unlocked
+    };
+    talentState.spent = talentState.unlocked;
+    state.player.talents = talentState;
+    state.player.talentPointsEarned = pointsEarned;
+    state.player.talentPointsSpent = pointsSpent;
+    state.player.talentPoints = Math.max(0, pointsEarned - pointsSpent);
+    return talentState;
+  }
+
+  function getTalentState(state) {
+    return repairTalentState(state);
+  }
+
+  function hasTalent(state, id) {
+    const talentState = getTalentState(state);
+    return !!talentState.unlocked[String(id || '')];
+  }
+
+  function getTalentBonuses(state) {
+    const survivor = hasTalent(state, 'survivor_hardened_start');
+    const hunter = hasTalent(state, 'hunter_board_regular');
+    const delver = hasTalent(state, 'delver_stair_sense');
+    const collector = hasTalent(state, 'collector_appraiser');
+    return {
+      maxHpPct: survivor ? 0.05 : 0,
+      eliteBoardRewardPct: hunter ? 0.05 : 0,
+      charterCostPct: delver ? 0.05 : 0,
+      sellValuePct: collector ? 0.05 : 0
+    };
+  }
+
+  function getTalentBonus(state, key) {
+    const bonuses = getTalentBonuses(state);
+    return Math.max(0, Math.min(1, Math.max(0, numberOr(bonuses[key], 0, 0, 1))));
+  }
+
+  function getAvailableTalentPoints(state) {
+    const talentState = getTalentState(state);
+    return Math.max(0, Math.floor(numberOr(talentState.pointsEarned - talentState.pointsSpent, 0, 0, 999999)));
+  }
+
+  function grantTalentPoints(state, amount = 1) {
+    if (!state?.player) return 0;
+    const talentState = getTalentState(state);
+    const gained = Math.max(0, Math.floor(numberOr(amount, 0, 0, 999999)));
+    if (!gained) return talentState.pointsEarned;
+    talentState.pointsEarned += gained;
+    state.player.talentPointsEarned = talentState.pointsEarned;
+    state.player.talentPoints = getAvailableTalentPoints(state);
+    return talentState.pointsEarned;
+  }
+
+  function unlockTalent(state, id) {
+    if (!state?.player) return false;
+    const talentId = String(id || '').trim();
+    if (!talentId) return false;
+    const talentState = getTalentState(state);
+    if (talentState.unlocked[talentId]) return false;
+    if (getAvailableTalentPoints(state) <= 0) return false;
+    talentState.unlocked[talentId] = true;
+    talentState.spent = talentState.unlocked;
+    talentState.pointsSpent = Math.min(talentState.pointsEarned, Object.keys(talentState.unlocked).length);
+    state.player.talentPointsSpent = talentState.pointsSpent;
+    state.player.talentPoints = getAvailableTalentPoints(state);
+    return true;
+  }
+
+  function resetTalents(state) {
+    if (!state?.player) return false;
+    state.player.talents = createTalentState();
+    state.player.talentPointsEarned = 0;
+    state.player.talentPointsSpent = 0;
+    state.player.talentPoints = 0;
+    return true;
+  }
+
+  function talentSummary(state) {
+    const talentState = getTalentState(state);
+    const bonuses = getTalentBonuses(state);
+    return {
+      pointsEarned: talentState.pointsEarned,
+      pointsSpent: talentState.pointsSpent,
+      pointsAvailable: getAvailableTalentPoints(state),
+      unlockedIds: Object.keys(talentState.unlocked || {}),
+      bonuses
+    };
+  }
+
   function normalizeSaveShape(parsed) {
     if (!isPlainObject(parsed) || !isPlainObject(parsed.player)) return createBaseState();
 
@@ -140,6 +291,7 @@
       ? createEliteTrophyState(isPlainObject(savedPlayer.eliteTrophies) ? savedPlayer.eliteTrophies : {})
       : { collected:{}, totalFound:0, latestId:'' };
     state.player.deepStairCharters = normalizeCharterDepthList(savedPlayer.deepStairCharters);
+    repairTalentState(state);
     if (state.player.permanentStartFloor >= 40) state.player.goldSink.boughtStart40Charter = true;
     ensurePermanentCharters(state);
     state.player.stats = { ...base.player.stats, ...(isPlainObject(savedPlayer.stats) ? savedPlayer.stats : {}) };
@@ -240,6 +392,7 @@
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})
       : { collected:{}, totalFound:0, latestId:'' };
+    repairTalentState(state);
     if (!isPlainObject(state.run)) state.run = {};
     ensureRunShell(state);
     state.run.active = !!state.run.active;
@@ -301,6 +454,7 @@
         if (Array.isArray(parsed.merchantStock)) parsed.merchantStock.forEach(normalizeItem);
       }
       if (parsed.player.earlyAidGiven == null) parsed.player.earlyAidGiven = false;
+      if (parsed.player.talents == null && parsed.player.talentPointsEarned == null && parsed.player.talentPoints == null) parsed.player.talents = createTalentState();
       return normalizeSaveShape(parsed);
     } catch (err) {
       console.warn('DungeonDex save recovery used a fresh state.');

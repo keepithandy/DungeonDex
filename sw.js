@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.29-intro-modal-mobile-spacing-audit';
+const CACHE_NAME = 'dungeondex-v1.5.0-talent-system-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.29-intro-modal-mobile-spacing-audit';
+const BUILD_QS = '1.5.0-talent-system-foundation';
 const ASSETS = [
   './',
   './index.html',

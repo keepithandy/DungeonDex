@@ -6448,6 +6448,97 @@ button:focus-visible,
     0 0 0 1px rgba(255,126,54,0.045);
 }
 
+#talentPanel {
+  padding: 10px;
+  border-color: rgba(255,188,104,0.22);
+  background:
+    linear-gradient(180deg, rgba(255,167,79,0.055), rgba(255,255,255,0.015)),
+    rgba(8,9,12,0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 10px 24px rgba(0,0,0,0.24);
+}
+
+#talentPanel .talent-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+#talentPanel .talent-summary-row span {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.03);
+  padding: 3px 6px;
+  white-space: nowrap;
+}
+
+#talentPanel .talent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#talentPanel .talent-path-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 8px;
+  background: rgba(255,255,255,0.025);
+}
+
+#talentPanel .talent-path-card.is-unlocked {
+  border-color: rgba(255,190,110,0.2);
+  background: linear-gradient(180deg, rgba(255,164,74,0.055), rgba(255,255,255,0.02));
+}
+
+#talentPanel .talent-path-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#talentPanel .talent-path-label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(243,209,145,0.78);
+}
+
+#talentPanel .talent-path-head h3 {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.08;
+}
+
+#talentPanel .talent-path-effect {
+  margin: 6px 0 0;
+  color: #f4d08b;
+  font-weight: 700;
+}
+
+#talentPanel .talent-path-summary,
+#talentPanel .talent-path-note {
+  margin: 3px 0 0;
+}
+
+#talentPanel .talent-path-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+#talentPanel .talent-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .loadout-head,
 .filter-head,
 .loadout-inventory-head {
@@ -6881,10 +6972,15 @@ button:focus-visible,
 
 @media (max-width: 560px) {
   .gear-player-panel,
+  #talentPanel,
   #equipmentPanel.loadout-panel,
   #filtersPanel.loadout-filter-panel,
   #inventoryPanel.loadout-inventory-panel {
     padding: 8px;
+  }
+
+  #talentPanel .talent-grid {
+    grid-template-columns: 1fr;
   }
 
   .gear-player-head,
