@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.28`
-* Current local package baseline: `v1.4.28`
-* Current development target: `v1.4.28`
+* Public/live itch version: `v1.4.28a`
+* Current local package baseline: `v1.4.28a`
+* Current development target: `v1.4.28a`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.28a - Intro Button Smoke Hotfix
+
+Status: Complete
+
+Summary:
+
+* Verified the intro/safe-return modal still renders the Current Roadmap card from v1.4.28.
+* Confirmed the modal retains the `Enter Dungeon` and `Close` controls in code and layout.
+* No UI redesign was needed, and no gameplay, combat, scaling, or save rules were changed.
+* Kept the safe-return/extraction flow intact.
+* Updated build and version labels to `DungeonDex v1.4.28a` for the hotfix pass.
+* No affixes, status effects, modifier popups, special monster behavior, or hidden enemy effects were added.
+* No save wipe.
 
 ---
 

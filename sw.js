@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.28-intro-roadmap-panel-itch-analytics-note';
+const CACHE_NAME = 'dungeondex-v1.4.28a-intro-button-smoke-hotfix';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.28-intro-roadmap-panel-itch-analytics-note';
+const BUILD_QS = '1.4.28a-intro-button-smoke-hotfix';
 const ASSETS = [
   './',
   './index.html',
