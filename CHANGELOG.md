@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.5.0a`
-* Current local package baseline: `v1.5.0a`
-* Current development target: `v1.5.0a`
+* Public/live itch version: `v1.5.0b`
+* Current local package baseline: `v1.5.0b`
+* Current development target: `v1.5.0b`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,19 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.5.0b - Talent Save/Load Regression Guard
+
+Status: Complete
+
+Summary:
+
+* Verified the talent system across fresh-save, older-save-style, unknown-id, longer-play, Elite Board, and charter/sell regression paths.
+* Confirmed save/load repair remains stable for missing talent state, legacy aliases, and the `talentUnlockIds` mirror.
+* Kept the Talent System foundation unchanged: no new talents, paths, combat mechanics, monster mechanics, or balance changes were added.
+* No save wipe.
 
 ---
 
