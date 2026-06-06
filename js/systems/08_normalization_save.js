@@ -104,7 +104,8 @@
       pointsEarned: 0,
       pointsSpent: 0,
       unlocked,
-      spent: unlocked
+      spent: unlocked,
+      unlockedIds: []
     };
   }
 
@@ -133,10 +134,32 @@
     return unlocked;
   }
 
+  function normalizeTalentUnlockIds(value) {
+    const ids = [];
+    const add = id => {
+      const key = String(id || '').trim();
+      if (!key || ids.includes(key)) return;
+      ids.push(key);
+    };
+    if (Array.isArray(value)) {
+      value.forEach(add);
+      return ids;
+    }
+    if (!isPlainObject(value)) return ids;
+    Object.keys(value).forEach(id => {
+      if (value[id]) add(id);
+    });
+    return ids;
+  }
+
   function repairTalentState(state) {
     if (!state?.player) return createTalentState();
     const legacy = isPlainObject(state.player.talents) ? state.player.talents : {};
     const unlocked = normalizeTalentUnlocks(legacy.unlocked || legacy.spent);
+    const unlockedIds = normalizeTalentUnlockIds(state.player.talentUnlockIds);
+    unlockedIds.forEach(id => {
+      unlocked[id] = true;
+    });
     const storedEarned = Math.max(
       0,
       Math.floor(numberOr(state.player.talentPointsEarned, legacy.pointsEarned, 0, 999999))
@@ -151,13 +174,15 @@
     const talentState = {
       pointsEarned,
       pointsSpent,
-      unlocked
+      unlocked,
+      unlockedIds: Object.keys(unlocked)
     };
     talentState.spent = talentState.unlocked;
     state.player.talents = talentState;
     state.player.talentPointsEarned = pointsEarned;
     state.player.talentPointsSpent = pointsSpent;
     state.player.talentPoints = Math.max(0, pointsEarned - pointsSpent);
+    state.player.talentUnlockIds = talentState.unlockedIds.slice();
     return talentState;
   }
 
@@ -214,8 +239,10 @@
     talentState.unlocked[talentId] = true;
     talentState.spent = talentState.unlocked;
     talentState.pointsSpent = Math.min(talentState.pointsEarned, Object.keys(talentState.unlocked).length);
+    talentState.unlockedIds = Object.keys(talentState.unlocked);
     state.player.talentPointsSpent = talentState.pointsSpent;
     state.player.talentPoints = getAvailableTalentPoints(state);
+    state.player.talentUnlockIds = talentState.unlockedIds.slice();
     return true;
   }
 
@@ -225,6 +252,7 @@
     state.player.talentPointsEarned = 0;
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
+    state.player.talentUnlockIds = [];
     return true;
   }
 

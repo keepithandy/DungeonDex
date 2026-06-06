@@ -33,13 +33,16 @@
 
   function ensureTalents(state){
     if (typeof repairTalentState === 'function') return repairTalentState(state);
-    if (!state?.player) return { pointsEarned:0, pointsSpent:0, unlocked:{}, spent:{} };
-    if (!state.player.talents || typeof state.player.talents !== 'object') state.player.talents = { pointsEarned:0, pointsSpent:0, unlocked:{} };
+    if (!state?.player) return { pointsEarned:0, pointsSpent:0, unlocked:{}, spent:{}, unlockedIds:[] };
+    if (!state.player.talents || typeof state.player.talents !== 'object') state.player.talents = { pointsEarned:0, pointsSpent:0, unlocked:{}, unlockedIds:[] };
     if (!state.player.talents.unlocked || typeof state.player.talents.unlocked !== 'object') state.player.talents.unlocked = {};
     state.player.talents.spent = state.player.talents.unlocked;
     state.player.talentPointsEarned = Math.max(0, Math.floor(Number(state.player.talents.pointsEarned) || 0));
     state.player.talentPointsSpent = Math.max(0, Math.floor(Number(state.player.talents.pointsSpent) || 0));
     state.player.talentPoints = Math.max(0, state.player.talentPointsEarned - state.player.talentPointsSpent);
+    state.player.talentUnlockIds = Array.isArray(state.player.talentUnlockIds)
+      ? state.player.talentUnlockIds.map(id => String(id || '').trim()).filter(Boolean)
+      : Object.keys(state.player.talents.unlocked);
     return state.player.talents;
   }
 
@@ -69,8 +72,10 @@
     if (availableTalentPoints(state) <= 0 || state.player.talents.unlocked[id]) return false;
     state.player.talents.unlocked[id] = true;
     state.player.talents.pointsSpent = Object.keys(state.player.talents.unlocked).length;
+    state.player.talents.unlockedIds = Object.keys(state.player.talents.unlocked);
     state.player.talentPointsSpent = state.player.talents.pointsSpent;
     state.player.talentPoints = Math.max(0, state.player.talentPointsEarned - state.player.talentPointsSpent);
+    state.player.talentUnlockIds = state.player.talents.unlockedIds.slice();
     if (typeof calcDerived === 'function') calcDerived(state);
     log(state, `Talent unlocked: ${def.name}.`);
     return true;
@@ -88,6 +93,7 @@
     state.player.talentPointsEarned = 0;
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
+    state.player.talentUnlockIds = [];
     if (typeof calcDerived === 'function') calcDerived(state);
     log(state, 'Talent points reset. Unlocks returned to zero.');
     return true;
@@ -535,6 +541,7 @@
         delete snapshot.player.talentPointsEarned;
         delete snapshot.player.talentPointsSpent;
         delete snapshot.player.talentPoints;
+        delete snapshot.player.talentUnlockIds;
         ensureTalents(snapshot);
         const cleaned = api.summary(snapshot);
         return {

@@ -316,6 +316,7 @@
       delete snapshot.player.talentPointsEarned;
       delete snapshot.player.talentPointsSpent;
       delete snapshot.player.talentPoints;
+      delete snapshot.player.talentUnlockIds;
       const repaired = typeof api.ensure === 'function' ? api.ensure(snapshot) : null;
       const summary = typeof api.summary === 'function' ? api.summary(snapshot) : null;
       let unknownSafe = true;

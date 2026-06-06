@@ -280,7 +280,7 @@
         boughtStart20Scroll: false,
         goldSink: createGoldSinkState(),
         eliteContracts: createEliteContractState(),
-        talents: { pointsEarned: 0, pointsSpent: 0, unlocked: {} }
+        talents: { pointsEarned: 0, pointsSpent: 0, unlocked: {}, unlockedIds: [] }
       },
       town: { merchantRefreshCost: coins(0, 1, 50), forgeTier: 1, relicFavor: 0 },
       run: {
