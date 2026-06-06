@@ -1,0 +1,117 @@
+DungeonDex v1.4.26 - Floor 20-35 Balance Sample Pass
+
+Baseline:
+- Local main was synced with origin/main before edits.
+- Starting HEAD: 521b35b "Add scaling runtime smoke guard".
+- Working tree was clean before v1.4.26 edits.
+
+Implementation:
+- Added DungeonDexScenarioDevTools.floorBalanceSample().
+- Added DungeonDexScenarioDevTools.floorBalanceSampleText().
+- Added a hidden DevTools Scenario Presets button: Floor 20-35 Sample.
+- Updated active build labels and cache query strings to DungeonDex v1.4.26 with build query 1.4.26-floor-20-35-balance-sample.
+- No monster scaling constants were changed.
+- No economy, gear generation, trophy payout, charter, death reset, extraction, or combat rewrite changes were made.
+
+Profile Used:
+- Synthetic ilvl 320 / 22k profile.
+- Reason: no high-power live save was loaded in the temporary smoke browser profile.
+- Player power: 22,000.
+- Player HP: 20,600.
+- Player Guard: 10,400.
+- Average ilvl: 320.
+- The synthetic profile does not overwrite or save player data.
+
+Floor Balance Samples:
+
+Floor 20:
+- rawDepth/chapter sampled: D60 - Floor 2 / Room 1 / Chapter 10.
+- Common: 5,669 power / 24,906 HP; ratios 0.26x power / 1.21x HP.
+- Elite: 7,089 power / 39,797 HP; ratios 0.32x power / 1.93x HP.
+- Boss: 9,345 power / 84,109 HP at D60; ratios 0.42x power / 4.08x HP.
+- Elite Board target: 7,089 power / 53,726 HP; ratios 0.32x power / 2.61x HP.
+- Rival Elite: 7,089 power / 61,785 HP; ratios 0.32x power / 3.00x HP.
+- Judgment: Low.
+
+Floor 24:
+- rawDepth/chapter sampled: D72 - Floor 2 / Room 3 / Chapter 2.
+- Common: 9,137 power / 40,411 HP; ratios 0.42x power / 1.96x HP.
+- Elite: 11,296 power / 63,838 HP; ratios 0.51x power / 3.10x HP.
+- Boss: 16,010 power / 145,061 HP at D75; ratios 0.73x power / 7.04x HP.
+- Elite Board target: 11,296 power / 86,181 HP; ratios 0.51x power / 4.18x HP.
+- Rival Elite: 11,296 power / 99,108 HP; ratios 0.51x power / 4.81x HP.
+- Judgment: Low.
+
+Floor 26:
+- rawDepth/chapter sampled: D78 - Floor 2 / Room 3 / Chapter 8.
+- Common: 11,350 power / 50,199 HP; ratios 0.52x power / 2.44x HP.
+- Elite: 13,970 power / 78,950 HP; ratios 0.64x power / 3.83x HP.
+- Boss: 24,592 power / 223,559 HP at D90; ratios 1.12x power / 10.85x HP.
+- Elite Board target: 13,970 power / 106,583 HP; ratios 0.64x power / 5.17x HP.
+- Rival Elite: 13,970 power / 122,570 HP; ratios 0.64x power / 5.95x HP.
+- Judgment: Boss Threat because the nearby boss is the main danger; Floor 26 common pressure is reasonable.
+
+Floor 30:
+- rawDepth/chapter sampled: D90 - Floor 2 / Room 4 / Chapter 10.
+- Common: 16,256 power / 72,136 HP; ratios 0.74x power / 3.50x HP.
+- Elite: 19,863 power / 112,626 HP; ratios 0.90x power / 5.47x HP.
+- Boss: 24,592 power / 223,559 HP at D90; ratios 1.12x power / 10.85x HP.
+- Elite Board target: 19,863 power / 152,045 HP; ratios 0.90x power / 7.38x HP.
+- Rival Elite: 19,863 power / 174,852 HP; ratios 0.90x power / 8.49x HP.
+- Judgment: Boss Threat.
+
+Floor 35:
+- rawDepth/chapter sampled: D105 - Floor 3 / Room 1 / Chapter 5.
+- Common: 18,896 power / 84,406 HP; ratios 0.86x power / 4.10x HP.
+- Elite: 22,929 power / 130,871 HP; ratios 1.04x power / 6.35x HP.
+- Boss: 27,830 power / 254,670 HP at D105; ratios 1.26x power / 12.36x HP.
+- Elite Board target: 22,929 power / 176,676 HP; ratios 1.04x power / 8.58x HP.
+- Rival Elite: 22,929 power / 203,177 HP; ratios 1.04x power / 9.86x HP.
+- Judgment: High.
+
+Generated Runtime Samples:
+- Floor 26 common sample generated in browser: 10,570 power / 46,749 HP.
+- Floor 26 elite sample generated in browser: 11,697 power / 66,104 HP.
+- Boss sample generated in browser at D90: 20,754 power / 188,669 HP.
+
+Browser Smoke:
+- In-app Browser plugin startup failed with "windows sandbox failed: spawn setup refresh".
+- Fallback used local headless Chrome through DevTools Protocol against http://127.0.0.1:8785.
+- Visible label: DungeonDex v1.4.26.
+- Town loaded.
+- Enter Dungeon worked.
+- Normal monster generation worked.
+- Elite generation worked.
+- Boss generation worked.
+- Combat screen opened.
+- Attack worked.
+- Ashburst skill worked.
+- Guard worked.
+- Extract worked.
+- Safe extraction preserved progress.
+- Floor / Room / Chapter display rendered.
+- Monster power/HP display rendered.
+- Lowfire Board rendered.
+- Contract accept worked.
+- Contract target spawned by exact name: Ash-Crowned Marauder.
+- Bonus Writ simulation worked.
+- Elite trophy force-award worked.
+- Rival Elite remembering, rival contract start, and rival target generation worked.
+- Death reset simulation worked.
+- Deep Stair Charter state remained available.
+- No save wipe was performed; smoke used a temporary browser profile.
+- No generateMonster runtime errors.
+- No DungeonDex runtime console errors. Chrome reported existing deprecation warnings for apple-mobile-web-app-capable.
+
+Affix / Status Audit:
+- generateMonster samples had empty affix values and zero modifiers.
+- Contract and Rival Elite samples had empty affix values and zero modifiers.
+- selectEliteModifiers() remains disabled and returns an empty array.
+- No affixes, status effects, modifier popups, special monster behavior, burn, bleed, poison, stun, thorns, regen, shield procs, aura mechanics, or hidden enemy effects were reintroduced.
+
+Syntax / File Checks:
+- node --check app.js: passed.
+- node --check sw.js: passed.
+- node --check all js/systems/*.js: passed.
+- manifest.json parse: passed.
+- git diff --check: passed, with CRLF normalization warnings only.

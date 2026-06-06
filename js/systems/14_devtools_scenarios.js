@@ -1,14 +1,15 @@
 'use strict';
 
-// DungeonDex v1.4.25 - DevTools Scenario Presets
+// DungeonDex v1.4.26 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.25';
-  const SCENARIO_BUILD = '1.4.25-scaling-followup-runtime-smoke';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.26';
+  const SCENARIO_BUILD = '1.4.26-floor-20-35-balance-sample';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
   const LOG_LIMIT = 10;
+  const FLOOR_BALANCE_SAMPLE_FLOORS = [20, 24, 26, 30, 35];
 
   const scenarioState = {
     lastScenario: 'none',
@@ -325,6 +326,173 @@
       probe.activeTarget ? `${probe.activeTarget.rival ? 'Rival' : 'Contract'} sample: ${probe.activeTarget.name} - ${fmt(probe.activeTarget.power)} power / ${fmt(probe.activeTarget.maxHp)} HP` : 'Contract/Rival sample: none active'
     ].join('\n');
   }
+  function ratioValue(value, baseline){
+    const v = Number(value);
+    const b = Number(baseline);
+    return Number.isFinite(v) && Number.isFinite(b) && b > 0 ? +(v / b).toFixed(2) : null;
+  }
+  function ratioText(value){
+    return value == null ? 'n/a' : `${Number(value).toFixed(2)}x`;
+  }
+  function equippedAverageIlvl(state){
+    const gear = Object.values(obj(state?.player?.equipment) ? state.player.equipment : {}).filter(obj);
+    return gear.length ? Math.round(gear.reduce(function(sum, item){ return sum + int(item.level || item.ilvl || 0, 0); }, 0) / gear.length) : 0;
+  }
+  function liveBalanceProfile(requireHighPower){
+    if (!hasState()) return null;
+    let derived = null;
+    try { derived = typeof calcDerived === 'function' ? calcDerived(S) : null; } catch (err) { derived = null; }
+    const p = S.player || {};
+    const power = Math.round(numberOr(derived?.power, p.stats?.power || 0, 0, 999999));
+    const guard = Math.round(numberOr(derived?.guard, p.stats?.guard || 0, 0, 999999));
+    const hp = Math.round(numberOr(p.maxHp, p.hp || 0, 0, 999999));
+    const avgIlvl = equippedAverageIlvl(S);
+    if (requireHighPower && power < 15000 && avgIlvl < 260) return null;
+    return {
+      source: 'live-save-derived',
+      note: 'current save, read-only sample',
+      power,
+      maxHp: hp,
+      guard,
+      avgIlvl
+    };
+  }
+  function syntheticBalanceProfile(reason){
+    return {
+      source: 'synthetic-ilvl-320-22k',
+      note: reason || 'synthetic multiple-mythic reference; no save data touched',
+      power: 22000,
+      maxHp: 20600,
+      guard: 10400,
+      avgIlvl: 320
+    };
+  }
+  function balanceSampleProfile(mode){
+    const sampleMode = String(mode || 'auto').toLowerCase();
+    if (sampleMode === 'live') return liveBalanceProfile(false) || syntheticBalanceProfile('live save unavailable; synthetic fallback used');
+    if (sampleMode === 'synthetic') return syntheticBalanceProfile();
+    return liveBalanceProfile(true) || syntheticBalanceProfile('no high-power live save loaded; synthetic reference used');
+  }
+  function rawDepthForSampleFloor(floor){
+    const step = typeof DEPTH_CHAPTERS_PER_THREAT_STEP === 'number' ? DEPTH_CHAPTERS_PER_THREAT_STEP : 3;
+    return Math.max(1, Math.floor(numberOr(floor, 1, 1, 999999)) * step);
+  }
+  function representativeBossDepth(rawDepth){
+    const step = typeof DEPTH_CHAPTERS_PER_THREAT_STEP === 'number' ? DEPTH_CHAPTERS_PER_THREAT_STEP : 3;
+    const interval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)) * step);
+    const depth = Math.max(1, Math.floor(numberOr(rawDepth, 1, 1, 999999)));
+    if (depth % interval === 0) return depth;
+    return typeof nextBossDepthFromDepth === 'function' ? nextBossDepthFromDepth(depth) : Math.max(interval, Math.ceil(depth / interval) * interval);
+  }
+  function targetSampleFromElite(rawDepth, rival){
+    const base = scalingProbeSample(rawDepth, 'Elite');
+    const targetFloor = base.threatFloor || (typeof threatDepthFromDepth === 'function' ? threatDepthFromDepth(rawDepth) : rawDepth);
+    const hpMult = (targetFloor < 20 ? 1.25 : 1.35) * (rival ? 1.15 : 1);
+    return {
+      rawDepth: base.rawDepth,
+      threatFloor: targetFloor,
+      power: base.power,
+      maxHp: Math.round(base.maxHp * hpMult)
+    };
+  }
+  function floorBalanceRisk(row){
+    if (row.floor >= 26 && row.commonPowerRatio < 0.45 && row.commonHpRatio < 1.8) return 'Too Weak';
+    if (row.commonPowerRatio < 0.45) return 'Low';
+    if (row.commonPowerRatio > 0.85) return 'High';
+    if (row.bossPowerRatio >= 0.95 && row.bossHpRatio >= 6) return 'Boss Threat';
+    if (row.commonPowerRatio >= 0.45 && row.eliteHpRatio >= 2.5) return 'Fair';
+    return 'Low';
+  }
+  function balanceSampleRow(floor, profile){
+    const rawDepth = rawDepthForSampleFloor(floor);
+    const depthLabel = scalingProbeDepthLabel(rawDepth);
+    const bossDepth = representativeBossDepth(rawDepth);
+    const common = scalingProbeSample(rawDepth, 'Common');
+    const elite = scalingProbeSample(rawDepth, 'Elite');
+    const boss = scalingProbeSample(bossDepth, 'Boss');
+    const board = targetSampleFromElite(rawDepth, false);
+    const rival = targetSampleFromElite(rawDepth, true);
+    const row = {
+      floor,
+      rawDepth,
+      depthLabel: depthLabel.text,
+      playerProfile: profile.source,
+      playerPower: profile.power,
+      playerHp: profile.maxHp,
+      playerGuard: profile.guard,
+      avgIlvl: profile.avgIlvl,
+      commonPower: common.power,
+      commonHp: common.maxHp,
+      commonPowerRatio: ratioValue(common.power, profile.power),
+      commonHpRatio: ratioValue(common.maxHp, profile.maxHp),
+      elitePower: elite.power,
+      eliteHp: elite.maxHp,
+      elitePowerRatio: ratioValue(elite.power, profile.power),
+      eliteHpRatio: ratioValue(elite.maxHp, profile.maxHp),
+      bossRawDepth: boss.rawDepth,
+      bossPower: boss.power,
+      bossHp: boss.maxHp,
+      bossPowerRatio: ratioValue(boss.power, profile.power),
+      bossHpRatio: ratioValue(boss.maxHp, profile.maxHp),
+      boardPower: board.power,
+      boardHp: board.maxHp,
+      boardPowerRatio: ratioValue(board.power, profile.power),
+      boardHpRatio: ratioValue(board.maxHp, profile.maxHp),
+      rivalPower: rival.power,
+      rivalHp: rival.maxHp,
+      rivalPowerRatio: ratioValue(rival.power, profile.power),
+      rivalHpRatio: ratioValue(rival.maxHp, profile.maxHp),
+      risk: '',
+      tuningChanged: 'no'
+    };
+    row.risk = floorBalanceRisk(row);
+    return row;
+  }
+  function floorBalanceSample(mode, options){
+    const opts = obj(options) ? options : {};
+    const profile = balanceSampleProfile(mode);
+    const rows = FLOOR_BALANCE_SAMPLE_FLOORS.map(function(floor){ return balanceSampleRow(floor, profile); });
+    const sample = {
+      build: SCENARIO_BUILD,
+      update: 'Floor 20-35 Balance Sample Pass',
+      profile,
+      sampleRawDepthNote: 'Representative end-of-threat-floor raw depth; boss sample uses the current or next boss depth nearby.',
+      tuningChanged: false,
+      rows
+    };
+    if (opts.log !== false && typeof console !== 'undefined') {
+      if (typeof console.table === 'function') console.table(rows);
+      else console.info('[DungeonDex Floor Balance Sample]', rows);
+    }
+    return sample;
+  }
+  function floorBalanceSampleText(mode){
+    const sample = floorBalanceSample(mode, { log:false });
+    if (!sample || !sample.rows) return 'Floor balance sample unavailable.';
+    const profile = sample.profile;
+    const lines = [
+      'Floor 20-35 Balance Sample',
+      `Build: ${sample.build}`,
+      `Player profile: ${profile.source} (${profile.note})`,
+      `Player power / HP / guard: ${fmt(profile.power)} / ${fmt(profile.maxHp)} / ${fmt(profile.guard)}`,
+      `Average ilvl: ${fmt(profile.avgIlvl)}`,
+      'Tuning changed: no'
+    ];
+    sample.rows.forEach(function(row){
+      lines.push(
+        '',
+        `Floor ${fmt(row.floor)}:`,
+        `rawDepth/chapter sampled: D${fmt(row.rawDepth)} - ${row.depthLabel}`,
+        `common: ${fmt(row.commonPower)} power / ${fmt(row.commonHp)} HP (${ratioText(row.commonPowerRatio)} power, ${ratioText(row.commonHpRatio)} HP)`,
+        `elite: ${fmt(row.elitePower)} power / ${fmt(row.eliteHp)} HP (${ratioText(row.elitePowerRatio)} power, ${ratioText(row.eliteHpRatio)} HP)`,
+        `boss: ${fmt(row.bossPower)} power / ${fmt(row.bossHp)} HP at D${fmt(row.bossRawDepth)} (${ratioText(row.bossPowerRatio)} power, ${ratioText(row.bossHpRatio)} HP)`,
+        `board target: ${fmt(row.boardPower)} power / ${fmt(row.boardHp)} HP (${ratioText(row.boardPowerRatio)} power, ${ratioText(row.boardHpRatio)} HP)`,
+        `rival elite: ${fmt(row.rivalPower)} power / ${fmt(row.rivalHp)} HP (${ratioText(row.rivalPowerRatio)} power, ${ratioText(row.rivalHpRatio)} HP)`,
+        `judgment: ${row.risk}`
+      );
+    });
+    return lines.join('\n');
+  }
   function createTestRival(){
     const api = eliteContractApi();
     if (!api || !hasState()) return false;
@@ -505,6 +673,7 @@
       </div>
       <div class="dd-devtools-button-grid">
         ${button('Scaling Probe', 'scaling-probe')}
+        ${button('Floor 20-35 Sample', 'floor-balance-sample')}
       </div>
       ${message}
       <div class="dd-devtools-log-list">${logs}</div>
@@ -547,6 +716,7 @@
     if (action === 'validate-board') return validateBoardState();
     if (action === 'simulate-death-reset') return simulateDeathReset();
     if (action === 'scaling-probe') { scenarioState.lastMessage = scalingProbeText(); log('Generated scaling probe.', 'info'); return renderScenarioSectionSoon(); }
+    if (action === 'floor-balance-sample') { scenarioState.lastMessage = floorBalanceSampleText(); log('Generated Floor 20-35 balance sample.', 'info'); return renderScenarioSectionSoon(); }
   });
   function init(){
     try { document.title = SCENARIO_VERSION; } catch (err) {}
@@ -565,6 +735,8 @@
     snapshot: scenarioSnapshot,
     scalingProbe: scalingProbeSnapshot,
     scalingProbeText,
+    floorBalanceSample,
+    floorBalanceSampleText,
     eliteTrophyStateText,
     eliteRivalStateText,
     state: scenarioState

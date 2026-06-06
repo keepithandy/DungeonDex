@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.25`
-* Current local package baseline: `v1.4.25`
-* Current development target: `v1.4.25`
+* Public/live itch version: `v1.4.26`
+* Current local package baseline: `v1.4.26`
+* Current development target: `v1.4.26`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.26 - Floor 20-35 Balance Sample Pass
+
+Status: Complete
+
+Summary:
+
+* Added a developer-only Floor 20-35 balance sample helper to the existing DevTools scaling tools.
+* The helper reports player power, HP, guard, average ilvl, common / elite / boss samples, Elite Board target samples, Rival Elite samples, ratios, and short risk labels.
+* The helper prefers a high-power live save when one is loaded and otherwise uses a clearly labeled synthetic ilvl 320 / 22k player profile without touching save data.
+* Sampled Floor 20, 24, 26, 30, and 35 against the v1.4.25 scaling shape.
+* Left monster scaling values unchanged because the sample data stayed in the intended range for the Floor 20-35 follow-up.
+* Preserved HP-first contract and rival threat shape.
+* No affixes, status effects, modifier popups, special monster behavior, aura mechanics, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+* No save wipe.
 
 ---
 

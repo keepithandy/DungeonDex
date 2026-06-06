@@ -1,0 +1,12 @@
+DungeonDex v1.4.26 - Floor 20-35 Balance Sample Pass
+
+Measured the Floor 20-35 monster scaling follow-up against an ilvl 320 / 22k synthetic reference profile when no high-power live save was loaded.
+
+Changes:
+- Added a developer-only Floor 20-35 balance sample helper to the existing DevTools scenario tools.
+- The helper reports player power, HP, guard, average ilvl, common / elite / boss samples, Elite Board target samples, Rival Elite samples, ratios, and risk labels.
+- The helper uses a live-save-derived profile only when a high-power save is currently loaded; otherwise it clearly labels the synthetic ilvl 320 / 22k reference and does not touch save data.
+- Left monster scaling values unchanged after the sample data showed Floor 26 commons in the intended range and Floor 30-35 pressure climbing without new monster mechanics.
+- Preserved HP-first elite, boss, Elite Board target, and Rival Elite threat shape.
+- No affixes, status effects, modifier popups, special monster behavior, aura mechanics, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+- No save wipe.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.25-scaling-followup-runtime-smoke';
+const CACHE_NAME = 'dungeondex-v1.4.26-floor-20-35-balance-sample';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.25-scaling-followup-runtime-smoke';
+const BUILD_QS = '1.4.26-floor-20-35-balance-sample';
 const ASSETS = [
   './',
   './index.html',
