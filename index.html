@@ -8,14 +8,14 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.5.0</title>
-  <link rel="stylesheet" href="./styles.css?build=1.5.0-talent-system-foundation" />
+  <title>DungeonDex v1.5.0a</title>
+  <link rel="stylesheet" href="./styles.css?build=1.5.0a-talent-browser-smoke-hotfix" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <h1 id="buildTag">DungeonDex v1.5.0</h1>
+        <h1 id="buildTag">DungeonDex v1.5.0a</h1>
       </div>
       <div class="top-actions">
         <span class="save-status" id="saveStatus">Saved</span>
@@ -100,8 +100,8 @@
   </div>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.5.0';
-    window.DUNGEONDEX_BUILD_QS = '1.5.0-talent-system-foundation';
+    window.DUNGEONDEX_BUILD = '1.5.0a';
+    window.DUNGEONDEX_BUILD_QS = '1.5.0a-talent-browser-smoke-hotfix';
     (function(){
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
@@ -142,7 +142,7 @@
         });
         return;
       }
-      window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js?build=1.5.0-talent-system-foundation').catch(function(){}); });
+      window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js?build=1.5.0a-talent-browser-smoke-hotfix').catch(function(){}); });
     })();
   </script>
 

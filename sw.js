@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.5.0-talent-system-foundation';
+const CACHE_NAME = 'dungeondex-v1.5.0a-talent-browser-smoke-hotfix';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.5.0-talent-system-foundation';
+const BUILD_QS = '1.5.0a-talent-browser-smoke-hotfix';
 const ASSETS = [
   './',
   './index.html',

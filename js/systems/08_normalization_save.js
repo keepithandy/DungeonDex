@@ -141,15 +141,10 @@
       0,
       Math.floor(numberOr(state.player.talentPointsEarned, legacy.pointsEarned, 0, 999999))
     );
-    const storedAvailable = Math.max(
-      0,
-      Math.floor(numberOr(state.player.talentPoints, Math.max(0, storedEarned - Object.keys(unlocked).length), 0, 999999))
-    );
     const storedSpent = Math.max(
       0,
       Math.floor(numberOr(state.player.talentPointsSpent, legacy.pointsSpent, 0, 999999)),
-      Object.keys(unlocked).length,
-      storedEarned - storedAvailable
+      Object.keys(unlocked).length
     );
     const pointsEarned = Math.max(talentMilestonePoints(bestTalentProgressDepth(state)), storedEarned);
     const pointsSpent = Math.min(pointsEarned, Math.max(0, storedSpent));

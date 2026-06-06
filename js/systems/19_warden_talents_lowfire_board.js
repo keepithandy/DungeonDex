@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.5.0 - Talent System Foundation + Lowfire Board.
+// DungeonDex v1.5.0a - Talent System Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.5.0-talent-system-foundation';
+  const SCRIPT_BUILD = '1.5.0a-talent-browser-smoke-hotfix';
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
