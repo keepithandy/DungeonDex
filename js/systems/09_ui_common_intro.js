@@ -141,6 +141,34 @@
     return `<div class="intro-stat ${extraClass}"><div class="small muted">${label}</div><strong>${value}</strong></div>`;
   }
 
+  function introRoadmapMarkup() {
+    return `
+      <div class="threshold-roadmap-card" aria-label="Current Roadmap">
+        <div class="threshold-roadmap-head">
+          <span class="threshold-label">Current Roadmap</span>
+          <p class="threshold-roadmap-copy">v1.4 stabilized the dungeon. v1.5 starts deeper progression.</p>
+        </div>
+        <div class="threshold-roadmap-list">
+          <div class="threshold-roadmap-row">
+            <span class="threshold-roadmap-key">Now</span>
+            <span class="threshold-roadmap-value">Scaling, board hunts, rivals, trophies</span>
+          </div>
+          <div class="threshold-roadmap-row">
+            <span class="threshold-roadmap-key">Next</span>
+            <span class="threshold-roadmap-value">Talent System Foundation</span>
+          </div>
+          <div class="threshold-roadmap-row">
+            <span class="threshold-roadmap-key">Later</span>
+            <span class="threshold-roadmap-value">Boss trophies, retired gear, famous items</span>
+          </div>
+          <div class="threshold-roadmap-row">
+            <span class="threshold-roadmap-key">Future</span>
+            <span class="threshold-roadmap-value">District identity, Debt Collector, Dungeon Court</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
   function deepStairCharterMarkup(mode = 'panel') {
     const unlockedDepth = getUnlockedCharterDepth(S);
     const depths = Array.from(new Set([...charterStartDepths(S), ...ensurePermanentCharters(S)])).sort((a, b) => a - b);
@@ -186,20 +214,13 @@
     const stagingDistrict = currentStagingDistrict(S);
     const activeDepth = S.run.active ? progressDepthValue(S.run.floor || 1, 1) : defaultRunStartDepth(S);
     const activeDepthMeta = depthProgressMeta(activeDepth);
-    const bestDepth = Math.max(1, progressDepthValue(S.player.depth || S.player.safeExtractDepth || 1, 1));
-    const safeDepth = progressDepthValue(S.player.safeExtractDepth || 1, 1);
     const returnDepth = S.run.active ? activeDepth : defaultRunStartDepth(S);
-    const boss = nextBossFloorFromDepth(activeDepth);
-    const bossText = boss.name ? `${escapeHtml(bossFloorLabel(boss.floor))} - ${escapeHtml(boss.name)}` : escapeHtml(bossFloorLabel(boss.floor));
     const lastRunText = S.run.active ? `Current descent: ${depthWithRawLabel(activeDepth)}` : latestRunSummary(S);
     const title = S.run.active ? 'Descent In Progress' : 'Hollow Stair Threshold';
     const subtitle = S.player.runHistory.length || S.player.depth > 0
       ? stagingDistrict.line
       : 'The Hollow Stair descends below Emberfall. Only debt is free here.';
-    const kicker = S.run.active ? 'Active Descent' : 'Safe Return';
-    const metaMarkup = `<span><b>Best Floor</b> ${escapeHtml(depthShortLabel(bestDepth))}</span>
-          <span><b>Safe Return</b> ${escapeHtml(depthShortLabel(safeDepth))}</span>
-          <span><b>Next Boss</b> ${bossText}</span>`;
+    const kicker = S.run.active ? 'Active Descent' : 'Returning Players';
     const actionId = S.run.active ? 'introModalContinueRunBtn' : 'introModalEnterDungeonBtn';
     const action = S.run.active
       ? `<button class="primary mini threshold-enter" id="${actionId}">Continue Run</button>`
@@ -231,9 +252,7 @@
           </div>
           <div class="depth-meter threshold-meter"><div style="width:${activeDepthMeta.chapterPct.toFixed(1)}%"></div></div>
         </div>
-        <div class="threshold-meta-row" aria-label="Hollow Stair status">
-          ${metaMarkup}
-        </div>
+        ${introRoadmapMarkup()}
         <div class="threshold-footer">
           <span>${escapeHtml(lastRunText)}</span>
           <span>${formatMoney(S.player.gold)} / Ember ${format(S.player.ember)}</span>

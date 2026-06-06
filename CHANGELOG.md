@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.27`
-* Current local package baseline: `v1.4.27`
-* Current development target: `v1.4.27`
+* Public/live itch version: `v1.4.28`
+* Current local package baseline: `v1.4.28`
+* Current development target: `v1.4.28`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,23 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.28 - Intro Roadmap Panel & Itch Analytics Note
+
+Status: Complete
+
+Summary:
+
+* Reworked the intro/safe-return modal so the old Best Floor, Safe Return, and Next Boss status chips no longer repeat progress summary data in that panel.
+* Added a compact Current Roadmap card that reads cleanly on mobile and keeps the panel focused on what is new and what comes next.
+* Kept the current district card, room progress bar, last-descent feedback, and wallet/ember display intact.
+* Updated the active build labels and cache query strings to `DungeonDex v1.4.28` with build query `1.4.28-intro-roadmap-panel-itch-analytics-note`.
+* Used recent itch traffic only as design context for a cleaner returning-player panel; no raw analytics numbers were surfaced in-game.
+* Kept gameplay, combat math, monster scaling, gear scaling, death/extraction/charter rules, Elite Board behavior, Bonus Writ behavior, Trophy behavior, and Rival behavior unchanged.
+* Did not add talents, combat systems, monster affixes, status effects, modifier popups, special monster behavior, or hidden enemy effects.
+* No save wipe.
 
 ---
 

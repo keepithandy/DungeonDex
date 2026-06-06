@@ -289,6 +289,52 @@ p { color: var(--soft); line-height: 1.35; }
 }
 .threshold-progress-head b { color: #f6d9a1; }
 .threshold-meter { height: 9px; background: rgba(255,255,255,0.06); }
+.threshold-roadmap-card {
+  display: grid;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,214,151,0.14);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255,196,99,0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.20));
+}
+.threshold-roadmap-head {
+  display: grid;
+  gap: 4px;
+}
+.threshold-roadmap-copy {
+  color: rgba(240,234,222,0.76);
+  font-size: 0.8rem;
+  line-height: 1.28;
+}
+.threshold-roadmap-list {
+  display: grid;
+  gap: 6px;
+}
+.threshold-roadmap-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 7px 8px;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,0.055);
+  background: rgba(0,0,0,0.18);
+}
+.threshold-roadmap-key {
+  color: #f6d9a1;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.threshold-roadmap-value {
+  color: rgba(248,246,238,0.9);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
 .threshold-meta-row, .threshold-footer {
   display: flex;
   flex-wrap: wrap;
@@ -400,6 +446,23 @@ p { color: var(--soft); line-height: 1.35; }
 .app-shell.combat-active .depth-progress-card p { font-size: 0.68rem; }
 @media (max-width: 430px) {
   .depth-progress-head { flex-direction: column; }
+}
+
+@media (max-width: 560px) {
+  .threshold-roadmap-card {
+    gap: 7px;
+    padding: 10px 11px;
+  }
+  .threshold-roadmap-copy,
+  .threshold-roadmap-value {
+    font-size: 0.76rem;
+    line-height: 1.22;
+  }
+  .threshold-roadmap-row {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 7px;
+    padding: 6px 7px;
+  }
 }
 
 .boss-warning { border-color: rgba(255,217,136,0.24); }

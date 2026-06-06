@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.4.27 — Roadmap Notes & Branch Cleanup
+- DungeonDex v1.4.28 — Intro Roadmap Panel & Itch Analytics Note
 
 ## Current Workflow
 - Inspect files before editing.
