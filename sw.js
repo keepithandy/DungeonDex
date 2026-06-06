@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.4.24a-enter-dungeon-scaling-hotfix';
+const CACHE_NAME = 'dungeondex-v1.4.25-scaling-followup-runtime-smoke';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.4.24a-enter-dungeon-scaling-hotfix';
+const BUILD_QS = '1.4.25-scaling-followup-runtime-smoke';
 const ASSETS = [
   './',
   './index.html',

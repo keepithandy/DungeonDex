@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.4.24a - Interface density and app-feel cleanup.
+// DungeonDex v1.4.25 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.4.24a';
+  const BUILD = '1.4.25';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.4.24a-enter-dungeon-scaling-hotfix';
+  const BUILD_QS = '1.4.25-scaling-followup-runtime-smoke';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

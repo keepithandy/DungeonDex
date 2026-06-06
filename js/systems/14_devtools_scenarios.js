@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.4.24a - DevTools Scenario Presets
+// DungeonDex v1.4.25 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.4.24a';
-  const SCENARIO_BUILD = '1.4.24a-enter-dungeon-scaling-hotfix';
+  const SCENARIO_VERSION = 'DungeonDex v1.4.25';
+  const SCENARIO_BUILD = '1.4.25-scaling-followup-runtime-smoke';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -240,30 +240,89 @@
       `trophies: ${board.trophyIds.length}`
     ].join('\n');
   }
-  function scalingProbeText(){
-    if (!hasState()) return 'Scaling probe unavailable.';
+  function scalingProbeDepthLabel(rawDepth){
+    if (typeof getLoreDepthProgress === 'function') {
+      const lore = getLoreDepthProgress(rawDepth);
+      return {
+        floor: lore.floorNumber,
+        room: lore.roomWithinFloor,
+        chapter: lore.chapterWithinRoom,
+        text: `Floor ${fmt(lore.floorNumber)} / Room ${fmt(lore.roomWithinFloor)} / Chapter ${fmt(lore.chapterWithinRoom)}`
+      };
+    }
+    return {
+      floor: rawDepth,
+      room: 1,
+      chapter: 1,
+      text: `Depth ${fmt(rawDepth)}`
+    };
+  }
+  function scalingProbeSample(rawDepth, tier){
+    if (typeof expectedMonsterSampleAtDepth === 'function') return expectedMonsterSampleAtDepth(rawDepth, tier);
+    const power = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(rawDepth, tier) : 0;
+    const hpMult = tier === 'Boss' ? 2.95 : tier === 'Elite' ? 1.84 : 1.44;
+    return {
+      rawDepth,
+      threatFloor: typeof threatDepthFromDepth === 'function' ? threatDepthFromDepth(rawDepth) : rawDepth,
+      tier,
+      power,
+      maxHp: Math.round(power * hpMult)
+    };
+  }
+  function scalingProbeSnapshot(){
+    if (!hasState()) return null;
     const derived = (() => {
       try { return typeof calcDerived === 'function' ? calcDerived(S) : null; } catch (err) { return null; }
     })();
     const playerPower = derived ? Math.round(derived.power || 0) : 0;
-    const depth = S.run && S.run.active ? S.run.floor : (S.player.depth || S.player.safeExtractDepth || 1);
-    const commonPower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(depth, 'Common') : 0;
-    const elitePower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(depth, 'Elite') : 0;
-    const bossDepth = Math.max(1, Math.ceil(depth / (typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5)) * (typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5));
-    const bossPower = typeof expectedMonsterPowerAtDepth === 'function' ? expectedMonsterPowerAtDepth(bossDepth, 'Boss') : 0;
-    const commonHp = commonPower ? Math.round(commonPower * 1.44) : 0;
-    const eliteHp = elitePower ? Math.round(elitePower * 1.84) : 0;
-    const bossHp = bossPower ? Math.round(bossPower * 2.95) : 0;
+    const rawDepth = Math.max(1, Math.floor(Number(S.run && S.run.active ? S.run.floor : (S.player.depth || S.player.safeExtractDepth || 1)) || 1));
+    const depthLabel = scalingProbeDepthLabel(rawDepth);
+    const bossDepth = typeof nextBossDepthFromDepth === 'function'
+      ? nextBossDepthFromDepth(rawDepth)
+      : Math.max(1, Math.ceil(rawDepth / ((typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5) * (typeof DEPTH_CHAPTERS_PER_THREAT_STEP === 'number' ? DEPTH_CHAPTERS_PER_THREAT_STEP : 3))) * ((typeof BOSS_INTERVAL === 'number' ? BOSS_INTERVAL : 5) * (typeof DEPTH_CHAPTERS_PER_THREAT_STEP === 'number' ? DEPTH_CHAPTERS_PER_THREAT_STEP : 3)));
+    const common = scalingProbeSample(rawDepth, 'Common');
+    const elite = scalingProbeSample(rawDepth, 'Elite');
+    const boss = scalingProbeSample(bossDepth, 'Boss');
     const api = eliteContractApi();
     const board = api && api.inspectBoardState ? api.inspectBoardState(S) : null;
+    const active = board && board.active ? board.active : null;
+    const targetRawDepth = active
+      ? (typeof eliteContractRawDepthForThreatFloor === 'function'
+        ? eliteContractRawDepthForThreatFloor(active.targetFloor)
+        : Math.max(1, (Math.floor(Number(active.targetFloor) || 1) - 1) * (typeof DEPTH_CHAPTERS_PER_THREAT_STEP === 'number' ? DEPTH_CHAPTERS_PER_THREAT_STEP : 3) + 1))
+      : 0;
+    const targetBase = active ? scalingProbeSample(targetRawDepth, 'Elite') : null;
+    const targetHpMult = active ? ((Math.floor(Number(active.targetFloor) || 1) < 20 ? 1.25 : 1.35) * (active.rivalContract ? 1.15 : 1)) : 1;
+    const activeTarget = active && targetBase ? {
+      name: active.eliteName,
+      rival: !!active.rivalContract,
+      targetFloor: active.targetFloor,
+      rawDepth: targetRawDepth,
+      power: targetBase.power,
+      maxHp: Math.round(targetBase.maxHp * targetHpMult)
+    } : null;
+    return {
+      build: SCENARIO_BUILD,
+      playerPower,
+      rawDepth,
+      depthLabel,
+      common,
+      elite,
+      boss,
+      activeTarget
+    };
+  }
+  function scalingProbeText(){
+    const probe = scalingProbeSnapshot();
+    if (!probe) return 'Scaling probe unavailable.';
     return [
       'Scaling Probe',
-      `Player Power: ${fmt(playerPower)}`,
-      `Floor: ${fmt(depth)}`,
-      commonPower ? `Common: ${fmt(commonPower)} power / ${fmt(commonHp)} HP` : 'Common: n/a',
-      elitePower ? `Elite: ${fmt(Math.round(elitePower * 1.16))} effective threat / ${fmt(eliteHp)} HP` : 'Elite: n/a',
-      bossPower ? `Boss: ${fmt(Math.round(bossPower * 1.22))} effective threat / ${fmt(bossHp)} HP` : 'Boss: n/a',
-      board && board.active ? `Active hunt: ${board.active.eliteName}` : 'Active hunt: none'
+      `Player Power: ${fmt(probe.playerPower)}`,
+      `Current: ${probe.depthLabel.text} (D${fmt(probe.rawDepth)}, threat Floor ${fmt(probe.common.threatFloor)})`,
+      probe.common.power ? `Common sample: ${fmt(probe.common.power)} power / ${fmt(probe.common.maxHp)} HP` : 'Common sample: n/a',
+      probe.elite.power ? `Elite sample: ${fmt(probe.elite.power)} power / ${fmt(probe.elite.maxHp)} HP` : 'Elite sample: n/a',
+      probe.boss.power ? `Boss sample: ${fmt(probe.boss.power)} power / ${fmt(probe.boss.maxHp)} HP at D${fmt(probe.boss.rawDepth)}` : 'Boss sample: n/a',
+      probe.activeTarget ? `${probe.activeTarget.rival ? 'Rival' : 'Contract'} sample: ${probe.activeTarget.name} - ${fmt(probe.activeTarget.power)} power / ${fmt(probe.activeTarget.maxHp)} HP` : 'Contract/Rival sample: none active'
     ].join('\n');
   }
   function createTestRival(){
@@ -504,6 +563,8 @@
     backup: function(){ scenarioState.lastBackup = cloneState(); return !!scenarioState.lastBackup; },
     restore: restoreBackup,
     snapshot: scenarioSnapshot,
+    scalingProbe: scalingProbeSnapshot,
+    scalingProbeText,
     eliteTrophyStateText,
     eliteRivalStateText,
     state: scenarioState

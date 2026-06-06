@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.4.22`
-* Current local package baseline: `v1.4.24a`
-* Current development target: `v1.4.24a`
+* Public/live itch version: `v1.4.25`
+* Current local package baseline: `v1.4.25`
+* Current development target: `v1.4.25`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -58,6 +58,22 @@ Use `VERSION.md` for the current active version.
 ## Active 1.4.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.4.25 - Scaling Follow-up & Runtime Smoke Guard
+
+Status: Complete
+
+Summary:
+
+* Verified the v1.4.24 scaling path after the v1.4.24a Enter Dungeon runtime hotfix.
+* Added a DevTools scaling smoke snapshot that reports player power, current Floor / Room / Chapter, common / elite / boss sample power and HP, and active contract / rival target HP when available.
+* Tuned Floor 20+ monster pressure so high-ilvl mythic gear no longer leaves common enemies far behind.
+* Preserved HP-first elite, boss, contract, and rival threat shape.
+* Confirmed the bad undefined `depth` reference is not present in `generateMonster`.
+* Preserved simple combat with no affixes, status effects, modifier popups, or special monster mechanics.
+* No save wipe.
 
 ---
 

@@ -123,6 +123,21 @@
     return 1 + base + tierBonus;
   }
 
+  function lateFloorPowerPressure(rawDepth) {
+    const depth = depthStageValue(rawDepth);
+    if (depth <= 20) return 1;
+    if (depth <= 40) return 1 + (depth - 20) * 0.45;
+    if (depth <= 90) return 10 + (depth - 40) * 0.82;
+    return 51 + Math.min(14, (depth - 90) * 0.02);
+  }
+
+  function lateFloorHpPressure(rawDepth) {
+    const depth = depthStageValue(rawDepth);
+    if (depth <= 20) return 1;
+    if (depth <= 40) return 1 + (depth - 20) * 0.1;
+    return 3;
+  }
+
   function expectedGearRating(level, rarityKey = 'common', source = 'normal', rawDepth = 0) {
     const safeLevel = normalizeItemLevel(level);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
@@ -137,10 +152,31 @@
     const boss = tier === 'Boss';
     const elite = tier === 'Elite';
     const earlyPressure = threatDepth <= 3 ? 0.90 : threatDepth <= 5 ? 1.0 : threatDepth <= 10 ? 1.08 : threatDepth <= 15 ? 1.06 : 1;
-    const lateFloorPressure = depth <= 20 ? 1 : depth <= 40 ? 1 + (depth - 20) * 0.085 : 2.7 + Math.min(0.8, (depth - 40) * 0.015);
+    const lateFloorPressure = lateFloorPowerPressure(depth);
     const base = (threatDepth * 9.5 + 15 + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure;
     const tierProfile = boss ? 1.22 : elite ? 1.16 : 1;
     return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile);
+  }
+
+  function expectedMonsterHpAtDepth(rawDepth, tier = 'Common') {
+    const depth = depthStageValue(rawDepth);
+    const ladder = depthDifficultyLadder(depth);
+    const power = expectedMonsterPowerAtDepth(depth, tier);
+    const boss = tier === 'Boss';
+    const elite = tier === 'Elite';
+    const hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * lateFloorHpPressure(depth);
+    return Math.round(hp);
+  }
+
+  function expectedMonsterSampleAtDepth(rawDepth, tier = 'Common') {
+    const depth = depthStageValue(rawDepth);
+    return {
+      rawDepth: depth,
+      threatFloor: threatDepthFromDepth(depth),
+      tier,
+      power: expectedMonsterPowerAtDepth(depth, tier),
+      maxHp: expectedMonsterHpAtDepth(depth, tier)
+    };
   }
 
   function generateStarterJunk() {
@@ -326,7 +362,7 @@
     const affix = '';
     const skill = 'Basic attack';
     const boss = rawDepth > 0 && rawDepth % (BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP) === 0;
-    const contractTarget = !boss && typeof eliteContractTargetDue === 'function' ? eliteContractTargetDue(state, rawDepth) : null;
+    const contractTarget = !boss && state && typeof eliteContractTargetDue === 'function' ? eliteContractTargetDue(state, rawDepth) : null;
     const eliteChance = clamp(eliteChanceForFloor(threatDepth) + ladder.eliteBonus + contractRisk.spawnBonus, 0.04, 0.43);
     const elite = !boss && (contractTarget || Math.random() < eliteChance);
     const modifiers = elite && !boss ? selectEliteModifiers(rawDepth, state) : [];
@@ -336,9 +372,9 @@
     // Monster scaling: threat-depth base roll × room/floor ladder × deep-floor pressure.
     // The deep multiplier is intentionally dormant before raw depth 800, then ramps so
     // normal monsters do not flatten behind deep Mythic-equipped players.
-    const lateFloorPressure = rawDepth <= 20 ? 1 : rawDepth <= 40 ? 1 + (rawDepth - 20) * 0.085 : 2.7 + Math.min(0.8, (rawDepth - 40) * 0.015);
+    const lateFloorPressure = lateFloorPowerPressure(rawDepth);
     let power = Math.round((threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier));
-    let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * (rawDepth <= 20 ? 1 : rawDepth <= 40 ? 1 + (rawDepth - 20) * 0.1 : 3);
+    let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * lateFloorHpPressure(rawDepth);
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;

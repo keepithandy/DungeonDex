@@ -1,0 +1,11 @@
+DungeonDex v1.4.25 - Scaling Follow-up & Runtime Smoke Guard
+
+Verified the v1.4.24 scaling changes after the v1.4.24a dungeon-entry hotfix.
+
+Changes:
+- Confirmed the Enter Dungeon and monster generation path no longer uses the undefined depth reference that broke v1.4.24.
+- Improved the DevTools Scaling Probe so it reports player power, current Floor / Room / Chapter, common / elite / boss sample power and HP, and active contract / rival target HP when available.
+- Made a small Floor 20+ scaling follow-up so high-ilvl mythic gear does not leave common enemies far behind.
+- Preserved HP-first combat pressure for elites, bosses, contracts, and rivals.
+- No affixes, status effects, modifier popups, special enemy behavior, aura mechanics, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+- No save wipe.

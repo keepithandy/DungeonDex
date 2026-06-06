@@ -1,0 +1,73 @@
+DungeonDex v1.4.25 - Scaling Follow-up & Runtime Smoke Guard
+
+Baseline:
+- Local main was synced with origin/main before edits.
+- v1.4.24a hotfix baseline was present in recent history: "Fix enter dungeon scaling runtime".
+- Current HEAD before v1.4.25 work was df591a2 "v2RuntimeHotfix".
+
+Audit:
+- generateMonster no longer contains the undefined depth reference from v1.4.24.
+- The exact bad pattern "depth <= 20 ? 1 : depth <= 40" is no longer present in scaling code.
+- generateMonster now guards the contract-target lookup when called without state for DevTools/runtime sampling.
+- Contract and rival targets remain HP-first: contract power multiplier stays 1 and HP receives the contract/rival bonus.
+- Elite modifier selection remains disabled and monster modifier markup/stat/reward helpers remain neutral.
+- No affixes, status effects, modifier popups, special monster behavior, burn, bleed, poison, stun, thorns, regen, shield procs, or hidden enemy effects were reintroduced.
+
+Scaling Probe:
+- Existing DevTools Scaling Probe was improved.
+- It now exposes DungeonDexScenarioDevTools.scalingProbe().
+- It reports player power, current Floor / Room / Chapter, common / elite / boss sample power and HP, and active contract/rival target HP when available.
+
+Browser Smoke:
+- In-app Browser plugin startup failed twice with "windows sandbox failed: spawn setup refresh".
+- Fallback used local headless Chrome through DevTools Protocol against http://127.0.0.1:8785.
+- Visible label: DungeonDex v1.4.25.
+- Town loaded.
+- Enter Dungeon worked.
+- Monster generation worked.
+- Combat screen opened.
+- Attack worked.
+- Ashburst skill worked.
+- Guard worked.
+- Extract worked.
+- Floor / Room / Chapter display rendered.
+- Monster power/HP display rendered.
+- No generateMonster console errors.
+- No console errors.
+- No affix/status/modifier text appeared in visible combat text.
+- Elite Board opened.
+- Contract accept worked.
+- Contract target spawned by exact name: Cinderjaw Bailiff.
+- Bonus Writ simulation worked.
+- Trophy force-award worked.
+- Rival remembering worked.
+- Death reset simulation worked.
+- Safe extraction preserved progress.
+- Deep Stair Charter state remained available.
+- No save wipe was performed; smoke used a temporary browser profile.
+
+Runtime Samples:
+- Clean test player power: 8 at Floor 1 / Room 1 / Chapter 1.
+- Initial common sample: 22 power / 32 HP.
+- Initial elite sample: 42 power / 77 HP.
+- Initial boss sample: 167 power / 494 HP at raw depth 15.
+- Contract target sample after accept: Cinderjaw Bailiff, 61 power / 140 HP, exact-name spawn confirmed.
+
+Floor 26 Scaling Check:
+- Raw depth checked: 78.
+- Threat Floor: 26.
+- Expected common: 11,350 power / 50,199 HP.
+- Expected elite: 13,970 power / 78,950 HP.
+- Expected boss at raw depth 90 / threat Floor 30: 24,592 power / 223,559 HP.
+- Generated common sample: 9,834 power / 43,494 HP.
+- Generated elite sample: 11,567 power / 65,369 HP.
+- Generated boss sample: 22,705 power / 206,405 HP.
+- Result: Floor 26 commons are materially higher than the old roughly 6k report and are in the intended 10k-16k band by expected probe values, with generated sample variance slightly below the band on this run.
+- Result: bosses and elites remain HP-heavy threats without reintroducing monster mechanics.
+
+Syntax / File Checks:
+- node --check app.js: passed.
+- node --check sw.js: passed.
+- node --check all js/systems/*.js: passed.
+- manifest.json parse: passed.
+- git diff --check: passed, with CRLF normalization warnings only.
