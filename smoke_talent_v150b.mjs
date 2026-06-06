@@ -428,6 +428,8 @@ async function main() {
           overflow,
           panelOverflow,
           hasTotals: /Available:\\s*\\d+/.test(text) && /Spent:\\s*\\d+/.test(text) && /Earned:\\s*\\d+/.test(text),
+          hasMilestone: text.includes('Next point: secure depth') || text.includes('All milestone points earned.'),
+          hasRule: text.includes('1 point per 5 secured depths. Max 20.'),
           hasStarterTalents: ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => text.includes(name)),
           hasPassiveNote: text.includes('Passive only. No combat buttons.')
         };
@@ -452,6 +454,28 @@ async function main() {
     record('Talent panel renders', ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
     record('Talent point totals are readable', /Available:\s*0/.test(freshPanelText) && /Spent:\s*0/.test(freshPanelText) && /Earned:\s*0/.test(freshPanelText), freshPanelText.slice(0, 300));
     record('Passive-only talent note is visible', freshPanelText.includes('Passive only. No combat buttons.'), freshPanelText.slice(0, 300));
+    record('Talent milestone explanation appears', freshPanelText.includes('Earn points by securing deeper milestones.') && freshPanelText.includes('1 point per 5 secured depths. Max 20.'), freshPanelText.slice(0, 400));
+    record('Next point line appears for non-maxed state', freshPanelText.includes('Next point: secure depth 5') && freshPanelText.includes('Progress: 1 / 5 secured depths'), freshPanelText.slice(0, 400));
+    record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
+    const unsafeRunMilestone = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      S.player.safeExtractDepth = 4;
+      S.player.returnDepth = 4;
+      S.player.permanentStartFloor = 1;
+      S.run.active = true;
+      S.run.floor = 50;
+      return api && typeof api.milestoneInfo === 'function' ? api.milestoneInfo(S) : null;
+    })()`);
+    record('Milestone display ignores unsafe run depth', unsafeRunMilestone && unsafeRunMilestone.nextDepth === 5 && unsafeRunMilestone.progress === 4, JSON.stringify(unsafeRunMilestone));
+    await evalByValue(client, `(() => {
+      S.run.active = false;
+      S.run.floor = 0;
+      S.player.safeExtractDepth = 1;
+      S.player.returnDepth = 1;
+      S.player.permanentStartFloor = 1;
+      if (typeof render === 'function') render();
+      return true;
+    })()`);
     const freshUnlockBtn = await evalByValue(client, `(() => {
       const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
       return !!btn && btn.disabled && /Need Point/.test(btn.textContent || '');
@@ -459,9 +483,28 @@ async function main() {
     record('Unlock buttons blocked with 0 points', !!freshUnlockBtn, 'Hardened Start button disabled');
     for (const width of [390, 375, 360, 320]) {
       const mobile = await checkTalentViewport(width);
-      record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasTotals && mobile.hasStarterTalents && mobile.hasPassiveNote, JSON.stringify(mobile));
+      record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasTotals && mobile.hasMilestone && mobile.hasRule && mobile.hasStarterTalents && mobile.hasPassiveNote, JSON.stringify(mobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
+    const maxPanelText = await evalByValue(client, `(() => {
+      S.screen = 'gear';
+      S.run.active = false;
+      S.run.floor = 0;
+      S.player.safeExtractDepth = 100;
+      S.player.returnDepth = 100;
+      S.player.permanentStartFloor = 100;
+      if (!S.player.talents || typeof S.player.talents !== 'object') S.player.talents = { pointsEarned:20, pointsSpent:0, unlocked:{}, unlockedIds:[] };
+      S.player.talents.pointsEarned = 20;
+      S.player.talentPointsEarned = 20;
+      S.player.talentPoints = Math.max(0, 20 - (S.player.talentPointsSpent || 0));
+      if (typeof render === 'function') render();
+      const panel = document.getElementById('talentPanel');
+      return panel ? panel.innerText : '';
+    })()`);
+    record('Max-point milestone state displays safely', maxPanelText.includes('All milestone points earned.') && maxPanelText.includes('Max points: 20'), maxPanelText.slice(0, 400));
+    await clearSave(client);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
 
     // Grant one point and unlock Hardened Start.
     const grantOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
@@ -512,6 +555,8 @@ async function main() {
     record('Older-save missing talent fields repairs safely', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const repairedSummary = await getSummary();
     record('Legacy aliases repaired', repairedSummary && repairedSummary.pointsEarned === 2 && repairedSummary.pointsSpent === 1 && repairedSummary.pointsAvailable === 1 && Array.isArray(repairedSummary.unlockedIds), JSON.stringify(repairedSummary));
+    const repairedPanelText = await getTalentText();
+    record('Repaired save milestone display is safe', repairedPanelText.includes('Next point: secure depth') && repairedPanelText.includes('1 point per 5 secured depths. Max 20.'), repairedPanelText.slice(0, 400));
 
     // Unknown id scenario.
     const unknownSave = JSON.parse(JSON.stringify(await readSave(client)));

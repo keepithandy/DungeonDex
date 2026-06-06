@@ -1,11 +1,13 @@
 'use strict';
 
-// DungeonDex v1.5.1 - Talent System Foundation + Lowfire Board.
+// DungeonDex v1.5.2 - Talent System Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.5.1-talent-ui-readability-save-compatibility-polish';
+  const SCRIPT_BUILD = '1.5.2-talent-milestone-feedback-clarity';
+  const TALENT_UI_POINT_STEP = 5;
+  const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const F = v => typeof format === 'function' ? format(v) : String(Math.round(Number(v) || 0));
   const M = v => typeof formatMoney === 'function' ? formatMoney(v) : `${Math.floor(Number(v) || 0)}c`;
@@ -123,6 +125,35 @@
     };
   }
 
+  function securedTalentDepth(state){
+    return Math.max(
+      1,
+      Math.floor(N(state?.player?.safeExtractDepth, 1, 1, 999999)),
+      Math.floor(N(state?.player?.returnDepth, 1, 1, 999999)),
+      Math.floor(N(state?.player?.permanentStartFloor, 1, 1, 999999))
+    );
+  }
+
+  function talentMilestoneInfo(state, summary){
+    const securedDepth = securedTalentDepth(state);
+    const securedPoints = Math.max(0, Math.min(TALENT_UI_POINT_CAP, Math.floor(securedDepth / TALENT_UI_POINT_STEP)));
+    const currentPoint = securedPoints;
+    const maxed = currentPoint >= TALENT_UI_POINT_CAP;
+    const baseDepth = currentPoint * TALENT_UI_POINT_STEP;
+    const nextDepth = maxed ? TALENT_UI_POINT_CAP * TALENT_UI_POINT_STEP : (currentPoint + 1) * TALENT_UI_POINT_STEP;
+    const progress = maxed ? TALENT_UI_POINT_STEP : Math.max(0, Math.min(TALENT_UI_POINT_STEP, securedDepth - baseDepth));
+    return {
+      securedDepth,
+      securedPoints,
+      nextDepth,
+      progress,
+      maxed,
+      statusLabel: maxed ? 'All milestone points earned.' : `Next point: secure depth ${F(nextDepth)}`,
+      progressLabel: maxed ? `Max points: ${F(TALENT_UI_POINT_CAP)}` : `Progress: ${F(progress)} / ${F(TALENT_UI_POINT_STEP)} secured depths`,
+      ruleLabel: `1 point per ${F(TALENT_UI_POINT_STEP)} secured depths. Max ${F(TALENT_UI_POINT_CAP)}.`
+    };
+  }
+
   function talentPathCardMarkup(state, def, summary){
     const path = TALENT_PATH_BY_ID[def.path] || { label:def.path, summary:'' };
     const unlocked = !!summary.unlockedIds.includes(def.id);
@@ -152,6 +183,7 @@
     if (!panel || !state?.player) return;
     ensureTalents(state);
     const summary = safeTalentSummary(state);
+    const milestone = talentMilestoneInfo(state, summary);
     const visibleUnlockedCount = summary.unlockedIds.filter(id => TALENT_BY_ID[id]).length;
     const hiddenCount = summary.unlockedIds.filter(id => !TALENT_BY_ID[id]).length;
     panel.innerHTML = `
@@ -170,9 +202,14 @@
         <span class="talent-separator" aria-hidden="true">&bull;</span>
         <span><b>Earned:</b> ${F(summary.pointsEarned)}</span>
       </div>
+      <div class="talent-milestone-line small" aria-label="Talent milestone progress">
+        <span><b>${H(milestone.statusLabel)}</b></span>
+        <span>${H(milestone.progressLabel)}</span>
+      </div>
       <div class="talent-summary-row small muted">
+        <span>Earn points by securing deeper milestones.</span>
         <span>${F(visibleUnlockedCount)} unlocked</span>
-        <span>+1 point every 5 secured depths</span>
+        <span>${H(milestone.ruleLabel)}</span>
       </div>
       <div class="talent-grid">${TALENT_DEFS.map(def => talentPathCardMarkup(state, def, summary)).join('')}</div>
       <div class="talent-footer">
@@ -535,14 +572,17 @@
     summary: state => {
       return safeTalentSummary(state);
     },
+    milestoneInfo: state => talentMilestoneInfo(state, null),
     summaryText: state => {
       const summary = api.summary(state);
+      const milestone = api.milestoneInfo(state);
       const unlockedNames = summary.unlockedIds
         .map(id => TALENT_BY_ID[id]?.name || id)
         .join(', ') || 'none';
       const pathLabels = TALENT_PATHS.map(path => path.label).join(', ');
       return [
         `Talent points: ${summary.pointsAvailable} available, ${summary.pointsSpent} spent, ${summary.pointsEarned} earned.`,
+        `${milestone.statusLabel} ${milestone.progressLabel} ${milestone.ruleLabel}`,
         `Unlocked: ${unlockedNames}.`,
         `Paths: ${pathLabels}.`,
         `Bonuses: HP +${Math.round(summary.bonuses.maxHpPct * 100)}%, Board +${Math.round(summary.bonuses.eliteBoardRewardPct * 100)}%, Charters -${Math.round(summary.bonuses.charterCostPct * 100)}%, Sell +${Math.round(summary.bonuses.sellValuePct * 100)}%.`

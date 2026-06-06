@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.5.1-talent-ui-readability-save-compatibility-polish';
+const CACHE_NAME = 'dungeondex-v1.5.2-talent-milestone-feedback-clarity';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.5.1-talent-ui-readability-save-compatibility-polish';
+const BUILD_QS = '1.5.2-talent-milestone-feedback-clarity';
 const ASSETS = [
   './',
   './index.html',

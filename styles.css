@@ -6504,6 +6504,24 @@ button:focus-visible,
   color: rgba(244,208,139,0.5);
 }
 
+#talentPanel .talent-milestone-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  margin: 0 0 7px;
+  border: 1px solid rgba(122,232,178,0.12);
+  border-radius: 12px;
+  background: rgba(122,232,178,0.035);
+  color: rgba(225,238,219,0.82);
+  padding: 6px 8px;
+}
+
+#talentPanel .talent-milestone-line b {
+  color: rgba(186,246,216,0.95);
+}
+
 #talentPanel .talent-summary-row {
   display: flex;
   flex-wrap: wrap;
@@ -7096,6 +7114,11 @@ button:focus-visible,
 
   #talentPanel .talent-head .pill {
     align-self: flex-start;
+  }
+
+  #talentPanel .talent-milestone-line {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .gear-player-head,

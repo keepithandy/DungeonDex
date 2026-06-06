@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.5.1`
-* Current local package baseline: `v1.5.1`
-* Current development target: `v1.5.1`
+* Public/live itch version: `v1.5.2`
+* Current local package baseline: `v1.5.2`
+* Current development target: `v1.5.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.5.2 - Talent Milestone Feedback Clarity
+
+Status: Complete
+
+Summary:
+
+* Clarified the Gear tab Talent panel with next-point milestone copy, secured-depth progress, and the max-point rule.
+* Added display-only milestone feedback: next point depth, progress toward the next 5-depth milestone, and max points.
+* Kept the Talent System foundation unchanged: no new talents, paths, combat mechanics, monster mechanics, bonus values, or earning-rate changes were added.
+* Confirmed repaired and older-save-style talent data still displays safely.
+* No save wipe.
 
 ---
 

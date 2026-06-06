@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.5.1 - Interface density and app-feel cleanup.
+// DungeonDex v1.5.2 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.5.1';
+  const BUILD = '1.5.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.5.1-talent-ui-readability-save-compatibility-polish';
+  const BUILD_QS = '1.5.2-talent-milestone-feedback-clarity';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -100,6 +100,7 @@
       #talentPanel .talent-head p{font-size:10.75px!important;line-height:1.22!important}
       #talentPanel .talent-passive-note{font-size:10.5px!important;line-height:1.1!important;padding:3px 7px!important;margin-top:5px!important}
       #talentPanel .talent-point-line{gap:3px 6px!important;margin:4px 0 6px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
+      #talentPanel .talent-milestone-line{gap:3px 7px!important;margin:0 0 7px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-summary-row{display:flex;flex-wrap:wrap;gap:5px!important;margin:5px 0 8px!important}
       #talentPanel .talent-summary-row span{font-size:10.5px!important;padding:3px 6px!important}
       #talentPanel .talent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
