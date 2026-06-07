@@ -109,6 +109,23 @@
   function bindInventoryActions() {
     $$('[data-equip]').forEach(btn => btn.onclick = () => runGuardedAction(() => { equipItem(S, btn.dataset.equip); render(); }));
     $$('[data-sell]').forEach(btn => btn.onclick = () => runGuardedAction(() => { const paid = sellItem(S, btn.dataset.sell); if (paid) showGoldPopup(paid); render(); }));
+    $$('[data-retire]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      const itemId = String(btn.dataset.retire || '').trim();
+      const item = asArray(S.player?.inventory, []).find(entry => entry && String(entry.id || '').trim() === itemId);
+      if (!item || !canRetireInventoryItem(S, item)) return;
+      const itemName = cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic');
+      const rarity = cleanDisplayText(item.rarity || 'common', 'common');
+      const slot = cleanDisplayText(item.slot || 'gear', 'gear');
+      const confirmText = `Retire ${itemName} (${rarity} ${slot}) into the Archive?\nThis removes it from inventory and preserves it as a record.`;
+      if (!window.confirm(confirmText)) return;
+      const result = retireInventoryItem(S, itemId);
+      if (!result.ok) {
+        console.warn('DungeonDex retire action skipped:', result.reason);
+        render();
+        return;
+      }
+      render();
+    }));
     const sellJunkBtn = el('sellJunkGearBtn');
     if (sellJunkBtn) sellJunkBtn.onclick = () => runGuardedAction(() => {
       const result = sellAllQuickSafeGear(S);

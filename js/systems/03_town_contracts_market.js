@@ -1126,6 +1126,68 @@
     return sellValue(item) > 0;
   }
 
+  function canRetireInventoryItem(state, item) {
+    if (!item || item.kind === 'special') return false;
+    if (!item.slot) return false;
+    if (item.locked || item.favorite || item.protected) return false;
+    const tags = asArray(item.tags, []).map(tag => String(tag).toLowerCase());
+    if (tags.includes('protected') || tags.includes('special')) return false;
+    if (itemIsEquipped(state, item)) return false;
+    return true;
+  }
+
+  function createRetiredRelicRecordFromItem(state, item, source) {
+    if (!item || !state?.player) return null;
+    const rawDepth = Math.max(1, Math.floor(numberOr(state.player.safeExtractDepth, state.player.depth, 1, 999999)));
+    const depthLabel = typeof getLoreDepthProgress === 'function'
+      ? getLoreDepthProgress(rawDepth)
+      : { floorNumber: rawDepth, roomWithinFloor: 1, chapterWithinRoom: 1 };
+    const snapshot = typeof structuredClone === 'function'
+      ? structuredClone(item)
+      : JSON.parse(JSON.stringify(item));
+    return {
+      id: `retired_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+      archivedAt: Date.now(),
+      stamp: new Date().toLocaleString(),
+      rawDepth,
+      floor: Math.max(1, Math.floor(numberOr(depthLabel.floorNumber, 1, 1, 999999))),
+      room: Math.max(1, Math.floor(numberOr(depthLabel.roomWithinFloor, 1, 1, 999999))),
+      chapter: Math.max(1, Math.floor(numberOr(depthLabel.chapterWithinRoom, 1, 1, 999999))),
+      slot: String(item.slot || 'weapon'),
+      rarity: String(item.rarity || 'common'),
+      itemLevel: Math.max(1, Math.floor(numberOr(item.level, 1, 1, 99999))),
+      rating: Math.max(1, Math.floor(numberOr(item.rating, 1, 1, 999999))),
+      value: Math.max(1, Math.floor(numberOr(item.value, 1, 1, Number.MAX_SAFE_INTEGER))),
+      source: source || 'Manual Retirement',
+      note: 'Manually retired into the Archive. No combat bonus granted.',
+      item: snapshot
+    };
+  }
+
+  function retireInventoryItem(state, itemId) {
+    if (!state?.player) return { ok:false, reason:'state unavailable' };
+    const inventory = asArray(state.player.inventory, []);
+    const cleanId = String(itemId || '').trim();
+    if (!cleanId) return { ok:false, reason:'missing item id' };
+    const index = inventory.findIndex(item => isPlainObject(item) && String(item.id || '').trim() === cleanId);
+    if (index < 0) return { ok:false, reason:'item not found' };
+    const item = inventory[index];
+    if (!canRetireInventoryItem(state, item)) return { ok:false, reason:'item not eligible' };
+    const record = createRetiredRelicRecordFromItem(state, item, 'Manual Retirement');
+    if (!record) return { ok:false, reason:'archive record failed' };
+    const archived = asArray(state.player.retiredRelics, []).filter(isPlainObject);
+    archived.unshift(record);
+    const before = inventory.length;
+    inventory.splice(index, 1);
+    if (inventory.length === before) {
+      return { ok:false, reason:'item removal failed' };
+    }
+    state.player.retiredRelics = archived.slice(0, 80);
+    state.player.inventory = inventory;
+    if (typeof pushLog === 'function') pushLog(state, `Archived: ${cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic')}.`);
+    return { ok:true, record, item };
+  }
+
   function isJunkSaleBonusItem(item) {
     if (!item || item.kind === 'special') return false;
     const tags = asArray(item.tags, []).map(tag => String(tag).toLowerCase());

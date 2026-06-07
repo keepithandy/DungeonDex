@@ -533,10 +533,12 @@
     const inventory = asArray(S.player?.inventory, []);
     const safeSellCount = inventory.filter(item => canQuickSellItem(S, item)).length;
     const allSellCount = inventory.filter(item => canSellAllGearItem(S, item)).length;
+    const retireCount = inventory.filter(item => canRetireInventoryItem(S, item)).length;
     const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
     const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after two confirmations" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
+    const retireAllBtn = `<button class="ghost mini tiny-sell-all" id="retireArchiveBtn" title="Manual retirement happens one item at a time from inventory cards." disabled>Retire ${format(retireCount)}</button>`;
     inventoryPanel.innerHTML = `
-      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Equip, sell, or filter.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}</div></div>
+      <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Equip, sell, retire, or filter.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}${retireAllBtn}</div></div>
       <div class="list inventory-list">${inv.map(itemCard).join('') || '<div class="empty-inventory-card"><strong>No matching gear</strong><span>Adjust filters or keep delving.</span></div>'}</div>`;
   }
 
@@ -580,6 +582,9 @@
     const setBonusPreview = setBonusPreviewMarkup(item, S, true);
     const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
     const sellAttrs = itemId ? `data-sell="${safeItemId}"` : 'disabled';
+    const retireEligible = canRetireInventoryItem(S, item);
+    const retireAttrs = itemId && retireEligible ? `data-retire="${safeItemId}"` : 'disabled';
+    const retireLabel = retireEligible ? 'Retire' : 'Retire Locked';
     const rarityEyebrow = `<span class="rarity-eyebrow ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span>`;
     return `<article class="loot-card inventory-card ${delta > 0 ? 'inventory-upgrade-card' : ''} ${getRarityCardClass(item)}">
       <div class="inventory-card-main">
@@ -593,7 +598,7 @@
       ${gearScoreMarkup(item)}
       ${summary ? `<p class="small inventory-card-summary">${escapeHtml(summary)}</p>` : ''}
       ${setBonusPreview}
-      <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button></div>
+      <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button><button class="ghost mini retire-item-btn" ${retireAttrs}>${retireLabel}</button></div>
     </article>`;
   }
 
@@ -753,7 +758,7 @@
     el('monsterDex').innerHTML = `${collectionShell('Boss Trophies', 'Collection records from defeated bosses.', `<div class="boss-trophy-section-head"><h4>Recorded Collection</h4><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : '<div class="boss-trophy-empty-state"><strong>No boss trophies recorded</strong><p>Defeat bosses to record their trophies here.</p><div class="small muted">Collection record only. No combat bonus.</div></div>'}</div><div class="sep"></div><div class="boss-trophy-section-head"><h4>Missing Trophy Case</h4><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`, { pill:`${format(bossSummary.totalFound)} recorded` })}${collectionShell('Board & Rival Trophies', 'Existing contract and rival collection records.', `<div class="elite-trophy-summary"><div class="elite-trophy-summary-head"><h4>Elite Trophies</h4><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div><div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div></div><div class="elite-trophy-summary rival-summary"><div class="elite-trophy-summary-head"><h4>Rivals Remembered</h4><span class="pill">${format(rivalActive.length)} active</span></div><div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div></div>`, { pill:`${format(eliteEntries.length)} trophies` })}${collectionShell('Retired Items', 'Archive records for gear worth remembering. DevTools-only record creation in this build.', `${retiredRelics.length ? `<div class="retired-relic-grid">${retiredRelics.map(entry => retiredRelicCard(entry)).join('')}</div>` : '<div class="empty-relic-shelf"><span>No retired items recorded</span><small>DevTools can seed archive records for save and UI checks. No player-facing retire action is active.</small></div>'}`, { pill: retiredRelics.length ? `${format(retiredRelics.length)} recorded` : 'No records yet' })}`;
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
-      <p class="small muted">Retired item archive foundation only. Records can render and persist, but no gear retirement actions are active in this build.</p>
+      <p class="small muted">Retired item archive records now support manual retirement from unequipped inventory items.</p>
       ${retiredRelics.length ? `<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : '<div class="empty-relic-shelf"><span>Retired Items</span><small>No archive records yet. Use DevTools helpers for archive-only test entries.</small></div>'}`;
   }
 
@@ -820,7 +825,7 @@
       <div class="list run-history-list">${historyMarkup}</div>
       <div class="sep"></div>
       <div class="archive-history-head">
-        <div><h3>Retired Item Archive</h3><p class="small muted">Read-only archive records. DevTools-only creation for v1.6.4.</p></div>
+        <div><h3>Retired Item Archive</h3><p class="small muted">Read-only archive records plus manual retirement for unequipped inventory items.</p></div>
         <span class="pill">${format(asArray(S.player.retiredRelics, []).filter(isPlainObject).length)} recorded</span>
       </div>
       <div class="list archive-log-list">${retiredRelicLines}</div>

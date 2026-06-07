@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.4-retired-item-archive-foundation';
+const CACHE_NAME = 'dungeondex-v1.6.5-retired-item-manual-archive-action';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.4-retired-item-archive-foundation';
+const BUILD_QS = '1.6.5-retired-item-manual-archive-action';
 const ASSETS = [
   './',
   './index.html',
