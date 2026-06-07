@@ -611,30 +611,41 @@
   }
 
   function bossTrophyLocationLabel(entry) {
-    if (!isPlainObject(entry)) return 'Location unknown';
-    const depthLabel = depthShortLabel(entry.bestKillDepth || entry.rawDepth || 1);
-    return `Best ${depthLabel} • F${format(entry.floor || 1)} R${format(entry.room || 1)} C${format(entry.chapter || 1)}`;
+    if (!isPlainObject(entry)) return 'Unrecorded depth';
+    const bestDepth = Math.max(0, Math.floor(numberOr(entry.bestKillDepth, entry.rawDepth, 0, 999999)));
+    if (bestDepth <= 0) return 'Unrecorded depth';
+    return depthShortLabel(bestDepth);
   }
 
   function bossTrophyLastEarnedLabel(entry) {
-    if (!isPlainObject(entry)) return 'Last earned location unknown';
-    const source = cleanDisplayText(entry.source || '', '');
-    return source ? `${source} • F${format(entry.floor || 1)} R${format(entry.room || 1)} C${format(entry.chapter || 1)}` : `F${format(entry.floor || 1)} R${format(entry.room || 1)} C${format(entry.chapter || 1)}`;
+    if (!isPlainObject(entry)) return 'Unknown Boss';
+    const floor = Math.max(1, Math.floor(numberOr(entry.floor, 1, 1, 999999)));
+    const room = Math.max(1, Math.floor(numberOr(entry.room, 1, 1, 999999)));
+    const chapter = Math.max(1, Math.floor(numberOr(entry.chapter, 1, 1, 999999)));
+    const source = cleanDisplayText(entry.source || entry.bossName || '', '');
+    const location = `F${format(floor)} R${format(room)} C${format(chapter)}`;
+    return source ? `${source} • ${location}` : location;
+  }
+
+  function bossTrophyMetaRow(label, value) {
+    return `<div class="boss-trophy-meta-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
   }
 
   function bossTrophyRecordCard(entry) {
+    const trophyName = typeof getBossTrophyDisplayName === 'function' ? getBossTrophyDisplayName(entry) : (entry.trophyName || entry.name || 'Boss Trophy');
+    const bossName = cleanDisplayText(entry.bossName || entry.source || '', 'Unknown Boss');
+    const count = `x${format(Math.max(1, numberOr(entry.count, 1, 1, 9999)))}`;
     return `<article class="boss-trophy-record-card">
       ${trophyIconMarkup(entry, true)}
       <div class="boss-trophy-copy">
-        <div class="trophy-kicker">${escapeHtml(entry.source || 'Boss Trophy')} • ${escapeHtml(entry.tone || 'Trophy')}</div>
-        <h3>${escapeHtml(typeof getBossTrophyDisplayName === 'function' ? getBossTrophyDisplayName(entry) : (entry.trophyName || entry.name || 'Boss Trophy'))}</h3>
-        <div class="boss-trophy-record-boss">${escapeHtml(entry.bossName || entry.source || 'Unknown Boss')}</div>
-        <div class="boss-trophy-record-meta">
-          <span class="pill trophy-pill-unlocked">Count x${format(entry.count || 1)}</span>
-          <span class="pill">Recorded</span>
+        <div class="trophy-kicker">${escapeHtml(entry.source || 'Boss Trophy')}</div>
+        <h3>${escapeHtml(trophyName)}</h3>
+        <div class="boss-trophy-record-boss">${escapeHtml(bossName)}</div>
+        <div class="boss-trophy-record-meta"><span class="pill trophy-pill-unlocked">Recorded</span><span class="pill">Count ${escapeHtml(count)}</span></div>
+        <div class="boss-trophy-meta-list">
+          ${bossTrophyMetaRow('Best Depth', bossTrophyLocationLabel(entry))}
+          ${bossTrophyMetaRow('Last Earned', bossTrophyLastEarnedLabel(entry))}
         </div>
-        <div class="small muted">${escapeHtml(bossTrophyLocationLabel(entry))}</div>
-        <div class="small muted">Last earned: ${escapeHtml(bossTrophyLastEarnedLabel(entry))}</div>
       </div>
     </article>`;
   }
@@ -644,9 +655,9 @@
       ? getBossTrophyCompletionState(S, trophy)
       : { key: isBossTrophyUnlocked(trophy, bestDepth) ? 'recorded' : 'locked', record:null };
     const unlocked = completion.recorded;
-    const stateLabel = unlocked ? 'Recorded' : completion.key === 'available' ? 'Missing Record' : `Locked until ${trophy.source}`;
+    const stateLabel = unlocked ? 'Recorded' : completion.key === 'available' ? 'Missing' : 'Locked';
     const lockedDescription = completion.key === 'available'
-      ? 'This boss trophy has not been recorded yet. Defeat the matching boss to identify it.'
+      ? 'Defeat this boss to record the trophy.'
       : 'Defeat deeper bosses to identify this trophy.';
     return `<article class="boss-trophy-card ${unlocked ? 'is-unlocked' : 'is-locked'}">
       ${trophyIconMarkup(trophy, unlocked)}
@@ -679,11 +690,14 @@
     const bossSummary = typeof getBossTrophyCollectionSummary === 'function'
       ? getBossTrophyCollectionSummary(S)
       : { recordedCount: bossRecords.length, totalDefinitions: trophies.length, missingCount: Math.max(0, trophies.length - bossRecords.length), totalFound: bossRecords.reduce((sum, entry) => sum + Math.max(1, numberOr(entry.count, 1, 1, 9999)), 0), bestRecord: bossRecords[0] || null };
+    const bossTotalLabel = bossSummary.totalDefinitions > 0
+      ? `${format(bossSummary.recordedCount)} / ${format(bossSummary.totalDefinitions)}`
+      : `${format(bossSummary.recordedCount)}`;
     el('dexSummary').innerHTML = `
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Boss trophies and retired relics collected by the Warden. Boss trophy records are collection records only and do not change combat.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
       <div class="trophy-tabs"><button class="trophy-tab active" type="button">Boss Trophies</button><button class="trophy-tab" type="button" disabled>Retired Relics soon</button></div>
-      <div class="tag-row"><span class="pill">Boss Trophies: ${format(bossSummary.recordedCount)} / ${format(bossSummary.totalDefinitions)}</span><span class="pill">Collected: ${format(bossSummary.totalFound)}</span><span class="pill">Missing: ${format(bossSummary.missingCount)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
-      <div class="boss-trophy-summary-card"><div><strong>Dex Summary</strong><div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(bossSummary.bestRecord.bossName || 'Unknown Boss')} holds the deepest recorded mark.` : 'Defeat bosses to start the collection.'}</div></div><div class="small muted">${bossSummary.bestRecord ? `Best record: ${escapeHtml(depthShortLabel(bossSummary.bestRecord.bestKillDepth || bossSummary.bestRecord.rawDepth || 1))}` : 'No boss trophies recorded yet.'}</div></div>
+      <div class="tag-row"><span class="pill">Boss Trophies: ${bossTotalLabel}</span><span class="pill">Recorded: ${format(bossSummary.totalFound)}</span><span class="pill">Missing: ${format(bossSummary.missingCount)}</span><span class="pill">Retired relics: ${format(S.player.retiredRelics.length)}</span></div>
+      <div class="boss-trophy-summary-card"><div><strong>Dex Summary</strong><div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(cleanDisplayText(bossSummary.bestRecord.bossName || '', 'Unknown Boss'))} holds the deepest recorded mark.` : 'Defeat bosses to start the collection.'}</div></div><div class="small muted">${bossSummary.bestRecord ? `Best Depth: ${escapeHtml(bossTrophyLocationLabel(bossSummary.bestRecord))}` : 'No boss trophies recorded yet.'}</div></div>
       <div class="elite-trophy-summary">
         <div class="elite-trophy-summary-head"><h3>Elite Trophies</h3><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout (display only)</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div>
@@ -692,7 +706,7 @@
         <div class="elite-trophy-summary-head"><h3>Rivals Remembered</h3><span class="pill">${format(rivalActive.length)} active</span></div>
         <div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div>
       </div>`;
-    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Which bosses have been defeated, what trophies were recorded, and how deep the best record reached.</p><div class="boss-trophy-section-head"><h3>Recorded Collection</h3><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : '<div class="boss-trophy-empty-state"><strong>No boss trophies recorded</strong><p>Defeat bosses to record their trophies here.</p><div class="small muted">Collection records only. No combat bonus.</div></div>'}</div><div class="sep"></div><div class="boss-trophy-section-head"><h3>Missing Trophy Case</h3><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
+    el('monsterDex').innerHTML = `<h2>Boss Trophies</h2><p class="small muted">Recorded trophies, missing entries, and best-depth marks.</p><div class="boss-trophy-section-head"><h3>Recorded Collection</h3><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : '<div class="boss-trophy-empty-state"><strong>No boss trophies recorded</strong><p>Defeat bosses to record their trophies here.</p><div class="small muted">Collection record only. No combat bonus.</div></div>'}</div><div class="sep"></div><div class="boss-trophy-section-head"><h3>Missing Trophy Case</h3><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`;
     el('gearDex').innerHTML = `
       <h2>Retired Relics</h2>
       <p class="small muted">This shelf is reserved for 1.5 retired items. Old favorite gear will live here instead of disappearing into the save.</p>

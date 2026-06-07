@@ -456,6 +456,35 @@ async function main() {
         };
       })()`);
     };
+    const checkBossTrophyViewport = async width => {
+      await client.send('Emulation.setDeviceMetricsOverride', {
+        width,
+        height: 900,
+        deviceScaleFactor: 1,
+        mobile: true
+      });
+      return await evalByValue(client, `(() => {
+        S.screen = 'dex';
+        if (typeof render === 'function') render();
+        const panel = document.getElementById('monsterDex');
+        const doc = document.documentElement;
+        const body = document.body;
+        const overflow = Math.ceil(Math.max(doc.scrollWidth || 0, body?.scrollWidth || 0)) > Math.ceil(window.innerWidth || ${width}) + 1;
+        const panelOverflow = panel ? Math.ceil(panel.scrollWidth || 0) > Math.ceil(panel.clientWidth || 0) + 1 : true;
+        const text = panel ? panel.innerText : '';
+        return {
+          width: window.innerWidth,
+          panel: !!panel,
+          overflow,
+          panelOverflow,
+          hasRecorded: text.includes('Recorded Collection'),
+          hasMissing: text.includes('Missing Trophy Case'),
+          hasCount: text.includes('Count'),
+          hasBestDepth: text.includes('Best Depth'),
+          hasLastEarned: text.includes('Last Earned')
+        };
+      })()`);
+    };
     const click = async selector => await evalByValue(client, `(() => {
       const el = document.querySelector(${JSON.stringify(selector)});
       if (!el) return false;
@@ -615,7 +644,20 @@ async function main() {
     const bossTrophyStateAfterGrant = await getBossTrophyState();
     record('Boss trophy record fields are populated', Array.isArray(bossTrophyStateAfterGrant.records) && bossTrophyStateAfterGrant.records.length > 0 && bossTrophyStateAfterGrant.records[0].trophyName && bossTrophyStateAfterGrant.records[0].bossName && bossTrophyStateAfterGrant.records[0].count >= 1, JSON.stringify(bossTrophyStateAfterGrant.records[0] || null));
     const bossDexAfterGrant = await getBossTrophyText();
-    record('Boss trophy UI shows compact record row', /Best/.test(bossDexAfterGrant) && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
+    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && bossDexAfterGrant.includes('Last Earned') && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
+    const forceBossTrophyDuplicate = await evalByValue(client, `(() => {
+      if (typeof recordBossTrophyUnlock !== 'function') return false;
+      const first = Array.isArray(S.player?.bossTrophyRecords) ? S.player.bossTrophyRecords[0] : null;
+      if (!first) return false;
+      return !!recordBossTrophyUnlock(S, first.rawDepth || first.bestKillDepth || 15, first.bossName || 'Boss Floor 5');
+    })()`);
+    const bossTrophyStateAfterDuplicate = await getBossTrophyState();
+    record('Duplicate boss trophy increments count safely', !!forceBossTrophyDuplicate && Array.isArray(bossTrophyStateAfterDuplicate.records) && bossTrophyStateAfterDuplicate.records.length > 0 && Number(bossTrophyStateAfterDuplicate.records[0].count) >= 2, JSON.stringify(bossTrophyStateAfterDuplicate.records[0] || null));
+    for (const width of [390, 375, 360, 320]) {
+      const trophyMobile = await checkBossTrophyViewport(width);
+      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned, JSON.stringify(trophyMobile));
+    }
+    await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossTrophyStateAfterReload = await getBossTrophyState();

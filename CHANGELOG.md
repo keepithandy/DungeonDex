@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.1`
-* Current local package baseline: `v1.6.1`
-* Current development target: `v1.6.1`
+* Public/live itch version: `v1.6.2`
+* Current local package baseline: `v1.6.2`
+* Current development target: `v1.6.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,19 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.2 - Trophy Hall Content Density & Metadata Consistency
+
+Status: Complete
+
+Summary:
+
+* Tightened Trophy Hall boss trophy spacing, labels, and card density so recorded entries stay readable without turning the screen into a wall of text.
+* Normalized boss trophy metadata display around short labels for Count, Best Depth, and Last Earned while keeping safe fallbacks for missing names or malformed depth fields.
+* Preserved the existing `bossTrophyRecords` save model, duplicate increment behavior, locked/missing case flow, and all Elite Board, Rival, and Talent behavior.
+* No save wipe.
 
 ---
 

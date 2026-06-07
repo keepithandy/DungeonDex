@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.1-boss-trophy-dex-identity-polish';
+const CACHE_NAME = 'dungeondex-v1.6.2-trophy-hall-metadata-density';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.1-boss-trophy-dex-identity-polish';
+const BUILD_QS = '1.6.2-trophy-hall-metadata-density';
 const ASSETS = [
   './',
   './index.html',
