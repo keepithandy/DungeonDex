@@ -416,6 +416,32 @@
     };
   }
 
+  function createDebtCollectorState() {
+    return {
+      active: false,
+      balanceCopper: 0,
+      pressure: 0,
+      lastVisitAt: '',
+      notes: []
+    };
+  }
+
+  function normalizeDebtCollectorState(value) {
+    const base = createDebtCollectorState();
+    const source = isPlainObject(value) ? value : {};
+    const notes = asArray(source.notes, [])
+      .map(note => cleanDisplayText(note || '', '').slice(0, 80))
+      .filter(Boolean)
+      .slice(0, 5);
+    return {
+      active: !!source.active,
+      balanceCopper: Math.max(0, Math.floor(numberOr(source.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER))),
+      pressure: Math.max(0, Math.floor(numberOr(source.pressure, 0, 0, 999999))),
+      lastVisitAt: cleanDisplayText(source.lastVisitAt || '', '').slice(0, 40),
+      notes: notes.length ? notes : base.notes
+    };
+  }
+
   function normalizeSaveShape(parsed) {
     if (!isPlainObject(parsed) || !isPlainObject(parsed.player)) return createBaseState();
 
@@ -457,6 +483,7 @@
     state.player.debtbrandBoostReady = !!state.player.debtbrandBoostReady;
     state.player.earlyAidGiven = !!state.player.earlyAidGiven;
     state.player.goldSink = createGoldSinkState(isPlainObject(savedPlayer.goldSink) ? savedPlayer.goldSink : {});
+    state.player.debtCollector = normalizeDebtCollectorState(savedPlayer.debtCollector);
     state.player.eliteContracts = createEliteContractState(isPlainObject(savedPlayer.eliteContracts) ? savedPlayer.eliteContracts : {}, state);
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(savedPlayer.eliteTrophies) ? savedPlayer.eliteTrophies : {})
@@ -565,6 +592,7 @@
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})
       : { collected:{}, totalFound:0, latestId:'' };
+    state.player.debtCollector = normalizeDebtCollectorState(state.player.debtCollector);
     state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
     repairTalentState(state);
     if (!isPlainObject(state.run)) state.run = {};

@@ -282,6 +282,13 @@
         debtbrandBoostReady: false,
         boughtStart20Scroll: false,
         goldSink: createGoldSinkState(),
+        debtCollector: {
+          active: false,
+          balanceCopper: 0,
+          pressure: 0,
+          lastVisitAt: '',
+          notes: []
+        },
         eliteContracts: createEliteContractState(),
         talents: { pointsEarned: 0, pointsSpent: 0, unlocked: {}, unlockedIds: [] }
       },

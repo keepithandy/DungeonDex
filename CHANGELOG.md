@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.7`
-* Current local package baseline: `v1.6.7`
-* Current development target: `v1.6.7`
+* Public/live itch version: `v1.6.8`
+* Current local package baseline: `v1.6.8`
+* Current development target: `v1.6.8`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -35,6 +35,13 @@ The goal of this line is to add deeper player progression without turning the ba
 * Small, readable progression steps
 * Continued build/cache label consistency
 * No combat complexity inflation
+
+## 1.6.x Direction
+
+* Collection, memory, and foundation-only town systems
+* Save-safe UI shells and normalization hooks
+* Display-only progression identity
+* No economy or combat rule changes
 
 ---
 

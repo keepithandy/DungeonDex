@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.7 — Boss Trophy Reward Polish
+- DungeonDex v1.6.8 — Debt Collector Foundation
 
 ## Current Workflow
 - Inspect files before editing.
@@ -89,7 +89,7 @@ Candidate systems:
 - Retire Items
 - Famous Gear
 - Early Dungeon Return Incentives
-- v1.6.7 target: boss trophy reward polish, display-only Trophy Hall layout cleanup.
+- v1.6.8 target: foundation-only Debt Collector save, repair, and town UI shell.
 - Scope: DevTools-applied memory tags, compact item/archive labels, save repair, and retire snapshot preservation.
 - Non-goals: gear stat bonuses, retired item bonuses, player-facing fame assignment, combat changes, scaling changes.
 
