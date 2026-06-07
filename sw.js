@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dungeondex-v1.6.6-famous-gear-memory-foundation';
+const CACHE_NAME = 'dungeondex-v1.6.7-boss-trophy-reward-polish';
 const CACHE_PREFIX = 'dungeondex-';
 const BUILD_QS = '1.6.6-famous-gear-memory-foundation';
 const ASSETS = [

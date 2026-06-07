@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.6 — Famous Gear Memory Foundation
+- DungeonDex v1.6.7 — Boss Trophy Reward Polish
 
 ## Current Workflow
 - Inspect files before editing.
@@ -74,7 +74,7 @@ Talent direction:
 - No affixes
 - Talents should modify existing systems instead of creating complex new combat behavior
 
-Active v1.6.6 talent paths:
+Active v1.6.7 talent paths:
 - Survivor: HP, recovery, safer extraction
 - Hunter: Elite Board, rivals, trophies
 - Delver: deeper floors, charters, bosses
@@ -89,7 +89,7 @@ Candidate systems:
 - Retire Items
 - Famous Gear
 - Early Dungeon Return Incentives
-- v1.6.6 target: save-safe, display-only Famous Gear memory foundation.
+- v1.6.7 target: boss trophy reward polish, display-only Trophy Hall layout cleanup.
 - Scope: DevTools-applied memory tags, compact item/archive labels, save repair, and retire snapshot preservation.
 - Non-goals: gear stat bonuses, retired item bonuses, player-facing fame assignment, combat changes, scaling changes.
 

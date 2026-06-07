@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.6`
-* Current local package baseline: `v1.6.6`
-* Current development target: `v1.6.6`
+* Public/live itch version: `v1.6.7`
+* Current local package baseline: `v1.6.7`
+* Current development target: `v1.6.7`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,19 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.7 - Boss Trophy Reward Polish
+
+Status: Complete
+
+Summary:
+
+* Tightened Trophy Hall boss summary, record cards, and empty-state spacing so the updated layout stays readable on narrow phones.
+* Added clearer trophy count and source metadata treatment for boss trophy records without changing reward behavior or save data.
+* Kept Trophy Hall updates display-only, with no gameplay, combat, scaling, affix, status, or special-mechanic changes.
+* No save wipe.
 
 ---
 
