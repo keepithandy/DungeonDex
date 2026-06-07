@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.2-trophy-hall-metadata-density';
+const CACHE_NAME = 'dungeondex-v1.6.3-trophy-hall-archive-shell-prep';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.2-trophy-hall-metadata-density';
+const BUILD_QS = '1.6.3-trophy-hall-archive-shell-prep';
 const ASSETS = [
   './',
   './index.html',

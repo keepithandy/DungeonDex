@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.2 — Trophy Hall Content Density & Metadata Consistency
+- DungeonDex v1.6.3 — Trophy Hall Archive Shell Prep
 
 ## Current Workflow
 - Inspect files before editing.
@@ -74,7 +74,7 @@ Talent direction:
 - No affixes
 - Talents should modify existing systems instead of creating complex new combat behavior
 
-Active v1.6.2 talent paths:
+Active v1.6.3 talent paths:
 - Survivor: HP, recovery, safer extraction
 - Hunter: Elite Board, rivals, trophies
 - Delver: deeper floors, charters, bosses

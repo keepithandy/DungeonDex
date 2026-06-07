@@ -408,8 +408,8 @@ async function main() {
     const getBossTrophyText = async () => await evalByValue(client, `(() => {
       S.screen = 'dex';
       if (typeof render === 'function') render();
-      const panel = document.getElementById('monsterDex');
-      return panel ? panel.innerText : '';
+      const ids = ['dexSummary', 'monsterDex', 'gearDex'];
+      return ids.map(id => document.getElementById(id)?.innerText || '').filter(Boolean).join('\\n\\n');
     })()`);
     const getBossTrophyState = async () => await evalByValue(client, `(() => ({
       ids: Array.isArray(S.player?.bossTrophies) ? S.player.bossTrophies.slice() : [],
@@ -466,12 +466,14 @@ async function main() {
       return await evalByValue(client, `(() => {
         S.screen = 'dex';
         if (typeof render === 'function') render();
-        const panel = document.getElementById('monsterDex');
+        const panel = document.getElementById('screen-dex') || document.getElementById('monsterDex');
         const doc = document.documentElement;
         const body = document.body;
         const overflow = Math.ceil(Math.max(doc.scrollWidth || 0, body?.scrollWidth || 0)) > Math.ceil(window.innerWidth || ${width}) + 1;
         const panelOverflow = panel ? Math.ceil(panel.scrollWidth || 0) > Math.ceil(panel.clientWidth || 0) + 1 : true;
-        const text = panel ? panel.innerText : '';
+        const ids = ['dexSummary', 'monsterDex', 'gearDex'];
+        const text = ids.map(id => document.getElementById(id)?.innerText || '').filter(Boolean).join('\\n\\n');
+        const lower = text.toLowerCase();
         return {
           width: window.innerWidth,
           panel: !!panel,
@@ -481,7 +483,10 @@ async function main() {
           hasMissing: text.includes('Missing Trophy Case'),
           hasCount: text.includes('Count'),
           hasBestDepth: text.includes('Best Depth'),
-          hasLastEarned: text.includes('Last Earned')
+          hasLastEarned: text.includes('Last Earned'),
+          hasRetiredItems: lower.includes('retired items'),
+          hasBoardRival: lower.includes('board & rival trophies'),
+          hasNoRetireButton: !/Retire\b/.test(text)
         };
       })()`);
     };
@@ -509,8 +514,8 @@ async function main() {
     record('Next point line appears for non-maxed state', freshPanelText.includes('Next point: secure depth 5') && freshPanelText.includes('Progress: 1 / 5 secured depths'), freshPanelText.slice(0, 400));
     record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
-    record('Trophy Hall loads', freshBossDexText.includes('Boss Trophies'), freshBossDexText.slice(0, 300));
-    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to record their trophies here.'), freshBossDexText.slice(0, 300));
+    record('Trophy Hall loads', freshBossDexText.includes('Boss Trophies') && freshBossDexText.includes('Retired Items'), freshBossDexText.slice(0, 320));
+    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to record their trophies here.'), freshBossDexText.slice(0, 320));
     const unsafeRunMilestone = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       S.player.safeExtractDepth = 4;
@@ -639,6 +644,8 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
     record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
+    record('Retired Items placeholder shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Coming soon: preserve old gear as archive records.'), bossEmptyText.slice(0, 400));
+    record('No Retire button or item mutation action appears', !/Retire\b/.test(bossEmptyText), bossEmptyText.slice(0, 400));
     const forceBossTrophy = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantBossTrophyForTest ? window.DungeonDexScenarioDevTools.grantBossTrophyForTest() : false)()`);
     record('Boss trophy record can be created', !!forceBossTrophy, String(forceBossTrophy));
     const bossTrophyStateAfterGrant = await getBossTrophyState();
@@ -655,7 +662,7 @@ async function main() {
     record('Duplicate boss trophy increments count safely', !!forceBossTrophyDuplicate && Array.isArray(bossTrophyStateAfterDuplicate.records) && bossTrophyStateAfterDuplicate.records.length > 0 && Number(bossTrophyStateAfterDuplicate.records[0].count) >= 2, JSON.stringify(bossTrophyStateAfterDuplicate.records[0] || null));
     for (const width of [390, 375, 360, 320]) {
       const trophyMobile = await checkBossTrophyViewport(width);
-      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned, JSON.stringify(trophyMobile));
+      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasBoardRival && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Page.reload', { ignoreCache: true });

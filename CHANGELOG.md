@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.2`
-* Current local package baseline: `v1.6.2`
-* Current development target: `v1.6.2`
+* Public/live itch version: `v1.6.3`
+* Current local package baseline: `v1.6.3`
+* Current development target: `v1.6.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -57,6 +57,19 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.3 - Trophy Hall Archive Shell Prep
+
+Status: Complete
+
+Summary:
+
+* Reframed the Trophy Hall as a compact collection hub with clearer section shells for Boss Trophies, Board & Rival Trophies, and a future Retired Items shelf.
+* Added a display-only Retired Items placeholder so future archive work has a clear home without introducing any gear mutation, retirement logic, or item actions.
+* Preserved boss trophy records, duplicate increment behavior, Elite Board and Rival rules, Talent behavior, and combat/scaling behavior.
+* No save wipe.
 
 ---
 

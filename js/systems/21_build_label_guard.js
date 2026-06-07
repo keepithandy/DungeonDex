@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.6.2 - Build label guard.
+// DungeonDex v1.6.3 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.6.2';
+  const BUILD = '1.6.3';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.2-trophy-hall-metadata-density';
+  const BUILD_QS = '1.6.3-trophy-hall-archive-shell-prep';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

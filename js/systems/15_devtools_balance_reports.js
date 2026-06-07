@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.2 - DevTools Balance Reports
+// DungeonDex v1.6.3 - DevTools Balance Reports
 // Internal-only measurement layer. It injects into the hidden DevTools overlay and does not touch normal UI.
 (function(){
-  const REPORT_VERSION = 'DungeonDex v1.6.2';
-  const REPORT_BUILD = '1.6.2-trophy-hall-metadata-density-devtools-balance-reports';
+  const REPORT_VERSION = 'DungeonDex v1.6.3';
+  const REPORT_BUILD = '1.6.3-trophy-hall-archive-shell-prep-devtools-balance-reports';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsBalanceReports';
