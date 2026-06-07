@@ -8141,9 +8141,37 @@ button:focus-visible,
   margin-top: 10px;
   padding: 10px 12px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+}
+
+.boss-trophy-summary-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.boss-trophy-summary-copy strong {
+  font-size: .92rem;
+}
+
+.boss-trophy-summary-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: min(100%, 280px);
+  text-align: right;
+}
+
+.boss-trophy-summary-stats .small {
+  flex-basis: 100%;
+}
+
+.trophy-total-pill {
+  border-color: rgba(255, 180, 126, .35);
+  color: #ffd3b4;
 }
 
 .boss-trophy-record-grid {
@@ -8159,17 +8187,34 @@ button:focus-visible,
   padding: 9px 10px;
 }
 
+.boss-trophy-card-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.boss-trophy-card-topline .trophy-kicker {
+  min-width: 0;
+}
+
+.trophy-count-pill {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .boss-trophy-record-boss {
   color: rgba(255, 225, 194, .9);
-  font-size: .8rem;
-  margin: 0 0 5px;
+  font-size: .82rem;
+  margin: 0 0 6px;
 }
 
 .boss-trophy-record-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin: 0 0 5px;
+  margin: 0 0 6px;
 }
 
 .boss-trophy-meta-list {
@@ -8199,7 +8244,7 @@ button:focus-visible,
 }
 
 .boss-trophy-empty-state {
-  padding: 14px;
+  padding: 16px 14px;
   grid-column: 1 / -1;
 }
 
@@ -8470,6 +8515,11 @@ button:focus-visible,
   .retired-relic-card-head,
   .boss-trophy-summary-card,
   .boss-trophy-section-head { align-items: flex-start; flex-direction: column; }
+  .boss-trophy-summary-stats {
+    justify-content: flex-start;
+    text-align: left;
+    max-width: none;
+  }
   .trophy-prestige-icon { width: 58px; height: 58px; transform: scale(.92); transform-origin: left center; }
 }
 
@@ -8480,12 +8530,21 @@ button:focus-visible,
     padding: 8px 9px;
   }
 
+  .boss-trophy-card-topline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .boss-trophy-record-boss {
     font-size: .77rem;
   }
 
   .boss-trophy-meta-row {
     font-size: .73rem;
+  }
+
+  .boss-trophy-card-topline {
+    gap: 6px;
   }
 
   .collection-shell {
