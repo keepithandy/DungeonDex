@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.10 — Famous Gear Memory Expansion
+- DungeonDex v1.6.11 — Retired Gear Hall Polish
 
 ## Current Workflow
 - Inspect files before editing.
@@ -93,6 +93,8 @@ Candidate systems:
 - v1.6.9 completed: compact Debt Collector loans, repayment, save-safe notes, and atmospheric pressure.
 - v1.6.10 completed: Famous Gear passive memory counters for kills, bosses, elites, and safe chapter clears.
 - Scope: save repair, equipped gear memory tracking, compact existing-card chips, and DevTools smoke coverage.
+- v1.6.11 completed: Retired Gear Hall readability, compact archive summaries, safe Famous Gear memory display, and DevTools smoke coverage.
+- Scope: existing archive UI polish, retired gear sorting, positive-only memory chips, and save/load repair verification.
 - Non-goals: combat changes, enemy mechanics, scaling changes, gear bonuses, or new collection screens.
 
 ### v1.7.x — World Identity and Serious Dungeon Personality

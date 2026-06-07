@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.10 - DevTools Scenario Presets
+// DungeonDex v1.6.11 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.6.10';
-  const SCENARIO_BUILD = '1.6.10-famous-gear-memory-expansion-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.11';
+  const SCENARIO_BUILD = '1.6.11-retired-gear-hall-polish-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -711,9 +711,13 @@
     if (!hasState()) return 'Retired item archive unavailable.';
     const records = arr(S.player.retiredRelics).filter(obj);
     const latest = records[0] || null;
+    const summary = retiredGearSummary(records);
     return [
       'Retired item archive',
       `records: ${fmt(records.length)}`,
+      `famous: ${fmt(summary.famous)}`,
+      `mythic/legendary: ${fmt(summary.mythicLegendary)}`,
+      `boss-marked: ${fmt(summary.bossMarked)}`,
       `latest: ${latest ? (latest.item?.name || 'unknown relic') : 'none yet'}`,
       `source: ${latest ? (latest.source || 'unknown') : 'n/a'}`
     ].join('\n');
@@ -751,6 +755,21 @@
       eliteKills: gearMemoryCount(memory?.eliteKills),
       chaptersCleared: gearMemoryCount(memory?.chaptersCleared)
     };
+  }
+  function retiredGearSummary(records){
+    const summary = { total:0, famous:0, mythicLegendary:0, bossMarked:0 };
+    arr(records || (hasState() ? S.player.retiredRelics : [])).filter(obj).forEach(function(record){
+      summary.total += 1;
+      const item = obj(record.item) ? record.item : {};
+      const rarity = String(item.rarity || record.rarity || '').toLowerCase();
+      const memory = memoryForItem(item);
+      if (rarity === 'mythic' || rarity === 'legendary') summary.mythicLegendary += 1;
+      if (!memory) return;
+      summary.famous += 1;
+      const bossTagged = arr(memory.tags).some(function(tag){ return /boss/i.test(String(tag || '')); });
+      if (bossTagged || gearMemoryCount(memory.bossKills) > 0) summary.bossMarked += 1;
+    });
+    return summary;
   }
   function gearMemoryTag(tag){
     const requested = String(tag || 'Boss-Worn').trim() || 'Boss-Worn';
@@ -921,6 +940,117 @@
     scenarioState.lastMessage = retiredRelicSummaryText();
     log('Retired item archive cleared for testing.', 'info');
     return true;
+  }
+  function renderRetiredHallForSmoke(){
+    if (typeof renderDex === 'function') renderDex();
+    if (typeof renderArchive === 'function') renderArchive();
+    if (typeof renderDex !== 'function' && typeof renderArchive !== 'function' && typeof render === 'function') render();
+  }
+  function retiredGearHallSmoke(){
+    if (!hasState()) return { ok:false, reason:'state unavailable' };
+    const previous = JSON.stringify(arr(S.player.retiredRelics));
+    const textFor = function(){
+      return ['monsterDex', 'gearDex', 'archivePanel']
+        .map(function(id){ return document.getElementById(id)?.textContent || ''; })
+        .join(' ');
+    };
+    try {
+      S.player.retiredRelics = [];
+      renderRetiredHallForSmoke();
+      const emptyText = textFor();
+      const emptyOk = /No retired gear yet\./i.test(emptyText);
+      S.player.retiredRelics = [
+        {
+          id:'smoke_plain_retired',
+          archivedAt:1,
+          stamp:'Smoke plain',
+          floor:1,
+          room:1,
+          chapter:1,
+          slot:'weapon',
+          rarity:'rare',
+          itemLevel:8,
+          rating:20,
+          source:'Smoke',
+          note:'Plain retired item.',
+          item:{ id:'smoke_plain_item', name:'Plain Hall Blade', slot:'weapon', type:'blade', rarity:'rare', level:8, rating:20, value:80, stats:{ power:10 } }
+        },
+        {
+          id:'smoke_old_memory_retired',
+          archivedAt:2,
+          stamp:'Smoke old',
+          floor:1,
+          room:1,
+          chapter:2,
+          slot:'armor',
+          rarity:'legendary',
+          itemLevel:11,
+          rating:40,
+          source:'Smoke',
+          memoryTags:['Deepmarked'],
+          fameTitle:'Old Hall Name',
+          memoryNote:'Kept note',
+          item:{ id:'smoke_old_memory_item', name:'Old Memory Coat', slot:'armor', type:'coat', rarity:'legendary', level:11, rating:40, value:120, stats:{ guard:14 } }
+        },
+        {
+          id:'smoke_counter_retired',
+          archivedAt:3,
+          stamp:'Smoke memory',
+          floor:2,
+          room:1,
+          chapter:3,
+          slot:'trinket',
+          rarity:'mythic',
+          itemLevel:12,
+          rating:50,
+          source:'Smoke',
+          item:{
+            id:'smoke_counter_item',
+            name:'Ash Crown Token',
+            slot:'trinket',
+            type:'token',
+            rarity:'mythic',
+            level:12,
+            rating:50,
+            value:140,
+            stats:{ speed:8 },
+            gearMemory:{ tags:['Boss-Worn'], title:'Ash Crown', firstMarkedAt:'2026-06-07T00:00:00.000Z', notes:['kept'], kills:12, bossKills:3, eliteKills:4, chaptersCleared:18 }
+          }
+        }
+      ];
+      if (typeof normalizeRetiredRelicRecords === 'function') S.player.retiredRelics = normalizeRetiredRelicRecords(S.player.retiredRelics);
+      renderRetiredHallForSmoke();
+      const text = textFor();
+      const plain = arr(S.player.retiredRelics).find(function(record){ return record.id === 'smoke_plain_retired'; });
+      const oldStyle = arr(S.player.retiredRelics).find(function(record){ return record.id === 'smoke_old_memory_retired'; });
+      const counter = arr(S.player.retiredRelics).find(function(record){ return record.id === 'smoke_counter_retired'; });
+      const oldMemory = memoryForItem(oldStyle?.item);
+      const counterMemory = memoryForItem(counter?.item);
+      const summary = retiredGearSummary(S.player.retiredRelics);
+      const chipOk = ['12 kills', '3 bosses', '4 elites', '18 chapters'].every(function(label){ return text.includes(label); });
+      const positiveOnly = !/0 (kills|bosses|elites|chapters)/i.test(text);
+      const counterSafe = ['kills','bossKills','eliteKills','chaptersCleared'].every(function(key){
+        return Number.isSafeInteger(counterMemory?.[key]) && counterMemory[key] >= 0;
+      });
+      return {
+        ok: emptyOk
+          && !!plain && !memoryForItem(plain.item)
+          && !!oldMemory?.tags?.length && oldMemory.title === 'Old Hall Name'
+          && chipOk && positiveOnly && counterSafe
+          && summary.total === 3 && summary.famous === 2 && summary.mythicLegendary === 2 && summary.bossMarked === 1,
+        emptyOk,
+        summary,
+        oldMemory,
+        counterMemory,
+        chipOk,
+        positiveOnly,
+        textSample: text.slice(0, 500)
+      };
+    } finally {
+      try { S.player.retiredRelics = JSON.parse(previous); }
+      catch (err) { S.player.retiredRelics = []; }
+      renderRetiredHallForSmoke();
+    }
   }
   function grantBossTrophyForTest(){
     if (!hasState() || typeof recordBossTrophyUnlock !== 'function') return false;
@@ -1112,6 +1242,8 @@
     grantBossTrophyForTest,
     clearBossTrophies,
     retiredRelicSummary: retiredRelicSummaryText,
+    retiredGearSummary,
+    retiredGearHallSmoke,
     grantRetiredRelicForTest,
     clearRetiredRelics,
     markGearFamousForTest,

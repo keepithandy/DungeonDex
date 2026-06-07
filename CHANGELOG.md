@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.10`
-* Current local package baseline: `v1.6.10`
-* Current development target: `v1.6.10`
+* Public/live itch version: `v1.6.11`
+* Current local package baseline: `v1.6.11`
+* Current development target: `v1.6.11`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,21 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.11 - Retired Gear Hall Polish
+
+Status: Complete
+
+Summary:
+
+* Improved retired/archive gear readability with compact name, rarity, slot/type, iLvl, rating, retired-at, and Famous Gear memory chips.
+* Added display-only retired gear summary counts for total retired items, Famous Gear, mythic/legendary items, and boss-marked memories.
+* Added stable archive ordering that shows Famous Gear first, then higher rarity, item level, rating, and recent retirement records.
+* Added DevTools-focused `retiredGearHallSmoke()` coverage for empty rendering, old-style memory repair, positive-only counter chips, and summary safety.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.11`.
+* No combat changes, rewards, bonuses, or save wipe.
 
 ---
 

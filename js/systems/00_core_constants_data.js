@@ -96,8 +96,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.6.10';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.6.10';
+  const BUILD = '1.6.11';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.6.11';
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;

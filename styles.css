@@ -8471,6 +8471,11 @@ button:focus-visible,
   gap: 10px;
 }
 
+.retired-relic-summary {
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
 .retired-relic-card {
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
@@ -8487,14 +8492,21 @@ button:focus-visible,
   align-items: flex-start;
 }
 
+.retired-relic-card-head > div {
+  min-width: 0;
+}
+
 .retired-relic-card-head h4 {
   margin: 0 0 3px;
   letter-spacing: .04em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
-.retired-relic-tags {
+.retired-relic-tags,
+.retired-relic-memory {
   gap: 6px;
+  align-items: flex-start;
 }
 
 .retired-relic-meta {
@@ -8505,6 +8517,29 @@ button:focus-visible,
   font-size: .83rem;
   line-height: 1.35;
   color: rgba(238,232,220,.82);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.retired-archive-line {
+  align-items: flex-start;
+}
+
+.retired-archive-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.retired-archive-copy strong {
+  overflow-wrap: anywhere;
+}
+
+.retired-archive-meta,
+.retired-archive-memory {
+  gap: 5px;
 }
 
 @media (max-width: 520px) {
