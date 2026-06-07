@@ -8405,11 +8405,53 @@ button:focus-visible,
   color: rgba(238,232,220,.45);
 }
 
+.retired-relic-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.retired-relic-card {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 10px;
+  background: linear-gradient(145deg, rgba(20,18,18,.9), rgba(8,8,10,.98));
+  display: grid;
+  gap: 8px;
+}
+
+.retired-relic-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.retired-relic-card-head h4 {
+  margin: 0 0 3px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.retired-relic-tags {
+  gap: 6px;
+}
+
+.retired-relic-meta {
+  line-height: 1.25;
+}
+
+.retired-relic-note {
+  font-size: .83rem;
+  line-height: 1.35;
+  color: rgba(238,232,220,.82);
+}
+
 @media (max-width: 520px) {
   .boss-trophy-grid { grid-template-columns: 1fr; }
   .boss-trophy-card { grid-template-columns: 64px 1fr; }
   .boss-trophy-record-card { grid-template-columns: 64px 1fr; }
   .collection-shell-head,
+  .retired-relic-card-head,
   .boss-trophy-summary-card,
   .boss-trophy-section-head { align-items: flex-start; flex-direction: column; }
   .trophy-prestige-icon { width: 58px; height: 58px; transform: scale(.92); transform-origin: left center; }

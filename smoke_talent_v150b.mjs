@@ -485,6 +485,7 @@ async function main() {
           hasBestDepth: text.includes('Best Depth'),
           hasLastEarned: text.includes('Last Earned'),
           hasRetiredItems: lower.includes('retired items'),
+          hasRetiredArchiveSummary: lower.includes('devtools-only record creation') || lower.includes('devtools archive records only'),
           hasBoardRival: lower.includes('board & rival trophies'),
           hasNoRetireButton: !/Retire\b/.test(text)
         };
@@ -644,8 +645,28 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
     record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
-    record('Retired Items placeholder shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Coming soon: preserve old gear as archive records.'), bossEmptyText.slice(0, 400));
+    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('DevTools can seed archive records') && bossEmptyText.includes('No player-facing retire action is active.'), bossEmptyText.slice(0, 500));
     record('No Retire button or item mutation action appears', !/Retire\b/.test(bossEmptyText), bossEmptyText.slice(0, 400));
+    const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
+    record('Retired item archive record can be created', !!retiredRelicGrant, String(retiredRelicGrant));
+    const retiredRelicStateAfterGrant = await evalByValue(client, `(() => ({
+      records: Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({
+        id: r.id,
+        itemName: r.item?.name,
+        source: r.source,
+        note: r.note,
+        slot: r.slot,
+        rarity: r.rarity,
+        itemLevel: r.itemLevel,
+        rating: r.rating,
+        floor: r.floor,
+        room: r.room,
+        chapter: r.chapter
+      })) : []
+    }))()`);
+    record('Retired item archive record fields are populated', Array.isArray(retiredRelicStateAfterGrant.records) && retiredRelicStateAfterGrant.records.length > 0 && retiredRelicStateAfterGrant.records[0].itemName && retiredRelicStateAfterGrant.records[0].source && retiredRelicStateAfterGrant.records[0].itemLevel >= 1, JSON.stringify(retiredRelicStateAfterGrant.records[0] || null));
+    const retiredRelicDexAfterGrant = await getBossTrophyText();
+    record('Retired item archive UI shows record card', retiredRelicDexAfterGrant.includes('DevTools Retired Item Test') && retiredRelicDexAfterGrant.includes('Rating') && retiredRelicDexAfterGrant.includes('Lv '), retiredRelicDexAfterGrant.slice(0, 700));
     const forceBossTrophy = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantBossTrophyForTest ? window.DungeonDexScenarioDevTools.grantBossTrophyForTest() : false)()`);
     record('Boss trophy record can be created', !!forceBossTrophy, String(forceBossTrophy));
     const bossTrophyStateAfterGrant = await getBossTrophyState();
@@ -662,21 +683,26 @@ async function main() {
     record('Duplicate boss trophy increments count safely', !!forceBossTrophyDuplicate && Array.isArray(bossTrophyStateAfterDuplicate.records) && bossTrophyStateAfterDuplicate.records.length > 0 && Number(bossTrophyStateAfterDuplicate.records[0].count) >= 2, JSON.stringify(bossTrophyStateAfterDuplicate.records[0] || null));
     for (const width of [390, 375, 360, 320]) {
       const trophyMobile = await checkBossTrophyViewport(width);
-      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasBoardRival && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
+      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasRetiredArchiveSummary && trophyMobile.hasBoardRival && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossTrophyStateAfterReload = await getBossTrophyState();
     record('Boss trophy record persists after reload', Array.isArray(bossTrophyStateAfterReload.records) && bossTrophyStateAfterReload.records.length > 0 && Array.isArray(bossTrophyStateAfterReload.ids) && bossTrophyStateAfterReload.ids.includes(bossTrophyStateAfterReload.records[0].trophyId), JSON.stringify(bossTrophyStateAfterReload));
+    const retiredRelicsAfterReload = await evalByValue(client, `(() => Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({ itemName:r.item?.name, source:r.source, note:r.note })) : [])()`);
+    record('Retired item archive record persists after reload', Array.isArray(retiredRelicsAfterReload) && retiredRelicsAfterReload.length > 0 && retiredRelicsAfterReload[0].itemName && retiredRelicsAfterReload[0].source, JSON.stringify(retiredRelicsAfterReload[0] || null));
     const malformedBossSave = JSON.parse(JSON.stringify(await readSave(client)));
     malformedBossSave.player.bossTrophies = ['lowfire_fang'];
     malformedBossSave.player.bossTrophyRecords = [{ trophyId:'lowfire_fang', trophyName:'Lowfire Fang', count:0, floor:'x', room:null, chapter:-2, rawDepth:'bad', bestKillDepth:0 }];
+    malformedBossSave.player.retiredRelics = [{ id:'bad_relic', item:{ slot:'weapon', rarity:'rare', level:'bad', rating:0, value:-10, name:'', stats:{} }, floor:'x', room:0, chapter:-2, note:'', source:'' }];
     await writeSave(client, malformedBossSave);
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const repairedBossState = await getBossTrophyState();
     record('Malformed boss trophy data repairs safely', Array.isArray(repairedBossState.records) && repairedBossState.records.length > 0 && repairedBossState.records[0].count >= 1 && repairedBossState.records[0].floor >= 1 && repairedBossState.records[0].room >= 1 && repairedBossState.records[0].chapter >= 1, JSON.stringify(repairedBossState.records[0] || null));
+    const repairedRetiredRelics = await evalByValue(client, `(() => Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({ itemName:r.item?.name, slot:r.slot, rarity:r.rarity, itemLevel:r.itemLevel, rating:r.rating, floor:r.floor, room:r.room, chapter:r.chapter, source:r.source, note:r.note })) : [])()`);
+    record('Malformed retired item archive data repairs safely', Array.isArray(repairedRetiredRelics) && repairedRetiredRelics.length > 0 && repairedRetiredRelics[0].itemName && repairedRetiredRelics[0].itemLevel >= 1 && repairedRetiredRelics[0].rating >= 1 && repairedRetiredRelics[0].floor >= 1 && repairedRetiredRelics[0].room >= 1 && repairedRetiredRelics[0].chapter >= 1, JSON.stringify(repairedRetiredRelics[0] || null));
 
     // Double unlock / point safety.
     await clearSave(client);

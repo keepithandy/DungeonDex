@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.3 — Trophy Hall Archive Shell Prep
+- DungeonDex v1.6.4 — Retired Item Archive Foundation
 
 ## Current Workflow
 - Inspect files before editing.
@@ -74,7 +74,7 @@ Talent direction:
 - No affixes
 - Talents should modify existing systems instead of creating complex new combat behavior
 
-Active v1.6.3 talent paths:
+Active v1.6.4 talent paths:
 - Survivor: HP, recovery, safer extraction
 - Hunter: Elite Board, rivals, trophies
 - Delver: deeper floors, charters, bosses
@@ -112,3 +112,6 @@ Possible pillars:
 - Talent and item retirement integration
 - Stronger new-player onboarding
 - Cleaner public-facing polish
+- v1.6.4 target: retired item archive foundation only.
+- Scope: archive data model, save repair, archive display, DevTools-only record creation, persistence smoke.
+- Non-goals: retire buttons, gear deletion, inventory/equipment mutation, sell flow changes, famous gear, bonuses, combat changes.

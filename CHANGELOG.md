@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.3`
-* Current local package baseline: `v1.6.3`
-* Current development target: `v1.6.3`
+* Public/live itch version: `v1.6.4`
+* Current local package baseline: `v1.6.4`
+* Current development target: `v1.6.4`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -599,3 +599,7 @@ Use clear commit messages such as:
 ## Notes
 
 This changelog replaces temporary patch-note files and should remain the single ongoing update record for DungeonDex.
+## v1.6.4 - Retired Item Archive Foundation
+* Added a normalized retired item archive record model under `player.retiredRelics`, preserving read-only gear snapshots for archive display and save repair without changing inventory or equipment behavior.
+* Replaced the Trophy Hall Retired Items placeholder with a real archive section that renders persisted records and keeps creation DevTools-only for this build.
+* Added DevTools retired item archive test helpers plus smoke coverage for record creation, malformed-save repair, reload persistence, and mobile layout stability.

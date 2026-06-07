@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.3 - DevTools Scenario Presets
+// DungeonDex v1.6.4 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.6.3';
-  const SCENARIO_BUILD = '1.6.3-trophy-hall-archive-shell-prep-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.4';
+  const SCENARIO_BUILD = '1.6.4-retired-item-archive-foundation-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -707,6 +707,64 @@
       `latest: ${latest ? latest.trophyName || latest.name || 'unknown' : 'none yet'}`
     ].join('\n');
   }
+  function retiredRelicSummaryText(){
+    if (!hasState()) return 'Retired item archive unavailable.';
+    const records = arr(S.player.retiredRelics).filter(obj);
+    const latest = records[0] || null;
+    return [
+      'Retired item archive',
+      `records: ${fmt(records.length)}`,
+      `latest: ${latest ? (latest.item?.name || 'unknown relic') : 'none yet'}`,
+      `source: ${latest ? (latest.source || 'unknown') : 'n/a'}`
+    ].join('\n');
+  }
+  function createRetiredRelicRecordFromItem(item, source){
+    if (!obj(item)) return null;
+    const rawDepth = int(S?.player?.safeExtractDepth || S?.player?.depth || 1, 1, 1);
+    const label = typeof getLoreDepthProgress === 'function' ? getLoreDepthProgress(rawDepth) : { floorNumber: rawDepth, roomWithinFloor: 1, chapterWithinRoom: 1 };
+    return {
+      id: `retired_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+      archivedAt: Date.now(),
+      stamp: new Date().toLocaleString(),
+      rawDepth,
+      floor: int(label.floorNumber, 1, 1),
+      room: int(label.roomWithinFloor, 1, 1),
+      chapter: int(label.chapterWithinRoom, 1, 1),
+      slot: item.slot || 'weapon',
+      rarity: item.rarity || 'common',
+      itemLevel: int(item.level, 1, 1),
+      rating: int(item.rating, 1, 1),
+      value: int(item.value, 1, 1),
+      source: source || 'DevTools Archive Record',
+      note: `${SCENARIO_VERSION} archive snapshot. No inventory mutation performed.`,
+      item: JSON.parse(JSON.stringify(item))
+    };
+  }
+  function grantRetiredRelicForTest(){
+    if (!hasState()) return false;
+    if (!Array.isArray(S.player.retiredRelics)) S.player.retiredRelics = [];
+    const sourceItem = Object.values(S.player.equipment || {}).find(obj)
+      || arr(S.player.inventory).find(obj)
+      || makeGear('weapon', 'rare', Math.max(1, int(S.player?.safeExtractDepth || 10, 10, 1)), 'modest');
+    const record = createRetiredRelicRecordFromItem(sourceItem, 'DevTools Retired Item Test');
+    if (!record) return false;
+    S.player.retiredRelics.unshift(record);
+    S.player.retiredRelics = arr(S.player.retiredRelics).filter(obj).slice(0, 80);
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = retiredRelicSummaryText();
+    log(`Retired item archive record added: ${record.item?.name || 'Unknown relic'}.`, 'info');
+    return true;
+  }
+  function clearRetiredRelics(){
+    if (!hasState()) return false;
+    S.player.retiredRelics = [];
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = retiredRelicSummaryText();
+    log('Retired item archive cleared for testing.', 'info');
+    return true;
+  }
   function grantBossTrophyForTest(){
     if (!hasState() || typeof recordBossTrophyUnlock !== 'function') return false;
     const defs = Array.isArray(BOSS_TROPHY_DEFINITIONS) ? BOSS_TROPHY_DEFINITIONS : [];
@@ -849,6 +907,9 @@
     if (action === 'force-boss-trophy') return grantBossTrophyForTest();
     if (action === 'boss-trophy-summary') { scenarioState.lastMessage = bossTrophySummaryText(); renderScenarioSectionSoon(); return true; }
     if (action === 'clear-boss-trophies') return clearBossTrophies();
+    if (action === 'force-retired-relic') return grantRetiredRelicForTest();
+    if (action === 'retired-relic-summary') { scenarioState.lastMessage = retiredRelicSummaryText(); renderScenarioSectionSoon(); return true; }
+    if (action === 'clear-retired-relics') return clearRetiredRelics();
     if (action === 'simulate-complete') return simulateEliteCompletion();
     if (action === 'clear-trophies') return clearTrophyState();
     if (action === 'create-rival') return createTestRival();
@@ -885,6 +946,9 @@
     bossTrophySummary: bossTrophySummaryText,
     grantBossTrophyForTest,
     clearBossTrophies,
+    retiredRelicSummary: retiredRelicSummaryText,
+    grantRetiredRelicForTest,
+    clearRetiredRelics,
     grantTalentPoint,
     resetTalents,
     unlockTalentForTest,

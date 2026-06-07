@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.3-trophy-hall-archive-shell-prep';
+const CACHE_NAME = 'dungeondex-v1.6.4-retired-item-archive-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.3-trophy-hall-archive-shell-prep';
+const BUILD_QS = '1.6.4-retired-item-archive-foundation';
 const ASSETS = [
   './',
   './index.html',

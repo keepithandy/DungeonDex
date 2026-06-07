@@ -266,6 +266,7 @@
         discoveredGear: [],
         bossTrophies: [],
         bossTrophyRecords: [],
+        retiredRelics: [],
         log: [],
         loreSeen: [LORE_SNIPPETS[0]],
         runHistory: [],

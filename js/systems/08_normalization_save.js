@@ -173,6 +173,38 @@
     return records.slice(0, 80);
   }
 
+  function normalizeRetiredRelicRecords(source) {
+    const records = [];
+    const seen = new Set();
+    asArray(source, []).forEach(raw => {
+      if (!isPlainObject(raw)) return;
+      const item = normalizeItem(isPlainObject(raw.item) ? { ...raw.item } : { ...raw }, raw.slot || raw.item?.slot || 'weapon');
+      if (!item) return;
+      const recordId = String(raw.id || raw.recordId || item.id || '').trim() || makeId('retired');
+      if (seen.has(recordId)) return;
+      seen.add(recordId);
+      const archivedAt = Math.max(0, Math.floor(numberOr(raw.archivedAt, raw.recordedAt, raw.earnedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER)));
+      records.push({
+        id: recordId,
+        archivedAt,
+        stamp: cleanDisplayText(raw.stamp || (archivedAt ? new Date(archivedAt).toLocaleString() : ''), ''),
+        rawDepth: Math.max(0, Math.floor(numberOr(raw.rawDepth, raw.depth, raw.bestDepth, 0, 999999))),
+        floor: Math.max(1, Math.floor(numberOr(raw.floor, 1, 1, 999999))),
+        room: Math.max(1, Math.floor(numberOr(raw.room, 1, 1, 999999))),
+        chapter: Math.max(1, Math.floor(numberOr(raw.chapter, 1, 1, 999999))),
+        slot: String(raw.slot || item.slot || 'weapon'),
+        rarity: String(raw.rarity || item.rarity || 'common'),
+        itemLevel: Math.max(1, Math.floor(numberOr(raw.itemLevel, item.level, 1, 99999))),
+        rating: Math.max(1, Math.floor(numberOr(raw.rating, item.rating, 1, 999999))),
+        value: Math.max(1, Math.floor(numberOr(raw.value, item.value, 1, Number.MAX_SAFE_INTEGER))),
+        source: cleanDisplayText(raw.source || raw.reason || 'DevTools Archive Record', 'DevTools Archive Record'),
+        note: cleanDisplayText(raw.note || raw.summary || item.summary || 'Archive record preserved for future retirement workflows.', 'Archive record preserved for future retirement workflows.'),
+        item
+      });
+    });
+    return records.slice(0, 80);
+  }
+
   function bestTalentProgressDepth(state) {
     const runDepth = Math.floor(numberOr(state?.run?.floor, 0, 0, 999999));
     const depth = Math.max(
@@ -411,7 +443,7 @@
     state.player.bossTrophies = Array.from(new Set(asArray(savedPlayer.bossTrophies, []).map(String).map(id => id.trim()).filter(Boolean))).slice(0, 80);
     state.player.bossTrophyRecords = normalizeBossTrophyRecords(savedPlayer.bossTrophyRecords, state.player.bossTrophies);
     state.player.bossTrophies = Array.from(new Set(state.player.bossTrophies.concat(state.player.bossTrophyRecords.map(entry => String(entry.trophyId || entry.id || '').trim()).filter(Boolean)))).slice(0, 80);
-    state.player.retiredRelics = asArray(savedPlayer.retiredRelics, []).filter(isPlainObject).slice(0, 80);
+    state.player.retiredRelics = normalizeRetiredRelicRecords(savedPlayer.retiredRelics);
     state.player.log = asArray(savedPlayer.log, base.player.log).map(String).slice(0, 60);
     state.player.loreSeen = asArray(savedPlayer.loreSeen, base.player.loreSeen).map(String).slice(0, 80);
     state.player.runHistory = asArray(savedPlayer.runHistory, []).filter(isPlainObject).slice(0, 12);
@@ -481,6 +513,7 @@
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})
       : { collected:{}, totalFound:0, latestId:'' };
+    state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
     repairTalentState(state);
     if (!isPlainObject(state.run)) state.run = {};
     ensureRunShell(state);

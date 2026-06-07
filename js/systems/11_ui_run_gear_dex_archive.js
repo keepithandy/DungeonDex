@@ -663,6 +663,44 @@
     </section>`;
   }
 
+  function retiredRelicDepthLabel(entry) {
+    if (!isPlainObject(entry)) return 'Depth unknown';
+    const floor = Math.max(1, Math.floor(numberOr(entry.floor, 1, 1, 999999)));
+    const room = Math.max(1, Math.floor(numberOr(entry.room, 1, 1, 999999)));
+    const chapter = Math.max(1, Math.floor(numberOr(entry.chapter, 1, 1, 999999)));
+    return `F${format(floor)} • R${format(room)} • C${format(chapter)}`;
+  }
+
+  function retiredRelicCard(entry) {
+    const item = isPlainObject(entry?.item) ? entry.item : {};
+    const itemName = cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic');
+    const slotLabel = cleanDisplayText(item.slot || entry.slot || 'gear', 'gear');
+    const rarityLabel = cleanDisplayText(item.rarity || entry.rarity || 'common', 'common');
+    const note = cleanDisplayText(entry.note || item.summary || 'Archive record preserved.', 'Archive record preserved.');
+    const source = cleanDisplayText(entry.source || 'DevTools Archive Record', 'DevTools Archive Record');
+    const stamp = cleanDisplayText(entry.stamp || '', '');
+    const valueLabel = typeof moneyText === 'function'
+      ? moneyText(numberOr(entry.value, item.value, 0, Number.MAX_SAFE_INTEGER))
+      : format(numberOr(entry.value, item.value, 0, Number.MAX_SAFE_INTEGER));
+    return `<article class="retired-relic-card">
+      <div class="retired-relic-card-head">
+        <div>
+          <h4>${escapeHtml(itemName)}</h4>
+          <div class="small muted">${escapeHtml(source)}</div>
+        </div>
+        <span class="pill">${escapeHtml(rarityLabel)}</span>
+      </div>
+      <div class="tag-row retired-relic-tags">
+        <span class="pill">${escapeHtml(slotLabel)}</span>
+        <span class="pill">Lv ${format(numberOr(entry.itemLevel, item.level, 1, 99999))}</span>
+        <span class="pill">Rating ${format(numberOr(entry.rating, item.rating, 1, 999999))}</span>
+        <span class="pill">${escapeHtml(valueLabel)}</span>
+      </div>
+      <div class="retired-relic-meta small muted">${escapeHtml(retiredRelicDepthLabel(entry))}${stamp ? ` • ${escapeHtml(stamp)}` : ''}</div>
+      <div class="retired-relic-note">${escapeHtml(note)}</div>
+    </article>`;
+  }
+
   function bossTrophyCard(trophy, bestDepth) {
     const completion = typeof getBossTrophyCompletionState === 'function'
       ? getBossTrophyCompletionState(S, trophy)
@@ -700,6 +738,7 @@
     const rivalActive = rivals.filter(rival => rival.revengeAvailable && !rival.completed);
     const rivalDefeated = rivals.filter(rival => rival.completed);
     const latestRival = rivals.slice().sort((a, b) => numberOr(b.updatedAt || b.createdAt, 0) - numberOr(a.updatedAt || a.createdAt, 0))[0] || null;
+    const retiredRelics = asArray(S.player.retiredRelics, []).filter(isPlainObject).slice(0, 80);
     const bossSummary = typeof getBossTrophyCollectionSummary === 'function'
       ? getBossTrophyCollectionSummary(S)
       : { recordedCount: bossRecords.length, totalDefinitions: trophies.length, missingCount: Math.max(0, trophies.length - bossRecords.length), totalFound: bossRecords.reduce((sum, entry) => sum + Math.max(1, numberOr(entry.count, 1, 1, 9999)), 0), bestRecord: bossRecords[0] || null };
@@ -707,15 +746,15 @@
       ? `${format(bossSummary.recordedCount)} / ${format(bossSummary.totalDefinitions)}`
       : `${format(bossSummary.recordedCount)}`;
     el('dexSummary').innerHTML = `
-      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Long-term collection records for bosses, boards, rivals, and future archive shelves.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
-      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Collection Hub</button><button class="trophy-tab" type="button" disabled>Retired Items soon</button></div>
-      <div class="tag-row"><span class="pill">Boss Trophies: ${bossTotalLabel}</span><span class="pill">Recorded: ${format(bossSummary.totalFound)}</span><span class="pill">Missing: ${format(bossSummary.missingCount)}</span><span class="pill">Retired Items: Coming soon</span></div>
+      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Long-term collection records for bosses, boards, rivals, and retired item archive entries.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
+      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Collection Hub</button><button class="trophy-tab" type="button" disabled>DevTools archive records only</button></div>
+      <div class="tag-row"><span class="pill">Boss Trophies: ${bossTotalLabel}</span><span class="pill">Recorded: ${format(bossSummary.totalFound)}</span><span class="pill">Missing: ${format(bossSummary.missingCount)}</span><span class="pill">Retired Items: ${format(retiredRelics.length)}</span></div>
       <div class="boss-trophy-summary-card"><div><strong>Hall Summary</strong><div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(cleanDisplayText(bossSummary.bestRecord.bossName || '', 'Unknown Boss'))} holds the deepest recorded mark.` : 'Defeat bosses to start the collection.'}</div></div><div class="small muted">${bossSummary.bestRecord ? `Best Depth: ${escapeHtml(bossTrophyLocationLabel(bossSummary.bestRecord))}` : 'No boss trophies recorded yet.'}</div></div>`;
-    el('monsterDex').innerHTML = `${collectionShell('Boss Trophies', 'Collection records from defeated bosses.', `<div class="boss-trophy-section-head"><h4>Recorded Collection</h4><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : '<div class="boss-trophy-empty-state"><strong>No boss trophies recorded</strong><p>Defeat bosses to record their trophies here.</p><div class="small muted">Collection record only. No combat bonus.</div></div>'}</div><div class="sep"></div><div class="boss-trophy-section-head"><h4>Missing Trophy Case</h4><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`, { pill:`${format(bossSummary.totalFound)} recorded` })}${collectionShell('Board & Rival Trophies', 'Existing contract and rival collection records.', `<div class="elite-trophy-summary"><div class="elite-trophy-summary-head"><h4>Elite Trophies</h4><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div><div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div></div><div class="elite-trophy-summary rival-summary"><div class="elite-trophy-summary-head"><h4>Rivals Remembered</h4><span class="pill">${format(rivalActive.length)} active</span></div><div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div></div>`, { pill:`${format(eliteEntries.length)} trophies` })}${collectionShell('Retired Items', 'Coming soon: preserve old gear as archive records.', `<div class="empty-relic-shelf"><span>Archive shelf sealed</span><small>Future archive records for gear worth remembering.</small></div>`, { pill:'Coming soon', placeholder:true })}`;
+    el('monsterDex').innerHTML = `${collectionShell('Boss Trophies', 'Collection records from defeated bosses.', `<div class="boss-trophy-section-head"><h4>Recorded Collection</h4><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : '<div class="boss-trophy-empty-state"><strong>No boss trophies recorded</strong><p>Defeat bosses to record their trophies here.</p><div class="small muted">Collection record only. No combat bonus.</div></div>'}</div><div class="sep"></div><div class="boss-trophy-section-head"><h4>Missing Trophy Case</h4><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`, { pill:`${format(bossSummary.totalFound)} recorded` })}${collectionShell('Board & Rival Trophies', 'Existing contract and rival collection records.', `<div class="elite-trophy-summary"><div class="elite-trophy-summary-head"><h4>Elite Trophies</h4><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div><div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div></div><div class="elite-trophy-summary rival-summary"><div class="elite-trophy-summary-head"><h4>Rivals Remembered</h4><span class="pill">${format(rivalActive.length)} active</span></div><div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div></div>`, { pill:`${format(eliteEntries.length)} trophies` })}${collectionShell('Retired Items', 'Archive records for gear worth remembering. DevTools-only record creation in this build.', `${retiredRelics.length ? `<div class="retired-relic-grid">${retiredRelics.map(entry => retiredRelicCard(entry)).join('')}</div>` : '<div class="empty-relic-shelf"><span>No retired items recorded</span><small>DevTools can seed archive records for save and UI checks. No player-facing retire action is active.</small></div>'}`, { pill: retiredRelics.length ? `${format(retiredRelics.length)} recorded` : 'No records yet' })}`;
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
-      <p class="small muted">Display-only shell prep for future archive sections. No gear retirement actions are active in this build.</p>
-      <div class="empty-relic-shelf"><span>Retired Items</span><small>Coming soon: preserve old gear as archive records.</small></div>`;
+      <p class="small muted">Retired item archive foundation only. Records can render and persist, but no gear retirement actions are active in this build.</p>
+      ${retiredRelics.length ? `<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : '<div class="empty-relic-shelf"><span>Retired Items</span><small>No archive records yet. Use DevTools helpers for archive-only test entries.</small></div>'}`;
   }
 
   function renderArchive() {
@@ -766,6 +805,12 @@
       const text = cleanDisplayText(a.text || '', 'Archive note unavailable.');
       return `<div class="archive-line archive-note-line"><div class="small muted archive-note-stamp">${escapeHtml(stamp)}</div><div>${escapeHtml(text)}</div></div>`;
     }).join('') || '<p class="small muted">No Emberfall notes yet.</p>';
+    const retiredRelicLines = asArray(S.player.retiredRelics, []).filter(isPlainObject).slice(0, 12).map(entry => {
+      const itemName = cleanDisplayText(entry?.item?.name || 'Unknown relic', 'Unknown relic');
+      const stamp = cleanDisplayText(entry.stamp || '', '');
+      const note = cleanDisplayText(entry.note || entry.source || 'Archive record preserved.', 'Archive record preserved.');
+      return `<div class="archive-line archive-note-line"><div class="small muted archive-note-stamp">${escapeHtml(stamp || retiredRelicDepthLabel(entry))}</div><div><strong>${escapeHtml(itemName)}</strong> • ${escapeHtml(note)}</div></div>`;
+    }).join('') || '<p class="small muted">No retired item archive records yet.</p>';
 
     el('archivePanel').innerHTML = `
       <div class="archive-history-head">
@@ -773,6 +818,12 @@
         <span class="pill">Latest ${format(history.length)}</span>
       </div>
       <div class="list run-history-list">${historyMarkup}</div>
+      <div class="sep"></div>
+      <div class="archive-history-head">
+        <div><h3>Retired Item Archive</h3><p class="small muted">Read-only archive records. DevTools-only creation for v1.6.4.</p></div>
+        <span class="pill">${format(asArray(S.player.retiredRelics, []).filter(isPlainObject).length)} recorded</span>
+      </div>
+      <div class="list archive-log-list">${retiredRelicLines}</div>
       <div class="sep"></div>
       <h3>Emberfall Notes</h3>
       <div class="list archive-log-list">${archiveLines}</div>`;
