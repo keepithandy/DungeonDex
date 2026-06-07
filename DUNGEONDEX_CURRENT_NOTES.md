@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.5a — Retired Item Manual Action Smoke Hotfix
+- DungeonDex v1.6.6 — Famous Gear Memory Foundation
 
 ## Current Workflow
 - Inspect files before editing.
@@ -74,7 +74,7 @@ Talent direction:
 - No affixes
 - Talents should modify existing systems instead of creating complex new combat behavior
 
-Active v1.6.5a talent paths:
+Active v1.6.6 talent paths:
 - Survivor: HP, recovery, safer extraction
 - Hunter: Elite Board, rivals, trophies
 - Delver: deeper floors, charters, bosses
@@ -89,6 +89,9 @@ Candidate systems:
 - Retire Items
 - Famous Gear
 - Early Dungeon Return Incentives
+- v1.6.6 target: save-safe, display-only Famous Gear memory foundation.
+- Scope: DevTools-applied memory tags, compact item/archive labels, save repair, and retire snapshot preservation.
+- Non-goals: gear stat bonuses, retired item bonuses, player-facing fame assignment, combat changes, scaling changes.
 
 ### v1.7.x — World Identity and Serious Dungeon Personality
 Purpose:
@@ -112,6 +115,3 @@ Possible pillars:
 - Talent and item retirement integration
 - Stronger new-player onboarding
 - Cleaner public-facing polish
-- v1.6.5a target: browser-backed verification and hotfix-only follow-up.
-- Scope: smoke validation for manual retire action, cancel/confirm/reload checks, mobile overflow verification, and any smallest fix needed for a real defect.
-- Non-goals: new archive features, equipped item retirement, gear deletion without confirmation, famous gear, bonuses, combat changes.

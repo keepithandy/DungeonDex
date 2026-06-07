@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.6.4 - Talent System Foundation + Lowfire Board.
+// DungeonDex v1.6.6 - Talent System Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.6.4-retired-item-archive-foundation';
+  const SCRIPT_BUILD = '1.6.6-famous-gear-memory-foundation';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

@@ -1,6 +1,45 @@
 'use strict';
 
 // Item/monster/save normalization and persistence
+  function normalizeGearMemoryTag(tag) {
+    const clean = cleanDisplayText(tag || '', '').slice(0, 32);
+    if (!clean) return '';
+    const known = asArray(typeof FAMOUS_GEAR_MEMORY_TAGS !== 'undefined' ? FAMOUS_GEAR_MEMORY_TAGS : [], [])
+      .find(entry => String(entry || '').toLowerCase() === clean.toLowerCase());
+    return known || clean;
+  }
+
+  function normalizeGearMemoryTags(value) {
+    const tags = [];
+    const source = Array.isArray(value) ? value : (value ? [value] : []);
+    source.forEach(tag => {
+      const clean = normalizeGearMemoryTag(tag);
+      if (clean && !tags.includes(clean)) tags.push(clean);
+    });
+    return tags.slice(0, 5);
+  }
+
+  function normalizeGearMemory(value, item = {}) {
+    const source = isPlainObject(value) ? value : {};
+    const legacy = isPlainObject(item) ? item : {};
+    const tags = normalizeGearMemoryTags(source.tags ?? source.memoryTags ?? legacy.memoryTags ?? legacy.fameTags ?? []);
+    const title = cleanDisplayText(source.title || legacy.fameTitle || legacy.memoryTitle || '', '').slice(0, 40);
+    const firstMarkedAt = cleanDisplayText(source.firstMarkedAt || legacy.firstMarkedAt || legacy.markedAt || '', '').slice(0, 40);
+    const rawNotes = Array.isArray(source.notes) ? source.notes : (source.notes ? [source.notes] : []);
+    if (legacy.memoryNote) rawNotes.push(legacy.memoryNote);
+    const notes = rawNotes
+      .map(note => cleanDisplayText(note || '', '').slice(0, 80))
+      .filter(Boolean)
+      .slice(0, 3);
+    if (!tags.length && !title && !firstMarkedAt && !notes.length) return null;
+    return {
+      tags,
+      title: title || (tags.length ? 'Famous Gear' : ''),
+      firstMarkedAt,
+      notes
+    };
+  }
+
   function normalizeItem(item, fallbackSlot = 'weapon') {
     if (!isPlainObject(item)) return null;
     if (item.kind === 'special') {
@@ -34,6 +73,14 @@
     if (item.setId && !getMythicSetDefinition(item.setId)) delete item.setId;
     if (item.setId || item.mythicSetId || item.setSlot != null || LEGACY_MYTHIC_SET_SLOTS.includes(rawSlot)) item.setSlot = legacySetSlot || mythicSetSlotFromSlot(baseSlot) || '';
     item.tags = asArray(item.tags, []).map(String);
+    const gearMemory = normalizeGearMemory(item.gearMemory, item);
+    if (gearMemory) item.gearMemory = gearMemory;
+    else delete item.gearMemory;
+    delete item.memoryTags;
+    delete item.fameTags;
+    delete item.fameTitle;
+    delete item.memoryTitle;
+    delete item.memoryNote;
     item.stats = {
       power: Math.floor(numberOr(stats.power, 0, 0, 99999)),
       guard: Math.floor(numberOr(stats.guard, 0, 0, 99999)),
@@ -178,7 +225,12 @@
     const seen = new Set();
     asArray(source, []).forEach(raw => {
       if (!isPlainObject(raw)) return;
-      const item = normalizeItem(isPlainObject(raw.item) ? { ...raw.item } : { ...raw }, raw.slot || raw.item?.slot || 'weapon');
+      const itemSource = isPlainObject(raw.item) ? { ...raw.item } : { ...raw };
+      if (!itemSource.gearMemory && raw.gearMemory) itemSource.gearMemory = raw.gearMemory;
+      if (!itemSource.memoryTags && raw.memoryTags) itemSource.memoryTags = raw.memoryTags;
+      if (!itemSource.fameTitle && raw.fameTitle) itemSource.fameTitle = raw.fameTitle;
+      if (!itemSource.memoryNote && raw.memoryNote) itemSource.memoryNote = raw.memoryNote;
+      const item = normalizeItem(itemSource, raw.slot || raw.item?.slot || 'weapon');
       if (!item) return;
       const recordId = String(raw.id || raw.recordId || item.id || '').trim() || makeId('retired');
       if (seen.has(recordId)) return;

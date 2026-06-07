@@ -26,6 +26,7 @@
    * @property {Currency} value
    * @property {StatBlock} stats
    * @property {string[]} tags
+   * @property {{tags:string[], title:string, firstMarkedAt:string, notes:string[]}} [gearMemory]
    * @property {string} summary
    *
    * @typedef {Object} Enemy
@@ -95,8 +96,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.6.4';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.6.4';
+  const BUILD = '1.6.6';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.6.6';
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;
@@ -117,6 +118,7 @@
   const DEFAULT_PLAYER_STATS = Object.freeze({ power: 8, guard: 6, wit: 5, luck: 4, speed: 5 });
   const SLOT_ORDER = ['weapon','offhand','helm','armor','gloves','boots','ring','amulet','cloak','charm'];
   const INVENTORY_SORTS = ['power','level','rarity','value','slot','newest'];
+  const FAMOUS_GEAR_MEMORY_TAGS = Object.freeze(['Boss-Worn', 'Rival-Marked', 'Deepmarked', 'Charter-Carried', 'Archive-Worthy']);
   const RARITIES = [
     { key:'common', mult:1, color:'rarity-common', chance:40 },
     { key:'uncommon', mult:1.18, color:'rarity-uncommon', chance:26 },

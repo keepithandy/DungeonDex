@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.5a`
-* Current local package baseline: `v1.6.5a`
-* Current development target: `v1.6.5a`
+* Public/live itch version: `v1.6.6`
+* Current local package baseline: `v1.6.6`
+* Current development target: `v1.6.6`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -599,6 +599,12 @@ Use clear commit messages such as:
 ## Notes
 
 This changelog replaces temporary patch-note files and should remain the single ongoing update record for DungeonDex.
+## v1.6.6 - Famous Gear Memory Foundation
+* Added a save-safe `gearMemory` item shape for display-only Famous Gear tags, titles, timestamps, and short notes.
+* Added compact memory labels to inventory/equipment cards and retired item archive cards when an item carries memory.
+* Preserved memory fields through save repair and manual retirement archive snapshots without changing gear stats, value, scaling, sell/equip behavior, or combat.
+* Added DevTools-only Famous Gear helpers and smoke coverage for mark, reload persistence, retire preservation, archive display, and mobile layout.
+
 ## v1.6.5a - Retired Item Manual Action Smoke Hotfix
 * Added a browser-backed smoke check for the manual retire action, including cancel, confirm, archive-before-remove, reload persistence, and mobile overflow coverage.
 * Kept the v1.6.5 retire action behavior unchanged unless smoke exposed a real defect.

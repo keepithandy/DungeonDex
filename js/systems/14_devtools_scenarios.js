@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.5a - DevTools Scenario Presets
+// DungeonDex v1.6.6 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.6.5a';
-  const SCENARIO_BUILD = '1.6.5a-retired-item-manual-action-smoke-hotfix-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.6';
+  const SCENARIO_BUILD = '1.6.6-famous-gear-memory-foundation-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -718,6 +718,104 @@
       `source: ${latest ? (latest.source || 'unknown') : 'n/a'}`
     ].join('\n');
   }
+  function gearMemoryEntries(){
+    if (!hasState()) return [];
+    const entries = [];
+    arr(S.player.inventory).forEach(function(item, index){
+      if (obj(item) && item.kind !== 'special') entries.push({ item, location:'inventory', key:String(index) });
+    });
+    Object.keys(obj(S.player.equipment) ? S.player.equipment : {}).forEach(function(slot){
+      const item = S.player.equipment[slot];
+      if (obj(item) && item.kind !== 'special') entries.push({ item, location:`equipped:${slot}`, key:slot });
+    });
+    return entries;
+  }
+  function memoryForItem(item){
+    if (!obj(item)) return null;
+    if (typeof normalizeGearMemory === 'function') return normalizeGearMemory(item.gearMemory, item);
+    const memory = obj(item.gearMemory) ? item.gearMemory : {};
+    const tags = arr(memory.tags).map(String).filter(Boolean).slice(0, 5);
+    if (!tags.length && !memory.title) return null;
+    return { tags, title: String(memory.title || 'Famous Gear'), firstMarkedAt:String(memory.firstMarkedAt || ''), notes:arr(memory.notes).map(String).slice(0, 3) };
+  }
+  function gearMemoryTag(tag){
+    const requested = String(tag || 'Boss-Worn').trim() || 'Boss-Worn';
+    const allowed = typeof FAMOUS_GEAR_MEMORY_TAGS !== 'undefined' ? arr(FAMOUS_GEAR_MEMORY_TAGS) : [];
+    return allowed.find(function(entry){ return String(entry).toLowerCase() === requested.toLowerCase(); }) || requested.slice(0, 32);
+  }
+  function findGearMemoryTarget(itemId){
+    const cleanId = String(itemId || '').trim();
+    const entries = gearMemoryEntries();
+    if (cleanId) return entries.find(function(entry){ return String(entry.item.id || '') === cleanId; }) || null;
+    return entries.find(function(entry){ return entry.location === 'inventory'; }) || entries[0] || null;
+  }
+  function markGearFamousForTest(tag, itemId){
+    if (!hasState()) return { ok:false, reason:'state unavailable' };
+    const target = findGearMemoryTarget(itemId);
+    if (!target) return { ok:false, reason:'no gear target' };
+    const item = target.item;
+    const before = JSON.stringify({ rating:item.rating, value:item.value, stats:item.stats });
+    const memory = memoryForItem(item) || { tags:[], title:'Famous Gear', firstMarkedAt:'', notes:[] };
+    const cleanTag = gearMemoryTag(tag);
+    const tags = arr(memory.tags).slice();
+    if (!tags.some(function(existing){ return String(existing).toLowerCase() === cleanTag.toLowerCase(); })) tags.push(cleanTag);
+    item.gearMemory = {
+      tags: tags.slice(0, 5),
+      title: memory.title || 'Famous Gear',
+      firstMarkedAt: memory.firstMarkedAt || new Date().toISOString(),
+      notes: arr(memory.notes).slice(0, 3)
+    };
+    if (typeof normalizeItem === 'function') normalizeItem(item, item.slot || 'weapon');
+    const after = JSON.stringify({ rating:item.rating, value:item.value, stats:item.stats });
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = famousGearSummary();
+    log(`Marked Famous Gear: ${item.name || 'Unknown gear'} (${cleanTag}).`, 'info');
+    return {
+      ok:true,
+      itemId:item.id || '',
+      itemName:item.name || '',
+      location:target.location,
+      tags: arr(item.gearMemory?.tags),
+      statsUnchanged: before === after
+    };
+  }
+  function clearGearMemoryForTest(){
+    if (!hasState()) return false;
+    gearMemoryEntries().forEach(function(entry){ delete entry.item.gearMemory; });
+    arr(S.player.retiredRelics).forEach(function(record){
+      if (obj(record?.item)) delete record.item.gearMemory;
+      delete record.gearMemory;
+      delete record.memoryTags;
+      delete record.fameTitle;
+      delete record.memoryNote;
+    });
+    if (typeof save === 'function') save(S);
+    if (typeof render === 'function') render();
+    scenarioState.lastMessage = famousGearSummary();
+    log('Famous Gear memory cleared for testing.', 'info');
+    return true;
+  }
+  function famousGearSummary(){
+    if (!hasState()) return 'Famous Gear memory unavailable.';
+    const active = gearMemoryEntries().filter(function(entry){ return !!memoryForItem(entry.item); });
+    const retired = arr(S.player.retiredRelics).filter(function(record){ return !!memoryForItem(record?.item); });
+    const latest = active[0]?.item || retired[0]?.item || null;
+    return [
+      'Famous Gear memory',
+      `active gear: ${fmt(active.length)}`,
+      `retired records: ${fmt(retired.length)}`,
+      `latest: ${latest ? (latest.name || 'unknown gear') : 'none yet'}`,
+      `tags: ${latest ? arr(memoryForItem(latest)?.tags).join(', ') || 'none' : 'n/a'}`
+    ].join('\n');
+  }
+  function famousGearSmoke(){
+    const result = markGearFamousForTest('Boss-Worn');
+    return {
+      ok: !!result?.ok && result.statsUnchanged === true && arr(result.tags).includes('Boss-Worn'),
+      result
+    };
+  }
   function createRetiredRelicRecordFromItem(item, source){
     if (!obj(item)) return null;
     const rawDepth = int(S?.player?.safeExtractDepth || S?.player?.depth || 1, 1, 1);
@@ -869,6 +967,11 @@
         ${button('Sim Death Reset', 'simulate-death-reset')}
       </div>
       <div class="dd-devtools-button-grid">
+        ${button('Mark Famous Gear', 'mark-famous-gear')}
+        ${button('Famous Gear Summary', 'famous-gear-summary')}
+        ${button('Clear Gear Memory', 'clear-gear-memory', '', true)}
+      </div>
+      <div class="dd-devtools-button-grid">
         ${button('Scaling Probe', 'scaling-probe')}
         ${button('Floor 20-35 Sample', 'floor-balance-sample')}
       </div>
@@ -910,6 +1013,9 @@
     if (action === 'force-retired-relic') return grantRetiredRelicForTest();
     if (action === 'retired-relic-summary') { scenarioState.lastMessage = retiredRelicSummaryText(); renderScenarioSectionSoon(); return true; }
     if (action === 'clear-retired-relics') return clearRetiredRelics();
+    if (action === 'mark-famous-gear') return markGearFamousForTest('Boss-Worn');
+    if (action === 'famous-gear-summary') { scenarioState.lastMessage = famousGearSummary(); renderScenarioSectionSoon(); return true; }
+    if (action === 'clear-gear-memory') return clearGearMemoryForTest();
     if (action === 'simulate-complete') return simulateEliteCompletion();
     if (action === 'clear-trophies') return clearTrophyState();
     if (action === 'create-rival') return createTestRival();
@@ -949,6 +1055,10 @@
     retiredRelicSummary: retiredRelicSummaryText,
     grantRetiredRelicForTest,
     clearRetiredRelics,
+    markGearFamousForTest,
+    clearGearMemoryForTest,
+    famousGearSummary,
+    famousGearSmoke,
     grantTalentPoint,
     resetTalents,
     unlockTalentForTest,

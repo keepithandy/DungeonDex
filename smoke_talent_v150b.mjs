@@ -440,12 +440,14 @@ async function main() {
         room: r.room || 0,
         chapter: r.chapter || 0,
         source: r.source || '',
-        note: r.note || ''
+        note: r.note || '',
+        memoryTitle: r.item?.gearMemory?.title || '',
+        memoryTags: Array.isArray(r.item?.gearMemory?.tags) ? r.item.gearMemory.tags.slice() : []
       })) : []
     }))()`);
     const setGearScreen = async () => await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return true; })()`);
     const gearInventorySnapshot = async () => await evalByValue(client, `(() => ({
-      inventory: Array.isArray(S.player?.inventory) ? S.player.inventory.map(item => ({ id:item.id, name:item.name, rarity:item.rarity, slot:item.slot, equipped:Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === item.id) })) : [],
+      inventory: Array.isArray(S.player?.inventory) ? S.player.inventory.map(item => ({ id:item.id, name:item.name, rarity:item.rarity, slot:item.slot, equipped:Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === item.id), memoryTags:Array.isArray(item.gearMemory?.tags) ? item.gearMemory.tags.slice() : [] })) : [],
       equippedIds: Object.values(S.player?.equipment || {}).filter(Boolean).map(item => item.id),
       retireButtons: Array.from(document.querySelectorAll('[data-retire]')).map(btn => ({
         id: btn.dataset.retire || '',
@@ -454,8 +456,10 @@ async function main() {
       })),
       equipmentHasRetire: !!document.getElementById('equipmentPanel')?.querySelector('[data-retire]')
     }))()`);
-    const clickRetireFlow = async (acceptConfirm) => await evalByValue(client, `(() => {
-      const item = Array.isArray(S.player?.inventory) ? S.player.inventory.find(entry => entry && !Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === entry.id) && entry.slot && entry.kind !== 'special' && !entry.locked && !entry.favorite && !entry.protected && !(Array.isArray(entry.tags) && entry.tags.some(tag => String(tag).toLowerCase() === 'protected' || String(tag).toLowerCase() === 'special'))) : null;
+    const clickRetireFlow = async (acceptConfirm, itemId = '') => await evalByValue(client, `(() => {
+      const targetId = ${JSON.stringify(itemId || '')};
+      const eligible = Array.isArray(S.player?.inventory) ? S.player.inventory.filter(entry => entry && !Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === entry.id) && entry.slot && entry.kind !== 'special' && !entry.locked && !entry.favorite && !entry.protected && !(Array.isArray(entry.tags) && entry.tags.some(tag => String(tag).toLowerCase() === 'protected' || String(tag).toLowerCase() === 'special'))) : [];
+      const item = targetId ? eligible.find(entry => String(entry.id || '') === targetId) : eligible[0];
       if (!item) return { ok:false, reason:'no eligible item' };
       const btn = Array.from(document.querySelectorAll('[data-retire]')).find(node => String(node.dataset.retire || '') === String(item.id || ''));
       if (!btn) return { ok:false, reason:'retire button missing', itemId:item.id };
@@ -468,7 +472,7 @@ async function main() {
       const archived = Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics[0] : null;
       return {
         ok:true,
-        item: { id:item.id, name:item.name, rarity:item.rarity, slot:item.slot },
+        item: { id:item.id, name:item.name, rarity:item.rarity, slot:item.slot, memoryTags:Array.isArray(item.gearMemory?.tags) ? item.gearMemory.tags.slice() : [] },
         before,
         after,
         confirmCalls,
@@ -483,7 +487,9 @@ async function main() {
           room: archived.room || 0,
           chapter: archived.chapter || 0,
           source: archived.source || '',
-          note: archived.note || ''
+          note: archived.note || '',
+          memoryTitle: archived.item?.gearMemory?.title || '',
+          memoryTags: Array.isArray(archived.item?.gearMemory?.tags) ? archived.item.gearMemory.tags.slice() : []
         } : null
       };
     })()`);
@@ -568,9 +574,9 @@ async function main() {
           hasBestDepth: text.includes('Best Depth'),
           hasLastEarned: text.includes('Last Earned'),
           hasRetiredItems: lower.includes('retired items'),
-          hasRetiredArchiveSummary: lower.includes('devtools-only record creation') || lower.includes('devtools archive records only'),
+          hasRetiredArchiveSummary: lower.includes('display-only memory tags') || lower.includes('famous gear memory'),
           hasBoardRival: lower.includes('board & rival trophies'),
-          hasNoRetireButton: !/Retire\b/.test(text)
+          hasNoRetireButton: !document.getElementById('screen-dex')?.querySelector('[data-retire]')
         };
       })()`);
     };
@@ -620,6 +626,8 @@ async function main() {
       return true;
     })()`);
     const freshUnlockBtn = await evalByValue(client, `(() => {
+      S.screen = 'gear';
+      if (typeof render === 'function') render();
       const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
       return !!btn && btn.disabled && /Need Point/.test(btn.textContent || '');
     })()`);
@@ -728,8 +736,9 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
     record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
-    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('DevTools can seed archive records') && bossEmptyText.includes('No player-facing retire action is active.'), bossEmptyText.slice(0, 500));
-    record('No Retire button or item mutation action appears', !/Retire\b/.test(bossEmptyText), bossEmptyText.slice(0, 400));
+    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Retire eligible inventory items') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
+    const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
+    record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
     const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
     record('Retired item archive record can be created', !!retiredRelicGrant, String(retiredRelicGrant));
     const retiredRelicStateAfterGrant = await evalByValue(client, `(() => ({
@@ -778,14 +787,15 @@ async function main() {
     const malformedBossSave = JSON.parse(JSON.stringify(await readSave(client)));
     malformedBossSave.player.bossTrophies = ['lowfire_fang'];
     malformedBossSave.player.bossTrophyRecords = [{ trophyId:'lowfire_fang', trophyName:'Lowfire Fang', count:0, floor:'x', room:null, chapter:-2, rawDepth:'bad', bestKillDepth:0 }];
-    malformedBossSave.player.retiredRelics = [{ id:'bad_relic', item:{ slot:'weapon', rarity:'rare', level:'bad', rating:0, value:-10, name:'', stats:{} }, floor:'x', room:0, chapter:-2, note:'', source:'' }];
+    malformedBossSave.player.retiredRelics = [{ id:'bad_relic', item:{ slot:'weapon', rarity:'rare', level:'bad', rating:0, value:-10, name:'', stats:{}, gearMemory:{ tags:['Boss-Worn', 42, '', '<b>bad</b>'], title:42, notes:'kept short' } }, floor:'x', room:0, chapter:-2, note:'', source:'' }];
     await writeSave(client, malformedBossSave);
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const repairedBossState = await getBossTrophyState();
     record('Malformed boss trophy data repairs safely', Array.isArray(repairedBossState.records) && repairedBossState.records.length > 0 && repairedBossState.records[0].count >= 1 && repairedBossState.records[0].floor >= 1 && repairedBossState.records[0].room >= 1 && repairedBossState.records[0].chapter >= 1, JSON.stringify(repairedBossState.records[0] || null));
-    const repairedRetiredRelics = await evalByValue(client, `(() => Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({ itemName:r.item?.name, slot:r.slot, rarity:r.rarity, itemLevel:r.itemLevel, rating:r.rating, floor:r.floor, room:r.room, chapter:r.chapter, source:r.source, note:r.note })) : [])()`);
+    const repairedRetiredRelics = await evalByValue(client, `(() => Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({ itemName:r.item?.name, slot:r.slot, rarity:r.rarity, itemLevel:r.itemLevel, rating:r.rating, floor:r.floor, room:r.room, chapter:r.chapter, source:r.source, note:r.note, memoryTags:Array.isArray(r.item?.gearMemory?.tags) ? r.item.gearMemory.tags.slice() : [] })) : [])()`);
     record('Malformed retired item archive data repairs safely', Array.isArray(repairedRetiredRelics) && repairedRetiredRelics.length > 0 && repairedRetiredRelics[0].itemName && repairedRetiredRelics[0].itemLevel >= 1 && repairedRetiredRelics[0].rating >= 1 && repairedRetiredRelics[0].floor >= 1 && repairedRetiredRelics[0].room >= 1 && repairedRetiredRelics[0].chapter >= 1, JSON.stringify(repairedRetiredRelics[0] || null));
+    record('Malformed famous gear memory repairs safely', Array.isArray(repairedRetiredRelics) && repairedRetiredRelics[0]?.memoryTags?.includes('Boss-Worn'), JSON.stringify(repairedRetiredRelics[0] || null));
 
     // Manual retire action smoke.
     await clearSave(client);
@@ -796,21 +806,39 @@ async function main() {
     const gearSnapshot = await gearInventorySnapshot();
     record('Gear inventory has eligible retire target', Array.isArray(gearSnapshot.inventory) && gearSnapshot.inventory.some(item => !item.equipped), JSON.stringify(gearSnapshot));
     record('Equipped items have no retire button', !gearSnapshot.equipmentHasRetire, JSON.stringify({ equipmentHasRetire: gearSnapshot.equipmentHasRetire }));
-    const retireCancel = await clickRetireFlow(false);
+    const famousMark = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.markGearFamousForTest ? window.DungeonDexScenarioDevTools.markGearFamousForTest('Boss-Worn') : { ok:false, reason:'missing helper' })()`);
+    record('DevTools can mark Famous Gear without stat changes', !!famousMark.ok && famousMark.statsUnchanged === true && Array.isArray(famousMark.tags) && famousMark.tags.includes('Boss-Worn'), JSON.stringify(famousMark));
+    await setGearScreen();
+    const famousGearText = await evalByValue(client, `(() => document.getElementById('inventoryPanel')?.innerText || document.getElementById('equipmentPanel')?.innerText || '')()`);
+    record('Item card displays Famous Gear memory label', famousGearText.includes('Famous Gear') && famousGearText.includes('Boss-Worn'), famousGearText.slice(0, 600));
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const famousAfterReload = await evalByValue(client, `(() => {
+      const item = Array.isArray(S.player?.inventory) ? S.player.inventory.find(entry => entry && entry.id === ${JSON.stringify(famousMark.itemId || '')}) : null;
+      S.screen = 'gear';
+      if (typeof render === 'function') render();
+      const text = document.getElementById('inventoryPanel')?.innerText || '';
+      return { itemFound:!!item, tags:Array.isArray(item?.gearMemory?.tags) ? item.gearMemory.tags.slice() : [], text };
+    })()`);
+    record('Famous Gear memory persists after reload', !!famousAfterReload.itemFound && famousAfterReload.tags.includes('Boss-Worn') && famousAfterReload.text.includes('Boss-Worn'), JSON.stringify({ itemFound:famousAfterReload.itemFound, tags:famousAfterReload.tags }));
+    const retireCancel = await clickRetireFlow(false, famousMark.itemId || '');
     record('Retire confirmation cancel leaves inventory unchanged', !!retireCancel.ok && retireCancel.before.inventory === retireCancel.after.inventory && retireCancel.before.retired === retireCancel.after.retired, JSON.stringify(retireCancel));
     await sleep(350);
-    const retireAccept = await clickRetireFlow(true);
+    const retireAccept = await clickRetireFlow(true, famousMark.itemId || '');
     record('Retire confirmation accept archives and removes exactly one item', !!retireAccept.ok && retireAccept.after.retired === retireAccept.before.retired + 1 && retireAccept.after.inventory === retireAccept.before.inventory - 1 && retireAccept.archived && retireAccept.archived.name && retireAccept.archived.rarity && retireAccept.archived.slot, JSON.stringify(retireAccept));
+    record('Retired item archive snapshot preserves Famous Gear memory', Array.isArray(retireAccept.archived?.memoryTags) && retireAccept.archived.memoryTags.includes('Boss-Worn'), JSON.stringify(retireAccept.archived || null));
     const postRetireGearText = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return document.getElementById('inventoryPanel')?.innerText || ''; })()`);
     record('Retired item removed from inventory card list', !postRetireGearText.includes(retireAccept.item.name), postRetireGearText.slice(0, 500));
     await evalByValue(client, `(() => { S.screen = 'dex'; if (typeof render === 'function') render(); return true; })()`);
     const archiveTextAfterRetire = await evalByValue(client, `(() => document.getElementById('gearDex')?.innerText || document.getElementById('monsterDex')?.innerText || '')()`);
     const archiveLower = String(archiveTextAfterRetire || '').toLowerCase();
     record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()), archiveTextAfterRetire.slice(0, 500));
+    record('Retired item archive displays Famous Gear memory label', archiveTextAfterRetire.includes('Famous Gear') && archiveTextAfterRetire.includes('Boss-Worn'), archiveTextAfterRetire.slice(0, 700));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const retiredAfterReload = await getRetiredRelicState();
     record('Retired item archive record persists after reload', Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retireAccept.item.name && r.rarity === retireAccept.item.rarity && r.slot === retireAccept.item.slot), JSON.stringify(retiredAfterReload.records[0] || null));
+    record('Retired Famous Gear memory persists after reload', Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retireAccept.item.name && Array.isArray(r.memoryTags) && r.memoryTags.includes('Boss-Worn')), JSON.stringify(retiredAfterReload.records[0] || null));
     const gearAfterReload = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return Array.isArray(S.player?.inventory) ? S.player.inventory.some(item => item && item.id === ${JSON.stringify(retireAccept.item.id)}) : false; })()`);
     record('Retired item does not return to inventory after reload', gearAfterReload === false, JSON.stringify({ gearAfterReload }));
 
