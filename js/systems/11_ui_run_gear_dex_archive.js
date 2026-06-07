@@ -407,8 +407,29 @@
     const memory = isPlainObject(item.gearMemory) ? item.gearMemory : null;
     const tags = asArray(memory?.tags, []).map(tag => cleanGearText(tag).slice(0, 32)).filter(Boolean).slice(0, 5);
     const title = cleanGearText(memory?.title || '', '').slice(0, 40);
-    if (!tags.length && !title) return null;
-    return { tags, title: title || 'Famous Gear', firstMarkedAt: cleanGearText(memory?.firstMarkedAt || ''), notes: [] };
+    const kills = gearMemoryCount(memory?.kills);
+    const bossKills = gearMemoryCount(memory?.bossKills);
+    const eliteKills = gearMemoryCount(memory?.eliteKills);
+    const chaptersCleared = gearMemoryCount(memory?.chaptersCleared);
+    if (!tags.length && !title && !kills && !bossKills && !eliteKills && !chaptersCleared) return null;
+    return { tags, title: title || (tags.length ? 'Famous Gear' : ''), firstMarkedAt: cleanGearText(memory?.firstMarkedAt || ''), notes: [], kills, bossKills, eliteKills, chaptersCleared };
+  }
+
+  function gearMemoryCount(value) {
+    return Math.floor(numberOr(value, 0, 0, Number.MAX_SAFE_INTEGER));
+  }
+
+  function gearMemoryStatChips(memory) {
+    if (!memory) return [];
+    return [
+      ['kills', 'kill', 'kills'],
+      ['bossKills', 'boss', 'bosses'],
+      ['eliteKills', 'elite', 'elites'],
+      ['chaptersCleared', 'chapter', 'chapters']
+    ].map(([key, singular, plural]) => {
+      const count = gearMemoryCount(memory[key]);
+      return count > 0 ? `${format(count)} ${count === 1 ? singular : plural}` : '';
+    }).filter(Boolean);
   }
 
   function gearMemoryBadges(item) {
@@ -418,7 +439,7 @@
     const chips = [memory.title || 'Famous Gear'].concat(tags.slice(0, 2));
     const overflow = Math.max(0, tags.length - 2);
     if (overflow > 0) chips.push(`+${format(overflow)}`);
-    return chips
+    return chips.concat(gearMemoryStatChips(memory))
       .filter(Boolean)
       .map(label => `<span class="gear-status-badge memory">${escapeHtml(label)}</span>`)
       .join('');
@@ -427,10 +448,10 @@
   function gearMemoryPills(item) {
     const memory = gearMemoryModel(item);
     if (!memory) return '';
-    const chips = [memory.title || 'Famous Gear'].concat(asArray(memory.tags, []));
+    const chips = [memory.title || 'Famous Gear'].concat(asArray(memory.tags, []), gearMemoryStatChips(memory));
     return chips
       .filter(Boolean)
-      .slice(0, 6)
+      .slice(0, 10)
       .map(label => `<span class="pill gear-memory-pill">${escapeHtml(label)}</span>`)
       .join('');
   }

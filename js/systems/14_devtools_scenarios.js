@@ -1,10 +1,10 @@
 'use strict';
 
-// DungeonDex v1.6.9 - DevTools Scenario Presets
+// DungeonDex v1.6.10 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
-  const SCENARIO_VERSION = 'DungeonDex v1.6.9';
-  const SCENARIO_BUILD = '1.6.9-debt-collector-activation-devtools';
+  const SCENARIO_VERSION = 'DungeonDex v1.6.10';
+  const SCENARIO_BUILD = '1.6.10-famous-gear-memory-expansion-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';
   const PANEL_SELECTOR = '.dd-devtools-panel';
   const SECTION_ID = 'ddDevToolsScenarioPresets';
@@ -735,8 +735,22 @@
     if (typeof normalizeGearMemory === 'function') return normalizeGearMemory(item.gearMemory, item);
     const memory = obj(item.gearMemory) ? item.gearMemory : {};
     const tags = arr(memory.tags).map(String).filter(Boolean).slice(0, 5);
-    if (!tags.length && !memory.title) return null;
-    return { tags, title: String(memory.title || 'Famous Gear'), firstMarkedAt:String(memory.firstMarkedAt || ''), notes:arr(memory.notes).map(String).slice(0, 3) };
+    const stats = gearMemoryStats(memory);
+    if (!tags.length && !memory.title && !stats.kills && !stats.bossKills && !stats.eliteKills && !stats.chaptersCleared) return null;
+    return { tags, title: String(memory.title || (tags.length ? 'Famous Gear' : '')), firstMarkedAt:String(memory.firstMarkedAt || ''), notes:arr(memory.notes).map(String).slice(0, 3), ...stats };
+  }
+  function gearMemoryCount(value){
+    if (typeof numberOr === 'function') return Math.floor(numberOr(value, 0, 0, Number.MAX_SAFE_INTEGER));
+    const n = Number(value);
+    return Math.floor(Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number.isFinite(n) ? n : 0)));
+  }
+  function gearMemoryStats(memory){
+    return {
+      kills: gearMemoryCount(memory?.kills),
+      bossKills: gearMemoryCount(memory?.bossKills),
+      eliteKills: gearMemoryCount(memory?.eliteKills),
+      chaptersCleared: gearMemoryCount(memory?.chaptersCleared)
+    };
   }
   function gearMemoryTag(tag){
     const requested = String(tag || 'Boss-Worn').trim() || 'Boss-Worn';
@@ -763,7 +777,11 @@
       tags: tags.slice(0, 5),
       title: memory.title || 'Famous Gear',
       firstMarkedAt: memory.firstMarkedAt || new Date().toISOString(),
-      notes: arr(memory.notes).slice(0, 3)
+      notes: arr(memory.notes).slice(0, 3),
+      kills: gearMemoryCount(memory.kills),
+      bossKills: gearMemoryCount(memory.bossKills),
+      eliteKills: gearMemoryCount(memory.eliteKills),
+      chaptersCleared: gearMemoryCount(memory.chaptersCleared)
     };
     if (typeof normalizeItem === 'function') normalizeItem(item, item.slot || 'weapon');
     const after = JSON.stringify({ rating:item.rating, value:item.value, stats:item.stats });
@@ -777,6 +795,7 @@
       itemName:item.name || '',
       location:target.location,
       tags: arr(item.gearMemory?.tags),
+      memory: gearMemoryStats(item.gearMemory),
       statsUnchanged: before === after
     };
   }
@@ -801,19 +820,59 @@
     const active = gearMemoryEntries().filter(function(entry){ return !!memoryForItem(entry.item); });
     const retired = arr(S.player.retiredRelics).filter(function(record){ return !!memoryForItem(record?.item); });
     const latest = active[0]?.item || retired[0]?.item || null;
+    const latestMemory = latest ? memoryForItem(latest) : null;
+    const latestStats = gearMemoryStats(latestMemory || {});
     return [
       'Famous Gear memory',
       `active gear: ${fmt(active.length)}`,
       `retired records: ${fmt(retired.length)}`,
       `latest: ${latest ? (latest.name || 'unknown gear') : 'none yet'}`,
-      `tags: ${latest ? arr(memoryForItem(latest)?.tags).join(', ') || 'none' : 'n/a'}`
+      `tags: ${latestMemory ? arr(latestMemory.tags).join(', ') || 'none' : 'n/a'}`,
+      `kills: ${latest ? fmt(latestStats.kills) : 'n/a'}`,
+      `bossKills: ${latest ? fmt(latestStats.bossKills) : 'n/a'}`,
+      `eliteKills: ${latest ? fmt(latestStats.eliteKills) : 'n/a'}`,
+      `chaptersCleared: ${latest ? fmt(latestStats.chaptersCleared) : 'n/a'}`
     ].join('\n');
   }
   function famousGearSmoke(){
     const result = markGearFamousForTest('Boss-Worn');
     return {
-      ok: !!result?.ok && result.statsUnchanged === true && arr(result.tags).includes('Boss-Worn'),
+      ok: !!result?.ok && result.statsUnchanged === true && arr(result.tags).includes('Boss-Worn') && ['kills','bossKills','eliteKills','chaptersCleared'].every(function(key){ return Number.isSafeInteger(result.memory?.[key]); }),
       result
+    };
+  }
+  function famousGearMemorySmoke(){
+    const result = markGearFamousForTest('Boss-Worn');
+    const target = result?.itemId ? findGearMemoryTarget(result.itemId) : null;
+    if (target?.item?.gearMemory) {
+      target.item.gearMemory.kills = gearMemoryCount(target.item.gearMemory.kills) + 12;
+      target.item.gearMemory.bossKills = gearMemoryCount(target.item.gearMemory.bossKills) + 3;
+      target.item.gearMemory.eliteKills = gearMemoryCount(target.item.gearMemory.eliteKills) + 4;
+      target.item.gearMemory.chaptersCleared = gearMemoryCount(target.item.gearMemory.chaptersCleared) + 18;
+      if (typeof normalizeItem === 'function') normalizeItem(target.item, target.item.slot || 'weapon');
+    }
+    const repaired = typeof normalizeGearMemory === 'function'
+      ? normalizeGearMemory({ tags:'Boss-Worn', title:42, firstMarkedAt:99, notes:'kept', kills:'7.8', bossKills:-4, eliteKills:'bad', chaptersCleared:3.4 }, {})
+      : null;
+    const oldStyle = typeof normalizeGearMemory === 'function'
+      ? normalizeGearMemory(null, { memoryTags:['Deepmarked'], memoryTitle:'Old Memory', memoryNote:'Kept note' })
+      : null;
+    const summary = famousGearSummary();
+    const summaryHasCounters = ['kills:', 'bossKills:', 'eliteKills:', 'chaptersCleared:'].every(function(label){ return summary.includes(label); });
+    const numericCounters = [result?.memory, target?.item?.gearMemory, repaired, oldStyle].filter(Boolean).every(function(memory){
+      return ['kills','bossKills','eliteKills','chaptersCleared'].every(function(key){ return Number.isSafeInteger(memory[key]) && memory[key] >= 0; });
+    });
+    const clearOk = clearGearMemoryForTest();
+    const cleared = gearMemoryEntries().every(function(entry){ return !memoryForItem(entry.item); })
+      && arr(S.player.retiredRelics).every(function(record){ return !memoryForItem(record?.item); });
+    return {
+      ok: !!result?.ok && result.statsUnchanged === true && numericCounters && summaryHasCounters && !!oldStyle?.tags?.length && clearOk === true && cleared,
+      result,
+      repaired,
+      oldStyle,
+      summary,
+      clearOk,
+      cleared
     };
   }
   function createRetiredRelicRecordFromItem(item, source){
@@ -1059,6 +1118,7 @@
     clearGearMemoryForTest,
     famousGearSummary,
     famousGearSmoke,
+    famousGearMemorySmoke,
     grantTalentPoint,
     resetTalents,
     unlockTalentForTest,

@@ -663,6 +663,41 @@
     return record;
   }
 
+  function famousGearMemoryCounter(value) {
+    return Math.floor(numberOr(value, 0, 0, Number.MAX_SAFE_INTEGER));
+  }
+
+  function incrementFamousGearMemoryCounter(memory, key, amount) {
+    if (!isPlainObject(memory)) return;
+    const current = famousGearMemoryCounter(memory[key]);
+    const gain = famousGearMemoryCounter(amount);
+    memory[key] = Math.min(Number.MAX_SAFE_INTEGER, current + gain);
+  }
+
+  function trackEquippedFamousGearMemory(state, increments) {
+    const equipment = isPlainObject(state?.player?.equipment) ? state.player.equipment : {};
+    const patch = isPlainObject(increments) ? increments : {};
+    const keys = ['kills', 'bossKills', 'eliteKills', 'chaptersCleared'].filter(key => famousGearMemoryCounter(patch[key]) > 0);
+    if (!keys.length) return;
+    const seen = new Set();
+    Object.keys(equipment).forEach(slot => {
+      const item = equipment[slot];
+      if (!isPlainObject(item) || item.kind === 'special' || !isPlainObject(item.gearMemory)) return;
+      const seenKey = item.id ? `id:${item.id}` : `slot:${slot}`;
+      if (seen.has(seenKey)) return;
+      seen.add(seenKey);
+      const memory = typeof normalizeGearMemory === 'function'
+        ? normalizeGearMemory(item.gearMemory, item)
+        : item.gearMemory;
+      if (!memory) {
+        delete item.gearMemory;
+        return;
+      }
+      keys.forEach(key => incrementFamousGearMemoryCounter(memory, key, patch[key]));
+      item.gearMemory = memory;
+    });
+  }
+
   function winEncounter(state) {
     ensureRunShell(state);
     const m = state.run.monster;
@@ -681,6 +716,11 @@
     addPendingRunShards(state, m.rewardShard);
     addPendingRunXp(state, m.rewardXp);
     addPendingRunKill(state, 1);
+    trackEquippedFamousGearMemory(state, {
+      kills: 1,
+      bossKills: source === 'boss' ? 1 : 0,
+      eliteKills: source === 'elite' ? 1 : 0
+    });
     state.run.roomsCleared += 1;
     state.run.chain += 1;
     const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
@@ -764,6 +804,7 @@
     if (milestone) pushCombat(state, milestone);
     applyRoomMilestoneReward(state, beforeDepth, state.run.floor);
     applyFloorMilestoneReward(state, beforeDepth, state.run.floor);
+    trackEquippedFamousGearMemory(state, { chaptersCleared: 1 });
 
     nextEncounter(state);
   }

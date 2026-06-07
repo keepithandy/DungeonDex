@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.9-debt-collector-activation';
+const CACHE_NAME = 'dungeondex-v1.6.10-famous-gear-memory-expansion';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.9-debt-collector-activation';
+const BUILD_QS = '1.6.10-famous-gear-memory-expansion';
 const ASSETS = [
   './',
   './index.html',

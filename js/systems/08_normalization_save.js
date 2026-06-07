@@ -19,6 +19,10 @@
     return tags.slice(0, 5);
   }
 
+  function normalizeGearMemoryCount(value) {
+    return Math.floor(numberOr(value, 0, 0, Number.MAX_SAFE_INTEGER));
+  }
+
   function normalizeGearMemory(value, item = {}) {
     const source = isPlainObject(value) ? value : {};
     const legacy = isPlainObject(item) ? item : {};
@@ -31,12 +35,20 @@
       .map(note => cleanDisplayText(note || '', '').slice(0, 80))
       .filter(Boolean)
       .slice(0, 3);
-    if (!tags.length && !title && !firstMarkedAt && !notes.length) return null;
+    const kills = normalizeGearMemoryCount(source.kills);
+    const bossKills = normalizeGearMemoryCount(source.bossKills);
+    const eliteKills = normalizeGearMemoryCount(source.eliteKills);
+    const chaptersCleared = normalizeGearMemoryCount(source.chaptersCleared);
+    if (!tags.length && !title && !firstMarkedAt && !notes.length && !kills && !bossKills && !eliteKills && !chaptersCleared) return null;
     return {
       tags,
       title: title || (tags.length ? 'Famous Gear' : ''),
       firstMarkedAt,
-      notes
+      notes,
+      kills,
+      bossKills,
+      eliteKills,
+      chaptersCleared
     };
   }
 

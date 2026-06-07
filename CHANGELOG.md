@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.9`
-* Current local package baseline: `v1.6.9`
-* Current development target: `v1.6.9`
+* Public/live itch version: `v1.6.10`
+* Current local package baseline: `v1.6.10`
+* Current development target: `v1.6.10`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,21 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.10 - Famous Gear Memory Expansion
+
+Status: Complete
+
+Summary:
+
+* Expanded save-safe Famous Gear memory with passive kill, boss, elite, and chapter counters.
+* Added equipped Famous Gear counter tracking on existing encounter and chapter-clear checkpoints without changing combat numbers, enemy behavior, rewards, or hidden mechanics.
+* Added compact memory stat chips to existing gear cards and retired archive records.
+* Added DevTools-focused `famousGearMemorySmoke()` coverage for marking, repair, summaries, clearing, and old-style memory repair.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.10`.
+* No save wipe.
 
 ---
 
