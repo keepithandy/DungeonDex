@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.5 — Retired Item Manual Archive Action
+- DungeonDex v1.6.5a — Retired Item Manual Action Smoke Hotfix
 
 ## Current Workflow
 - Inspect files before editing.
@@ -74,7 +74,7 @@ Talent direction:
 - No affixes
 - Talents should modify existing systems instead of creating complex new combat behavior
 
-Active v1.6.5 talent paths:
+Active v1.6.5a talent paths:
 - Survivor: HP, recovery, safer extraction
 - Hunter: Elite Board, rivals, trophies
 - Delver: deeper floors, charters, bosses
@@ -112,6 +112,6 @@ Possible pillars:
 - Talent and item retirement integration
 - Stronger new-player onboarding
 - Cleaner public-facing polish
-- v1.6.5 target: manual retired item archive action only.
-- Scope: archive data model, save repair, archive display, DevTools-only record creation, manual retire action for unequipped inventory items, persistence smoke.
-- Non-goals: equipped item retirement, gear deletion without confirmation, inventory/equipment refactors, sell flow changes, famous gear, bonuses, combat changes.
+- v1.6.5a target: browser-backed verification and hotfix-only follow-up.
+- Scope: smoke validation for manual retire action, cancel/confirm/reload checks, mobile overflow verification, and any smallest fix needed for a real defect.
+- Non-goals: new archive features, equipped item retirement, gear deletion without confirmation, famous gear, bonuses, combat changes.

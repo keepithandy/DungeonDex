@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.6.5
+v1.6.5a
 
 ## Current Local Package Version
-v1.6.5
+v1.6.5a
 
 ## Current Development Target
-v1.6.5
+v1.6.5a
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

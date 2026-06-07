@@ -411,7 +411,7 @@ async function main() {
       const ids = ['dexSummary', 'monsterDex', 'gearDex'];
       return ids.map(id => document.getElementById(id)?.innerText || '').filter(Boolean).join('\\n\\n');
     })()`);
-    const getBossTrophyState = async () => await evalByValue(client, `(() => ({
+  const getBossTrophyState = async () => await evalByValue(client, `(() => ({
       ids: Array.isArray(S.player?.bossTrophies) ? S.player.bossTrophies.slice() : [],
       records: Array.isArray(S.player?.bossTrophyRecords) ? S.player.bossTrophyRecords.map(r => ({
         id: r.id,
@@ -426,6 +426,89 @@ async function main() {
         count: r.count
       })) : []
     }))()`);
+    const getRetiredRelicState = async () => await evalByValue(client, `(() => ({
+      count: Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.length : 0,
+      records: Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({
+        id: r.id,
+        name: r.item?.name || r.name || '',
+        rarity: r.item?.rarity || r.rarity || '',
+        slot: r.item?.slot || r.slot || '',
+        itemLevel: r.itemLevel || r.item?.level || 0,
+        rating: r.rating || r.item?.rating || 0,
+        archivedAt: r.archivedAt || 0,
+        floor: r.floor || 0,
+        room: r.room || 0,
+        chapter: r.chapter || 0,
+        source: r.source || '',
+        note: r.note || ''
+      })) : []
+    }))()`);
+    const setGearScreen = async () => await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return true; })()`);
+    const gearInventorySnapshot = async () => await evalByValue(client, `(() => ({
+      inventory: Array.isArray(S.player?.inventory) ? S.player.inventory.map(item => ({ id:item.id, name:item.name, rarity:item.rarity, slot:item.slot, equipped:Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === item.id) })) : [],
+      equippedIds: Object.values(S.player?.equipment || {}).filter(Boolean).map(item => item.id),
+      retireButtons: Array.from(document.querySelectorAll('[data-retire]')).map(btn => ({
+        id: btn.dataset.retire || '',
+        text: btn.innerText || '',
+        disabled: !!btn.disabled
+      })),
+      equipmentHasRetire: !!document.getElementById('equipmentPanel')?.querySelector('[data-retire]')
+    }))()`);
+    const clickRetireFlow = async (acceptConfirm) => await evalByValue(client, `(() => {
+      const item = Array.isArray(S.player?.inventory) ? S.player.inventory.find(entry => entry && !Object.values(S.player?.equipment || {}).some(eq => eq && eq.id === entry.id) && entry.slot && entry.kind !== 'special' && !entry.locked && !entry.favorite && !entry.protected && !(Array.isArray(entry.tags) && entry.tags.some(tag => String(tag).toLowerCase() === 'protected' || String(tag).toLowerCase() === 'special'))) : null;
+      if (!item) return { ok:false, reason:'no eligible item' };
+      const btn = Array.from(document.querySelectorAll('[data-retire]')).find(node => String(node.dataset.retire || '') === String(item.id || ''));
+      if (!btn) return { ok:false, reason:'retire button missing', itemId:item.id };
+      const before = { inventory: Array.isArray(S.player?.inventory) ? S.player.inventory.length : 0, retired: Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.length : 0 };
+      const confirmCalls = [];
+      const originalConfirm = window.confirm;
+      window.confirm = (msg) => { confirmCalls.push(String(msg || '')); return ${acceptConfirm ? 'true' : 'false'}; };
+      try { btn.click(); } finally { window.confirm = originalConfirm; }
+      const after = { inventory: Array.isArray(S.player?.inventory) ? S.player.inventory.length : 0, retired: Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.length : 0 };
+      const archived = Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics[0] : null;
+      return {
+        ok:true,
+        item: { id:item.id, name:item.name, rarity:item.rarity, slot:item.slot },
+        before,
+        after,
+        confirmCalls,
+        archived: archived ? {
+          name: archived.item?.name || '',
+          rarity: archived.item?.rarity || '',
+          slot: archived.item?.slot || '',
+          itemLevel: archived.itemLevel || archived.item?.level || 0,
+          rating: archived.rating || archived.item?.rating || 0,
+          archivedAt: archived.archivedAt || 0,
+          floor: archived.floor || 0,
+          room: archived.room || 0,
+          chapter: archived.chapter || 0,
+          source: archived.source || '',
+          note: archived.note || ''
+        } : null
+      };
+    })()`);
+    const gearViewportCheck = async width => {
+      await client.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: true, screenWidth: width, screenHeight: 900 });
+      await sleep(120);
+      return await evalByValue(client, `(() => {
+        S.screen = 'gear';
+        if (typeof render === 'function') render();
+        const doc = document.documentElement;
+        const body = document.body;
+        const panel = document.getElementById('inventoryPanel');
+        const retired = document.querySelector('[data-retire]');
+        const overflow = Math.ceil(Math.max(doc.scrollWidth || 0, body?.scrollWidth || 0)) > Math.ceil(window.innerWidth || ${width}) + 1;
+        const panelOverflow = panel ? Math.ceil(panel.scrollWidth || 0) > Math.ceil(panel.clientWidth || 0) + 1 : true;
+        return {
+          width: window.innerWidth,
+          overflow,
+          panelOverflow,
+          retireButton: !!retired,
+          retireButtonText: retired ? (retired.innerText || '') : '',
+          inventoryText: panel ? panel.innerText : ''
+        };
+      })()`);
+    };
     const checkTalentViewport = async width => {
       await client.send('Emulation.setDeviceMetricsOverride', {
         width,
@@ -703,6 +786,54 @@ async function main() {
     record('Malformed boss trophy data repairs safely', Array.isArray(repairedBossState.records) && repairedBossState.records.length > 0 && repairedBossState.records[0].count >= 1 && repairedBossState.records[0].floor >= 1 && repairedBossState.records[0].room >= 1 && repairedBossState.records[0].chapter >= 1, JSON.stringify(repairedBossState.records[0] || null));
     const repairedRetiredRelics = await evalByValue(client, `(() => Array.isArray(S.player?.retiredRelics) ? S.player.retiredRelics.map(r => ({ itemName:r.item?.name, slot:r.slot, rarity:r.rarity, itemLevel:r.itemLevel, rating:r.rating, floor:r.floor, room:r.room, chapter:r.chapter, source:r.source, note:r.note })) : [])()`);
     record('Malformed retired item archive data repairs safely', Array.isArray(repairedRetiredRelics) && repairedRetiredRelics.length > 0 && repairedRetiredRelics[0].itemName && repairedRetiredRelics[0].itemLevel >= 1 && repairedRetiredRelics[0].rating >= 1 && repairedRetiredRelics[0].floor >= 1 && repairedRetiredRelics[0].room >= 1 && repairedRetiredRelics[0].chapter >= 1, JSON.stringify(repairedRetiredRelics[0] || null));
+
+    // Manual retire action smoke.
+    await clearSave(client);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.apply('floor-40'))()`);
+    await setGearScreen();
+    const gearSnapshot = await gearInventorySnapshot();
+    record('Gear inventory has eligible retire target', Array.isArray(gearSnapshot.inventory) && gearSnapshot.inventory.some(item => !item.equipped), JSON.stringify(gearSnapshot));
+    record('Equipped items have no retire button', !gearSnapshot.equipmentHasRetire, JSON.stringify({ equipmentHasRetire: gearSnapshot.equipmentHasRetire }));
+    const retireCancel = await clickRetireFlow(false);
+    record('Retire confirmation cancel leaves inventory unchanged', !!retireCancel.ok && retireCancel.before.inventory === retireCancel.after.inventory && retireCancel.before.retired === retireCancel.after.retired, JSON.stringify(retireCancel));
+    await sleep(350);
+    const retireAccept = await clickRetireFlow(true);
+    record('Retire confirmation accept archives and removes exactly one item', !!retireAccept.ok && retireAccept.after.retired === retireAccept.before.retired + 1 && retireAccept.after.inventory === retireAccept.before.inventory - 1 && retireAccept.archived && retireAccept.archived.name && retireAccept.archived.rarity && retireAccept.archived.slot, JSON.stringify(retireAccept));
+    const postRetireGearText = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return document.getElementById('inventoryPanel')?.innerText || ''; })()`);
+    record('Retired item removed from inventory card list', !postRetireGearText.includes(retireAccept.item.name), postRetireGearText.slice(0, 500));
+    await evalByValue(client, `(() => { S.screen = 'dex'; if (typeof render === 'function') render(); return true; })()`);
+    const archiveTextAfterRetire = await evalByValue(client, `(() => document.getElementById('gearDex')?.innerText || document.getElementById('monsterDex')?.innerText || '')()`);
+    const archiveLower = String(archiveTextAfterRetire || '').toLowerCase();
+    record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()), archiveTextAfterRetire.slice(0, 500));
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const retiredAfterReload = await getRetiredRelicState();
+    record('Retired item archive record persists after reload', Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retireAccept.item.name && r.rarity === retireAccept.item.rarity && r.slot === retireAccept.item.slot), JSON.stringify(retiredAfterReload.records[0] || null));
+    const gearAfterReload = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return Array.isArray(S.player?.inventory) ? S.player.inventory.some(item => item && item.id === ${JSON.stringify(retireAccept.item.id)}) : false; })()`);
+    record('Retired item does not return to inventory after reload', gearAfterReload === false, JSON.stringify({ gearAfterReload }));
+
+    // Mobile overflow sweep on gear and archive screens.
+    for (const width of [390, 375, 360, 320]) {
+      const gearMobile = await gearViewportCheck(width);
+      record(`Gear mobile ${width}px`, !!gearMobile && !gearMobile.overflow && !gearMobile.panelOverflow, JSON.stringify(gearMobile));
+    }
+    await evalByValue(client, `(() => { S.screen = 'dex'; if (typeof render === 'function') render(); return true; })()`);
+    for (const width of [390, 375, 360, 320]) {
+      await client.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: true, screenWidth: width, screenHeight: 900 });
+      await sleep(120);
+      const archiveMobile = await evalByValue(client, `(() => {
+        const doc = document.documentElement;
+        const body = document.body;
+        const panel = document.getElementById('gearDex') || document.getElementById('archivePanel');
+        const overflow = Math.ceil(Math.max(doc.scrollWidth || 0, body?.scrollWidth || 0)) > Math.ceil(window.innerWidth || ${width}) + 1;
+        const panelOverflow = panel ? Math.ceil(panel.scrollWidth || 0) > Math.ceil(panel.clientWidth || 0) + 1 : true;
+        return { width: window.innerWidth, overflow, panelOverflow, text: panel ? panel.innerText : '' };
+      })()`);
+      record(`Archive mobile ${width}px`, !!archiveMobile && !archiveMobile.overflow && !archiveMobile.panelOverflow, JSON.stringify(archiveMobile));
+    }
+    await client.send('Emulation.clearDeviceMetricsOverride');
 
     // Double unlock / point safety.
     await clearSave(client);

@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.5`
-* Current local package baseline: `v1.6.5`
-* Current development target: `v1.6.5`
+* Public/live itch version: `v1.6.5a`
+* Current local package baseline: `v1.6.5a`
+* Current development target: `v1.6.5a`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -599,6 +599,10 @@ Use clear commit messages such as:
 ## Notes
 
 This changelog replaces temporary patch-note files and should remain the single ongoing update record for DungeonDex.
+## v1.6.5a - Retired Item Manual Action Smoke Hotfix
+* Added a browser-backed smoke check for the manual retire action, including cancel, confirm, archive-before-remove, reload persistence, and mobile overflow coverage.
+* Kept the v1.6.5 retire action behavior unchanged unless smoke exposed a real defect.
+
 ## v1.6.5 - Retired Item Manual Archive Action
 * Added a safe manual retire action for unequipped inventory items only, with confirmation copy that identifies the item by name, rarity, and slot.
 * Archived retired items before inventory removal, and rolled back the archive entry if the item could not be removed.
