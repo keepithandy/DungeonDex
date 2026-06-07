@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.8 — Debt Collector Foundation
+- DungeonDex v1.6.9 — Debt Collector Activation
 
 ## Current Workflow
 - Inspect files before editing.
@@ -89,9 +89,10 @@ Candidate systems:
 - Retire Items
 - Famous Gear
 - Early Dungeon Return Incentives
-- v1.6.8 target: foundation-only Debt Collector save, repair, and town UI shell.
-- Scope: DevTools-applied memory tags, compact item/archive labels, save repair, and retire snapshot preservation.
-- Non-goals: gear stat bonuses, retired item bonuses, player-facing fame assignment, combat changes, scaling changes.
+- v1.6.8 completed: foundation-only Debt Collector save, repair, and town UI shell.
+- v1.6.9 target: compact Debt Collector loans, repayment, save-safe notes, and atmospheric pressure.
+- Scope: town-panel borrow/repay actions, pressure display, save repair, and manual smoke coverage.
+- Non-goals: combat changes, enemy mechanics, scaling changes, or debt punishment.
 
 ### v1.7.x — World Identity and Serious Dungeon Personality
 Purpose:

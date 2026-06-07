@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.8`
-* Current local package baseline: `v1.6.8`
-* Current development target: `v1.6.8`
+* Public/live itch version: `v1.6.9`
+* Current local package baseline: `v1.6.9`
+* Current development target: `v1.6.9`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -38,10 +38,10 @@ The goal of this line is to add deeper player progression without turning the ba
 
 ## 1.6.x Direction
 
-* Collection, memory, and foundation-only town systems
+* Collection, memory, and compact town economy systems
 * Save-safe UI shells and normalization hooks
 * Display-only progression identity
-* No economy or combat rule changes
+* No combat complexity inflation
 
 ---
 
@@ -64,6 +64,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.9 - Debt Collector Activation
+
+Status: Complete
+
+Summary:
+
+* Activated the Debt Collector town panel with compact 5s, 10s, and 25s loan actions that add coin to the Warden's purse and record a save-safe debt balance.
+* Added a repay action that spends available purse coin against the marker, supports partial repayment, and clears active debt plus pressure when fully paid.
+* Added visible atmospheric pressure growth on completed run returns only; pressure does not alter combat stats, enemy behavior, rewards, or hidden mechanics.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.9`.
+* No save wipe.
 
 ---
 

@@ -429,14 +429,15 @@
   function normalizeDebtCollectorState(value) {
     const base = createDebtCollectorState();
     const source = isPlainObject(value) ? value : {};
+    const balanceCopper = Math.max(0, Math.floor(numberOr(source.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER)));
     const notes = asArray(source.notes, [])
       .map(note => cleanDisplayText(note || '', '').slice(0, 80))
       .filter(Boolean)
       .slice(0, 5);
     return {
-      active: !!source.active,
-      balanceCopper: Math.max(0, Math.floor(numberOr(source.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER))),
-      pressure: Math.max(0, Math.floor(numberOr(source.pressure, 0, 0, 999999))),
+      active: balanceCopper > 0,
+      balanceCopper,
+      pressure: balanceCopper > 0 ? Math.max(0, Math.floor(numberOr(source.pressure, 0, 0, 999999))) : 0,
       lastVisitAt: cleanDisplayText(source.lastVisitAt || '', '').slice(0, 40),
       notes: notes.length ? notes : base.notes
     };

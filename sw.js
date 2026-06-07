@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.8-debt-collector-foundation';
+const CACHE_NAME = 'dungeondex-v1.6.9-debt-collector-activation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.6-famous-gear-memory-foundation';
+const BUILD_QS = '1.6.9-debt-collector-activation';
 const ASSETS = [
   './',
   './index.html',
@@ -27,6 +27,7 @@ const ASSETS = [
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
   `./js/systems/19_warden_talents_lowfire_board.js?build=${BUILD_QS}`,
+  `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
   `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,
   `./js/systems/22_nav_centering.js?build=${BUILD_QS}`,

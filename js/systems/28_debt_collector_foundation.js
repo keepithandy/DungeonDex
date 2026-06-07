@@ -1,41 +1,143 @@
 'use strict';
 
-// DungeonDex v1.6.8 Debt Collector foundation.
+// DungeonDex v1.6.9 Debt Collector activation.
 (function(){
   if (window.DDDebtCollectorFoundation) return;
   window.DDDebtCollectorFoundation = true;
 
   const PANEL_ID = 'debtCollectorPanel';
   const CSS_ID = 'ddDebtCollectorFoundationCss';
+  const BORROW_OPTIONS = [
+    { label: 'Borrow 5s', amount: coinValue(0, 5, 0) },
+    { label: 'Borrow 10s', amount: coinValue(0, 10, 0) },
+    { label: 'Borrow 25s', amount: coinValue(0, 25, 0) }
+  ];
 
-  function debtState(state){
-    const raw = state && state.player ? state.player.debtCollector : null;
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-      return {
-        active: false,
-        balanceCopper: 0,
-        pressure: 0,
-        lastVisitAt: '',
-        notes: []
-      };
-    }
-    const notes = Array.isArray(raw.notes) ? raw.notes.map(note => String(note || '').trim()).filter(Boolean).slice(0, 5) : [];
+  function coinValue(gold = 0, silver = 0, copper = 0){
+    if (typeof coins === 'function') return coins(gold, silver, copper);
+    return Math.max(0, Math.round((Number(gold) || 0) * 10000 + (Number(silver) || 0) * 100 + (Number(copper) || 0)));
+  }
+
+  function safeText(value, fallback = ''){
+    if (typeof cleanDisplayText === 'function') return cleanDisplayText(value, fallback);
+    return String(value || fallback || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function moneyHtml(copper){
+    return typeof formatMoney === 'function' ? formatMoney(copper) : `${Math.max(0, Math.floor(Number(copper) || 0))}c`;
+  }
+
+  function moneyPlain(copper){
+    if (typeof moneyText === 'function') return moneyText(copper);
+    return safeText(moneyHtml(copper), '0c');
+  }
+
+  function nowStamp(){
+    try { return new Date().toLocaleString(); }
+    catch (_) { return ''; }
+  }
+
+  function normalizeDebt(raw){
+    const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const balanceCopper = Math.max(0, Math.floor(Number(source.balanceCopper) || 0));
+    const notes = Array.isArray(source.notes)
+      ? source.notes.map(note => safeText(note).slice(0, 80)).filter(Boolean).slice(0, 5)
+      : [];
     return {
-      active: !!raw.active,
-      balanceCopper: Math.max(0, Math.floor(Number(raw.balanceCopper) || 0)),
-      pressure: Math.max(0, Math.floor(Number(raw.pressure) || 0)),
-      lastVisitAt: String(raw.lastVisitAt || '').trim().slice(0, 40),
+      active: balanceCopper > 0,
+      balanceCopper,
+      pressure: balanceCopper > 0 ? Math.max(0, Math.floor(Number(source.pressure) || 0)) : 0,
+      lastVisitAt: safeText(source.lastVisitAt).slice(0, 40),
       notes
     };
   }
 
+  function ensureDebtCollectorState(state){
+    if (!state || !state.player) return normalizeDebt(null);
+    state.player.debtCollector = normalizeDebt(state.player.debtCollector);
+    return state.player.debtCollector;
+  }
+
+  function debtState(state){
+    return normalizeDebt(state && state.player ? state.player.debtCollector : null);
+  }
+
+  function addDebtNote(debt, note){
+    if (!debt) return;
+    const clean = safeText(note).slice(0, 80);
+    if (!clean) return;
+    debt.notes = Array.isArray(debt.notes) ? debt.notes : [];
+    debt.notes.unshift(clean);
+    debt.notes = debt.notes.filter(Boolean).slice(0, 5);
+  }
+
+  function pressureWarning(debt){
+    if (!debt || debt.balanceCopper <= 0) return 'The ledger is quiet.';
+    if (debt.pressure <= 1) return 'A collector has been asking around.';
+    if (debt.pressure <= 3) return 'The ledger grows heavier.';
+    return 'Someone remembers what you owe.';
+  }
+
+  function borrowDebt(state, amount){
+    if (!state || !state.player) return { ok: false, reason: 'missing state' };
+    const borrowed = Math.max(0, Math.floor(Number(amount) || 0));
+    if (borrowed <= 0) return { ok: false, reason: 'invalid amount' };
+    const debt = ensureDebtCollectorState(state);
+    if (typeof addPlayerGold === 'function') addPlayerGold(state, borrowed);
+    else state.player.gold = Math.max(0, Math.floor(Number(state.player.gold) || 0)) + borrowed;
+    debt.balanceCopper = Math.min(Number.MAX_SAFE_INTEGER, debt.balanceCopper + borrowed);
+    debt.active = true;
+    debt.lastVisitAt = nowStamp();
+    addDebtNote(debt, `Borrowed ${moneyPlain(borrowed)} from the Lowfire ledger.`);
+    if (typeof pushLog === 'function') pushLog(state, `Debt Collector loan taken: ${moneyHtml(borrowed)}.`);
+    return { ok: true, amount: borrowed, balanceCopper: debt.balanceCopper };
+  }
+
+  function repayDebt(state){
+    if (!state || !state.player) return { ok: false, reason: 'missing state' };
+    const debt = ensureDebtCollectorState(state);
+    const balance = Math.max(0, Math.floor(Number(debt.balanceCopper) || 0));
+    if (balance <= 0) {
+      debt.active = false;
+      debt.pressure = 0;
+      return { ok: false, reason: 'no debt' };
+    }
+    const wallet = Math.max(0, Math.floor(Number(state.player.gold) || 0));
+    const paid = Math.min(wallet, balance);
+    if (paid <= 0) {
+      if (typeof pushLog === 'function') pushLog(state, 'No coin available to repay the Debt Collector.');
+      return { ok: false, reason: 'no coin' };
+    }
+    state.player.gold = Math.max(0, wallet - paid);
+    debt.balanceCopper = Math.max(0, balance - paid);
+    debt.lastVisitAt = nowStamp();
+    if (debt.balanceCopper <= 0) {
+      debt.active = false;
+      debt.pressure = 0;
+      addDebtNote(debt, 'Debt cleared. The collector closed the marker.');
+      if (typeof pushLog === 'function') pushLog(state, `Debt Collector marker cleared with ${moneyHtml(paid)}.`);
+    } else {
+      debt.active = true;
+      addDebtNote(debt, `Repaid ${moneyPlain(paid)} toward the marker.`);
+      if (typeof pushLog === 'function') pushLog(state, `Debt Collector repayment: ${moneyHtml(paid)}.`);
+    }
+    return { ok: true, amount: paid, balanceCopper: debt.balanceCopper };
+  }
+
+  function recordDebtReturn(state){
+    const debt = ensureDebtCollectorState(state);
+    if (!debt.active || debt.balanceCopper <= 0) return false;
+    debt.pressure = Math.min(999999, Math.max(0, Math.floor(Number(debt.pressure) || 0)) + 1);
+    debt.lastVisitAt = nowStamp();
+    return true;
+  }
+
   function compactLabel(state){
     const debt = debtState(state);
-    const clear = debt.balanceCopper <= 0;
-    const pressureText = debt.pressure > 0 ? `Pressure ${debt.pressure}` : 'No pressure';
+    const pressureText = debt.balanceCopper > 0 ? `Pressure ${debt.pressure}` : 'No pressure';
     return {
-      clear: clear ? 'Clear' : 'Notice posted',
-      balance: debt.balanceCopper > 0 ? `${debt.balanceCopper} debt` : '0 debt',
+      clear: debt.balanceCopper > 0 ? 'Notice posted' : 'Clear',
+      balance: debt.balanceCopper > 0 ? moneyHtml(debt.balanceCopper) : moneyHtml(0),
       pressure: pressureText,
       active: debt.active
     };
@@ -45,9 +147,12 @@
     const debt = debtState(state);
     const chips = compactLabel(state);
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
+    const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
+    const canRepay = debt.balanceCopper > 0 && wallet > 0;
     const notes = debt.notes.length
       ? `<div class="small muted debt-collector-notes">${debt.notes.map(note => `<div class="debt-collector-note">${escapeHtml(note)}</div>`).join('')}</div>`
       : '';
+    const borrowButtons = BORROW_OPTIONS.map(option => `<button class="ghost mini" data-debt-borrow="${option.amount}">${escapeHtml(option.label)}</button>`).join('');
     return `<div class="split debt-collector-head">
       <div>
         <h2>Debt Collector</h2>
@@ -55,12 +160,17 @@
       </div>
       <span class="pill ${statusClass}">${debt.balanceCopper > 0 ? 'Notice Posted' : 'Clear'}</span>
     </div>
-    <p class="small muted debt-collector-flavor">The collectors have a ledger. Your name is not written in it yet.</p>
+    <p class="small muted debt-collector-flavor">${escapeHtml(pressureWarning(debt))}</p>
     <div class="tag-row debt-collector-chips" aria-label="Debt Collector status">
       <span class="pill">${escapeHtml(chips.clear)}</span>
-      <span class="pill">${escapeHtml(chips.balance)}</span>
+      <span class="pill">Debt ${chips.balance}</span>
       <span class="pill">${escapeHtml(chips.pressure)}</span>
     </div>
+    <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
+      ${borrowButtons}
+      <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
+    </div>
+    <p class="small muted debt-collector-terms">Repay uses available purse coin. Pressure is only atmosphere.</p>
     <div class="debt-collector-meta small">
       <span><b>Active:</b> ${debt.active ? 'Yes' : 'No'}</span>
       <span><b>Last Visit:</b> ${escapeHtml(debt.lastVisitAt || 'None')}</span>
@@ -77,9 +187,13 @@
       .debt-collector-head p{margin:3px 0 0}
       .debt-collector-flavor{margin-top:8px}
       .debt-collector-chips{margin-top:8px}
+      .debt-collector-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+      .debt-collector-actions button{flex:1 1 86px}
+      .debt-collector-terms{margin:6px 0 0}
       .debt-collector-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px}
       .debt-collector-notes{display:grid;gap:4px;margin-top:8px}
       .debt-collector-note{padding:6px 8px;border:1px solid rgba(255,190,110,.12);border-radius:10px;background:rgba(0,0,0,.14)}
+      @media(max-width:420px){.debt-collector-actions button{flex-basis:calc(50% - 3px)}}
     `;
     document.head.appendChild(style);
   }
@@ -88,7 +202,57 @@
     injectCss();
     const slot = typeof el === 'function' ? el(PANEL_ID) : document.getElementById(PANEL_ID);
     if (!slot || typeof S === 'undefined') return;
+    ensureDebtCollectorState(S);
     slot.innerHTML = panelMarkup(S);
+  }
+
+  function bindDebtCollectorActions(){
+    if (typeof S === 'undefined') return;
+    const guard = fn => typeof runGuardedAction === 'function' ? runGuardedAction(fn) : fn();
+    Array.from(document.querySelectorAll('[data-debt-borrow]')).forEach(btn => {
+      btn.onclick = () => guard(() => {
+        borrowDebt(S, btn.dataset.debtBorrow);
+        if (typeof render === 'function') render();
+      });
+    });
+    const repay = document.getElementById('repayDebtBtn');
+    if (repay) repay.onclick = () => guard(() => {
+      repayDebt(S);
+      if (typeof render === 'function') render();
+    });
+  }
+
+  function smoke(){
+    const state = typeof createBaseState === 'function'
+      ? createBaseState()
+      : { player: { gold: 0, stats: { power: 8, guard: 6, wit: 5, luck: 4, speed: 5 }, log: [], debtCollector: normalizeDebt(null) }, run: { active: false, choices: ['attack','guard','skill','extract'] } };
+    state.player.gold = 0;
+    state.player.debtCollector = normalizeDebt(null);
+    const statsBefore = JSON.stringify(state.player.stats || {});
+    const choicesBefore = JSON.stringify(state.run?.choices || []);
+    const borrow = borrowDebt(state, coinValue(0, 5, 0));
+    const borrowOk = borrow.ok && state.player.gold === coinValue(0, 5, 0) && state.player.debtCollector.balanceCopper === coinValue(0, 5, 0) && state.player.debtCollector.active === true;
+    const persisted = typeof normalizeSaveShape === 'function'
+      ? normalizeSaveShape(JSON.parse(JSON.stringify(state)))
+      : JSON.parse(JSON.stringify(state));
+    const persistOk = persisted.player.debtCollector.balanceCopper === state.player.debtCollector.balanceCopper && persisted.player.debtCollector.active === true;
+    state.player.gold = coinValue(0, 3, 0);
+    const partial = repayDebt(state);
+    const partialOk = partial.ok && state.player.gold === 0 && state.player.debtCollector.balanceCopper === coinValue(0, 2, 0) && state.player.debtCollector.active === true;
+    state.player.gold = coinValue(0, 25, 0);
+    const clear = repayDebt(state);
+    const clearOk = clear.ok && state.player.debtCollector.balanceCopper === 0 && state.player.debtCollector.active === false && state.player.debtCollector.pressure === 0;
+    borrowDebt(state, coinValue(0, 10, 0));
+    const pressureBefore = state.player.debtCollector.pressure;
+    recordDebtReturn(state, 'extract');
+    const pressureOk = state.player.debtCollector.pressure === pressureBefore + 1;
+    const combatOk = JSON.stringify(state.player.stats || {}) === statsBefore && JSON.stringify(state.run?.choices || []) === choicesBefore;
+    const checks = { borrowOk, persistOk, partialOk, clearOk, pressureOk, combatOk };
+    return {
+      ok: Object.values(checks).every(Boolean),
+      checks,
+      finalDebt: { ...state.player.debtCollector }
+    };
   }
 
   const oldRenderTown = typeof renderTown === 'function' ? renderTown : null;
@@ -101,6 +265,37 @@
     wrapped.__debtCollectorFoundation = true;
     try { renderTown = wrapped; } catch (_) { window.renderTown = wrapped; }
   }
+
+  const oldBindDynamic = typeof bindDynamic === 'function' ? bindDynamic : null;
+  if (oldBindDynamic && !oldBindDynamic.__debtCollectorFoundation) {
+    const wrappedBind = function(){
+      const result = oldBindDynamic.apply(this, arguments);
+      bindDebtCollectorActions();
+      return result;
+    };
+    wrappedBind.__debtCollectorFoundation = true;
+    try { bindDynamic = wrappedBind; } catch (_) { window.bindDynamic = wrappedBind; }
+  }
+
+  const oldFinishRun = typeof finishRun === 'function' ? finishRun : null;
+  if (oldFinishRun && !oldFinishRun.__debtCollectorFoundation) {
+    const wrappedFinishRun = function(state, reason){
+      const result = oldFinishRun.apply(this, arguments);
+      if (state && state.screen === 'town') recordDebtReturn(state, reason);
+      return result;
+    };
+    wrappedFinishRun.__debtCollectorFoundation = true;
+    try { finishRun = wrappedFinishRun; } catch (_) { window.finishRun = wrappedFinishRun; }
+  }
+
+  window.DungeonDexDebtCollector = {
+    borrow: borrowDebt,
+    repay: repayDebt,
+    pressureReturn: recordDebtReturn,
+    state: debtState,
+    warning: pressureWarning,
+    smoke
+  };
 
   injectCss();
   if (typeof render === 'function') render();
