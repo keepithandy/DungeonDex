@@ -814,7 +814,7 @@
   }
 
   function retiredRelicEmptyState() {
-    return '<div class="empty-relic-shelf"><span>No retired gear yet.</span><small>Favorite items can be kept here when their run is over.</small></div>';
+    return '<div class="empty-relic-shelf"><span>No retired gear yet.</span><small>Retire eligible gear from the Gear screen to add it to this archive.</small></div>';
   }
 
   function retiredRelicCard(entry) {

@@ -739,7 +739,7 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
     record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
-    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Retire eligible inventory items') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
+    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Retire eligible gear from the Gear screen') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
     const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
