@@ -607,7 +607,7 @@ async function main() {
     record('Next point line appears for non-maxed state', freshPanelText.includes('Next point: secure depth 5') && freshPanelText.includes('Progress: 1 / 5 secured depths'), freshPanelText.slice(0, 400));
     record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
-    record('Trophy Hall loads', freshBossDexText.includes('Boss Trophies') && freshBossDexText.includes('Retired Items'), freshBossDexText.slice(0, 320));
+    record('Trophy Hall loads', freshBossDexText.includes('Boss Trophies') && freshBossDexText.includes('Retired Gear Hall'), freshBossDexText.slice(0, 320));
     record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to record their trophies here.'), freshBossDexText.slice(0, 320));
     const unsafeRunMilestone = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
@@ -739,7 +739,7 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
     record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
-    record('Retired Items archive shell appears', bossEmptyText.includes('Retired Items') && bossEmptyText.includes('Retire eligible gear from the Gear screen') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
+    record('Retired Gear Hall archive shell appears', bossEmptyText.includes('Retired Gear Hall') && bossEmptyText.includes('Retire eligible gear from the Gear screen') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
     const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
