@@ -817,6 +817,10 @@
     return '<div class="empty-relic-shelf"><span>No retired gear yet.</span><small>Retire eligible gear from the Gear screen to add it to this archive.</small></div>';
   }
 
+  function retiredRelicHelpText() {
+    return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Retiring an item removes it from active use.</p>';
+  }
+
   function retiredRelicCard(entry) {
     const item = retiredRelicItem(entry);
     const itemName = cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic');
@@ -918,6 +922,7 @@
     el('monsterDex').innerHTML = `${collectionShell('Boss Trophies', 'Permanent records from defeated bosses. Recorded trophies do not grant combat bonuses.', `<div class="boss-trophy-section-head"><h4>Recorded Collection</h4><span class="pill">${format(bossSummary.recordedCount)} entries</span></div><div class="boss-trophy-grid boss-trophy-record-grid">${bossRecords.length ? bossRecords.map(entry => bossTrophyRecordCard(entry)).join('') : bossEmptyState}</div><div class="sep"></div><div class="boss-trophy-section-head"><h4>Missing Trophy Case</h4><span class="pill">${format(bossSummary.missingCount)} missing</span></div><div class="boss-trophy-grid">${trophies.map(trophy => bossTrophyCard(trophy, bestDepth)).join('')}</div>`, { pill:`${format(bossSummary.totalFound)} recorded` })}${collectionShell('Board & Rival Trophies', 'Existing contract and rival collection records.', `<div class="elite-trophy-summary"><div class="elite-trophy-summary-head"><h4>Elite Trophies</h4><span class="pill">Trophy Bonus Preview: +${format(eliteBonus)}% board payout</span></div><div class="elite-trophy-summary-copy small muted">${format(Object.keys(eliteTrophies.collected || {}).length)} found${eliteTrophies.totalFound > 0 ? ` • ${format(eliteTrophies.totalFound)} total` : ''}${latestElite ? ` • Latest: ${escapeHtml(latestElite.name)}` : ' • Latest: none yet'}</div></div><div class="elite-trophy-summary rival-summary"><div class="elite-trophy-summary-head"><h4>Rivals Remembered</h4><span class="pill">${format(rivalActive.length)} active</span></div><div class="elite-trophy-summary-copy small muted">${format(rivals.length)} remembered • ${format(rivalDefeated.length)} defeated${latestRival ? ` • Latest: ${escapeHtml(latestRival.eliteName)}` : ' • Latest: none yet'}</div></div>`, { pill:`${format(eliteEntries.length)} trophies` })}${collectionShell('Retired Items', 'Archive records for manually retired gear and display-only memory tags.', `${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`, { pill: retiredRelics.length ? `${format(retiredRelics.length)} recorded` : 'No records yet' })}`;
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
+      ${retiredRelicHelpText()}
       <p class="small muted">Retired item archive records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }
@@ -1006,7 +1011,7 @@
       <div class="list run-history-list">${historyMarkup}</div>
       <div class="sep"></div>
       <div class="archive-history-head">
-        <div><h3>Retired Item Archive</h3><p class="small muted">Read-only archive records plus manual retirement for unequipped inventory items.</p></div>
+        <div><h3>Retired Item Archive</h3>${retiredRelicHelpText()}<p class="small muted">Read-only archive records plus manual retirement for unequipped inventory items.</p></div>
         <span class="pill">${format(archiveRetiredSummary.total)} recorded</span>
       </div>
       ${retiredRelicSummaryMarkup(archiveRetiredSummary)}
