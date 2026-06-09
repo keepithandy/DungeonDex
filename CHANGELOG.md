@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.11`
-* Current local package baseline: `v1.6.11`
-* Current development target: `v1.6.11`
+* Public/live itch version: `v1.6.12`
+* Current local package baseline: `v1.6.12`
+* Current development target: `v1.6.12`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.12 - Lowfire Ember Theme Pass
+
+Status: Complete
+
+Summary:
+
+* Refined the shared interface palette toward charcoal, ash, ember, and warm gold tones across town, run, gear, dex, and archive surfaces.
+* Tightened panel, tab, card, pill, and combat shell treatment so the UI feels heavier and less neon while staying compact and readable on mobile.
+* Reworked primary, focus, and archive accents to fit the Lowfire theme while keeping rarity colors legible.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.12`.
+* No gameplay, save structure, or combat logic changes.
 
 ---
 

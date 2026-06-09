@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.11-retired-gear-hall-polish';
+const CACHE_NAME = 'dungeondex-v1.6.12-lowfire-ember-theme-pass';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.11-retired-gear-hall-polish';
+const BUILD_QS = '1.6.12-lowfire-ember-theme-pass';
 const ASSETS = [
   './',
   './index.html',
