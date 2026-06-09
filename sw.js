@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.22-famous-gear-memory-readability';
+const CACHE_NAME = 'dungeondex-v1.6.23-debt-collector-visibility';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.22-famous-gear-memory-readability';
+const BUILD_QS = '1.6.23-debt-collector-visibility';
 const ASSETS = [
   './',
   './index.html',

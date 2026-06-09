@@ -250,12 +250,12 @@ async function main() {
         panelText: document.getElementById('debtCollectorPanel')?.innerText || ''
       };
     })()`));
-    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && /Borrow 10s/.test(uiResult.panelText), JSON.stringify(uiResult));
+    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && /Borrow 10s/.test(uiResult.panelText) && /Debt Collector Ledger/.test(uiResult.panelText) && /Debt pressure is active/.test(uiResult.panelText), JSON.stringify(uiResult));
 
     await client.send('Page.reload', { ignoreCache: true });
     if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after persistence reload.');
     const persisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '' }))()`));
-    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true, JSON.stringify(persisted));
+    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && /Debt Collector Ledger/.test(persisted.panelText), JSON.stringify(persisted));
 
     const repayResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 300;
@@ -270,7 +270,7 @@ async function main() {
       return { partial, clear, partialHadHandler: !!partialButton && typeof partialButton.onclick === 'function' };
     })()`));
     record('Repay Debt spends available wallet partially', repayResult.partialHadHandler && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.active === true, JSON.stringify(repayResult.partial));
-    record('Full payoff clears active debt and pressure', repayResult.clear.wallet === 800 && repayResult.clear.debt.balanceCopper === 0 && repayResult.clear.debt.active === false && repayResult.clear.debt.pressure === 0 && /The ledger is quiet/.test(repayResult.clear.panelText), JSON.stringify(repayResult.clear));
+    record('Full payoff clears active debt and pressure', repayResult.clear.wallet === 800 && repayResult.clear.debt.balanceCopper === 0 && repayResult.clear.debt.active === false && repayResult.clear.debt.pressure === 0 && /The ledger is quiet/.test(repayResult.clear.panelText) && /No debt pressure is active/.test(repayResult.clear.panelText), JSON.stringify(repayResult.clear));
 
     const pressureResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;

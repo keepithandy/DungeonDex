@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.6.17 Debt Collector support.
+// DungeonDex v1.6.23 Debt Collector support.
 (function(){
   if (window.DDDebtCollectorFoundation) return;
   window.DDDebtCollectorFoundation = true;
@@ -72,10 +72,10 @@
   }
 
   function pressureWarning(debt){
-    if (!debt || debt.balanceCopper <= 0) return 'The ledger is quiet.';
-    if (debt.pressure <= 1) return 'A collector has been asking around.';
-    if (debt.pressure <= 3) return 'The ledger grows heavier.';
-    return 'Someone remembers what you owe.';
+    if (!debt || debt.balanceCopper <= 0) return 'The ledger is quiet. No debt pressure is active.';
+    if (debt.pressure <= 1) return 'Debt pressure is active: a collector has been asking around.';
+    if (debt.pressure <= 3) return 'Debt pressure is active: the ledger grows heavier.';
+    return 'Debt pressure is active: someone remembers what you owe.';
   }
 
   function borrowDebt(state, amount){
@@ -134,9 +134,9 @@
 
   function compactLabel(state){
     const debt = debtState(state);
-    const pressureText = debt.balanceCopper > 0 ? `Pressure ${debt.pressure}` : 'No pressure';
+    const pressureText = debt.balanceCopper > 0 ? `Pressure ${debt.pressure}` : 'Pressure 0';
     return {
-      clear: debt.balanceCopper > 0 ? 'Notice posted' : 'Clear',
+      clear: debt.balanceCopper > 0 ? 'Marker active' : 'Marker clear',
       balance: debt.balanceCopper > 0 ? moneyHtml(debt.balanceCopper) : moneyHtml(0),
       pressure: pressureText,
       active: debt.active
@@ -155,24 +155,24 @@
     const borrowButtons = BORROW_OPTIONS.map(option => `<button class="ghost mini" data-debt-borrow="${option.amount}">${escapeHtml(option.label)}</button>`).join('');
     return `<div class="split debt-collector-head">
       <div>
-        <h2>Debt Collector</h2>
-        <p>${debt.balanceCopper > 0 ? 'A marker has been posted against this Warden.' : 'No marker has been posted against this Warden.'}</p>
+        <h2>Debt Collector Ledger</h2>
+        <p>${debt.balanceCopper > 0 ? 'Borrowed coin is on the Lowfire ledger; pressure marks the risk.' : 'No debt marker is active; borrowing adds coin now and marks a pressure risk.'}</p>
       </div>
-      <span class="pill ${statusClass}">${debt.balanceCopper > 0 ? 'Notice Posted' : 'Clear'}</span>
+      <span class="pill debt-collector-status-pill ${statusClass}">${debt.balanceCopper > 0 ? 'Debt Active' : 'No Debt'}</span>
     </div>
     <p class="small muted debt-collector-flavor">${escapeHtml(pressureWarning(debt))}</p>
     <div class="tag-row debt-collector-chips" aria-label="Debt Collector status">
-      <span class="pill">${escapeHtml(chips.clear)}</span>
-      <span class="pill">Debt ${chips.balance}</span>
-      <span class="pill">${escapeHtml(chips.pressure)}</span>
+      <span class="pill debt-collector-chip ${chips.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(chips.clear)}</span>
+      <span class="pill debt-collector-chip">Owed ${chips.balance}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(chips.pressure)}</span>
     </div>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
       <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
     </div>
-    <p class="small muted debt-collector-terms">Repay uses available purse coin. Pressure is only atmosphere.</p>
+    <p class="small muted debt-collector-terms">Repay spends purse coin. Pressure is a visible risk marker only; it does not change combat or rewards.</p>
     <div class="debt-collector-meta small">
-      <span><b>Active:</b> ${debt.active ? 'Yes' : 'No'}</span>
+      <span><b>Debt Active:</b> ${debt.active ? 'Yes' : 'No'}</span>
       <span><b>Last Visit:</b> ${escapeHtml(debt.lastVisitAt || 'None')}</span>
     </div>
     ${notes}`;
@@ -184,12 +184,15 @@
     style.id = CSS_ID;
     style.textContent = `
       .debt-collector-head h2{margin:0}
-      .debt-collector-head p{margin:3px 0 0}
-      .debt-collector-flavor{margin-top:8px}
+      .debt-collector-head p{margin:3px 0 0;line-height:1.25}
+      .debt-collector-status-pill{border-color:rgba(255,188,104,.24);background:rgba(255,160,82,.08)}
+      .debt-collector-flavor{margin-top:8px;color:rgba(255,225,175,.86);line-height:1.28}
       .debt-collector-chips{margin-top:8px}
+      .debt-collector-chip{font-size:.68rem;line-height:1.12;border-color:rgba(255,190,110,.18);background:rgba(255,190,110,.055)}
+      .debt-collector-chip-active{border-color:rgba(255,130,92,.28);background:rgba(255,130,92,.09);color:#ffd7be}
       .debt-collector-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
       .debt-collector-actions button{flex:1 1 86px}
-      .debt-collector-terms{margin:6px 0 0}
+      .debt-collector-terms{margin:6px 0 0;line-height:1.25}
       .debt-collector-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px}
       .debt-collector-notes{display:grid;gap:4px;margin-top:8px}
       .debt-collector-note{padding:6px 8px;border:1px solid rgba(255,190,110,.12);border-radius:10px;background:rgba(0,0,0,.14)}

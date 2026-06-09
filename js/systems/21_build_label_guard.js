@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.6.22';
+  const BUILD = '1.6.23';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.22-famous-gear-memory-readability';
+  const BUILD_QS = '1.6.23-debt-collector-visibility';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

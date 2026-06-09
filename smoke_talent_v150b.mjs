@@ -744,7 +744,7 @@ async function main() {
     {
       const bossEmptyLower = bossEmptyText.toLowerCase();
       record('Boss trophy empty state stays readable', bossEmptyLower.includes('defeat bosses to start the collection.') && bossEmptyLower.includes('recorded collection') && bossEmptyLower.includes('missing trophy case') && bossEmptyLower.includes('last recorded: none yet.') && (bossEmptyLower.includes('trophy hall') || bossEmptyLower.includes('collection records')), bossEmptyText.slice(0, 320));
-      record('Retired Gear Hall archive shell appears', bossEmptyLower.includes('archive shelf') && bossEmptyLower.includes('retired relic archive records') && bossEmptyLower.includes('display-only famous gear memory') && bossEmptyLower.includes('read-only collection records plus manual retirement'), bossEmptyText.slice(0, 500));
+      record('Retired Gear Hall archive shell appears', bossEmptyLower.includes('archive shelf') && bossEmptyLower.includes('retired relic archive records') && bossEmptyLower.includes('display-only famous gear memory') && bossEmptyLower.includes('famous gear memory is a read-only collection record'), bossEmptyText.slice(0, 500));
     }
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
