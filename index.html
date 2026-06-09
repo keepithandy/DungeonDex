@@ -26,6 +26,25 @@
     .primary {
       box-shadow: 0 0 14px rgba(255,162,70,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
     }
+
+    /* v1.6.17 uncommon rarity hotfix: restore the pre-theme green uncommon read. */
+    .rarity-uncommon {
+      color: #a8f0b3;
+    }
+
+    .pill.rarity-uncommon,
+    .rarity-uncommon.pill {
+      color: #a8f0b3;
+      border-color: rgba(168,240,179,0.30);
+      background: rgba(168,240,179,0.075);
+    }
+
+    .rarity-card-uncommon {
+      --rarity-bg: rgba(168,240,179,0.045);
+      --rarity-border: rgba(168,240,179,0.18);
+      --rarity-glow: rgba(168,240,179,0.06);
+      --rarity-sheen: rgba(168,240,179,0.11);
+    }
   </style>
 </head>
 <body>
