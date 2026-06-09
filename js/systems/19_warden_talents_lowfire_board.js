@@ -5,7 +5,7 @@
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.6.24-elite-board-contract-clarity';
+  const SCRIPT_BUILD = '1.6.25-early-dungeon-revisit-planning-stub';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -223,6 +223,7 @@
     const current = Math.floor(+state.town.lowfireBoardRefreshCost || C(0,1,25));
     return state.town.lowfireBoardRefreshCost = Math.max(C(0,0,25), Math.min(C(0,8,0), current));
   }
+  // TODO(v1.7): Revisit contracts can eventually point at earlier districts and old boss markers without changing board rules now.
   function contractState(state){ return typeof ensureEliteContractState === 'function' ? ensureEliteContractState(state) : {active:null,claimed:[]}; }
   function contractPool(state){
     const st = contractState(state); if (st.active) return [];

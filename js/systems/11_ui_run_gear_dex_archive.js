@@ -818,6 +818,7 @@
   }
 
   function retiredRelicHelpText() {
+    // TODO(v1.7): Let archive memory and famous gear point back toward revisited old zones without changing retirement rules.
     return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Famous Gear memory is a read-only collection record, and retiring an item removes it from active use.</p>';
   }
 
@@ -952,6 +953,7 @@
 
   function renderArchive() {
     if (!el('archivePanel') || !el('settingsPanel')) return;
+    // TODO(v1.7): Use Trophy Hall records as a future callback surface for earlier-dungeon revisit incentives.
     const history = asArray(S.player.runHistory, []).filter(isPlainObject).slice(0, 12);
     const historyMarkup = history.map(rawEntry => {
       const r = rawEntry || {};

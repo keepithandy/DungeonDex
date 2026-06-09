@@ -6,9 +6,9 @@
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.6.24';
+  const BUILD = '1.6.25';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.24-elite-board-contract-clarity';
+  const BUILD_QS = '1.6.25-early-dungeon-revisit-planning-stub';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

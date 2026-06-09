@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.18 - Boss Trophy Identity Pass
+- DungeonDex v1.6.25 - Early Dungeon Revisit Planning Stub
 
 ## Current Workflow
 - Inspect files before editing.
@@ -60,7 +60,7 @@
 - Boss trophy and Dex identity improvements.
 - Famous Gear memory readability and attachment polish.
 - Retired Gear Hall depth within the existing archive flow.
-- Early dungeon revisit incentives that do not disrupt current scaling.
+- Early dungeon revisit planning stub: revisit earlier dungeons, keep the current simple run loop, and attach future value to trophies, famous gear, rivals, debt pressure, and board contracts without changing current scaling yet.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

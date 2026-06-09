@@ -263,6 +263,7 @@
   function renderIntroModal() {
     const content = el('introModalContent');
     if (!content) return;
+    // TODO(v1.7): Let earlier district revisits surface here without changing the current single-run entry flow.
     content.innerHTML = introProgressMarkup();
   }
 

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.24-elite-board-contract-clarity';
+const CACHE_NAME = 'dungeondex-v1.6.25-early-dungeon-revisit-planning-stub';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.24-elite-board-contract-clarity';
+const BUILD_QS = '1.6.25-early-dungeon-revisit-planning-stub';
 const ASSETS = [
   './',
   './index.html',
