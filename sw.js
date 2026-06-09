@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.19-boss-trophy-smoke-fix';
+const CACHE_NAME = 'dungeondex-v1.6.20-trophy-hall-mobile-readability';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.19-boss-trophy-smoke-fix';
+const BUILD_QS = '1.6.20-trophy-hall-mobile-readability';
 const ASSETS = [
   './',
   './index.html',
