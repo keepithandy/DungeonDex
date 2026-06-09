@@ -660,9 +660,9 @@ select, input {
 .feed-action { border-color: rgba(184,150,255,0.18); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 0 16px rgba(184,150,255,0.05); }
 .feed-action .feed-icon { color: #d3a7ff; background: rgba(184,150,255,0.09); border-color: rgba(184,150,255,0.2); box-shadow: 0 0 16px rgba(184,150,255,0.10); }
 .feed-action .feed-kicker { color: rgba(223,198,255,0.84); }
-.feed-escape { border-color: rgba(118,222,238,0.18); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 0 16px rgba(118,222,238,0.05); }
-.feed-escape .feed-icon { color: #90eef8; background: rgba(118,222,238,0.08); border-color: rgba(118,222,238,0.2); box-shadow: 0 0 16px rgba(118,222,238,0.10); }
-.feed-escape .feed-kicker { color: rgba(182,244,255,0.84); }
+.feed-escape { border-color: rgba(255,178,96,0.18); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 0 16px rgba(255,178,96,0.05); }
+.feed-escape .feed-icon { color: #ffd19a; background: rgba(255,178,96,0.08); border-color: rgba(255,178,96,0.2); box-shadow: 0 0 16px rgba(255,178,96,0.10); }
+.feed-escape .feed-kicker { color: rgba(255,220,186,0.84); }
 
 .elite-modifier-row {
   display: flex;
@@ -2683,8 +2683,8 @@ html {
 }
 
 .feed-escape {
-  border-color: rgba(137, 206, 255, .24);
-  background: rgba(137, 206, 255, .055);
+  border-color: rgba(255, 178, 96, .24);
+  background: rgba(255, 178, 96, .055);
 }
 
 .feed-chip {
@@ -3207,8 +3207,8 @@ html {
   background: linear-gradient(180deg, rgba(255,255,255,0.044), rgba(255,255,255,0.020));
 }
 .run-history-card.feed-escape {
-  border-color: rgba(164,203,166,0.18);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 0 20px rgba(112,178,126,0.045);
+  border-color: rgba(255,178,96,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 0 20px rgba(255,178,96,0.045);
 }
 .run-history-card.feed-death {
   border-color: rgba(255,111,106,0.22);
@@ -4216,11 +4216,11 @@ html, body {
   background: rgba(255,178,96,0.050);
 }
 .feed-escape .feed-icon {
-  color: #8ee8d8;
+  color: #ffd19a;
   background: rgba(255,178,96,0.08);
   border-color: rgba(255,178,96,0.18);
 }
-.feed-escape .feed-kicker { color: rgba(160,240,220,0.82); }
+.feed-escape .feed-kicker { color: rgba(255,220,186,0.82); }
 
 /* Chip: depth floor — shift from blue to warm gold */
 .feed-chip-depth {
@@ -4252,8 +4252,8 @@ html, body {
 }
 
 .run-history-card.feed-escape {
-  border-color: rgba(164,203,166,0.18);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.030), 0 0 18px rgba(112,178,126,0.045);
+  border-color: rgba(255,178,96,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.030), 0 0 18px rgba(255,178,96,0.045);
 }
 
 .run-history-card.feed-death {

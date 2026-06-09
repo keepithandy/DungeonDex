@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.13`
-* Current local package baseline: `v1.6.13`
-* Current development target: `v1.6.13`
+* Public/live itch version: `v1.6.14`
+* Current local package baseline: `v1.6.14`
+* Current development target: `v1.6.14`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,18 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.14 - Legacy Accent Holdout Cleanup
+
+Status: Complete
+
+Summary:
+
+* Removed the remaining cyan/blue escape-feed holdout and aligned the related escape/feed chip surfaces to the Lowfire ember palette.
+* Kept layout, combat math, saves, enemies, loot, and progression unchanged.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.14`.
 
 ---
 

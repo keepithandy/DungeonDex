@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.13 — Combat Accent Cleanup Pass
+- DungeonDex v1.6.14 — Legacy Accent Holdout Cleanup
 
 ## Current Workflow
 - Inspect files before editing.
