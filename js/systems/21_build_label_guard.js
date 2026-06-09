@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.6.23';
+  const BUILD = '1.6.24';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.23-debt-collector-visibility';
+  const BUILD_QS = '1.6.24-elite-board-contract-clarity';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

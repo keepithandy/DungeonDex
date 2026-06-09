@@ -961,7 +961,9 @@ async function main() {
     const acceptOk = await evalByValue(client, `(() => window.DungeonDexEliteContracts?.acceptById ? window.DungeonDexEliteContracts.acceptById(S, ${JSON.stringify(acceptedContractId)}) : false)()`);
     record('Elite Board contract flow still works', !!acceptOk, JSON.stringify({ acceptedContractId, acceptOk }));
     const boardStateText = await evalByValue(client, `(() => window.DungeonDexEliteContracts?.activeSummaryText ? window.DungeonDexEliteContracts.activeSummaryText(S) : '')()`);
-    record('Elite Board active summary stays stable', typeof boardStateText === 'string' && boardStateText.length > 0, boardStateText.slice(0, 300));
+    record('Elite Board active summary stays stable', typeof boardStateText === 'string' && boardStateText.includes('Where:') && boardStateText.includes('Bonus Goal:') && boardStateText.includes('Hunt:'), boardStateText.slice(0, 300));
+    const boardPanelText = await evalByValue(client, `(() => { S.screen = 'town'; if (typeof render === 'function') render(); return document.getElementById('questPanel')?.innerText || ''; })()`);
+    record('Elite Board clarity copy appears', boardPanelText.includes('One hunt can be active') && boardPanelText.includes('Held Reward') && boardPanelText.includes('Bonus Goal') && boardPanelText.includes('Reward Preview'), boardPanelText.slice(0, 700));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const boardReloadSummary = await getSummary();

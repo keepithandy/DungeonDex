@@ -5,7 +5,7 @@
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.6.21-archive-trophy-link-polish';
+  const SCRIPT_BUILD = '1.6.24-elite-board-contract-clarity';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -349,13 +349,13 @@
   }
   function boardNotice(st){
     const failed = Array.isArray(st.failed) ? st.failed[0] : null;
-    if (failed) return `<div class="lowfire-board-note small muted"><b>Contract failed: ${H(failed.eliteName || 'Unknown mark')}.</b> ${H(failed.failureNote || 'The board reclaimed the writ after your fall.')}</div>`;
+    if (failed) return `<div class="lowfire-board-note small muted"><b>Failed writ: ${H(failed.eliteName || 'Unknown mark')}.</b> ${H(failed.failureNote || 'The board reclaimed the contract after your fall.')}</div>`;
     const expired = Array.isArray(st.expired) ? st.expired[0] : null;
-    if (expired) return `<div class="lowfire-board-note small muted"><b>Contract expired: ${H(expired.eliteName || 'Unknown mark')}.</b> The target slipped past the posted floor.</div>`;
+    if (expired) return `<div class="lowfire-board-note small muted"><b>Expired writ: ${H(expired.eliteName || 'Unknown mark')}.</b> The target slipped past its posted floor.</div>`;
     const completedRival = Array.isArray(st.rivals) ? st.rivals.filter(r => r.completed).sort((a,b) => N(b.updatedAt || b.createdAt,0) - N(a.updatedAt || a.createdAt,0))[0] : null;
-    if (completedRival) return `<div class="lowfire-board-note small muted"><b>Completed rival:</b> ${H(completedRival.eliteName)}. The board scratched its name from the writ.</div>`;
+    if (completedRival) return `<div class="lowfire-board-note small muted"><b>Rival cleared:</b> ${H(completedRival.eliteName)}. The board scratched its name from the danger list.</div>`;
     const completedCount = Math.max(Array.isArray(st.claimed) ? st.claimed.length : 0, Array.isArray(st.completed) ? st.completed.length : 0);
-    if (completedCount) return `<div class="lowfire-board-note small muted"><b>Completed contracts:</b> ${F(completedCount)} claimed. New marks are available below.</div>`;
+    if (completedCount) return `<div class="lowfire-board-note small muted"><b>Claimed contracts:</b> ${F(completedCount)} paid out. New marks are posted below.</div>`;
     return '';
   }
   function boardStateStrip(st, availableCount, state){
@@ -363,7 +363,7 @@
     const expiredCount = Array.isArray(st.expired) ? st.expired.length : 0;
     const rivalCount = rivalContracts(state).length;
     const completedCount = Math.max(Array.isArray(st.claimed) ? st.claimed.length : 0, Array.isArray(st.completed) ? st.completed.length : 0);
-    return `<div class="active-contract-summary small"><span><b>Available:</b> ${F(availableCount)}</span><span><b>Completed:</b> ${F(completedCount)}</span><span><b>Failed:</b> ${F(failedCount)}</span><span><b>Expired:</b> ${F(expiredCount)}</span><span><b>Rivals:</b> ${F(rivalCount)}</span></div>`;
+    return `<div class="active-contract-summary small"><span><b>Posted:</b> ${F(availableCount)}</span><span><b>Claimed:</b> ${F(completedCount)}</span><span><b>Failed:</b> ${F(failedCount)}</span><span><b>Expired:</b> ${F(expiredCount)}</span><span><b>Rival danger:</b> ${F(rivalCount)}</span></div>`;
   }
   function contractCard(model,contract,state,active=null){
     const accepted = !!model.accepted;
@@ -384,19 +384,20 @@
       <div class="contract-wanted-line"><strong>${H(model.title)}</strong>${accepted?'<span class="pill rarity-rare">Accepted</span>':''}</div>
       <div class="contract-elite-name">${H(model.eliteName)}</div>
       <div class="elite-contract-detail-grid contract-identity-grid small">
-        <span><b>Target:</b> ${H(model.eliteName)}</span>
-        <span><b>Location:</b> ${H(model.targetLocation || targetText(model))}</span>
-        <span><b>Contract:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
-        <span><b>Bonus Writ:</b> ${H(model.bonusWrit || 'Pending')}</span>
-        <span><b>Threat:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
+        <span><b>Mark:</b> ${H(model.eliteName)}</span>
+        <span><b>Where:</b> ${H(model.targetLocation || targetText(model))}</span>
+        <span><b>Objective:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
+        <span><b>Bonus Goal:</b> ${H(model.bonusWrit || 'Pending')}</span>
+        <span><b>Danger:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
         <span><b>Status:</b> ${H(statusText)}</span>
+        ${rival ? '<span><b>Rival Layer:</b> Revenge hunt</span>' : ''}
         ${rival ? `<span><b>Killed you:</b> ${F(model.defeats || model.rivalDefeats || active?.rivalDefeats || 1)} time${(model.defeats || model.rivalDefeats || active?.rivalDefeats || 1) === 1 ? '' : 's'}</span>` : ''}
         ${rival ? `<span><b>Last seen:</b> ${H(model.killedPlayerAtLocation || 'Unknown floor')}</span>` : ''}
-        <span><b>Reward:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
+        <span><b>Reward Preview:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
       </div>
       <p class="small muted contract-flavor">${H(model.flavor)}</p>
       ${active && contract ? `<div class="elite-contract-meter"><div style="width:${pct}%"></div></div>` : ''}
-      <div class="elite-contract-actions"><span class="pill">${accepted ? (rival ? 'Active Rival' : 'Active Contract') : (rival ? 'Rival Writ' : 'Contract Writ')}</span>${button}</div>
+      <div class="elite-contract-actions"><span class="pill">${accepted ? (rival ? 'Active Rival Hunt' : 'Active Board Hunt') : (rival ? 'Rival Danger Layer' : 'Board Contract')}</span>${button}</div>
     </div>`;
   }
 
@@ -425,7 +426,7 @@
   function rivalSection(state){
     const rivals = rivalContracts(state);
     if (!rivals.length) return '';
-    return `<div class="rival-writ-section"><div class="split rival-writ-head"><strong>Rival Writ</strong><span class="pill">${F(rivals.length)} sighted</span></div>${rivals.slice(0,1).map(rival => rivalCard(rival,state)).join('')}</div>`;
+    return `<div class="rival-writ-section"><div class="split rival-writ-head"><strong>Rival Writs</strong><span class="pill">${F(rivals.length)} danger layer</span></div>${rivals.slice(0,1).map(rival => rivalCard(rival,state)).join('')}</div>`;
   }
 
   function boardMarkup(state){
@@ -436,14 +437,14 @@
         const c = contractDef(active.id); if (!c) return '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
         const ready = active.complete || active.completed, reward = activeReward(active,c,state);
         const model = contractModel({...c, ...active}, state, true);
-        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One elite contract can be active. The board freezes until the hunt is finished or claimed.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':active.rivalContract?'Rival Hunt':'Active Hunt'}</span></div><div class="active-contract-summary small"><span><b>${active.rivalContract?'Rival Writ':'Active Hunt'}:</b> ${H(model.eliteName)}</span><span><b>Target:</b> ${H(targetText(model))}</span>${active.rivalContract ? `<span><b>Last seen:</b> ${H(model.killedPlayerAtLocation || 'unknown')}</span>` : ''}<span><b>Bonus Writ:</b> ${H(model.bonusWrit || 'none')}</span><span><b>Bonus Status:</b> ${H(bonusWritState(active))}</span><span><b>Status:</b> ${H(huntStatusLabel(active, ready))}</span><span><b>Held Pay:</b> ${M(reward)}</span></div>${trophyStrip(trophySummary)}${contractCard(model,c,state,active)}</div>`;
+        return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>One hunt can be active. Finish or claim it before taking another mark; rival writs are the danger layer.</p></div><span class="pill ${ready?'rarity-rare':''}">${ready?'Ready':active.rivalContract?'Rival Hunt':'Active Hunt'}</span></div><div class="active-contract-summary small"><span><b>${active.rivalContract?'Rival Writ':'Active Hunt'}:</b> ${H(model.eliteName)}</span><span><b>Where:</b> ${H(targetText(model))}</span>${active.rivalContract ? `<span><b>Last seen:</b> ${H(model.killedPlayerAtLocation || 'unknown')}</span>` : ''}<span><b>Bonus Goal:</b> ${H(model.bonusWrit || 'none')}</span><span><b>Bonus:</b> ${H(bonusWritState(active))}</span><span><b>Hunt:</b> ${H(huntStatusLabel(active, ready))}</span><span><b>Held Reward:</b> ${M(reward)}</span></div>${trophyStrip(trophySummary)}${contractCard(model,c,state,active)}</div>`;
       }
       const list = typeof availableEliteContracts === 'function' ? availableEliteContracts(state) : filteredContracts(state, contractPool(state));
       const models = generatedContracts(state, list, '');
       const cards = models.length ? models.map(model => contractCard(model, contractDef(model.id), state)).join('') : '<p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p>';
-      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div>${boardStateStrip(st, models.length, state)}${boardNotice(st)}<div class="lowfire-board-note small muted">Three readable contracts are posted at a time. Rewards are previews. Bonus Writs are short optional goals.</div>${trophyStrip(trophySummary)}${rivalSection(state)}<div class="elite-contract-list contract-identity-list">${cards}</div></div>`;
+      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one posted mark before the next descent. Rivals are the extra danger layer.</p></div><button class="ghost mini refresh-compact" id="refreshLowfireBoardBtn"><span>Random Board</span><strong>${M(boardCost(state))}</strong></button></div>${boardStateStrip(st, models.length, state)}${boardNotice(st)}<div class="lowfire-board-note small muted">Three contracts are posted at a time. Reward previews show the payout; Bonus Goals are optional.</div>${trophyStrip(trophySummary)}${rivalSection(state)}<div class="elite-contract-list contract-identity-list">${cards}</div></div>`;
     } catch (_) {
-      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one elite contract before the next descent.</p></div></div><p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p></div>`;
+      return `<div class="elite-contract-board lowfire-board-v2 elite-contract-identity-board"><div class="elite-contract-head"><div><h3>Lowfire Elite Board</h3><p>Choose one posted mark before the next descent. Rivals are the extra danger layer.</p></div></div><p class="small muted elite-contract-empty">The board is being rewritten. Check back after the next descent.</p></div>`;
     }
   }
 
@@ -453,7 +454,7 @@
   function injectCss(){
     if (document.getElementById('ddWardenTalentBoardCss')) return;
     const st = document.createElement('style'); st.id = 'ddWardenTalentBoardCss';
-    st.textContent = `.town-currency-strip{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:5px;font-size:10.75px;line-height:1.15;color:rgba(244,232,210,.82)}.town-currency-strip span{border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(0,0,0,.18);padding:3px 6px;font-weight:650;white-space:nowrap}.lowfire-board-v2 .elite-contract-head{align-items:flex-start;gap:8px}.lowfire-board-note{margin:-2px 0 8px}.lowfire-board-v2 .active-contract-summary{gap:5px 7px;margin:6px 0 9px}.lowfire-board-v2 .elite-contract-list{gap:8px}.lowfire-board-v2 .elite-contract-card{padding:10px;gap:6px}.lowfire-board-v2 .elite-contract-card .split{gap:6px}.lowfire-board-v2 .elite-contract-detail-grid{gap:5px 8px}.lowfire-board-v2 .elite-contract-detail-grid span{line-height:1.25}#talentPanel{font-size:12px}.talent-meter-row{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.talent-meter-row span{border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:3px 6px;background:rgba(255,255,255,.035)}.talent-tree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.talent-tree{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px;background:rgba(255,255,255,.025)}.talent-card{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.18);color:inherit;padding:7px;margin:0 0 6px}.talent-card:disabled{opacity:.62}.talent-card-top{display:flex;justify-content:space-between;gap:6px}.talent-card-top strong{font-size:12px}.talent-card-top em{font-style:normal;font-size:11px;color:#f2c06b}.talent-effect,.talent-lore{display:block;font-size:11px;line-height:1.2}.talent-effect{margin-top:3px;color:rgba(255,235,190,.9);font-weight:700}.talent-lore{margin-top:2px;color:rgba(230,222,205,.62)}.talent-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}@media(max-width:720px){.talent-tree-grid{grid-template-columns:1fr}.talent-footer{align-items:flex-start;flex-direction:column}}`;
+    st.textContent = `.town-currency-strip{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:5px;font-size:10.75px;line-height:1.15;color:rgba(244,232,210,.82)}.town-currency-strip span{border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(0,0,0,.18);padding:3px 6px;font-weight:650;white-space:nowrap}.lowfire-board-v2 .elite-contract-head{align-items:flex-start;gap:8px}.lowfire-board-note{margin:-2px 0 8px}.lowfire-board-v2 .active-contract-summary{gap:5px 7px;margin:6px 0 9px}.lowfire-board-v2 .active-contract-summary span{border-color:rgba(255,190,110,.14);background:rgba(255,190,110,.045);line-height:1.18}.lowfire-board-v2 .elite-contract-list{gap:8px}.lowfire-board-v2 .elite-contract-card{padding:10px;gap:6px}.lowfire-board-v2 .elite-contract-card .split{gap:6px}.lowfire-board-v2 .elite-contract-detail-grid{gap:5px 8px}.lowfire-board-v2 .elite-contract-detail-grid span{line-height:1.25;padding:3px 0}.lowfire-board-v2 .contract-threat{color:#ffd287}.lowfire-board-v2 .elite-contract-actions .pill{border-color:rgba(255,190,110,.22);background:rgba(255,190,110,.065)}#talentPanel{font-size:12px}.talent-meter-row{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.talent-meter-row span{border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:3px 6px;background:rgba(255,255,255,.035)}.talent-tree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.talent-tree{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px;background:rgba(255,255,255,.025)}.talent-card{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.18);color:inherit;padding:7px;margin:0 0 6px}.talent-card:disabled{opacity:.62}.talent-card-top{display:flex;justify-content:space-between;gap:6px}.talent-card-top strong{font-size:12px}.talent-card-top em{font-style:normal;font-size:11px;color:#f2c06b}.talent-effect,.talent-lore{display:block;font-size:11px;line-height:1.2}.talent-effect{margin-top:3px;color:rgba(255,235,190,.9);font-weight:700}.talent-lore{margin-top:2px;color:rgba(230,222,205,.62)}.talent-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}@media(max-width:720px){.talent-tree-grid{grid-template-columns:1fr}.talent-footer{align-items:flex-start;flex-direction:column}}`;
     document.head.appendChild(st);
   }
 

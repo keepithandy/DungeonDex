@@ -1226,9 +1226,9 @@
         const active = activeEliteContractHunt(state);
         if (!active) return '';
         const status = active.failed ? 'Failed' : active.expired ? 'Expired' : active.completed ? 'Completed' : 'Active';
-        const label = active.rivalContract ? 'Rival Writ' : 'Active Hunt';
+        const label = active.rivalContract ? 'Rival Danger' : 'Active Hunt';
         const writ = String(active.bonusWrit || 'None').replace(/[.]+$/g, '');
-        return `${label}: ${active.eliteName}. Target: ${active.targetLocation || eliteContractTargetLocationLabel(active.targetFloor)}. Bonus Writ: ${writ}. Status: ${status}.`;
+        return `${label}: ${active.eliteName}. Where: ${active.targetLocation || eliteContractTargetLocationLabel(active.targetFloor)}. Bonus Goal: ${writ}. Hunt: ${status}.`;
       },
       inspectBoardState(state = S) {
         const contracts = ensureEliteContractState(state);
