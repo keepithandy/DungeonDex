@@ -8542,6 +8542,22 @@ button:focus-visible,
   gap: 5px;
 }
 
+.gear-memory-pill {
+  border-color: rgba(255,178,96,0.28);
+  background: rgba(255,178,96,0.09);
+  color: #ffe0bf;
+  font-size: 0.68rem;
+  line-height: 1.12;
+}
+
+.gear-status-badge.memory {
+  border-color: rgba(255,178,96,0.24);
+  background: rgba(255,178,96,0.08);
+  color: #ffe3c4;
+  font-size: 0.68rem;
+  line-height: 1.12;
+}
+
 @media (max-width: 520px) {
   .boss-trophy-grid { grid-template-columns: 1fr; }
   .boss-trophy-card { grid-template-columns: 64px 1fr; }

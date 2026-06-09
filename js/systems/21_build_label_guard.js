@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.6.21';
+  const BUILD = '1.6.22';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.21-archive-trophy-link-polish';
+  const BUILD_QS = '1.6.22-famous-gear-memory-readability';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

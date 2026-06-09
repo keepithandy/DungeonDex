@@ -436,7 +436,7 @@
     const memory = gearMemoryModel(item);
     if (!memory) return '';
     const tags = asArray(memory.tags, []);
-    const chips = [memory.title || 'Famous Gear'].concat(tags.slice(0, 2));
+    const chips = ['Famous Gear Record'].concat(memory.title ? [memory.title] : []).concat(tags.slice(0, 2));
     const overflow = Math.max(0, tags.length - 2);
     if (overflow > 0) chips.push(`+${format(overflow)}`);
     return chips.concat(gearMemoryStatChips(memory))
@@ -448,7 +448,7 @@
   function gearMemoryPills(item) {
     const memory = gearMemoryModel(item);
     if (!memory) return '';
-    const chips = [memory.title || 'Famous Gear'].concat(asArray(memory.tags, []), gearMemoryStatChips(memory));
+    const chips = ['Famous Gear Record'].concat(memory.title ? [memory.title] : []).concat(asArray(memory.tags, []), gearMemoryStatChips(memory));
     return chips
       .filter(Boolean)
       .slice(0, 10)
@@ -818,7 +818,7 @@
   }
 
   function retiredRelicHelpText() {
-    return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Retiring an item removes it from active use.</p>';
+    return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Famous Gear memory is a read-only collection record, and retiring an item removes it from active use.</p>';
   }
 
   function retiredRelicCard(entry) {
@@ -922,7 +922,7 @@
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
       ${retiredRelicHelpText()}
-      <p class="small muted">Retired relic archive records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
+      <p class="small muted">Retired relic archive records preserve manual retirement snapshots and display-only Famous Gear memory as part of the collection archive.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }
 

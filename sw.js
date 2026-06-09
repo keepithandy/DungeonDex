@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.21-archive-trophy-link-polish';
+const CACHE_NAME = 'dungeondex-v1.6.22-famous-gear-memory-readability';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.21-archive-trophy-link-polish';
+const BUILD_QS = '1.6.22-famous-gear-memory-readability';
 const ASSETS = [
   './',
   './index.html',

@@ -819,7 +819,7 @@ async function main() {
     record('DevTools can mark Famous Gear without stat changes', !!famousMark.ok && famousMark.statsUnchanged === true && Array.isArray(famousMark.tags) && famousMark.tags.includes('Boss-Worn'), JSON.stringify(famousMark));
     await setGearScreen();
     const famousGearText = await evalByValue(client, `(() => document.getElementById('inventoryPanel')?.innerText || document.getElementById('equipmentPanel')?.innerText || '')()`);
-    record('Item card displays Famous Gear memory label', famousGearText.includes('Famous Gear') && famousGearText.includes('Boss-Worn'), famousGearText.slice(0, 600));
+    record('Item card displays Famous Gear memory label', famousGearText.includes('Famous Gear Record') && famousGearText.includes('Boss-Worn'), famousGearText.slice(0, 600));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const famousAfterReload = await evalByValue(client, `(() => {
@@ -842,7 +842,7 @@ async function main() {
     const archiveTextAfterRetire = await evalByValue(client, `(() => document.getElementById('gearDex')?.innerText || document.getElementById('monsterDex')?.innerText || '')()`);
     const archiveLower = String(archiveTextAfterRetire || '').toLowerCase();
     record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()), archiveTextAfterRetire.slice(0, 500));
-    record('Retired item archive displays Famous Gear memory label', archiveTextAfterRetire.includes('Famous Gear') && archiveTextAfterRetire.includes('Boss-Worn'), archiveTextAfterRetire.slice(0, 700));
+    record('Retired item archive displays Famous Gear memory label', archiveTextAfterRetire.includes('Famous Gear Record') && archiveTextAfterRetire.includes('Boss-Worn'), archiveTextAfterRetire.slice(0, 700));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const retiredAfterReload = await getRetiredRelicState();
