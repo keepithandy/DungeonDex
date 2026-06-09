@@ -7,9 +7,11 @@
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
     const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
-    const body = hooks.slice(0, 5).map(hook => `<div class="split"><span><b>${escapeHtml(hook.label)}:</b> ${escapeHtml(hook.value)}</span><span class="small muted">${escapeHtml(hook.note)}</span></div>`).join('');
+    const body = hooks.length
+      ? hooks.slice(0, 5).map(hook => `<div class="revisit-candidate-row"><span class="pill revisit-candidate-chip">${escapeHtml(hook.label)}</span><span class="revisit-candidate-detail">${escapeHtml(hook.detail)}</span><span class="small muted revisit-candidate-source">${escapeHtml(hook.source)}</span><span class="small muted revisit-candidate-state">${hook.locked ? 'Locked' : 'Planned'}</span></div>`).join('')
+      : `<div class="small muted revisit-empty-state">No return routes are marked yet. Deeper runs will leave better traces.</div>`;
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
-      <div class="split"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are being marked for future return routes.</p></div><span class="pill">${status}</span></div>
+      <div class="split"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
       <div class="small muted">For now, these notes show where future revisit hooks may attach.</div>
       <div class="list revisit-hook-list">${body}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>

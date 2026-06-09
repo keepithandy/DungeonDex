@@ -626,14 +626,56 @@
     const retired = asArray(state?.player?.retiredRelics, []);
     const trophyCount = Object.keys(trophies.collected || {}).length;
     const rivalCount = rivals.filter(r => !r.completed && r.revengeAvailable).length;
-    const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival Trace' : 'Board Echo') : 'Board Echo';
+    const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival route active' : 'Board route open') : 'Board route quiet';
+    const currentFloor = Math.max(1, Math.floor(numberOr(state?.run?.floor, state?.player?.safeExtractDepth || 1, 1, 999999)));
+    const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(state) : null;
+    const districtName = String(currentDistrict?.name || 'Lowfire District').trim();
+    const floorLabel = typeof getLoreDepthProgress === 'function'
+      ? getLoreDepthProgress(currentFloor)
+      : { floorNumber: currentFloor, roomWithinFloor: 1, chapterWithinRoom: 1 };
+    const meta = revisitState.unlocked ? 'Planned' : 'Future Route';
     return [
-      { label:'Trophy Echo', value: trophyCount ? `${trophyCount} recorded` : 'No boss marks yet' },
-      { label:'Famous Gear Memory', value: retired.length ? `${Math.min(retired.length, 3)} archive record${retired.length === 1 ? '' : 's'}` : 'No archive memory yet' },
-      { label:'Rival Trace', value: rivalCount ? `${rivalCount} ready` : 'Quiet' },
-      { label:'Debt Pressure', value: state?.player?.debtCollector?.balanceCopper > 0 ? 'Active' : 'Dormant' },
-      { label:'Board Echo', value: boardEcho }
-    ].map(entry => ({ ...entry, note: revisitState.unlocked ? 'Planned' : 'Locked' }));
+      {
+        key: 'trophy_echo',
+        label: 'Trophy Echo',
+        detail: trophyCount ? `${trophyCount} recorded` : 'No boss marks yet',
+        source: `Trophies in ${districtName}`,
+        priority: 1,
+        locked: !trophyCount
+      },
+      {
+        key: 'famous_gear_memory',
+        label: 'Famous Gear Memory',
+        detail: retired.length ? `${Math.min(retired.length, 3)} archive record${retired.length === 1 ? '' : 's'}` : 'No archive memory yet',
+        source: 'Archive memory',
+        priority: 2,
+        locked: !retired.length
+      },
+      {
+        key: 'rival_trace',
+        label: 'Rival Trace',
+        detail: rivalCount ? `${rivalCount} ready` : 'Quiet',
+        source: contracts.active?.rivalContract ? 'Elite Board rival' : `Current floor F${format(floorLabel.floorNumber)}`,
+        priority: 3,
+        locked: !rivalCount && !contracts.active?.rivalContract
+      },
+      {
+        key: 'debt_pressure',
+        label: 'Debt Pressure',
+        detail: state?.player?.debtCollector?.balanceCopper > 0 ? 'Active' : 'Dormant',
+        source: 'Debt Collector',
+        priority: 4,
+        locked: !(state?.player?.debtCollector?.balanceCopper > 0)
+      },
+      {
+        key: 'board_echo',
+        label: 'Board Echo',
+        detail: boardEcho,
+        source: contracts.active ? 'Board activity' : `District ${districtName}`,
+        priority: 5,
+        locked: false
+      }
+    ].map(entry => ({ ...entry, note: meta }));
   }
 
   function ensureEliteContractState(state) {
@@ -1261,6 +1303,16 @@
           trophies: eliteTrophySummary(state),
           trophyIds: Object.keys(trophies.collected || {})
         };
+      },
+      revisitCandidateSummary(state = S) {
+        return revisitCandidateHooks(state).map(entry => ({
+          key: entry.key,
+          label: entry.label,
+          detail: entry.detail,
+          source: entry.source,
+          priority: entry.priority,
+          locked: entry.locked
+        }));
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;

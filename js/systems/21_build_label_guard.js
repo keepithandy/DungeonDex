@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.7.0';
+  const BUILD = '1.7.1';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.7.0-early-dungeon-revisit-foundation';
+  const BUILD_QS = '1.7.1-revisit-candidate-ledger-pass';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
