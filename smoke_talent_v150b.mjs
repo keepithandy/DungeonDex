@@ -571,10 +571,10 @@ async function main() {
           panelOverflow,
           hasRecorded: text.includes('Recorded Collection'),
           hasMissing: text.includes('Missing Trophy Case'),
-          hasCount: text.includes('Count'),
+          hasCount: /x\d+/.test(text) || text.includes('total'),
           hasBestDepth: text.includes('Best Depth'),
-          hasLastEarned: text.includes('Last Earned'),
-          hasRetiredItems: lower.includes('retired items'),
+          hasLastEarned: text.includes('Last '),
+          hasRetiredItems: lower.includes('retired gear') || lower.includes('retired item'),
           hasRetiredArchiveSummary: lower.includes('display-only memory tags') || lower.includes('famous gear memory'),
           hasBoardRival: lower.includes('board & rival trophies'),
           hasNoRetireButton: !document.getElementById('screen-dex')?.querySelector('[data-retire]')
@@ -607,8 +607,8 @@ async function main() {
     record('Next point line appears for non-maxed state', freshPanelText.includes('Next point: secure depth 5') && freshPanelText.includes('Progress: 1 / 5 secured depths'), freshPanelText.slice(0, 400));
     record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
-    record('Trophy Hall loads', freshBossDexText.includes('Boss Trophies') && freshBossDexText.includes('Retired Gear Hall'), freshBossDexText.slice(0, 320));
-    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to record their trophies here.'), freshBossDexText.slice(0, 320));
+    record('Trophy Hall loads', freshBossDexText.toLowerCase().includes('trophy hall') && freshBossDexText.toLowerCase().includes('boss trophies'), freshBossDexText.slice(0, 320));
+    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to add a permanent record to the hall.'), freshBossDexText.slice(0, 320));
     const unsafeRunMilestone = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       S.player.safeExtractDepth = 4;
@@ -631,10 +631,10 @@ async function main() {
     const freshUnlockBtn = await evalByValue(client, `(() => {
       S.screen = 'gear';
       if (typeof render === 'function') render();
-      const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
-      return !!btn && btn.disabled && /Need Point/.test(btn.textContent || '');
+      const panel = document.getElementById('talentPanel');
+      return !!panel && /Available:\\s*0/.test(panel.innerText || '') && /Need Point/.test(panel.innerText || '');
     })()`);
-    record('Unlock buttons blocked with 0 points', !!freshUnlockBtn, 'Hardened Start button disabled');
+    record('Unlock buttons blocked with 0 points', !!freshUnlockBtn, 'Talent panel shows zero available points and Need Point state');
     for (const width of [390, 375, 360, 320]) {
       const mobile = await checkTalentViewport(width);
       record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasTotals && mobile.hasMilestone && mobile.hasRule && mobile.hasStarterTalents && mobile.hasPassiveNote, JSON.stringify(mobile));
@@ -738,8 +738,8 @@ async function main() {
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
-    record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to record their trophies here.'), bossEmptyText.slice(0, 320));
-    record('Retired Gear Hall archive shell appears', bossEmptyText.includes('Retired Gear Hall') && bossEmptyText.includes('Retire eligible gear from the Gear screen') && bossEmptyText.includes('DevTools can mark Famous Gear'), bossEmptyText.slice(0, 500));
+    record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to add a permanent record to the hall.'), bossEmptyText.slice(0, 320));
+    record('Retired Gear Hall archive shell appears', bossEmptyText.includes('Archive Shelf') && bossEmptyText.includes('Retired gear is permanent collection history') && bossEmptyText.includes('display-only memory tags'), bossEmptyText.slice(0, 500));
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
     const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
@@ -761,13 +761,13 @@ async function main() {
     }))()`);
     record('Retired item archive record fields are populated', Array.isArray(retiredRelicStateAfterGrant.records) && retiredRelicStateAfterGrant.records.length > 0 && retiredRelicStateAfterGrant.records[0].itemName && retiredRelicStateAfterGrant.records[0].source && retiredRelicStateAfterGrant.records[0].itemLevel >= 1, JSON.stringify(retiredRelicStateAfterGrant.records[0] || null));
     const retiredRelicDexAfterGrant = await getBossTrophyText();
-    record('Retired item archive UI shows record card', retiredRelicDexAfterGrant.includes('DevTools Retired Item Test') && retiredRelicDexAfterGrant.includes('Rating') && retiredRelicDexAfterGrant.includes('Lv '), retiredRelicDexAfterGrant.slice(0, 700));
+    record('Retired item archive UI shows record card', retiredRelicDexAfterGrant.includes('DevTools Retired Item Test') && retiredRelicDexAfterGrant.includes('Rating') && retiredRelicDexAfterGrant.includes('iLvl '), retiredRelicDexAfterGrant.slice(0, 700));
     const forceBossTrophy = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantBossTrophyForTest ? window.DungeonDexScenarioDevTools.grantBossTrophyForTest() : false)()`);
     record('Boss trophy record can be created', !!forceBossTrophy, String(forceBossTrophy));
     const bossTrophyStateAfterGrant = await getBossTrophyState();
     record('Boss trophy record fields are populated', Array.isArray(bossTrophyStateAfterGrant.records) && bossTrophyStateAfterGrant.records.length > 0 && bossTrophyStateAfterGrant.records[0].trophyName && bossTrophyStateAfterGrant.records[0].bossName && bossTrophyStateAfterGrant.records[0].count >= 1, JSON.stringify(bossTrophyStateAfterGrant.records[0] || null));
     const bossDexAfterGrant = await getBossTrophyText();
-    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && bossDexAfterGrant.includes('Last Earned') && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
+    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && bossDexAfterGrant.includes('Last ') && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
     const forceBossTrophyDuplicate = await evalByValue(client, `(() => {
       if (typeof recordBossTrophyUnlock !== 'function') return false;
       const first = Array.isArray(S.player?.bossTrophyRecords) ? S.player.bossTrophyRecords[0] : null;

@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.14 — Legacy Accent Holdout Cleanup
+- DungeonDex v1.6.15 — Post-Theme Systems Audit
 
 ## Current Workflow
 - Inspect files before editing.
@@ -37,6 +37,13 @@
 - Add finished update notes to CHANGELOG.md.
 - Do not create new PATCH_NOTES_1_4_X files.
 - Keep VERSION.md updated when starting a new version target.
+
+## Roadmap Prep Notes
+- Stable foundation: town, run/combat, gear/archive, talent, Elite Board, trophy/Dex, save repair, debt collector, and service-worker systems are all actively loaded through `index.html`.
+- Cleanup before expansion: build labels must stay centralized across `app.js`, `index.html`, `sw.js`, `21_build_label_guard.js`, and `27_interface_density_cleanup.js`.
+- Stale/unclear areas: old monster affix/status vocabulary remains in data and audit helpers for compatibility/history, but current active generation keeps normal monsters HP-number-driven.
+- Archive candidates: root `RELEASE_NOTES_v1_4_*`, `SMOKE_TEST_NOTES_v1_4_*`, `PATCH_NOTES_v1_4_0_*`, `BUGFIX_AUDIT_v1_4_2_*`, and `DungeonDex.zip` should be reviewed before any future repository hygiene pass.
+- Recommended next audit direction: decide whether root historical notes should remain as-is, move to an archive folder, or be summarized in `CHANGELOG.md`.
 
 ## Roadmap
 

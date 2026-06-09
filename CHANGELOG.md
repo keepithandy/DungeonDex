@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.14`
-* Current local package baseline: `v1.6.14`
-* Current development target: `v1.6.14`
+* Public/live itch version: `v1.6.15`
+* Current local package baseline: `v1.6.15`
+* Current development target: `v1.6.15`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,18 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.15 - Post-Theme Systems Audit
+
+Status: Complete
+
+Summary:
+
+* Audited active runtime labels, service-worker cache strings, loaded system modules, root release-note clutter, smoke tooling, and theme/status leftovers after the Lowfire cleanup passes.
+* Fixed stale loaded build guards and service-worker build query strings so runtime labels and cache assets stay aligned with `VERSION.md`.
+* Added factual roadmap-prep audit notes without adding a new gameplay roadmap or changing combat, saves, economy, loot, talents, or debt behavior.
 
 ---
 

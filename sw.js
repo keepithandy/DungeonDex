@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.14-legacy-accent-holdout-cleanup';
+const CACHE_NAME = 'dungeondex-v1.6.15-post-theme-systems-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.13-combat-accent-cleanup';
+const BUILD_QS = '1.6.15-post-theme-systems-audit';
 const ASSETS = [
   './',
   './index.html',
