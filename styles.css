@@ -111,8 +111,8 @@ p { color: var(--soft); line-height: 1.35; }
   color: rgba(255,210,210,0.92);
 }
 .rarity-common { color: #c6d0dd; }
-.rarity-uncommon { color: #a8f0b3; }
-.rarity-rare { color: #84c8ff; }
+.rarity-uncommon { color: #d7b97e; }
+.rarity-rare { color: #8bb8ff; }
 .rarity-epic { color: #d3a7ff; }
 .rarity-legendary { color: #ffd988; }
 .rarity-mythic { color: #ff9ba6; }
@@ -210,7 +210,7 @@ p { color: var(--soft); line-height: 1.35; }
   border: 1px solid rgba(255,214,151,0.13);
   background:
     radial-gradient(circle at 16% 0%, var(--district-a, rgba(255,196,99,0.14)), transparent 34%),
-    radial-gradient(circle at 88% 14%, var(--district-b, rgba(135,168,255,0.10)), transparent 38%),
+    radial-gradient(circle at 88% 14%, var(--district-b, rgba(197,139,255,0.08)), transparent 38%),
     linear-gradient(180deg, rgba(18,15,16,0.96), rgba(5,6,10,0.98) 62%, rgba(3,4,7,0.99));
 }
 .threshold-veil {
@@ -406,10 +406,10 @@ p { color: var(--soft); line-height: 1.35; }
   gap: 7px;
   margin: 8px 0;
   padding: 9px;
-  border: 1px solid rgba(135,168,255,0.14);
+  border: 1px solid rgba(255,178,96,0.14);
   border-radius: 14px;
   background:
-    radial-gradient(circle at 8% 0%, rgba(135,168,255,0.10), transparent 36%),
+    radial-gradient(circle at 8% 0%, rgba(197,139,255,0.08), transparent 36%),
     rgba(255,255,255,0.025);
 }
 .depth-progress-head { align-items: flex-start; gap: 10px; }
@@ -440,7 +440,7 @@ p { color: var(--soft); line-height: 1.35; }
 .depth-meter > div {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(135,168,255,0.50), rgba(122,232,178,0.70));
+  background: linear-gradient(90deg, rgba(255,178,96,0.54), rgba(255,210,128,0.74));
 }
 .app-shell.combat-active .depth-progress-card { margin: 6px 0; padding: 8px; }
 .app-shell.combat-active .depth-progress-card p { font-size: 0.68rem; }
@@ -1004,8 +1004,8 @@ button:disabled {
 
 .combat-btn.tap-now {
   transform: translateY(1px) scale(0.985);
-  border-color: rgba(122,232,178,0.42);
-  background: rgba(122,232,178,0.14);
+  border-color: rgba(255,178,96,0.42);
+  background: rgba(255,178,96,0.14);
 }
 .danger-btn {
   border-color: rgba(255,141,141,0.22);
@@ -1067,21 +1067,21 @@ button:disabled {
 
 .district-pill { border-color: rgba(255,171,76,0.26); color: var(--accent); }
 .boss-pill { border-color: rgba(255,141,141,0.28); color: var(--warn); }
-.district-tone-lowfire { --district-a: rgba(255,196,99,0.13); --district-b: rgba(122,232,178,0.08); }
+.district-tone-lowfire { --district-a: rgba(255,196,99,0.13); --district-b: rgba(255,178,96,0.08); }
 .district-tone-ashgate { --district-a: rgba(161,182,210,0.13); --district-b: rgba(90,109,132,0.12); }
 .district-tone-debtworks { --district-a: rgba(255,118,84,0.14); --district-b: rgba(255,213,128,0.08); }
 .district-tone-sootveil { --district-a: rgba(151,156,176,0.12); --district-b: rgba(36,40,52,0.18); }
 .district-tone-cinderbone { --district-a: rgba(255,142,95,0.15); --district-b: rgba(212,190,160,0.10); }
 .district-tone-blacktithe { --district-a: rgba(255,213,128,0.13); --district-b: rgba(48,42,38,0.22); }
-.district-tone-lanternless { --district-a: rgba(135,168,255,0.11); --district-b: rgba(28,33,55,0.22); }
+.district-tone-lanternless { --district-a: rgba(197,139,255,0.11); --district-b: rgba(28,33,55,0.22); }
 .district-tone-hunger { --district-a: rgba(255,119,91,0.13); --district-b: rgba(88,33,31,0.20); }
 .district-tone-redwake { --district-a: rgba(255,79,91,0.14); --district-b: rgba(96,23,37,0.22); }
-.district-tone-final-lowflame { --district-a: rgba(255,226,153,0.16); --district-b: rgba(122,232,178,0.06); }
+.district-tone-final-lowflame { --district-a: rgba(255,226,153,0.16); --district-b: rgba(255,178,96,0.06); }
 .district-banner,
 .run-command-strip {
   background:
     radial-gradient(circle at 0% 0%, var(--district-a, rgba(255,213,128,0.12)), transparent 38%),
-    radial-gradient(circle at 100% 20%, var(--district-b, rgba(135,168,255,0.08)), transparent 36%),
+    radial-gradient(circle at 100% 20%, var(--district-b, rgba(197,139,255,0.08)), transparent 36%),
     linear-gradient(180deg, rgba(20,24,33,0.92), rgba(9,11,16,0.96));
 }
 .boss-floor-banner {
@@ -1161,7 +1161,7 @@ button:disabled {
 .feed-chip-boss { color: #ffd988; border-color: rgba(255,141,141,0.28); background: rgba(255,141,141,0.08); box-shadow: 0 0 12px rgba(255,87,87,0.10); }
 .feed-chip-elite { color: #d7b2ff; border-color: rgba(184,150,255,0.28); background: rgba(184,150,255,0.08); box-shadow: 0 0 12px rgba(184,150,255,0.09); }
 .feed-chip-depth { color: #a9c1ff; border-color: rgba(136,166,255,0.28); background: rgba(136,166,255,0.08); box-shadow: 0 0 12px rgba(136,166,255,0.08); }
-.feed-chip-escape { color: #90eef8; border-color: rgba(118,222,238,0.30); background: rgba(118,222,238,0.08); box-shadow: 0 0 12px rgba(118,222,238,0.08); }
+.feed-chip-escape { color: #ffd19a; border-color: rgba(255,178,96,0.30); background: rgba(255,178,96,0.08); box-shadow: 0 0 12px rgba(255,178,96,0.08); }
 .run-command-main strong::after {
   content: "";
   display: block;
@@ -1229,9 +1229,9 @@ button:disabled {
   gap: 3px;
   padding: 2px 7px;
   border-radius: 999px;
-  border: 1px solid rgba(122,232,178,0.34);
-  background: rgba(122,232,178,0.09);
-  color: #7ae8b2;
+  border: 1px solid rgba(255,178,96,0.34);
+  background: rgba(255,178,96,0.09);
+  color: #ffd3a0;
   font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0;
@@ -1240,14 +1240,14 @@ button:disabled {
 .upgrade-delta {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.62rem;
-  color: rgba(122,232,178,0.78);
+  color: rgba(255,214,150,0.78);
   margin-left: 1px;
 }
 
 /* ── Equipped slot: emphasise currently-on gear ── */
 .equip-slot-filled {
-  border-color: rgba(135,168,255,0.22);
-  box-shadow: 0 0 14px rgba(135,168,255,0.06);
+  border-color: rgba(255,178,96,0.22);
+  box-shadow: 0 0 14px rgba(255,178,96,0.06);
 }
 .equip-slot-filled .item-name {
   color: rgba(243,245,250,0.96);
@@ -1274,14 +1274,14 @@ button:disabled {
 
 /* Floor-clear milestone: slightly bolder distinction */
 .feed-floor {
-  border-color: rgba(135,168,255,0.24);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 0 20px rgba(135,168,255,0.08);
+  border-color: rgba(255,178,96,0.24);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 0 20px rgba(255,178,96,0.08);
 }
 .feed-floor .feed-icon {
   color: #a0b8ff;
-  background: rgba(135,168,255,0.10);
-  border-color: rgba(135,168,255,0.24);
-  box-shadow: 0 0 16px rgba(135,168,255,0.12);
+  background: rgba(255,178,96,0.10);
+  border-color: rgba(255,178,96,0.24);
+  box-shadow: 0 0 16px rgba(255,178,96,0.12);
 }
 .feed-floor .feed-kicker { color: rgba(190,206,255,0.88); }
 
@@ -1289,9 +1289,9 @@ button:disabled {
 .extraction-card {
   padding: 10px 12px;
   border-radius: 14px;
-  border: 1px solid rgba(122,232,178,0.22);
-  background: linear-gradient(135deg, rgba(122,232,178,0.07), rgba(135,168,255,0.05));
-  box-shadow: 0 0 18px rgba(122,232,178,0.07);
+  border: 1px solid rgba(255,178,96,0.22);
+  background: linear-gradient(135deg, rgba(255,178,96,0.07), rgba(197,139,255,0.05));
+  box-shadow: 0 0 18px rgba(255,178,96,0.07);
   display: grid;
   gap: 4px;
 }
@@ -1305,7 +1305,7 @@ button:disabled {
   text-transform: uppercase;
   letter-spacing: 0;
   font-size: 0.56rem;
-  color: rgba(122,232,178,0.70);
+  color: rgba(255,214,150,0.70);
   font-weight: 900;
 }
 .extraction-card-defeat span { color: rgba(255,141,141,0.70); }
@@ -1372,7 +1372,7 @@ button:disabled {
 .milestone-bar > div {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(135,168,255,0.62), rgba(122,232,178,0.70));
+  background: linear-gradient(90deg, rgba(255,178,96,0.62), rgba(255,214,150,0.70));
 }
 
 /* ── Milestone progress strip in run header ── */
@@ -1508,7 +1508,7 @@ button:focus-visible,
 .mini:focus-visible,
 .ghost:focus-visible,
 .primary:focus-visible {
-  outline: 2px solid rgba(122,232,178,0.46);
+  outline: 2px solid rgba(255,178,96,0.46);
   outline-offset: 2px;
 }
 
@@ -2380,7 +2380,7 @@ html {
 
 /* ─── Guard reaction: player HP card flash ─── */
 .combat-device-shell:has(.guard-btn.tap-now) .player-hp {
-  box-shadow: 0 0 0 1px rgba(118,196,255,0.28), inset 0 0 22px rgba(118,196,255,0.07);
+  box-shadow: 0 0 0 1px rgba(255,178,96,0.28), inset 0 0 22px rgba(255,178,96,0.07);
 }
 
 /* ─── Extract reaction: whole shell glow ─── */
@@ -2424,7 +2424,7 @@ html {
 .combat-hp-read { display:grid; gap:3px; min-width:0; font-size:.72rem; color:rgba(243,245,250,.88); }
 .combat-hp-read .hpbar { height: 7px; }
 .enemy-stat-row { border-color: rgba(255,141,141,0.12); }
-.player-stat-row { border-color: rgba(122,232,178,0.12); }
+.player-stat-row { border-color: rgba(255,178,96,0.12); }
 .combat-run-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap:6px; }
 .combat-run-stat-grid .stat-box { padding: 6px; text-align:center; background: rgba(255,255,255,0.025); }
 .combat-run-stat-grid .stat-box .small { font-size:.58rem; letter-spacing:.02em; }
@@ -2445,7 +2445,7 @@ html {
 }
 .attack-btn { border-color: rgba(255,141,141,0.24); background: linear-gradient(180deg, rgba(120,30,23,0.82), rgba(48,18,18,0.92)); }
 .skill-btn { border-color: rgba(145,104,255,0.26); color:#dcc9ff; }
-.guard-btn { border-color: rgba(122,232,178,0.20); color:#bff4d4; }
+.guard-btn { border-color: rgba(255,178,96,0.20); color:#ffd9ad; }
 .extract-btn { border-color: rgba(255,213,128,0.26); color:#ffe0a6; }
 .combat-boss-banner { margin-bottom:0; padding:8px; }
 .app-shell.combat-active .run-log-head { margin-bottom:5px; }
@@ -3123,7 +3123,7 @@ html {
   background: rgba(255,255,255,.055);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.055);
 }
-.run-progress-only .depth-meter > div { border-radius: inherit; box-shadow: 0 0 14px rgba(122,232,178,.23); }
+.run-progress-only .depth-meter > div { border-radius: inherit; box-shadow: 0 0 14px rgba(255,178,96,.23); }
 
 .app-shell.combat-active .combat-device-shell { gap: 9px; padding: 10px; }
 .app-shell.combat-active .combat-enemy-header { gap: 4px; padding: 2px 6px 0; }
@@ -4210,15 +4210,15 @@ html, body {
 }
 .feed-floor .feed-kicker { color: rgba(255,220,150,0.86); }
 
-/* Escape feed: keep teal-ish but desaturate from neon-blue */
+/* Escape feed: keep readable but warm it for the Lowfire palette */
 .feed-escape {
-  border-color: rgba(100,210,200,0.20);
-  background: rgba(80,180,160,0.050);
+  border-color: rgba(255,178,96,0.20);
+  background: rgba(255,178,96,0.050);
 }
 .feed-escape .feed-icon {
   color: #8ee8d8;
-  background: rgba(80,200,180,0.08);
-  border-color: rgba(80,200,180,0.18);
+  background: rgba(255,178,96,0.08);
+  border-color: rgba(255,178,96,0.18);
 }
 .feed-escape .feed-kicker { color: rgba(160,240,220,0.82); }
 
@@ -4230,12 +4230,12 @@ html, body {
   box-shadow: 0 0 10px rgba(255,180,72,0.08);
 }
 
-/* Chip: escape — keep slightly teal but toned */
+/* Chip: escape — warm and subdued */
 .feed-chip-escape {
-  color: #88ddd4;
-  border-color: rgba(100,210,200,0.28);
-  background: rgba(80,200,180,0.07);
-  box-shadow: 0 0 10px rgba(80,200,180,0.07);
+  color: #ffd19a;
+  border-color: rgba(255,178,96,0.28);
+  background: rgba(255,178,96,0.07);
+  box-shadow: 0 0 10px rgba(255,178,96,0.07);
 }
 
 /* Shard chip: keep slightly violet not blue */
@@ -6511,9 +6511,9 @@ button:focus-visible,
   justify-content: space-between;
   gap: 4px 8px;
   margin: 0 0 7px;
-  border: 1px solid rgba(122,232,178,0.12);
+  border: 1px solid rgba(255,178,96,0.12);
   border-radius: 12px;
-  background: rgba(122,232,178,0.035);
+  background: rgba(255,178,96,0.035);
   color: rgba(225,238,219,0.82);
   padding: 6px 8px;
 }
@@ -6562,9 +6562,9 @@ button:focus-visible,
 }
 
 #talentPanel .talent-path-card.is-unlocked {
-  border-color: rgba(122,232,178,0.24);
-  background: linear-gradient(180deg, rgba(122,232,178,0.07), rgba(255,255,255,0.02));
-  box-shadow: inset 0 1px 0 rgba(190,255,220,0.045);
+  border-color: rgba(255,178,96,0.24);
+  background: linear-gradient(180deg, rgba(255,178,96,0.07), rgba(255,255,255,0.02));
+  box-shadow: inset 0 1px 0 rgba(255,226,189,0.045);
 }
 
 #talentPanel .talent-path-head {
@@ -6613,8 +6613,8 @@ button:focus-visible,
 }
 
 #talentPanel .talent-state-pill.is-unlocked {
-  border-color: rgba(122,232,178,0.24);
-  color: rgba(186,246,216,0.94);
+  border-color: rgba(255,178,96,0.24);
+  color: rgba(255,230,189,0.94);
 }
 
 #talentPanel .talent-path-effect {
@@ -6651,9 +6651,9 @@ button:focus-visible,
 }
 
 #talentPanel .talent-state-button.is-unlocked:disabled {
-  border-color: rgba(122,232,178,0.22);
-  background: rgba(122,232,178,0.075);
-  color: rgba(186,246,216,0.92);
+  border-color: rgba(255,178,96,0.22);
+  background: rgba(255,178,96,0.075);
+  color: rgba(255,230,189,0.92);
 }
 
 #talentPanel .talent-footer {
@@ -7027,9 +7027,9 @@ button:focus-visible,
 }
 
 .gear-status-badge.better {
-  border-color: rgba(122,232,178,0.28);
-  background: rgba(122,232,178,0.075);
-  color: rgba(166,246,202,0.92);
+  border-color: rgba(255,178,96,0.28);
+  background: rgba(255,178,96,0.075);
+  color: rgba(255,230,189,0.92);
 }
 
 .gear-status-badge.set {

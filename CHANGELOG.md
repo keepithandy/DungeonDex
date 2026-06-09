@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.12`
-* Current local package baseline: `v1.6.12`
-* Current development target: `v1.6.12`
+* Public/live itch version: `v1.6.13`
+* Current local package baseline: `v1.6.13`
+* Current development target: `v1.6.13`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,20 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.13 - Combat Accent Cleanup Pass
+
+Status: Complete
+
+Summary:
+
+* Reworked the remaining cold combat-heavy accents toward ember, bronze, ash, and muted gold tones.
+* Tightened run-screen, combat log, enemy, tab, archive, gear, and helper surfaces so the Lowfire theme reads more consistently.
+* Kept success affordances readable while reducing mint/cyan holdouts that clashed with the theme.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.13`.
+* No gameplay, save structure, or combat logic changes.
 
 ---
 

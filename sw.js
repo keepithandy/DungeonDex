@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.12-lowfire-ember-theme-pass';
+const CACHE_NAME = 'dungeondex-v1.6.13-combat-accent-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.12-lowfire-ember-theme-pass';
+const BUILD_QS = '1.6.13-combat-accent-cleanup';
 const ASSETS = [
   './',
   './index.html',
