@@ -8562,24 +8562,28 @@ button:focus-visible,
   .boss-trophy-record-card,
   .boss-trophy-card {
     gap: 8px;
-    padding: 8px 9px;
+    padding: 7px 8px;
   }
 
   .boss-trophy-card-topline {
     flex-direction: column;
     align-items: flex-start;
+    gap: 4px;
   }
 
   .boss-trophy-record-boss {
-    font-size: .77rem;
+    margin-bottom: 4px;
+    font-size: .76rem;
   }
 
   .boss-trophy-meta-row {
-    font-size: .73rem;
+    gap: 8px;
+    font-size: .72rem;
   }
 
-  .boss-trophy-card-topline {
-    gap: 6px;
+  .boss-trophy-record-meta {
+    gap: 4px;
+    margin-bottom: 5px;
   }
 
   .collection-shell {
@@ -8606,6 +8610,21 @@ button:focus-visible,
     text-align: center;
     white-space: normal;
     width: 100%;
+  }
+
+  .boss-trophy-empty-state {
+    padding: 12px 11px;
+  }
+
+  .boss-trophy-empty-state strong {
+    margin-bottom: 4px;
+    font-size: .9rem;
+  }
+
+  .boss-trophy-empty-state p {
+    margin-bottom: 4px;
+    font-size: .74rem;
+    line-height: 1.25;
   }
 }
 

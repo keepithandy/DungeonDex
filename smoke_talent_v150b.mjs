@@ -778,7 +778,7 @@ async function main() {
     record('Duplicate boss trophy increments count safely', !!forceBossTrophyDuplicate && Array.isArray(bossTrophyStateAfterDuplicate.records) && bossTrophyStateAfterDuplicate.records.length > 0 && Number(bossTrophyStateAfterDuplicate.records[0].count) >= 2, JSON.stringify(bossTrophyStateAfterDuplicate.records[0] || null));
     for (const width of [390, 375, 360, 320]) {
       const trophyMobile = await checkBossTrophyViewport(width);
-      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasRetiredArchiveSummary && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
+      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasRetiredArchiveSummary && trophyMobile.hasNoRetireButton && /last earned/i.test(trophyMobile.text || ''), JSON.stringify(trophyMobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Page.reload', { ignoreCache: true });
