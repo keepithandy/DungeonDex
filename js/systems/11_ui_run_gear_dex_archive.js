@@ -903,13 +903,13 @@
     const bossTotalLabel = bossSummary.totalDefinitions > 0
       ? `${format(bossSummary.recordedCount)} / ${format(bossSummary.totalDefinitions)}`
       : `${format(bossSummary.recordedCount)}`;
-    const bossEmptyState = `<div class="boss-trophy-empty-state"><strong>No boss trophies collected yet</strong><p>Boss trophies are permanent identity records. Defeat a boss to add its name, depth, and count to the hall.</p><div class="small muted">Collection record only. No combat bonus. Recorded Collection • Missing Trophy Case.</div></div>`;
+    const bossEmptyState = `<div class="boss-trophy-empty-state"><strong>No boss trophies collected yet</strong><p>Boss trophies are permanent collection records. Defeat a boss to add its name, depth, and count to the hall.</p><div class="small muted">Collection Record • No combat bonus • Recorded Collection • Missing Trophy Case.</div></div>`;
     el('dexSummary').innerHTML = `
-      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Long-term collection records for bosses, boards, rivals, and retired item archive entries.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
-      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Collection Hub</button><button class="trophy-tab" type="button" disabled>DevTools archive records only</button></div>
+      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Long-term collection records for bosses, boards, rivals, and retired relic archive entries.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
+      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Collection Records</button><button class="trophy-tab" type="button" disabled>DevTools archive records only</button></div>
       <div class="boss-trophy-summary-card">
         <div class="boss-trophy-summary-copy">
-          <strong>Hall Summary</strong>
+          <strong>Collection Record Summary</strong>
           <div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(cleanDisplayText(bossSummary.bestRecord.bossName || '', 'Unknown Boss'))} holds the deepest recorded mark.` : 'Defeat bosses to start the collection. Recorded Collection. Missing Trophy Case. Last recorded: none yet.'}</div>
         </div>
         <div class="boss-trophy-summary-stats">
@@ -922,7 +922,7 @@
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
       ${retiredRelicHelpText()}
-      <p class="small muted">Retired item archive records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
+      <p class="small muted">Retired relic archive records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }
 
@@ -1010,7 +1010,7 @@
       <div class="list run-history-list">${historyMarkup}</div>
       <div class="sep"></div>
       <div class="archive-history-head">
-        <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only archive records plus manual retirement for unequipped inventory gear.</p></div>
+        <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only collection records plus manual retirement for unequipped inventory gear.</p></div>
         <span class="pill">${format(archiveRetiredSummary.total)} recorded</span>
       </div>
       ${retiredRelicSummaryMarkup(archiveRetiredSummary)}
