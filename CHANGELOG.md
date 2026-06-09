@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.15`
-* Current local package baseline: `v1.6.15`
-* Current development target: `v1.6.15`
+* Public/live itch version: `v1.6.16`
+* Current local package baseline: `v1.6.16`
+* Current development target: `v1.6.16`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,19 @@ Use `VERSION.md` for the current active version.
 ## Active 1.5.x Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.16 - Repository Archive Cleanup
+
+Status: Complete
+
+Summary:
+
+* Moved historical root release notes, smoke-test notes, patch notes, the v1.4.2 bugfix audit, and the local package zip artifact into archive folders while preserving filenames.
+* Kept active runtime files, current version/changelog notes, active tools, and active smoke scripts in place for itch-upload safety.
+* Updated active build/cache labels and notes to `DungeonDex v1.6.16`.
+* No gameplay, save structure, combat, economy, loot, talent, board, archive, or debt collector behavior changes.
 
 ---
 
