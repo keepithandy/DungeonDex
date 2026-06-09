@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.17 - Current Roadmap Refresh
+- DungeonDex v1.6.18 - Boss Trophy Identity Pass
 
 ## Current Workflow
 - Inspect files before editing.

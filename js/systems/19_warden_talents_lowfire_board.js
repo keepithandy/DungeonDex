@@ -5,7 +5,7 @@
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.6.17-current-roadmap-refresh';
+  const SCRIPT_BUILD = '1.6.18-boss-trophy-identity-pass';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

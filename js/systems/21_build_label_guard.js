@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.6.17';
+  const BUILD = '1.6.18';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.17-current-roadmap-refresh';
+  const BUILD_QS = '1.6.18-boss-trophy-identity-pass';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

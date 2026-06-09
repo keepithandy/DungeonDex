@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.17-current-roadmap-refresh';
+const CACHE_NAME = 'dungeondex-v1.6.18-boss-trophy-identity-pass';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.17-current-roadmap-refresh';
+const BUILD_QS = '1.6.18-boss-trophy-identity-pass';
 const ASSETS = [
   './',
   './index.html',
