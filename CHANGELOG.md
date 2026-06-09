@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.16`
-* Current local package baseline: `v1.6.16`
-* Current development target: `v1.6.16`
+* Public/live itch version: `v1.6.17`
+* Current local package baseline: `v1.6.17`
+* Current development target: `v1.6.17`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -26,7 +26,7 @@ The goal of this line is to add deeper player progression without turning the ba
 
 ---
 
-## Current 1.5.x Focus
+## Historical 1.5.x Focus
 
 * Talent System Foundation
 * Passive-only progression hooks
@@ -61,9 +61,22 @@ Use `VERSION.md` for the current active version.
 
 ---
 
-## Active 1.5.x Notes
+## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.6.17 - Current Roadmap Refresh
+
+Status: Complete
+
+Summary:
+
+* Refreshed the current roadmap in `DUNGEONDEX_CURRENT_NOTES.md` around the active post-v1.6.16 systems baseline.
+* Replaced stale planning fragments with stable baseline, near-term priorities, next-system candidates, larger direction, and guardrails.
+* Grounded next-system candidates in audited active systems without promising new gameplay.
+* No gameplay, save structure, combat, economy, loot, talent, board, archive, or debt collector behavior changes.
 
 ---
 

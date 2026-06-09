@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.16-repository-archive-cleanup';
+const CACHE_NAME = 'dungeondex-v1.6.17-current-roadmap-refresh';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.16-repository-archive-cleanup';
+const BUILD_QS = '1.6.17-current-roadmap-refresh';
 const ASSETS = [
   './',
   './index.html',

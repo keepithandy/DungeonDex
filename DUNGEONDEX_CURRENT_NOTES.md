@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.16 — Repository Archive Cleanup
+- DungeonDex v1.6.17 - Current Roadmap Refresh
 
 ## Current Workflow
 - Inspect files before editing.
@@ -38,91 +38,43 @@
 - Do not create new PATCH_NOTES_1_4_X files.
 - Keep VERSION.md updated when starting a new version target.
 
-## Roadmap Prep Notes
-- Stable foundation: town, run/combat, gear/archive, talent, Elite Board, trophy/Dex, save repair, debt collector, and service-worker systems are all actively loaded through `index.html`.
-- Cleanup before expansion: build labels must stay centralized across `app.js`, `index.html`, `sw.js`, `21_build_label_guard.js`, and `27_interface_density_cleanup.js`.
-- Stale/unclear areas: old monster affix/status vocabulary remains in data and audit helpers for compatibility/history, but current active generation keeps normal monsters HP-number-driven.
-- Archived in v1.6.16: root `RELEASE_NOTES_v1_4_*`, `SMOKE_TEST_NOTES_v1_4_*`, `PATCH_NOTES_v1_4_0_*`, and `BUGFIX_AUDIT_v1_4_2_*` were moved into `docs/archive/*` while preserving filenames; local ignored `DungeonDex.zip` was moved out of the runtime root into `archive/packages/`.
-- Recommended next audit direction: decide whether archived historical notes should be summarized further in `CHANGELOG.md` before a roadmap rewrite.
+## Current Roadmap
 
-## Roadmap
+### Stable Baseline
+- v1.6.16 is the stable post-theme, post-audit, post-archive baseline.
+- Active screens: town, run/combat, gear, Trophy Hall/Dex, and Archive.
+- Active foundations: talents, debt collector, Famous Gear memory, retired gear, boss trophies, and Elite Board/rival contracts.
+- Save/load repair, DevTools helpers, smoke scripts, service worker/cache, and Lowfire ember theme are active.
+- Repository clutter is archived, and the runtime root is easier to review.
 
-### v1.4.x — Stabilization and Release Cleanliness
-Purpose:
-Finish the stability branch and prepare DungeonDex for cleaner public-facing builds.
+### Near-Term Patch Priorities
+- Keep patches small, targeted, and smoke-tested.
+- Harden save repair, labels, cache strings, and optional UI panels.
+- Improve compact mobile readability without broad theme churn.
+- Add or refresh smoke coverage around changed surfaces only.
+- Avoid balance changes unless backed by focused testing.
 
-Completed focus:
-- Lore depth display consistency
-- Elite Board polish
-- Trophy and rival support
-- Death/extraction/charter smoke coverage
-- Gear/enemy scaling audit
-- Enter Dungeon runtime hotfix
-- Scaling smoke guard
-- Floor 20–35 balance sample tools
+### Next System Candidates
+- Talent expansion with clearer passive player choice.
+- Debt collector visibility and risk/reward pressure built from the existing foundation.
+- Boss trophy and Dex identity improvements.
+- Famous Gear memory readability and attachment polish.
+- Retired Gear Hall depth within the existing archive flow.
+- Early dungeon revisit incentives that do not disrupt current scaling.
+- Elite Board and rival contract clarity/polish.
+- District and dungeon-world identity expansion.
 
-Remaining possible v1.4.x work:
-- Final branch audit
-- Small readability cleanup
-- Release cleanup
-- Public polish candidate only if needed
+### Larger Direction
+- Move v1.7/v2 planning toward stronger world identity and collection-game feel.
+- Build emotional attachment to gear, bosses, rival elites, and districts.
+- Add reasons to revisit earlier dungeons without bloating combat.
+- Improve progression arcs while keeping normal monsters Common / Elite / Boss.
+- Preserve the mobile-first, one-hand-friendly interface.
 
-### v1.5.x — Progression Identity Systems
-Purpose:
-Add deeper player progression without making base monster combat complicated.
-
-Main candidate:
-Talent System Foundation
-
-Talent direction:
-- Passive talents only at first
-- No new combat buttons
-- No status effects
-- No affixes
-- Talents should modify existing systems instead of creating complex new combat behavior
-
-Active v1.6.7 talent paths:
-- Survivor: HP, recovery, safer extraction
-- Hunter: Elite Board, rivals, trophies
-- Delver: deeper floors, charters, bosses
-- Collector: item finds, trophy value, archive/famous gear support
-
-### v1.6.x — Collection, Memory, and Item Attachment
-Purpose:
-Make the Dex identity stronger.
-
-Candidate systems:
-- Boss Trophy Expansion
-- Retire Items
-- Famous Gear
-- Early Dungeon Return Incentives
-- v1.6.8 completed: foundation-only Debt Collector save, repair, and town UI shell.
-- v1.6.9 completed: compact Debt Collector loans, repayment, save-safe notes, and atmospheric pressure.
-- v1.6.10 completed: Famous Gear passive memory counters for kills, bosses, elites, and safe chapter clears.
-- Scope: save repair, equipped gear memory tracking, compact existing-card chips, and DevTools smoke coverage.
-- v1.6.11 completed: Retired Gear Hall readability, compact archive summaries, safe Famous Gear memory display, and DevTools smoke coverage.
-- Scope: existing archive UI polish, retired gear sorting, positive-only memory chips, and save/load repair verification.
-- Non-goals: combat changes, enemy mechanics, scaling changes, gear bonuses, or new collection screens.
-
-### v1.7.x — World Identity and Serious Dungeon Personality
-Purpose:
-Make districts, rivals, bosses, and the dungeon world feel more distinct.
-
-Candidate systems:
-- District Identity Pass
-- Rival Lore Lines
-- Dungeon Court event foundation
-- Debt Collector event foundation
-
-### v2.0 Direction — DungeonDex Identity Pass
-Purpose:
-Move DungeonDex from strong prototype into a more complete-feeling solo-dev browser game.
-
-Possible pillars:
-- App-like mobile shell
-- District ambience/backgrounds
-- Better monster presentation
-- Complete trophy/boss archive
-- Talent and item retirement integration
-- Stronger new-player onboarding
-- Cleaner public-facing polish
+### Deferred / Guardrails
+- Do not reintroduce monster affixes or status effects.
+- Do not make combat mechanically complex or text-heavy.
+- Do not bloat the mobile UI or restart broad theme churn.
+- Do not rewrite save structure casually.
+- Do not change combat, loot, enemy scaling, economy, talent, debt, board, or archive behavior without a clear bug.
+- Treat roadmap items as candidates unless explicitly promoted into a patch plan.
