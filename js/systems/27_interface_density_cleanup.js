@@ -6,9 +6,9 @@
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.6.18';
+  const BUILD = '1.6.19';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.6.18-boss-trophy-identity-pass';
+  const BUILD_QS = '1.6.19-boss-trophy-smoke-fix';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

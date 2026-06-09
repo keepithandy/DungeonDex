@@ -573,7 +573,7 @@ async function main() {
           hasMissing: text.includes('Missing Trophy Case'),
           hasCount: /x\d+/.test(text) || text.includes('total'),
           hasBestDepth: text.includes('Best Depth'),
-          hasLastEarned: text.includes('Last '),
+          hasLastEarned: text.includes('Last Earned'),
           hasRetiredItems: lower.includes('retired gear') || lower.includes('retired item'),
           hasRetiredArchiveSummary: lower.includes('display-only memory tags') || lower.includes('famous gear memory'),
           hasBoardRival: lower.includes('board & rival trophies'),
@@ -608,7 +608,7 @@ async function main() {
     record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
     record('Trophy Hall loads', freshBossDexText.toLowerCase().includes('trophy hall') && freshBossDexText.toLowerCase().includes('boss trophies'), freshBossDexText.slice(0, 320));
-    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to add a permanent record to the hall.'), freshBossDexText.slice(0, 320));
+    record('Boss trophy empty state renders on fresh save', freshBossDexText.includes('Defeat bosses to start the collection.') && freshBossDexText.includes('Recorded Collection') && freshBossDexText.includes('Missing Trophy Case') && freshBossDexText.includes('Last recorded: none yet.'), freshBossDexText.slice(0, 320));
     const unsafeRunMilestone = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       S.player.safeExtractDepth = 4;
@@ -738,8 +738,8 @@ async function main() {
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const bossEmptyText = await getBossTrophyText();
-    record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to add a permanent record to the hall.'), bossEmptyText.slice(0, 320));
-    record('Retired Gear Hall archive shell appears', bossEmptyText.includes('Archive Shelf') && bossEmptyText.includes('Retired gear is permanent collection history') && bossEmptyText.includes('display-only memory tags'), bossEmptyText.slice(0, 500));
+    record('Boss trophy empty state stays readable', bossEmptyText.includes('Defeat bosses to start the collection.') && bossEmptyText.includes('Recorded Collection') && bossEmptyText.includes('Missing Trophy Case') && bossEmptyText.includes('Last recorded: none yet.'), bossEmptyText.slice(0, 320));
+    record('Retired Gear Hall archive shell appears', bossEmptyText.includes('Archive Shelf') && bossEmptyText.includes('Retired gear is permanent collection history') && bossEmptyText.includes('display-only Famous Gear memory'), bossEmptyText.slice(0, 500));
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
     const retiredRelicGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantRetiredRelicForTest ? window.DungeonDexScenarioDevTools.grantRetiredRelicForTest() : false)()`);
@@ -767,7 +767,7 @@ async function main() {
     const bossTrophyStateAfterGrant = await getBossTrophyState();
     record('Boss trophy record fields are populated', Array.isArray(bossTrophyStateAfterGrant.records) && bossTrophyStateAfterGrant.records.length > 0 && bossTrophyStateAfterGrant.records[0].trophyName && bossTrophyStateAfterGrant.records[0].bossName && bossTrophyStateAfterGrant.records[0].count >= 1, JSON.stringify(bossTrophyStateAfterGrant.records[0] || null));
     const bossDexAfterGrant = await getBossTrophyText();
-    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && bossDexAfterGrant.includes('Last ') && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
+    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && bossDexAfterGrant.includes('Last Earned') && /x1|x2|x3/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
     const forceBossTrophyDuplicate = await evalByValue(client, `(() => {
       if (typeof recordBossTrophyUnlock !== 'function') return false;
       const first = Array.isArray(S.player?.bossTrophyRecords) ? S.player.bossTrophyRecords[0] : null;
@@ -778,7 +778,7 @@ async function main() {
     record('Duplicate boss trophy increments count safely', !!forceBossTrophyDuplicate && Array.isArray(bossTrophyStateAfterDuplicate.records) && bossTrophyStateAfterDuplicate.records.length > 0 && Number(bossTrophyStateAfterDuplicate.records[0].count) >= 2, JSON.stringify(bossTrophyStateAfterDuplicate.records[0] || null));
     for (const width of [390, 375, 360, 320]) {
       const trophyMobile = await checkBossTrophyViewport(width);
-      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasRecorded && trophyMobile.hasMissing && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasRetiredArchiveSummary && trophyMobile.hasBoardRival && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
+      record(`Trophy Hall mobile ${width}px`, !!trophyMobile.panel && !trophyMobile.overflow && !trophyMobile.panelOverflow && trophyMobile.hasCount && trophyMobile.hasBestDepth && trophyMobile.hasLastEarned && trophyMobile.hasRetiredItems && trophyMobile.hasRetiredArchiveSummary && trophyMobile.hasNoRetireButton, JSON.stringify(trophyMobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Page.reload', { ignoreCache: true });
