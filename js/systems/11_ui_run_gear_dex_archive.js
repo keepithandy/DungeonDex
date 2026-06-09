@@ -822,6 +822,12 @@
     return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Famous Gear memory is a read-only collection record, and retiring an item removes it from active use.</p>';
   }
 
+  function revisitArchiveEchoMarkup(state = S) {
+    const revisit = state?.player?.revisitState || {};
+    if (revisit.unlocked) return '';
+    return `<div class="small muted">Earlier Dungeon Revisit stays planned. Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain read-only for now.</div>`;
+  }
+
   function retiredRelicCard(entry) {
     const item = retiredRelicItem(entry);
     const itemName = cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic');
@@ -923,6 +929,7 @@
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
       ${retiredRelicHelpText()}
+      ${revisitArchiveEchoMarkup(S)}
       <p class="small muted">Retired relic archive records preserve manual retirement snapshots and display-only Famous Gear memory as part of the collection archive.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }

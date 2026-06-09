@@ -618,6 +618,24 @@
     };
   }
 
+  function revisitCandidateHooks(state = S) {
+    const revisitState = state?.player?.revisitState || {};
+    const contracts = ensureEliteContractState(state);
+    const rivals = ensureEliteRivalState(state);
+    const trophies = ensureEliteTrophyState(state);
+    const retired = asArray(state?.player?.retiredRelics, []);
+    const trophyCount = Object.keys(trophies.collected || {}).length;
+    const rivalCount = rivals.filter(r => !r.completed && r.revengeAvailable).length;
+    const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival Trace' : 'Board Echo') : 'Board Echo';
+    return [
+      { label:'Trophy Echo', value: trophyCount ? `${trophyCount} recorded` : 'No boss marks yet' },
+      { label:'Famous Gear Memory', value: retired.length ? `${Math.min(retired.length, 3)} archive record${retired.length === 1 ? '' : 's'}` : 'No archive memory yet' },
+      { label:'Rival Trace', value: rivalCount ? `${rivalCount} ready` : 'Quiet' },
+      { label:'Debt Pressure', value: state?.player?.debtCollector?.balanceCopper > 0 ? 'Active' : 'Dormant' },
+      { label:'Board Echo', value: boardEcho }
+    ].map(entry => ({ ...entry, note: revisitState.unlocked ? 'Planned' : 'Locked' }));
+  }
+
   function ensureEliteContractState(state) {
     if (!state.player) state.player = {};
     state.player.eliteContracts = validateEliteBoardState(state);

@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.6.25 - Early Dungeon Revisit Planning Stub
+- DungeonDex v1.7.0 - Early Dungeon Revisit Foundation
 
 ## Current Workflow
 - Inspect files before editing.
@@ -60,7 +60,7 @@
 - Boss trophy and Dex identity improvements.
 - Famous Gear memory readability and attachment polish.
 - Retired Gear Hall depth within the existing archive flow.
-- Early dungeon revisit planning stub: revisit earlier dungeons, keep the current simple run loop, and attach future value to trophies, famous gear, rivals, debt pressure, and board contracts without changing current scaling yet.
+- Early dungeon revisit foundation: read-only candidate hooks now surface earlier-dungeon return ideas while the normal run loop stays unchanged.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

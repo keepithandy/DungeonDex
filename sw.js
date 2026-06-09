@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.6.25-early-dungeon-revisit-planning-stub';
+const CACHE_NAME = 'dungeondex-v1.7.0-early-dungeon-revisit-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.6.25-early-dungeon-revisit-planning-stub';
+const BUILD_QS = '1.7.0-early-dungeon-revisit-foundation';
 const ASSETS = [
   './',
   './index.html',

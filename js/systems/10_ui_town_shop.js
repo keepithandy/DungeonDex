@@ -1,6 +1,21 @@
 'use strict';
 
 // Elite contract board, town panels, district wares, shop cards
+  function earlierDungeonRevisitMarkup(state) {
+    const hooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
+    const status = state?.player?.revisitState?.unlocked ? 'Planned' : 'Future Route';
+    const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
+    const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
+    const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
+    const body = hooks.slice(0, 5).map(hook => `<div class="split"><span><b>${escapeHtml(hook.label)}:</b> ${escapeHtml(hook.value)}</span><span class="small muted">${escapeHtml(hook.note)}</span></div>`).join('');
+    return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
+      <div class="split"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are being marked for future return routes.</p></div><span class="pill">${status}</span></div>
+      <div class="small muted">For now, these notes show where future revisit hooks may attach.</div>
+      <div class="list revisit-hook-list">${body}</div>
+      <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
+    </div>`;
+  }
+
   function eliteContractBoardMarkup(state) {
     const contracts = ensureEliteContractState(state);
     const active = contracts.active;
@@ -98,6 +113,7 @@
     if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
     if (el('districtLine')) el('districtLine').innerHTML = `Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}. Lowfire banks the haul and returns you to ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
+    if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup(S);
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {

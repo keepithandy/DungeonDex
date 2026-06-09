@@ -5,7 +5,7 @@
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.6.25-early-dungeon-revisit-planning-stub';
+  const SCRIPT_BUILD = '1.7.0-early-dungeon-revisit-foundation';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

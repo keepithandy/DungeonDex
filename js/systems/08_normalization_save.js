@@ -438,6 +438,23 @@
     };
   }
 
+  function createRevisitState() {
+    return {
+      unlocked: false,
+      lastViewedAt: '',
+      notedDistricts: []
+    };
+  }
+
+  function normalizeRevisitState(value) {
+    const base = createRevisitState();
+    const source = isPlainObject(value) ? value : {};
+    base.unlocked = !!source.unlocked;
+    base.lastViewedAt = String(source.lastViewedAt || '').trim();
+    base.notedDistricts = asArray(source.notedDistricts, []).map(String).map(x => x.trim()).filter(Boolean).slice(0, 12);
+    return base;
+  }
+
   function normalizeDebtCollectorState(value) {
     const base = createDebtCollectorState();
     const source = isPlainObject(value) ? value : {};
@@ -497,6 +514,7 @@
     state.player.earlyAidGiven = !!state.player.earlyAidGiven;
     state.player.goldSink = createGoldSinkState(isPlainObject(savedPlayer.goldSink) ? savedPlayer.goldSink : {});
     state.player.debtCollector = normalizeDebtCollectorState(savedPlayer.debtCollector);
+    state.player.revisitState = normalizeRevisitState(savedPlayer.revisitState);
     state.player.eliteContracts = createEliteContractState(isPlainObject(savedPlayer.eliteContracts) ? savedPlayer.eliteContracts : {}, state);
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(savedPlayer.eliteTrophies) ? savedPlayer.eliteTrophies : {})
@@ -606,6 +624,7 @@
       ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})
       : { collected:{}, totalFound:0, latestId:'' };
     state.player.debtCollector = normalizeDebtCollectorState(state.player.debtCollector);
+    state.player.revisitState = normalizeRevisitState(state.player.revisitState);
     state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
     repairTalentState(state);
     if (!isPlainObject(state.run)) state.run = {};
