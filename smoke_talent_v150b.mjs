@@ -400,6 +400,8 @@ async function main() {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       return api && typeof api.summary === 'function' ? api.summary(S) : null;
     })()`);
+    const getRevisitHooks = async () => await evalByValue(client, `(() => typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(S) : null)()`);
+    const getRevisitSummary = async () => await evalByValue(client, `(() => typeof revisitCandidateSummary === 'function' ? revisitCandidateSummary(S) : null)()`);
     const getSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.talentSmoke())()`);
     const getRetiredGearHallSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.retiredGearHallSmoke ? window.DungeonDexScenarioDevTools.retiredGearHallSmoke() : { ok:false, reason:'missing helper' })()`);
     const getTalentText = async () => await evalByValue(client, `(() => {
@@ -599,6 +601,26 @@ async function main() {
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));
+    const townRevisitText = await evalByValue(client, `(() => {
+      S.screen = 'town';
+      if (typeof render === 'function') render();
+      return document.getElementById('revisitFoundationSlot')?.innerText || '';
+    })()`);
+    const revisitHooks = await getRevisitHooks();
+    const revisitSummary = await getRevisitSummary();
+    const revisitHookShapeOk = Array.isArray(revisitHooks) && revisitHooks.every(entry => !entry || (typeof entry === 'object' && ['key','label','detail','source','priority','locked'].every(key => Object.prototype.hasOwnProperty.call(entry, key))));
+    const revisitSummaryExists = await evalByValue(client, `(() => typeof revisitCandidateSummary === 'function')()`);
+    const revisitTownSource = await readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8');
+    const revisitArchiveSource = await readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8');
+    const revisitMarketSource = await readFile(path.join(ROOT, 'js/systems/03_town_contracts_market.js'), 'utf8');
+    const revisitPreviewWords = ['Planned Return Routes', 'Route Preview', 'Start Return Route', 'Travel', 'Begin Revisit'];
+    const revisitPreviewClean = revisitPreviewWords.every(word => !townRevisitText.includes(word) && !initialDiag.bodyText.includes(word) && !revisitTownSource.includes(word) && !revisitArchiveSource.includes(word));
+    record('Earlier Dungeon Revisit appears', /Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
+    record('Revisit panel copy stays read-only', /planned|read-only|locked/i.test(townRevisitText), townRevisitText.slice(0, 300));
+    record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet. Deeper runs will leave better traces.'), revisitTownSource.slice(0, 300));
+    record('Revisit candidate labels are protected', ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'].every(label => townRevisitText.includes(label)), townRevisitText.slice(0, 300));
+    record('Revisit helper shape is stable', Array.isArray(revisitHooks) && revisitHookShapeOk && revisitMarketSource.includes('revisitCandidateSummary(state = S) {') && revisitMarketSource.includes("key: String(entry.key || '')"), JSON.stringify({ hooksType: Array.isArray(revisitHooks) ? 'array' : typeof revisitHooks, summarySource: revisitMarketSource.includes('revisitCandidateSummary(state = S) {'), sample: Array.isArray(revisitHooks) ? revisitHooks.slice(0, 2) : revisitHooks }));
+    record('Revisit helper avoids preview language', revisitPreviewClean, townRevisitText.slice(0, 300));
     const freshPanelText = await getTalentText();
     record('Talent panel renders', ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
     record('Talent point totals are readable', /Available:\s*0/.test(freshPanelText) && /Spent:\s*0/.test(freshPanelText) && /Earned:\s*0/.test(freshPanelText), freshPanelText.slice(0, 300));

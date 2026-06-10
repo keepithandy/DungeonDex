@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.1b - Revisit System Rule Lock
+- DungeonDex v1.7.1c - Revisit Smoke Guard
 
 ## Current Workflow
 - Inspect files before editing.
@@ -64,6 +64,7 @@
 - Revisit candidate ledger hardening: candidate shape and empty-state behavior were protected while travel and rewards remain absent.
 - Revisit rule lock: revisits are side routes only, anchored to trophies, Famous Gear/archive memory, rivals, debt pressure, and Elite Board/contract history.
 - Revisit rules stay read-only for now: no route previews, no travel, no rewards, no route selection, and no interruption to Enter/Continue.
+- Revisit smoke guard: the read-only candidate ledger and empty-state copy are now regression-protected in smoke coverage.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

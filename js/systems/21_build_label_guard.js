@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.7.1b - Build label guard.
+// DungeonDex v1.7.1c - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.7.1b';
+  const BUILD = '1.7.1c';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.7.1b-revisit-system-rule-lock';
+  const BUILD_QS = '1.7.1c-revisit-smoke-guard';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
