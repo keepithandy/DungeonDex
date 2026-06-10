@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.1a - Revisit Candidate Hardening
+- DungeonDex v1.7.1b - Revisit System Rule Lock
 
 ## Current Workflow
 - Inspect files before editing.
@@ -62,6 +62,8 @@
 - Retired Gear Hall depth within the existing archive flow.
 - Early dungeon revisit ledger pass: candidate display was structured for clearer read-only planning while travel and rewards remain absent.
 - Revisit candidate ledger hardening: candidate shape and empty-state behavior were protected while travel and rewards remain absent.
+- Revisit rule lock: revisits are side routes only, anchored to trophies, Famous Gear/archive memory, rivals, debt pressure, and Elite Board/contract history.
+- Revisit rules stay read-only for now: no route previews, no travel, no rewards, no route selection, and no interruption to Enter/Continue.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 
@@ -78,4 +80,5 @@
 - Do not bloat the mobile UI or restart broad theme churn.
 - Do not rewrite save structure casually.
 - Do not change combat, loot, enemy scaling, economy, talent, debt, board, or archive behavior without a clear bug.
+- Revisit guardrail: avoid infinite farming loops, best-in-slot low-floor farming, mandatory revisit grind, forced district choice before combat, and new affix/status complexity.
 - Treat roadmap items as candidates unless explicitly promoted into a patch plan.

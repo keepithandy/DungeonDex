@@ -1,6 +1,7 @@
 'use strict';
 
 // Elite contract board, town panels, district wares, shop cards
+  // Read-only town panel: this is a design lock surface, not route selection or travel.
   function earlierDungeonRevisitMarkup(state) {
     const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];

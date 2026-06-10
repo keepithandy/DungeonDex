@@ -618,6 +618,8 @@
     };
   }
 
+  // Revisit candidate ledger is read-only foundation data until route mechanics are explicitly introduced.
+  // Keep this side-route planning surface attached to existing systems only; do not turn it into gameplay flow.
   function revisitCandidateHooks(state = S) {
     const safeState = state && typeof state === 'object' ? state : {};
     const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
@@ -1325,6 +1327,7 @@
           trophyIds: Object.keys(trophies.collected || {})
         };
       },
+      // Summary mirrors the same read-only candidate shape used by the town panel.
       revisitCandidateSummary(state = S) {
         return revisitCandidateHooks(state).map(entry => ({
           key: String(entry.key || ''),

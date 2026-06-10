@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.1a-revisit-candidate-hardening';
+const CACHE_NAME = 'dungeondex-v1.7.1b-revisit-system-rule-lock';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.1a-revisit-candidate-hardening';
+const BUILD_QS = '1.7.1b-revisit-system-rule-lock';
 const ASSETS = [
   './',
   './index.html',
