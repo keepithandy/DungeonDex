@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.1-revisit-candidate-ledger-pass';
+const CACHE_NAME = 'dungeondex-v1.7.1a-revisit-candidate-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.1-revisit-candidate-ledger-pass';
+const BUILD_QS = '1.7.1a-revisit-candidate-hardening';
 const ASSETS = [
   './',
   './index.html',

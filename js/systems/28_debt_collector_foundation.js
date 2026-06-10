@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.7.1 Debt Collector support.
+// DungeonDex v1.7.1a Debt Collector support.
 (function(){
   if (window.DDDebtCollectorFoundation) return;
   window.DDDebtCollectorFoundation = true;

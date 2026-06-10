@@ -619,28 +619,31 @@
   }
 
   function revisitCandidateHooks(state = S) {
-    const revisitState = state?.player?.revisitState || {};
-    const contracts = ensureEliteContractState(state);
-    const rivals = ensureEliteRivalState(state);
-    const trophies = ensureEliteTrophyState(state);
-    const retired = asArray(state?.player?.retiredRelics, []);
+    const safeState = state && typeof state === 'object' ? state : {};
+    const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
+    const revisitState = safePlayer.revisitState && typeof safePlayer.revisitState === 'object' ? safePlayer.revisitState : {};
+    const contracts = ensureEliteContractState(safeState);
+    const rivals = ensureEliteRivalState(safeState);
+    const trophies = ensureEliteTrophyState(safeState);
+    const retired = asArray(safePlayer.retiredRelics, []).filter(entry => entry && typeof entry === 'object');
     const trophyCount = Object.keys(trophies.collected || {}).length;
-    const rivalCount = rivals.filter(r => !r.completed && r.revengeAvailable).length;
+    const rivalCount = rivals.filter(r => r && !r.completed && r.revengeAvailable).length;
     const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival route active' : 'Board route open') : 'Board route quiet';
-    const currentFloor = Math.max(1, Math.floor(numberOr(state?.run?.floor, state?.player?.safeExtractDepth || 1, 1, 999999)));
-    const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(state) : null;
-    const districtName = String(currentDistrict?.name || 'Lowfire District').trim();
+    const currentFloor = Math.max(1, Math.floor(numberOr(safeState.run?.floor, safePlayer.safeExtractDepth || 1, 1, 999999)));
+    const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(safeState) : null;
+    const districtName = String(currentDistrict && currentDistrict.name ? currentDistrict.name : 'Lowfire District').trim() || 'Lowfire District';
     const floorLabel = typeof getLoreDepthProgress === 'function'
       ? getLoreDepthProgress(currentFloor)
       : { floorNumber: currentFloor, roomWithinFloor: 1, chapterWithinRoom: 1 };
     const meta = revisitState.unlocked ? 'Planned' : 'Future Route';
-    return [
+    const debtBalance = Math.max(0, Math.floor(numberOr(safePlayer?.debtCollector?.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const entries = [
       {
         key: 'trophy_echo',
         label: 'Trophy Echo',
         detail: trophyCount ? `${trophyCount} recorded` : 'No boss marks yet',
         source: `Trophies in ${districtName}`,
-        priority: 1,
+        priority: 10,
         locked: !trophyCount
       },
       {
@@ -648,7 +651,7 @@
         label: 'Famous Gear Memory',
         detail: retired.length ? `${Math.min(retired.length, 3)} archive record${retired.length === 1 ? '' : 's'}` : 'No archive memory yet',
         source: 'Archive memory',
-        priority: 2,
+        priority: 20,
         locked: !retired.length
       },
       {
@@ -656,26 +659,44 @@
         label: 'Rival Trace',
         detail: rivalCount ? `${rivalCount} ready` : 'Quiet',
         source: contracts.active?.rivalContract ? 'Elite Board rival' : `Current floor F${format(floorLabel.floorNumber)}`,
-        priority: 3,
+        priority: 30,
         locked: !rivalCount && !contracts.active?.rivalContract
       },
       {
         key: 'debt_pressure',
         label: 'Debt Pressure',
-        detail: state?.player?.debtCollector?.balanceCopper > 0 ? 'Active' : 'Dormant',
+        detail: debtBalance > 0 ? 'Active' : 'Dormant',
         source: 'Debt Collector',
-        priority: 4,
-        locked: !(state?.player?.debtCollector?.balanceCopper > 0)
+        priority: 40,
+        locked: debtBalance <= 0
       },
       {
         key: 'board_echo',
         label: 'Board Echo',
         detail: boardEcho,
         source: contracts.active ? 'Board activity' : `District ${districtName}`,
-        priority: 5,
+        priority: 50,
         locked: false
       }
-    ].map(entry => ({ ...entry, note: meta }));
+    ];
+    const seen = new Set();
+    return entries
+      .filter(entry => entry && typeof entry === 'object')
+      .map(entry => ({
+        key: String(entry.key || '').trim() || `revisit_${entry.priority || 0}`,
+        label: String(entry.label || '').trim() || 'Unknown Hook',
+        detail: String(entry.detail || '').trim() || 'No details',
+        source: String(entry.source || '').trim() || 'Unknown source',
+        priority: Math.max(0, Math.floor(numberOr(entry.priority, 0, 0, Number.MAX_SAFE_INTEGER))),
+        locked: !!entry.locked,
+        note: meta
+      }))
+      .sort((left, right) => (left.priority - right.priority) || left.key.localeCompare(right.key))
+      .filter(entry => {
+        if (seen.has(entry.key)) return false;
+        seen.add(entry.key);
+        return true;
+      });
   }
 
   function ensureEliteContractState(state) {
@@ -1306,12 +1327,12 @@
       },
       revisitCandidateSummary(state = S) {
         return revisitCandidateHooks(state).map(entry => ({
-          key: entry.key,
-          label: entry.label,
-          detail: entry.detail,
-          source: entry.source,
-          priority: entry.priority,
-          locked: entry.locked
+          key: String(entry.key || ''),
+          label: String(entry.label || ''),
+          detail: String(entry.detail || ''),
+          source: String(entry.source || ''),
+          priority: Math.max(0, Math.floor(numberOr(entry.priority, 0, 0, Number.MAX_SAFE_INTEGER))),
+          locked: !!entry.locked
         }));
       },
       simulateDeathReset(state = S) {

@@ -825,7 +825,7 @@
   function revisitArchiveEchoMarkup(state = S) {
     const revisit = state?.player?.revisitState || {};
     if (revisit.unlocked) return '';
-    return `<div class="small muted">Earlier Dungeon Revisit stays planned. Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain read-only for now.</div>`;
+    return `<div class="small muted">Earlier Dungeon Revisit stays planned. Candidate notes stay read-only for now.</div>`;
   }
 
   function retiredRelicCard(entry) {

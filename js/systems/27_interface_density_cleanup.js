@@ -8,7 +8,7 @@
 
   const BUILD = '1.7.1';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.7.1-revisit-candidate-ledger-pass';
+  const BUILD_QS = '1.7.1a-revisit-candidate-hardening';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

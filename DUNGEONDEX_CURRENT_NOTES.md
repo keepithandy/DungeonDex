@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.1 - Revisit Candidate Ledger Pass
+- DungeonDex v1.7.1a - Revisit Candidate Hardening
 
 ## Current Workflow
 - Inspect files before editing.
@@ -61,6 +61,7 @@
 - Famous Gear memory readability and attachment polish.
 - Retired Gear Hall depth within the existing archive flow.
 - Early dungeon revisit ledger pass: candidate display was structured for clearer read-only planning while travel and rewards remain absent.
+- Revisit candidate ledger hardening: candidate shape and empty-state behavior were protected while travel and rewards remain absent.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

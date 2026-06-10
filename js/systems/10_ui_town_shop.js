@@ -2,13 +2,19 @@
 
 // Elite contract board, town panels, district wares, shop cards
   function earlierDungeonRevisitMarkup(state) {
-    const hooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
+    const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
+    const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const status = state?.player?.revisitState?.unlocked ? 'Planned' : 'Future Route';
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
     const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
     const body = hooks.length
-      ? hooks.slice(0, 5).map(hook => `<div class="revisit-candidate-row"><span class="pill revisit-candidate-chip">${escapeHtml(hook.label)}</span><span class="revisit-candidate-detail">${escapeHtml(hook.detail)}</span><span class="small muted revisit-candidate-source">${escapeHtml(hook.source)}</span><span class="small muted revisit-candidate-state">${hook.locked ? 'Locked' : 'Planned'}</span></div>`).join('')
+      ? hooks.slice(0, 5).map(hook => {
+          const label = String(hook.label || '').trim() || 'Unknown Hook';
+          const detail = String(hook.detail || '').trim() || 'No details';
+          const source = String(hook.source || '').trim() || 'Unknown source';
+          return `<div class="revisit-candidate-row"><span class="pill revisit-candidate-chip">${escapeHtml(label)}</span><span class="revisit-candidate-detail">${escapeHtml(detail)}</span><span class="small muted revisit-candidate-source">${escapeHtml(source)}</span><span class="small muted revisit-candidate-state">${hook.locked ? 'Locked' : 'Planned'}</span></div>`;
+        }).join('')
       : `<div class="small muted revisit-empty-state">No return routes are marked yet. Deeper runs will leave better traces.</div>`;
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
       <div class="split"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
