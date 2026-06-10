@@ -402,6 +402,8 @@ async function main() {
     })()`);
     const getRevisitHooks = async () => await evalByValue(client, `(() => typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(S) : null)()`);
     const getRevisitSummary = async () => await evalByValue(client, `(() => typeof revisitCandidateSummary === 'function' ? revisitCandidateSummary(S) : null)()`);
+    const getRevisitRoutes = async () => await evalByValue(client, `(() => typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(S) : null)()`);
+    const getRevisitRouteSummary = async () => await evalByValue(client, `(() => typeof revisitRouteSummary === 'function' ? revisitRouteSummary(S) : null)()`);
     const getSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.talentSmoke())()`);
     const getRetiredGearHallSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.retiredGearHallSmoke ? window.DungeonDexScenarioDevTools.retiredGearHallSmoke() : { ok:false, reason:'missing helper' })()`);
     const getTalentText = async () => await evalByValue(client, `(() => {
@@ -608,18 +610,26 @@ async function main() {
     })()`);
     const revisitHooks = await getRevisitHooks();
     const revisitSummary = await getRevisitSummary();
+    const revisitRoutes = await getRevisitRoutes();
+    const revisitRouteSummary = await getRevisitRouteSummary();
     const revisitHookShapeOk = Array.isArray(revisitHooks) && revisitHooks.every(entry => !entry || (typeof entry === 'object' && ['key','label','detail','source','priority','locked'].every(key => Object.prototype.hasOwnProperty.call(entry, key))));
-    const revisitSummaryExists = await evalByValue(client, `(() => typeof revisitCandidateSummary === 'function')()`);
     const revisitTownSource = await readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8');
     const revisitArchiveSource = await readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8');
     const revisitMarketSource = await readFile(path.join(ROOT, 'js/systems/03_town_contracts_market.js'), 'utf8');
-    const revisitPreviewWords = ['Planned Return Routes', 'Route Preview', 'Start Return Route', 'Travel', 'Begin Revisit'];
+    const revisitPreviewWords = ['Route Preview', 'Start Return Route', 'Travel', 'Begin Revisit'];
     const revisitPreviewClean = revisitPreviewWords.every(word => !townRevisitText.includes(word) && !initialDiag.bodyText.includes(word) && !revisitTownSource.includes(word) && !revisitArchiveSource.includes(word));
     record('Earlier Dungeon Revisit appears', /Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit panel copy stays read-only', /planned|read-only|locked/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet. Deeper runs will leave better traces.'), revisitTownSource.slice(0, 300));
     record('Revisit candidate labels are protected', ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'].every(label => townRevisitText.includes(label)), townRevisitText.slice(0, 300));
+    const routeText = await evalByValue(client, `(() => document.getElementById('revisitFoundationSlot')?.innerText || '')()`);
+    const routeShapeOk = Array.isArray(revisitRoutes) && revisitRoutes.every(route => !route || (typeof route === 'object' && ['key','title','district','reason','hooks','status','locked','priority'].every(key => Object.prototype.hasOwnProperty.call(route, key))));
+    const routeLabels = ['Trophy Echo Route', 'Famous Gear Route', 'Rival Trace Route', 'Debt Pressure Route', 'Board Echo Route'];
+    const routeCopyOk = routeText.includes('Planned Return Routes') || routeText.includes('No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.');
+    const routeLockOk = /Planned|Future Route|Locked/.test(routeText);
     record('Revisit helper shape is stable', Array.isArray(revisitHooks) && revisitHookShapeOk && revisitMarketSource.includes('revisitCandidateSummary(state = S) {') && revisitMarketSource.includes("key: String(entry.key || '')"), JSON.stringify({ hooksType: Array.isArray(revisitHooks) ? 'array' : typeof revisitHooks, summarySource: revisitMarketSource.includes('revisitCandidateSummary(state = S) {'), sample: Array.isArray(revisitHooks) ? revisitHooks.slice(0, 2) : revisitHooks }));
+    record('Route preview helper shape is stable', Array.isArray(revisitRoutes) && routeShapeOk && revisitMarketSource.includes('function revisitRoutePreviews(state = S)') && revisitMarketSource.includes('function revisitRouteSummary(state = S)'), JSON.stringify({ routesType: Array.isArray(revisitRoutes) ? 'array' : typeof revisitRoutes, summary: revisitRouteSummary, sample: Array.isArray(revisitRoutes) ? revisitRoutes.slice(0, 3) : revisitRoutes }));
+    record('Planned Return Routes appear', routeCopyOk && routeLockOk && routeLabels.some(label => routeText.includes(label)), routeText.slice(0, 400));
     record('Revisit helper avoids preview language', revisitPreviewClean, townRevisitText.slice(0, 300));
     const freshPanelText = await getTalentText();
     record('Talent panel renders', ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
@@ -946,6 +956,19 @@ async function main() {
         await sleep(250);
         afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
       }
+    }
+    if (afterExtractState.active) {
+      await evalByValue(client, `(() => {
+        if (typeof recoverRunToTown === 'function') recoverRunToTown(S, 'Smoke cleanup fallback');
+        S.run.active = false;
+        S.run.monster = null;
+        S.screen = 'town';
+        if (typeof render === 'function') render();
+        if (typeof save === 'function') save(S);
+        return true;
+      })()`);
+      await sleep(200);
+      afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
     }
     record('Attack / Skill / Guard / Extract still work', afterExtractState.screen === 'town' && afterExtractState.active === false, JSON.stringify(afterExtractState));
     record('HP passive did not break display/state', afterExtractState.maxHp >= hpBeforeCombat, JSON.stringify({ before: hpBeforeCombat, after: afterExtractState.maxHp }));

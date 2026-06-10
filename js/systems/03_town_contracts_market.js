@@ -701,6 +701,93 @@
       });
   }
 
+  function revisitRoutePreviews(state = S) {
+    const hooks = revisitCandidateHooks(state);
+    if (!Array.isArray(hooks) || !hooks.length) return [];
+    const sourceHooks = hooks.filter(hook => hook && typeof hook === 'object');
+    const routeDefs = [
+      {
+        key: 'trophy_echo_route',
+        title: 'Trophy Echo Route',
+        district: 'Trophy record districts',
+        reason: 'Old victories may call back later.',
+        hooks: ['trophy_echo'],
+        status: 'Planned',
+        locked: true,
+        priority: 10
+      },
+      {
+        key: 'famous_gear_route',
+        title: 'Famous Gear Route',
+        district: 'Archive memory districts',
+        reason: 'Retired gear may remember old ground.',
+        hooks: ['famous_gear_memory'],
+        status: 'Future Route',
+        locked: true,
+        priority: 20
+      },
+      {
+        key: 'rival_trace_route',
+        title: 'Rival Trace Route',
+        district: 'Board and rival districts',
+        reason: 'A rival path may cross earlier districts.',
+        hooks: ['rival_trace', 'board_echo'],
+        status: 'Locked',
+        locked: true,
+        priority: 30
+      },
+      {
+        key: 'debt_pressure_route',
+        title: 'Debt Pressure Route',
+        district: 'Ledger districts',
+        reason: 'The ledger may point back to safer work.',
+        hooks: ['debt_pressure'],
+        status: 'Locked',
+        locked: true,
+        priority: 40
+      },
+      {
+        key: 'board_echo_route',
+        title: 'Board Echo Route',
+        district: 'Contract history districts',
+        reason: 'Contract history may reopen old roads.',
+        hooks: ['board_echo'],
+        status: 'Planned',
+        locked: true,
+        priority: 50
+      }
+    ];
+    const byKey = new Map(sourceHooks.map(hook => [hook.key, hook]));
+    return routeDefs
+      .map(route => {
+        const routeHooks = route.hooks.map(key => byKey.get(key)).filter(Boolean);
+        if (!routeHooks.length) return null;
+        const topHook = routeHooks[0];
+        return {
+          key: String(route.key || '').trim(),
+          title: String(route.title || '').trim(),
+          district: String(route.district || '').trim(),
+          reason: String(route.reason || '').trim(),
+          hooks: routeHooks.map(hook => String(hook.label || '').trim()).filter(Boolean),
+          status: String(route.status || 'Locked').trim(),
+          locked: true,
+          priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER)))
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 3);
+  }
+
+  function revisitRouteSummary(state = S) {
+    const routes = revisitRoutePreviews(state);
+    return {
+      total: routes.length,
+      planned: routes.filter(route => route.status === 'Planned').length,
+      future: routes.filter(route => route.status === 'Future Route').length,
+      locked: routes.filter(route => route.locked).length
+    };
+  }
+
   function ensureEliteContractState(state) {
     if (!state.player) state.player = {};
     state.player.eliteContracts = validateEliteBoardState(state);
@@ -1337,6 +1424,12 @@
           priority: Math.max(0, Math.floor(numberOr(entry.priority, 0, 0, Number.MAX_SAFE_INTEGER))),
           locked: !!entry.locked
         }));
+      },
+      revisitRoutePreviews(state = S) {
+        return revisitRoutePreviews(state);
+      },
+      revisitRouteSummary(state = S) {
+        return revisitRouteSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;
