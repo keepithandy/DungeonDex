@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.7-revisit-criteria-stub-copy-polish';
+const CACHE_NAME = 'dungeondex-v1.7.8-revisit-checkpoint-planning-pass';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.7-revisit-criteria-stub-copy-polish';
+const BUILD_QS = '1.7.8-revisit-checkpoint-planning-pass';
 const ASSETS = [
   './',
   './index.html',
