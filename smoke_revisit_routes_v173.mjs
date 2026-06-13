@@ -64,11 +64,16 @@ async function main() {
       const routeSummary = typeof api.revisitRouteSummary === 'function' ? api.revisitRouteSummary(S) : null;
       const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : null;
       const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const previews = typeof api.revisitUnlockPreview === 'function' ? api.revisitUnlockPreview(S) : null;
+      const previewSummary = typeof api.revisitUnlockPreviewSummary === 'function' ? api.revisitUnlockPreviewSummary(S) : null;
       const gatesAgain = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : null;
       const gateSummaryAgain = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const previewsAgain = typeof api.revisitUnlockPreview === 'function' ? api.revisitUnlockPreview(S) : null;
+      const previewSummaryAgain = typeof api.revisitUnlockPreviewSummary === 'function' ? api.revisitUnlockPreviewSummary(S) : null;
       const unknownGateMeta = typeof revisitUnlockGateMeta === 'function' ? revisitUnlockGateMeta('malformed_route_preview') : null;
       const after = JSON.stringify(S);
       const text = document.getElementById('revisitFoundationSlot')?.innerText || '';
+      const trophyPreview = Array.isArray(previews) ? previews.find(entry => entry && entry.key === 'trophy_echo_route') : null;
       return {
         before,
         after,
@@ -79,9 +84,14 @@ async function main() {
         routeSummary,
         gates,
         gateSummary,
+        previews,
+        previewSummary,
         gatesAgain,
         gateSummaryAgain,
+        previewsAgain,
+        previewSummaryAgain,
         unknownGateMeta,
+        trophyPreview,
         text,
         hasCandidateLedger: text.includes('Earlier Dungeon Revisit'),
         hasPlannedRoutes: text.includes('Planned Return Routes'),
@@ -94,16 +104,21 @@ async function main() {
         hasLockedGate: text.includes('Locked Gate'),
         hasGateRequirement: text.includes('Requirement:'),
         hasGateStatus: text.includes('Status: Preview only'),
-        hasReadiness: text.includes('Signal strength') || text.includes('Faint Trace') || text.includes('Route Forming') || text.includes('Strong Echo') || text.includes('Not Open Yet')
+        hasReadiness: text.includes('Signal strength') || text.includes('Faint Trace') || text.includes('Route Forming') || text.includes('Strong Echo') || text.includes('Not Open Yet'),
+        hasUnlockPreview: text.includes('Unlock Preview'),
+        hasFutureCondition: text.includes('Future condition'),
+        hasPreviewOnlySafety: text.includes('Preview only - route access is unavailable.'),
+        hasRouteAccessUnavailable: text.includes('route access is unavailable')
       };
     })()`);
     record('normalizeRevisitState repairs missing revisitState', !!fresh.repaired && fresh.repaired.unlocked === false && Array.isArray(fresh.repaired.notedDistricts), JSON.stringify(fresh.repaired));
     record('revisit functions return stable shapes on fresh save', Array.isArray(fresh.hooks) && fresh.summary && fresh.routes && fresh.routeSummary && Array.isArray(fresh.gates) && fresh.gateSummary, JSON.stringify({ hooks: fresh.hooks?.length || 0, summary: fresh.summary, routes: fresh.routes?.length || 0, routeSummary: fresh.routeSummary, gates: fresh.gates?.length || 0, gateSummary: fresh.gateSummary }));
     record('Unlock gate helper exists and returns locked gate shapes', Array.isArray(fresh.gates) && fresh.gateSummary && fresh.gateSummary.total === fresh.gates.length && fresh.gateSummary.ready === 0 && fresh.gates.every(gate => gate.locked === true && gate.ready === false && typeof gate.key === 'string' && typeof gate.label === 'string' && typeof gate.gateType === 'string' && typeof gate.reason === 'string' && typeof gate.requirement === 'string' && typeof gate.progressLabel === 'string' && typeof gate.source === 'string'), JSON.stringify({ gates: fresh.gates?.slice(0, 3), gateSummary: fresh.gateSummary }));
     record('Unlock gate helper returns equivalent repeated output', JSON.stringify(fresh.gates) === JSON.stringify(fresh.gatesAgain) && JSON.stringify(fresh.gateSummary) === JSON.stringify(fresh.gateSummaryAgain), JSON.stringify({ first: fresh.gates?.slice(0, 3), second: fresh.gatesAgain?.slice(0, 3), summary: fresh.gateSummary, repeatedSummary: fresh.gateSummaryAgain }));
+    record('Unlock preview helper exists and returns stable output', Array.isArray(fresh.previews) && fresh.previewSummary && fresh.previewSummary.total === fresh.previews.length && fresh.previewSummary.locked === fresh.previews.length && fresh.previewSummary.playable === 0 && JSON.stringify(fresh.previews) === JSON.stringify(fresh.previewsAgain) && JSON.stringify(fresh.previewSummary) === JSON.stringify(fresh.previewSummaryAgain), JSON.stringify({ previews: fresh.previews?.slice(0, 3), previewSummary: fresh.previewSummary, repeatedPreviewSummary: fresh.previewSummaryAgain }));
     record('Unlock gate keys labels and types are stable display values', Array.isArray(fresh.gates) && fresh.gates.every(gate => String(gate.key || '').trim().length > 0 && String(gate.label || '').trim().length > 0 && ['trophy', 'famousGear', 'rival', 'debt', 'board', 'unknown'].includes(gate.gateType)), JSON.stringify(fresh.gates?.slice(0, 3)));
     record('Unknown gate types fall back safely', fresh.unknownGateMeta && fresh.unknownGateMeta.gateType === 'unknown' && typeof fresh.unknownGateMeta.gateLabel === 'string' && typeof fresh.unknownGateMeta.reason === 'string' && typeof fresh.unknownGateMeta.requirement === 'string', JSON.stringify(fresh.unknownGateMeta));
-    record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasLockedPreview && fresh.hasRouteNotOpen && fresh.hasEchoSource && fresh.hasReadOnlyPreview && fresh.hasUnlockCriteria && fresh.hasPreviewOnly && fresh.hasLockedGate && fresh.hasGateRequirement && fresh.hasGateStatus && fresh.hasReadiness, fresh.text.slice(0, 500));
+    record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasLockedPreview && fresh.hasRouteNotOpen && fresh.hasEchoSource && fresh.hasReadOnlyPreview && fresh.hasUnlockCriteria && fresh.hasPreviewOnly && fresh.hasLockedGate && fresh.hasGateRequirement && fresh.hasGateStatus && fresh.hasReadiness && fresh.hasUnlockPreview && fresh.hasFutureCondition && fresh.hasPreviewOnlySafety, fresh.text.slice(0, 500));
     record('Revisit helpers do not mutate state on fresh save', fresh.before === fresh.after, JSON.stringify({ before: fresh.before, after: fresh.after }));
 
     const edgeCases = await evalByValue(client, `(() => {
@@ -154,20 +169,60 @@ async function main() {
       const hooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(S) : [];
       const routes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
       const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : [];
+      const previews = typeof api.revisitUnlockPreview === 'function' ? api.revisitUnlockPreview(S) : [];
       const summary = typeof revisitCandidateSummary === 'function' ? revisitCandidateSummary(S) : null;
       const routeSummary = typeof revisitRouteSummary === 'function' ? revisitRouteSummary(S) : null;
       const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const previewSummary = typeof api.revisitUnlockPreviewSummary === 'function' ? api.revisitUnlockPreviewSummary(S) : null;
       const text = document.getElementById('revisitFoundationSlot')?.innerText || '';
-      return { before, afterNormalize, repaired, hooks, routes, gates, summary, routeSummary, gateSummary, text };
+      return { before, afterNormalize, repaired, hooks, routes, gates, previews, summary, routeSummary, gateSummary, previewSummary, text };
     })()`);
     record('normalizeRevisitState repairs malformed revisitState', malformed.repaired && typeof malformed.repaired.unlocked === 'boolean' && typeof malformed.repaired.lastViewedAt === 'string' && Array.isArray(malformed.repaired.notedDistricts), JSON.stringify(malformed.repaired));
     record('normalizeRevisitState leaves live state untouched when called directly', malformed.before === malformed.afterNormalize, JSON.stringify({ before: malformed.before, afterNormalize: malformed.afterNormalize }));
     record('Route previews stay locked/read-only', Array.isArray(malformed.routes) && malformed.routes.every(route => route.locked === true && typeof route.title === 'string' && typeof route.reason === 'string'), JSON.stringify(malformed.routes?.slice(0, 3)));
     record('Unlock gates tolerate malformed revisitState', Array.isArray(malformed.gates) && malformed.gateSummary && malformed.gateSummary.total === malformed.gates.length, JSON.stringify({ gates: malformed.gates?.slice(0, 3), gateSummary: malformed.gateSummary }));
     record('Unlock gates stay locked/read-only', Array.isArray(malformed.gates) && malformed.gates.every(gate => gate.locked === true && gate.ready === false && typeof gate.reason === 'string' && typeof gate.requirement === 'string' && typeof gate.progressLabel === 'string' && typeof gate.source === 'string'), JSON.stringify(malformed.gates?.slice(0, 3)));
+    record('Unlock previews stay locked/read-only', Array.isArray(malformed.previews) && malformed.previews.every(preview => preview.locked === true && preview.playable === false && typeof preview.previewState === 'string' && typeof preview.previewLabel === 'string' && typeof preview.previewReason === 'string' && typeof preview.previewRequirement === 'string' && typeof preview.previewSafety === 'string'), JSON.stringify(malformed.previews?.slice(0, 3)));
     record('Unlock criteria appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => Array.isArray(route.criteria) && route.criteria.every(text => typeof text === 'string' && text.trim().length > 0)), JSON.stringify(malformed.routes?.slice(0, 3)));
     record('Readiness labels appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => typeof route.readiness === 'string' && /Faint Trace|Route Forming|Strong Echo|Not Open Yet/.test(route.readiness)), JSON.stringify(malformed.routes?.slice(0, 3)));
-    record('Candidate and route outputs are display-safe', malformed.hooks.every(h => typeof h.label === 'string' && typeof h.detail === 'string' && typeof h.source === 'string') && malformed.routes.every(r => typeof r.title === 'string' && Array.isArray(r.hooks) && Array.isArray(r.criteria) && typeof r.readiness === 'string') && /Locked Preview/.test(malformed.text) && /Read-only route preview/.test(malformed.text) && /Unlock Criteria/.test(malformed.text) && /Signal strength/.test(malformed.text), JSON.stringify({ hookSample: malformed.hooks[0], routeSample: malformed.routes[0] }));
+    record(
+      'Candidate and route outputs are display-safe',
+      malformed.hooks.every(h =>
+        typeof h.label === 'string' &&
+        typeof h.detail === 'string' &&
+        typeof h.source === 'string'
+      ) &&
+      malformed.routes.every(r =>
+        typeof r.title === 'string' &&
+        Array.isArray(r.hooks) &&
+        Array.isArray(r.criteria) &&
+        typeof r.readiness === 'string'
+      ) &&
+      malformed.previews.every(preview =>
+        typeof preview.key === 'string' &&
+        typeof preview.previewState === 'string' &&
+        typeof preview.previewLabel === 'string' &&
+        typeof preview.previewReason === 'string' &&
+        typeof preview.previewRequirement === 'string' &&
+        typeof preview.previewSafety === 'string' &&
+        preview.locked === true &&
+        preview.playable === false &&
+        !/(enter|entry|start|travel|begin|claim|complete|available now|ready to enter)/i.test(preview.previewSafety)
+      ) &&
+      malformed.previewSummary &&
+      malformed.previewSummary.playable === 0 &&
+      malformed.previewSummary.locked === malformed.previewSummary.total &&
+      /Locked Preview/.test(malformed.text) &&
+      /Read-only route preview/.test(malformed.text) &&
+      /Unlock Criteria/.test(malformed.text) &&
+      /Signal strength/.test(malformed.text),
+      JSON.stringify({
+        hookSample: malformed.hooks[0],
+        routeSample: malformed.routes[0],
+        previewSample: malformed.previews[0],
+        previewSummary: malformed.previewSummary
+      })
+    );
 
     const mutationCheck = await evalByValue(client, `(() => {
       const snapshot = JSON.stringify({
@@ -197,8 +252,12 @@ async function main() {
       const routeObjectsBefore = JSON.stringify(routes);
       const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : [];
       const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const previews = typeof api.revisitUnlockPreview === 'function' ? api.revisitUnlockPreview(S) : [];
+      const previewSummary = typeof api.revisitUnlockPreviewSummary === 'function' ? api.revisitUnlockPreviewSummary(S) : null;
       const candidateObjectsAfter = JSON.stringify(hooks);
       const routeObjectsAfter = JSON.stringify(routes);
+      const previewObjectsBefore = JSON.stringify(previews);
+      const previewObjectsAfter = JSON.stringify(previews);
       const apiKeys = Object.keys(api);
       const buttons = Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
       const routeSlotButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
@@ -221,14 +280,17 @@ async function main() {
           combatLog: S.run.combatLog
         }
       });
-      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, apiKeys, buttons, routeSlotButtons, routeSlotText };
+      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, previews, previewSummary, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, previewObjectsBefore, previewObjectsAfter, apiKeys, buttons, routeSlotButtons, routeSlotText };
     })()`);
     record('Revisit summary helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after, JSON.stringify({ before: mutationCheck.snapshot, after: mutationCheck.after }));
     record('Unlock gate helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after && Array.isArray(mutationCheck.gates) && mutationCheck.gateSummary, JSON.stringify({ gateSummary: mutationCheck.gateSummary, gates: mutationCheck.gates?.slice(0, 3) }));
+    record('Unlock preview helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after && Array.isArray(mutationCheck.previews) && mutationCheck.previewSummary, JSON.stringify({ previewSummary: mutationCheck.previewSummary, previews: mutationCheck.previews?.slice(0, 3) }));
     record('Unlock gate helpers do not mutate candidate objects', mutationCheck.candidateObjectsBefore === mutationCheck.candidateObjectsAfter, JSON.stringify({ before: mutationCheck.candidateObjectsBefore, after: mutationCheck.candidateObjectsAfter }));
     record('Unlock gate helpers do not mutate route preview objects', mutationCheck.routeObjectsBefore === mutationCheck.routeObjectsAfter, JSON.stringify({ before: mutationCheck.routeObjectsBefore, after: mutationCheck.routeObjectsAfter }));
+    record('Unlock preview helpers do not mutate preview objects', mutationCheck.previewObjectsBefore === mutationCheck.previewObjectsAfter, JSON.stringify({ before: mutationCheck.previewObjectsBefore, after: mutationCheck.previewObjectsAfter }));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
     record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
+    record('Trophy Echo exposes preview copy without becoming playable', Array.isArray(mutationCheck.previews) && mutationCheck.previews.every(preview => preview.locked === true && preview.playable === false) && !!mutationCheck.previews.find(preview => preview.key === 'trophy_echo_route' && preview.previewState === 'preview' && preview.previewLabel === 'Unlock Preview' && preview.previewSafety.includes('route access is unavailable')) && !!String(mutationCheck.routeSlotText || '').includes('Unlock Preview'), JSON.stringify({ trophyPreview: mutationCheck.previews?.find(preview => preview.key === 'trophy_echo_route'), previewSummary: mutationCheck.previewSummary, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));
     record('Unlock gates remain inert and add no route mechanics', mutationCheck.gates.every(gate => gate.locked === true && gate.ready === false && !gate.entry && !gate.enter && !gate.start && !gate.travel && !gate.begin && !gate.action && !gate.enabled && !gate.playable && !gate.unlocked && !gate.available && !gate.reward && !gate.rewards && !gate.teleport && !gate.rerun && !gate.combat && !gate.completion && !gate.complete && !gate.scaling && !gate.scale), JSON.stringify(mutationCheck.gates?.slice(0, 3)));
     record('Unlock gate summaries cannot imply playable route access', mutationCheck.gateSummary && mutationCheck.gateSummary.total === mutationCheck.gateSummary.locked && mutationCheck.gateSummary.ready === 0 && !mutationCheck.gateSummary.unlocked && !mutationCheck.gateSummary.playable && !mutationCheck.gateSummary.available && !mutationCheck.gateSummary.entry && !mutationCheck.gateSummary.reward && !mutationCheck.gateSummary.completion && !mutationCheck.gateSummary.scaling, JSON.stringify(mutationCheck.gateSummary));
     record('No revisit route entry API or button exists', mutationCheck.apiKeys.every(key => !/revisit.*(enter|start|claim|complete|reward|teleport|rerun|scale)/i.test(key)) && mutationCheck.buttons.every(label => !/revisit|return route|route preview|enter route/i.test(label)), JSON.stringify({ apiKeys: mutationCheck.apiKeys, buttons: mutationCheck.buttons }));

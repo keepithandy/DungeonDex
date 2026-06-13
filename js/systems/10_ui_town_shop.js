@@ -6,10 +6,13 @@
     const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
     const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
+    const rawPreviews = typeof revisitUnlockPreview === 'function' ? revisitUnlockPreview(state) : [];
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
     const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
+    const previews = Array.isArray(rawPreviews) ? rawPreviews.filter(preview => preview && typeof preview === 'object') : [];
     const gatesByKey = new Map(gates.map(gate => [String(gate.key || ''), gate]));
+    const previewsByKey = new Map(previews.map(preview => [String(preview.key || ''), preview]));
     const status = state?.player?.revisitState?.unlocked ? 'Planned Preview' : 'Locked Preview';
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
@@ -36,10 +39,17 @@
           const criteriaNote = String(route.criteriaNote || '').trim();
           const readiness = String(route.readiness || 'Not Open Yet').trim() || 'Not Open Yet';
           const gate = gatesByKey.get(String(route.key || '')) || {};
+          const preview = previewsByKey.get(String(route.key || '')) || {};
+          const isTrophyEcho = String(route.key || '') === 'trophy_echo_route';
           const gateReason = String(gate.reason || 'Locked: Revisit gate not ready').trim();
           const gateRequirement = String(gate.requirement || 'Build more town and dungeon history').trim();
           const gateProgress = String(gate.progressLabel || 'Preview only').trim();
           const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
+          const previewState = String(preview.previewState || '').trim();
+          const previewLabel = String(preview.previewLabel || '').trim();
+          const previewReason = String(preview.previewReason || '').trim();
+          const previewRequirement = String(preview.previewRequirement || '').trim();
+          const previewSafety = String(preview.previewSafety || '').trim();
           const criteriaBody = criteria.length
             ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
             : `<div class="small muted revisit-route-criteria-item">Future condition not active yet.</div>`;
@@ -50,15 +60,19 @@
             </div>
             <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
             <div class="split revisit-route-readiness-head">
-              <span class="pill revisit-route-readiness-pill">${escapeHtml(readiness)}</span>
+              <span class="pill revisit-route-readiness-pill">${escapeHtml(isTrophyEcho ? previewLabel || 'Unlock Preview' : readiness)}</span>
               <span class="small muted">Signal strength</span>
             </div>
             <div class="split revisit-route-criteria-head">
               <span class="pill revisit-route-criteria-pill">Unlock Criteria</span>
-              <span class="small muted">Preview only</span>
+              <span class="small muted">${escapeHtml(isTrophyEcho ? 'Future condition' : 'Preview only')}</span>
             </div>
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
             ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
+            ${isTrophyEcho ? `<div class="small muted revisit-route-preview-label">${escapeHtml(previewLabel || 'Unlock Preview')}</div>
+            <div class="small muted revisit-route-preview-reason">${escapeHtml(previewReason || 'Future boss history may reopen this path.')}</div>
+            <div class="small muted revisit-route-preview-requirement">Requirement: ${escapeHtml(previewRequirement || 'Build more boss history.')}</div>
+            <div class="small muted revisit-route-preview-safety">${escapeHtml(previewSafety || 'Preview only - route access is unavailable.')}</div>` : ''}
             <div class="revisit-route-gate">
               <div class="split revisit-route-gate-head">
                 <span class="pill revisit-route-gate-pill">Locked Gate</span>

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.10-revisit-gate-smoke-hardening';
+const CACHE_NAME = 'dungeondex-v1.8.0-revisit-unlock-preview';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.10-revisit-gate-smoke-hardening';
+const BUILD_QS = '1.8.0-revisit-unlock-preview';
 const ASSETS = [
   './',
   './index.html',

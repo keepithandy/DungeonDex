@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.10 - Revisit Gate Smoke Hardening
+- DungeonDex v1.8.0 - First Revisit Route Unlock Preview
+
+## v1.8.0 First Revisit Route Unlock Preview
+- Current baseline: v1.8.0.
+- Trophy Echo now shows preview-only unlock language while remaining locked/read-only.
+- Unlock preview metadata is display-only and still reports route access as unavailable.
+- Routes remain locked/read-only.
+- No route entry, route buttons, revisit rewards, teleporting, rerun combat, route completion, route scaling, combat balance changes, or economy changes were added.
+- Smoke verifies preview copy cannot imply playable access.
+- Recommended next step: v1.8.1 Revisit Unlock Preview Copy Hardening. That pass should keep the preview inert and avoid any playable route entry unless explicitly requested later.
 
 ## v1.7.10 Revisit Gate Smoke Hardening
 - Current baseline: v1.7.10.

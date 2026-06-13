@@ -810,6 +810,7 @@
       const meta = revisitUnlockGateMeta(key);
       const sourceHooks = asArray(route?.hooks, []).map(hook => String(hook || '').trim()).filter(Boolean);
       const readiness = String(route?.readiness || 'Faint Trace');
+      const preview = revisitUnlockPreview(state).find(entry => entry.key === key) || null;
       return {
         key,
         label: String(route?.title || meta.gateLabel || 'Planned Route'),
@@ -820,7 +821,13 @@
         requirement: meta.requirement,
         progressLabel: `Preview only - ${readiness}`,
         ready: false,
-        source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown')
+        source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown'),
+        previewState: preview?.previewState || 'locked',
+        previewLabel: preview?.previewLabel || 'Preview only',
+        previewReason: preview?.previewReason || 'Route remains locked.',
+        previewRequirement: preview?.previewRequirement || 'Requirement remains informational.',
+        previewSafety: preview?.previewSafety || 'Preview only - route access is unavailable.',
+        playable: false
       };
     });
   }
@@ -837,6 +844,38 @@
       locked: gates.length,
       ready: 0,
       types
+    };
+  }
+
+  function revisitUnlockPreview(state = S) {
+    const routeDefs = [
+      { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Unlock Preview', previewReason: 'Future boss history may reopen this path.', previewRequirement: 'Build more boss history.' },
+      { key: 'famous_gear_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'Retired gear may remember old ground.', previewRequirement: 'Carry or retire stronger remembered gear.' },
+      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'A rival path may cross earlier districts.', previewRequirement: 'Leave a clearer rival trail through elite history.' },
+      { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'The ledger may point back to safer work.', previewRequirement: 'Let the debt ledger build a clearer district pressure note.' },
+      { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'Contract history may reopen old roads.', previewRequirement: 'Complete more board hunts.' }
+    ];
+    return routeDefs.map(def => {
+      return {
+        key: def.key,
+        previewState: def.previewState,
+        previewLabel: def.previewLabel,
+        previewReason: def.previewReason,
+        previewRequirement: def.previewRequirement,
+        previewSafety: 'Preview only - route access is unavailable.',
+        locked: true,
+        playable: false
+      };
+    });
+  }
+
+  function revisitUnlockPreviewSummary(state = S) {
+    const previews = revisitUnlockPreview(state);
+    return {
+      total: previews.length,
+      preview: previews.filter(entry => entry.previewState === 'preview').length,
+      locked: previews.length,
+      playable: 0
     };
   }
 
@@ -1579,6 +1618,12 @@
       },
       revisitUnlockGateSummary(state = S) {
         return revisitUnlockGateSummary(state);
+      },
+      revisitUnlockPreview(state = S) {
+        return revisitUnlockPreview(state);
+      },
+      revisitUnlockPreviewSummary(state = S) {
+        return revisitUnlockPreviewSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;
