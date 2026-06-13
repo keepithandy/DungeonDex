@@ -728,6 +728,16 @@
     return (criteriaMap[String(routeKey || '').trim()] || []).map(text => String(text || '').trim()).filter(Boolean);
   }
 
+  function revisitRouteReadiness(route = {}, hooks = []) {
+    const criteria = asArray(route?.criteria, []).filter(Boolean);
+    const hookCount = Math.max(0, Math.floor(numberOr(asArray(hooks, []).length, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const priority = Math.max(0, Math.floor(numberOr(route?.priority, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const signal = hookCount + criteria.length + Math.max(0, Math.min(2, Math.floor(priority / 20)));
+    if (signal >= 6) return 'Strong Echo';
+    if (signal >= 3) return 'Route Forming';
+    return 'Faint Trace';
+  }
+
   function revisitRoutePreviews(state = S) {
     const hooks = revisitCandidateHooks(state);
     if (!Array.isArray(hooks) || !hooks.length) return [];
@@ -800,7 +810,8 @@
           status: String(route.status || 'Locked').trim(),
           locked: true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
-          criteria
+          criteria,
+          readiness: revisitRouteReadiness({ ...route, criteria }, routeHooks)
         };
       })
       .filter(Boolean)

@@ -80,12 +80,13 @@ async function main() {
         hasEchoSource: text.includes('Echo source:'),
         hasReadOnlyPreview: text.includes('Read-only route preview'),
         hasUnlockCriteria: text.includes('Unlock Criteria'),
-        hasPreviewOnly: text.includes('Preview only')
+        hasPreviewOnly: text.includes('Preview only'),
+        hasReadiness: text.includes('Signal strength') || text.includes('Faint Trace') || text.includes('Route Forming') || text.includes('Strong Echo') || text.includes('Not Open Yet')
       };
     })()`);
     record('normalizeRevisitState repairs missing revisitState', !!fresh.repaired && fresh.repaired.unlocked === false && Array.isArray(fresh.repaired.notedDistricts), JSON.stringify(fresh.repaired));
     record('revisit functions return stable shapes on fresh save', Array.isArray(fresh.hooks) && fresh.summary && fresh.routes && fresh.routeSummary, JSON.stringify({ hooks: fresh.hooks?.length || 0, summary: fresh.summary, routes: fresh.routes?.length || 0, routeSummary: fresh.routeSummary }));
-    record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasLockedPreview && fresh.hasRouteNotOpen && fresh.hasEchoSource && fresh.hasReadOnlyPreview && fresh.hasUnlockCriteria && fresh.hasPreviewOnly, fresh.text.slice(0, 400));
+    record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasLockedPreview && fresh.hasRouteNotOpen && fresh.hasEchoSource && fresh.hasReadOnlyPreview && fresh.hasUnlockCriteria && fresh.hasPreviewOnly && fresh.hasReadiness, fresh.text.slice(0, 400));
     record('Revisit helpers do not mutate state on fresh save', fresh.before === fresh.after, JSON.stringify({ before: fresh.before, after: fresh.after }));
 
     const malformed = await evalByValue(client, `(() => {
@@ -105,7 +106,8 @@ async function main() {
     record('normalizeRevisitState leaves live state untouched when called directly', malformed.before === malformed.afterNormalize, JSON.stringify({ before: malformed.before, afterNormalize: malformed.afterNormalize }));
     record('Route previews stay locked/read-only', Array.isArray(malformed.routes) && malformed.routes.every(route => route.locked === true && typeof route.title === 'string' && typeof route.reason === 'string'), JSON.stringify(malformed.routes?.slice(0, 3)));
     record('Unlock criteria appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => Array.isArray(route.criteria) && route.criteria.every(text => typeof text === 'string' && text.trim().length > 0)), JSON.stringify(malformed.routes?.slice(0, 3)));
-    record('Candidate and route outputs are display-safe', malformed.hooks.every(h => typeof h.label === 'string' && typeof h.detail === 'string' && typeof h.source === 'string') && malformed.routes.every(r => typeof r.title === 'string' && Array.isArray(r.hooks) && Array.isArray(r.criteria)) && /Locked Preview/.test(malformed.text) && /Read-only route preview/.test(malformed.text) && /Unlock Criteria/.test(malformed.text), JSON.stringify({ hookSample: malformed.hooks[0], routeSample: malformed.routes[0] }));
+    record('Readiness labels appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => typeof route.readiness === 'string' && /Faint Trace|Route Forming|Strong Echo|Not Open Yet/.test(route.readiness)), JSON.stringify(malformed.routes?.slice(0, 3)));
+    record('Candidate and route outputs are display-safe', malformed.hooks.every(h => typeof h.label === 'string' && typeof h.detail === 'string' && typeof h.source === 'string') && malformed.routes.every(r => typeof r.title === 'string' && Array.isArray(r.hooks) && Array.isArray(r.criteria) && typeof r.readiness === 'string') && /Locked Preview/.test(malformed.text) && /Read-only route preview/.test(malformed.text) && /Unlock Criteria/.test(malformed.text) && /Signal strength/.test(malformed.text), JSON.stringify({ hookSample: malformed.hooks[0], routeSample: malformed.routes[0] }));
 
     const mutationCheck = await evalByValue(client, `(() => {
       const snapshot = JSON.stringify({
@@ -153,6 +155,7 @@ async function main() {
     })()`);
     record('Revisit summary helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after, JSON.stringify({ before: mutationCheck.snapshot, after: mutationCheck.after }));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
+    record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
 
     const oldSave = await evalByValue(client, `(() => {
       const base = JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})) || JSON.parse(JSON.stringify(S));

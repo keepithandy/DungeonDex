@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.5-revisit-unlock-criteria-stub';
+const CACHE_NAME = 'dungeondex-v1.7.6-revisit-route-readiness-summary';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.5-revisit-unlock-criteria-stub';
+const BUILD_QS = '1.7.6-revisit-route-readiness-summary';
 const ASSETS = [
   './',
   './index.html',
