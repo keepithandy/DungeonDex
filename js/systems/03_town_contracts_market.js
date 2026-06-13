@@ -813,7 +813,7 @@
       return {
         key,
         label: String(route?.title || meta.gateLabel || 'Planned Route'),
-        locked: route?.locked !== false,
+        locked: true,
         gateType: meta.gateType,
         gateLabel: meta.gateLabel,
         reason: meta.reason,
@@ -834,7 +834,7 @@
     }, {});
     return {
       total: gates.length,
-      locked: gates.filter(gate => gate?.locked !== false).length,
+      locked: gates.length,
       ready: 0,
       types
     };

@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.9 - Revisit Unlock Gate Model
+- DungeonDex v1.7.10 - Revisit Gate Smoke Hardening
+
+## v1.7.10 Revisit Gate Smoke Hardening
+- Current baseline: v1.7.10.
+- Revisit Gate Smoke Hardening completed.
+- Unlock-gate model remains inert and read-only.
+- Routes remain locked/read-only.
+- Smoke now verifies missing-player safety, missing revisitState safety, malformed-state safety, repeated helper stability, candidate/route preview immutability, unknown-gate fallback, and no route-card action controls.
+- No route entry, route buttons, revisit rewards, teleporting, rerun combat, route completion, route scaling, combat balance changes, or economy changes were added.
+- Recommended next step: v1.8.0 First Revisit Route Unlock Preview. That pass should still avoid playable route entry unless explicitly requested later.
 
 ## v1.7.9 Revisit Unlock Gate Model
 - Current baseline: v1.7.9.
@@ -85,6 +94,7 @@
 - Route previews stay read-only; no travel, rewards, route selection, or rematches were added.
 - Revisit checkpoint planning pass: v1.7.8 keeps route previews display-only and recommends inert unlock-gate data as the next safest step.
 - Revisit unlock gate model: v1.7.9 adds inert locked-gate data and compact route-card copy without entry, rewards, combat, completion, or scaling.
+- Revisit gate smoke hardening: v1.7.10 strengthens malformed-state, immutability, and no-entry regression coverage while keeping gates inert.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

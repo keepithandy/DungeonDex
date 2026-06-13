@@ -64,6 +64,9 @@ async function main() {
       const routeSummary = typeof api.revisitRouteSummary === 'function' ? api.revisitRouteSummary(S) : null;
       const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : null;
       const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const gatesAgain = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : null;
+      const gateSummaryAgain = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const unknownGateMeta = typeof revisitUnlockGateMeta === 'function' ? revisitUnlockGateMeta('malformed_route_preview') : null;
       const after = JSON.stringify(S);
       const text = document.getElementById('revisitFoundationSlot')?.innerText || '';
       return {
@@ -76,6 +79,9 @@ async function main() {
         routeSummary,
         gates,
         gateSummary,
+        gatesAgain,
+        gateSummaryAgain,
+        unknownGateMeta,
         text,
         hasCandidateLedger: text.includes('Earlier Dungeon Revisit'),
         hasPlannedRoutes: text.includes('Planned Return Routes'),
@@ -94,8 +100,50 @@ async function main() {
     record('normalizeRevisitState repairs missing revisitState', !!fresh.repaired && fresh.repaired.unlocked === false && Array.isArray(fresh.repaired.notedDistricts), JSON.stringify(fresh.repaired));
     record('revisit functions return stable shapes on fresh save', Array.isArray(fresh.hooks) && fresh.summary && fresh.routes && fresh.routeSummary && Array.isArray(fresh.gates) && fresh.gateSummary, JSON.stringify({ hooks: fresh.hooks?.length || 0, summary: fresh.summary, routes: fresh.routes?.length || 0, routeSummary: fresh.routeSummary, gates: fresh.gates?.length || 0, gateSummary: fresh.gateSummary }));
     record('Unlock gate helper exists and returns locked gate shapes', Array.isArray(fresh.gates) && fresh.gateSummary && fresh.gateSummary.total === fresh.gates.length && fresh.gateSummary.ready === 0 && fresh.gates.every(gate => gate.locked === true && gate.ready === false && typeof gate.key === 'string' && typeof gate.label === 'string' && typeof gate.gateType === 'string' && typeof gate.reason === 'string' && typeof gate.requirement === 'string' && typeof gate.progressLabel === 'string' && typeof gate.source === 'string'), JSON.stringify({ gates: fresh.gates?.slice(0, 3), gateSummary: fresh.gateSummary }));
+    record('Unlock gate helper returns equivalent repeated output', JSON.stringify(fresh.gates) === JSON.stringify(fresh.gatesAgain) && JSON.stringify(fresh.gateSummary) === JSON.stringify(fresh.gateSummaryAgain), JSON.stringify({ first: fresh.gates?.slice(0, 3), second: fresh.gatesAgain?.slice(0, 3), summary: fresh.gateSummary, repeatedSummary: fresh.gateSummaryAgain }));
+    record('Unlock gate keys labels and types are stable display values', Array.isArray(fresh.gates) && fresh.gates.every(gate => String(gate.key || '').trim().length > 0 && String(gate.label || '').trim().length > 0 && ['trophy', 'famousGear', 'rival', 'debt', 'board', 'unknown'].includes(gate.gateType)), JSON.stringify(fresh.gates?.slice(0, 3)));
+    record('Unknown gate types fall back safely', fresh.unknownGateMeta && fresh.unknownGateMeta.gateType === 'unknown' && typeof fresh.unknownGateMeta.gateLabel === 'string' && typeof fresh.unknownGateMeta.reason === 'string' && typeof fresh.unknownGateMeta.requirement === 'string', JSON.stringify(fresh.unknownGateMeta));
     record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasLockedPreview && fresh.hasRouteNotOpen && fresh.hasEchoSource && fresh.hasReadOnlyPreview && fresh.hasUnlockCriteria && fresh.hasPreviewOnly && fresh.hasLockedGate && fresh.hasGateRequirement && fresh.hasGateStatus && fresh.hasReadiness, fresh.text.slice(0, 500));
     record('Revisit helpers do not mutate state on fresh save', fresh.before === fresh.after, JSON.stringify({ before: fresh.before, after: fresh.after }));
+
+    const edgeCases = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const cases = [
+        { name: 'null state', state: null },
+        { name: 'missing player', state: {} },
+        { name: 'missing revisitState', state: { player: {}, run: {} } },
+        { name: 'malformed revisitState', state: { player: { revisitState: 'bad', eliteContracts: 'bad', eliteTrophies: 'bad', retiredRelics: 'bad', debtCollector: 'bad' }, run: 'bad' } }
+      ];
+      return cases.map(testCase => {
+        let before = '';
+        let after = '';
+        try { before = JSON.stringify(testCase.state); } catch (err) { before = '[unserializable]'; }
+        try {
+          const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(testCase.state) : null;
+          const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(testCase.state) : null;
+          const repeat = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(testCase.state) : null;
+          try { after = JSON.stringify(testCase.state); } catch (err) { after = '[unserializable]'; }
+          return {
+            name: testCase.name,
+            ok: Array.isArray(gates) && gateSummary && gateSummary.total === gates.length,
+            gates,
+            gateSummary,
+            equivalent: JSON.stringify(gates) === JSON.stringify(repeat),
+            notMutated: before === after,
+            lockedOnly: Array.isArray(gates) && gates.every(gate => gate.locked === true && gate.ready === false),
+            before,
+            after
+          };
+        } catch (err) {
+          try { after = JSON.stringify(testCase.state); } catch (inner) { after = '[unserializable]'; }
+          return { name: testCase.name, ok: false, error: String(err && err.message ? err.message : err), before, after };
+        }
+      });
+    })()`);
+    record('Unlock gates tolerate missing and malformed state', Array.isArray(edgeCases) && edgeCases.every(entry => entry.ok && entry.equivalent && entry.notMutated && entry.lockedOnly), JSON.stringify(edgeCases.map(entry => ({ name: entry.name, ok: entry.ok, equivalent: entry.equivalent, notMutated: entry.notMutated, lockedOnly: entry.lockedOnly, total: entry.gateSummary?.total || 0, error: entry.error || '' }))));
+    record('Unlock gates tolerate missing player', !!edgeCases.find(entry => entry.name === 'missing player' && entry.ok && entry.notMutated), JSON.stringify(edgeCases.find(entry => entry.name === 'missing player')));
+    record('Unlock gates tolerate missing revisitState', !!edgeCases.find(entry => entry.name === 'missing revisitState' && entry.ok && entry.notMutated), JSON.stringify(edgeCases.find(entry => entry.name === 'missing revisitState')));
+    record('Unlock gates tolerate malformed state without playable output', !!edgeCases.find(entry => entry.name === 'malformed revisitState' && entry.ok && entry.lockedOnly && entry.gateSummary?.ready === 0), JSON.stringify(edgeCases.find(entry => entry.name === 'malformed revisitState')));
 
     const malformed = await evalByValue(client, `(() => {
       S.player.revisitState = { unlocked: 'yes', lastViewedAt: 123, notedDistricts: ['A', '', null, 'B', 3, { x: 1 }] };
@@ -145,10 +193,16 @@ async function main() {
       const summary = typeof api.revisitCandidateSummary === 'function' ? api.revisitCandidateSummary(S) : null;
       const routes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
       const routeSummary = typeof api.revisitRouteSummary === 'function' ? api.revisitRouteSummary(S) : null;
+      const candidateObjectsBefore = JSON.stringify(hooks);
+      const routeObjectsBefore = JSON.stringify(routes);
       const gates = typeof api.revisitUnlockGates === 'function' ? api.revisitUnlockGates(S) : [];
       const gateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(S) : null;
+      const candidateObjectsAfter = JSON.stringify(hooks);
+      const routeObjectsAfter = JSON.stringify(routes);
       const apiKeys = Object.keys(api);
       const buttons = Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
+      const routeSlotButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
+      const routeSlotText = document.getElementById('revisitFoundationSlot')?.innerText || '';
       const after = JSON.stringify({
         player: {
           gold: S.player.gold,
@@ -167,14 +221,18 @@ async function main() {
           combatLog: S.run.combatLog
         }
       });
-      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, apiKeys, buttons };
+      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, apiKeys, buttons, routeSlotButtons, routeSlotText };
     })()`);
     record('Revisit summary helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after, JSON.stringify({ before: mutationCheck.snapshot, after: mutationCheck.after }));
     record('Unlock gate helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after && Array.isArray(mutationCheck.gates) && mutationCheck.gateSummary, JSON.stringify({ gateSummary: mutationCheck.gateSummary, gates: mutationCheck.gates?.slice(0, 3) }));
+    record('Unlock gate helpers do not mutate candidate objects', mutationCheck.candidateObjectsBefore === mutationCheck.candidateObjectsAfter, JSON.stringify({ before: mutationCheck.candidateObjectsBefore, after: mutationCheck.candidateObjectsAfter }));
+    record('Unlock gate helpers do not mutate route preview objects', mutationCheck.routeObjectsBefore === mutationCheck.routeObjectsAfter, JSON.stringify({ before: mutationCheck.routeObjectsBefore, after: mutationCheck.routeObjectsAfter }));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
     record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
-    record('Unlock gates remain inert and add no route mechanics', mutationCheck.gates.every(gate => gate.locked === true && gate.ready === false && !gate.entry && !gate.reward && !gate.teleport && !gate.rerun && !gate.completion && !gate.scaling), JSON.stringify(mutationCheck.gates?.slice(0, 3)));
+    record('Unlock gates remain inert and add no route mechanics', mutationCheck.gates.every(gate => gate.locked === true && gate.ready === false && !gate.entry && !gate.enter && !gate.start && !gate.travel && !gate.begin && !gate.action && !gate.enabled && !gate.playable && !gate.unlocked && !gate.available && !gate.reward && !gate.rewards && !gate.teleport && !gate.rerun && !gate.combat && !gate.completion && !gate.complete && !gate.scaling && !gate.scale), JSON.stringify(mutationCheck.gates?.slice(0, 3)));
+    record('Unlock gate summaries cannot imply playable route access', mutationCheck.gateSummary && mutationCheck.gateSummary.total === mutationCheck.gateSummary.locked && mutationCheck.gateSummary.ready === 0 && !mutationCheck.gateSummary.unlocked && !mutationCheck.gateSummary.playable && !mutationCheck.gateSummary.available && !mutationCheck.gateSummary.entry && !mutationCheck.gateSummary.reward && !mutationCheck.gateSummary.completion && !mutationCheck.gateSummary.scaling, JSON.stringify(mutationCheck.gateSummary));
     record('No revisit route entry API or button exists', mutationCheck.apiKeys.every(key => !/revisit.*(enter|start|claim|complete|reward|teleport|rerun|scale)/i.test(key)) && mutationCheck.buttons.every(label => !/revisit|return route|route preview|enter route/i.test(label)), JSON.stringify({ apiKeys: mutationCheck.apiKeys, buttons: mutationCheck.buttons }));
+    record('Route cards expose no Enter Start Travel or Begin action', Array.isArray(mutationCheck.routeSlotButtons) && mutationCheck.routeSlotButtons.length === 0 && !/(Enter|Start|Travel|Begin)\\s+(Revisit|Route|Return)/i.test(mutationCheck.routeSlotText || ''), JSON.stringify({ routeSlotButtons: mutationCheck.routeSlotButtons, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));
 
     const oldSave = await evalByValue(client, `(() => {
       const base = JSON.parse(localStorage.getItem(${JSON.stringify(STORAGE_KEY)})) || JSON.parse(JSON.stringify(S));
