@@ -7,7 +7,7 @@
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
-    const status = state?.player?.revisitState?.unlocked ? 'Planned' : 'Future Route';
+    const status = state?.player?.revisitState?.unlocked ? 'Planned Preview' : 'Locked Preview';
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
     const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
@@ -16,25 +16,39 @@
           const label = String(hook.label || '').trim() || 'Unknown Hook';
           const detail = String(hook.detail || '').trim() || 'No details';
           const source = String(hook.source || '').trim() || 'Unknown source';
-          return `<div class="revisit-candidate-row"><span class="pill revisit-candidate-chip">${escapeHtml(label)}</span><span class="revisit-candidate-detail">${escapeHtml(detail)}</span><span class="small muted revisit-candidate-source">${escapeHtml(source)}</span><span class="small muted revisit-candidate-state">${hook.locked ? 'Locked' : 'Planned'}</span></div>`;
+          return `<div class="revisit-candidate-row">
+            <div class="split revisit-candidate-head">
+              <strong>${escapeHtml(label)}</strong>
+              <span class="pill revisit-candidate-state">${hook.locked ? 'Locked Preview' : 'Planned Preview'}</span>
+            </div>
+            <div class="small muted revisit-candidate-detail">${escapeHtml(detail)}</div>
+            <div class="small muted revisit-candidate-source">Echo source: ${escapeHtml(source)}</div>
+          </div>`;
         }).join('')
       : `<div class="small muted revisit-empty-state">No return routes are marked yet. Deeper runs will leave better traces.</div>`;
     const routeBody = routes.length
       ? routes.slice(0, 3).map(route => {
           const hookLabels = Array.isArray(route.hooks) ? route.hooks.filter(Boolean).join(' • ') : '';
           return `<div class="revisit-route-card">
-            <div class="split"><strong>${escapeHtml(route.title || 'Planned Route')}</strong><span class="pill revisit-route-pill">${escapeHtml(route.status || 'Locked')}</span></div>
-            <div class="small muted">${escapeHtml(route.district || 'Earlier district band')}</div>
-            <div class="small">${escapeHtml(route.reason || 'Future roads remain read-only.')}</div>
-            <div class="small muted">Hooks: ${escapeHtml(hookLabels || 'Unknown')}</div>
+            <div class="split revisit-route-head">
+              <strong>${escapeHtml(route.title || 'Planned Route')}</strong>
+              <span class="pill revisit-route-pill">${escapeHtml(route.status || 'Locked Preview')}</span>
+            </div>
+            <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
+            <div class="revisit-route-meta small muted">
+              <span>Route not open yet</span>
+              <span>Read-only route preview</span>
+            </div>
+            <div class="small revisit-route-reason">${escapeHtml(route.reason || 'Future roads remain read-only.')}</div>
+            <div class="small muted revisit-route-hooks">Echo source: ${escapeHtml(hookLabels || 'Unknown')}</div>
           </div>`;
         }).join('')
       : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
-      <div class="split"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
-      <div class="small muted">For now, these notes show where future revisit hooks may attach.</div>
+      <div class="split revisit-foundation-head"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
+      <div class="small muted">Locked preview only. These notes show where future revisit hooks may attach.</div>
       <div class="list revisit-hook-list">${body}</div>
-      <div class="split"><h4>Planned Return Routes</h4><span class="pill">Locked</span></div>
+      <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Read-only route preview</span></div>
       <div class="list revisit-route-list">${routeBody}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
     </div>`;
