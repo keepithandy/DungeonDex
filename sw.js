@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.7.6-revisit-route-readiness-summary';
+const CACHE_NAME = 'dungeondex-v1.7.7-revisit-criteria-stub-copy-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.7.6-revisit-route-readiness-summary';
+const BUILD_QS = '1.7.7-revisit-criteria-stub-copy-polish';
 const ASSETS = [
   './',
   './index.html',

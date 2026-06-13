@@ -30,6 +30,7 @@
       ? routes.slice(0, 3).map(route => {
           const hookLabels = Array.isArray(route.hooks) ? route.hooks.filter(Boolean).join(' • ') : '';
           const criteria = Array.isArray(route.criteria) ? route.criteria.filter(Boolean).slice(0, 2) : [];
+          const criteriaNote = String(route.criteriaNote || '').trim();
           const readiness = String(route.readiness || 'Not Open Yet').trim() || 'Not Open Yet';
           const criteriaBody = criteria.length
             ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
@@ -49,6 +50,7 @@
               <span class="small muted">Preview only</span>
             </div>
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
+            ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
             <div class="revisit-route-meta small muted">
               <span>Route not open yet</span>
               <span>Read-only route preview</span>

@@ -701,31 +701,35 @@
       });
   }
 
-  function revisitRouteUnlockCriteria(routeKey, hooks = []) {
+  function revisitRouteUnlockCriteriaStub(routeKey, hooks = []) {
     const hookSet = new Set(asArray(hooks, []).map(hook => String(hook || '').trim()).filter(Boolean));
     const criteriaMap = {
       trophy_echo_route: [
-        'Recover a stronger boss record',
-        'Bind this echo to a future return route'
+        'Stub: recover a stronger boss record',
+        'Stub: bind this echo to a future return route'
       ],
       famous_gear_route: [
-        'Carry or retire gear with stronger memory',
-        'Record more kills or boss marks on a named item'
+        'Stub: carry or retire gear with stronger memory',
+        'Stub: record more kills or boss marks on a named item'
       ],
       rival_trace_route: [
-        'Leave a clearer rival trail',
-        'Defeat or encounter more named elites'
+        'Stub: leave a clearer rival trail',
+        'Stub: defeat or encounter more named elites'
       ],
       debt_pressure_route: [
-        'Let the debt ledger build pressure',
-        'Tie the debt note to a return district'
+        'Stub: let the debt ledger build pressure',
+        'Stub: tie the debt note to a return district'
       ],
       board_echo_route: [
-        'Complete more board hunts',
-        'Leave a stronger contract trace'
+        'Stub: complete more board hunts',
+        'Stub: leave a stronger contract trace'
       ]
     };
-    return (criteriaMap[String(routeKey || '').trim()] || []).map(text => String(text || '').trim()).filter(Boolean);
+    const criteria = (criteriaMap[String(routeKey || '').trim()] || []).map(text => String(text || '').trim()).filter(Boolean);
+    return {
+      criteria: criteria.length ? criteria : ['Stub: future conditions are inferred, not active'],
+      note: hookSet.size ? 'Stub only - criteria are display text from active hooks.' : 'Stub only - future conditions are inferred, not active.'
+    };
   }
 
   function revisitRouteReadiness(route = {}, hooks = []) {
@@ -800,7 +804,7 @@
         const routeHooks = route.hooks.map(key => byKey.get(key)).filter(Boolean);
         if (!routeHooks.length) return null;
         const topHook = routeHooks[0];
-        const criteria = revisitRouteUnlockCriteria(route.key, routeHooks.map(hook => hook.key));
+        const criteriaStub = revisitRouteUnlockCriteriaStub(route.key, routeHooks.map(hook => hook.key));
         return {
           key: String(route.key || '').trim(),
           title: String(route.title || '').trim(),
@@ -810,8 +814,9 @@
           status: String(route.status || 'Locked').trim(),
           locked: true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
-          criteria,
-          readiness: revisitRouteReadiness({ ...route, criteria }, routeHooks)
+          criteria: criteriaStub.criteria,
+          criteriaNote: criteriaStub.note,
+          readiness: revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
         };
       })
       .filter(Boolean)
