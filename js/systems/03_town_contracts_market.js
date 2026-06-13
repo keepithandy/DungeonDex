@@ -742,6 +742,104 @@
     return 'Faint Trace';
   }
 
+  function revisitReadOnlyStateSnapshot(state = S) {
+    const safeState = state && typeof state === 'object' ? state : {};
+    try {
+      if (typeof structuredClone === 'function') return structuredClone(safeState);
+    } catch (err) {}
+    try {
+      return JSON.parse(JSON.stringify(safeState));
+    } catch (err) {}
+    return {};
+  }
+
+  function revisitUnlockGateMeta(routeKey = '') {
+    const key = String(routeKey || '');
+    if (key === 'trophy_echo_route') {
+      return {
+        gateType: 'trophy',
+        gateLabel: 'Trophy Echo',
+        reason: 'Locked: Trophy Echo not ready',
+        requirement: 'Defeat and record more boss history'
+      };
+    }
+    if (key === 'famous_gear_route') {
+      return {
+        gateType: 'famousGear',
+        gateLabel: 'Famous Gear',
+        reason: 'Locked: Famous Gear memory not ready',
+        requirement: 'Carry or retire stronger remembered gear'
+      };
+    }
+    if (key === 'rival_trace_route') {
+      return {
+        gateType: 'rival',
+        gateLabel: 'Rival Trace',
+        reason: 'Locked: Rival Trace not ready',
+        requirement: 'Leave a clearer rival trail through elite history'
+      };
+    }
+    if (key === 'debt_pressure_route') {
+      return {
+        gateType: 'debt',
+        gateLabel: 'Debt Pressure',
+        reason: 'Locked: Debt Pressure not ready',
+        requirement: 'Let the debt ledger build a clearer district pressure note'
+      };
+    }
+    if (key === 'board_echo_route') {
+      return {
+        gateType: 'board',
+        gateLabel: 'Board Echo',
+        reason: 'Locked: Board Echo not ready',
+        requirement: 'Complete more board hunts and contract history'
+      };
+    }
+    return {
+      gateType: 'unknown',
+      gateLabel: 'Unknown Gate',
+      reason: 'Locked: Revisit gate not ready',
+      requirement: 'Build more town and dungeon history'
+    };
+  }
+
+  function revisitUnlockGates(state = S) {
+    const routes = revisitRoutePreviews(revisitReadOnlyStateSnapshot(state));
+    return asArray(routes, []).map(route => {
+      const key = String(route?.key || 'unknown_route');
+      const meta = revisitUnlockGateMeta(key);
+      const sourceHooks = asArray(route?.hooks, []).map(hook => String(hook || '').trim()).filter(Boolean);
+      const readiness = String(route?.readiness || 'Faint Trace');
+      return {
+        key,
+        label: String(route?.title || meta.gateLabel || 'Planned Route'),
+        locked: route?.locked !== false,
+        gateType: meta.gateType,
+        gateLabel: meta.gateLabel,
+        reason: meta.reason,
+        requirement: meta.requirement,
+        progressLabel: `Preview only - ${readiness}`,
+        ready: false,
+        source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown')
+      };
+    });
+  }
+
+  function revisitUnlockGateSummary(state = S) {
+    const gates = revisitUnlockGates(state);
+    const types = gates.reduce((acc, gate) => {
+      const type = String(gate?.gateType || 'unknown');
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {});
+    return {
+      total: gates.length,
+      locked: gates.filter(gate => gate?.locked !== false).length,
+      ready: 0,
+      types
+    };
+  }
+
   function revisitRoutePreviews(state = S) {
     const hooks = revisitCandidateHooks(state);
     if (!Array.isArray(hooks) || !hooks.length) return [];
@@ -1475,6 +1573,12 @@
       },
       revisitRouteSummary(state = S) {
         return revisitRouteSummary(state);
+      },
+      revisitUnlockGates(state = S) {
+        return revisitUnlockGates(state);
+      },
+      revisitUnlockGateSummary(state = S) {
+        return revisitUnlockGateSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;

@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.7.8 - Revisit Checkpoint Planning Pass
+- DungeonDex v1.7.9 - Revisit Unlock Gate Model
+
+## v1.7.9 Revisit Unlock Gate Model
+- Current baseline: v1.7.9.
+- Added inert unlock-gate data for planned revisit route previews.
+- Revisit gates are read-only display objects that explain why a route is locked, what future requirement would matter, and that status remains preview-only.
+- Verified safe: gate helpers derive from route preview data, tolerate malformed state, and do not add player or run state mutations.
+- Routes remain locked/read-only.
+- Intentionally not implemented: route entry, route buttons, revisit rewards, teleporting, rerun combat, route completion, route scaling, or combat balance changes.
+- Recommended next step: v1.7.10 Revisit Gate Smoke Hardening. Keep routes locked while adding stricter regression coverage before any unlock preview work.
 
 ## v1.7.8 Revisit Checkpoint
 - Current baseline: v1.7.8.
@@ -75,6 +84,7 @@
 - Revisit route previews now group candidate hooks into locked future return-route cards.
 - Route previews stay read-only; no travel, rewards, route selection, or rematches were added.
 - Revisit checkpoint planning pass: v1.7.8 keeps route previews display-only and recommends inert unlock-gate data as the next safest step.
+- Revisit unlock gate model: v1.7.9 adds inert locked-gate data and compact route-card copy without entry, rewards, combat, completion, or scaling.
 - Elite Board and rival contract clarity/polish.
 - District and dungeon-world identity expansion.
 

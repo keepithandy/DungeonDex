@@ -5,8 +5,11 @@
   function earlierDungeonRevisitMarkup(state) {
     const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
+    const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
+    const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
+    const gatesByKey = new Map(gates.map(gate => [String(gate.key || ''), gate]));
     const status = state?.player?.revisitState?.unlocked ? 'Planned Preview' : 'Locked Preview';
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
@@ -32,6 +35,11 @@
           const criteria = Array.isArray(route.criteria) ? route.criteria.filter(Boolean).slice(0, 2) : [];
           const criteriaNote = String(route.criteriaNote || '').trim();
           const readiness = String(route.readiness || 'Not Open Yet').trim() || 'Not Open Yet';
+          const gate = gatesByKey.get(String(route.key || '')) || {};
+          const gateReason = String(gate.reason || 'Locked: Revisit gate not ready').trim();
+          const gateRequirement = String(gate.requirement || 'Build more town and dungeon history').trim();
+          const gateProgress = String(gate.progressLabel || 'Preview only').trim();
+          const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
           const criteriaBody = criteria.length
             ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
             : `<div class="small muted revisit-route-criteria-item">Future condition not active yet.</div>`;
@@ -51,6 +59,16 @@
             </div>
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
             ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
+            <div class="revisit-route-gate">
+              <div class="split revisit-route-gate-head">
+                <span class="pill revisit-route-gate-pill">Locked Gate</span>
+                <span class="small muted">Preview only</span>
+              </div>
+              <div class="small muted revisit-route-gate-reason">${escapeHtml(gateReason)}</div>
+              <div class="small muted revisit-route-gate-requirement">Requirement: ${escapeHtml(gateRequirement)}</div>
+              <div class="small muted revisit-route-gate-status">Status: ${escapeHtml(gateProgress)}</div>
+              <div class="small muted revisit-route-gate-source">Gate source: ${escapeHtml(gateSource)}</div>
+            </div>
             <div class="revisit-route-meta small muted">
               <span>Route not open yet</span>
               <span>Read-only route preview</span>
