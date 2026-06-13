@@ -29,12 +29,21 @@
     const routeBody = routes.length
       ? routes.slice(0, 3).map(route => {
           const hookLabels = Array.isArray(route.hooks) ? route.hooks.filter(Boolean).join(' • ') : '';
+          const criteria = Array.isArray(route.criteria) ? route.criteria.filter(Boolean).slice(0, 2) : [];
+          const criteriaBody = criteria.length
+            ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
+            : `<div class="small muted revisit-route-criteria-item">Future condition not active yet.</div>`;
           return `<div class="revisit-route-card">
             <div class="split revisit-route-head">
               <strong>${escapeHtml(route.title || 'Planned Route')}</strong>
               <span class="pill revisit-route-pill">${escapeHtml(route.status || 'Locked Preview')}</span>
             </div>
             <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
+            <div class="split revisit-route-criteria-head">
+              <span class="pill revisit-route-criteria-pill">Unlock Criteria</span>
+              <span class="small muted">Preview only</span>
+            </div>
+            <div class="revisit-route-criteria-list">${criteriaBody}</div>
             <div class="revisit-route-meta small muted">
               <span>Route not open yet</span>
               <span>Read-only route preview</span>
@@ -49,6 +58,7 @@
       <div class="small muted">Locked preview only. These notes show where future revisit hooks may attach.</div>
       <div class="list revisit-hook-list">${body}</div>
       <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Read-only route preview</span></div>
+      <div class="small muted revisit-route-criteria-note">Unlock Criteria is display-only. Future conditions are inferred, not active.</div>
       <div class="list revisit-route-list">${routeBody}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
     </div>`;
