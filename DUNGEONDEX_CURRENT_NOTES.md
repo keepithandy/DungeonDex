@@ -7,7 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.9.1 - Revisit Gate Diagnostics Polish
+- DungeonDex v1.9.2 - Revisit Gate Checkpoint Audit
+
+## v1.9.2 Revisit Gate Checkpoint Audit
+- Current baseline: v1.9.2.
+- Revisit Gate Checkpoint Audit confirms the locked-only revisit diagnostics layer before v1.10 unlock-rule planning.
+- Locked-only gate diagnostics were verified in source and smoke coverage.
+- Smoke scope was verified and one compact checkpoint assertion was added.
+- README current-baseline drift from v1.8.0 was corrected.
+- Trophy Echo remains preview-only and non-playable.
+- All gates remain locked:true, ready:false, playable:false.
+- All routes remain locked/read-only.
+- No gameplay, rewards, combat reruns, teleporting, completion logic, or scaling was added.
 
 ## v1.9.1 Revisit Gate Diagnostics Polish
 - Current baseline: v1.9.1.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.9.1-revisit-gate-diagnostics-polish';
+const CACHE_NAME = 'dungeondex-v1.9.2-revisit-gate-checkpoint-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.9.1-revisit-gate-diagnostics-polish';
+const BUILD_QS = '1.9.2-revisit-gate-checkpoint-audit';
 const ASSETS = [
   './',
   './index.html',

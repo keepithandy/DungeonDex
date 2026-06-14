@@ -2,19 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.8.0**
+Current baseline: **DungeonDex v1.9.2**
 
 ## Current Build
 
-**v1.8.0 — First Revisit Unlock Preview**
+**v1.9.2 — Revisit Gate Checkpoint Audit**
 
-This version adds the first preview-only layer for future revisit-route unlocks. Revisit routes are still locked, read-only, and non-playable. The preview layer is intentionally inert and does not add route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
+This version checkpoints the locked-only revisit gate diagnostics layer. Revisit routes remain locked, read-only, and non-playable. The gate foundation is diagnostic-only and does not add route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
 
-Latest confirmed commit at the time of this README draft:
-
-```text
-3f6a453 Add first revisit unlock preview
-```
+Latest confirmed commit is the repository HEAD for the current baseline.
 
 ## What DungeonDex Is
 
