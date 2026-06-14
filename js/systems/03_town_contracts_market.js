@@ -753,6 +753,93 @@
     return {};
   }
 
+  function revisitGateProgressClamp(current, required) {
+    const progressCurrent = Math.max(0, Math.floor(numberOr(current, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const progressRequired = Math.max(1, Math.floor(numberOr(required, 1, 1, Number.MAX_SAFE_INTEGER)));
+    return {
+      progressCurrent,
+      progressRequired,
+      progressPercent: Math.max(0, Math.min(100, Math.floor((progressCurrent / progressRequired) * 100)))
+    };
+  }
+
+  function revisitGateProgressPercent(current, required) {
+    return revisitGateProgressClamp(current, required).progressPercent;
+  }
+
+  function revisitGateProgressSignals(routeKey, state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
+    const safeKey = String(routeKey || '');
+    const signals = [];
+    const add = (label, value) => {
+      const count = Math.max(0, Math.floor(numberOr(value, 0, 0, Number.MAX_SAFE_INTEGER)));
+      if (count > 0) signals.push(`${label}:${count}`);
+    };
+    const countArray = source => asArray(source, []).filter(entry => entry && typeof entry === 'object').length;
+
+    if (safeKey === 'trophy_echo_route') {
+      add('bossTrophies', Array.isArray(safePlayer.bossTrophies) ? safePlayer.bossTrophies.length : 0);
+      add('eliteTrophies', isPlainObject(safePlayer.eliteTrophies) ? Object.keys(safePlayer.eliteTrophies).length : 0);
+      add('bossRecords', countArray(safePlayer.bossTrophyRecords));
+    } else if (safeKey === 'famous_gear_route') {
+      add('retiredRelics', countArray(safePlayer.retiredRelics));
+      add('gearMemory', asArray(safePlayer.inventory, []).filter(item => isPlainObject(item) && isPlainObject(item.gearMemory)).length);
+      add('memoryTags', asArray(safePlayer.inventory, []).filter(item => isPlainObject(item) && Array.isArray(item.tags) && item.tags.some(tag => /famous|archive|memory/i.test(String(tag || '')))).length);
+    } else if (safeKey === 'rival_trace_route') {
+      const contracts = ensureEliteContractState(safeState);
+      add('claimedContracts', Array.isArray(contracts.claimed) ? contracts.claimed.length : 0);
+      add('activeRival', contracts.active && contracts.active.rivalId ? 1 : 0);
+      add('rivalRecords', countArray(contracts.rivals));
+    } else if (safeKey === 'debt_pressure_route') {
+      const debt = isPlainObject(safePlayer.debtCollector) ? safePlayer.debtCollector : {};
+      add('debtNotes', Array.isArray(debt.notes) ? debt.notes.length : 0);
+      add('debtPressure', debt.pressure);
+      add('debtBalance', debt.balanceCopper);
+    } else if (safeKey === 'board_echo_route') {
+      const contracts = ensureEliteContractState(safeState);
+      add('claimed', Array.isArray(contracts.claimed) ? contracts.claimed.length : 0);
+      add('completed', Array.isArray(contracts.completed) ? contracts.completed.length : 0);
+      add('history', Array.isArray(contracts.history) ? contracts.history.length : 0);
+    }
+
+    return signals.slice(0, 6);
+  }
+
+  function revisitGateProgressModel(routeKey, state = S) {
+    const meta = revisitUnlockGateMeta(routeKey);
+    const safeKey = String(routeKey || '');
+    const signals = revisitGateProgressSignals(safeKey, state);
+    const signalScore = signals.reduce((sum, signal) => {
+      const match = /:(\d+)$/.exec(String(signal || ''));
+      return sum + (match ? Math.max(0, Math.floor(numberOr(match[1], 0, 0, Number.MAX_SAFE_INTEGER))) : 0);
+    }, 0);
+    const thresholds = {
+      trophy_echo_route: 3,
+      famous_gear_route: 2,
+      rival_trace_route: 2,
+      debt_pressure_route: 3,
+      board_echo_route: 3
+    };
+    const progress = revisitGateProgressClamp(signalScore, thresholds[safeKey] || 1);
+    const progressLabel = progress.progressCurrent <= 0
+      ? 'No signal yet'
+      : progress.progressPercent >= 100
+        ? 'Foundation capped'
+        : progress.progressCurrent === 1
+          ? 'Trace noted'
+          : 'Progress noted';
+    return {
+      routeKey: safeKey,
+      gateType: meta.gateType || 'unknown',
+      progressCurrent: progress.progressCurrent,
+      progressRequired: progress.progressRequired,
+      progressPercent: progress.progressPercent,
+      progressLabel,
+      signals
+    };
+  }
+
   function revisitUnlockGateMeta(routeKey = '') {
     const key = String(routeKey || '');
     if (key === 'trophy_echo_route') {
@@ -853,38 +940,47 @@
       const sourceHooks = asArray(route?.hooks, []).map(hook => String(hook || '').trim()).filter(Boolean);
       const readiness = String(route?.readiness || 'Faint Trace');
       const preview = revisitUnlockPreview(state).find(entry => entry.key === key) || null;
+      const progress = revisitGateProgressModel(key, state);
       return {
         key,
         label: String(route?.title || meta.gateLabel || 'Planned Route'),
         locked: true,
         gateType: meta.gateType,
         gateLabel: meta.gateLabel,
+        ready: false,
+        playable: false,
         reason: meta.reason,
         requirement: meta.requirement,
-        progressLabel: meta.progressLabel || `Preview only - ${readiness}`,
-        ready: false,
+        progressCurrent: progress.progressCurrent,
+        progressRequired: progress.progressRequired,
+        progressPercent: progress.progressPercent,
+        progressLabel: progress.progressLabel || meta.progressLabel || `Preview only - ${readiness}`,
+        signals: progress.signals,
         source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown'),
         previewState: preview?.previewState || meta.previewState || 'locked',
         previewLabel: preview?.previewLabel || meta.previewLabel || 'Still locked',
         previewReason: preview?.previewReason || meta.previewReason || 'Future route history may shape this path later.',
         previewRequirement: preview?.previewRequirement || meta.previewRequirement || 'Build more dungeon history.',
-        previewSafety: preview?.previewSafety || meta.previewSafety || 'Preview only - route access is unavailable.',
-        playable: false
+        previewSafety: preview?.previewSafety || meta.previewSafety || 'Preview only - route access is unavailable.'
       };
     });
   }
 
   function revisitUnlockGateSummary(state = S) {
     const gates = revisitUnlockGates(state);
+    const total = gates.length;
     const types = gates.reduce((acc, gate) => {
       const type = String(gate?.gateType || 'unknown');
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
     return {
-      total: gates.length,
-      locked: gates.length,
+      total,
+      locked: total,
       ready: 0,
+      playable: 0,
+      progressAverage: total ? Math.floor(gates.reduce((sum, gate) => sum + Math.max(0, Math.floor(numberOr(gate?.progressPercent, 0, 0, 100))), 0) / total) : 0,
+      progressNoted: gates.filter(gate => Math.max(0, Math.floor(numberOr(gate?.progressCurrent, 0, 0, Number.MAX_SAFE_INTEGER))) > 0).length,
       types
     };
   }

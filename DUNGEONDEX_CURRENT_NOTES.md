@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.8.2 - Revisit Preview Panel Polish
+- DungeonDex v1.9.0 - Revisit Unlock Gate Foundation
+
+## v1.9.0 Revisit Unlock Gate Foundation
+- Current baseline: v1.9.0.
+- Added read-only gate progress models for revisit routes.
+- Added per-route progress and signal labels for locked preview display.
+- Earlier Dungeon Revisit now shows compact locked progress detail in the preview panel.
+- Gates remain locked/read-only and Trophy Echo remains preview-only and non-playable.
+- No route gameplay, rewards, combat reruns, teleporting, completion logic, or scaling was added.
 
 ## v1.8.2 Revisit Preview Panel Polish
 - Current baseline: v1.8.2.
