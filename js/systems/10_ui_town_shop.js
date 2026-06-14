@@ -46,37 +46,38 @@
           const gateProgress = String(gate.progressLabel || 'Preview only').trim();
           const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
           const previewState = String(preview.previewState || '').trim();
-          const previewLabel = String(preview.previewLabel || '').trim();
-          const previewReason = String(preview.previewReason || '').trim();
-          const previewRequirement = String(preview.previewRequirement || '').trim();
-          const previewSafety = String(preview.previewSafety || '').trim();
+          const previewLabel = String(preview.previewLabel || meta.previewLabel || '').trim();
+          const previewReason = String(preview.previewReason || meta.previewReason || '').trim();
+          const previewRequirement = String(preview.previewRequirement || meta.previewRequirement || '').trim();
+          const previewSafety = String(preview.previewSafety || meta.previewSafety || '').trim();
           const criteriaBody = criteria.length
             ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
-            : `<div class="small muted revisit-route-criteria-item">Future condition not active yet.</div>`;
+            : `<div class="small muted revisit-route-criteria-item">Future condition only.</div>`;
           return `<div class="revisit-route-card">
             <div class="split revisit-route-head">
               <strong>${escapeHtml(route.title || 'Planned Route')}</strong>
-              <span class="pill revisit-route-pill">${escapeHtml(route.status || 'Locked Preview')}</span>
+              <span class="pill revisit-route-pill">${escapeHtml(route.status || 'Still locked')}</span>
             </div>
             <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
             <div class="split revisit-route-readiness-head">
-              <span class="pill revisit-route-readiness-pill">${escapeHtml(isTrophyEcho ? previewLabel || 'Unlock Preview' : readiness)}</span>
-              <span class="small muted">Signal strength</span>
+              <span class="pill revisit-route-readiness-pill">${escapeHtml(previewLabel || 'Still locked')}</span>
+              <span class="small muted">Future Conditions</span>
             </div>
             <div class="split revisit-route-criteria-head">
-              <span class="pill revisit-route-criteria-pill">Unlock Criteria</span>
-              <span class="small muted">${escapeHtml(isTrophyEcho ? 'Future condition' : 'Preview only')}</span>
+              <span class="pill revisit-route-criteria-pill">Future Conditions</span>
+              <span class="small muted">Preview notes only</span>
             </div>
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
             ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
-            ${isTrophyEcho ? `<div class="small muted revisit-route-preview-label">${escapeHtml(previewLabel || 'Unlock Preview')}</div>
-            <div class="small muted revisit-route-preview-reason">${escapeHtml(previewReason || 'Future boss history may reopen this path.')}</div>
-            <div class="small muted revisit-route-preview-requirement">Requirement: ${escapeHtml(previewRequirement || 'Build more boss history.')}</div>
-            <div class="small muted revisit-route-preview-safety">${escapeHtml(previewSafety || 'Preview only - route access is unavailable.')}</div>` : ''}
+            <div class="small muted revisit-route-preview-state">${escapeHtml(previewState || 'locked')}</div>
+            <div class="small muted revisit-route-preview-label">${escapeHtml(previewLabel || 'Still locked')}</div>
+            <div class="small muted revisit-route-preview-reason">${escapeHtml(previewReason || 'Future route history may shape this path later.')}</div>
+            <div class="small muted revisit-route-preview-requirement">Requirement: ${escapeHtml(previewRequirement || 'Build more dungeon history.')}</div>
+            <div class="small muted revisit-route-preview-safety">Safety: ${escapeHtml(previewSafety || 'Preview only - route access is unavailable.')}</div>
             <div class="revisit-route-gate">
               <div class="split revisit-route-gate-head">
                 <span class="pill revisit-route-gate-pill">Locked Gate</span>
-                <span class="small muted">Preview only</span>
+                <span class="small muted">Preview notes only</span>
               </div>
               <div class="small muted revisit-route-gate-reason">${escapeHtml(gateReason)}</div>
               <div class="small muted revisit-route-gate-requirement">Requirement: ${escapeHtml(gateRequirement)}</div>
@@ -84,8 +85,8 @@
               <div class="small muted revisit-route-gate-source">Gate source: ${escapeHtml(gateSource)}</div>
             </div>
             <div class="revisit-route-meta small muted">
-              <span>Route not open yet</span>
-              <span>Read-only route preview</span>
+              <span>Still locked</span>
+              <span>Preview notes only</span>
             </div>
             <div class="small revisit-route-reason">${escapeHtml(route.reason || 'Future roads remain read-only.')}</div>
             <div class="small muted revisit-route-hooks">Echo source: ${escapeHtml(hookLabels || 'Unknown')}</div>
@@ -94,11 +95,11 @@
       : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
       <div class="split revisit-foundation-head"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
-      <div class="small muted">Locked preview only. These notes show where future revisit hooks may attach.</div>
+      <div class="small muted">Locked Preview. Preview notes only. Route access is unavailable.</div>
       <div class="list revisit-hook-list">${body}</div>
-      <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Read-only route preview</span></div>
-      <div class="small muted revisit-route-readiness-note">Readiness is display-only. Routes remain still locked.</div>
-      <div class="small muted revisit-route-criteria-note">Unlock Criteria is display-only. Future conditions are inferred, not active.</div>
+      <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
+      <div class="small muted revisit-route-readiness-note">Preview notes only. Routes remain locked.</div>
+      <div class="small muted revisit-route-criteria-note">Future Conditions are display-only. Future conditions are inferred, not active.</div>
       <div class="list revisit-route-list">${routeBody}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
     </div>`;

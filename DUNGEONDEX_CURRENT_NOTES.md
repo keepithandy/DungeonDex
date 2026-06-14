@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.8.0 - First Revisit Route Unlock Preview
+- DungeonDex v1.8.1 - Revisit Unlock Preview Copy Hardening
+
+## v1.8.1 Revisit Unlock Preview Copy Hardening
+- Current baseline: v1.8.1.
+- Preview copy was hardened so revisit text stays locked, inert, and clearly informational.
+- Trophy Echo remains preview-only and non-playable.
+- All routes remain locked/read-only.
+- No gameplay, rewards, teleporting, rerun combat, completion, or scaling was added.
+- Recommended next step: keep smoke coverage aligned with any later preview copy changes.
 
 ## v1.8.0 First Revisit Route Unlock Preview
 - Current baseline: v1.8.0.

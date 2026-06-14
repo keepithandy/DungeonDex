@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.8.0-revisit-unlock-preview';
+const CACHE_NAME = 'dungeondex-v1.8.1-revisit-preview-copy-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.8.0-revisit-unlock-preview';
+const BUILD_QS = '1.8.1-revisit-preview-copy-hardening';
 const ASSETS = [
   './',
   './index.html',

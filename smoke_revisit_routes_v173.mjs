@@ -96,17 +96,17 @@ async function main() {
         hasCandidateLedger: text.includes('Earlier Dungeon Revisit'),
         hasPlannedRoutes: text.includes('Planned Return Routes'),
         hasLockedPreview: text.includes('Locked Preview'),
-        hasRouteNotOpen: text.includes('Route not open yet'),
+        hasRouteNotOpen: text.includes('Still locked'),
         hasEchoSource: text.includes('Echo source:'),
-        hasReadOnlyPreview: text.includes('Read-only route preview'),
-        hasUnlockCriteria: text.includes('Unlock Criteria'),
-        hasPreviewOnly: text.includes('Preview only'),
+        hasReadOnlyPreview: text.includes('Preview notes only'),
+        hasUnlockCriteria: text.includes('Future Conditions'),
+        hasPreviewOnly: text.includes('Preview notes only'),
         hasLockedGate: text.includes('Locked Gate'),
         hasGateRequirement: text.includes('Requirement:'),
-        hasGateStatus: text.includes('Status: Preview only'),
-        hasReadiness: text.includes('Signal strength') || text.includes('Faint Trace') || text.includes('Route Forming') || text.includes('Strong Echo') || text.includes('Not Open Yet'),
-        hasUnlockPreview: text.includes('Unlock Preview'),
-        hasFutureCondition: text.includes('Future condition'),
+        hasGateStatus: text.includes('Status: Preview only - route access is unavailable.') || text.includes('Status: Still locked'),
+        hasReadiness: text.includes('Still locked') || text.includes('Future Unlock Preview'),
+        hasUnlockPreview: text.includes('Future Unlock Preview'),
+        hasFutureCondition: text.includes('Future Conditions'),
         hasPreviewOnlySafety: text.includes('Preview only - route access is unavailable.'),
         hasRouteAccessUnavailable: text.includes('route access is unavailable')
       };
@@ -184,7 +184,7 @@ async function main() {
     record('Unlock gates stay locked/read-only', Array.isArray(malformed.gates) && malformed.gates.every(gate => gate.locked === true && gate.ready === false && typeof gate.reason === 'string' && typeof gate.requirement === 'string' && typeof gate.progressLabel === 'string' && typeof gate.source === 'string'), JSON.stringify(malformed.gates?.slice(0, 3)));
     record('Unlock previews stay locked/read-only', Array.isArray(malformed.previews) && malformed.previews.every(preview => preview.locked === true && preview.playable === false && typeof preview.previewState === 'string' && typeof preview.previewLabel === 'string' && typeof preview.previewReason === 'string' && typeof preview.previewRequirement === 'string' && typeof preview.previewSafety === 'string'), JSON.stringify(malformed.previews?.slice(0, 3)));
     record('Unlock criteria appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => Array.isArray(route.criteria) && route.criteria.every(text => typeof text === 'string' && text.trim().length > 0)), JSON.stringify(malformed.routes?.slice(0, 3)));
-    record('Readiness labels appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => typeof route.readiness === 'string' && /Faint Trace|Route Forming|Strong Echo|Not Open Yet/.test(route.readiness)), JSON.stringify(malformed.routes?.slice(0, 3)));
+    record('Readiness labels appear as display strings only', Array.isArray(malformed.routes) && malformed.routes.every(route => typeof route.readiness === 'string' && /Faint Trace|Route Forming|Strong Echo|Still locked|Future Unlock Preview/.test(route.readiness)), JSON.stringify(malformed.routes?.slice(0, 3)));
     record(
       'Candidate and route outputs are display-safe',
       malformed.hooks.every(h =>
@@ -212,10 +212,10 @@ async function main() {
       malformed.previewSummary &&
       malformed.previewSummary.playable === 0 &&
       malformed.previewSummary.locked === malformed.previewSummary.total &&
+      malformed.previewSummary.preview >= 1 &&
       /Locked Preview/.test(malformed.text) &&
-      /Read-only route preview/.test(malformed.text) &&
-      /Unlock Criteria/.test(malformed.text) &&
-      /Signal strength/.test(malformed.text),
+      /Preview notes only/.test(malformed.text) &&
+      /Future Conditions/.test(malformed.text),
       JSON.stringify({
         hookSample: malformed.hooks[0],
         routeSample: malformed.routes[0],
@@ -290,7 +290,7 @@ async function main() {
     record('Unlock preview helpers do not mutate preview objects', mutationCheck.previewObjectsBefore === mutationCheck.previewObjectsAfter, JSON.stringify({ before: mutationCheck.previewObjectsBefore, after: mutationCheck.previewObjectsAfter }));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
     record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
-    record('Trophy Echo exposes preview copy without becoming playable', Array.isArray(mutationCheck.previews) && mutationCheck.previews.every(preview => preview.locked === true && preview.playable === false) && !!mutationCheck.previews.find(preview => preview.key === 'trophy_echo_route' && preview.previewState === 'preview' && preview.previewLabel === 'Unlock Preview' && preview.previewSafety.includes('route access is unavailable')) && !!String(mutationCheck.routeSlotText || '').includes('Unlock Preview'), JSON.stringify({ trophyPreview: mutationCheck.previews?.find(preview => preview.key === 'trophy_echo_route'), previewSummary: mutationCheck.previewSummary, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));
+    record('Trophy Echo exposes preview copy without becoming playable', Array.isArray(mutationCheck.previews) && mutationCheck.previews.every(preview => preview.locked === true && preview.playable === false) && !!mutationCheck.previews.find(preview => preview.key === 'trophy_echo_route' && preview.previewState === 'preview' && preview.previewLabel === 'Future Unlock Preview' && /future boss history/i.test(preview.previewReason || '') && preview.previewRequirement === 'Build more boss history.' && preview.previewSafety === 'Preview only - route access is unavailable.') && !!String(mutationCheck.routeSlotText || '').includes('Future Unlock Preview'), JSON.stringify({ trophyPreview: mutationCheck.previews?.find(preview => preview.key === 'trophy_echo_route'), previewSummary: mutationCheck.previewSummary, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));
     record('Unlock gates remain inert and add no route mechanics', mutationCheck.gates.every(gate => gate.locked === true && gate.ready === false && !gate.entry && !gate.enter && !gate.start && !gate.travel && !gate.begin && !gate.action && !gate.enabled && !gate.playable && !gate.unlocked && !gate.available && !gate.reward && !gate.rewards && !gate.teleport && !gate.rerun && !gate.combat && !gate.completion && !gate.complete && !gate.scaling && !gate.scale), JSON.stringify(mutationCheck.gates?.slice(0, 3)));
     record('Unlock gate summaries cannot imply playable route access', mutationCheck.gateSummary && mutationCheck.gateSummary.total === mutationCheck.gateSummary.locked && mutationCheck.gateSummary.ready === 0 && !mutationCheck.gateSummary.unlocked && !mutationCheck.gateSummary.playable && !mutationCheck.gateSummary.available && !mutationCheck.gateSummary.entry && !mutationCheck.gateSummary.reward && !mutationCheck.gateSummary.completion && !mutationCheck.gateSummary.scaling, JSON.stringify(mutationCheck.gateSummary));
     record('No revisit route entry API or button exists', mutationCheck.apiKeys.every(key => !/revisit.*(enter|start|claim|complete|reward|teleport|rerun|scale)/i.test(key)) && mutationCheck.buttons.every(label => !/revisit|return route|route preview|enter route/i.test(label)), JSON.stringify({ apiKeys: mutationCheck.apiKeys, buttons: mutationCheck.buttons }));

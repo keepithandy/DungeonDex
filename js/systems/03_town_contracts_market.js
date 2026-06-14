@@ -760,7 +760,14 @@
         gateType: 'trophy',
         gateLabel: 'Trophy Echo',
         reason: 'Locked: Trophy Echo not ready',
-        requirement: 'Defeat and record more boss history'
+        requirement: 'Build more boss history.',
+        progressLabel: 'Preview only - route access is unavailable.',
+        source: 'trophy echo',
+        previewState: 'preview',
+        previewLabel: 'Future Unlock Preview',
+        previewReason: 'Future boss history may reopen this path later.',
+        previewRequirement: 'Build more boss history.',
+        previewSafety: 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'famous_gear_route') {
@@ -768,7 +775,14 @@
         gateType: 'famousGear',
         gateLabel: 'Famous Gear',
         reason: 'Locked: Famous Gear memory not ready',
-        requirement: 'Carry or retire stronger remembered gear'
+        requirement: 'Build stronger gear memory.',
+        progressLabel: 'Preview only - route access is unavailable.',
+        source: 'famous gear',
+        previewState: 'locked',
+        previewLabel: 'Still locked',
+        previewReason: 'Future archive memory may shape this path later.',
+        previewRequirement: 'Build stronger gear memory.',
+        previewSafety: 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'rival_trace_route') {
@@ -776,7 +790,14 @@
         gateType: 'rival',
         gateLabel: 'Rival Trace',
         reason: 'Locked: Rival Trace not ready',
-        requirement: 'Leave a clearer rival trail through elite history'
+        requirement: 'Build more rival history.',
+        progressLabel: 'Preview only - route access is unavailable.',
+        source: 'rival trace',
+        previewState: 'locked',
+        previewLabel: 'Still locked',
+        previewReason: 'Future rival history may sharpen this trace later.',
+        previewRequirement: 'Build more rival history.',
+        previewSafety: 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'debt_pressure_route') {
@@ -784,7 +805,14 @@
         gateType: 'debt',
         gateLabel: 'Debt Pressure',
         reason: 'Locked: Debt Pressure not ready',
-        requirement: 'Let the debt ledger build a clearer district pressure note'
+        requirement: 'Build more debt history.',
+        progressLabel: 'Preview only - route access is unavailable.',
+        source: 'debt pressure',
+        previewState: 'locked',
+        previewLabel: 'Still locked',
+        previewReason: 'Future ledger pressure may mark this district later.',
+        previewRequirement: 'Build more debt history.',
+        previewSafety: 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'board_echo_route') {
@@ -792,14 +820,28 @@
         gateType: 'board',
         gateLabel: 'Board Echo',
         reason: 'Locked: Board Echo not ready',
-        requirement: 'Complete more board hunts and contract history'
+        requirement: 'Build more board history.',
+        progressLabel: 'Preview only - route access is unavailable.',
+        source: 'board echo',
+        previewState: 'locked',
+        previewLabel: 'Still locked',
+        previewReason: 'Future board history may strengthen this echo later.',
+        previewRequirement: 'Build more board history.',
+        previewSafety: 'Preview only - route access is unavailable.'
       };
     }
     return {
       gateType: 'unknown',
       gateLabel: 'Unknown Gate',
       reason: 'Locked: Revisit gate not ready',
-      requirement: 'Build more town and dungeon history'
+      requirement: 'Build more dungeon history.',
+      progressLabel: 'Preview only - route access is unavailable.',
+      source: 'unknown',
+      previewState: 'locked',
+      previewLabel: 'Still locked',
+      previewReason: 'Future route history may shape this path later.',
+      previewRequirement: 'Build more dungeon history.',
+      previewSafety: 'Preview only - route access is unavailable.'
     };
   }
 
@@ -819,14 +861,14 @@
         gateLabel: meta.gateLabel,
         reason: meta.reason,
         requirement: meta.requirement,
-        progressLabel: `Preview only - ${readiness}`,
+        progressLabel: meta.progressLabel || `Preview only - ${readiness}`,
         ready: false,
         source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown'),
-        previewState: preview?.previewState || 'locked',
-        previewLabel: preview?.previewLabel || 'Preview only',
-        previewReason: preview?.previewReason || 'Route remains locked.',
-        previewRequirement: preview?.previewRequirement || 'Requirement remains informational.',
-        previewSafety: preview?.previewSafety || 'Preview only - route access is unavailable.',
+        previewState: preview?.previewState || meta.previewState || 'locked',
+        previewLabel: preview?.previewLabel || meta.previewLabel || 'Still locked',
+        previewReason: preview?.previewReason || meta.previewReason || 'Future route history may shape this path later.',
+        previewRequirement: preview?.previewRequirement || meta.previewRequirement || 'Build more dungeon history.',
+        previewSafety: preview?.previewSafety || meta.previewSafety || 'Preview only - route access is unavailable.',
         playable: false
       };
     });
@@ -849,11 +891,11 @@
 
   function revisitUnlockPreview(state = S) {
     const routeDefs = [
-      { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Unlock Preview', previewReason: 'Future boss history may reopen this path.', previewRequirement: 'Build more boss history.' },
-      { key: 'famous_gear_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'Retired gear may remember old ground.', previewRequirement: 'Carry or retire stronger remembered gear.' },
-      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'A rival path may cross earlier districts.', previewRequirement: 'Leave a clearer rival trail through elite history.' },
-      { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'The ledger may point back to safer work.', previewRequirement: 'Let the debt ledger build a clearer district pressure note.' },
-      { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Preview only', previewReason: 'Contract history may reopen old roads.', previewRequirement: 'Complete more board hunts.' }
+      { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Future Unlock Preview', previewReason: 'Future boss history may reopen this path later.', previewRequirement: 'Build more boss history.' },
+      { key: 'famous_gear_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future archive memory may shape this path later.', previewRequirement: 'Build stronger gear memory.' },
+      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future rival history may sharpen this trace later.', previewRequirement: 'Build more rival history.' },
+      { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future ledger pressure may mark this district later.', previewRequirement: 'Build more debt history.' },
+      { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future board history may strengthen this echo later.', previewRequirement: 'Build more board history.' }
     ];
     return routeDefs.map(def => {
       return {
