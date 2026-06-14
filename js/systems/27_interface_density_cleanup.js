@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.9.0 - Interface density and app-feel cleanup.
+// DungeonDex v1.9.1 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.9.0';
+  const BUILD = '1.9.1';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.9.0-revisit-unlock-gate-foundation';
+  const BUILD_QS = '1.9.1-revisit-gate-diagnostics-polish';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

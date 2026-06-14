@@ -47,6 +47,9 @@
           const gateRequirement = String(gate.requirement || 'Build more town and dungeon history.').trim();
           const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
           const signal = String(gate.progressLabel || route.readiness || 'No signal yet').trim();
+          const diagnosticLabel = String(gate.diagnosticLabel || 'Gate Diagnostics').trim();
+          const diagnosticDetail = String(gate.diagnosticDetail || 'Diagnostic only - future unlock rule inactive.').trim();
+          const accessLabel = String(gate.accessLabel || 'Route access is unavailable.').trim();
           const progressCurrent = Math.max(0, Math.floor(Number(gate.progressCurrent || 0)));
           const progressRequired = Math.max(1, Math.floor(Number(gate.progressRequired || 1)));
           const progressPercent = Math.max(0, Math.min(100, Math.floor(Number(gate.progressPercent || 0))));
@@ -66,24 +69,28 @@
             <div class="small muted revisit-route-reason">${escapeHtml(previewReason || 'Future route history may shape this path later.')}</div>
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
             ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
-            <div class="small muted revisit-route-progress">Gate progress: ${escapeHtml(String(progressCurrent))} / ${escapeHtml(String(progressRequired))} · ${escapeHtml(signal || 'No signal yet')} (${escapeHtml(String(progressPercent))}%)</div>
+            <div class="small muted revisit-route-diagnostic-label">${escapeHtml(diagnosticLabel)}</div>
+            <div class="small muted revisit-route-diagnostic-detail">${escapeHtml(diagnosticDetail)}</div>
+            <div class="small muted revisit-route-progress">Progress: ${escapeHtml(String(progressCurrent))} / ${escapeHtml(String(progressRequired))} · ${escapeHtml(signal || 'No signal yet')} (${escapeHtml(String(progressPercent))}%)</div>
             <div class="split revisit-route-meta">
               <span class="small muted"><strong>Requirement:</strong> ${escapeHtml(previewRequirement || 'Build more dungeon history.')}</span>
               <span class="small muted"><strong>Safety:</strong> ${escapeHtml(previewSafety || 'Preview only - route access is unavailable.')}</span>
             </div>
             <div class="revisit-route-gate">
               <div class="split revisit-route-gate-head">
-                <span class="pill revisit-route-gate-pill">Locked Gate</span>
+                <span class="pill revisit-route-gate-pill">Locked Foundation</span>
                 <span class="small muted">Future Conditions</span>
               </div>
               <div class="small muted revisit-route-gate-reason">${escapeHtml(gateReason)}</div>
               <div class="small muted revisit-route-gate-requirement"><strong>Requirement:</strong> ${escapeHtml(gateRequirement)}</div>
               <div class="small muted revisit-route-gate-status"><strong>Signal:</strong> ${escapeHtml(signal || 'No signal yet')}</div>
+              <div class="small muted revisit-route-gate-access"><strong>Access:</strong> ${escapeHtml(accessLabel)}</div>
               <div class="small muted revisit-route-gate-source"><strong>Source:</strong> ${escapeHtml(gateSource)}</div>
             </div>
             <div class="revisit-route-meta small muted">
-              <span>Locked Foundation</span>
-              <span>Preview notes only</span>
+              <span>Diagnostic only</span>
+              <span>Future rule inactive</span>
+              <span>Route access is unavailable.</span>
             </div>
             <div class="small muted revisit-route-hooks"><strong>Source:</strong> ${escapeHtml(hookLabels || 'Unknown')}</div>
           </div>`;
@@ -91,11 +98,11 @@
       : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
       <div class="split revisit-foundation-head"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
-      <div class="small muted">Locked Preview. Preview notes only. Route access is unavailable.</div>
+      <div class="small muted">Locked Preview. Preview notes only. Future Conditions. Route access is unavailable.</div>
       <div class="list revisit-hook-list">${body}</div>
       <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
-      <div class="small muted revisit-route-readiness-note">Preview notes only. Route access is unavailable.</div>
-      <div class="small muted revisit-route-criteria-note">Future Conditions are display-only. Future conditions are inferred, not active.</div>
+      <div class="small muted revisit-route-readiness-note">Preview notes only. Future Conditions. Requirement: display only. Safety: display only. Progress: display only. Signal: display only. Route access is unavailable.</div>
+      <div class="small muted revisit-route-criteria-note">Future Conditions. Gate Diagnostics. Diagnostic only - future unlock rule inactive.</div>
       <div class="list revisit-route-list">${routeBody}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
     </div>`;

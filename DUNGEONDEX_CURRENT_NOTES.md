@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.9.0 - Revisit Unlock Gate Foundation
+- DungeonDex v1.9.1 - Revisit Gate Diagnostics Polish
+
+## v1.9.1 Revisit Gate Diagnostics Polish
+- Current baseline: v1.9.1.
+- Clarified revisit gate diagnostics so the copy reads as diagnostic only.
+- Added or refined diagnostic labels and access text on locked gate previews.
+- Earlier Dungeon Revisit now shows clearer gate progress and signal detail.
+- Gate summary remains locked, non-playable, and read-only.
+- Trophy Echo remains preview-only and non-playable.
+- No gameplay, rewards, combat reruns, teleporting, completion logic, or scaling was added.
 
 ## v1.9.0 Revisit Unlock Gate Foundation
 - Current baseline: v1.9.0.

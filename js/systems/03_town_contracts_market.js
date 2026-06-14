@@ -825,9 +825,9 @@
     const progressLabel = progress.progressCurrent <= 0
       ? 'No signal yet'
       : progress.progressPercent >= 100
-        ? 'Foundation capped'
+        ? 'Diagnostic cap reached'
         : progress.progressCurrent === 1
-          ? 'Trace noted'
+          ? 'Foundation signal noted'
           : 'Progress noted';
     return {
       routeKey: safeKey,
@@ -836,6 +836,9 @@
       progressRequired: progress.progressRequired,
       progressPercent: progress.progressPercent,
       progressLabel,
+      diagnosticLabel: 'Gate Diagnostics',
+      diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+      accessLabel: 'Route access is unavailable.',
       signals
     };
   }
@@ -848,7 +851,10 @@
         gateLabel: 'Trophy Echo',
         reason: 'Locked: Trophy Echo not ready',
         requirement: 'Build more boss history.',
-        progressLabel: 'Preview only - route access is unavailable.',
+        progressLabel: 'No signal yet',
+        diagnosticLabel: 'Gate Diagnostics',
+        diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+        accessLabel: 'Route access is unavailable.',
         source: 'trophy echo',
         previewState: 'preview',
         previewLabel: 'Future Unlock Preview',
@@ -863,7 +869,10 @@
         gateLabel: 'Famous Gear',
         reason: 'Locked: Famous Gear memory not ready',
         requirement: 'Build stronger gear memory.',
-        progressLabel: 'Preview only - route access is unavailable.',
+        progressLabel: 'No signal yet',
+        diagnosticLabel: 'Gate Diagnostics',
+        diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+        accessLabel: 'Route access is unavailable.',
         source: 'famous gear',
         previewState: 'locked',
         previewLabel: 'Still locked',
@@ -878,7 +887,10 @@
         gateLabel: 'Rival Trace',
         reason: 'Locked: Rival Trace not ready',
         requirement: 'Build more rival history.',
-        progressLabel: 'Preview only - route access is unavailable.',
+        progressLabel: 'No signal yet',
+        diagnosticLabel: 'Gate Diagnostics',
+        diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+        accessLabel: 'Route access is unavailable.',
         source: 'rival trace',
         previewState: 'locked',
         previewLabel: 'Still locked',
@@ -893,7 +905,10 @@
         gateLabel: 'Debt Pressure',
         reason: 'Locked: Debt Pressure not ready',
         requirement: 'Build more debt history.',
-        progressLabel: 'Preview only - route access is unavailable.',
+        progressLabel: 'No signal yet',
+        diagnosticLabel: 'Gate Diagnostics',
+        diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+        accessLabel: 'Route access is unavailable.',
         source: 'debt pressure',
         previewState: 'locked',
         previewLabel: 'Still locked',
@@ -908,7 +923,10 @@
         gateLabel: 'Board Echo',
         reason: 'Locked: Board Echo not ready',
         requirement: 'Build more board history.',
-        progressLabel: 'Preview only - route access is unavailable.',
+        progressLabel: 'No signal yet',
+        diagnosticLabel: 'Gate Diagnostics',
+        diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+        accessLabel: 'Route access is unavailable.',
         source: 'board echo',
         previewState: 'locked',
         previewLabel: 'Still locked',
@@ -922,7 +940,10 @@
       gateLabel: 'Unknown Gate',
       reason: 'Locked: Revisit gate not ready',
       requirement: 'Build more dungeon history.',
-      progressLabel: 'Preview only - route access is unavailable.',
+      progressLabel: 'No signal yet',
+      diagnosticLabel: 'Gate Diagnostics',
+      diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
+      accessLabel: 'Route access is unavailable.',
       source: 'unknown',
       previewState: 'locked',
       previewLabel: 'Still locked',
@@ -951,12 +972,15 @@
         playable: false,
         reason: meta.reason,
         requirement: meta.requirement,
-        progressCurrent: progress.progressCurrent,
-        progressRequired: progress.progressRequired,
-        progressPercent: progress.progressPercent,
-        progressLabel: progress.progressLabel || meta.progressLabel || `Preview only - ${readiness}`,
-        signals: progress.signals,
-        source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown'),
+      progressCurrent: progress.progressCurrent,
+      progressRequired: progress.progressRequired,
+      progressPercent: progress.progressPercent,
+      progressLabel: progress.progressLabel || meta.progressLabel || 'No signal yet',
+      signals: progress.signals,
+      diagnosticLabel: meta.diagnosticLabel || 'Gate Diagnostics',
+      diagnosticDetail: meta.diagnosticDetail || 'Diagnostic only - future unlock rule inactive.',
+      accessLabel: meta.accessLabel || 'Route access is unavailable.',
+      source: sourceHooks.length ? sourceHooks.join(' / ') : String(route?.source || 'Unknown'),
         previewState: preview?.previewState || meta.previewState || 'locked',
         previewLabel: preview?.previewLabel || meta.previewLabel || 'Still locked',
         previewReason: preview?.previewReason || meta.previewReason || 'Future route history may shape this path later.',
@@ -981,6 +1005,8 @@
       playable: 0,
       progressAverage: total ? Math.floor(gates.reduce((sum, gate) => sum + Math.max(0, Math.floor(numberOr(gate?.progressPercent, 0, 0, 100))), 0) / total) : 0,
       progressNoted: gates.filter(gate => Math.max(0, Math.floor(numberOr(gate?.progressCurrent, 0, 0, Number.MAX_SAFE_INTEGER))) > 0).length,
+      diagnosticOnly: true,
+      accessAvailable: false,
       types
     };
   }
