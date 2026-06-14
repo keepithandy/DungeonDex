@@ -383,8 +383,54 @@ async function main() {
       const routeSlot = document.getElementById('revisitFoundationSlot');
       const routeSlotText = routeSlot?.innerText || '';
       const routeSlotButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
+      const routeSlotActionAttrs = Array.from(document.querySelectorAll('#revisitFoundationSlot [data-action], #revisitFoundationSlot [data-route-action], #revisitFoundationSlot [onclick], #revisitFoundationSlot a[href]')).map(node => ({
+        tag: node.tagName,
+        text: String(node.textContent || '').trim(),
+        action: node.getAttribute('data-action') || '',
+        routeAction: node.getAttribute('data-route-action') || '',
+        onclick: node.getAttribute('onclick') || '',
+        href: node.getAttribute('href') || ''
+      }));
       const apiKeys = Object.keys(api);
-      return { snapshot, after, plan, planAgain, planGlobal, summary, summaryAgain, highPlan, highSummary, malformedPlan, malformedSummary, malformedError, routeSlotText, routeSlotButtons, apiKeys };
+      const trophyEdgeInputs = [
+        { name: 'null state', state: null },
+        { name: 'missing player', state: {} },
+        { name: 'empty player', state: { player: {} } },
+        { name: 'malformed trophy arrays', state: { player: { bossTrophies: 'bad', eliteTrophies: 'bad', bossTrophyRecords: 'bad' } } },
+        { name: 'mixed trophy arrays', state: { player: { bossTrophies: [null, 'x', 1, {}, { id: 'boss-a' }], eliteTrophies: { a: true, b: {}, c: null }, bossTrophyRecords: [null, {}, { bossKey: 'boss-b' }] } } },
+        { name: 'high boss history', state: { player: { bossTrophies: new Array(50).fill({ bossKey: 'echo' }), eliteTrophies: { a: {}, b: {}, c: {}, d: {} }, bossTrophyRecords: new Array(50).fill({ bossKey: 'echo' }) } } }
+      ];
+      const edgeCases = trophyEdgeInputs.map(testCase => {
+        let edgePlan = null;
+        let edgePlanAgain = null;
+        let edgeSummary = null;
+        let edgeSummaryAgain = null;
+        let edgeError = '';
+        const before = (() => { try { return JSON.stringify(testCase.state); } catch (_) { return '[unserializable]'; } })();
+        try {
+          edgePlan = typeof api.revisitTrophyEchoRulePlan === 'function' ? api.revisitTrophyEchoRulePlan(testCase.state) : null;
+          edgePlanAgain = typeof api.revisitTrophyEchoRulePlan === 'function' ? api.revisitTrophyEchoRulePlan(testCase.state) : null;
+          edgeSummary = typeof api.revisitTrophyEchoRuleSummary === 'function' ? api.revisitTrophyEchoRuleSummary(testCase.state) : null;
+          edgeSummaryAgain = typeof api.revisitTrophyEchoRuleSummary === 'function' ? api.revisitTrophyEchoRuleSummary(testCase.state) : null;
+        } catch (err) {
+          edgeError = String(err && err.message ? err.message : err);
+        }
+        const afterEdge = (() => { try { return JSON.stringify(testCase.state); } catch (_) { return '[unserializable]'; } })();
+        return {
+          name: testCase.name,
+          before,
+          after: afterEdge,
+          plan: edgePlan,
+          summary: edgeSummary,
+          deterministic: JSON.stringify(edgePlan) === JSON.stringify(edgePlanAgain) && JSON.stringify(edgeSummary) === JSON.stringify(edgeSummaryAgain),
+          notMutated: before === afterEdge,
+          error: edgeError
+        };
+      });
+      const highEdge = edgeCases.find(entry => entry.name === 'high boss history') || {};
+      const highGateSummary = typeof api.revisitUnlockGateSummary === 'function' ? api.revisitUnlockGateSummary(highState) : null;
+      const highPreviewSummary = typeof api.revisitUnlockPreviewSummary === 'function' ? api.revisitUnlockPreviewSummary(highState) : null;
+      return { snapshot, after, plan, planAgain, planGlobal, summary, summaryAgain, highPlan, highSummary, malformedPlan, malformedSummary, malformedError, routeSlotText, routeSlotButtons, routeSlotActionAttrs, apiKeys, edgeCases, highEdge, highGateSummary, highPreviewSummary };
     })()`);
     record('Trophy Echo planning helpers exist and are deterministic', trophyPlanCheck.plan && trophyPlanCheck.summary && JSON.stringify(trophyPlanCheck.plan) === JSON.stringify(trophyPlanCheck.planAgain) && JSON.stringify(trophyPlanCheck.plan) === JSON.stringify(trophyPlanCheck.planGlobal) && JSON.stringify(trophyPlanCheck.summary) === JSON.stringify(trophyPlanCheck.summaryAgain), JSON.stringify({ plan: trophyPlanCheck.plan, summary: trophyPlanCheck.summary }));
     record('Trophy Echo rule plan stays locked inactive and non-playable', trophyPlanCheck.plan?.key === 'trophy_echo_route' && trophyPlanCheck.plan.locked === true && trophyPlanCheck.plan.ready === false && trophyPlanCheck.plan.playable === false && trophyPlanCheck.plan.active === false && trophyPlanCheck.plan.accessAvailable === false && trophyPlanCheck.plan.rewardAvailable === false && /route access is unavailable/i.test(trophyPlanCheck.plan.routeAccessLabel || '') && /future rule inactive/i.test(trophyPlanCheck.plan.ruleInactiveLabel || '') && typeof trophyPlanCheck.plan.signalCurrent === 'number' && typeof trophyPlanCheck.plan.signalRequired === 'number' && typeof trophyPlanCheck.plan.signalPercent === 'number' && Array.isArray(trophyPlanCheck.plan.signalSources) && Array.isArray(trophyPlanCheck.plan.antiFarmPolicy) && trophyPlanCheck.plan.rewardPolicy?.rewardAccess === false, JSON.stringify(trophyPlanCheck.plan));
@@ -392,9 +438,11 @@ async function main() {
     record('Trophy Echo planning helpers do not mutate player or run state', trophyPlanCheck.snapshot === trophyPlanCheck.after, JSON.stringify({ before: trophyPlanCheck.snapshot, after: trophyPlanCheck.after }));
     record('High boss-history signal still does not activate Trophy Echo', trophyPlanCheck.highPlan?.locked === true && trophyPlanCheck.highPlan.ready === false && trophyPlanCheck.highPlan.playable === false && trophyPlanCheck.highPlan.active === false && trophyPlanCheck.highPlan.accessAvailable === false && trophyPlanCheck.highPlan.rewardAvailable === false && trophyPlanCheck.highSummary?.ready === 0 && trophyPlanCheck.highSummary.playable === 0 && trophyPlanCheck.highSummary.active === 0 && trophyPlanCheck.routeSlotButtons.length === 0, JSON.stringify({ highPlan: trophyPlanCheck.highPlan, highSummary: trophyPlanCheck.highSummary, routeSlotButtons: trophyPlanCheck.routeSlotButtons }));
     record('Malformed boss-history structures keep Trophy Echo planning safe', !trophyPlanCheck.malformedError && trophyPlanCheck.malformedPlan?.locked === true && trophyPlanCheck.malformedPlan.ready === false && trophyPlanCheck.malformedPlan.playable === false && trophyPlanCheck.malformedPlan.active === false && trophyPlanCheck.malformedPlan.accessAvailable === false && trophyPlanCheck.malformedPlan.rewardAvailable === false && trophyPlanCheck.malformedSummary?.ready === 0 && trophyPlanCheck.malformedSummary.playable === 0, JSON.stringify({ malformedPlan: trophyPlanCheck.malformedPlan, malformedSummary: trophyPlanCheck.malformedSummary, malformedError: trophyPlanCheck.malformedError }));
+    record('Trophy Echo planning tolerates edge-case boss history states', Array.isArray(trophyPlanCheck.edgeCases) && trophyPlanCheck.edgeCases.length >= 6 && trophyPlanCheck.edgeCases.every(entry => !entry.error && entry.deterministic && entry.notMutated && entry.plan?.key === 'trophy_echo_route' && entry.plan.locked === true && entry.plan.ready === false && entry.plan.playable === false && entry.plan.active === false && entry.plan.accessAvailable === false && entry.plan.rewardAvailable === false && entry.plan.rewardPolicy?.rewardAccess === false && entry.summary?.locked === true && entry.summary.ready === 0 && entry.summary.playable === 0 && entry.summary.active === 0 && entry.summary.accessAvailable === false && entry.summary.rewardAvailable === false && typeof entry.plan.signalCurrent === 'number' && typeof entry.plan.signalRequired === 'number' && entry.plan.signalRequired >= 1 && typeof entry.plan.signalPercent === 'number' && entry.plan.signalPercent >= 0 && entry.plan.signalPercent <= 100), JSON.stringify(trophyPlanCheck.edgeCases));
+    record('High Trophy Echo signal does not create route access', trophyPlanCheck.highEdge?.plan?.signalCurrent >= trophyPlanCheck.highEdge?.plan?.signalRequired && trophyPlanCheck.highEdge.plan.signalPercent === 100 && trophyPlanCheck.highEdge.plan.locked === true && trophyPlanCheck.highEdge.plan.ready === false && trophyPlanCheck.highEdge.plan.playable === false && trophyPlanCheck.highEdge.plan.active === false && trophyPlanCheck.highEdge.plan.accessAvailable === false && trophyPlanCheck.highEdge.plan.rewardAvailable === false && trophyPlanCheck.highSummary?.ready === 0 && trophyPlanCheck.highSummary.playable === 0 && trophyPlanCheck.highSummary.active === 0 && trophyPlanCheck.highSummary.accessAvailable === false && trophyPlanCheck.highSummary.rewardAvailable === false && trophyPlanCheck.highGateSummary?.ready === 0 && trophyPlanCheck.highGateSummary.playable === 0 && trophyPlanCheck.highPreviewSummary?.playable === 0 && trophyPlanCheck.routeSlotButtons.length === 0 && trophyPlanCheck.routeSlotActionAttrs.length === 0 && trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify({ highEdge: trophyPlanCheck.highEdge, highSummary: trophyPlanCheck.highSummary, highGateSummary: trophyPlanCheck.highGateSummary, highPreviewSummary: trophyPlanCheck.highPreviewSummary, routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
     record('Trophy Echo anti-farming policy is present', Array.isArray(trophyPlanCheck.plan?.antiFarmPolicy) && /low-floor farming/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /infinite revisit loops/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /mandatory revisit grind/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /stronger than main progression/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /Enter Dungeon and Continue Run remain primary/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')), JSON.stringify(trophyPlanCheck.plan?.antiFarmPolicy));
     record('Trophy Echo reward policy remains planning only', trophyPlanCheck.plan?.rewardPolicy?.status === 'Planning only' && trophyPlanCheck.plan.rewardPolicy.rewardAccess === false && /Memory, trophy, and Dex identity rewards first/i.test(trophyPlanCheck.plan.rewardPolicy.allowedFutureClass || '') && Array.isArray(trophyPlanCheck.plan.rewardPolicy.disallowed) && trophyPlanCheck.plan.rewardPolicy.disallowed.length >= 4, JSON.stringify(trophyPlanCheck.plan?.rewardPolicy));
-    record('Earlier Dungeon Revisit shows Trophy Echo planning copy without controls', /Trophy Echo Rule Planning/i.test(trophyPlanCheck.routeSlotText || '') && /Planning only/i.test(trophyPlanCheck.routeSlotText || '') && /Future rule inactive/i.test(trophyPlanCheck.routeSlotText || '') && /Boss-history signal/i.test(trophyPlanCheck.routeSlotText || '') && /Route access is unavailable/i.test(trophyPlanCheck.routeSlotText || '') && /No reward access/i.test(trophyPlanCheck.routeSlotText || '') && /Anti-farming/i.test(trophyPlanCheck.routeSlotText || '') && trophyPlanCheck.routeSlotButtons.length === 0, JSON.stringify({ routeSlotText: String(trophyPlanCheck.routeSlotText || '').slice(0, 900), routeSlotButtons: trophyPlanCheck.routeSlotButtons }));
+    record('Earlier Dungeon Revisit shows Trophy Echo planning copy without controls', /Trophy Echo Rule Planning/i.test(trophyPlanCheck.routeSlotText || '') && /Planning only/i.test(trophyPlanCheck.routeSlotText || '') && /Future rule inactive/i.test(trophyPlanCheck.routeSlotText || '') && /Boss-history signal/i.test(trophyPlanCheck.routeSlotText || '') && /Route access is unavailable/i.test(trophyPlanCheck.routeSlotText || '') && /No reward access/i.test(trophyPlanCheck.routeSlotText || '') && /Anti-farming/i.test(trophyPlanCheck.routeSlotText || '') && trophyPlanCheck.routeSlotButtons.length === 0 && trophyPlanCheck.routeSlotActionAttrs.length === 0, JSON.stringify({ routeSlotText: String(trophyPlanCheck.routeSlotText || '').slice(0, 900), routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
     record('No unsafe Trophy Echo planning API names exist', trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify(trophyPlanCheck.apiKeys));
 
     const oldSave = await evalByValue(client, `(() => {

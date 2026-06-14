@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.10.0`
-* Current local package baseline: `v1.10.0`
-* Current development target: `v1.10.0`
+* Public/live itch version: `v1.10.1`
+* Current local package baseline: `v1.10.1`
+* Current development target: `v1.10.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,20 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.10.1 - Trophy Echo Rule Smoke Hardening
+
+Status: Complete
+
+Summary:
+
+* Hardened Trophy Echo rule planning smoke against malformed, missing, mixed, and high boss-history data.
+* Confirmed high Trophy Echo signal progress does not create route access.
+* Confirmed route access and reward access remain unavailable.
+* Trophy Echo remains locked, inactive, and non-playable.
+* No save fields, gameplay, route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance, or economy changes.
 
 ---
 

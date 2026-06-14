@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.10.0**
+Current baseline: **DungeonDex v1.10.1**
 
 ## Current Build
 
-**v1.10.0 — Trophy Echo Unlock Rule Planning**
+**v1.10.1 — Trophy Echo Rule Smoke Hardening**
 
-This version adds read-only Trophy Echo unlock-rule planning metadata. Trophy Echo remains locked, inactive, and non-playable. The planning layer defines boss-history signals, anti-farming guardrails, and future reward policy without adding route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
+This version hardens Trophy Echo rule-planning smoke coverage against malformed, missing, mixed, and high boss-history data. Trophy Echo remains locked, inactive, and non-playable, with no route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.10.0 is a Trophy Echo unlock-rule planning pass; it does not start active unlock rules or playable revisit routes.
+v1.10.1 is a Trophy Echo rule smoke-hardening pass; it does not start active unlock rules or playable revisit routes.
 
 ## Running Locally
 

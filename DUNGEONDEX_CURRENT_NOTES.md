@@ -7,7 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.10.0 - Trophy Echo Unlock Rule Planning
+- DungeonDex v1.10.1 - Trophy Echo Rule Smoke Hardening
+
+## v1.10.1 Trophy Echo Rule Smoke Hardening
+- Current baseline: v1.10.1.
+- Hardened Trophy Echo rule planning smoke against malformed, missing, mixed, and high boss-history data.
+- Confirmed high boss-history progress does not activate Trophy Echo.
+- Confirmed route access and reward access remain unavailable.
+- Trophy Echo remains locked, inactive, and non-playable.
+- All revisit routes remain locked/read-only.
+- All gates remain locked:true, ready:false, playable:false.
+- No gameplay was added.
 
 ## v1.10.0 Trophy Echo Unlock Rule Planning
 - Current baseline: v1.10.0.
@@ -189,14 +199,14 @@
 ## Current Roadmap
 
 ### Current Stable Checkpoint
-- DungeonDex v1.10.0 is the Trophy Echo Unlock Rule Planning baseline.
+- DungeonDex v1.10.1 is the Trophy Echo Rule Smoke Hardening baseline.
 - Revisit systems remain safe, read-only, non-playable, and smoke-protected.
 - Trophy Echo has read-only future rule metadata and remains locked, inactive, and non-playable.
 - No route entry, rewards, teleporting, combat reruns, completion logic, or scaling exists.
 
-### v1.10.0 Trophy Echo Rule Planning
-- Define boss-history signals for the first future revisit rule.
-- Document anti-farming guardrails and future reward policy.
+### v1.10.1 Trophy Echo Rule Smoke Hardening
+- Stress-test Trophy Echo planning helpers against malformed, missing, mixed, and high boss-history inputs.
+- Confirm high signal progress cannot create route access or reward access.
 - Keep the rule inactive and route access unavailable.
 
 ### Candidate Follow-Up Lanes
