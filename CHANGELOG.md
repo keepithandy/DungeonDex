@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.9.3`
-* Current local package baseline: `v1.9.3`
-* Current development target: `v1.9.3`
+* Public/live itch version: `v1.10.0`
+* Current local package baseline: `v1.10.0`
+* Current development target: `v1.10.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,20 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.10.0 - Trophy Echo Unlock Rule Planning
+
+Status: Complete
+
+Summary:
+
+* Added read-only Trophy Echo unlock-rule planning metadata.
+* Added boss-history signal planning.
+* Added anti-farming and future reward-policy metadata.
+* Trophy Echo remains locked, inactive, and non-playable.
+* No route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance, or economy changes.
 
 ---
 

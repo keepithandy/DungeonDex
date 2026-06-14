@@ -7,6 +7,7 @@
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
     const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
     const rawPreviews = typeof revisitUnlockPreview === 'function' ? revisitUnlockPreview(state) : [];
+    const trophyEchoPlan = typeof revisitTrophyEchoRulePlan === 'function' ? revisitTrophyEchoRulePlan(state) : null;
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
     const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
@@ -96,6 +97,19 @@
           </div>`;
         }).join('')
       : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;
+    const planningNote = trophyEchoPlan && typeof trophyEchoPlan === 'object'
+      ? `<div class="revisit-route-card revisit-trophy-echo-plan">
+          <div class="split revisit-route-head">
+            <strong>Trophy Echo Rule Planning</strong>
+            <span class="pill">${escapeHtml(trophyEchoPlan.status || 'Planning only')}</span>
+          </div>
+          <div class="small muted">Planning only. ${escapeHtml(trophyEchoPlan.ruleInactiveLabel || 'Future rule inactive.')}</div>
+          <div class="small muted">${escapeHtml(trophyEchoPlan.signalLabel || 'Boss-history signal')}: ${escapeHtml(String(Math.max(0, Math.floor(Number(trophyEchoPlan.signalCurrent || 0)))))} / ${escapeHtml(String(Math.max(1, Math.floor(Number(trophyEchoPlan.signalRequired || 1)))))}</div>
+          <div class="small muted">${escapeHtml(trophyEchoPlan.routeAccessLabel || 'Route access is unavailable.')}</div>
+          <div class="small muted">No reward access.</div>
+          <div class="small muted">Anti-farming guardrails: no low-floor farming, no infinite loops, no mandatory revisit grind.</div>
+        </div>`
+      : '';
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
       <div class="split revisit-foundation-head"><div><h3>Earlier Dungeon Revisit</h3><p>Old districts are beginning to leave return traces.</p></div><span class="pill">${status}</span></div>
       <div class="small muted">Locked Preview. Preview notes only. Future Conditions. Route access is unavailable.</div>
@@ -103,6 +117,7 @@
       <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
       <div class="small muted revisit-route-readiness-note">Preview notes only. Future Conditions. Requirement: display only. Safety: display only. Progress: display only. Signal: display only. Route access is unavailable.</div>
       <div class="small muted revisit-route-criteria-note">Future Conditions. Gate Diagnostics. Diagnostic only - future unlock rule inactive.</div>
+      ${planningNote}
       <div class="list revisit-route-list">${routeBody}</div>
       <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
     </div>`;

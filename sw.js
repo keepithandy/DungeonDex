@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.9.3-systems-handoff-audit';
+const CACHE_NAME = 'dungeondex-v1.10.0-trophy-echo-unlock-rule-planning';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.9.3-systems-handoff-audit';
+const BUILD_QS = '1.10.0-trophy-echo-unlock-rule-planning';
 const ASSETS = [
   './',
   './index.html',

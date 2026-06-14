@@ -7,7 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.9.3 - Systems Handoff Audit
+- DungeonDex v1.10.0 - Trophy Echo Unlock Rule Planning
+
+## v1.10.0 Trophy Echo Unlock Rule Planning
+- Current baseline: v1.10.0.
+- Added read-only Trophy Echo rule plan metadata.
+- Added boss-history signal planning for the future Trophy Echo rule.
+- Added anti-farming policy metadata.
+- Added future reward policy metadata.
+- Trophy Echo remains locked, inactive, and non-playable.
+- All revisit routes remain locked/read-only.
+- All gates remain locked:true, ready:false, playable:false.
+- No gameplay, rewards, combat reruns, teleporting, completion logic, scaling, combat balance, or economy balance was added.
 
 ## v1.9.3 Systems Handoff Audit
 - Current baseline: v1.9.3.
@@ -178,27 +189,27 @@
 ## Current Roadmap
 
 ### Current Stable Checkpoint
-- DungeonDex v1.9.2 is the locked Revisit Gate Checkpoint baseline.
-- Revisit systems are safe, read-only, non-playable, and smoke-protected.
-- Trophy Echo remains preview-only.
+- DungeonDex v1.10.0 is the Trophy Echo Unlock Rule Planning baseline.
+- Revisit systems remain safe, read-only, non-playable, and smoke-protected.
+- Trophy Echo has read-only future rule metadata and remains locked, inactive, and non-playable.
 - No route entry, rewards, teleporting, combat reruns, completion logic, or scaling exists.
 
-### v1.9.3 Systems Handoff
-- Audit unfinished foundations before choosing v1.10.
-- Mark Revisit as checkpointed but not playable.
-- Hand likely next lanes into v1.10 planning.
+### v1.10.0 Trophy Echo Rule Planning
+- Define boss-history signals for the first future revisit rule.
+- Document anti-farming guardrails and future reward policy.
+- Keep the rule inactive and route access unavailable.
 
-### Candidate v1.10 Lanes
-1. Trophy Echo Unlock Rule Planning
-2. Talent Foundation Expansion
-3. Debt Collector Visibility / Risk Pressure
-4. Famous Gear Memory Attachment
-5. Boss Trophy / Dex Identity
-6. District / World Identity
+### Candidate Follow-Up Lanes
+1. Trophy Echo smoke hardening.
+2. Talent Foundation Expansion.
+3. Debt Collector Visibility / Risk Pressure.
+4. Famous Gear Memory Attachment.
+5. Boss Trophy / Dex Identity.
+6. District / World Identity.
 
-### Recommended v1.10 Lane
-- Trophy Echo Unlock Rule Planning remains the safest first lane because it uses boss-history systems that already exist and can stay read-only.
-- Do not start playable revisit routes in v1.10.0.
+### Recommended Next Lane
+- Trophy Echo smoke hardening is the safest next lane because the rule plan exists and should remain read-only before any future unlock design is considered.
+- Do not start playable revisit routes in the next patch.
 
 ### Larger Direction
 - Move v1.7/v2 planning toward stronger world identity and collection-game feel.

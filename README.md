@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.9.3**
+Current baseline: **DungeonDex v1.10.0**
 
 ## Current Build
 
-**v1.9.3 — Systems Handoff Audit**
+**v1.10.0 — Trophy Echo Unlock Rule Planning**
 
-This version audits checkpointed and unfinished systems before v1.10 planning. Revisit routes remain locked, read-only, and non-playable. The handoff does not add route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
+This version adds read-only Trophy Echo unlock-rule planning metadata. Trophy Echo remains locked, inactive, and non-playable. The planning layer defines boss-history signals, anti-farming guardrails, and future reward policy without adding route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -73,14 +73,16 @@ Implemented so far:
 * `revisitUnlockGateSummary(state)`
 * `revisitUnlockPreview(state)`
 * `revisitUnlockPreviewSummary(state)`
+* `revisitTrophyEchoRulePlan(state)`
+* `revisitTrophyEchoRuleSummary(state)`
 
 Current rule:
 
 > Revisit routes are not playable yet.
 
-Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo are planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
+Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.9.3 is a systems handoff audit before v1.10 planning; it does not start active unlock rules or playable revisit routes.
+v1.10.0 is a Trophy Echo unlock-rule planning pass; it does not start active unlock rules or playable revisit routes.
 
 ## Running Locally
 
@@ -125,11 +127,11 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Near-term development is focused on choosing the safest v1.10 lane from checkpointed foundations without starting playable revisit routes.
+Near-term development is focused on hardening the Trophy Echo planning layer without starting playable revisit routes.
 
-Candidate v1.10 lanes:
+Candidate follow-up lanes:
 
-1. Trophy Echo Unlock Rule Planning
+1. Trophy Echo smoke hardening
 2. Talent Foundation Expansion
 3. Debt Collector Visibility / Risk Pressure
 4. Famous Gear Memory Attachment
@@ -138,7 +140,7 @@ Candidate v1.10 lanes:
 
 Recommended next lane:
 
-**Trophy Echo Unlock Rule Planning** remains the safest first v1.10 candidate because it can use existing boss-history records while staying read-only. Do not start playable revisit routes in v1.10.0.
+**Trophy Echo smoke hardening** is the safest next lane because the rule plan now exists and must stay read-only before any future unlock design is considered. Do not start playable revisit routes in the next patch.
 
 ## Project Status
 

@@ -767,6 +767,104 @@
     return revisitGateProgressClamp(current, required).progressPercent;
   }
 
+  function revisitTrophyEchoSignalModel(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
+    const countArray = source => asArray(source, []).filter(entry => entry && (typeof entry === 'object' || typeof entry === 'string')).length;
+    const bossTrophyCount = countArray(safePlayer.bossTrophies);
+    const eliteSource = isPlainObject(safePlayer.eliteTrophies) && isPlainObject(safePlayer.eliteTrophies.collected)
+      ? safePlayer.eliteTrophies.collected
+      : isPlainObject(safePlayer.eliteTrophies)
+        ? safePlayer.eliteTrophies
+        : {};
+    const eliteTrophyCount = Object.keys(eliteSource).filter(key => {
+      const entry = eliteSource[key];
+      return entry && typeof entry === 'object';
+    }).length;
+    const bossRecordCount = countArray(safePlayer.bossTrophyRecords);
+    const signalSources = [
+      { key: 'bossTrophies', label: 'Boss trophy memory', count: bossTrophyCount },
+      { key: 'eliteTrophies', label: 'Elite trophy memory', count: eliteTrophyCount },
+      { key: 'bossRecords', label: 'Boss record memory', count: bossRecordCount }
+    ].map(source => ({
+      key: source.key,
+      label: source.label,
+      count: Math.max(0, Math.floor(numberOr(source.count, 0, 0, Number.MAX_SAFE_INTEGER)))
+    }));
+    const signalCurrent = signalSources.reduce((sum, source) => sum + source.count, 0);
+    const signalRequired = 3;
+    const progress = revisitGateProgressClamp(signalCurrent, signalRequired);
+    return {
+      signalCurrent: progress.progressCurrent,
+      signalRequired: progress.progressRequired,
+      signalPercent: progress.progressPercent,
+      signalSources
+    };
+  }
+
+  function revisitTrophyEchoRulePlan(state = S) {
+    const signal = revisitTrophyEchoSignalModel(state);
+    return {
+      key: 'trophy_echo_route',
+      label: 'Trophy Echo',
+      planLabel: 'Future Trophy Echo Rule',
+      status: 'Planning only',
+      locked: true,
+      ready: false,
+      playable: false,
+      active: false,
+      accessAvailable: false,
+      rewardAvailable: false,
+      routeAccessLabel: 'Route access is unavailable.',
+      ruleInactiveLabel: 'Future rule inactive.',
+      signalLabel: 'Boss-history signal',
+      signalCurrent: signal.signalCurrent,
+      signalRequired: signal.signalRequired,
+      signalPercent: signal.signalPercent,
+      signalSources: signal.signalSources,
+      futureCondition: 'Build boss-history memory before this future route can be considered.',
+      antiFarmPolicy: [
+        'No best-in-slot low-floor farming.',
+        'No infinite revisit loops.',
+        'No mandatory revisit grind.',
+        'No route rewards stronger than main progression.',
+        'Enter Dungeon and Continue Run remain primary.'
+      ],
+      rewardPolicy: {
+        status: 'Planning only',
+        rewardAccess: false,
+        allowedFutureClass: 'Memory, trophy, and Dex identity rewards first.',
+        disallowed: [
+          'No mythic farming path.',
+          'No uncapped gear rewards.',
+          'No repeatable low-floor power spike.',
+          'No economy bypass.'
+        ]
+      },
+      notes: [
+        'Trophy Echo should be the first planned revisit route because boss history is already tracked.',
+        'This plan is read-only and does not create route activation.'
+      ]
+    };
+  }
+
+  function revisitTrophyEchoRuleSummary(state = S) {
+    const plan = revisitTrophyEchoRulePlan(state);
+    return {
+      planned: true,
+      locked: true,
+      ready: 0,
+      playable: 0,
+      active: 0,
+      accessAvailable: false,
+      rewardAvailable: false,
+      signalCurrent: plan.signalCurrent,
+      signalRequired: plan.signalRequired,
+      signalPercent: plan.signalPercent,
+      antiFarmGuardrails: Array.isArray(plan.antiFarmPolicy) ? plan.antiFarmPolicy.length : 0
+    };
+  }
+
   function revisitGateProgressSignals(routeKey, state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
@@ -1788,6 +1886,12 @@
       },
       revisitUnlockPreviewSummary(state = S) {
         return revisitUnlockPreviewSummary(state);
+      },
+      revisitTrophyEchoRulePlan(state = S) {
+        return revisitTrophyEchoRulePlan(state);
+      },
+      revisitTrophyEchoRuleSummary(state = S) {
+        return revisitTrophyEchoRuleSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;
