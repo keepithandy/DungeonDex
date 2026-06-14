@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.8.1 - Revisit Unlock Preview Copy Hardening
+- DungeonDex v1.8.2 - Revisit Preview Panel Polish
+
+## v1.8.2 Revisit Preview Panel Polish
+- Current baseline: v1.8.2.
+- Earlier Dungeon Revisit panel is easier to scan on mobile.
+- Route rows present preview label, reason, requirement, safety, and source more clearly.
+- Future Conditions wording replaces ambiguous unlock/action phrasing.
+- Trophy Echo remains preview-only and non-playable.
+- All routes remain locked/read-only.
+- No gameplay was added.
 
 ## v1.8.1 Revisit Unlock Preview Copy Hardening
 - Current baseline: v1.8.1.
