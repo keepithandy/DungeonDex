@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.10.1`
-* Current local package baseline: `v1.10.1`
-* Current development target: `v1.10.1`
+* Public/live itch version: `v1.10.2`
+* Current local package baseline: `v1.10.2`
+* Current development target: `v1.10.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,19 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.10.2 - Trophy Echo Rule Handoff Audit
+
+Status: Complete
+
+Summary:
+
+* Checkpointed the Trophy Echo rule-planning chain after smoke hardening.
+* Clarified that Trophy Echo remains locked, inactive, rewardless, and non-playable.
+* Preserved no-entry, no-reward, no-teleport, no-combat-rerun, no-completion, and no-scaling guardrails.
+* No gameplay, combat, economy, or save-model changes.
 
 ---
 

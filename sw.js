@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.10.1-trophy-echo-rule-smoke-hardening';
+const CACHE_NAME = 'dungeondex-v1.10.2-trophy-echo-rule-handoff-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.10.1-trophy-echo-rule-smoke-hardening';
+const BUILD_QS = '1.10.2-trophy-echo-rule-handoff-audit';
 const ASSETS = [
   './',
   './index.html',

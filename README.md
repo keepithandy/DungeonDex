@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.10.1**
+Current baseline: **DungeonDex v1.10.2**
 
 ## Current Build
 
-**v1.10.1 — Trophy Echo Rule Smoke Hardening**
+**v1.10.2 — Trophy Echo Rule Handoff Audit**
 
-This version hardens Trophy Echo rule-planning smoke coverage against malformed, missing, mixed, and high boss-history data. Trophy Echo remains locked, inactive, and non-playable, with no route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, or economy balance changes.
+This version checkpoints the Trophy Echo rule-planning chain after smoke hardening. Trophy Echo remains locked, inactive, rewardless, and non-playable. No route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, economy balance changes, or save-model changes were added.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.10.1 is a Trophy Echo rule smoke-hardening pass; it does not start active unlock rules or playable revisit routes.
+v1.10.2 is a Trophy Echo rule handoff audit; it does not start active unlock rules or playable revisit routes.
 
 ## Running Locally
 
@@ -127,20 +127,20 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Near-term development is focused on hardening the Trophy Echo planning layer without starting playable revisit routes.
+Near-term development is focused on moving to the next non-route system lane while Trophy Echo planning remains checkpointed and non-playable.
 
-Candidate follow-up lanes:
+Candidate next lanes:
 
-1. Trophy Echo smoke hardening
-2. Talent Foundation Expansion
-3. Debt Collector Visibility / Risk Pressure
-4. Famous Gear Memory Attachment
-5. Boss Trophy / Dex Identity
-6. District / World Identity
+1. Talent Foundation Expansion
+2. Debt Collector Visibility / Risk Pressure
+3. Famous Gear Memory Attachment
+4. Boss Trophy / Dex Identity
+5. District / World Identity
+6. Trophy Echo UI Readiness Preview, still non-playable
 
 Recommended next lane:
 
-**Trophy Echo smoke hardening** is the safest next lane because the rule plan now exists and must stay read-only before any future unlock design is considered. Do not start playable revisit routes in the next patch.
+**Talent Foundation Expansion** is the safest next non-route lane if the Trophy Echo chain pauses here. Keep any future playable Trophy Echo work separate and explicitly approved.
 
 ## Project Status
 
