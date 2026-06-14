@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.10.2`
-* Current local package baseline: `v1.10.2`
-* Current development target: `v1.10.2`
+* Public/live itch version: `v1.10.3`
+* Current local package baseline: `v1.10.3`
+* Current development target: `v1.10.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,19 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.10.3 - Talent Foundation Planning Audit
+
+Status: Complete
+
+Summary:
+
+* Audited the existing Talent foundation and smoke coverage.
+* Classified Talent Foundation Expansion as the next planning lane.
+* Preserved existing talent behavior, costs, unlocks, combat balance, economy balance, and save behavior.
+* Revisit/Trophy Echo remains paused, locked, and non-playable.
 
 ---
 

@@ -7,7 +7,19 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.10.2 - Trophy Echo Rule Handoff Audit
+- DungeonDex v1.10.3 - Talent Foundation Planning Audit
+
+## v1.10.3 Talent Foundation Planning Audit
+- Current baseline: v1.10.3.
+- Audited the existing Talent foundation after the Trophy Echo handoff.
+- Classified current talent save shape, UI surface, helper/API surface, and smoke coverage.
+- Current talent save shape uses `player.talents` plus point/unlock mirrors repaired by `repairTalentState`.
+- Current talent UI surface is the Warden Talents panel with passive-only cards, milestone progress, unlock buttons, and reset control.
+- Current helper/API surface is `DungeonDexTalents` / `DungeonDexWardenTalents`, backed by normalization helpers and DevTools smoke helpers.
+- Current smoke coverage checks malformed repair, zero-point UI, unlock/reset persistence, unknown IDs, mobile layout, combat path, board payout, charter cost, sell value, and runtime errors.
+- Talent Foundation Expansion is the next candidate lane, but this audit did not change talent gameplay.
+- Talent behavior, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, and revisit routes were left unchanged.
+- Revisit and Trophy Echo remain paused, locked/read-only, and non-playable.
 
 ## v1.10.2 Trophy Echo Rule Handoff Audit
 - Current baseline: v1.10.2.
@@ -211,15 +223,16 @@
 ## Current Roadmap
 
 ### Current Stable Checkpoint
-- DungeonDex v1.10.1 is the Trophy Echo rule-planning smoke-hardened baseline.
-- Trophy Echo has read-only rule planning and smoke coverage.
+- DungeonDex v1.10.2 is the Trophy Echo rule handoff baseline.
+- Trophy Echo planning is checkpointed and safe to pause.
 - Trophy Echo remains locked, inactive, rewardless, and non-playable.
 - All revisit routes remain locked/read-only.
 
-### v1.10.2 Handoff
-- Checkpoint Trophy Echo planning as safe to pause.
-- Do not start playable route activation.
-- Hand future playable Trophy Echo work into a separate approved gameplay patch.
+### v1.10.3 Talent Foundation Planning Audit
+- Audit the current Talent foundation before any passive choice expansion.
+- Talent Foundation Expansion is now the active next planning lane.
+- Do not change talent effects, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit routes in this audit.
+- Playable revisit routes require a separate approved gameplay patch.
 
 ### Candidate Next Lanes
 1. Talent Foundation Expansion.
@@ -230,7 +243,8 @@
 6. Trophy Echo UI Readiness Preview, still non-playable.
 
 ### Recommended Next Lane
-- Talent Foundation Expansion is a safe next non-route lane if the Trophy Echo chain pauses here.
+- Talent Foundation Expansion is the active next planning lane.
+- Keep the next talent patch focused on passive player choice planning before any behavior changes.
 - Keep any future Trophy Echo gameplay work separate and explicitly approved.
 
 ### Larger Direction

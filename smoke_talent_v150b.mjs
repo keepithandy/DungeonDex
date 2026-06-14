@@ -405,6 +405,36 @@ async function main() {
     const getRevisitRoutes = async () => await evalByValue(client, `(() => typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(S) : null)()`);
     const getRevisitRouteSummary = async () => await evalByValue(client, `(() => typeof revisitRouteSummary === 'function' ? revisitRouteSummary(S) : null)()`);
     const getSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.talentSmoke())()`);
+    const getTalentFoundationAudit = async () => await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api) return { ok:false, reason:'missing talent api' };
+      const before = JSON.stringify({
+        talents: S.player?.talents || null,
+        pointsEarned: S.player?.talentPointsEarned,
+        pointsSpent: S.player?.talentPointsSpent,
+        points: S.player?.talentPoints,
+        unlockIds: S.player?.talentUnlockIds || []
+      });
+      const summary = typeof api.summary === 'function' ? api.summary(S) : null;
+      const bonuses = typeof api.bonuses === 'function' ? api.bonuses(S) : null;
+      const after = JSON.stringify({
+        talents: S.player?.talents || null,
+        pointsEarned: S.player?.talentPointsEarned,
+        pointsSpent: S.player?.talentPointsSpent,
+        points: S.player?.talentPoints,
+        unlockIds: S.player?.talentUnlockIds || []
+      });
+      return {
+        ok: true,
+        notMutated: before === after,
+        defs: Array.isArray(api.defs) ? api.defs.map(def => ({ id:def.id, effect:def.effect })) : [],
+        paths: Array.isArray(api.paths) ? api.paths.map(path => path.id) : [],
+        hasReadHelpers: typeof api.summary === 'function' && typeof api.milestoneInfo === 'function' && typeof api.summaryText === 'function',
+        hasCurrentMutators: typeof api.unlock === 'function' && typeof api.reset === 'function' && typeof api.grantPoints === 'function',
+        summary,
+        bonuses
+      };
+    })()`);
     const getRetiredGearHallSmoke = async () => await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.retiredGearHallSmoke ? window.DungeonDexScenarioDevTools.retiredGearHallSmoke() : { ok:false, reason:'missing helper' })()`);
     const getTalentText = async () => await evalByValue(client, `(() => {
       const panel = document.getElementById('talentPanel');
@@ -600,6 +630,8 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     let smoke = await getSmoke();
     record('Fresh save repair', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
+    const talentFoundationAudit = await getTalentFoundationAudit();
+    record('Talent foundation planning audit preserves current shape', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated && talentFoundationAudit.defs.length === 4 && talentFoundationAudit.paths.length === 4 && talentFoundationAudit.hasReadHelpers && talentFoundationAudit.hasCurrentMutators && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.hardened && def.effect === '+5% max HP') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.board && def.effect === '+5% Elite Board payout') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.stair && def.effect === 'Charters cost 5% less') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.appraiser && def.effect === '+5% sell value') && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary.pointsSpent === 0 && talentFoundationAudit.summary.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses.charterCostPct === 0 && talentFoundationAudit.bonuses.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));

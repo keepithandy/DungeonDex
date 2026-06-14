@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.10.2-trophy-echo-rule-handoff-audit';
+const CACHE_NAME = 'dungeondex-v1.10.3-talent-foundation-planning-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.10.2-trophy-echo-rule-handoff-audit';
+const BUILD_QS = '1.10.3-talent-foundation-planning-audit';
 const ASSETS = [
   './',
   './index.html',

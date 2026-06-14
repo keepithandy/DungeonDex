@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.10.2**
+Current baseline: **DungeonDex v1.10.3**
 
 ## Current Build
 
-**v1.10.2 — Trophy Echo Rule Handoff Audit**
+**v1.10.3 — Talent Foundation Planning Audit**
 
-This version checkpoints the Trophy Echo rule-planning chain after smoke hardening. Trophy Echo remains locked, inactive, rewardless, and non-playable. No route entry, rewards, teleporting, combat reruns, completion logic, scaling, combat balance changes, economy balance changes, or save-model changes were added.
+This version audits the existing Talent foundation and prepares the next talent-expansion lane. It does not change talent effects, talent costs, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit route behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.10.2 is a Trophy Echo rule handoff audit; it does not start active unlock rules or playable revisit routes.
+v1.10.3 is a Talent Foundation Planning Audit; it does not start active unlock rules or playable revisit routes.
 
 ## Running Locally
 
@@ -127,7 +127,7 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Near-term development is focused on moving to the next non-route system lane while Trophy Echo planning remains checkpointed and non-playable.
+Near-term development is focused on Talent Foundation Expansion planning while Trophy Echo planning remains checkpointed and non-playable.
 
 Candidate next lanes:
 
@@ -140,7 +140,7 @@ Candidate next lanes:
 
 Recommended next lane:
 
-**Talent Foundation Expansion** is the safest next non-route lane if the Trophy Echo chain pauses here. Keep any future playable Trophy Echo work separate and explicitly approved.
+**Talent Foundation Expansion** is the active next planning lane. Keep the next talent patch focused on passive player choice planning before any behavior changes, and keep any future playable Trophy Echo work separate and explicitly approved.
 
 ## Project Status
 
