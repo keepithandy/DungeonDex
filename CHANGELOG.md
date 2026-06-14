@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.6.18`
-* Current local package baseline: `v1.6.18`
-* Current development target: `v1.6.18`
+* Public/live itch version: `v1.9.3`
+* Current local package baseline: `v1.9.3`
+* Current development target: `v1.9.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,19 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.9.3 - Systems Handoff Audit
+
+Status: Complete
+
+Summary:
+
+* Added a roadmap handoff audit for checkpointed and unfinished systems.
+* Marked Revisit as checkpointed but non-playable.
+* Identified v1.10 candidate lanes.
+* No gameplay, combat, economy, route activation, rewards, teleporting, completion logic, or scaling changes.
 
 ---
 

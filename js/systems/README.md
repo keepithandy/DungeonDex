@@ -17,8 +17,23 @@ It preserves classic browser script load order instead of converting the game to
 - `11_ui_run_gear_dex_archive.js` — Run, gear, inventory, Dex, archive renderers.
 - `12_render_bindings_boot.js` — Sticky bar, render loop, guarded actions, bindings, audits, boot.
 - `13_devtools_overlay.js` — Hidden internal DevTools overlay for save inspection, run controls, test loot, snapshots, and error logs.
+- `14_devtools_scenarios.js` — DevTools scenario presets and focused state setup helpers.
+- `15_devtools_balance_reports.js` — DevTools balance reports and simulation helpers.
+- `16_relic_forge_crafting.js` — Relic Forge crafting actions and forge state helpers.
+- `17_relic_forge_clarity.js` — Relic Forge clarity copy and UI support.
+- `18_relic_forge_compact_text.js` — Compact Relic Forge text adjustments.
+- `19_warden_talents_lowfire_board.js` — Warden Talent foundation and Lowfire Board support.
+- `20_town_currency_clean_strip.js` — Compact town currency strip cleanup.
+- `21_build_label_guard.js` — Build label guard and cache query alignment.
+- `22_nav_centering.js` — Navigation centering cleanup.
+- `23_boss_header_cleanup.js` — Boss header readability cleanup.
+- `24_lowfire_spark_board.js` — Lowfire Spark Board UI/support pass.
+- `25_town_wallet_chip_fix.js` — Town wallet chip layout fix.
+- `26_spark_writ_pill_cleanup.js` — Spark writ pill cleanup.
+- `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
+- `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
 
 Notes:
 - `index.html` now loads these files directly in order.
 - `app.js` is replaced with a tiny pointer file so future work does not accidentally edit the old monolith.
-- This is intended as a review/refactor staging pass; future passes can split internals further once a target system is chosen.
+- This map is documentation only; future passes can split internals further once a target system is chosen.

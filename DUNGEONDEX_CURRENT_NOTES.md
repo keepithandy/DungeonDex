@@ -7,7 +7,65 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.9.2 - Revisit Gate Checkpoint Audit
+- DungeonDex v1.9.3 - Systems Handoff Audit
+
+## v1.9.3 Systems Handoff Audit
+- Current baseline: v1.9.3.
+- Added a systems handoff audit before v1.10 planning.
+- Revisit is checkpointed as locked, read-only, diagnostic-only, and non-playable.
+- Unfinished foundations are classified so future patches can stay focused.
+- Candidate v1.10 lanes are identified without starting v1.10.0.
+- Trophy Echo remains preview-only and non-playable.
+- All gates remain locked:true, ready:false, playable:false.
+- All routes remain locked/read-only.
+- No gameplay, rewards, combat reruns, teleporting, completion logic, scaling, combat balance, economy balance, talent behavior, debt behavior, gear generation, or enemy scaling was changed.
+
+### v1.9.3 System Status Categories
+
+#### Checkpointed Foundation
+- Revisit candidate ledger.
+- Revisit route previews.
+- Revisit unlock gates.
+- Revisit gate diagnostics.
+- Revisit checkpoint smoke.
+- Boss trophy records baseline.
+- Famous Gear memory baseline.
+- Retired Gear archive baseline.
+- Debt Collector foundation baseline.
+- Talent foundation baseline.
+- Elite Board/rival contract baseline.
+
+#### Active but Unfinished
+- Trophy Echo / first revisit rule planning.
+- Talent passive choice expansion.
+- Debt Collector pressure/risk visibility.
+- Famous Gear memory attachment depth.
+- Boss Trophy / Dex identity improvements.
+- Retired Gear Hall depth.
+- Elite Board / Rival Trace route support.
+- District/world identity expansion.
+
+#### Future Candidate
+- Trophy Echo unlock-rule planning.
+- Trophy Echo smoke hardening.
+- Famous Gear route planning.
+- Debt Pressure route planning.
+- Rival Trace / Board Echo route planning.
+- District identity pass.
+- Talent choice/passive expansion.
+
+#### Do Not Touch Without Separate Patch
+- Combat balance.
+- Enemy scaling.
+- Economy balance.
+- Gear drop scaling.
+- Route activation.
+- Route rewards.
+- Teleporting.
+- Combat reruns.
+- Route completion logic.
+- Monster affixes/status effects.
+- Broad theme rewrite.
 
 ## v1.9.2 Revisit Gate Checkpoint Audit
 - Current baseline: v1.9.2.
@@ -119,38 +177,28 @@
 
 ## Current Roadmap
 
-### Stable Baseline
-- v1.6.16 is the stable post-theme, post-audit, post-archive baseline.
-- Active screens: town, run/combat, gear, Trophy Hall/Dex, and Archive.
-- Active foundations: talents, debt collector, Famous Gear memory, retired gear, boss trophies, and Elite Board/rival contracts.
-- Save/load repair, DevTools helpers, smoke scripts, service worker/cache, and Lowfire ember theme are active.
-- Repository clutter is archived, and the runtime root is easier to review.
+### Current Stable Checkpoint
+- DungeonDex v1.9.2 is the locked Revisit Gate Checkpoint baseline.
+- Revisit systems are safe, read-only, non-playable, and smoke-protected.
+- Trophy Echo remains preview-only.
+- No route entry, rewards, teleporting, combat reruns, completion logic, or scaling exists.
 
-### Near-Term Patch Priorities
-- Keep patches small, targeted, and smoke-tested.
-- Harden save repair, labels, cache strings, and optional UI panels.
-- Improve compact mobile readability without broad theme churn.
-- Add or refresh smoke coverage around changed surfaces only.
-- Avoid balance changes unless backed by focused testing.
+### v1.9.3 Systems Handoff
+- Audit unfinished foundations before choosing v1.10.
+- Mark Revisit as checkpointed but not playable.
+- Hand likely next lanes into v1.10 planning.
 
-### Next System Candidates
-- Talent expansion with clearer passive player choice.
-- Debt collector visibility and risk/reward pressure built from the existing foundation.
-- Boss trophy and Dex identity improvements.
-- Famous Gear memory readability and attachment polish.
-- Retired Gear Hall depth within the existing archive flow.
-- Early dungeon revisit ledger pass: candidate display was structured for clearer read-only planning while travel and rewards remain absent.
-- Revisit candidate ledger hardening: candidate shape and empty-state behavior were protected while travel and rewards remain absent.
-- Revisit rule lock: revisits are side routes only, anchored to trophies, Famous Gear/archive memory, rivals, debt pressure, and Elite Board/contract history.
-- Revisit rules stay read-only for now: no route previews, no travel, no rewards, no route selection, and no interruption to Enter/Continue.
-- Revisit smoke guard: the read-only candidate ledger and empty-state copy are now regression-protected in smoke coverage.
-- Revisit route previews now group candidate hooks into locked future return-route cards.
-- Route previews stay read-only; no travel, rewards, route selection, or rematches were added.
-- Revisit checkpoint planning pass: v1.7.8 keeps route previews display-only and recommends inert unlock-gate data as the next safest step.
-- Revisit unlock gate model: v1.7.9 adds inert locked-gate data and compact route-card copy without entry, rewards, combat, completion, or scaling.
-- Revisit gate smoke hardening: v1.7.10 strengthens malformed-state, immutability, and no-entry regression coverage while keeping gates inert.
-- Elite Board and rival contract clarity/polish.
-- District and dungeon-world identity expansion.
+### Candidate v1.10 Lanes
+1. Trophy Echo Unlock Rule Planning
+2. Talent Foundation Expansion
+3. Debt Collector Visibility / Risk Pressure
+4. Famous Gear Memory Attachment
+5. Boss Trophy / Dex Identity
+6. District / World Identity
+
+### Recommended v1.10 Lane
+- Trophy Echo Unlock Rule Planning remains the safest first lane because it uses boss-history systems that already exist and can stay read-only.
+- Do not start playable revisit routes in v1.10.0.
 
 ### Larger Direction
 - Move v1.7/v2 planning toward stronger world identity and collection-game feel.
