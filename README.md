@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.10.3**
+Current baseline: **DungeonDex v1.11.0**
 
 ## Current Build
 
-**v1.10.3 — Talent Foundation Planning Audit**
+**v1.11.0 — Talent Tree Locked Preview UI**
 
-This version audits the existing Talent foundation and prepares the next talent-expansion lane. It does not change talent effects, talent costs, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit route behavior.
+This version adds a locked talent-tree preview shell for planned branches and nodes. It does not change talent effects, talent costs, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit route behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.10.3 is a Talent Foundation Planning Audit; it does not start active unlock rules or playable revisit routes.
+v1.11.0 is a locked talent preview step; it does not start active unlock rules or playable revisit routes.
 
 ## Running Locally
 

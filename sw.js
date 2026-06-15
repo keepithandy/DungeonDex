@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.10.3-talent-foundation-planning-audit';
+const CACHE_NAME = 'dungeondex-v1.11.0-talent-tree-preview';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.10.3-talent-foundation-planning-audit';
+const BUILD_QS = '1.11.0-talent-tree-preview';
 const ASSETS = [
   './',
   './index.html',

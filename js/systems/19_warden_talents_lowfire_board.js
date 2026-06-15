@@ -5,7 +5,7 @@
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.7.0-early-dungeon-revisit-foundation';
+  const SCRIPT_BUILD = '1.11.0-talent-tree-preview';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -52,6 +52,50 @@
     return typeof getAvailableTalentPoints === 'function'
       ? getAvailableTalentPoints(state)
       : Math.max(0, Math.floor(Number(state?.player?.talentPoints) || 0));
+  }
+
+  function talentTreePreview(state){
+    ensureTalents(state);
+    const branchesSource = Array.isArray(window.TALENT_PREVIEW_BRANCHES) && window.TALENT_PREVIEW_BRANCHES.length
+      ? window.TALENT_PREVIEW_BRANCHES
+      : TALENT_PATHS.map(branch => ({ key: branch.id, title: branch.label, detail: branch.summary }));
+    const nodesSource = Array.isArray(window.TALENT_PREVIEW_NODES) && window.TALENT_PREVIEW_NODES.length
+      ? window.TALENT_PREVIEW_NODES
+      : TALENT_DEFS.map(node => ({ key: node.id, branch: node.path, title: node.name, detail: node.summary, plannedEffect: node.effect, status: 'Preview only', locked: true, order: 0 }));
+    const branches = branchesSource.map(branch => {
+      const nodes = nodesSource.filter(node => node.branch === branch.key).map(node => ({
+        key: node.key,
+        branch: node.branch,
+        title: node.title,
+        detail: node.detail,
+        plannedEffect: node.plannedEffect,
+        status: node.status || 'Preview only',
+        locked: node.locked !== false,
+        order: node.order || 0
+      })).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+      return {
+        key: branch.key,
+        title: branch.title,
+        detail: branch.detail,
+        status: 'Locked preview',
+        locked: true,
+        nodeCount: nodes.length,
+        nodes
+      };
+    });
+    const nodes = branches.flatMap(branch => branch.nodes);
+    return { previewOnly: true, branches, nodes };
+  }
+
+  function talentTreePreviewSummary(state){
+    const preview = talentTreePreview(state);
+    return {
+      totalBranches: preview.branches.length,
+      totalNodes: preview.nodes.length,
+      lockedNodes: preview.nodes.filter(node => node.locked).length,
+      activeNodes: 0,
+      previewOnly: true
+    };
   }
 
   function talentEffects(state){
@@ -154,26 +198,22 @@
     };
   }
 
-  function talentPathCardMarkup(state, def, summary){
-    const path = TALENT_PATH_BY_ID[def.path] || { label:def.path, summary:'' };
-    const unlocked = !!summary.unlockedIds.includes(def.id);
-    const hasPoints = summary.pointsAvailable > 0;
-    const stateKey = unlocked ? 'unlocked' : hasPoints ? 'ready' : 'locked';
-    const stateLabel = unlocked ? 'Unlocked' : hasPoints ? 'Ready' : 'Locked';
-    const buttonLabel = unlocked ? 'Unlocked' : hasPoints ? 'Unlock' : 'Need Point';
-    return `<article class="talent-path-card is-${H(stateKey)}">
+  function talentPreviewNodeMarkup(node, branch){
+    return `<article class="talent-preview-node is-locked">
       <div class="talent-path-head">
         <div>
-          <span class="talent-path-label">${H(path.label)}</span>
-          <h3>${H(def.name)}</h3>
+          <span class="talent-path-label">${H(branch.title)}</span>
+          <h3>${H(node.title)}</h3>
         </div>
-        <span class="talent-state-pill is-${H(stateKey)}">${H(stateLabel)}</span>
+        <span class="talent-state-pill is-locked">Locked</span>
       </div>
-      <p class="talent-path-effect">${H(def.effect)}</p>
-      <p class="small muted talent-path-summary">${H(def.summary)}</p>
-      <p class="talent-path-note small muted">${H(def.note)}</p>
-      <div class="talent-path-actions">
-        <button class="primary mini talent-state-button is-${H(stateKey)}" ${unlocked ? '' : `data-learn-talent="${H(def.id)}"`} ${unlocked || !hasPoints ? 'disabled' : ''}>${H(buttonLabel)}</button>
+      <p class="talent-path-effect">${H(node.plannedEffect)}</p>
+      <p class="small muted talent-path-summary">${H(node.detail)}</p>
+      <p class="talent-path-note small muted">${H(node.status)}</p>
+      <div class="talent-preview-tags">
+        <span class="pill">Preview</span>
+        <span class="pill">Planned</span>
+        <span class="pill">Inactive</span>
       </div>
     </article>`;
   }
@@ -182,39 +222,55 @@
     const panel = talentPanel();
     if (!panel || !state?.player) return;
     ensureTalents(state);
-    const summary = safeTalentSummary(state);
-    const milestone = talentMilestoneInfo(state, summary);
-    const visibleUnlockedCount = summary.unlockedIds.filter(id => TALENT_BY_ID[id]).length;
-    const hiddenCount = summary.unlockedIds.filter(id => !TALENT_BY_ID[id]).length;
+    const preview = talentTreePreview(state);
+    const summary = talentTreePreviewSummary(state);
     panel.innerHTML = `
       <div class="card-head talent-head">
         <div>
-          <h2>Warden Talents</h2>
-          <p>Passive bonuses earned through secured depth milestones.</p>
-          <div class="talent-passive-note small">Passive only. No combat buttons.</div>
+          <h2>Talent Tree Preview</h2>
+          <p>Locked planning view. Talent effects are not active yet.</p>
+          <div class="talent-passive-note small">Preview only. No active bonus.</div>
         </div>
-        <span class="pill rarity-rare">${F(summary.pointsAvailable)} available</span>
+        <span class="pill rarity-rare">Locked</span>
       </div>
-      <div class="talent-point-line small" aria-label="Talent point totals">
-        <span><b>Available:</b> ${F(summary.pointsAvailable)}</span>
+      <div class="talent-point-line small" aria-label="Talent preview totals">
+        <span><b>Branches:</b> ${F(summary.totalBranches)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Spent:</b> ${F(summary.pointsSpent)}</span>
+        <span><b>Nodes:</b> ${F(summary.totalNodes)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Earned:</b> ${F(summary.pointsEarned)}</span>
+        <span><b>Status:</b> Locked preview</span>
       </div>
-      <div class="talent-milestone-line small" aria-label="Talent milestone progress">
-        <span><b>${H(milestone.statusLabel)}</b></span>
-        <span>${H(milestone.progressLabel)}</span>
+      <div class="talent-milestone-line small" aria-label="Talent preview status">
+        <span><b>Locked nodes:</b> ${F(summary.lockedNodes)}</span>
+        <span>Active nodes: ${F(summary.activeNodes)}</span>
       </div>
       <div class="talent-summary-row small muted">
-        <span>Earn points by securing deeper milestones.</span>
-        <span>${F(visibleUnlockedCount)} unlocked</span>
-        <span>${H(milestone.ruleLabel)}</span>
+        <span>Future branches are mapped for planning only.</span>
+        <span>Nothing is purchasable.</span>
+        <span>No combat, economy, or save effects are active.</span>
       </div>
-      <div class="talent-grid">${TALENT_DEFS.map(def => talentPathCardMarkup(state, def, summary)).join('')}</div>
+      <div class="talent-preview-grid">
+        ${preview.branches.map(branch => `
+          <section class="talent-preview-branch">
+            <div class="split talent-preview-branch-head">
+              <div>
+                <strong>${H(branch.title)}</strong>
+                <p class="small muted">${H(branch.detail)}</p>
+              </div>
+              <span class="pill">Locked</span>
+            </div>
+            <div class="talent-meter-row">
+              <span>Nodes ${F(branch.nodeCount)}</span>
+              <span>Preview</span>
+              <span>Inactive</span>
+            </div>
+            <div class="talent-preview-node-grid">
+              ${branch.nodes.map(node => talentPreviewNodeMarkup(node, branch)).join('')}
+            </div>
+          </section>`).join('')}
+      </div>
       <div class="talent-footer">
-        <button class="ghost mini" id="resetTalentsBtn">Reset Talents</button>
-        <span class="small muted">${hiddenCount ? `${F(hiddenCount)} legacy or unknown unlock id${hiddenCount === 1 ? '' : 's'} preserved in save and hidden here.` : 'Legacy aliases and the unlock mirror repair quietly.'}</span>
+        <span class="small muted">${H(summary.previewOnly ? 'Preview only. No spendable points or unlock actions exist here.' : '')}</span>
       </div>`;
   }
 
@@ -455,7 +511,7 @@
   function injectCss(){
     if (document.getElementById('ddWardenTalentBoardCss')) return;
     const st = document.createElement('style'); st.id = 'ddWardenTalentBoardCss';
-    st.textContent = `.town-currency-strip{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:5px;font-size:10.75px;line-height:1.15;color:rgba(244,232,210,.82)}.town-currency-strip span{border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(0,0,0,.18);padding:3px 6px;font-weight:650;white-space:nowrap}.lowfire-board-v2 .elite-contract-head{align-items:flex-start;gap:8px}.lowfire-board-note{margin:-2px 0 8px}.lowfire-board-v2 .active-contract-summary{gap:5px 7px;margin:6px 0 9px}.lowfire-board-v2 .active-contract-summary span{border-color:rgba(255,190,110,.14);background:rgba(255,190,110,.045);line-height:1.18}.lowfire-board-v2 .elite-contract-list{gap:8px}.lowfire-board-v2 .elite-contract-card{padding:10px;gap:6px}.lowfire-board-v2 .elite-contract-card .split{gap:6px}.lowfire-board-v2 .elite-contract-detail-grid{gap:5px 8px}.lowfire-board-v2 .elite-contract-detail-grid span{line-height:1.25;padding:3px 0}.lowfire-board-v2 .contract-threat{color:#ffd287}.lowfire-board-v2 .elite-contract-actions .pill{border-color:rgba(255,190,110,.22);background:rgba(255,190,110,.065)}#talentPanel{font-size:12px}.talent-meter-row{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.talent-meter-row span{border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:3px 6px;background:rgba(255,255,255,.035)}.talent-tree-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.talent-tree{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px;background:rgba(255,255,255,.025)}.talent-card{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(0,0,0,.18);color:inherit;padding:7px;margin:0 0 6px}.talent-card:disabled{opacity:.62}.talent-card-top{display:flex;justify-content:space-between;gap:6px}.talent-card-top strong{font-size:12px}.talent-card-top em{font-style:normal;font-size:11px;color:#f2c06b}.talent-effect,.talent-lore{display:block;font-size:11px;line-height:1.2}.talent-effect{margin-top:3px;color:rgba(255,235,190,.9);font-weight:700}.talent-lore{margin-top:2px;color:rgba(230,222,205,.62)}.talent-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}@media(max-width:720px){.talent-tree-grid{grid-template-columns:1fr}.talent-footer{align-items:flex-start;flex-direction:column}}`;
+    st.textContent = `.town-currency-strip{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:5px;font-size:10.75px;line-height:1.15;color:rgba(244,232,210,.82)}.town-currency-strip span{border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(0,0,0,.18);padding:3px 6px;font-weight:650;white-space:nowrap}.lowfire-board-v2 .elite-contract-head{align-items:flex-start;gap:8px}.lowfire-board-note{margin:-2px 0 8px}.lowfire-board-v2 .active-contract-summary{gap:5px 7px;margin:6px 0 9px}.lowfire-board-v2 .active-contract-summary span{border-color:rgba(255,190,110,.14);background:rgba(255,190,110,.045);line-height:1.18}.lowfire-board-v2 .elite-contract-list{gap:8px}.lowfire-board-v2 .elite-contract-card{padding:10px;gap:6px}.lowfire-board-v2 .elite-contract-card .split{gap:6px}.lowfire-board-v2 .elite-contract-detail-grid{gap:5px 8px}.lowfire-board-v2 .elite-contract-detail-grid span{line-height:1.25;padding:3px 0}.lowfire-board-v2 .contract-threat{color:#ffd287}.lowfire-board-v2 .elite-contract-actions .pill{border-color:rgba(255,190,110,.22);background:rgba(255,190,110,.065)}#talentPanel{font-size:12px}.talent-meter-row{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.talent-meter-row span{border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:3px 6px;background:rgba(255,255,255,.035)}.talent-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.talent-preview-branch{border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:8px;background:rgba(255,255,255,.025)}.talent-preview-branch-head{align-items:flex-start;gap:8px}.talent-preview-node-grid{display:grid;grid-template-columns:1fr;gap:7px;margin-top:6px}.talent-preview-node{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px;background:rgba(0,0,0,.18)}.talent-preview-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.talent-preview-tags .pill{font-size:10px;padding:3px 6px}.talent-card,.talent-tree{display:none}.talent-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}@media(max-width:720px){.talent-preview-grid{grid-template-columns:1fr}.talent-footer{align-items:flex-start;flex-direction:column}}@media(max-width:360px){#talentPanel{font-size:11.25px}.talent-preview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.talent-preview-branch{padding:6px}.talent-preview-branch-head{gap:3px}.talent-preview-branch-head p{display:none}.talent-preview-node-grid{gap:4px;margin-top:3px}.talent-preview-node{padding:5px}.talent-preview-node .talent-path-effect,.talent-preview-node .talent-path-summary,.talent-preview-node .talent-path-note{font-size:9.5px;line-height:1.12}.talent-preview-tags{gap:2px;margin-top:3px}.talent-preview-tags .pill{padding:2px 4px}}`;
     document.head.appendChild(st);
   }
 
@@ -545,12 +601,14 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-learn-talent]').forEach(btn => btn.onclick = () => guard(() => { learn(S, btn.dataset.learnTalent); render(); })); const resetBtn = document.getElementById('resetTalentsBtn'); if (resetBtn) resetBtn.onclick = () => guard(() => { if (window.confirm && !window.confirm('Reset all talent points?')) return; reset(S); render(); }); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); };
 
   const api = {
     build: SCRIPT_BUILD,
     defs: TALENT_DEFS,
     paths: TALENT_PATHS,
+    preview: talentTreePreview,
+    previewSummary: talentTreePreviewSummary,
     ensure: ensureTalents,
     getState: ensureTalents,
     getAvailablePoints: availableTalentPoints,
@@ -601,11 +659,14 @@
         delete snapshot.player.talentUnlockIds;
         ensureTalents(snapshot);
         const cleaned = api.summary(snapshot);
+        const preview = api.preview(snapshot);
         return {
           ok: true,
           available: cleaned.pointsAvailable,
           unlocked: cleaned.unlockedIds.length,
-          summary: api.summaryText(snapshot)
+          summary: api.summaryText(snapshot),
+          previewBranches: preview.branches.length,
+          previewNodes: preview.nodes.length
         };
       } catch (err) {
         return { ok:false, reason: err?.message || String(err) };

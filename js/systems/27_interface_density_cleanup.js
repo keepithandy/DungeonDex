@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.10.3 - Interface density and app-feel cleanup.
+// DungeonDex v1.11.0 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.10.3';
+  const BUILD = '1.11.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.10.3-talent-foundation-planning-audit';
+  const BUILD_QS = '1.11.0-talent-tree-preview';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -103,15 +103,14 @@
       #talentPanel .talent-milestone-line{gap:3px 7px!important;margin:0 0 7px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-summary-row{display:flex;flex-wrap:wrap;gap:5px!important;margin:5px 0 8px!important}
       #talentPanel .talent-summary-row span{font-size:10.5px!important;padding:3px 6px!important}
-      #talentPanel .talent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
-      #talentPanel .talent-path-card{padding:8px!important;border-radius:13px!important}
-      #talentPanel .talent-path-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
-      #talentPanel .talent-path-head h3{margin:1px 0 3px!important;font-size:13px!important;line-height:1.08!important}
+      #talentPanel .talent-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important}
+      #talentPanel .talent-preview-branch{padding:8px!important;border-radius:13px!important}
+      #talentPanel .talent-preview-branch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+      #talentPanel .talent-preview-branch-head strong{margin:1px 0 3px!important;font-size:13px!important;line-height:1.08!important}
       #talentPanel .talent-state-pill{min-height:19px!important;padding:3px 6px!important;font-size:9.75px!important}
       #talentPanel .talent-path-label{display:block;font-size:10px!important;letter-spacing:.04em;text-transform:uppercase;color:#e3c187}
       #talentPanel .talent-path-effect,#talentPanel .talent-path-summary,#talentPanel .talent-path-note{font-size:10.5px!important;line-height:1.22!important}
-      #talentPanel .talent-path-actions{margin-top:6px!important}
-      #talentPanel .talent-state-button{min-height:31px!important;width:100%!important}
+      #talentPanel .talent-preview-tags{margin-top:5px!important}
 
       /* Gear and archive scanability */
       #screen-gear .inventory-upgrade-card{border-color:rgba(122,232,178,.20)!important;background:linear-gradient(180deg,rgba(122,232,178,.040),rgba(255,255,255,.014))!important}

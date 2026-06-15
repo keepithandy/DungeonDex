@@ -572,11 +572,10 @@ async function main() {
           panel: !!panel,
           overflow,
           panelOverflow,
-          hasTotals: /Available:\\s*\\d+/.test(text) && /Spent:\\s*\\d+/.test(text) && /Earned:\\s*\\d+/.test(text),
-          hasMilestone: text.includes('Next point: secure depth') || text.includes('All milestone points earned.'),
-          hasRule: text.includes('1 point per 5 secured depths. Max 20.'),
-          hasStarterTalents: ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => text.includes(name)),
-          hasPassiveNote: text.includes('Passive only. No combat buttons.')
+          hasPreviewTotals: text.includes('Branches: 5') && text.includes('Nodes: 10') && text.includes('Status: Locked preview'),
+          hasPreviewStatus: text.includes('Locked nodes: 10') && text.includes('Active nodes: 0'),
+          hasPreviewBranches: ['Survival', 'Strikes', 'Relics', 'Contracts', 'Memory'].every(name => text.includes(name)),
+          hasPreviewNote: text.includes('Preview only. No active bonus.')
         };
       })()`);
     };
@@ -631,7 +630,22 @@ async function main() {
     let smoke = await getSmoke();
     record('Fresh save repair', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const talentFoundationAudit = await getTalentFoundationAudit();
-    record('Talent foundation planning audit preserves current shape', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated && talentFoundationAudit.defs.length === 4 && talentFoundationAudit.paths.length === 4 && talentFoundationAudit.hasReadHelpers && talentFoundationAudit.hasCurrentMutators && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.hardened && def.effect === '+5% max HP') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.board && def.effect === '+5% Elite Board payout') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.stair && def.effect === 'Charters cost 5% less') && talentFoundationAudit.defs.some(def => def.id === TALENT_IDS.appraiser && def.effect === '+5% sell value') && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary.pointsSpent === 0 && talentFoundationAudit.summary.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses.charterCostPct === 0 && talentFoundationAudit.bonuses.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
+    const previewSummary = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api || typeof api.preview !== 'function' || typeof api.previewSummary !== 'function') return null;
+      const preview = api.preview(S);
+      const summary = api.previewSummary(S);
+      return {
+        hasPreview: !!api.preview,
+        hasPreviewSummary: !!api.previewSummary,
+        previewOnly: !!preview?.previewOnly,
+        branches: Array.isArray(preview?.branches) ? preview.branches.length : 0,
+        nodes: Array.isArray(preview?.nodes) ? preview.nodes.length : 0,
+        summary
+      };
+    })()`);
+    record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary, JSON.stringify(previewSummary));
+    record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 5 && previewSummary.nodes === 10 && previewSummary.summary?.totalBranches === 5 && previewSummary.summary?.totalNodes === 10 && previewSummary.summary?.lockedNodes === 10 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.previewOnly === true, JSON.stringify(previewSummary));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));
@@ -664,12 +678,11 @@ async function main() {
     record('Planned Return Routes appear', routeCopyOk && routeLockOk && routeLabels.some(label => routeText.includes(label)), routeText.slice(0, 400));
     record('Revisit helper avoids preview language', revisitPreviewClean, townRevisitText.slice(0, 300));
     const freshPanelText = await getTalentText();
-    record('Talent panel renders', ['Hardened Start', 'Board Regular', 'Stair Sense', 'Appraiser'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
-    record('Talent point totals are readable', /Available:\s*0/.test(freshPanelText) && /Spent:\s*0/.test(freshPanelText) && /Earned:\s*0/.test(freshPanelText), freshPanelText.slice(0, 300));
-    record('Passive-only talent note is visible', freshPanelText.includes('Passive only. No combat buttons.'), freshPanelText.slice(0, 300));
-    record('Talent milestone explanation appears', freshPanelText.includes('Earn points by securing deeper milestones.') && freshPanelText.includes('1 point per 5 secured depths. Max 20.'), freshPanelText.slice(0, 400));
-    record('Next point line appears for non-maxed state', freshPanelText.includes('Next point: secure depth 5') && freshPanelText.includes('Progress: 1 / 5 secured depths'), freshPanelText.slice(0, 400));
-    record('Zero-point state displays clearly', /Available:\s*0/.test(freshPanelText) && freshPanelText.includes('Need Point') && freshPanelText.includes('Next point: secure depth 5'), freshPanelText.slice(0, 400));
+    record('Talent panel renders preview header', freshPanelText.includes('Talent Tree Preview') && freshPanelText.includes('Locked planning view. Talent effects are not active yet.'), freshPanelText.slice(0, 300));
+    record('Talent preview branches are readable', ['Survival', 'Strikes', 'Relics', 'Contracts', 'Memory'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
+    record('Talent preview states are locked and inactive', freshPanelText.includes('Locked preview') && freshPanelText.includes('Preview only. No active bonus.') && freshPanelText.includes('Nothing is purchasable.') && freshPanelText.includes('No combat, economy, or save effects are active.'), freshPanelText.slice(0, 400));
+    record('Talent preview nodes remain inert', freshPanelText.includes('Locked') && freshPanelText.includes('Preview') && freshPanelText.includes('Planned') && freshPanelText.includes('Inactive'), freshPanelText.slice(0, 400));
+    record('Zero-point state shows preview locks', freshPanelText.includes('Locked preview') && !freshPanelText.includes('Need Point') && !freshPanelText.includes('Unlock'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
     record('Trophy Hall loads', freshBossDexText.toLowerCase().includes('trophy hall') && freshBossDexText.toLowerCase().includes('boss trophies'), freshBossDexText.slice(0, 320));
     {
@@ -699,12 +712,12 @@ async function main() {
       S.screen = 'gear';
       if (typeof render === 'function') render();
       const panel = document.getElementById('talentPanel');
-      return !!panel && /Available:\\s*0/.test(panel.innerText || '') && /Need Point/.test(panel.innerText || '');
+      return !!panel && !panel.querySelector('[data-learn-talent]') && !/Need Point/i.test(panel.innerText || '');
     })()`);
-    record('Unlock buttons blocked with 0 points', !!freshUnlockBtn, 'Talent panel shows zero available points and Need Point state');
+    record('No unlock buttons are rendered', !!freshUnlockBtn, 'Talent panel stays locked and inert');
     for (const width of [390, 375, 360, 320]) {
       const mobile = await checkTalentViewport(width);
-      record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasTotals && mobile.hasMilestone && mobile.hasRule && mobile.hasStarterTalents && mobile.hasPassiveNote, JSON.stringify(mobile));
+      record(`Talent panel mobile ${width}px`, !!mobile.panel && !mobile.overflow && !mobile.panelOverflow && mobile.hasPreviewTotals && mobile.hasPreviewStatus && mobile.hasPreviewBranches && mobile.hasPreviewNote, JSON.stringify(mobile));
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
     const maxPanelText = await evalByValue(client, `(() => {
@@ -722,26 +735,23 @@ async function main() {
       const panel = document.getElementById('talentPanel');
       return panel ? panel.innerText : '';
     })()`);
-    record('Max-point milestone state displays safely', maxPanelText.includes('All milestone points earned.') && maxPanelText.includes('Max points: 20'), maxPanelText.slice(0, 400));
+    record('Max-point preview state displays safely', maxPanelText.includes('Talent Tree Preview') && maxPanelText.includes('Locked planning view. Talent effects are not active yet.') && maxPanelText.includes('Branches: 5') && maxPanelText.includes('Nodes: 10'), maxPanelText.slice(0, 400));
     await clearSave(client);
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
 
-    // Grant one point and unlock Hardened Start.
+    // Grant one point and confirm the preview stays inert.
     const grantOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
     record('grantTalentPoint(1)', !!grantOk, String(grantOk));
-    const availableUnlockBtn = await evalByValue(client, `(() => {
-      const btn = document.querySelector('[data-learn-talent="${TALENT_IDS.hardened}"]');
-      return !!btn && !btn.disabled && /^Unlock$/.test((btn.textContent || '').trim());
-    })()`);
-    record('Unlock button enabled with available point', !!availableUnlockBtn, 'Hardened Start button reads Unlock');
+    const availableUnlockBtn = await evalByValue(client, `(() => !document.querySelector('[data-learn-talent]'))`);
+    record('No unlock button appears after point grant', !!availableUnlockBtn, 'Preview panel remains non-interactive');
     const unlockOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
     record('unlockTalentForTest(Hardened Start)', !!unlockOk, String(unlockOk));
     const unlockedButtonState = await evalByValue(client, `(() => {
       const btn = document.querySelector('.talent-state-button.is-unlocked');
       return !!btn && btn.disabled && /^Unlocked$/.test((btn.textContent || '').trim());
     })()`);
-    record('Unlocked button state is readable', !!unlockedButtonState, 'Unlocked button disabled and labeled');
+    record('No unlock button state is rendered', !unlockedButtonState, 'Preview panel remains inert after grant');
     const summaryAfterUnlock = await getSummary();
     record('Points spent/available update after unlock', summaryAfterUnlock && summaryAfterUnlock.pointsEarned === 1 && summaryAfterUnlock.pointsSpent === 1 && summaryAfterUnlock.pointsAvailable === 0, JSON.stringify(summaryAfterUnlock));
     const hpAfterUnlock = await evalByValue(client, `(() => ({ hp: S.player.hp, maxHp: S.player.maxHp }))()`);
@@ -777,7 +787,7 @@ async function main() {
     const repairedSummary = await getSummary();
     record('Legacy aliases repaired', repairedSummary && repairedSummary.pointsEarned === 2 && repairedSummary.pointsSpent === 1 && repairedSummary.pointsAvailable === 1 && Array.isArray(repairedSummary.unlockedIds), JSON.stringify(repairedSummary));
     const repairedPanelText = await getTalentText();
-    record('Repaired save milestone display is safe', repairedPanelText.includes('Next point: secure depth') && repairedPanelText.includes('1 point per 5 secured depths. Max 20.'), repairedPanelText.slice(0, 400));
+    record('Repaired save preview display is safe', repairedPanelText.includes('Talent Tree Preview') && repairedPanelText.includes('Preview only. No active bonus.'), repairedPanelText.slice(0, 400));
 
     // Unknown id scenario.
     const unknownSave = JSON.parse(JSON.stringify(await readSave(client)));
@@ -798,7 +808,7 @@ async function main() {
     smoke = await getSmoke();
     record('Unknown talent id stays safe', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const unknownPanelText = await getTalentText();
-    record('Unknown talent id hidden from UI', !unknownPanelText.includes('__unknown_talent__') && unknownPanelText.includes('Hardened Start'), unknownPanelText.slice(0, 300));
+    record('Unknown talent id hidden from UI', !unknownPanelText.includes('__unknown_talent__') && unknownPanelText.includes('Talent Tree Preview') && unknownPanelText.includes('Survival'), unknownPanelText.slice(0, 300));
 
     // Boss trophy foundation: fresh save, forced award, reload, malformed repair.
     await clearSave(client);
