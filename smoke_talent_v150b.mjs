@@ -661,8 +661,6 @@ async function main() {
       const summary = api.previewSummary(S);
       const ledger = api.ledger(S);
       const ledgerSummary = api.ledgerSummary(S);
-      const legacyBranches = Array.isArray(window.TALENT_PREVIEW_BRANCHES) ? window.TALENT_PREVIEW_BRANCHES.length : 0;
-      const legacyNodes = Array.isArray(window.TALENT_PREVIEW_NODES) ? window.TALENT_PREVIEW_NODES.length : 0;
       return {
         hasPreview: !!api.preview,
         hasPreviewSummary: !!api.previewSummary,
@@ -671,8 +669,8 @@ async function main() {
         previewOnly: !!preview?.previewOnly,
         branches: Array.isArray(preview?.branches) ? preview.branches.length : 0,
         nodes: Array.isArray(preview?.nodes) ? preview.nodes.length : 0,
-        legacyBranches,
-        legacyNodes,
+        legacyBranches: typeof window.TALENT_PREVIEW_BRANCHES === 'undefined' ? null : (Array.isArray(window.TALENT_PREVIEW_BRANCHES) ? window.TALENT_PREVIEW_BRANCHES.length : -1),
+        legacyNodes: typeof window.TALENT_PREVIEW_NODES === 'undefined' ? null : (Array.isArray(window.TALENT_PREVIEW_NODES) ? window.TALENT_PREVIEW_NODES.length : -1),
         summary,
         ledger,
         ledgerSummary
@@ -680,6 +678,7 @@ async function main() {
     })()`);
     record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary && !!previewSummary?.hasLedger && !!previewSummary?.hasLedgerSummary, JSON.stringify(previewSummary));
     record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 3 && previewSummary.nodes === 9 && previewSummary.summary?.totalBranches === 3 && previewSummary.summary?.totalNodes === 9 && previewSummary.summary?.lockedNodes === 9 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true && previewSummary.summary?.rulesetId === 'talent_ruleset_preview_v1' && previewSummary.summary?.rulesetVersion === 1, JSON.stringify(previewSummary));
+    record('Legacy preview globals are retired', previewSummary?.legacyBranches === null && previewSummary?.legacyNodes === null, JSON.stringify({ legacyBranches: previewSummary?.legacyBranches, legacyNodes: previewSummary?.legacyNodes }));
     record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === false && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 0, JSON.stringify(previewSummary?.ledgerSummary));
     const rulesetAudit = await getRulesetAudit();
     const ruleset = rulesetAudit?.ruleset || {};
@@ -694,7 +693,6 @@ async function main() {
     record('Talent ruleset branch/tier/node data is locked', rulesetBranchesOk && rulesetTiersOk && rulesetNodesOk, JSON.stringify({ branches: ruleset.branches, tiers: ruleset.tiers, nodes: rulesetNodes.slice(0, 3) }));
     record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === false && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 3 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 9 && rulesetSummary.activeCap === 0 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
-    record('Legacy preview globals stay separate from ruleset-backed preview', previewSummary?.legacyBranches === 5 && previewSummary?.legacyNodes === 10 && previewSummary.branches === 3 && previewSummary.nodes === 9, JSON.stringify({ legacyBranches: previewSummary?.legacyBranches, legacyNodes: previewSummary?.legacyNodes, previewBranches: previewSummary?.branches, previewNodes: previewSummary?.nodes }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));

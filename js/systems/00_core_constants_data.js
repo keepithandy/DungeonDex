@@ -98,27 +98,7 @@
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
   const BUILD = '1.12.3';
   const VISIBLE_VERSION_LABEL = 'DungeonDex v1.12.3';
-  const TALENT_PREVIEW_BRANCHES = Object.freeze([
-    Object.freeze({ key: 'survival', title: 'Survival', detail: 'Safer descent planning and recovery lanes.' }),
-    Object.freeze({ key: 'strikes', title: 'Strikes', detail: 'Future offense routing for planned combat branches.' }),
-    Object.freeze({ key: 'relics', title: 'Relics', detail: 'Treasure and loot planning hooks for later expansion.' }),
-    Object.freeze({ key: 'contracts', title: 'Contracts', detail: 'Board and writ planning without live reward changes.' }),
-    Object.freeze({ key: 'memory', title: 'Memory', detail: 'Long-run history, echo, and archive planning.' })
-  ]);
-  const TALENT_PREVIEW_NODES = Object.freeze([
-    Object.freeze({ key: 'survival_anchor', branch: 'survival', title: 'Anchor Point', detail: 'Preview only. No active bonus.', plannedEffect: 'Future survival hook for locked-down routes.', status: 'Preview locked', locked: true, order: 1 }),
-    Object.freeze({ key: 'survival_rationing', branch: 'survival', title: 'Rationing', detail: 'Preview only. Locked and inactive.', plannedEffect: 'Future recovery hook for later design.', status: 'Preview locked', locked: true, order: 2 }),
-    Object.freeze({ key: 'strikes_opening', branch: 'strikes', title: 'Opening Cut', detail: 'Preview only. No combat effect yet.', plannedEffect: 'Future strike hook for the talent tree.', status: 'Preview locked', locked: true, order: 1 }),
-    Object.freeze({ key: 'strikes_rhythm', branch: 'strikes', title: 'Rhythm', detail: 'Preview only. No gameplay effect yet.', plannedEffect: 'Future tempo hook for planned talents.', status: 'Preview locked', locked: true, order: 2 }),
-    Object.freeze({ key: 'relics_value', branch: 'relics', title: 'Value Sense', detail: 'Preview only. No active loot bonus.', plannedEffect: 'Future relic hook for later planning.', status: 'Preview locked', locked: true, order: 1 }),
-    Object.freeze({ key: 'relics_memory', branch: 'relics', title: 'Memory Case', detail: 'Preview only. Inactive and locked.', plannedEffect: 'Future archive hook for planned talent expansion.', status: 'Preview locked', locked: true, order: 2 }),
-    Object.freeze({ key: 'contracts_ledgers', branch: 'contracts', title: 'Ledger Mark', detail: 'Preview only. No contract payout change.', plannedEffect: 'Future contract hook for planning.', status: 'Preview locked', locked: true, order: 1 }),
-    Object.freeze({ key: 'contracts_signal', branch: 'contracts', title: 'Signal Relay', detail: 'Preview only. Locked preview.', plannedEffect: 'Future board hook for inactive routes.', status: 'Preview locked', locked: true, order: 2 }),
-    Object.freeze({ key: 'memory_etch', branch: 'memory', title: 'Etched Trace', detail: 'Preview only. No route unlock.', plannedEffect: 'Future memory hook for later use.', status: 'Preview locked', locked: true, order: 1 }),
-    Object.freeze({ key: 'memory_echo', branch: 'memory', title: 'Echo Archive', detail: 'Preview only. Locked and inactive.', plannedEffect: 'Future echo hook for talent planning.', status: 'Preview locked', locked: true, order: 2 })
-  ]);
-  window.TALENT_PREVIEW_BRANCHES = TALENT_PREVIEW_BRANCHES;
-  window.TALENT_PREVIEW_NODES = TALENT_PREVIEW_NODES;
+  // Legacy preview globals were retired in v1.12.4; the ruleset-backed helper path is the only active talent preview source.
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
   const DEPTH_CHAPTERS_PER_ROOM = 10;

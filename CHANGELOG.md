@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.12.3`
-* Current local package baseline: `v1.12.3`
-* Current development target: `v1.12.3`
+* Public/live itch version: `v1.12.4`
+* Current local package baseline: `v1.12.4`
+* Current development target: `v1.12.4`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -67,7 +67,7 @@ Add new notes below this section.
 
 ---
 
-### v1.12.3 - Talent System Ruleset Integration Pass
+### v1.12.4 - Talent Legacy Preview Cleanup
 
 Status: Complete
 
