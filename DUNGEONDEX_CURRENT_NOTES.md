@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.12.2 - Talent System Ruleset Foundation
+- DungeonDex v1.12.3 - Talent System Ruleset Integration Pass
 
-## v1.12.2 Talent System Ruleset Foundation
-- Current baseline: v1.12.2.
+## v1.12.3 Talent System Ruleset Integration Pass
+- Current baseline: v1.12.3.
 - Added a locked `TALENT_RULESET_PREVIEW` foundation for future point source rules, caps, branch/category structure, node tiers, cost model, unlock requirements, and preview-only node metadata.
 - Current ruleset helpers are read-only and defensive: `talentRulesetPreview`, `talentRulesetSummary`, and `talentPreviewNodes`.
 - All ruleset helper output reports locked, preview-only, inactive, and non-gameplay state.
@@ -250,7 +250,7 @@
 - Trophy Echo remains locked, inactive, rewardless, and non-playable.
 - All revisit routes remain locked/read-only.
 
-### v1.12.2 Talent System Ruleset Foundation
+### v1.12.3 Talent System Ruleset Integration Pass
 - The locked talent ruleset foundation now defines future point source, cap, branch, tier, cost, unlock, and preview node metadata.
 - Talent Passive Preview Mapping is now the active next systems lane.
 - Do not change talent earning, spending, effects, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit routes without a separate activation patch.

@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.12.2 - Talent System Ruleset Foundation + Lowfire Board.
+// DungeonDex v1.12.3 - Talent System Ruleset Integration + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.12.2-talent-ruleset-foundation';
+  const SCRIPT_BUILD = '1.12.3-talent-ruleset-integration';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const ZERO_TALENT_BONUSES = Object.freeze({ maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 });
@@ -159,31 +159,36 @@
 
   function talentTreePreview(state){
     ensureTalents(state);
-    const branchesSource = Array.isArray(window.TALENT_PREVIEW_BRANCHES) && window.TALENT_PREVIEW_BRANCHES.length
-      ? window.TALENT_PREVIEW_BRANCHES
-      : TALENT_PATHS.map(branch => ({ key: branch.id, title: branch.label, detail: branch.summary }));
-    const nodesSource = Array.isArray(window.TALENT_PREVIEW_NODES) && window.TALENT_PREVIEW_NODES.length
-      ? window.TALENT_PREVIEW_NODES
-      : TALENT_DEFS.map(node => ({ key: node.id, branch: node.path, title: node.name, detail: node.summary, plannedEffect: node.effect, status: 'Preview only', locked: true, order: 0 }));
-    const branches = branchesSource.map(branch => {
-      const nodes = nodesSource.filter(node => node.branch === branch.key).map(node => ({
-        key: node.key,
-        branch: node.branch,
+    const ruleset = talentRulesetPreview();
+    const nodesSource = talentPreviewNodes();
+    const branchNodes = new Map();
+    nodesSource.forEach(node => {
+      const key = String(node.branch || '').trim();
+      if (!key) return;
+      const list = branchNodes.get(key) || [];
+      list.push(node);
+      branchNodes.set(key, list);
+    });
+    const branches = asArray(ruleset.branches, []).map(branch => {
+      const key = String(branch.id || branch.key || '').trim();
+      const nodes = (branchNodes.get(key) || []).map(node => ({
+        key: node.id,
+        branch: key,
         title: node.title,
-        detail: node.detail,
-        plannedEffect: node.plannedEffect,
-        status: node.status || 'Preview only',
-        locked: node.locked !== false,
+        detail: node.plannedEffect || node.detail || '',
+        plannedEffect: node.plannedEffect || node.detail || '',
+        status: node.previewOnly === false ? 'Preview locked' : 'Preview locked',
+        locked: true,
         active: false,
         purchased: false,
         learned: false,
         unlocked: false,
-        order: node.order || 0
+        order: Math.floor(numberOr(node.tier, node.order, 0, 999999))
       })).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
       return {
-        key: branch.key,
-        title: branch.title,
-        detail: branch.detail,
+        key,
+        title: branch.label || branch.title || key,
+        detail: branch.summary || branch.detail || '',
         status: 'Preview locked',
         locked: true,
         active: false,
@@ -195,7 +200,12 @@
       };
     });
     const nodes = branches.flatMap(branch => branch.nodes);
-    return { previewOnly: true, branches, nodes };
+    return {
+      ...ruleset,
+      previewOnly: true,
+      branches,
+      nodes
+    };
   }
 
   function talentTreePreviewSummary(state){
@@ -206,7 +216,9 @@
       lockedNodes: preview.nodes.filter(node => node.locked).length,
       activeNodes: 0,
       spendablePoints: 0,
-      previewOnly: true
+      previewOnly: true,
+      rulesetId: preview.id || '',
+      rulesetVersion: preview.version || 0
     };
   }
 

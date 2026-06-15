@@ -96,8 +96,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.12.2';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.12.2';
+  const BUILD = '1.12.3';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.12.3';
   const TALENT_PREVIEW_BRANCHES = Object.freeze([
     Object.freeze({ key: 'survival', title: 'Survival', detail: 'Safer descent planning and recovery lanes.' }),
     Object.freeze({ key: 'strikes', title: 'Strikes', detail: 'Future offense routing for planned combat branches.' }),
