@@ -1,9 +1,9 @@
-// DungeonDex v1.15.2 runtime pointer.
+// DungeonDex v1.16.0 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.13.1';
-window.DUNGEONDEX_BUILD_QS = '1.15.2-remove-planned-return-routes-town-panel';
+window.DUNGEONDEX_BUILD = '1.16.0';
+window.DUNGEONDEX_BUILD_QS = '1.16.0-talent-passive-preview-mapping';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -33,7 +33,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.15.2-remove-planned-return-routes-town-panel';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.16.0-talent-passive-preview-mapping';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);

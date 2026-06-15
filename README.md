@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.15.2**
+Current baseline: **DungeonDex v1.16.0**
 
 ## Current Build
 
-**v1.15.2 - Remove Planned Return Routes Town Panel**
+**v1.16.0 - Talent Passive Preview Mapping**
 
-This version tightens revisit route panel readability and detail copy for the existing side-route previews. Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, and revisit route activation behavior remain unchanged.
+This version maps planned passive talent identities into the locked Talent Tree Preview so the branch cards read more clearly without activating talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, or revisit route activation behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.15.2 keeps revisit routes side-content only while removing the planned return routes panel from Town.
+v1.16.0 keeps Talent Tree Preview locked, read-only, and inert while presenting future passive identities in a clearer planning layout.
 
 ## Running Locally
 

@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.12.3 - Talent System Ruleset Integration + Lowfire Board.
+// DungeonDex v1.16.0 - Talent passive preview mapping.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.12.3-talent-ruleset-integration';
+  const SCRIPT_BUILD = '1.16.0-talent-passive-preview-mapping';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const ZERO_TALENT_BONUSES = Object.freeze({ maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 });
@@ -47,19 +47,63 @@
     return JSON.parse(JSON.stringify(value));
   }
 
-  const TALENT_PATHS = [
-    { id:'survivor', label:'Survivor', summary:'Staying alive, recovery, and safer runs.' },
-    { id:'hunter', label:'Hunter', summary:'Elite Board marks, rivals, and trophy flow.' },
-    { id:'delver', label:'Delver', summary:'Deep stairs, charters, and boss pressure.' },
-    { id:'collector', label:'Collector', summary:'Loot value, archive value, and careful selling.' }
-  ];
+  const TALENT_PASSIVE_PREVIEW_MAP = {
+    survivor: {
+      branchName: 'Survivor',
+      branchSummary: 'HP, guard, and safer-return planning only.',
+      nodes: [
+        { nodeKey:'survivor_sturdy_start', nodeTitle:'Sturdy Start', tier:1, costPreview:1, requirementPreview:'Preview only. Branch stays locked.', passivePreviewDescription:'Planned future passive for slightly sturdier opening runs. Inactive.' },
+        { nodeKey:'survivor_safe_recovery', nodeTitle:'Safe Recovery', tier:2, costPreview:2, requirementPreview:'Preview only. Requires future branch progress.', passivePreviewDescription:'Planned future passive for safer early recovery after extraction. Inactive.' },
+        { nodeKey:'survivor_guard_return', nodeTitle:'Guarded Return', tier:3, costPreview:3, requirementPreview:'Preview only. Future capstone gate disabled.', passivePreviewDescription:'Planned future passive for clearer death and extraction resilience language. Inactive.' }
+      ]
+    },
+    hunter: {
+      branchName: 'Hunter',
+      branchSummary: 'Elite Board, rival, and contract readability only.',
+      nodes: [
+        { nodeKey:'hunter_board_clarity', nodeTitle:'Board Clarity', tier:1, costPreview:1, requirementPreview:'Preview only. Board rules remain locked.', passivePreviewDescription:'Planned future passive for better contract readability. Inactive.' },
+        { nodeKey:'hunter_board_payout_plan', nodeTitle:'Payout Plan', tier:2, costPreview:2, requirementPreview:'Preview only. No payout changes are live.', passivePreviewDescription:'Planned future passive for small board payout planning. Inactive.' },
+        { nodeKey:'hunter_rival_trace', nodeTitle:'Rival Trace', tier:3, costPreview:3, requirementPreview:'Preview only. Rival layer stays inert.', passivePreviewDescription:'Planned future passive for rival trace awareness. Inactive.' }
+      ]
+    },
+    delver: {
+      branchName: 'Delver',
+      branchSummary: 'Dungeon depth, navigation, and charter planning only.',
+      nodes: [
+        { nodeKey:'delver_stair_sense', nodeTitle:'Stair Sense', tier:1, costPreview:1, requirementPreview:'Preview only. Depth gates are disabled.', passivePreviewDescription:'Planned future passive for stair sense and safer route planning. Inactive.' },
+        { nodeKey:'delver_depth_plan', nodeTitle:'Depth Plan', tier:2, costPreview:2, requirementPreview:'Preview only. Future depth support is inert.', passivePreviewDescription:'Planned future passive for deeper-run planning. Inactive.' },
+        { nodeKey:'delver_charter_support', nodeTitle:'Charter Support', tier:3, costPreview:3, requirementPreview:'Preview only. Charter support stays disabled.', passivePreviewDescription:'Planned future passive for future charter support. Inactive.' }
+      ]
+    },
+    collector: {
+      branchName: 'Collector',
+      branchSummary: 'Loot, gear memory, archive, and trophy planning only.',
+      nodes: [
+        { nodeKey:'collector_item_appraisal', nodeTitle:'Item Appraisal', tier:1, costPreview:1, requirementPreview:'Preview only. Loot values are unchanged.', passivePreviewDescription:'Planned future passive for item appraisal. Inactive.' },
+        { nodeKey:'collector_famous_memory', nodeTitle:'Famous Memory', tier:2, costPreview:2, requirementPreview:'Preview only. Gear memory remains read-only.', passivePreviewDescription:'Planned future passive for Famous Gear memory support. Inactive.' },
+        { nodeKey:'collector_trophy_archive', nodeTitle:'Trophy Archive', tier:3, costPreview:3, requirementPreview:'Preview only. Trophy archive visibility only.', passivePreviewDescription:'Planned future passive for trophy and archive visibility. Inactive.' }
+      ]
+    }
+  };
 
-  const TALENT_DEFS = [
-    { id:'survivor_hardened_start', path:'survivor', name:'Hardened Start', effect:'Preview only. No active bonus.', summary:'Locked future survival hook.', note:'Preview locked.' },
-    { id:'hunter_board_regular', path:'hunter', name:'Board Regular', effect:'Preview only. No board payout change.', summary:'Locked future board hook.', note:'Preview locked.' },
-    { id:'delver_stair_sense', path:'delver', name:'Stair Sense', effect:'Preview only. No charter discount.', summary:'Locked future charter hook.', note:'Preview locked.' },
-    { id:'collector_appraiser', path:'collector', name:'Appraiser', effect:'Preview only. No sell-value bonus.', summary:'Locked future loot hook.', note:'Preview locked.' }
-  ];
+  const TALENT_PATHS = Object.entries(TALENT_PASSIVE_PREVIEW_MAP).map(([id, branch]) => ({
+    id,
+    label: branch.branchName,
+    summary: branch.branchSummary,
+    locked: true,
+    previewOnly: true,
+    active: false,
+    gameplayEnabled: false
+  }));
+
+  const TALENT_DEFS = TALENT_PATHS.flatMap(path => TALENT_PASSIVE_PREVIEW_MAP[path.id].nodes.map(node => ({
+    id: node.nodeKey,
+    path: path.id,
+    name: node.nodeTitle,
+    effect: node.passivePreviewDescription,
+    summary: node.requirementPreview,
+    note: 'Locked preview only.'
+  })));
 
   const TALENT_BY_ID = Object.fromEntries(TALENT_DEFS.map(def => [def.id, def]));
   const TALENT_PATH_BY_ID = Object.fromEntries(TALENT_PATHS.map(path => [path.id, path]));
@@ -99,11 +143,16 @@
       active: false,
       gameplayEnabled: false
     },
-    branches: [
-      { id: 'survivor', label: 'Survivor', category: 'role', summary: 'HP, sustain, and safer runs.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'delver', label: 'Delver', category: 'role', summary: 'Gold, contracts, and extraction value.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'warden', label: 'Warden', category: 'identity', summary: 'Gear memory, trophies, and dungeon identity.', locked: true, previewOnly: true, active: false, gameplayEnabled: false }
-    ],
+    branches: TALENT_PATHS.map(path => ({
+      id: path.id,
+      label: path.label,
+      category: path.id === 'collector' ? 'identity' : path.id === 'hunter' ? 'contract' : 'role',
+      summary: path.summary,
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false
+    })),
     tiers: [
       { tier: 1, label: 'Tier I', plannedCost: 1, unlockRequirement: 'Ruleset only; no live unlock.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
       { tier: 2, label: 'Tier II', plannedCost: 2, unlockRequirement: 'Future branch investment gate; disabled.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
@@ -125,17 +174,34 @@
       { id: 'previous_tier', label: 'Previous tier planned', enabled: false, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
       { id: 'point_balance', label: 'Spendable point balance', enabled: false, locked: true, previewOnly: true, active: false, gameplayEnabled: false }
     ],
-    nodes: [
-      { id: 'survivor_grit_i', branch: 'survivor', tier: 1, title: 'Grit I', plannedRole: 'HP baseline', plannedEffect: 'Future small max HP passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'survivor_recovery_ii', branch: 'survivor', tier: 2, title: 'Recovery II', plannedRole: 'Sustain baseline', plannedEffect: 'Future simple sustain passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'survivor_safe_return_iii', branch: 'survivor', tier: 3, title: 'Safe Return III', plannedRole: 'Safer runs', plannedEffect: 'Future safe-run passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'delver_coin_i', branch: 'delver', tier: 1, title: 'Coin I', plannedRole: 'Gold baseline', plannedEffect: 'Future small gold-value passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'delver_contract_ii', branch: 'delver', tier: 2, title: 'Contract II', plannedRole: 'Contract value', plannedEffect: 'Future simple contract passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'delver_extract_iii', branch: 'delver', tier: 3, title: 'Extract III', plannedRole: 'Extraction value', plannedEffect: 'Future extraction-value passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'warden_memory_i', branch: 'warden', tier: 1, title: 'Memory I', plannedRole: 'Gear memory', plannedEffect: 'Future gear-memory passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'warden_trophy_ii', branch: 'warden', tier: 2, title: 'Trophy II', plannedRole: 'Trophy identity', plannedEffect: 'Future trophy-record passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
-      { id: 'warden_depth_iii', branch: 'warden', tier: 3, title: 'Depth III', plannedRole: 'Dungeon identity', plannedEffect: 'Future dungeon-identity passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false }
-    ]
+    nodes: TALENT_DEFS.map(def => {
+      const nodeMeta = (TALENT_PASSIVE_PREVIEW_MAP[def.path]?.nodes || []).find(node => node.nodeKey === def.id) || {};
+      const path = TALENT_PASSIVE_PREVIEW_MAP[def.path] || {};
+      return {
+        id: def.id,
+        branch: def.path,
+        tier: nodeMeta.tier || 1,
+        title: def.name,
+        branchName: path.branchName || def.path,
+        branchSummary: path.branchSummary || '',
+        nodeKey: def.id,
+        nodeTitle: def.name,
+        costPreview: nodeMeta.costPreview || 0,
+        requirementPreview: nodeMeta.requirementPreview || '',
+        passivePreviewDescription: def.effect,
+        plannedRole: nodeMeta.requirementPreview || '',
+        plannedEffect: def.effect,
+        plannedCost: nodeMeta.costPreview || 0,
+        locked: true,
+        previewOnly: true,
+        active: false,
+        gameplayEnabled: false,
+        learned: false,
+        effectValue: 0,
+        applied: false,
+        status: 'Locked preview only. Inactive.'
+      };
+    })
   });
 
   window.TALENT_RULESET_PREVIEW = TALENT_RULESET_PREVIEW;
@@ -157,6 +223,56 @@
     return 0;
   }
 
+  function talentPassivePreviewSummary(branchId){
+    const branch = TALENT_PASSIVE_PREVIEW_MAP[String(branchId || '').trim()];
+    if (!branch) return null;
+    return {
+      branchName: branch.branchName,
+      branchSummary: branch.branchSummary,
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false,
+      nodeCount: branch.nodes.length
+    };
+  }
+
+  function talentPreviewBranchSummary(branch){
+    if (!branch) return null;
+    return {
+      branchName: branch.label || branch.branchName || branch.id || '',
+      branchSummary: branch.summary || branch.branchSummary || '',
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false,
+      nodeCount: Array.isArray(branch.nodes) ? branch.nodes.length : 0
+    };
+  }
+
+  function talentPreviewNodeDetails(node){
+    if (!node) return null;
+    return {
+      nodeKey: node.id || node.nodeKey || '',
+      nodeTitle: node.title || node.nodeTitle || '',
+      tier: Math.max(0, Math.floor(numberOr(node.tier, 0, 0, 999999))),
+      costPreview: Math.max(0, Math.floor(numberOr(node.costPreview ?? node.plannedCost, 0, 0, 999999))),
+      requirementPreview: String(node.requirementPreview || node.plannedRole || '').trim(),
+      passivePreviewDescription: String(node.passivePreviewDescription || node.plannedEffect || '').trim(),
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false,
+      learned: false,
+      effectValue: 0,
+      applied: false
+    };
+  }
+
+  function talentPassivePreviewMap(){
+    return clonePlain(TALENT_PASSIVE_PREVIEW_MAP);
+  }
+
   function talentTreePreview(state){
     ensureTalents(state);
     const ruleset = talentRulesetPreview();
@@ -171,30 +287,44 @@
     });
     const branches = asArray(ruleset.branches, []).map(branch => {
       const key = String(branch.id || branch.key || '').trim();
+      const branchMeta = TALENT_PASSIVE_PREVIEW_MAP[key] || {};
       const nodes = (branchNodes.get(key) || []).map(node => ({
         key: node.id,
         branch: key,
         title: node.title,
         detail: node.plannedEffect || node.detail || '',
         plannedEffect: node.plannedEffect || node.detail || '',
-        status: node.previewOnly === false ? 'Preview locked' : 'Preview locked',
+        branchName: branchMeta.branchName || branch.label || key,
+        branchSummary: branchMeta.branchSummary || branch.summary || '',
+        nodeKey: node.id,
+        nodeTitle: node.title,
+        costPreview: Math.max(0, Math.floor(numberOr(node.plannedCost, 0, 0, 999999))),
+        requirementPreview: String(node.plannedRole || '').trim(),
+        passivePreviewDescription: String(node.plannedEffect || node.detail || '').trim(),
+        status: 'Locked preview only. Inactive.',
         locked: true,
         active: false,
         purchased: false,
         learned: false,
         unlocked: false,
+        previewOnly: true,
+        gameplayEnabled: false,
+        effectValue: 0,
+        applied: false,
         order: Math.floor(numberOr(node.tier, node.order, 0, 999999))
       })).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
       return {
         key,
         title: branch.label || branch.title || key,
         detail: branch.summary || branch.detail || '',
-        status: 'Preview locked',
+        status: 'Locked preview only.',
         locked: true,
         active: false,
         purchased: false,
         learned: false,
         unlocked: false,
+        previewOnly: true,
+        gameplayEnabled: false,
         nodeCount: nodes.length,
         nodes
       };
@@ -380,9 +510,9 @@
         </div>
         <span class="talent-state-pill is-locked">Locked</span>
       </div>
-      <p class="talent-path-effect">${H(node.plannedEffect)}</p>
-      <p class="small muted talent-path-summary">${H(node.detail)}</p>
-      <p class="talent-path-note small muted">${H(node.status)}</p>
+      <p class="talent-path-effect">${H(node.passivePreviewDescription || node.plannedEffect)}</p>
+      <p class="small muted talent-path-summary">${H(node.branchSummary || node.detail)}</p>
+      <p class="talent-path-note small muted">${H(node.requirementPreview || node.status)}</p>
       <div class="talent-preview-tags">
         <span class="pill">Preview</span>
         <span class="pill">Planned</span>
@@ -405,7 +535,7 @@
         <div>
           <h2>Talent Tree Preview</h2>
           <p>Talent Tree Preview is locked. No talent points, purchases, unlocks, or bonuses are active yet.</p>
-          <div class="talent-passive-note small">Preview only. No active bonus. No gameplay effect yet.</div>
+          <div class="talent-passive-note small">Preview only. Locked. Inactive. No gameplay effect yet.</div>
         </div>
         <span class="pill rarity-rare">Locked</span>
       </div>
@@ -469,7 +599,7 @@
         <span class="talent-separator" aria-hidden="true">&bull;</span>
         <span><b>Nodes:</b> ${F(summary.totalNodes)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Status:</b> Preview locked</span>
+        <span><b>Status:</b> Locked preview only</span>
       </div>
       <div class="talent-milestone-line small" aria-label="Talent preview status">
         <span><b>Locked nodes:</b> ${F(summary.lockedNodes)}</span>
@@ -838,6 +968,10 @@
     build: SCRIPT_BUILD,
     defs: TALENT_DEFS,
     paths: TALENT_PATHS,
+    passivePreviewMap: talentPassivePreviewMap,
+    passivePreviewSummary: talentPassivePreviewSummary,
+    previewBranchSummary: talentPreviewBranchSummary,
+    previewNodeDetails: talentPreviewNodeDetails,
     ruleset: talentRulesetPreview,
     rulesetSummary: talentRulesetSummary,
     rulesetNodes: talentPreviewNodes,

@@ -9,12 +9,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.15.2`
-* Current development target: `v1.15.2`
+* Current local package baseline: `v1.16.0`
+* Current development target: `v1.16.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.16.0 - Talent Passive Preview Mapping
+
+* Mapped future passive talent candidates into the locked Talent Tree Preview for clearer planning copy.
+* Added Survivor, Hunter, Delver, and Collector passive preview branches with compact passive-only node copy.
+* Added defensive passive preview helper metadata so preview output stays locked, preview-only, inactive, and zero-effect.
+* Expanded smoke coverage to check the passive preview map, branch count, node count, inert status fields, and runtime safety.
+* Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and revisit behavior remain unchanged.
 
 ---
 

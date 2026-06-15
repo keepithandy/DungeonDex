@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.15.2 - Build label guard.
+// DungeonDex v1.16.0 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.15.2';
+  const BUILD = '1.16.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.15.2-remove-planned-return-routes-town-panel';
+  const BUILD_QS = '1.16.0-talent-passive-preview-mapping';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
