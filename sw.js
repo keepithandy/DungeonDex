@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.12.4-talent-legacy-preview-cleanup';
+const CACHE_NAME = 'dungeondex-v1.12.5-talent-foundation-checkpoint';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.12.4-talent-legacy-preview-cleanup';
+const BUILD_QS = '1.12.5-talent-foundation-checkpoint';
 const ASSETS = [
   './',
   './index.html',
