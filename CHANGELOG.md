@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.13.0`
-* Current development target: `v1.13.0`
+* Current local package baseline: `v1.13.1`
+* Current development target: `v1.13.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -66,6 +66,12 @@ Use `VERSION.md` for the current active version.
 Add new notes below this section.
 
 ---
+
+### v1.13.1 - Rendered Build Label / Cache Hygiene Audit
+
+* Fixed the stale visible build label source in the build label guard, which was still hardcoded to `DungeonDex v1.12.5`.
+* Updated the visible version label and cache/build query strings to `DungeonDex v1.13.1` with build query `1.13.1-rendered-build-label-cache-hygiene`.
+* Confirmed the fix is cache/label hygiene only. No revisit, talent, combat, economy, debt, trophy, Famous Gear, Elite Board, or scaling behavior changed.
 
 ### v1.13.0 - Revisit Routes Activation Foundation
 

@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.13.0 - Revisit Routes Activation Foundation
+- DungeonDex v1.13.1 - Rendered Build Label / Cache Hygiene Audit
+
+## v1.13.1 Rendered Build Label / Cache Hygiene Audit
+- Current baseline: v1.13.1.
+- Fixed the stale visible label source in `js/systems/21_build_label_guard.js`, which was still hardcoded to `DungeonDex v1.12.5`.
+- Updated cache/build query strings to a new `1.13.1-rendered-build-label-cache-hygiene` label so browser and smoke runs do not reuse the old label path.
+- Revisit routes, talent preview, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
 
 ## v1.13.0 Revisit Routes Activation Foundation
 - Current baseline: v1.13.0.

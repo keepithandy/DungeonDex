@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.12.5 - Build label guard.
+// DungeonDex v1.13.1 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.12.5';
+  const BUILD = '1.13.1';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.12.5-talent-foundation-checkpoint';
+  const BUILD_QS = '1.13.1-rendered-build-label-cache-hygiene';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

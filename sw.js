@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.13.0-revisit-routes-activation-foundation';
+const CACHE_NAME = 'dungeondex-v1.13.1-rendered-build-label-cache-hygiene';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.13.0-revisit-routes-activation-foundation';
+const BUILD_QS = '1.13.1-rendered-build-label-cache-hygiene';
 const ASSETS = [
   './',
   './index.html',
