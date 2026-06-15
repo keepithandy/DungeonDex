@@ -156,6 +156,13 @@
   const TALENT_POINT_STEP = 5;
   const TALENT_POINT_CAP = 20;
   const TALENT_BONUS_KEYS = Object.freeze(['maxHpPct', 'eliteBoardRewardPct', 'charterCostPct', 'sellValuePct']);
+  const TALENT_LEDGER_VERSION = 1;
+  const ZERO_TALENT_BONUSES = Object.freeze({
+    maxHpPct: 0,
+    eliteBoardRewardPct: 0,
+    charterCostPct: 0,
+    sellValuePct: 0
+  });
 
   function createTalentState() {
     const unlocked = {};
@@ -282,81 +289,55 @@
   }
 
   function talentMilestonePoints(depth) {
-    return Math.max(0, Math.min(TALENT_POINT_CAP, Math.floor(Math.max(1, Math.floor(numberOr(depth, 1, 1, 999999))) / TALENT_POINT_STEP)));
+    return 0;
   }
 
   function normalizeTalentUnlocks(value) {
-    const unlocked = {};
-    if (!isPlainObject(value)) return unlocked;
-    Object.keys(value).forEach(id => {
-      if (value[id]) unlocked[String(id)] = true;
-    });
-    return unlocked;
+    return {};
   }
 
   function normalizeTalentUnlockIds(value) {
-    const ids = [];
-    const add = id => {
-      const key = String(id || '').trim();
-      if (!key || ids.includes(key)) return;
-      ids.push(key);
-    };
-    if (Array.isArray(value)) {
-      value.forEach(add);
-      return ids;
-    }
-    if (!isPlainObject(value)) return ids;
-    Object.keys(value).forEach(id => {
-      if (value[id]) add(id);
-    });
-    return ids;
+    return [];
   }
 
   function repairTalentState(state) {
-    if (!state?.player) return createTalentState();
-    const legacy = isPlainObject(state.player.talents) ? state.player.talents : {};
-    const unlocked = normalizeTalentUnlocks(legacy.unlocked || legacy.spent);
-    const unlockedIds = normalizeTalentUnlockIds(state.player.talentUnlockIds);
-    unlockedIds.forEach(id => {
-      unlocked[id] = true;
-    });
-    const storedEarned = Math.max(
-      0,
-      Math.floor(numberOr(state.player.talentPointsEarned, legacy.pointsEarned, 0, 999999))
-    );
-    const storedSpent = Math.max(
-      0,
-      Math.floor(numberOr(state.player.talentPointsSpent, legacy.pointsSpent, 0, 999999)),
-      Object.keys(unlocked).length
-    );
-    const pointsEarned = Math.max(talentMilestonePoints(bestTalentProgressDepth(state)), storedEarned);
-    const pointsSpent = Math.min(pointsEarned, Math.max(0, storedSpent));
-    const talentState = {
-      pointsEarned,
-      pointsSpent,
-      unlocked,
-      unlockedIds: Object.keys(unlocked)
-    };
+    const talentState = createTalentState();
     talentState.spent = talentState.unlocked;
+    if (!state?.player) return talentState;
     state.player.talents = talentState;
-    state.player.talentPointsEarned = pointsEarned;
-    state.player.talentPointsSpent = pointsSpent;
-    state.player.talentPoints = Math.max(0, pointsEarned - pointsSpent);
-    state.player.talentUnlockIds = talentState.unlockedIds.slice();
+    state.player.talentPointsEarned = 0;
+    state.player.talentPointsSpent = 0;
+    state.player.talentPoints = 0;
+    state.player.talentUnlockIds = [];
     return talentState;
   }
 
+  function safeTalentLedgerSource(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+    const proto = Object.getPrototypeOf(value);
+    if (proto && proto !== Object.prototype && proto !== null) return {};
+    return value;
+  }
+
+  function ownTalentLedgerValue(source, key, fallback) {
+    return Object.prototype.hasOwnProperty.call(source, key) ? source[key] : fallback;
+  }
+
   function normalizeTalentLedger(value) {
-    const source = isPlainObject(value) ? value : {};
+    const source = safeTalentLedgerSource(value);
+    const rawNotes = ownTalentLedgerValue(source, 'notes', []);
     return {
-      version: Math.max(1, Math.floor(numberOr(source.version, 1, 1, 999999))),
+      version: Math.max(TALENT_LEDGER_VERSION, Math.floor(numberOr(ownTalentLedgerValue(source, 'version', TALENT_LEDGER_VERSION), TALENT_LEDGER_VERSION, TALENT_LEDGER_VERSION, 999999))),
       unlocked: false,
       previewOnly: true,
       lifetimePoints: 0,
       availablePoints: 0,
       spentPoints: 0,
       earnedSources: [],
-      notes: asArray(source.notes, []).map(entry => String(entry || '').trim()).filter(Boolean).slice(0, 6)
+      notes: asArray(rawNotes, [])
+        .map(entry => cleanDisplayText(entry || '', '').slice(0, 80))
+        .filter(Boolean)
+        .slice(0, 6)
     };
   }
 
@@ -376,21 +357,13 @@
   }
 
   function hasTalent(state, id) {
-    const talentState = getTalentState(state);
-    return !!talentState.unlocked[String(id || '')];
+    repairTalentState(state);
+    return false;
   }
 
   function getTalentBonuses(state) {
-    const survivor = hasTalent(state, 'survivor_hardened_start');
-    const hunter = hasTalent(state, 'hunter_board_regular');
-    const delver = hasTalent(state, 'delver_stair_sense');
-    const collector = hasTalent(state, 'collector_appraiser');
-    return {
-      maxHpPct: survivor ? 0.05 : 0,
-      eliteBoardRewardPct: hunter ? 0.05 : 0,
-      charterCostPct: delver ? 0.05 : 0,
-      sellValuePct: collector ? 0.05 : 0
-    };
+    repairTalentState(state);
+    return { ...ZERO_TALENT_BONUSES };
   }
 
   function getTalentBonus(state, key) {
@@ -399,36 +372,18 @@
   }
 
   function getAvailableTalentPoints(state) {
-    const talentState = getTalentState(state);
-    return Math.max(0, Math.floor(numberOr(talentState.pointsEarned - talentState.pointsSpent, 0, 0, 999999)));
+    repairTalentState(state);
+    return 0;
   }
 
   function grantTalentPoints(state, amount = 1) {
-    if (!state?.player) return 0;
-    const talentState = getTalentState(state);
-    const gained = Math.max(0, Math.floor(numberOr(amount, 0, 0, 999999)));
-    if (!gained) return talentState.pointsEarned;
-    talentState.pointsEarned += gained;
-    state.player.talentPointsEarned = talentState.pointsEarned;
-    state.player.talentPoints = getAvailableTalentPoints(state);
-    return talentState.pointsEarned;
+    repairTalentState(state);
+    return 0;
   }
 
   function unlockTalent(state, id) {
-    if (!state?.player) return false;
-    const talentId = String(id || '').trim();
-    if (!talentId) return false;
-    const talentState = getTalentState(state);
-    if (talentState.unlocked[talentId]) return false;
-    if (getAvailableTalentPoints(state) <= 0) return false;
-    talentState.unlocked[talentId] = true;
-    talentState.spent = talentState.unlocked;
-    talentState.pointsSpent = Math.min(talentState.pointsEarned, Object.keys(talentState.unlocked).length);
-    talentState.unlockedIds = Object.keys(talentState.unlocked);
-    state.player.talentPointsSpent = talentState.pointsSpent;
-    state.player.talentPoints = getAvailableTalentPoints(state);
-    state.player.talentUnlockIds = talentState.unlockedIds.slice();
-    return true;
+    repairTalentState(state);
+    return false;
   }
 
   function resetTalents(state) {
@@ -442,14 +397,13 @@
   }
 
   function talentSummary(state) {
-    const talentState = getTalentState(state);
-    const bonuses = getTalentBonuses(state);
+    repairTalentState(state);
     return {
-      pointsEarned: talentState.pointsEarned,
-      pointsSpent: talentState.pointsSpent,
-      pointsAvailable: getAvailableTalentPoints(state),
-      unlockedIds: Object.keys(talentState.unlocked || {}),
-      bonuses
+      pointsEarned: 0,
+      pointsSpent: 0,
+      pointsAvailable: 0,
+      unlockedIds: [],
+      bonuses: { ...ZERO_TALENT_BONUSES }
     };
   }
 

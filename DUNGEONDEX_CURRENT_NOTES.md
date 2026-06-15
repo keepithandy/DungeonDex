@@ -7,16 +7,27 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.12.0 - First Talent Point Ledger Foundation
+- DungeonDex v1.12.1 - Talent Ledger Repair/Smoke Hardening
+
+## v1.12.1 Talent Ledger Repair/Smoke Hardening
+- Current baseline: v1.12.1.
+- Hardened `player.talentLedger` repair/normalization against missing, null, array, string, partial, legacy, and polluted shapes.
+- Current talent ledger helpers are read-only and always zeroed: no earning, no spending, no active sources, no active points.
+- Current legacy talent save mirrors are repaired to a safe zero-state compatibility shell.
+- Current legacy talent API/devtools mutation hooks remain present but inert: no point grants, no unlocks, no learned state, and no passive bonuses.
+- Current Talent Tree Preview remains locked, preview-only, and non-gameplay-affecting.
+- Smoke coverage checks malformed talent-ledger repair, zero-state summaries, no-op mutation hooks, mobile layout, combat path safety, board reward stability, charter cost stability, sell value stability, and runtime errors.
+- Combat, economy, scaling, monsters, gear, debt, revisit routes, and Elite Board behavior were left unchanged.
+- Revisit and Trophy Echo remain paused, locked/read-only, and non-playable.
 
 ## v1.12.0 First Talent Point Ledger Foundation
-- Current baseline: v1.12.0.
+- Historical baseline: v1.12.0.
 - Audited the existing Talent foundation after the Trophy Echo handoff.
 - Classified current talent save shape, UI surface, helper/API surface, and smoke coverage.
-- Current talent save shape uses `player.talents` plus point/unlock mirrors repaired by `repairTalentState`.
-- Current talent UI surface is the Warden Talents panel with passive-only cards, milestone progress, unlock buttons, and reset control.
-- Current helper/API surface is `DungeonDexTalents` / `DungeonDexWardenTalents`, backed by normalization helpers and DevTools smoke helpers.
-- Current smoke coverage checks malformed repair, zero-point UI, unlock/reset persistence, unknown IDs, mobile layout, combat path, board payout, charter cost, sell value, and runtime errors.
+- v1.12.0 talent save shape used `player.talents` plus point/unlock mirrors repaired by `repairTalentState`.
+- v1.12.0 talent UI surface was the Warden Talents panel with passive-only cards, milestone progress, unlock buttons, and reset control.
+- v1.12.0 helper/API surface was `DungeonDexTalents` / `DungeonDexWardenTalents`, backed by normalization helpers and DevTools smoke helpers.
+- v1.12.0 smoke coverage checked malformed repair, zero-point UI, unlock/reset persistence, unknown IDs, mobile layout, combat path, board payout, charter cost, sell value, and runtime errors.
 - First Talent Point Ledger Foundation is the next visible lane, but this patch did not change talent gameplay.
 - Talent behavior, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, and revisit routes were left unchanged.
 - Revisit and Trophy Echo remain paused, locked/read-only, and non-playable.

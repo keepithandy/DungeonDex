@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.12.0-talent-ledger-foundation';
+const CACHE_NAME = 'dungeondex-v1.12.1-talent-ledger-repair-smoke-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.12.0-talent-ledger-foundation';
+const BUILD_QS = '1.12.1-talent-ledger-repair-smoke-hardening';
 const ASSETS = [
   './',
   './index.html',

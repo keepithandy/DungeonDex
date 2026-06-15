@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.12.0`
-* Current local package baseline: `v1.12.0`
-* Current development target: `v1.12.0`
+* Public/live itch version: `v1.12.1`
+* Current local package baseline: `v1.12.1`
+* Current development target: `v1.12.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,21 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.12.1 - Talent Ledger Repair/Smoke Hardening
+
+Status: Complete
+
+Summary:
+
+* Hardened `player.talentLedger` normalization against missing, null, array, string, partial, legacy, and polluted shapes.
+* Kept `talentPointLedger` and `talentPointLedgerSummary` read-only, preview-only, and zeroed.
+* Froze legacy talent point/unlock/bonus helpers into a zero-state compatibility shell.
+* Extended `smoke_talent_v150b.mjs` coverage for malformed talent-ledger repair and no-op legacy talent mutation paths.
+* Preserved the locked Talent Tree Preview copy and status panel.
+* No talent earning, talent spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, scaling changes, monsters, gear, debt, revisit routes, or Elite Board behavior changes were added.
 
 ---
 

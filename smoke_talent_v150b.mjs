@@ -653,6 +653,7 @@ async function main() {
     record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary && !!previewSummary?.hasLedger && !!previewSummary?.hasLedgerSummary, JSON.stringify(previewSummary));
     record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 5 && previewSummary.nodes === 10 && previewSummary.summary?.totalBranches === 5 && previewSummary.summary?.totalNodes === 10 && previewSummary.summary?.lockedNodes === 10 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true, JSON.stringify(previewSummary));
     record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === false && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 0, JSON.stringify(previewSummary?.ledgerSummary));
+    record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));
@@ -707,7 +708,7 @@ async function main() {
       S.run.floor = 50;
       return api && typeof api.milestoneInfo === 'function' ? api.milestoneInfo(S) : null;
     })()`);
-    record('Milestone display ignores unsafe run depth', unsafeRunMilestone && unsafeRunMilestone.nextDepth === 5 && unsafeRunMilestone.progress === 4, JSON.stringify(unsafeRunMilestone));
+    record('Milestone display remains locked despite unsafe run depth', unsafeRunMilestone && unsafeRunMilestone.securedDepth === 4 && unsafeRunMilestone.securedPoints === 0 && unsafeRunMilestone.nextDepth === 0 && unsafeRunMilestone.progress === 0 && /inactive/i.test(unsafeRunMilestone.statusLabel || ''), JSON.stringify(unsafeRunMilestone));
     await evalByValue(client, `(() => {
       S.run.active = false;
       S.run.floor = 0;
@@ -750,30 +751,36 @@ async function main() {
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
 
-    // Grant one point and confirm the preview stays inert.
+    // Legacy grant/unlock calls stay present for compatibility, but remain inert.
+    const hpBeforeTalentAttempt = await evalByValue(client, `(() => ({ hp: S.player.hp, maxHp: S.player.maxHp }))()`);
     const grantOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
-    record('grantTalentPoint(1)', !!grantOk, String(grantOk));
+    record('grantTalentPoint(1) remains inert', grantOk === false, String(grantOk));
     const availableUnlockBtn = await evalByValue(client, `(() => !document.querySelector('[data-learn-talent]'))`);
-    record('No unlock button appears after point grant', !!availableUnlockBtn, 'Preview panel remains non-interactive');
+    record('No unlock button appears after point attempt', !!availableUnlockBtn, 'Preview panel remains non-interactive');
     const unlockOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
-    record('unlockTalentForTest(Hardened Start)', !!unlockOk, String(unlockOk));
+    record('unlockTalentForTest(Hardened Start) remains inert', unlockOk === false, String(unlockOk));
     const unlockedButtonState = await evalByValue(client, `(() => {
       const btn = document.querySelector('.talent-state-button.is-unlocked');
       return !!btn && btn.disabled && /^Unlocked$/.test((btn.textContent || '').trim());
     })()`);
-    record('No unlock button state is rendered', !unlockedButtonState, 'Preview panel remains inert after grant');
+    record('No unlock button state is rendered', !unlockedButtonState, 'Preview panel remains inert after attempted grant');
     const summaryAfterUnlock = await getSummary();
-    record('Points spent/available update after unlock', summaryAfterUnlock && summaryAfterUnlock.pointsEarned === 1 && summaryAfterUnlock.pointsSpent === 1 && summaryAfterUnlock.pointsAvailable === 0, JSON.stringify(summaryAfterUnlock));
+    record('Point mirrors stay zero after grant/unlock attempts', summaryAfterUnlock && summaryAfterUnlock.pointsEarned === 0 && summaryAfterUnlock.pointsSpent === 0 && summaryAfterUnlock.pointsAvailable === 0 && Array.isArray(summaryAfterUnlock.unlockedIds) && summaryAfterUnlock.unlockedIds.length === 0, JSON.stringify(summaryAfterUnlock));
     const hpAfterUnlock = await evalByValue(client, `(() => ({ hp: S.player.hp, maxHp: S.player.maxHp }))()`);
-    record('Hardened Start max HP bonus applied', hpAfterUnlock.maxHp > 100, JSON.stringify(hpAfterUnlock));
+    record('Hardened Start max HP bonus remains inactive', hpAfterUnlock.maxHp === hpBeforeTalentAttempt.maxHp, JSON.stringify({ before: hpBeforeTalentAttempt, after: hpAfterUnlock }));
 
     const savedAfterUnlock = await readSave(client);
-    record('Save contains unlocked talent mirror', Array.isArray(savedAfterUnlock?.player?.talentUnlockIds) && savedAfterUnlock.player.talentUnlockIds.includes(TALENT_IDS.hardened), JSON.stringify(savedAfterUnlock?.player?.talentUnlockIds || []));
+    record('Save talent mirrors remain zeroed after attempts', Array.isArray(savedAfterUnlock?.player?.talentUnlockIds) && savedAfterUnlock.player.talentUnlockIds.length === 0 && savedAfterUnlock.player.talentPointsEarned === 0 && savedAfterUnlock.player.talentPointsSpent === 0 && savedAfterUnlock.player.talentPoints === 0, JSON.stringify({
+      talentUnlockIds: savedAfterUnlock?.player?.talentUnlockIds || [],
+      talentPointsEarned: savedAfterUnlock?.player?.talentPointsEarned,
+      talentPointsSpent: savedAfterUnlock?.player?.talentPointsSpent,
+      talentPoints: savedAfterUnlock?.player?.talentPoints
+    }));
 
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const summaryAfterReload = await getSummary();
-    record('Unlock persists after reload', summaryAfterReload && Array.isArray(summaryAfterReload.unlockedIds) && summaryAfterReload.unlockedIds.includes(TALENT_IDS.hardened) && summaryAfterReload.pointsSpent === 1 && summaryAfterReload.pointsAvailable === 0, JSON.stringify(summaryAfterReload));
+    record('Talent unlock does not persist after reload', summaryAfterReload && Array.isArray(summaryAfterReload.unlockedIds) && summaryAfterReload.unlockedIds.length === 0 && summaryAfterReload.pointsEarned === 0 && summaryAfterReload.pointsSpent === 0 && summaryAfterReload.pointsAvailable === 0, JSON.stringify(summaryAfterReload));
 
     const resetOk = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.resetTalents())()`);
     record('resetTalents()', !!resetOk, String(resetOk));
@@ -795,7 +802,7 @@ async function main() {
     smoke = await getSmoke();
     record('Older-save missing talent fields repairs safely', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const repairedSummary = await getSummary();
-    record('Legacy aliases repaired', repairedSummary && repairedSummary.pointsEarned === 2 && repairedSummary.pointsSpent === 1 && repairedSummary.pointsAvailable === 1 && Array.isArray(repairedSummary.unlockedIds), JSON.stringify(repairedSummary));
+    record('Legacy aliases repair to locked zero state', repairedSummary && repairedSummary.pointsEarned === 0 && repairedSummary.pointsSpent === 0 && repairedSummary.pointsAvailable === 0 && Array.isArray(repairedSummary.unlockedIds) && repairedSummary.unlockedIds.length === 0, JSON.stringify(repairedSummary));
     const repairedPanelText = await getTalentText();
     record('Repaired save preview display is safe', repairedPanelText.includes('Talent Tree Preview') && repairedPanelText.includes('Preview only. No active bonus.') && repairedPanelText.includes('No gameplay effect yet.'), repairedPanelText.slice(0, 400));
     record('Repaired save ledger display is safe', repairedPanelText.includes('Talent Ledger') && repairedPanelText.includes('Foundation only. Talent points cannot be earned or spent yet.'), repairedPanelText.slice(0, 400));
@@ -818,9 +825,44 @@ async function main() {
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     smoke = await getSmoke();
     record('Unknown talent id stays safe', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
+    const unknownSummary = await getSummary();
+    record('Unknown talent id repairs to locked zero state', unknownSummary && unknownSummary.pointsEarned === 0 && unknownSummary.pointsSpent === 0 && unknownSummary.pointsAvailable === 0 && Array.isArray(unknownSummary.unlockedIds) && unknownSummary.unlockedIds.length === 0, JSON.stringify(unknownSummary));
     const unknownPanelText = await getTalentText();
     record('Unknown talent id hidden from UI', !unknownPanelText.includes('__unknown_talent__') && unknownPanelText.includes('Talent Tree Preview') && unknownPanelText.includes('Survival') && unknownPanelText.includes('Preview only'), unknownPanelText.slice(0, 300));
     record('Unknown talent id keeps ledger foundation', unknownPanelText.includes('Talent Ledger') && unknownPanelText.includes('Spending inactive'), unknownPanelText.slice(0, 300));
+
+    const ledgerRepairBase = JSON.parse(JSON.stringify(await readSave(client)));
+    const malformedLedgerCases = [
+      { name: 'missing', omit:true },
+      { name: 'null', value:null },
+      { name: 'array', value:[{ lifetimePoints:99 }] },
+      { name: 'string', value:'earned:99' },
+      { name: 'partial', value:{ notes:['kept note'], availablePoints:99, spentPoints:88, earnedSources:[{ id:'bad' }] } },
+      { name: 'polluted', value:{ __proto__:{ unlocked:true, lifetimePoints:99 }, notes:['safe note'], lifetimePoints:99 } }
+    ];
+    for (const entry of malformedLedgerCases) {
+      const malformedSave = JSON.parse(JSON.stringify(ledgerRepairBase));
+      if (entry.omit) delete malformedSave.player.talentLedger;
+      else malformedSave.player.talentLedger = entry.value;
+      malformedSave.player.talents = { pointsEarned:99, pointsSpent:88, unlocked:{ [TALENT_IDS.hardened]:true }, spent:{ [TALENT_IDS.hardened]:true }, unlockedIds:[TALENT_IDS.hardened] };
+      malformedSave.player.talentUnlockIds = [TALENT_IDS.hardened];
+      malformedSave.player.talentPointsEarned = 99;
+      malformedSave.player.talentPointsSpent = 88;
+      malformedSave.player.talentPoints = 11;
+      await writeSave(client, malformedSave);
+      await client.send('Page.reload', { ignoreCache: true });
+      await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+      const repairedLedger = await evalByValue(client, `(() => {
+        const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+        return {
+          ledger: api?.ledger ? api.ledger(S) : null,
+          summary: api?.ledgerSummary ? api.ledgerSummary(S) : null,
+          talentSummary: api?.summary ? api.summary(S) : null,
+          saved: S.player?.talentLedger || null
+        };
+      })()`);
+      record(`Malformed talentLedger repairs safely: ${entry.name}`, !!repairedLedger?.ledger && repairedLedger.ledger.previewOnly === true && repairedLedger.ledger.unlocked === false && repairedLedger.ledger.lifetimePoints === 0 && repairedLedger.ledger.availablePoints === 0 && repairedLedger.ledger.spentPoints === 0 && Array.isArray(repairedLedger.ledger.earnedSources) && repairedLedger.ledger.earnedSources.length === 0 && repairedLedger.summary?.canEarn === false && repairedLedger.summary?.canSpend === false && repairedLedger.talentSummary?.pointsEarned === 0 && repairedLedger.talentSummary?.pointsSpent === 0 && repairedLedger.talentSummary?.pointsAvailable === 0 && Array.isArray(repairedLedger.talentSummary?.unlockedIds) && repairedLedger.talentSummary.unlockedIds.length === 0, JSON.stringify(repairedLedger));
+    }
 
     // Boss trophy foundation: fresh save, forced award, reload, malformed repair.
     await clearSave(client);
@@ -958,11 +1000,11 @@ async function main() {
     }
     await client.send('Emulation.clearDeviceMetricsOverride');
 
-    // Double unlock / point safety.
+    // Double unlock / point safety: all legacy mutation paths remain no-ops.
     await clearSave(client);
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
+    const safetyGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
     const firstUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
     const secondUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
     await evalScript(client, `S.player.talents.pointsEarned = 1; S.player.talents.pointsSpent = 1; S.player.talentPointsEarned = 1; S.player.talentPointsSpent = 1; S.player.talentPoints = 0; if (typeof save === 'function') save(S); if (typeof render === 'function') render(); return true;`);
@@ -971,14 +1013,15 @@ async function main() {
       return api && typeof api.unlock === 'function' ? api.unlock(S, ${JSON.stringify(TALENT_IDS.board)}) : false;
     })()`);
     const safetySummary = await getSummary();
-    record('Unlock same talent twice does not double-spend', !!firstUnlock && !secondUnlock && safetySummary && safetySummary.pointsSpent === 1 && safetySummary.pointsAvailable === 0, JSON.stringify({ firstUnlock, secondUnlock, noPointUnlock, safetySummary }));
+    record('Legacy unlock paths remain no-op and zeroed', safetyGrant === false && firstUnlock === false && secondUnlock === false && noPointUnlock === false && safetySummary && safetySummary.pointsEarned === 0 && safetySummary.pointsSpent === 0 && safetySummary.pointsAvailable === 0 && Array.isArray(safetySummary.unlockedIds) && safetySummary.unlockedIds.length === 0, JSON.stringify({ safetyGrant, firstUnlock, secondUnlock, noPointUnlock, safetySummary }));
 
-    // Longer play path with the hardened-start passive active.
+    // Longer play path after failed talent calls.
     await clearSave(client);
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
+    const combatGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
+    const combatUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.hardened)}))()`);
+    record('Combat path talent calls remain inert', combatGrant === false && combatUnlock === false, JSON.stringify({ combatGrant, combatUnlock }));
     const hpBeforeCombat = await evalByValue(client, `(() => S.player.maxHp)()`);
     const enterDungeon = await click('#startRunBtn');
     record('Enter Dungeon button works', !!enterDungeon, String(enterDungeon));
@@ -1025,11 +1068,11 @@ async function main() {
       afterExtractState = await evalByValue(client, `(() => ({ active: !!S.run?.active, screen: S.screen, hp: S.player.hp, maxHp: S.player.maxHp, saveOk: !!save(S) }))()`);
     }
     record('Attack / Skill / Guard / Extract still work', afterExtractState.screen === 'town' && afterExtractState.active === false, JSON.stringify(afterExtractState));
-    record('HP passive did not break display/state', afterExtractState.maxHp >= hpBeforeCombat, JSON.stringify({ before: hpBeforeCombat, after: afterExtractState.maxHp }));
+    record('HP passive remains inactive during combat path', afterExtractState.maxHp === hpBeforeCombat, JSON.stringify({ before: hpBeforeCombat, after: afterExtractState.maxHp }));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const afterCombatReload = await getSummary();
-    record('Talent state persists after combat path', afterCombatReload && Array.isArray(afterCombatReload.unlockedIds) && afterCombatReload.unlockedIds.includes(TALENT_IDS.hardened), JSON.stringify(afterCombatReload));
+    record('Talent state remains locked after combat path', afterCombatReload && Array.isArray(afterCombatReload.unlockedIds) && afterCombatReload.unlockedIds.length === 0 && afterCombatReload.pointsEarned === 0 && afterCombatReload.pointsSpent === 0 && afterCombatReload.pointsAvailable === 0, JSON.stringify(afterCombatReload));
 
     // Elite Board path.
     await clearSave(client);
@@ -1043,7 +1086,7 @@ async function main() {
       const fallback = { id:'__smoke_contract__', baseReward:1000, reward:1000, floorBonusPerDepth:0, maxReward:1200 };
       return calculateContractReward(contract || fallback, S);
     })()`);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
+    const boardGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(1))()`);
     const boardUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.board)}))()`);
     const boardRewardAfterUnlock = await evalByValue(client, `(() => {
       const api = window.DungeonDexEliteContracts;
@@ -1051,8 +1094,8 @@ async function main() {
       const fallback = { id:'__smoke_contract__', baseReward:1000, reward:1000, floorBonusPerDepth:0, maxReward:1200 };
       return calculateContractReward(contract || fallback, S);
     })()`);
-    record('Board Regular unlock works', !!boardUnlock, `base=${boardBaseReward} after=${boardRewardAfterUnlock}`);
-    record('Board reward helper stable', boardRewardAfterUnlock >= boardBaseReward, JSON.stringify({ boardBaseReward, boardRewardAfterUnlock }));
+    record('Board Regular unlock remains inert', boardGrant === false && boardUnlock === false, JSON.stringify({ boardGrant, boardUnlock }));
+    record('Board reward helper unchanged by talent attempts', boardRewardAfterUnlock === boardBaseReward, JSON.stringify({ boardBaseReward, boardRewardAfterUnlock }));
     const acceptedContractId = await evalByValue(client, `(() => {
       const list = Array.isArray(ELITE_CONTRACTS) ? ELITE_CONTRACTS.filter(c => !c.unlockFloor || c.unlockFloor <= 40) : [];
       return list[0] ? list[0].id : '';
@@ -1066,7 +1109,7 @@ async function main() {
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const boardReloadSummary = await getSummary();
-    record('Talent state persists after Elite Board path', boardReloadSummary && Array.isArray(boardReloadSummary.unlockedIds) && boardReloadSummary.unlockedIds.includes(TALENT_IDS.board), JSON.stringify(boardReloadSummary));
+    record('Talent state remains locked after Elite Board path', boardReloadSummary && Array.isArray(boardReloadSummary.unlockedIds) && boardReloadSummary.unlockedIds.length === 0 && boardReloadSummary.pointsEarned === 0 && boardReloadSummary.pointsSpent === 0 && boardReloadSummary.pointsAvailable === 0, JSON.stringify(boardReloadSummary));
 
     // Charter + sell hooks.
     await clearSave(client);
@@ -1076,17 +1119,18 @@ async function main() {
     await setScreenTown();
     const charterBase = await evalByValue(client, `(() => charterStartCost(40))()`);
     const sellItemBase = await evalByValue(client, `(() => sellValue({ value: 1000, rarity: 'rare', slot: 'weapon', level: 10, rating: 10 }))()`);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(2))()`);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.stair)}))()`);
-    await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.appraiser)}))()`);
+    const hookGrant = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantTalentPoint(2))()`);
+    const stairUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.stair)}))()`);
+    const appraiserUnlock = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.unlockTalentForTest(${JSON.stringify(TALENT_IDS.appraiser)}))()`);
     const charterAfter = await evalByValue(client, `(() => charterStartCost(40))()`);
     const sellItemAfter = await evalByValue(client, `(() => sellValue({ value: 1000, rarity: 'rare', slot: 'weapon', level: 10, rating: 10 }))()`);
-    record('Stair Sense charter helper stable', charterAfter <= charterBase, JSON.stringify({ charterBase, charterAfter }));
-    record('Appraiser sell helper stable', sellItemAfter >= sellItemBase, JSON.stringify({ sellItemBase, sellItemAfter }));
+    record('Charter/sell talent unlock calls remain inert', hookGrant === false && stairUnlock === false && appraiserUnlock === false, JSON.stringify({ hookGrant, stairUnlock, appraiserUnlock }));
+    record('Stair Sense charter helper unchanged', charterAfter === charterBase, JSON.stringify({ charterBase, charterAfter }));
+    record('Appraiser sell helper unchanged', sellItemAfter === sellItemBase, JSON.stringify({ sellItemBase, sellItemAfter }));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const hookReloadSummary = await getSummary();
-    record('Talent state persists after charter/sell path', hookReloadSummary && Array.isArray(hookReloadSummary.unlockedIds) && hookReloadSummary.unlockedIds.includes(TALENT_IDS.stair) && hookReloadSummary.unlockedIds.includes(TALENT_IDS.appraiser), JSON.stringify(hookReloadSummary));
+    record('Talent state remains locked after charter/sell path', hookReloadSummary && Array.isArray(hookReloadSummary.unlockedIds) && hookReloadSummary.unlockedIds.length === 0 && hookReloadSummary.pointsEarned === 0 && hookReloadSummary.pointsSpent === 0 && hookReloadSummary.pointsAvailable === 0, JSON.stringify(hookReloadSummary));
 
     const finalDiag = await pageDiagnostics(client);
     const finalEvents = snapshotEvents();
