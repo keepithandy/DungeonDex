@@ -346,8 +346,33 @@
     return talentState;
   }
 
+  function normalizeTalentLedger(value) {
+    const source = isPlainObject(value) ? value : {};
+    return {
+      version: Math.max(1, Math.floor(numberOr(source.version, 1, 1, 999999))),
+      unlocked: false,
+      previewOnly: true,
+      lifetimePoints: 0,
+      availablePoints: 0,
+      spentPoints: 0,
+      earnedSources: [],
+      notes: asArray(source.notes, []).map(entry => String(entry || '').trim()).filter(Boolean).slice(0, 6)
+    };
+  }
+
+  function normalizeTalentLedgerState(state) {
+    if (!state?.player) return normalizeTalentLedger();
+    const ledger = normalizeTalentLedger(state.player.talentLedger);
+    state.player.talentLedger = ledger;
+    return ledger;
+  }
+
   function getTalentState(state) {
     return repairTalentState(state);
+  }
+
+  function getTalentLedger(state) {
+    return normalizeTalentLedgerState(state);
   }
 
   function hasTalent(state, id) {
@@ -425,6 +450,24 @@
       pointsAvailable: getAvailableTalentPoints(state),
       unlockedIds: Object.keys(talentState.unlocked || {}),
       bonuses
+    };
+  }
+
+  function talentPointLedger(state) {
+    return getTalentLedger(state);
+  }
+
+  function talentPointLedgerSummary(state) {
+    const ledger = getTalentLedger(state);
+    return {
+      previewOnly: ledger.previewOnly === true,
+      unlocked: ledger.unlocked === true,
+      lifetimePoints: ledger.lifetimePoints,
+      availablePoints: ledger.availablePoints,
+      spentPoints: ledger.spentPoints,
+      canEarn: false,
+      canSpend: false,
+      sourceCount: Array.isArray(ledger.earnedSources) ? ledger.earnedSources.length : 0
     };
   }
 
@@ -521,6 +564,7 @@
       : { collected:{}, totalFound:0, latestId:'' };
     state.player.deepStairCharters = normalizeCharterDepthList(savedPlayer.deepStairCharters);
     repairTalentState(state);
+    normalizeTalentLedgerState(state);
     if (state.player.permanentStartFloor >= 40) state.player.goldSink.boughtStart40Charter = true;
     ensurePermanentCharters(state);
     state.player.stats = { ...base.player.stats, ...(isPlainObject(savedPlayer.stats) ? savedPlayer.stats : {}) };
@@ -627,6 +671,7 @@
     state.player.revisitState = normalizeRevisitState(state.player.revisitState);
     state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
     repairTalentState(state);
+    normalizeTalentLedgerState(state);
     if (!isPlainObject(state.run)) state.run = {};
     ensureRunShell(state);
     state.run.active = !!state.run.active;

@@ -7,17 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.11.1 - Talent Preview Copy Hardening
+- DungeonDex v1.12.0 - First Talent Point Ledger Foundation
 
-## v1.11.1 Talent Preview Copy Hardening
-- Current baseline: v1.11.1.
+## v1.12.0 First Talent Point Ledger Foundation
+- Current baseline: v1.12.0.
 - Audited the existing Talent foundation after the Trophy Echo handoff.
 - Classified current talent save shape, UI surface, helper/API surface, and smoke coverage.
 - Current talent save shape uses `player.talents` plus point/unlock mirrors repaired by `repairTalentState`.
 - Current talent UI surface is the Warden Talents panel with passive-only cards, milestone progress, unlock buttons, and reset control.
 - Current helper/API surface is `DungeonDexTalents` / `DungeonDexWardenTalents`, backed by normalization helpers and DevTools smoke helpers.
 - Current smoke coverage checks malformed repair, zero-point UI, unlock/reset persistence, unknown IDs, mobile layout, combat path, board payout, charter cost, sell value, and runtime errors.
-- Talent Preview Copy Hardening is the next visible lane, but this patch did not change talent gameplay.
+- First Talent Point Ledger Foundation is the next visible lane, but this patch did not change talent gameplay.
 - Talent behavior, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, and revisit routes were left unchanged.
 - Revisit and Trophy Echo remain paused, locked/read-only, and non-playable.
 
@@ -228,7 +228,7 @@
 - Trophy Echo remains locked, inactive, rewardless, and non-playable.
 - All revisit routes remain locked/read-only.
 
-### v1.11.1 Talent Preview Copy Hardening
+### v1.12.0 First Talent Point Ledger Foundation
 - Audit the current Talent foundation before any passive choice expansion.
 - Talent Foundation Expansion is now the active next planning lane.
 - Do not change talent effects, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit routes in this audit.

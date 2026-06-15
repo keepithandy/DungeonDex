@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.11.1 - Talent Preview Copy Hardening + Lowfire Board.
+// DungeonDex v1.12.0 - Talent Point Ledger Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.11.1-talent-preview-copy-hardening';
+  const SCRIPT_BUILD = '1.12.0-talent-ledger-foundation';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -104,6 +104,35 @@
       activeNodes: 0,
       spendablePoints: 0,
       previewOnly: true
+    };
+  }
+
+  function talentPointLedger(state){
+    const player = state?.player || {};
+    const source = isPlainObject(player.talentLedger) ? player.talentLedger : {};
+    return {
+      version: Math.max(1, Math.floor(Number(source.version) || 1)),
+      unlocked: false,
+      previewOnly: true,
+      lifetimePoints: 0,
+      availablePoints: 0,
+      spentPoints: 0,
+      earnedSources: [],
+      notes: Array.isArray(source.notes) ? source.notes.slice(0, 6) : []
+    };
+  }
+
+  function talentPointLedgerSummary(state){
+    const ledger = talentPointLedger(state);
+    return {
+      previewOnly: ledger.previewOnly === true,
+      unlocked: ledger.unlocked === true,
+      lifetimePoints: ledger.lifetimePoints,
+      availablePoints: ledger.availablePoints,
+      spentPoints: ledger.spentPoints,
+      canEarn: false,
+      canSpend: false,
+      sourceCount: Array.isArray(ledger.earnedSources) ? ledger.earnedSources.length : 0
     };
   }
 
@@ -231,6 +260,8 @@
     const panel = talentPanel();
     if (!panel || !state?.player) return;
     ensureTalents(state);
+    const ledger = talentPointLedger(state);
+    const ledgerSummary = talentPointLedgerSummary(state);
     const preview = talentTreePreview(state);
     const summary = talentTreePreviewSummary(state);
     panel.innerHTML = `
@@ -246,6 +277,32 @@
         <strong>Locked preview</strong>
         <span>Talents are planning-only. No talent spending is live yet.</span>
       </div>
+      <section class="talent-ledger-card">
+        <div class="split talent-ledger-head">
+          <div>
+            <strong>Talent Ledger</strong>
+            <p class="small muted">Foundation only. Talent points cannot be earned or spent yet.</p>
+          </div>
+          <span class="pill">Preview</span>
+        </div>
+        <div class="talent-summary-row small muted talent-ledger-chips">
+          <span>Locked</span>
+          <span>0 available</span>
+          <span>Spending inactive</span>
+          <span>No active points</span>
+        </div>
+        <div class="talent-milestone-line small" aria-label="Talent ledger status">
+          <span>Preview only</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Unlocked: ${ledgerSummary.unlocked ? 'yes' : 'no'}</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Lifetime: ${ledgerSummary.lifetimePoints}</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Available: ${ledgerSummary.availablePoints}</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Spent: ${ledgerSummary.spentPoints}</span>
+        </div>
+      </section>
       <div class="talent-point-line small" aria-label="Talent preview totals">
         <span><b>Branches:</b> ${F(summary.totalBranches)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
@@ -622,6 +679,8 @@
     paths: TALENT_PATHS,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
+    ledger: talentPointLedger,
+    ledgerSummary: talentPointLedgerSummary,
     ensure: ensureTalents,
     getState: ensureTalents,
     getAvailablePoints: availableTalentPoints,

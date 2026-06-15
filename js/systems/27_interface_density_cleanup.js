@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.11.1 - Interface density and app-feel cleanup.
+// DungeonDex v1.12.0 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.11.1';
+  const BUILD = '1.12.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.11.1-talent-preview-copy-hardening';
+  const BUILD_QS = '1.12.0-talent-ledger-foundation';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -102,6 +102,11 @@
       #talentPanel .talent-preview-banner{display:flex;flex-direction:column;gap:2px;margin:4px 0 7px;padding:6px 8px;border:1px solid rgba(255,190,110,.14);border-radius:12px;background:rgba(255,255,255,.024)}
       #talentPanel .talent-preview-banner strong{font-size:10.75px;line-height:1.05;color:#f2d59a}
       #talentPanel .talent-preview-banner span{font-size:10.25px;line-height:1.2;color:rgba(231,221,205,.78)}
+      #talentPanel .talent-ledger-card{margin:0 0 7px;padding:7px 8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02)}
+      #talentPanel .talent-ledger-head{gap:6px;align-items:flex-start}
+      #talentPanel .talent-ledger-head strong{display:block;font-size:12px;line-height:1.08;color:#f1d79d}
+      #talentPanel .talent-ledger-head p{font-size:10.5px;line-height:1.16;margin-top:2px}
+      #talentPanel .talent-ledger-chips{gap:4px 5px;margin:5px 0 6px!important}
       #talentPanel .talent-point-line{gap:3px 6px!important;margin:4px 0 6px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-milestone-line{gap:3px 7px!important;margin:0 0 7px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-summary-row{display:flex;flex-wrap:wrap;gap:5px!important;margin:5px 0 8px!important}
@@ -185,6 +190,9 @@
 
       @media(max-width:340px){
         #talentPanel .talent-preview-banner{margin-bottom:5px!important;padding:5px 7px!important}
+        #talentPanel .talent-ledger-card{margin-bottom:5px!important;padding:5px 7px!important}
+        #talentPanel .talent-ledger-head p{display:none!important}
+        #talentPanel .talent-ledger-chips{gap:3px 4px!important;margin:3px 0 4px!important}
         #talentPanel .talent-preview-grid{gap:4px!important}
         #talentPanel .talent-preview-branch{padding:5px!important}
         #talentPanel .talent-preview-branch-head p{display:none!important}

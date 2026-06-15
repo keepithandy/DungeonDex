@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.11.1-talent-preview-copy-hardening';
+const CACHE_NAME = 'dungeondex-v1.12.0-talent-ledger-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.11.1-talent-preview-copy-hardening';
+const BUILD_QS = '1.12.0-talent-ledger-foundation';
 const ASSETS = [
   './',
   './index.html',
