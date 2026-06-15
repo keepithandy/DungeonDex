@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.13.1 - Rendered Build Label / Cache Hygiene Audit
+- DungeonDex v1.14.0 - Revisit Route Content Completion
+
+## v1.14.0 Revisit Route Content Completion
+- Current baseline: v1.14.0.
+- Added deterministic content-definition helpers for revisit route previews so each known route gets clearer title, district, reason, hook source, short description, flavor line, safety line, and readiness copy.
+- Improved the Town revisit route panel copy to make the side-route/preview-only status easier to read on mobile.
+- Extended revisit smoke coverage to assert the route content definitions and richer preview copy remain stable.
+- Revisit activation behavior, talent preview, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
 
 ## v1.13.1 Rendered Build Label / Cache Hygiene Audit
 - Current baseline: v1.13.1.

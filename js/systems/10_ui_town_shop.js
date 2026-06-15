@@ -44,6 +44,10 @@
           const previewReason = String(preview.previewReason || gate.previewReason || 'Future route history may shape this path later.').trim();
           const previewRequirement = String(preview.previewRequirement || gate.previewRequirement || 'Build more dungeon history.').trim();
           const previewSafety = String(preview.previewSafety || gate.previewSafety || 'Preview only - route access is unavailable.').trim();
+          const routeFlavorLine = String(route.routeFlavorLine || '').trim();
+          const shortDescription = String(route.shortDescription || '').trim();
+          const lockedReadinessNote = String(route.lockedReadinessNote || '').trim();
+          const hookSource = String(route.hookSource || gate.source || hookLabels || 'Unknown').trim();
           const gateReason = String(gate.reason || 'Locked: Revisit gate not ready').trim();
           const gateRequirement = String(gate.requirement || 'Build more town and dungeon history.').trim();
           const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
@@ -67,15 +71,18 @@
               <span class="pill revisit-route-pill">${escapeHtml(previewLabel || 'Still locked')}</span>
             </div>
             <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
+            ${shortDescription ? `<div class="small revisit-route-short">${escapeHtml(shortDescription)}</div>` : ''}
             <div class="split revisit-route-readiness-head">
               <span class="pill revisit-route-readiness-pill">${escapeHtml(previewLabel || 'Still locked')}</span>
               <span class="small muted">Signal: ${escapeHtml(signal || 'Still locked')}</span>
             </div>
             <div class="small muted revisit-route-reason">${escapeHtml(previewReason || 'Future route history may shape this path later.')}</div>
+            ${routeFlavorLine ? `<div class="small muted revisit-route-flavor">${escapeHtml(routeFlavorLine)}</div>` : ''}
             <div class="revisit-route-criteria-list">${criteriaBody}</div>
             ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
             <div class="small muted revisit-route-diagnostic-label">${escapeHtml(diagnosticLabel)}</div>
             <div class="small muted revisit-route-diagnostic-detail">${escapeHtml(diagnosticDetail)}</div>
+            ${lockedReadinessNote ? `<div class="small muted revisit-route-readiness-note">${escapeHtml(lockedReadinessNote)}</div>` : ''}
             <div class="small muted revisit-route-progress">Progress: ${escapeHtml(String(progressCurrent))} / ${escapeHtml(String(progressRequired))} · ${escapeHtml(signal || 'No signal yet')} (${escapeHtml(String(progressPercent))}%)</div>
             <div class="split revisit-route-meta">
               <span class="small muted"><strong>Requirement:</strong> ${escapeHtml(previewRequirement || 'Build more dungeon history.')}</span>
@@ -90,14 +97,14 @@
               <div class="small muted revisit-route-gate-requirement"><strong>Requirement:</strong> ${escapeHtml(gateRequirement)}</div>
               <div class="small muted revisit-route-gate-status"><strong>Signal:</strong> ${escapeHtml(signal || 'No signal yet')}</div>
               <div class="small muted revisit-route-gate-access"><strong>Access:</strong> ${escapeHtml(accessLabel)}</div>
-              <div class="small muted revisit-route-gate-source"><strong>Source:</strong> ${escapeHtml(gateSource)}</div>
+              <div class="small muted revisit-route-gate-source"><strong>Hook source:</strong> ${escapeHtml(hookSource || gateSource)}</div>
             </div>
             <div class="revisit-route-meta small muted">
               <span>Diagnostic only</span>
               <span>Future rule inactive</span>
               <span>Route access is unavailable.</span>
             </div>
-            <div class="small muted revisit-route-hooks"><strong>Source:</strong> ${escapeHtml(hookLabels || 'Unknown')}</div>
+            <div class="small muted revisit-route-hooks"><strong>Hook source:</strong> ${escapeHtml(hookSource || hookLabels || 'Unknown')}</div>
             <div class="revisit-route-action">${startButtonHtml}</div>
           </div>`;
         }).join('')

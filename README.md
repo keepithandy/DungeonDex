@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.13.1**
+Current baseline: **DungeonDex v1.14.0**
 
 ## Current Build
 
-**v1.13.1 - Rendered Build Label / Cache Hygiene Audit**
+**v1.14.0 - Revisit Route Content Completion**
 
-This version keeps the locked talent preview read-only and routes it through the ruleset-backed helper path so the preview UI and helper API stay aligned. Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, and revisit route behavior changes remain disabled.
+This version adds authored revisit route copy and route-content definitions for the existing side-route previews. Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, and revisit route activation behavior remain unchanged.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.13.1 fixes the stale rendered build label source and cache hygiene while keeping gameplay unchanged.
+v1.14.0 completes the first authored revisit route content layer while keeping revisit routes side-content only.
 
 ## Running Locally
 

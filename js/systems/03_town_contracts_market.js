@@ -1141,6 +1141,79 @@
     };
   }
 
+  function revisitRouteContentDefinitions() {
+    return {
+      trophy_echo_route: {
+        title: 'Trophy Echo Route',
+        district: 'Trophy record districts',
+        hookSource: 'trophy_echo',
+        shortDescription: 'An old boss record echoes through earlier districts.',
+        routeFlavorLine: 'Boss history keeps the trail warm.',
+        safetyStatusLine: 'Preview only. Route access is unavailable.',
+        lockedReadinessNote: 'Build more boss history before this route can be tested.',
+        reason: 'Old victories may call back later.'
+      },
+      famous_gear_route: {
+        title: 'Famous Gear Memory Route',
+        district: 'Archive memory districts',
+        hookSource: 'famous_gear_memory',
+        shortDescription: 'Retired gear memory leaves a careful route marker.',
+        routeFlavorLine: 'Notable gear remembers where it mattered.',
+        safetyStatusLine: 'Preview only. Route access is unavailable.',
+        lockedReadinessNote: 'Build stronger gear memory before this route can be tested.',
+        reason: 'Retired gear may remember old ground.'
+      },
+      rival_trace_route: {
+        title: 'Rival Trace Route',
+        district: 'Board and rival districts',
+        hookSource: 'rival_trace / board_echo',
+        shortDescription: 'A named rival trace threads back through earlier districts.',
+        routeFlavorLine: 'Rival marks always leave a sharper trail.',
+        safetyStatusLine: 'Preview only. Route access is unavailable.',
+        lockedReadinessNote: 'Build more rival history before this route can be tested.',
+        reason: 'A rival path may cross earlier districts.'
+      },
+      debt_pressure_route: {
+        title: 'Debt Pressure Route',
+        district: 'Ledger districts',
+        hookSource: 'debt_pressure',
+        shortDescription: 'The debt ledger points to a pressure trail in old ground.',
+        routeFlavorLine: 'Every ledger mark leaves a route-shaped shadow.',
+        safetyStatusLine: 'Preview only. Route access is unavailable.',
+        lockedReadinessNote: 'Build more debt history before this route can be tested.',
+        reason: 'The ledger may point back to safer work.'
+      },
+      board_echo_route: {
+        title: 'Board Echo Route',
+        district: 'Contract history districts',
+        hookSource: 'board_echo',
+        shortDescription: 'An old board contract repeats as a route echo.',
+        routeFlavorLine: 'Paid marks can still echo after the payout.',
+        safetyStatusLine: 'Preview only. Route access is unavailable.',
+        lockedReadinessNote: 'Build more board history before this route can be tested.',
+        reason: 'Contract history may reopen old roads.'
+      }
+    };
+  }
+
+  function hydrateRevisitRoutePreview(route = {}, fallbackHookLabels = []) {
+    const definitions = revisitRouteContentDefinitions();
+    const def = definitions[String(route?.key || '').trim()] || {};
+    const hookLabels = Array.isArray(route?.hooks) ? route.hooks.filter(Boolean) : [];
+    const sourceLabels = Array.isArray(fallbackHookLabels) ? fallbackHookLabels.filter(Boolean) : [];
+    return {
+      ...route,
+      title: String(route?.title || def.title || 'Planned Route').trim(),
+      district: String(route?.district || def.district || 'Earlier district band').trim(),
+      reason: String(route?.reason || def.reason || 'Future route history may shape this path later.').trim(),
+      hookSource: String(route?.hookSource || def.hookSource || sourceLabels.join(' / ') || hookLabels.join(' / ') || 'unknown').trim(),
+      shortDescription: String(route?.shortDescription || def.shortDescription || 'A side route preview only.').trim(),
+      routeFlavorLine: String(route?.routeFlavorLine || def.routeFlavorLine || 'Preview only.').trim(),
+      safetyStatusLine: String(route?.safetyStatusLine || def.safetyStatusLine || 'Preview only. Route access is unavailable.').trim(),
+      lockedReadinessNote: String(route?.lockedReadinessNote || def.lockedReadinessNote || 'Build more dungeon history.').trim()
+    };
+  }
+
   function revisitRoutePreviews(state = S) {
     const hooks = revisitCandidateHooks(state);
     if (!Array.isArray(hooks) || !hooks.length) return [];
@@ -1154,17 +1227,19 @@
         hooks: ['trophy_echo'],
         status: 'Planned',
         locked: true,
-        priority: 10
+        priority: 10,
+        hookSource: 'trophy_echo'
       },
       {
         key: 'famous_gear_route',
-        title: 'Famous Gear Route',
+        title: 'Famous Gear Memory Route',
         district: 'Archive memory districts',
         reason: 'Retired gear may remember old ground.',
         hooks: ['famous_gear_memory'],
         status: 'Future Route',
         locked: true,
-        priority: 20
+        priority: 20,
+        hookSource: 'famous_gear_memory'
       },
       {
         key: 'rival_trace_route',
@@ -1174,7 +1249,8 @@
         hooks: ['rival_trace', 'board_echo'],
         status: 'Locked',
         locked: true,
-        priority: 30
+        priority: 30,
+        hookSource: 'rival_trace / board_echo'
       },
       {
         key: 'debt_pressure_route',
@@ -1184,7 +1260,8 @@
         hooks: ['debt_pressure'],
         status: 'Locked',
         locked: true,
-        priority: 40
+        priority: 40,
+        hookSource: 'debt_pressure'
       },
       {
         key: 'board_echo_route',
@@ -1194,7 +1271,8 @@
         hooks: ['board_echo'],
         status: 'Planned',
         locked: true,
-        priority: 50
+        priority: 50,
+        hookSource: 'board_echo'
       }
     ];
     const byKey = new Map(sourceHooks.map(hook => [hook.key, hook]));
@@ -1204,19 +1282,54 @@
         if (!routeHooks.length) return null;
         const topHook = routeHooks[0];
         const criteriaStub = revisitRouteUnlockCriteriaStub(route.key, routeHooks.map(hook => hook.key));
-        return {
+        return hydrateRevisitRoutePreview({
           key: String(route.key || '').trim(),
           title: String(route.title || '').trim(),
           district: String(route.district || '').trim(),
           reason: String(route.reason || '').trim(),
           hooks: routeHooks.map(hook => String(hook.label || '').trim()).filter(Boolean),
+          hookSource: String(route.hookSource || '').trim(),
+          shortDescription: route.key === 'trophy_echo_route'
+            ? 'Old boss memory reaches back from the record.'
+            : route.key === 'famous_gear_route'
+              ? 'Gear memory keeps a note of earlier steps.'
+              : route.key === 'rival_trace_route'
+                ? 'A rival trace crosses the route map again.'
+                : route.key === 'debt_pressure_route'
+                  ? 'Ledger pressure leaves a narrow trail.'
+                  : route.key === 'board_echo_route'
+                    ? 'Contract history repeats as a quiet echo.'
+                    : 'A route preview only.',
+          routeFlavorLine: route.key === 'trophy_echo_route'
+            ? 'The oldest victories still hum.'
+            : route.key === 'famous_gear_route'
+              ? 'Notable gear remembers its walk home.'
+              : route.key === 'rival_trace_route'
+                ? 'Rivals make sharper roadmarks.'
+                : route.key === 'debt_pressure_route'
+                  ? 'The ledger can point the way back.'
+                  : route.key === 'board_echo_route'
+                    ? 'Contracts echo after the payout.'
+                    : 'Preview only.',
+          safetyStatusLine: 'Preview only. Route access is unavailable.',
+          lockedReadinessNote: route.key === 'trophy_echo_route'
+            ? 'Build more boss history before this route can be tested.'
+            : route.key === 'famous_gear_route'
+              ? 'Build stronger gear memory before this route can be tested.'
+              : route.key === 'rival_trace_route'
+                ? 'Build more rival history before this route can be tested.'
+                : route.key === 'debt_pressure_route'
+                  ? 'Build more debt history before this route can be tested.'
+                  : route.key === 'board_echo_route'
+                    ? 'Build more board history before this route can be tested.'
+                    : 'Build more dungeon history.',
           status: String(route.status || 'Locked').trim(),
           locked: true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
           criteria: criteriaStub.criteria,
           criteriaNote: criteriaStub.note,
           readiness: revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
-        };
+        }, routeHooks.map(hook => hook.key));
       })
       .filter(Boolean)
       .slice(0, 3);
@@ -1935,6 +2048,9 @@
       },
       revisitRouteSummary(state = S) {
         return revisitRouteSummary(state);
+      },
+      revisitRouteContentDefinitions() {
+        return revisitRouteContentDefinitions();
       },
       revisitUnlockGates(state = S) {
         return revisitUnlockGates(state);

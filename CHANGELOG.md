@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.13.1`
-* Current development target: `v1.13.1`
+* Current local package baseline: `v1.14.0`
+* Current development target: `v1.14.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -66,6 +66,13 @@ Use `VERSION.md` for the current active version.
 Add new notes below this section.
 
 ---
+
+### v1.14.0 - Revisit Route Content Completion
+
+* Added a deterministic content-definition layer for revisit route previews so the existing side-route cards show clearer title, district, reason, hook source, short description, flavor line, safety line, and readiness note copy.
+* Improved the Town revisit panel copy to explain that these routes are optional side content, preview-only until requirements are met, and not a replacement for main dungeon progress.
+* Extended revisit smoke coverage to check route content definitions and the richer preview copy while leaving gameplay behavior unchanged.
+* No revisit activation, talent, combat, economy, debt, trophy, Famous Gear, Elite Board, or scaling behavior changed.
 
 ### v1.13.1 - Rendered Build Label / Cache Hygiene Audit
 
