@@ -6,13 +6,16 @@
     const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
     const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
+    const rawRouteGates = typeof revisitRouteGateState === 'function' ? rawRoutes.map(route => revisitRouteGateState(state, route)) : [];
     const rawPreviews = typeof revisitUnlockPreview === 'function' ? revisitUnlockPreview(state) : [];
     const trophyEchoPlan = typeof revisitTrophyEchoRulePlan === 'function' ? revisitTrophyEchoRulePlan(state) : null;
     const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
     const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
+    const routeGates = Array.isArray(rawRouteGates) ? rawRouteGates.filter(gate => gate && typeof gate === 'object') : [];
     const previews = Array.isArray(rawPreviews) ? rawPreviews.filter(preview => preview && typeof preview === 'object') : [];
     const gatesByKey = new Map(gates.map(gate => [String(gate.key || ''), gate]));
+    const routeGatesByKey = new Map(routeGates.map(gate => [String(gate.routeKey || ''), gate]));
     const previewsByKey = new Map(previews.map(preview => [String(preview.key || ''), preview]));
     const status = state?.player?.revisitState?.unlocked ? 'Planned Preview' : 'Locked Preview';
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
@@ -47,6 +50,10 @@
           const routeFlavorLine = String(route.routeFlavorLine || '').trim();
           const shortDescription = String(route.shortDescription || '').trim();
           const lockedReadinessNote = String(route.lockedReadinessNote || '').trim();
+          const routeGate = routeGatesByKey.get(String(route.key || '')) || {};
+          const gateStatusLabel = String(routeGate.statusLabel || (routeGate.enterable ? 'Entry Ready' : 'Entry Locked')).trim();
+          const gateRequirementLabel = String(routeGate.requirementLabel || previewRequirement || gateRequirement || 'Build more dungeon history.').trim();
+          const gateSafetyLabel = String(routeGate.safetyLabel || previewSafety || accessLabel || 'Route access is unavailable.').trim();
           const hookSource = String(route.hookSource || gate.source || hookLabels || 'Unknown').trim();
           const gateReason = String(gate.reason || 'Locked: Revisit gate not ready').trim();
           const gateRequirement = String(gate.requirement || 'Build more town and dungeon history.').trim();
@@ -83,15 +90,16 @@
             <div class="small muted revisit-route-diagnostic-label">${escapeHtml(diagnosticLabel)}</div>
             <div class="small muted revisit-route-diagnostic-detail">${escapeHtml(diagnosticDetail)}</div>
             ${lockedReadinessNote ? `<div class="small muted revisit-route-readiness-note">${escapeHtml(lockedReadinessNote)}</div>` : ''}
+            <div class="small muted revisit-route-gate-ready">${escapeHtml(gateStatusLabel || 'Entry Locked')}</div>
             <div class="small muted revisit-route-progress">Progress: ${escapeHtml(String(progressCurrent))} / ${escapeHtml(String(progressRequired))} · ${escapeHtml(signal || 'No signal yet')} (${escapeHtml(String(progressPercent))}%)</div>
             <div class="split revisit-route-meta">
-              <span class="small muted"><strong>Need:</strong> ${escapeHtml(previewRequirement || 'Build more dungeon history.')}</span>
-              <span class="small muted"><strong>Safety:</strong> ${escapeHtml(previewSafety || 'Preview only - route access is unavailable.')}</span>
+              <span class="small muted"><strong>Need:</strong> ${escapeHtml(gateRequirementLabel || previewRequirement || 'Build more dungeon history.')}</span>
+              <span class="small muted"><strong>Safety:</strong> ${escapeHtml(gateSafetyLabel || previewSafety || 'Route access is unavailable.')}</span>
             </div>
             <div class="revisit-route-gate">
               <div class="split revisit-route-gate-head">
-                <span class="pill revisit-route-gate-pill">Locked Foundation</span>
-                <span class="small muted">Future Conditions</span>
+                <span class="pill revisit-route-gate-pill">Entry gate prepared</span>
+                <span class="small muted">Route still locked</span>
               </div>
               <div class="small muted revisit-route-gate-reason">${escapeHtml(gateReason)}</div>
               <div class="small muted revisit-route-gate-requirement"><strong>Need:</strong> ${escapeHtml(gateRequirement)}</div>
@@ -102,7 +110,7 @@
             <div class="revisit-route-meta small muted">
               <span>Read-only</span>
               <span>Inactive</span>
-              <span>No route access</span>
+              <span>No rewards or route runs active yet</span>
             </div>
             <div class="small muted revisit-route-hooks"><strong>Hook source:</strong> ${escapeHtml(hookSource || hookLabels || 'Unknown')}</div>
             <div class="revisit-route-action">${startButtonHtml}</div>
@@ -127,7 +135,7 @@
       <div class="small muted">Routes stay locked until their records are ready. Enter Dungeon and Continue remain primary.</div>
       <div class="list revisit-hook-list">${body}</div>
       <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
-      <div class="small muted revisit-route-readiness-note">Locked previews only. Need, safety, and signal copy is display-only.</div>
+      <div class="small muted revisit-route-readiness-note">Entry gate prepared. Route still locked. Requirements tracked from existing records. No rewards or route runs active yet.</div>
       <div class="small muted revisit-route-criteria-note">Gate diagnostics stay read-only.</div>
       ${planningNote}
       <div class="list revisit-route-list">${routeBody}</div>

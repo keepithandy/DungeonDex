@@ -1109,6 +1109,57 @@
     };
   }
 
+  function revisitRouteGateState(state = S, route = null) {
+    const routeKey = String(route?.key || route || '');
+    const routes = revisitRoutePreviews(revisitReadOnlyStateSnapshot(state));
+    const preview = Array.isArray(routes) ? routes.find(entry => String(entry?.key || '') === routeKey) || null : null;
+    const gateMeta = revisitUnlockGateMeta(routeKey);
+    const routeContent = revisitRouteContentDefinitions()?.[routeKey] || null;
+    const hasRoute = !!preview;
+    const locked = true;
+    const eligible = !!preview && !!gateMeta && !!routeContent;
+    const enterable = false;
+    const previewOnly = true;
+    return {
+      routeKey: routeKey || 'unknown_route',
+      eligible,
+      enterable,
+      locked,
+      reason: String(preview?.reason || gateMeta?.reason || routeContent?.reason || 'Route gate prepared.').trim(),
+      requirementLabel: String(preview?.lockedReadinessNote || gateMeta?.requirement || routeContent?.lockedReadinessNote || 'Build more dungeon history.').trim(),
+      safetyLabel: String(preview?.safetyStatusLine || gateMeta?.accessLabel || 'Route access is unavailable.').trim(),
+      previewOnly,
+      routeTitle: String(preview?.title || routeContent?.title || gateMeta?.gateLabel || 'Route Preview').trim(),
+      gateLabel: String(gateMeta?.gateLabel || routeContent?.title || 'Route Gate').trim(),
+      statusLabel: enterable ? 'Entry Ready' : (hasRoute ? 'Entry Locked' : 'Gate Prepared'),
+      sourceLabel: String(preview?.hookSource || routeContent?.hookSource || gateMeta?.source || '').trim(),
+      previewState: String(preview?.status || gateMeta?.previewState || 'locked').trim(),
+      routeFound: hasRoute,
+      gatedBy: String(gateMeta?.gateType || 'unknown').trim()
+    };
+  }
+
+  function revisitRouteGateSummary(state = S) {
+    const routes = revisitRoutePreviews(state);
+    const gates = routes.map(route => revisitRouteGateState(state, route));
+    return {
+      total: gates.length,
+      eligible: gates.filter(entry => entry.eligible).length,
+      enterable: gates.filter(entry => entry.enterable).length,
+      locked: gates.filter(entry => entry.locked).length,
+      previewOnly: gates.every(entry => entry.previewOnly),
+      routes
+    };
+  }
+
+  function canEnterRevisitRoute(state = S, routeKey = '') {
+    return !!revisitRouteGateState(state, routeKey).enterable;
+  }
+
+  function explainRevisitRouteGate(state = S, routeKey = '') {
+    return revisitRouteGateState(state, routeKey);
+  }
+
   function revisitUnlockPreview(state = S) {
     const routeDefs = [
       { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Future Unlock Preview', previewReason: 'Future boss history may reopen this path later.', previewRequirement: 'Build more boss history.' },
@@ -2048,6 +2099,18 @@
       },
       revisitRouteSummary(state = S) {
         return revisitRouteSummary(state);
+      },
+      revisitRouteGateState(state = S, route = null) {
+        return revisitRouteGateState(state, route);
+      },
+      revisitRouteGateSummary(state = S) {
+        return revisitRouteGateSummary(state);
+      },
+      canEnterRevisitRoute(state = S, routeKey = '') {
+        return canEnterRevisitRoute(state, routeKey);
+      },
+      explainRevisitRouteGate(state = S, routeKey = '') {
+        return explainRevisitRouteGate(state, routeKey);
       },
       revisitRouteContentDefinitions() {
         return revisitRouteContentDefinitions();
