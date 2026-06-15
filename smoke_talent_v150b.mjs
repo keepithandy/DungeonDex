@@ -400,6 +400,30 @@ async function main() {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       return api && typeof api.summary === 'function' ? api.summary(S) : null;
     })()`);
+    const getRulesetAudit = async () => await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api || typeof api.ruleset !== 'function' || typeof api.rulesetSummary !== 'function' || typeof api.rulesetNodes !== 'function') return { ok:false, reason:'missing ruleset helpers' };
+      const ruleset = api.ruleset();
+      const summary = api.rulesetSummary();
+      const nodes = api.rulesetNodes();
+      const rulesetSnapshot = JSON.parse(JSON.stringify(ruleset));
+      const nodesSnapshot = JSON.parse(JSON.stringify(nodes));
+      const firstBranch = ruleset?.branches?.[0]?.label || '';
+      const firstNodeActive = nodes?.[0]?.active;
+      if (ruleset?.branches?.[0]) ruleset.branches[0].label = '__mutated__';
+      if (nodes?.[0]) nodes[0].active = true;
+      const reread = api.ruleset();
+      const rereadNodes = api.rulesetNodes();
+      return {
+        ok:true,
+        hasGlobal: !!window.TALENT_RULESET_PREVIEW,
+        frozenGlobal: Object.isFrozen(window.TALENT_RULESET_PREVIEW) && Object.isFrozen(window.TALENT_RULESET_PREVIEW?.branches || []),
+        defensiveCopy: reread?.branches?.[0]?.label === firstBranch && rereadNodes?.[0]?.active === firstNodeActive,
+        ruleset: rulesetSnapshot,
+        summary,
+        nodes: nodesSnapshot
+      };
+    })()`);
     const getRevisitHooks = async () => await evalByValue(client, `(() => typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(S) : null)()`);
     const getRevisitSummary = async () => await evalByValue(client, `(() => typeof revisitCandidateSummary === 'function' ? revisitCandidateSummary(S) : null)()`);
     const getRevisitRoutes = async () => await evalByValue(client, `(() => typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(S) : null)()`);
@@ -653,6 +677,19 @@ async function main() {
     record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary && !!previewSummary?.hasLedger && !!previewSummary?.hasLedgerSummary, JSON.stringify(previewSummary));
     record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 5 && previewSummary.nodes === 10 && previewSummary.summary?.totalBranches === 5 && previewSummary.summary?.totalNodes === 10 && previewSummary.summary?.lockedNodes === 10 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true, JSON.stringify(previewSummary));
     record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === false && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 0, JSON.stringify(previewSummary?.ledgerSummary));
+    const rulesetAudit = await getRulesetAudit();
+    const ruleset = rulesetAudit?.ruleset || {};
+    const rulesetSummary = rulesetAudit?.summary || {};
+    const rulesetNodes = Array.isArray(rulesetAudit?.nodes) ? rulesetAudit.nodes : [];
+    const rulesetSourceOk = Array.isArray(ruleset.pointSources) && ruleset.pointSources.length === 1 && ruleset.pointSources[0].sourceType === 'bossDepthMilestone' && ruleset.pointSources[0].enabled === false && ruleset.pointSources[0].active === false && !/common monster/i.test(ruleset.pointSources[0].sourceType || '');
+    const rulesetBranchesOk = Array.isArray(ruleset.branches) && ruleset.branches.length === 3 && ['Survivor', 'Delver', 'Warden'].every(label => ruleset.branches.some(branch => branch.label === label));
+    const rulesetTiersOk = Array.isArray(ruleset.tiers) && ruleset.tiers.length === 3 && ruleset.tiers.every(tier => tier.locked === true && tier.previewOnly === true && tier.active === false && tier.gameplayEnabled === false);
+    const rulesetNodesOk = rulesetNodes.length === 9 && rulesetNodes.every(node => node.locked === true && node.previewOnly === true && node.active === false && node.gameplayEnabled === false && node.purchased === false && node.learned === false && node.unlocked === false);
+    record('Talent ruleset foundation exists', !!rulesetAudit?.ok && ruleset.locked === true && ruleset.previewOnly === true && ruleset.active === false && ruleset.gameplayEnabled === false && ruleset.earningEnabled === false && ruleset.spendingEnabled === false && ruleset.unlocksEnabled === false && ruleset.passiveEffectsEnabled === false, JSON.stringify(rulesetAudit));
+    record('Talent ruleset source/caps/costs are stable and inactive', rulesetSourceOk && ruleset.pointCaps?.earlyCap === 6 && ruleset.pointCaps?.activeCap === 0 && ruleset.pointCaps?.spendableCap === 0 && ruleset.costModel?.activeCost === 0 && ruleset.costModel?.costsByTier?.['1'] === 1 && ruleset.costModel?.costsByTier?.['2'] === 2 && ruleset.costModel?.costsByTier?.['3'] === 3, JSON.stringify({ pointSources: ruleset.pointSources, pointCaps: ruleset.pointCaps, costModel: ruleset.costModel }));
+    record('Talent ruleset branch/tier/node data is locked', rulesetBranchesOk && rulesetTiersOk && rulesetNodesOk, JSON.stringify({ branches: ruleset.branches, tiers: ruleset.tiers, nodes: rulesetNodes.slice(0, 3) }));
+    record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === false && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 3 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 9 && rulesetSummary.activeCap === 0 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
+    record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));

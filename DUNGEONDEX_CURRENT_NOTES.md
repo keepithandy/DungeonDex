@@ -7,10 +7,21 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.12.1 - Talent Ledger Repair/Smoke Hardening
+- DungeonDex v1.12.2 - Talent System Ruleset Foundation
+
+## v1.12.2 Talent System Ruleset Foundation
+- Current baseline: v1.12.2.
+- Added a locked `TALENT_RULESET_PREVIEW` foundation for future point source rules, caps, branch/category structure, node tiers, cost model, unlock requirements, and preview-only node metadata.
+- Current ruleset helpers are read-only and defensive: `talentRulesetPreview`, `talentRulesetSummary`, and `talentPreviewNodes`.
+- All ruleset helper output reports locked, preview-only, inactive, and non-gameplay state.
+- Current talent earning, spending, unlocks, learned state, active nodes, and passive effects remain disabled.
+- Current Talent Tree Preview keeps its locked status panel and now includes a compact rules summary.
+- Smoke coverage checks ruleset existence, frozen source data, defensive helper copies, disabled earning/spending/unlocks/passives, malformed talent-ledger repair, no-op mutation hooks, mobile layout, combat path safety, board reward stability, charter cost stability, sell value stability, and runtime errors.
+- Combat, economy, scaling, monsters, gear, debt, revisit routes, and Elite Board behavior were left unchanged.
+- Revisit and Trophy Echo remain paused, locked/read-only, and non-playable.
 
 ## v1.12.1 Talent Ledger Repair/Smoke Hardening
-- Current baseline: v1.12.1.
+- Historical baseline: v1.12.1.
 - Hardened `player.talentLedger` repair/normalization against missing, null, array, string, partial, legacy, and polluted shapes.
 - Current talent ledger helpers are read-only and always zeroed: no earning, no spending, no active sources, no active points.
 - Current legacy talent save mirrors are repaired to a safe zero-state compatibility shell.
@@ -239,14 +250,14 @@
 - Trophy Echo remains locked, inactive, rewardless, and non-playable.
 - All revisit routes remain locked/read-only.
 
-### v1.12.0 First Talent Point Ledger Foundation
-- Audit the current Talent foundation before any passive choice expansion.
-- Talent Foundation Expansion is now the active next planning lane.
-- Do not change talent effects, costs, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit routes in this audit.
+### v1.12.2 Talent System Ruleset Foundation
+- The locked talent ruleset foundation now defines future point source, cap, branch, tier, cost, unlock, and preview node metadata.
+- Talent Passive Preview Mapping is now the active next systems lane.
+- Do not change talent earning, spending, effects, unlocks, combat balance, economy balance, enemy scaling, gear generation, debt behavior, or revisit routes without a separate activation patch.
 - Playable revisit routes require a separate approved gameplay patch.
 
 ### Candidate Next Lanes
-1. Talent Foundation Expansion.
+1. Talent Passive Preview Mapping.
 2. Debt Collector Visibility / Risk Pressure.
 3. Famous Gear Memory Attachment.
 4. Boss Trophy / Dex Identity.
@@ -254,8 +265,8 @@
 6. Trophy Echo UI Readiness Preview, still non-playable.
 
 ### Recommended Next Lane
-- Talent Foundation Expansion is the active next planning lane.
-- Keep the next talent patch focused on passive player choice planning before any behavior changes.
+- Talent Passive Preview Mapping is the active next systems lane.
+- Keep the next talent patch focused on mapping simple passive candidates to the locked ruleset before any behavior changes.
 - Keep any future Trophy Echo gameplay work separate and explicitly approved.
 
 ### Larger Direction

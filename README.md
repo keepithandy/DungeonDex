@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.12.1**
+Current baseline: **DungeonDex v1.12.2**
 
 ## Current Build
 
-**v1.12.1 — Talent Ledger Repair/Smoke Hardening**
+**v1.12.2 - Talent System Ruleset Foundation**
 
-This version hardens locked talent-ledger save repair and smoke coverage. It does not add talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, or revisit route behavior changes.
+This version defines the locked talent ruleset foundation: future point source rules, caps, branch/category structure, node tiers, cost model, unlock requirements, and preview-only node metadata. Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, enemy scaling changes, gear generation changes, debt behavior changes, and revisit route behavior changes remain disabled.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.12.1 is a locked talent ledger repair/smoke hardening step; it does not start active unlock rules, active talent bonuses, or playable revisit routes.
+v1.12.2 is a locked talent ruleset foundation step; it does not start active unlock rules, active talent bonuses, or playable revisit routes.
 
 ## Running Locally
 
@@ -127,11 +127,11 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Near-term development is focused on Talent Foundation Expansion planning while Trophy Echo planning remains checkpointed and non-playable.
+Near-term development is focused on finishing the locked Talent System foundation while Trophy Echo planning remains checkpointed and non-playable.
 
 Candidate next lanes:
 
-1. Talent Foundation Expansion
+1. Talent Passive Preview Mapping
 2. Debt Collector Visibility / Risk Pressure
 3. Famous Gear Memory Attachment
 4. Boss Trophy / Dex Identity
@@ -140,7 +140,7 @@ Candidate next lanes:
 
 Recommended next lane:
 
-**Talent Foundation Expansion** is the active next planning lane. Keep the next talent patch focused on passive player choice planning before any behavior changes, and keep any future playable Trophy Echo work separate and explicitly approved.
+**Talent Passive Preview Mapping** is the active next systems lane. Keep the next talent patch focused on mapping simple passive candidates to the locked ruleset before any behavior changes, and keep any future playable Trophy Echo work separate and explicitly approved.
 
 ## Project Status
 

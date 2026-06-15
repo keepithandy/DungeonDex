@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.12.1`
-* Current local package baseline: `v1.12.1`
-* Current development target: `v1.12.1`
+* Public/live itch version: `v1.12.2`
+* Current local package baseline: `v1.12.2`
+* Current development target: `v1.12.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,21 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.12.2 - Talent System Ruleset Foundation
+
+Status: Complete
+
+Summary:
+
+* Added a locked, preview-only talent ruleset foundation with point source rules, caps, branches, tiers, costs, unlock requirements, and node metadata.
+* Added read-only ruleset helpers that return defensive zero-gameplay data with `locked:true`, `previewOnly:true`, `active:false`, and `gameplayEnabled:false`.
+* Added a compact read-only rules summary to the existing locked Talent Tree Preview UI.
+* Extended `smoke_talent_v150b.mjs` coverage to verify the ruleset exists, remains defensive, and does not activate gameplay.
+* Preserved malformed `player.talentLedger` repair safety from v1.12.1.
+* No talent earning, talent spending, unlocks, learned state, active nodes, passive bonuses, combat changes, economy changes, scaling changes, monsters, gear, debt, revisit routes, or Elite Board behavior changes were added.
 
 ---
 

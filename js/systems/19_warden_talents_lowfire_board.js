@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.12.1 - Talent Ledger Repair/Smoke Hardening + Lowfire Board.
+// DungeonDex v1.12.2 - Talent System Ruleset Foundation + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.12.1-talent-ledger-repair-smoke-hardening';
+  const SCRIPT_BUILD = '1.12.2-talent-ruleset-foundation';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const ZERO_TALENT_BONUSES = Object.freeze({ maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 });
@@ -36,6 +36,17 @@
     return 0;
   }
 
+  function deepFreeze(value){
+    if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
+    Object.freeze(value);
+    Object.keys(value).forEach(key => deepFreeze(value[key]));
+    return value;
+  }
+
+  function clonePlain(value){
+    return JSON.parse(JSON.stringify(value));
+  }
+
   const TALENT_PATHS = [
     { id:'survivor', label:'Survivor', summary:'Staying alive, recovery, and safer runs.' },
     { id:'hunter', label:'Hunter', summary:'Elite Board marks, rivals, and trophy flow.' },
@@ -52,6 +63,82 @@
 
   const TALENT_BY_ID = Object.fromEntries(TALENT_DEFS.map(def => [def.id, def]));
   const TALENT_PATH_BY_ID = Object.fromEntries(TALENT_PATHS.map(path => [path.id, path]));
+
+  const TALENT_RULESET_PREVIEW = deepFreeze({
+    id: 'talent_ruleset_preview_v1',
+    version: 1,
+    locked: true,
+    previewOnly: true,
+    active: false,
+    gameplayEnabled: false,
+    earningEnabled: false,
+    spendingEnabled: false,
+    unlocksEnabled: false,
+    passiveEffectsEnabled: false,
+    pointSources: [
+      {
+        id: 'boss_depth_milestone',
+        label: 'Boss / depth milestones',
+        sourceType: 'bossDepthMilestone',
+        rule: 'Future points come from secured boss-depth milestones, not common monster grinding.',
+        cadence: 'One planned point per secured milestone block.',
+        enabled: false,
+        active: false,
+        locked: true,
+        previewOnly: true
+      }
+    ],
+    pointCaps: {
+      earlyCap: 6,
+      previewCap: 6,
+      absoluteCap: 12,
+      activeCap: 0,
+      spendableCap: 0,
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false
+    },
+    branches: [
+      { id: 'survivor', label: 'Survivor', category: 'role', summary: 'HP, sustain, and safer runs.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'delver', label: 'Delver', category: 'role', summary: 'Gold, contracts, and extraction value.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'warden', label: 'Warden', category: 'identity', summary: 'Gear memory, trophies, and dungeon identity.', locked: true, previewOnly: true, active: false, gameplayEnabled: false }
+    ],
+    tiers: [
+      { tier: 1, label: 'Tier I', plannedCost: 1, unlockRequirement: 'Ruleset only; no live unlock.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { tier: 2, label: 'Tier II', plannedCost: 2, unlockRequirement: 'Future branch investment gate; disabled.', locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { tier: 3, label: 'Tier III', plannedCost: 3, unlockRequirement: 'Future capstone gate; disabled.', locked: true, previewOnly: true, active: false, gameplayEnabled: false }
+    ],
+    costModel: {
+      type: 'tiered_flat',
+      costsByTier: { '1': 1, '2': 2, '3': 3 },
+      activeCost: 0,
+      refundEnabled: false,
+      respecEnabled: false,
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false
+    },
+    unlockRequirements: [
+      { id: 'branch_open', label: 'Branch exists', enabled: false, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'previous_tier', label: 'Previous tier planned', enabled: false, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'point_balance', label: 'Spendable point balance', enabled: false, locked: true, previewOnly: true, active: false, gameplayEnabled: false }
+    ],
+    nodes: [
+      { id: 'survivor_grit_i', branch: 'survivor', tier: 1, title: 'Grit I', plannedRole: 'HP baseline', plannedEffect: 'Future small max HP passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'survivor_recovery_ii', branch: 'survivor', tier: 2, title: 'Recovery II', plannedRole: 'Sustain baseline', plannedEffect: 'Future simple sustain passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'survivor_safe_return_iii', branch: 'survivor', tier: 3, title: 'Safe Return III', plannedRole: 'Safer runs', plannedEffect: 'Future safe-run passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'delver_coin_i', branch: 'delver', tier: 1, title: 'Coin I', plannedRole: 'Gold baseline', plannedEffect: 'Future small gold-value passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'delver_contract_ii', branch: 'delver', tier: 2, title: 'Contract II', plannedRole: 'Contract value', plannedEffect: 'Future simple contract passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'delver_extract_iii', branch: 'delver', tier: 3, title: 'Extract III', plannedRole: 'Extraction value', plannedEffect: 'Future extraction-value passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'warden_memory_i', branch: 'warden', tier: 1, title: 'Memory I', plannedRole: 'Gear memory', plannedEffect: 'Future gear-memory passive candidate; inactive.', plannedCost: 1, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'warden_trophy_ii', branch: 'warden', tier: 2, title: 'Trophy II', plannedRole: 'Trophy identity', plannedEffect: 'Future trophy-record passive candidate; inactive.', plannedCost: 2, locked: true, previewOnly: true, active: false, gameplayEnabled: false },
+      { id: 'warden_depth_iii', branch: 'warden', tier: 3, title: 'Depth III', plannedRole: 'Dungeon identity', plannedEffect: 'Future dungeon-identity passive candidate; inactive.', plannedCost: 3, locked: true, previewOnly: true, active: false, gameplayEnabled: false }
+    ]
+  });
+
+  window.TALENT_RULESET_PREVIEW = TALENT_RULESET_PREVIEW;
 
   function ensureTalents(state){
     if (typeof repairTalentState === 'function') return repairTalentState(state);
@@ -120,6 +207,59 @@
       activeNodes: 0,
       spendablePoints: 0,
       previewOnly: true
+    };
+  }
+
+  function talentRulesetPreview(){
+    const ruleset = clonePlain(TALENT_RULESET_PREVIEW);
+    ruleset.locked = true;
+    ruleset.previewOnly = true;
+    ruleset.active = false;
+    ruleset.gameplayEnabled = false;
+    ruleset.earningEnabled = false;
+    ruleset.spendingEnabled = false;
+    ruleset.unlocksEnabled = false;
+    ruleset.passiveEffectsEnabled = false;
+    return ruleset;
+  }
+
+  function talentPreviewNodes(){
+    return TALENT_RULESET_PREVIEW.nodes.map(node => ({
+      ...clonePlain(node),
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false,
+      purchased: false,
+      learned: false,
+      unlocked: false
+    }));
+  }
+
+  function talentRulesetSummary(){
+    const costs = Object.values(TALENT_RULESET_PREVIEW.costModel.costsByTier).map(value => Math.max(0, Math.floor(Number(value) || 0)));
+    return {
+      id: TALENT_RULESET_PREVIEW.id,
+      version: TALENT_RULESET_PREVIEW.version,
+      locked: true,
+      previewOnly: true,
+      active: false,
+      gameplayEnabled: false,
+      earningEnabled: false,
+      spendingEnabled: false,
+      unlocksEnabled: false,
+      passiveEffectsEnabled: false,
+      pointSourceCount: TALENT_RULESET_PREVIEW.pointSources.length,
+      branchCount: TALENT_RULESET_PREVIEW.branches.length,
+      tierCount: TALENT_RULESET_PREVIEW.tiers.length,
+      nodeCount: TALENT_RULESET_PREVIEW.nodes.length,
+      earlyCap: TALENT_RULESET_PREVIEW.pointCaps.earlyCap,
+      activeCap: 0,
+      spendableCap: 0,
+      plannedMaxCost: costs.length ? Math.max(...costs) : 0,
+      branchLabels: TALENT_RULESET_PREVIEW.branches.map(branch => branch.label),
+      pointSourceLabels: TALENT_RULESET_PREVIEW.pointSources.map(source => source.label),
+      costSummary: 'Tier costs planned: 1 / 2 / 3. Active cost: 0.'
     };
   }
 
@@ -245,6 +385,7 @@
     ensureTalents(state);
     const ledger = talentPointLedger(state);
     const ledgerSummary = talentPointLedgerSummary(state);
+    const rulesSummary = talentRulesetSummary(state);
     const preview = talentTreePreview(state);
     const summary = talentTreePreviewSummary(state);
     panel.innerHTML = `
@@ -284,6 +425,31 @@
           <span>Available: ${ledgerSummary.availablePoints}</span>
           <span class="talent-separator" aria-hidden="true">&bull;</span>
           <span>Spent: ${ledgerSummary.spentPoints}</span>
+        </div>
+      </section>
+      <section class="talent-ledger-card talent-rules-card">
+        <div class="split talent-ledger-head">
+          <div>
+            <strong>Ruleset Foundation</strong>
+            <p class="small muted">Read-only future rules. Gameplay remains disabled.</p>
+          </div>
+          <span class="pill">Locked</span>
+        </div>
+        <div class="talent-summary-row small muted talent-ledger-chips">
+          <span>Source: ${H(rulesSummary.pointSourceLabels[0] || 'Milestones')}</span>
+          <span>Cap ${F(rulesSummary.earlyCap)} planned / ${F(rulesSummary.activeCap)} active</span>
+          <span>${F(rulesSummary.branchCount)} branches</span>
+          <span>${F(rulesSummary.tierCount)} tiers</span>
+          <span>${F(rulesSummary.nodeCount)} nodes</span>
+        </div>
+        <div class="talent-milestone-line small" aria-label="Talent ruleset status">
+          <span>Earning disabled</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Spending disabled</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Unlocks disabled</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Passives disabled</span>
         </div>
       </section>
       <div class="talent-point-line small" aria-label="Talent preview totals">
@@ -660,6 +826,9 @@
     build: SCRIPT_BUILD,
     defs: TALENT_DEFS,
     paths: TALENT_PATHS,
+    ruleset: talentRulesetPreview,
+    rulesetSummary: talentRulesetSummary,
+    rulesetNodes: talentPreviewNodes,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,
