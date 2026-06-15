@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.15.1 - Remove Duplicate Revisit Preview Panel
+- DungeonDex v1.15.2 - Remove Planned Return Routes Town Panel
 
-## v1.15.1 Remove Duplicate Revisit Preview Panel
-- Current baseline: v1.15.1.
+## v1.15.2 Remove Planned Return Routes Town Panel
+- Current baseline: v1.15.2.
 - Tightened revisit route panel copy for mobile readability and shortened repeated status language.
 - Shortened route detail and readiness strings for the protected route identities while keeping the routes locked and read-only.
 - Extended revisit smoke coverage to check the detail fields remain present as strings and that preview output stays inert.

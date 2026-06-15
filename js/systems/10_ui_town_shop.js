@@ -1,126 +1,9 @@
 'use strict';
 
 // Elite contract board, town panels, district wares, shop cards
-  // Read-only town panel: this is a design lock surface, not route selection or travel.
-  function earlierDungeonRevisitMarkup(state) {
-    const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
-    const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
-    const rawRouteGates = typeof revisitRouteGateState === 'function' ? rawRoutes.map(route => revisitRouteGateState(state, route)) : [];
-    const rawPreviews = typeof revisitUnlockPreview === 'function' ? revisitUnlockPreview(state) : [];
-    const trophyEchoPlan = typeof revisitTrophyEchoRulePlan === 'function' ? revisitTrophyEchoRulePlan(state) : null;
-    const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
-    const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
-    const routeGates = Array.isArray(rawRouteGates) ? rawRouteGates.filter(gate => gate && typeof gate === 'object') : [];
-    const previews = Array.isArray(rawPreviews) ? rawPreviews.filter(preview => preview && typeof preview === 'object') : [];
-    const gatesByKey = new Map(gates.map(gate => [String(gate.key || ''), gate]));
-    const routeGatesByKey = new Map(routeGates.map(gate => [String(gate.routeKey || ''), gate]));
-    const previewsByKey = new Map(previews.map(preview => [String(preview.key || ''), preview]));
-    const status = state?.player?.revisitState?.unlocked ? 'Planned Preview' : 'Locked Preview';
-    const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
-    const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
-    const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
-    const routeBody = routes.length
-      ? routes.slice(0, 3).map(route => {
-          const hookLabels = Array.isArray(route.hooks) ? route.hooks.filter(Boolean).join(' • ') : '';
-          const criteria = Array.isArray(route.criteria) ? route.criteria.filter(Boolean).slice(0, 2) : [];
-          const criteriaNote = String(route.criteriaNote || '').trim();
-          const gate = gatesByKey.get(String(route.key || '')) || {};
-          const preview = previewsByKey.get(String(route.key || '')) || {};
-          const previewLabel = String(preview.previewLabel || gate.previewLabel || 'Still locked').trim();
-          const previewReason = String(preview.previewReason || gate.previewReason || 'Return route preview only.').trim();
-          const previewRequirement = String(preview.previewRequirement || gate.previewRequirement || 'Build more dungeon history.').trim();
-          const previewSafety = String(preview.previewSafety || gate.previewSafety || 'Locked preview. No route access.').trim();
-          const routeFlavorLine = String(route.routeFlavorLine || '').trim();
-          const shortDescription = String(route.shortDescription || '').trim();
-          const lockedReadinessNote = String(route.lockedReadinessNote || '').trim();
-          const routeGate = routeGatesByKey.get(String(route.key || '')) || {};
-          const gateStatusLabel = String(routeGate.statusLabel || (routeGate.enterable ? 'Entry Ready' : 'Entry Locked')).trim();
-          const gateRequirementLabel = String(routeGate.requirementLabel || previewRequirement || gateRequirement || 'Build more dungeon history.').trim();
-          const gateSafetyLabel = String(routeGate.safetyLabel || previewSafety || accessLabel || 'Route access is unavailable.').trim();
-          const hookSource = String(route.hookSource || gate.source || hookLabels || 'Unknown').trim();
-          const gateReason = String(gate.reason || 'Locked: Revisit gate not ready').trim();
-          const gateRequirement = String(gate.requirement || 'Build more town and dungeon history.').trim();
-          const gateSource = String(gate.source || hookLabels || 'Unknown').trim();
-          const signal = String(gate.progressLabel || route.readiness || 'No signal yet').trim();
-          const diagnosticLabel = String(gate.diagnosticLabel || 'Gate Diagnostics').trim();
-          const diagnosticDetail = String(gate.diagnosticDetail || 'Diagnostic only - future unlock rule inactive.').trim();
-          const accessLabel = String(gate.accessLabel || 'Route access is unavailable.').trim();
-          const progressCurrent = Math.max(0, Math.floor(Number(gate.progressCurrent || 0)));
-          const progressRequired = Math.max(1, Math.floor(Number(gate.progressRequired || 1)));
-          const progressPercent = Math.max(0, Math.min(100, Math.floor(Number(gate.progressPercent || 0))));
-          const criteriaBody = criteria.length
-            ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
-            : `<div class="small muted revisit-route-criteria-item">Future condition only.</div>`;
-          const canStart = typeof canStartRevisitRoute === 'function' && canStartRevisitRoute(state, route.key);
-          const startButtonHtml = canStart
-            ? `<button class="revisit-route-start-btn" data-route-key="${escapeHtml(String(route.key || ''))}">Start Return Route</button>`
-            : `<button class="revisit-route-start-btn" disabled>Route Locked</button>`;
-          return `<div class="revisit-route-card">
-            <div class="split revisit-route-head">
-              <strong>${escapeHtml(route.title || 'Planned Route')}</strong>
-              <span class="pill revisit-route-pill">${escapeHtml(previewLabel || 'Still locked')}</span>
-            </div>
-            <div class="small muted revisit-route-district">${escapeHtml(route.district || 'Earlier district band')}</div>
-            ${shortDescription ? `<div class="small revisit-route-short">${escapeHtml(shortDescription)}</div>` : ''}
-            <div class="small muted revisit-route-reason">${escapeHtml(previewReason || 'Return route preview only.')}</div>
-            <div class="split revisit-route-readiness-head">
-              <span class="pill revisit-route-readiness-pill">${escapeHtml(previewLabel || 'Still locked')}</span>
-              <span class="small muted">Signal: ${escapeHtml(signal || 'Still locked')}</span>
-            </div>
-            ${routeFlavorLine ? `<div class="small muted revisit-route-flavor">${escapeHtml(routeFlavorLine)}</div>` : ''}
-            <div class="revisit-route-criteria-list">${criteriaBody}</div>
-            ${criteriaNote ? `<div class="small muted revisit-route-criteria-note">${escapeHtml(criteriaNote)}</div>` : ''}
-            <div class="small muted revisit-route-diagnostic-label">${escapeHtml(diagnosticLabel)}</div>
-            <div class="small muted revisit-route-diagnostic-detail">${escapeHtml(diagnosticDetail)}</div>
-            ${lockedReadinessNote ? `<div class="small muted revisit-route-readiness-note">${escapeHtml(lockedReadinessNote)}</div>` : ''}
-            <div class="small muted revisit-route-gate-ready">${escapeHtml(gateStatusLabel || 'Entry Locked')}</div>
-            <div class="small muted revisit-route-progress">Progress: ${escapeHtml(String(progressCurrent))} / ${escapeHtml(String(progressRequired))} · ${escapeHtml(signal || 'No signal yet')} (${escapeHtml(String(progressPercent))}%)</div>
-            <div class="split revisit-route-meta">
-              <span class="small muted"><strong>Need:</strong> ${escapeHtml(gateRequirementLabel || previewRequirement || 'Build more dungeon history.')}</span>
-              <span class="small muted"><strong>Safety:</strong> ${escapeHtml(gateSafetyLabel || previewSafety || 'Route access is unavailable.')}</span>
-            </div>
-            <div class="revisit-route-gate">
-              <div class="split revisit-route-gate-head">
-                <span class="pill revisit-route-gate-pill">Entry gate prepared</span>
-                <span class="small muted">Route still locked</span>
-              </div>
-              <div class="small muted revisit-route-gate-reason">${escapeHtml(gateReason)}</div>
-              <div class="small muted revisit-route-gate-requirement"><strong>Need:</strong> ${escapeHtml(gateRequirement)}</div>
-              <div class="small muted revisit-route-gate-status"><strong>Signal:</strong> ${escapeHtml(signal || 'No signal yet')}</div>
-              <div class="small muted revisit-route-gate-access"><strong>Access:</strong> ${escapeHtml(accessLabel)}</div>
-              <div class="small muted revisit-route-gate-source"><strong>Hook source:</strong> ${escapeHtml(hookSource || gateSource)}</div>
-            </div>
-            <div class="revisit-route-meta small muted">
-              <span>Read-only</span>
-              <span>Inactive</span>
-              <span>No rewards or route runs active yet</span>
-            </div>
-            <div class="small muted revisit-route-hooks"><strong>Hook source:</strong> ${escapeHtml(hookSource || hookLabels || 'Unknown')}</div>
-            <div class="revisit-route-action">${startButtonHtml}</div>
-          </div>`;
-        }).join('')
-      : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;
-    const planningNote = trophyEchoPlan && typeof trophyEchoPlan === 'object'
-      ? `<div class="revisit-route-card revisit-trophy-echo-plan">
-          <div class="split revisit-route-head">
-            <strong>Trophy Echo Rule Planning</strong>
-            <span class="pill">${escapeHtml(trophyEchoPlan.status || 'Planning only')}</span>
-          </div>
-          <div class="small muted">Planning only. ${escapeHtml(trophyEchoPlan.ruleInactiveLabel || 'Future rule inactive.')}</div>
-          <div class="small muted">${escapeHtml(trophyEchoPlan.signalLabel || 'Boss-history signal')}: ${escapeHtml(String(Math.max(0, Math.floor(Number(trophyEchoPlan.signalCurrent || 0)))))} / ${escapeHtml(String(Math.max(1, Math.floor(Number(trophyEchoPlan.signalRequired || 1)))))}</div>
-          <div class="small muted">${escapeHtml(trophyEchoPlan.routeAccessLabel || 'Route access is unavailable.')}</div>
-          <div class="small muted">No reward access.</div>
-          <div class="small muted">Anti-farming guardrails: no low-floor farming, no infinite loops, no mandatory revisit grind.</div>
-        </div>`
-      : '';
-    return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
-      <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
-      <div class="small muted revisit-route-readiness-note">Entry gate prepared. Route still locked. Requirements tracked from existing records. No rewards or route runs active yet.</div>
-      <div class="small muted revisit-route-criteria-note">Gate diagnostics stay read-only.</div>
-      ${planningNote}
-      <div class="list revisit-route-list">${routeBody}</div>
-      <div class="split small muted"><span>Last viewed: ${escapeHtml(viewed || 'Never')}</span><span>${notes}</span></div>
-    </div>`;
+  // Read-only revisit helper surface remains in backend systems only.
+  function earlierDungeonRevisitMarkup() {
+    return '';
   }
 
   function eliteContractBoardMarkup(state) {
@@ -220,7 +103,7 @@
     if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
     if (el('districtLine')) el('districtLine').innerHTML = `Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}. Lowfire banks the haul and returns you to ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
-    if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup(S);
+    if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = '';
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {

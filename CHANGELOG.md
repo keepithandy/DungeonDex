@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.15.1`
-* Current development target: `v1.15.1`
+* Current local package baseline: `v1.15.2`
+* Current development target: `v1.15.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -67,7 +67,7 @@ Add new notes below this section.
 
 ---
 
-### v1.15.1 - Remove Duplicate Revisit Preview Panel
+### v1.15.2 - Remove Planned Return Routes Town Panel
 
 * Tightened the revisit route panel copy so the existing locked previews read more cleanly on mobile.
 * Shortened route detail and readiness strings for the protected route identities without changing lock state or gameplay behavior.

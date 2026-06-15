@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.15.1 - Interface density and app-feel cleanup.
+// DungeonDex v1.15.2 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.15.1';
+  const BUILD = '1.15.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.15.1-remove-duplicate-revisit-preview-panel';
+  const BUILD_QS = '1.15.2-remove-planned-return-routes-town-panel';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
