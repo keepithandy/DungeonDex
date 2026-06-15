@@ -714,10 +714,10 @@ async function main() {
     const revisitPreviewClean = revisitPreviewWords.every(word => !townRevisitText.includes(word) && !initialDiag.bodyText.includes(word) && !revisitTownSource.includes(word) && !revisitArchiveSource.includes(word));
     const revisitActivationAllowed = revisitTownSource.includes('Start Return Route');
     const revisitPreviewCleanV2 = revisitPreviewClean && revisitActivationAllowed;
-    record('Earlier Dungeon Revisit appears', /Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
+    record('Planned Return Routes appears', /Planned Return Routes/i.test(townRevisitText) && !/Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit panel copy stays read-only', /planned|read-only|locked/i.test(townRevisitText), townRevisitText.slice(0, 300));
-    record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet.'), revisitTownSource.slice(0, 300));
-    record('Revisit candidate labels are protected', ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'].every(label => townRevisitText.includes(label)), townRevisitText.slice(0, 300));
+    record('Revisit planned-routes copy is protected', revisitTownSource.includes('Entry gate prepared. Route still locked. Requirements tracked from existing records. No rewards or route runs active yet.'), revisitTownSource.slice(0, 300));
+    record('Revisit candidate labels are protected', Array.isArray(revisitRoutes) && ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'].every(label => revisitRoutes.some(route => String(route?.title || '').includes(label) || String(route?.key || '').includes(label.replace(/\s+/g, '')))), JSON.stringify(Array.isArray(revisitRoutes) ? revisitRoutes.map(route => ({ key: route?.key, title: route?.title })).slice(0, 5) : revisitRoutes));
     const routeText = await evalByValue(client, `(() => document.getElementById('revisitFoundationSlot')?.innerText || '')()`);
     const routeShapeOk = Array.isArray(revisitRoutes) && revisitRoutes.every(route => !route || (typeof route === 'object' && ['key','title','district','reason','hooks','status','locked','priority'].every(key => Object.prototype.hasOwnProperty.call(route, key))));
     const routeLabels = ['Trophy Echo Route', 'Famous Gear Route', 'Rival Trace Route', 'Debt Pressure Route', 'Board Echo Route'];

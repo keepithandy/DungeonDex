@@ -107,22 +107,21 @@ async function main() {
         routeCardButtons,
         trophyPreview,
         text,
-        hasCandidateLedger: text.includes('Earlier Dungeon Revisit'),
         hasPlannedRoutes: text.includes('Planned Return Routes'),
-        hasLockedPreview: text.includes('Locked Preview'),
-        hasRouteNotOpen: text.includes('Still locked'),
-        hasEchoSource: text.includes('Source:') || text.includes('Echo source:'),
-        hasReadOnlyPreview: text.includes('Locked previews only'),
-        hasUnlockCriteria: text.includes('Need:') || text.includes('Locked previews only'),
-        hasPreviewOnly: text.includes('Locked previews only'),
+        hasLockedPreview: text.includes('Still locked'),
+        hasRouteNotOpen: text.includes('Route still locked'),
+        hasEchoSource: text.includes('Hook source:') || text.includes('Echo source:'),
+        hasReadOnlyPreview: text.includes('Entry gate prepared'),
+        hasUnlockCriteria: text.includes('Need:') || text.includes('Requirements tracked from existing records'),
+        hasPreviewOnly: text.includes('Requirements tracked from existing records'),
         hasEntryGate: text.includes('Entry gate prepared'),
         hasRouteStillLocked: text.includes('Route still locked'),
-        hasLockedGate: text.includes('Locked Gate'),
-        hasGateRequirement: text.includes('Requirement:'),
+        hasLockedGate: text.includes('Entry gate prepared'),
+        hasGateRequirement: text.includes('Need:'),
         hasGateStatus: text.includes('Signal: Route Forming') || text.includes('Signal: Still locked') || text.includes('Signal:'),
-        hasReadiness: text.includes('Still locked') || text.includes('Future Unlock Preview'),
+        hasReadiness: text.includes('Route still locked') || text.includes('Future Unlock Preview'),
         hasUnlockPreview: text.includes('Future Unlock Preview'),
-        hasFutureCondition: text.includes('Need:') || text.includes('Locked previews only'),
+        hasFutureCondition: text.includes('Need:') || text.includes('Requirements tracked from existing records'),
         hasPreviewOnlySafety: text.includes('Route access is unavailable'),
         hasRouteAccessUnavailable: text.includes('Route access is unavailable'),
         hasSafetyLabel: text.includes('Safety:'),
@@ -144,7 +143,7 @@ async function main() {
     record('Route preview copy remains short and read-only', Array.isArray(fresh.routes) && fresh.routes.every(route => typeof route.title === 'string' && typeof route.reason === 'string' && typeof route.shortDescription === 'string' && typeof route.routeFlavorLine === 'string' && typeof route.safetyStatusLine === 'string' && typeof route.lockedReadinessNote === 'string' && route.locked === true && /route access is unavailable|no route access/i.test(String(route.safetyStatusLine || '')) && String(route.reason || '').length <= 80), JSON.stringify(fresh.routes?.slice(0, 3)));
     record('Unlock gate keys labels and types are stable display values', Array.isArray(fresh.gates) && fresh.gates.every(gate => String(gate.key || '').trim().length > 0 && String(gate.label || '').trim().length > 0 && ['trophy', 'famousGear', 'rival', 'debt', 'board', 'unknown'].includes(gate.gateType)), JSON.stringify(fresh.gates?.slice(0, 3)));
     record('Unknown gate types fall back safely', fresh.unknownGateMeta && fresh.unknownGateMeta.gateType === 'unknown' && typeof fresh.unknownGateMeta.gateLabel === 'string' && typeof fresh.unknownGateMeta.reason === 'string' && typeof fresh.unknownGateMeta.requirement === 'string', JSON.stringify(fresh.unknownGateMeta));
-    record('Town revisit slot renders candidate ledger and planned routes', fresh.hasCandidateLedger && fresh.hasPlannedRoutes && fresh.hasEntryGate && fresh.hasRouteStillLocked && fresh.hasRouteCards && fresh.hasTrophyEchoRow && fresh.hasStillLockedRow && fresh.hasFutureUnlockRow && Array.isArray(fresh.routeCardButtons) && fresh.routeCardButtons.every(btn => /Route Locked/i.test(btn)), JSON.stringify({ text: fresh.text.slice(0, 500), routeCards: fresh.routeCards, routeCardButtons: fresh.routeCardButtons }));
+    record('Town revisit slot renders planned routes only', fresh.hasPlannedRoutes && fresh.hasEntryGate && fresh.hasRouteStillLocked && fresh.hasRouteCards && fresh.hasTrophyEchoRow && fresh.hasStillLockedRow && fresh.hasFutureUnlockRow && Array.isArray(fresh.routeCardButtons) && fresh.routeCardButtons.every(btn => /Route Locked/i.test(btn)) && !/Earlier Dungeon Revisit/i.test(fresh.text || ''), JSON.stringify({ text: fresh.text.slice(0, 500), routeCards: fresh.routeCards, routeCardButtons: fresh.routeCardButtons }));
     record('Revisit helpers do not mutate state on fresh save', fresh.before === fresh.after, JSON.stringify({ before: fresh.before, after: fresh.after }));
 
     const edgeCases = await evalByValue(client, `(() => {
@@ -508,7 +507,7 @@ async function main() {
     record('Trophy Echo rule chain remains handoff-safe', trophyPlanCheck.plan && trophyPlanCheck.summary && trophyPlanCheck.highEdge?.plan?.locked === true && trophyPlanCheck.highEdge.plan.ready === false && trophyPlanCheck.highEdge.plan.playable === false && trophyPlanCheck.highEdge.plan.active === false && trophyPlanCheck.highEdge.plan.rewardAvailable === false && trophyPlanCheck.malformedPlan?.locked === true && trophyPlanCheck.malformedPlan.ready === false && trophyPlanCheck.malformedPlan.playable === false && trophyPlanCheck.malformedPlan.active === false && trophyPlanCheck.malformedPlan.rewardAvailable === false && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0 && trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify({ plan: !!trophyPlanCheck.plan, summary: !!trophyPlanCheck.summary, high: trophyPlanCheck.highEdge?.plan, malformed: trophyPlanCheck.malformedPlan, routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
     record('Trophy Echo anti-farming policy is present', Array.isArray(trophyPlanCheck.plan?.antiFarmPolicy) && /low-floor farming/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /infinite revisit loops/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /mandatory revisit grind/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /stronger than main progression/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /Enter Dungeon and Continue Run remain primary/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')), JSON.stringify(trophyPlanCheck.plan?.antiFarmPolicy));
     record('Trophy Echo reward policy remains planning only', trophyPlanCheck.plan?.rewardPolicy?.status === 'Planning only' && trophyPlanCheck.plan.rewardPolicy.rewardAccess === false && /Memory, trophy, and Dex identity rewards first/i.test(trophyPlanCheck.plan.rewardPolicy.allowedFutureClass || '') && Array.isArray(trophyPlanCheck.plan.rewardPolicy.disallowed) && trophyPlanCheck.plan.rewardPolicy.disallowed.length >= 4, JSON.stringify(trophyPlanCheck.plan?.rewardPolicy));
-    record('Earlier Dungeon Revisit shows Trophy Echo planning copy without controls', /Optional side routes from existing records/i.test(trophyPlanCheck.routeSlotText || '') && /Routes stay locked until their records are ready/i.test(trophyPlanCheck.routeSlotText || '') && /Entry gate prepared/i.test(trophyPlanCheck.routeSlotText || '') && /Route still locked/i.test(trophyPlanCheck.routeSlotText || '') && /Gate diagnostics stay read-only/i.test(trophyPlanCheck.routeSlotText || '') && /Trophy Echo Rule Planning/i.test(trophyPlanCheck.routeSlotText || '') && /Planning only/i.test(trophyPlanCheck.routeSlotText || '') && /Boss-history signal/i.test(trophyPlanCheck.routeSlotText || '') && /Route access is unavailable/i.test(trophyPlanCheck.routeSlotText || '') && /No reward access/i.test(trophyPlanCheck.routeSlotText || '') && /Anti-farming/i.test(trophyPlanCheck.routeSlotText || '') && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0, JSON.stringify({ routeSlotText: String(trophyPlanCheck.routeSlotText || '').slice(0, 900), routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
+    record('Planned Return Routes shows Trophy Echo planning copy without controls', /Planned Return Routes/i.test(trophyPlanCheck.routeSlotText || '') && /Entry gate prepared/i.test(trophyPlanCheck.routeSlotText || '') && /Route still locked/i.test(trophyPlanCheck.routeSlotText || '') && /Gate diagnostics stay read-only/i.test(trophyPlanCheck.routeSlotText || '') && /Trophy Echo Rule Planning/i.test(trophyPlanCheck.routeSlotText || '') && /Planning only/i.test(trophyPlanCheck.routeSlotText || '') && /Boss-history signal/i.test(trophyPlanCheck.routeSlotText || '') && /Route access is unavailable/i.test(trophyPlanCheck.routeSlotText || '') && /No reward access/i.test(trophyPlanCheck.routeSlotText || '') && /Anti-farming/i.test(trophyPlanCheck.routeSlotText || '') && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0 && !/Earlier Dungeon Revisit/i.test(trophyPlanCheck.routeSlotText || ''), JSON.stringify({ routeSlotText: String(trophyPlanCheck.routeSlotText || '').slice(0, 900), routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
     record('No unsafe Trophy Echo planning API names exist', trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify(trophyPlanCheck.apiKeys));
 
     const oldSave = await evalByValue(client, `(() => {

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.15.0-revisit-route-entry-gate-foundation';
+const CACHE_NAME = 'dungeondex-v1.15.1-remove-duplicate-revisit-preview-panel';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.15.0-revisit-route-entry-gate-foundation';
+const BUILD_QS = '1.15.1-remove-duplicate-revisit-preview-panel';
 const ASSETS = [
   './',
   './index.html',

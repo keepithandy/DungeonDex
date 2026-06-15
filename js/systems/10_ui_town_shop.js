@@ -3,13 +3,11 @@
 // Elite contract board, town panels, district wares, shop cards
   // Read-only town panel: this is a design lock surface, not route selection or travel.
   function earlierDungeonRevisitMarkup(state) {
-    const rawHooks = typeof revisitCandidateHooks === 'function' ? revisitCandidateHooks(state) : [];
     const rawRoutes = typeof revisitRoutePreviews === 'function' ? revisitRoutePreviews(state) : [];
     const rawGates = typeof revisitUnlockGates === 'function' ? revisitUnlockGates(state) : [];
     const rawRouteGates = typeof revisitRouteGateState === 'function' ? rawRoutes.map(route => revisitRouteGateState(state, route)) : [];
     const rawPreviews = typeof revisitUnlockPreview === 'function' ? revisitUnlockPreview(state) : [];
     const trophyEchoPlan = typeof revisitTrophyEchoRulePlan === 'function' ? revisitTrophyEchoRulePlan(state) : null;
-    const hooks = Array.isArray(rawHooks) ? rawHooks.filter(hook => hook && typeof hook === 'object') : [];
     const routes = Array.isArray(rawRoutes) ? rawRoutes.filter(route => route && typeof route === 'object') : [];
     const gates = Array.isArray(rawGates) ? rawGates.filter(gate => gate && typeof gate === 'object') : [];
     const routeGates = Array.isArray(rawRouteGates) ? rawRouteGates.filter(gate => gate && typeof gate === 'object') : [];
@@ -21,21 +19,6 @@
     const viewed = String(state?.player?.revisitState?.lastViewedAt || '').trim();
     const noted = Array.isArray(state?.player?.revisitState?.notedDistricts) ? state.player.revisitState.notedDistricts.slice(0, 3) : [];
     const notes = noted.length ? escapeHtml(noted.join(' • ')) : 'No districts noted yet.';
-    const body = hooks.length
-      ? hooks.slice(0, 5).map(hook => {
-          const label = String(hook.label || '').trim() || 'Unknown Hook';
-          const detail = String(hook.detail || '').trim() || 'No details';
-          const source = String(hook.source || '').trim() || 'Unknown source';
-          return `<div class="revisit-candidate-row">
-            <div class="split revisit-candidate-head">
-              <strong>${escapeHtml(label)}</strong>
-              <span class="pill revisit-candidate-state">${hook.locked ? 'Locked Preview' : 'Planned Preview'}</span>
-            </div>
-            <div class="small muted revisit-candidate-detail">${escapeHtml(detail)}</div>
-            <div class="small muted revisit-candidate-source">Echo source: ${escapeHtml(source)}</div>
-          </div>`;
-        }).join('')
-      : `<div class="small muted revisit-empty-state">No return routes are marked yet.</div>`;
     const routeBody = routes.length
       ? routes.slice(0, 3).map(route => {
           const hookLabels = Array.isArray(route.hooks) ? route.hooks.filter(Boolean).join(' • ') : '';
@@ -131,9 +114,6 @@
         </div>`
       : '';
     return `<div class="district-wallet-card revisit-foundation-card" aria-label="Earlier Dungeon Revisit">
-      <div class="split revisit-foundation-head"><div><h3>Earlier Dungeon Revisit</h3><p>Optional side routes from existing records.</p></div><span class="pill">${status}</span></div>
-      <div class="small muted">Routes stay locked until their records are ready. Enter Dungeon and Continue remain primary.</div>
-      <div class="list revisit-hook-list">${body}</div>
       <div class="split revisit-route-headline"><h4>Planned Return Routes</h4><span class="pill">Still locked</span></div>
       <div class="small muted revisit-route-readiness-note">Entry gate prepared. Route still locked. Requirements tracked from existing records. No rewards or route runs active yet.</div>
       <div class="small muted revisit-route-criteria-note">Gate diagnostics stay read-only.</div>
