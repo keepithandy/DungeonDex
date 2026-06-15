@@ -439,7 +439,13 @@
     return {
       unlocked: false,
       lastViewedAt: '',
-      notedDistricts: []
+      notedDistricts: [],
+      activeRouteKey: '',
+      startedAt: 0,
+      sourceFloor: 0,
+      sideRoute: false,
+      locked: true,
+      cappedReward: true
     };
   }
 
@@ -449,6 +455,12 @@
     base.unlocked = !!source.unlocked;
     base.lastViewedAt = String(source.lastViewedAt || '').trim();
     base.notedDistricts = asArray(source.notedDistricts, []).map(String).map(x => x.trim()).filter(Boolean).slice(0, 12);
+    base.activeRouteKey = String(source.activeRouteKey || '').trim();
+    base.startedAt = Math.max(0, Math.floor(numberOr(source.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)));
+    base.sourceFloor = Math.max(0, Math.floor(numberOr(source.sourceFloor, 0, 0, 999999)));
+    base.sideRoute = !!source.sideRoute;
+    base.locked = source.locked !== false;
+    base.cappedReward = source.cappedReward !== false;
     return base;
   }
 

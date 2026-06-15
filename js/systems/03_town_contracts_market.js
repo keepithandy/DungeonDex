@@ -1232,6 +1232,67 @@
     };
   }
 
+  function canStartRevisitRoute(state = S, routeKey = '') {
+    if (!state || typeof state !== 'object') return false;
+    if (!state.player || typeof state.player !== 'object') return false;
+    const safeKey = String(routeKey || '').trim();
+    if (!safeKey) return false;
+    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
+    if (revisitState.locked !== false) return false;
+    const routes = revisitRoutePreviews(state);
+    const route = routes.find(r => String(r?.key || '') === safeKey);
+    if (!route) return false;
+    if (route.locked !== false) return false;
+    return true;
+  }
+
+  function startRevisitRoute(state = S, routeKey = '') {
+    if (!canStartRevisitRoute(state, routeKey)) return null;
+    if (!state?.player) return null;
+    const safeKey = String(routeKey || '').trim();
+    const currentFloor = Math.max(0, Math.floor(numberOr(state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
+    const routes = revisitRoutePreviews(state);
+    const route = routes.find(r => String(r?.key || '') === safeKey);
+    if (!route) return null;
+    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
+    revisitState.activeRouteKey = safeKey;
+    revisitState.startedAt = Date.now();
+    revisitState.sourceFloor = currentFloor;
+    revisitState.sideRoute = true;
+    revisitState.locked = false;
+    revisitState.cappedReward = true;
+    state.player.revisitState = revisitState;
+    return {
+      routeKey: safeKey,
+      routeTitle: String(route?.title || 'Return Route'),
+      startedAt: revisitState.startedAt,
+      sourceFloor: revisitState.sourceFloor,
+      sideRoute: true,
+      locked: false,
+      cappedReward: true
+    };
+  }
+
+  function activeRevisitRouteSummary(state = S) {
+    if (!state?.player) return null;
+    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
+    if (!revisitState.activeRouteKey) return null;
+    const safeKey = String(revisitState.activeRouteKey || '').trim();
+    const routes = revisitRoutePreviews(state);
+    const route = routes.find(r => String(r?.key || '') === safeKey);
+    if (!route) return null;
+    return {
+      routeKey: safeKey,
+      routeTitle: String(route?.title || 'Return Route'),
+      district: String(route?.district || ''),
+      startedAt: Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      sourceFloor: Math.max(0, Math.floor(numberOr(revisitState.sourceFloor, 0, 0, 999999))),
+      sideRoute: !!revisitState.sideRoute,
+      locked: revisitState.locked !== false,
+      cappedReward: revisitState.cappedReward !== false
+    };
+  }
+
   function ensureEliteContractState(state) {
     if (!state.player) state.player = {};
     state.player.eliteContracts = validateEliteBoardState(state);
@@ -1892,6 +1953,15 @@
       },
       revisitTrophyEchoRuleSummary(state = S) {
         return revisitTrophyEchoRuleSummary(state);
+      },
+      canStartRevisitRoute(state = S, routeKey = '') {
+        return canStartRevisitRoute(state, routeKey);
+      },
+      startRevisitRoute(state = S, routeKey = '') {
+        return startRevisitRoute(state, routeKey);
+      },
+      activeRevisitRouteSummary(state = S) {
+        return activeRevisitRouteSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;

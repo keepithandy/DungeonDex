@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.12.5`
-* Current development target: `v1.12.5`
+* Current local package baseline: `v1.13.0`
+* Current development target: `v1.13.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -64,6 +64,25 @@ Use `VERSION.md` for the current active version.
 ## Version Notes
 
 Add new notes below this section.
+
+---
+
+### v1.13.0 - Revisit Routes Activation Foundation
+
+Status: In Progress
+
+Summary:
+
+* Added a safe route selection/start foundation for revisit side-routes, starting from locked preview state.
+* Extended `player.revisitState` to include optional active-route shape: `activeRouteKey`, `startedAt`, `sourceFloor`, `sideRoute`, `locked` flags, and `cappedReward` flag.
+* Added defensive helper functions: `canStartRevisitRoute(state, routeKey)`, `startRevisitRoute(state, routeKey)`, `activeRevisitRouteSummary(state)`.
+* Added validation safeguards: route key checks, locked-state enforcement, malformed-data handling, state isolation verification.
+* Added minimal UI affordance for valid route previews in the town Revisit panel.
+* Verified through extended smoke tests that starting a revisit route does not mutate: main floor progression, chapter progress, combat scaling, Talent state, gear inventory, economy/copper, trophies, Famous Gear, Debt state, or Elite Board contract state.
+* Rewrites remain capped/preview-scoped with side-route isolation flags.
+* Confirmed Enter/Continue remains the primary progression path.
+* No combat mechanics, no new reward systems, no permanent progression changes, no passive bonuses, and no talent gameplay changes were added.
+* Revisit Routes remain optional side routes without affecting main progression, economy balance, or existing systems.
 
 ---
 

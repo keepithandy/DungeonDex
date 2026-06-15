@@ -57,6 +57,10 @@
           const criteriaBody = criteria.length
             ? criteria.map(text => `<div class="small muted revisit-route-criteria-item">${escapeHtml(text)}</div>`).join('')
             : `<div class="small muted revisit-route-criteria-item">Future condition only.</div>`;
+          const canStart = typeof canStartRevisitRoute === 'function' && canStartRevisitRoute(state, route.key);
+          const startButtonHtml = canStart
+            ? `<button class="revisit-route-start-btn" data-route-key="${escapeHtml(String(route.key || ''))}">Start Return Route</button>`
+            : `<button class="revisit-route-start-btn" disabled>Route Locked</button>`;
           return `<div class="revisit-route-card">
             <div class="split revisit-route-head">
               <strong>${escapeHtml(route.title || 'Planned Route')}</strong>
@@ -94,6 +98,7 @@
               <span>Route access is unavailable.</span>
             </div>
             <div class="small muted revisit-route-hooks"><strong>Source:</strong> ${escapeHtml(hookLabels || 'Unknown')}</div>
+            <div class="revisit-route-action">${startButtonHtml}</div>
           </div>`;
         }).join('')
       : `<div class="small muted revisit-empty-state">No route previews are ready yet. More trophies, rivals, debt, or archive memories will mark future roads.</div>`;

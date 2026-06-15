@@ -7,7 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.12.5 - Talent Foundation Completion Checkpoint
+- DungeonDex v1.13.0 - Revisit Routes Activation Foundation
+
+## v1.13.0 Revisit Routes Activation Foundation
+- Current baseline: v1.13.0.
+- Added safe route selection/start foundation with extended `player.revisitState` shape.
+- New fields: `activeRouteKey`, `startedAt`, `sourceFloor`, `sideRoute`, `locked`, `cappedReward`.
+- Added helpers: `canStartRevisitRoute`, `startRevisitRoute`, `activeRevisitRouteSummary`.
+- Verification: Route start does not mutate main progression, scaling, Talent, gear, economy, or other systems.
+- Smoke coverage extended to validate route isolation, state safety, and primary progression preservation.
+- Revisit Routes remain locked/optional/side-route-only with capped rewards.
+- Enter/Continue remains primary progression path.
+- Combat, economy, scaling, talents, debt, Elite Board, Famous Gear, and trophy behavior remain unchanged.
 
 ## v1.12.5 Talent Foundation Completion Checkpoint
 - Current baseline: v1.12.5.

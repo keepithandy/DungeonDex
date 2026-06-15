@@ -710,8 +710,10 @@ async function main() {
     const revisitTownSource = await readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8');
     const revisitArchiveSource = await readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8');
     const revisitMarketSource = await readFile(path.join(ROOT, 'js/systems/03_town_contracts_market.js'), 'utf8');
-    const revisitPreviewWords = ['Route Preview', 'Start Return Route', 'Travel', 'Begin Revisit'];
+    const revisitPreviewWords = ['Route Preview', 'Travel', 'Begin Revisit'];
     const revisitPreviewClean = revisitPreviewWords.every(word => !townRevisitText.includes(word) && !initialDiag.bodyText.includes(word) && !revisitTownSource.includes(word) && !revisitArchiveSource.includes(word));
+    const revisitActivationAllowed = revisitTownSource.includes('Start Return Route');
+    const revisitPreviewCleanV2 = revisitPreviewClean && revisitActivationAllowed;
     record('Earlier Dungeon Revisit appears', /Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit panel copy stays read-only', /planned|read-only|locked/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet. Deeper runs will leave better traces.'), revisitTownSource.slice(0, 300));
@@ -724,7 +726,7 @@ async function main() {
     record('Revisit helper shape is stable', Array.isArray(revisitHooks) && revisitHookShapeOk && revisitMarketSource.includes('revisitCandidateSummary(state = S) {') && revisitMarketSource.includes("key: String(entry.key || '')"), JSON.stringify({ hooksType: Array.isArray(revisitHooks) ? 'array' : typeof revisitHooks, summarySource: revisitMarketSource.includes('revisitCandidateSummary(state = S) {'), sample: Array.isArray(revisitHooks) ? revisitHooks.slice(0, 2) : revisitHooks }));
     record('Route preview helper shape is stable', Array.isArray(revisitRoutes) && routeShapeOk && revisitMarketSource.includes('function revisitRoutePreviews(state = S)') && revisitMarketSource.includes('function revisitRouteSummary(state = S)'), JSON.stringify({ routesType: Array.isArray(revisitRoutes) ? 'array' : typeof revisitRoutes, summary: revisitRouteSummary, sample: Array.isArray(revisitRoutes) ? revisitRoutes.slice(0, 3) : revisitRoutes }));
     record('Planned Return Routes appear', routeCopyOk && routeLockOk && routeLabels.some(label => routeText.includes(label)), routeText.slice(0, 400));
-    record('Revisit helper avoids preview language', revisitPreviewClean, townRevisitText.slice(0, 300));
+    record('Revisit helper avoids preview language', revisitPreviewCleanV2, townRevisitText.slice(0, 300));
     const freshPanelText = await getTalentText();
     record('Talent panel renders preview header', freshPanelText.includes('Talent Tree Preview') && freshPanelText.includes('Talent Tree Preview is locked. No talent points, purchases, unlocks, or bonuses are active yet.'), freshPanelText.slice(0, 300));
     record('Talent preview banner is visible', freshPanelText.includes('Locked preview') && freshPanelText.includes('Talents are planning-only. No talent spending is live yet.'), freshPanelText.slice(0, 300));
