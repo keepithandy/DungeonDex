@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.14.0 - Revisit Route Content Completion
+- DungeonDex v1.14.1 - Revisit Route Readability / Detail Polish
+
+## v1.14.1 Revisit Route Readability / Detail Polish
+- Current baseline: v1.14.1.
+- Tightened revisit route panel copy for mobile readability and shortened repeated status language.
+- Shortened route detail and readiness strings for the protected route identities while keeping the routes locked and read-only.
+- Extended revisit smoke coverage to check the detail fields remain present as strings and that preview output stays inert.
+- Revisit activation behavior, talent preview, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
 
 ## v1.14.0 Revisit Route Content Completion
 - Current baseline: v1.14.0.

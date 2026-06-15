@@ -716,7 +716,7 @@ async function main() {
     const revisitPreviewCleanV2 = revisitPreviewClean && revisitActivationAllowed;
     record('Earlier Dungeon Revisit appears', /Earlier Dungeon Revisit/i.test(townRevisitText), townRevisitText.slice(0, 300));
     record('Revisit panel copy stays read-only', /planned|read-only|locked/i.test(townRevisitText), townRevisitText.slice(0, 300));
-    record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet. Deeper runs will leave better traces.'), revisitTownSource.slice(0, 300));
+    record('Revisit empty-state copy is protected', revisitTownSource.includes('No return routes are marked yet.'), revisitTownSource.slice(0, 300));
     record('Revisit candidate labels are protected', ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'].every(label => townRevisitText.includes(label)), townRevisitText.slice(0, 300));
     const routeText = await evalByValue(client, `(() => document.getElementById('revisitFoundationSlot')?.innerText || '')()`);
     const routeShapeOk = Array.isArray(revisitRoutes) && revisitRoutes.every(route => !route || (typeof route === 'object' && ['key','title','district','reason','hooks','status','locked','priority'].every(key => Object.prototype.hasOwnProperty.call(route, key))));

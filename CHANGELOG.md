@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.14.0`
-* Current development target: `v1.14.0`
+* Current local package baseline: `v1.14.1`
+* Current development target: `v1.14.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -66,6 +66,13 @@ Use `VERSION.md` for the current active version.
 Add new notes below this section.
 
 ---
+
+### v1.14.1 - Revisit Route Readability / Detail Polish
+
+* Tightened the revisit route panel copy so the existing locked previews read more cleanly on mobile.
+* Shortened route detail and readiness strings for the protected route identities without changing lock state or gameplay behavior.
+* Extended smoke coverage to confirm the revisit route content fields remain present, string-based, and read-only.
+* No route entry, reward, combat, economy, debt, trophy, Famous Gear, Elite Board, Talent, or main progression behavior changed.
 
 ### v1.14.0 - Revisit Route Content Completion
 

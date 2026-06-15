@@ -1147,50 +1147,50 @@
         title: 'Trophy Echo Route',
         district: 'Trophy record districts',
         hookSource: 'trophy_echo',
-        shortDescription: 'An old boss record echoes through earlier districts.',
-        routeFlavorLine: 'Boss history keeps the trail warm.',
-        safetyStatusLine: 'Preview only. Route access is unavailable.',
-        lockedReadinessNote: 'Build more boss history before this route can be tested.',
+        shortDescription: 'Boss history leaves a return trail.',
+        routeFlavorLine: 'Old victories still mark the path.',
+        safetyStatusLine: 'Locked preview. No route access.',
+        lockedReadinessNote: 'Needs more boss history.',
         reason: 'Old victories may call back later.'
       },
       famous_gear_route: {
         title: 'Famous Gear Memory Route',
         district: 'Archive memory districts',
         hookSource: 'famous_gear_memory',
-        shortDescription: 'Retired gear memory leaves a careful route marker.',
-        routeFlavorLine: 'Notable gear remembers where it mattered.',
-        safetyStatusLine: 'Preview only. Route access is unavailable.',
-        lockedReadinessNote: 'Build stronger gear memory before this route can be tested.',
+        shortDescription: 'Retired gear remembers the route.',
+        routeFlavorLine: 'Notable gear keeps the old turn.',
+        safetyStatusLine: 'Locked preview. No route access.',
+        lockedReadinessNote: 'Needs stronger gear memory.',
         reason: 'Retired gear may remember old ground.'
       },
       rival_trace_route: {
         title: 'Rival Trace Route',
         district: 'Board and rival districts',
         hookSource: 'rival_trace / board_echo',
-        shortDescription: 'A named rival trace threads back through earlier districts.',
-        routeFlavorLine: 'Rival marks always leave a sharper trail.',
-        safetyStatusLine: 'Preview only. Route access is unavailable.',
-        lockedReadinessNote: 'Build more rival history before this route can be tested.',
+        shortDescription: 'A rival trace runs through old districts.',
+        routeFlavorLine: 'Rivals leave a sharp trail.',
+        safetyStatusLine: 'Locked preview. No route access.',
+        lockedReadinessNote: 'Needs more rival history.',
         reason: 'A rival path may cross earlier districts.'
       },
       debt_pressure_route: {
         title: 'Debt Pressure Route',
         district: 'Ledger districts',
         hookSource: 'debt_pressure',
-        shortDescription: 'The debt ledger points to a pressure trail in old ground.',
-        routeFlavorLine: 'Every ledger mark leaves a route-shaped shadow.',
-        safetyStatusLine: 'Preview only. Route access is unavailable.',
-        lockedReadinessNote: 'Build more debt history before this route can be tested.',
+        shortDescription: 'Ledger pressure marks an old trail.',
+        routeFlavorLine: 'Every ledger mark points back.',
+        safetyStatusLine: 'Locked preview. No route access.',
+        lockedReadinessNote: 'Needs more debt history.',
         reason: 'The ledger may point back to safer work.'
       },
       board_echo_route: {
         title: 'Board Echo Route',
         district: 'Contract history districts',
         hookSource: 'board_echo',
-        shortDescription: 'An old board contract repeats as a route echo.',
-        routeFlavorLine: 'Paid marks can still echo after the payout.',
-        safetyStatusLine: 'Preview only. Route access is unavailable.',
-        lockedReadinessNote: 'Build more board history before this route can be tested.',
+        shortDescription: 'Old board contracts echo as a route.',
+        routeFlavorLine: 'Paid marks can still linger.',
+        safetyStatusLine: 'Locked preview. No route access.',
+        lockedReadinessNote: 'Needs more board history.',
         reason: 'Contract history may reopen old roads.'
       }
     };
@@ -1203,14 +1203,14 @@
     const sourceLabels = Array.isArray(fallbackHookLabels) ? fallbackHookLabels.filter(Boolean) : [];
     return {
       ...route,
-      title: String(route?.title || def.title || 'Planned Route').trim(),
+      title: String(route?.title || def.title || 'Return Route').trim(),
       district: String(route?.district || def.district || 'Earlier district band').trim(),
-      reason: String(route?.reason || def.reason || 'Future route history may shape this path later.').trim(),
+      reason: String(route?.reason || def.reason || 'Return route preview only.').trim(),
       hookSource: String(route?.hookSource || def.hookSource || sourceLabels.join(' / ') || hookLabels.join(' / ') || 'unknown').trim(),
-      shortDescription: String(route?.shortDescription || def.shortDescription || 'A side route preview only.').trim(),
-      routeFlavorLine: String(route?.routeFlavorLine || def.routeFlavorLine || 'Preview only.').trim(),
-      safetyStatusLine: String(route?.safetyStatusLine || def.safetyStatusLine || 'Preview only. Route access is unavailable.').trim(),
-      lockedReadinessNote: String(route?.lockedReadinessNote || def.lockedReadinessNote || 'Build more dungeon history.').trim()
+      shortDescription: String(route?.shortDescription || def.shortDescription || 'Side route preview only.').trim(),
+      routeFlavorLine: String(route?.routeFlavorLine || def.routeFlavorLine || 'Read-only route note.').trim(),
+      safetyStatusLine: String(route?.safetyStatusLine || def.safetyStatusLine || 'Locked preview. No route access.').trim(),
+      lockedReadinessNote: String(route?.lockedReadinessNote || def.lockedReadinessNote || 'Needs more dungeon history.').trim()
     };
   }
 
@@ -1290,39 +1290,39 @@
           hooks: routeHooks.map(hook => String(hook.label || '').trim()).filter(Boolean),
           hookSource: String(route.hookSource || '').trim(),
           shortDescription: route.key === 'trophy_echo_route'
-            ? 'Old boss memory reaches back from the record.'
+            ? 'Boss history leaves a return trail.'
             : route.key === 'famous_gear_route'
-              ? 'Gear memory keeps a note of earlier steps.'
+              ? 'Retired gear remembers the route.'
               : route.key === 'rival_trace_route'
-                ? 'A rival trace crosses the route map again.'
+                ? 'A rival trace runs through old districts.'
                 : route.key === 'debt_pressure_route'
-                  ? 'Ledger pressure leaves a narrow trail.'
+                  ? 'Ledger pressure marks an old trail.'
                   : route.key === 'board_echo_route'
-                    ? 'Contract history repeats as a quiet echo.'
-                    : 'A route preview only.',
+                    ? 'Old board contracts echo as a route.'
+                    : 'Side route preview only.',
           routeFlavorLine: route.key === 'trophy_echo_route'
-            ? 'The oldest victories still hum.'
+            ? 'Old victories still mark the path.'
             : route.key === 'famous_gear_route'
-              ? 'Notable gear remembers its walk home.'
+              ? 'Notable gear keeps the old turn.'
               : route.key === 'rival_trace_route'
-                ? 'Rivals make sharper roadmarks.'
+                ? 'Rivals leave a sharp trail.'
                 : route.key === 'debt_pressure_route'
-                  ? 'The ledger can point the way back.'
+                  ? 'Every ledger mark points back.'
                   : route.key === 'board_echo_route'
-                    ? 'Contracts echo after the payout.'
-                    : 'Preview only.',
-          safetyStatusLine: 'Preview only. Route access is unavailable.',
+                    ? 'Paid marks can still linger.'
+                    : 'Read-only route note.',
+          safetyStatusLine: 'Locked preview. No route access.',
           lockedReadinessNote: route.key === 'trophy_echo_route'
-            ? 'Build more boss history before this route can be tested.'
+            ? 'Needs more boss history.'
             : route.key === 'famous_gear_route'
-              ? 'Build stronger gear memory before this route can be tested.'
+              ? 'Needs stronger gear memory.'
               : route.key === 'rival_trace_route'
-                ? 'Build more rival history before this route can be tested.'
+                ? 'Needs more rival history.'
                 : route.key === 'debt_pressure_route'
-                  ? 'Build more debt history before this route can be tested.'
+                  ? 'Needs more debt history.'
                   : route.key === 'board_echo_route'
-                    ? 'Build more board history before this route can be tested.'
-                    : 'Build more dungeon history.',
+                    ? 'Needs more board history.'
+                    : 'Needs more dungeon history.',
           status: String(route.status || 'Locked').trim(),
           locked: true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
