@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.12.5-talent-foundation-checkpoint';
+const CACHE_NAME = 'dungeondex-v1.13.0-revisit-routes-activation-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.12.5-talent-foundation-checkpoint';
+const BUILD_QS = '1.13.0-revisit-routes-activation-foundation';
 const ASSETS = [
   './',
   './index.html',
