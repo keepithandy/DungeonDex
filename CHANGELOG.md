@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.11.0`
-* Current local package baseline: `v1.11.0`
-* Current development target: `v1.11.0`
+* Public/live itch version: `v1.11.1`
+* Current local package baseline: `v1.11.1`
+* Current development target: `v1.11.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -67,7 +67,7 @@ Add new notes below this section.
 
 ---
 
-### v1.11.0 - Talent Tree Locked Preview UI
+### v1.11.1 - Talent Preview Copy Hardening
 
 Status: Complete
 

@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.6.17 - Talent System Foundation + Lowfire Board.
+// DungeonDex v1.11.1 - Talent Preview Copy Hardening + Lowfire Board.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.11.0-talent-tree-preview';
+  const SCRIPT_BUILD = '1.11.1-talent-preview-copy-hardening';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const H = v => typeof escapeHtml === 'function' ? escapeHtml(v) : String(v ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -71,14 +71,22 @@
         plannedEffect: node.plannedEffect,
         status: node.status || 'Preview only',
         locked: node.locked !== false,
+        active: false,
+        purchased: false,
+        learned: false,
+        unlocked: false,
         order: node.order || 0
       })).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
       return {
         key: branch.key,
         title: branch.title,
         detail: branch.detail,
-        status: 'Locked preview',
+        status: 'Preview locked',
         locked: true,
+        active: false,
+        purchased: false,
+        learned: false,
+        unlocked: false,
         nodeCount: nodes.length,
         nodes
       };
@@ -94,6 +102,7 @@
       totalNodes: preview.nodes.length,
       lockedNodes: preview.nodes.filter(node => node.locked).length,
       activeNodes: 0,
+      spendablePoints: 0,
       previewOnly: true
     };
   }
@@ -228,24 +237,28 @@
       <div class="card-head talent-head">
         <div>
           <h2>Talent Tree Preview</h2>
-          <p>Locked planning view. Talent effects are not active yet.</p>
-          <div class="talent-passive-note small">Preview only. No active bonus.</div>
+          <p>Talent Tree Preview is locked. No talent points, purchases, unlocks, or bonuses are active yet.</p>
+          <div class="talent-passive-note small">Preview only. No active bonus. No gameplay effect yet.</div>
         </div>
         <span class="pill rarity-rare">Locked</span>
+      </div>
+      <div class="talent-preview-banner small">
+        <strong>Locked preview</strong>
+        <span>Talents are planning-only. No talent spending is live yet.</span>
       </div>
       <div class="talent-point-line small" aria-label="Talent preview totals">
         <span><b>Branches:</b> ${F(summary.totalBranches)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
         <span><b>Nodes:</b> ${F(summary.totalNodes)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Status:</b> Locked preview</span>
+        <span><b>Status:</b> Preview locked</span>
       </div>
       <div class="talent-milestone-line small" aria-label="Talent preview status">
         <span><b>Locked nodes:</b> ${F(summary.lockedNodes)}</span>
         <span>Active nodes: ${F(summary.activeNodes)}</span>
       </div>
       <div class="talent-summary-row small muted">
-        <span>Future branches are mapped for planning only.</span>
+        <span>Preview only.</span>
         <span>Nothing is purchasable.</span>
         <span>No combat, economy, or save effects are active.</span>
       </div>
@@ -270,7 +283,7 @@
           </section>`).join('')}
       </div>
       <div class="talent-footer">
-        <span class="small muted">${H(summary.previewOnly ? 'Preview only. No spendable points or unlock actions exist here.' : '')}</span>
+        <span class="small muted">${H(summary.previewOnly ? 'Preview only. No spendable points, unlocks, or active bonuses exist here.' : '')}</span>
       </div>`;
   }
 

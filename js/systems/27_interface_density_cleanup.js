@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.11.0 - Interface density and app-feel cleanup.
+// DungeonDex v1.11.1 - Interface density and app-feel cleanup.
 // Broad low-risk UI/copy cleanup for Town, Lowfire Board, Relic Forge, talents, boss headers, and mobile spacing.
 (function(){
   if (window.DDInterfaceDensityCleanup) return;
   window.DDInterfaceDensityCleanup = true;
 
-  const BUILD = '1.11.0';
+  const BUILD = '1.11.1';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.11.0-talent-tree-preview';
+  const BUILD_QS = '1.11.1-talent-preview-copy-hardening';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -99,6 +99,9 @@
       #talentPanel .talent-head{gap:7px!important;margin-bottom:6px!important}
       #talentPanel .talent-head p{font-size:10.75px!important;line-height:1.22!important}
       #talentPanel .talent-passive-note{font-size:10.5px!important;line-height:1.1!important;padding:3px 7px!important;margin-top:5px!important}
+      #talentPanel .talent-preview-banner{display:flex;flex-direction:column;gap:2px;margin:4px 0 7px;padding:6px 8px;border:1px solid rgba(255,190,110,.14);border-radius:12px;background:rgba(255,255,255,.024)}
+      #talentPanel .talent-preview-banner strong{font-size:10.75px;line-height:1.05;color:#f2d59a}
+      #talentPanel .talent-preview-banner span{font-size:10.25px;line-height:1.2;color:rgba(231,221,205,.78)}
       #talentPanel .talent-point-line{gap:3px 6px!important;margin:4px 0 6px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-milestone-line{gap:3px 7px!important;margin:0 0 7px!important;padding:6px 7px!important;font-size:10.75px!important;line-height:1.18!important}
       #talentPanel .talent-summary-row{display:flex;flex-wrap:wrap;gap:5px!important;margin:5px 0 8px!important}
@@ -178,6 +181,15 @@
         .app-shell.combat-active .run-log-list{max-height:clamp(64px,12dvh,92px)!important}
         .app-shell.combat-active .combat-monster-stage{min-height:clamp(78px,14dvh,112px)!important}
         .app-shell.combat-active .combat-device-actions button{font-size:.62rem!important}
+      }
+
+      @media(max-width:340px){
+        #talentPanel .talent-preview-banner{margin-bottom:5px!important;padding:5px 7px!important}
+        #talentPanel .talent-preview-grid{gap:4px!important}
+        #talentPanel .talent-preview-branch{padding:5px!important}
+        #talentPanel .talent-preview-branch-head p{display:none!important}
+        #talentPanel .talent-preview-node-grid{display:none!important}
+        #talentPanel .talent-preview-tags{gap:2px!important;margin-top:2px!important}
       }
     `;
     document.head.appendChild(style);
