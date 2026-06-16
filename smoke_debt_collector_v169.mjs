@@ -233,6 +233,13 @@ async function main() {
 
     const smoke = await evaluate(client, `(() => window.DungeonDexDebtCollector.smoke())()`);
     record('Debt API smoke helper passes', !!smoke?.ok, JSON.stringify(smoke));
+    const debtHelperShape = asObject(await evaluate(client, `(() => ({
+      hasSummary: typeof window.DungeonDexDebtCollector?.debtCollectorDisplaySummary === 'function',
+      hasPressure: typeof window.DungeonDexDebtCollector?.debtPressureDisplay === 'function',
+      hasStatusLine: typeof window.DungeonDexDebtCollector?.debtCollectorStatusLine === 'function',
+      hasFallback: typeof window.DungeonDexDebtCollector?.debtCollectorFallbackState === 'function'
+    }))()`));
+    record('Debt display helpers exist', !!smoke?.summary && !!smoke?.pressure && typeof smoke?.statusLine === 'string' && debtHelperShape.hasSummary && debtHelperShape.hasPressure && debtHelperShape.hasStatusLine && debtHelperShape.hasFallback, JSON.stringify({ summary: smoke?.summary, pressure: smoke?.pressure, statusLine: smoke?.statusLine, debtHelperShape }));
 
     const uiResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;
@@ -250,12 +257,12 @@ async function main() {
         panelText: document.getElementById('debtCollectorPanel')?.innerText || ''
       };
     })()`));
-    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && /Borrow 10s/.test(uiResult.panelText) && /Debt Collector Ledger/.test(uiResult.panelText) && /Debt pressure is active/.test(uiResult.panelText), JSON.stringify(uiResult));
+    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && /Borrow 10s/.test(uiResult.panelText) && /Debt Collector/.test(uiResult.panelText) && /Pressure is visible/.test(uiResult.panelText), JSON.stringify(uiResult));
 
     await client.send('Page.reload', { ignoreCache: true });
     if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after persistence reload.');
     const persisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '' }))()`));
-    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && /Debt Collector Ledger/.test(persisted.panelText), JSON.stringify(persisted));
+    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && /Debt Collector/.test(persisted.panelText), JSON.stringify(persisted));
 
     const repayResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 300;
@@ -270,7 +277,7 @@ async function main() {
       return { partial, clear, partialHadHandler: !!partialButton && typeof partialButton.onclick === 'function' };
     })()`));
     record('Repay Debt spends available wallet partially', repayResult.partialHadHandler && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.active === true, JSON.stringify(repayResult.partial));
-    record('Full payoff clears active debt and pressure', repayResult.clear.wallet === 800 && repayResult.clear.debt.balanceCopper === 0 && repayResult.clear.debt.active === false && repayResult.clear.debt.pressure === 0 && /The ledger is quiet/.test(repayResult.clear.panelText) && /No debt pressure is active/.test(repayResult.clear.panelText), JSON.stringify(repayResult.clear));
+    record('Full payoff clears active debt and pressure', repayResult.clear.wallet === 800 && repayResult.clear.debt.balanceCopper === 0 && repayResult.clear.debt.active === false && repayResult.clear.debt.pressure === 0 && /No debt due/.test(repayResult.clear.panelText) && /Pressure is quiet/.test(repayResult.clear.panelText), JSON.stringify(repayResult.clear));
 
     const pressureResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;
@@ -289,6 +296,18 @@ async function main() {
       });
     })()`));
     record('Pressure increments on return only as atmosphere', pressureResult.pressureAfter === pressureResult.pressureBefore + 1 && pressureResult.statsSame && pressureResult.choicesSame, JSON.stringify(pressureResult));
+
+    const malformedResult = asObject(await evaluate(client, `(() => {
+      const raw = { player: { debtCollector: ['bad'], gold: 0 } };
+      const before = JSON.stringify(raw);
+      const summary = window.DungeonDexDebtCollector.debtCollectorDisplaySummary(raw);
+      const pressure = window.DungeonDexDebtCollector.debtPressureDisplay(raw);
+      const statusLine = window.DungeonDexDebtCollector.debtCollectorStatusLine(raw);
+      const fallback = window.DungeonDexDebtCollector.debtCollectorFallbackState();
+      const after = JSON.stringify(raw);
+      return JSON.stringify({ before, after, summary, pressure, statusLine, fallback });
+    })()`));
+    record('Malformed debt state falls back safely', malformedResult.before === malformedResult.after && malformedResult.summary?.statusLabel === 'No Debt' && malformedResult.pressure?.label === 'Pressure 0' && typeof malformedResult.statusLine === 'string' && malformedResult.fallback?.active === false, JSON.stringify(malformedResult));
 
     record('No runtime or console errors', runtimeErrors.length === 0 && consoleErrors.length === 0, JSON.stringify({ runtimeErrors, consoleErrors }));
 

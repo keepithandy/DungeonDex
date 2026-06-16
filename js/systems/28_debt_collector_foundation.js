@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.7.1a Debt Collector support.
+  // DungeonDex v1.19.0 Debt Collector support.
 (function(){
   if (window.DDDebtCollectorFoundation) return;
   window.DDDebtCollectorFoundation = true;
@@ -78,6 +78,48 @@
     return 'Debt pressure is active: someone remembers what you owe.';
   }
 
+  function debtCollectorDisplaySummary(state){
+    const debt = debtState(state);
+    return {
+      title: debt.balanceCopper > 0 ? 'Debt Collector' : 'Debt Collector',
+      summary: debt.balanceCopper > 0 ? 'Active debt. Pressure is visible.' : 'No active debt. Pressure is quiet.',
+      statusLabel: debt.balanceCopper > 0 ? 'Debt Active' : 'No Debt',
+      balanceLabel: `Owed ${moneyHtml(debt.balanceCopper)}`,
+      pressureLabel: debt.balanceCopper > 0 ? debt.pressure : 0,
+      lastVisitLabel: debt.lastVisitAt || 'None',
+      notesLabel: Array.isArray(debt.notes) && debt.notes.length ? `${debt.notes.length} note${debt.notes.length === 1 ? '' : 's'}` : 'No notes',
+      active: debt.active === true,
+      balanceCopper: debt.balanceCopper,
+      pressure: debt.pressure,
+      notes: Array.isArray(debt.notes) ? debt.notes.slice() : []
+    };
+  }
+
+  function debtPressureDisplay(state){
+    const debt = debtState(state);
+    if (debt.balanceCopper <= 0) return { label: 'Pressure 0', detail: 'Quiet', active: false };
+    if (debt.pressure <= 1) return { label: 'Pressure 1', detail: 'Watching', active: true };
+    if (debt.pressure <= 3) return { label: `Pressure ${debt.pressure}`, detail: 'Rising', active: true };
+    return { label: `Pressure ${debt.pressure}`, detail: 'High', active: true };
+  }
+
+  function debtCollectorStatusLine(state){
+    const debt = debtState(state);
+    return debt.balanceCopper > 0
+      ? `Owed ${moneyPlain(debt.balanceCopper)}. Pressure is visible.`
+      : 'No debt due. Pressure is quiet.';
+  }
+
+  function debtCollectorFallbackState(){
+    return {
+      active: false,
+      balanceCopper: 0,
+      pressure: 0,
+      lastVisitAt: 'None',
+      notes: []
+    };
+  }
+
   function borrowDebt(state, amount){
     if (!state || !state.player) return { ok: false, reason: 'missing state' };
     const borrowed = Math.max(0, Math.floor(Number(amount) || 0));
@@ -145,7 +187,8 @@
 
   function panelMarkup(state){
     const debt = debtState(state);
-    const chips = compactLabel(state);
+    const summary = debtCollectorDisplaySummary(state);
+    const pressure = debtPressureDisplay(state);
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     const canRepay = debt.balanceCopper > 0 && wallet > 0;
@@ -155,25 +198,26 @@
     const borrowButtons = BORROW_OPTIONS.map(option => `<button class="ghost mini" data-debt-borrow="${option.amount}">${escapeHtml(option.label)}</button>`).join('');
     return `<div class="split debt-collector-head">
       <div>
-        <h2>Debt Collector Ledger</h2>
-        <p>${debt.balanceCopper > 0 ? 'Borrowed coin is on the Lowfire ledger; pressure marks the risk.' : 'No debt marker is active; borrowing adds coin now and marks a pressure risk.'}</p>
+        <h2>${escapeHtml(summary.title)}</h2>
+        <p>${escapeHtml(summary.summary)}</p>
       </div>
-      <span class="pill debt-collector-status-pill ${statusClass}">${debt.balanceCopper > 0 ? 'Debt Active' : 'No Debt'}</span>
+      <span class="pill debt-collector-status-pill ${statusClass}">${escapeHtml(summary.statusLabel)}</span>
     </div>
-    <p class="small muted debt-collector-flavor">${escapeHtml(pressureWarning(debt))}</p>
+    <p class="small muted debt-collector-flavor">${escapeHtml(debtCollectorStatusLine(state))}</p>
     <div class="tag-row debt-collector-chips" aria-label="Debt Collector status">
-      <span class="pill debt-collector-chip ${chips.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(chips.clear)}</span>
-      <span class="pill debt-collector-chip">Owed ${chips.balance}</span>
-      <span class="pill debt-collector-chip">${escapeHtml(chips.pressure)}</span>
+      <span class="pill debt-collector-chip ${summary.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(summary.statusLabel)}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(summary.balanceLabel)}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(pressure.label)}${pressure.detail ? ` • ${escapeHtml(pressure.detail)}` : ''}</span>
     </div>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
       <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
     </div>
-    <p class="small muted debt-collector-terms">Repay spends purse coin. Pressure is a visible risk marker only; it does not change combat or rewards.</p>
+    <p class="small muted debt-collector-terms">Repay spends purse coin. Pressure is visible only.</p>
     <div class="debt-collector-meta small">
-      <span><b>Debt Active:</b> ${debt.active ? 'Yes' : 'No'}</span>
-      <span><b>Last Visit:</b> ${escapeHtml(debt.lastVisitAt || 'None')}</span>
+      <span><b>Status:</b> ${escapeHtml(summary.statusLabel)}</span>
+      <span><b>Last Visit:</b> ${escapeHtml(summary.lastVisitLabel)}</span>
+      <span><b>Notes:</b> ${escapeHtml(summary.notesLabel)}</span>
     </div>
     ${notes}`;
   }
@@ -254,7 +298,11 @@
     return {
       ok: Object.values(checks).every(Boolean),
       checks,
-      finalDebt: { ...state.player.debtCollector }
+      finalDebt: { ...state.player.debtCollector },
+      fallback: debtCollectorFallbackState(),
+      summary: debtCollectorDisplaySummary(state),
+      pressure: debtPressureDisplay(state),
+      statusLine: debtCollectorStatusLine(state)
     };
   }
 
@@ -296,6 +344,10 @@
     repay: repayDebt,
     pressureReturn: recordDebtReturn,
     state: debtState,
+    debtCollectorDisplaySummary,
+    debtPressureDisplay,
+    debtCollectorStatusLine,
+    debtCollectorFallbackState,
     warning: pressureWarning,
     smoke
   };

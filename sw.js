@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.18.0-archive-trophy-player-facing-cleanup';
+const CACHE_NAME = 'dungeondex-v1.19.0-debt-collector-visibility-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.18.0-archive-trophy-player-facing-cleanup';
+const BUILD_QS = '1.19.0-debt-collector-visibility-polish';
 const ASSETS = [
   './',
   './index.html',

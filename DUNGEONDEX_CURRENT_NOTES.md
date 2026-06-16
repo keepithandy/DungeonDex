@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.18.0 - Archive / Trophy Hall Player-Facing Cleanup
+- DungeonDex v1.19.0 - Debt Collector Visibility Polish
 
-## v1.18.0 Archive / Trophy Hall Player-Facing Cleanup
-- Current baseline: v1.18.0.
+## v1.19.0 Debt Collector Visibility Polish
+- Current baseline: v1.19.0.
 - Added a deterministic district identity layer for display-only naming, subtitles, flavor, and boss-approach copy.
 - Town now shows a compact current-district display with one-line flavor and a short next-descent line.
 - Combat now surfaces the district subtitle and boss approach line while keeping HP and progress readable first.
