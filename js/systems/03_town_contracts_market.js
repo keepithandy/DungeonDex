@@ -1448,6 +1448,26 @@
     };
   }
 
+  function revisitRouteActivationSummary(state = S) {
+    const plan = revisitRouteActivationPlan(state);
+    const routeStates = asArray(plan?.routeStates, []);
+    const eligibleRoutes = asArray(plan?.eligibleRoutes, []);
+    return {
+      contractId: String(plan?.contractId || 'revisit_route_activation_contract_v1'),
+      allowedStates: asArray(plan?.allowedFutureRouteStates, ['locked', 'planned', 'eligible-preview', 'playable-later']).slice(),
+      currentLockedCount: routeStates.length,
+      currentPlayableCount: 0,
+      currentPreviewOnly: true,
+      hasLiveEntry: false,
+      hasRewards: false,
+      hasCompletion: false,
+      status: String(plan?.status || 'Planning only'),
+      note: 'Preview-state vocabulary only. No route entry, reward, or completion is exposed.',
+      routeStateCount: routeStates.length,
+      eligibleRouteCount: eligibleRoutes.length
+    };
+  }
+
   function canStartRevisitRoute(state = S, routeKey = '') {
     if (!state || typeof state !== 'object') return false;
     if (!state.player || typeof state.player !== 'object') return false;
@@ -2154,6 +2174,9 @@
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);
+      },
+      revisitRouteActivationSummary(state = S) {
+        return revisitRouteActivationSummary(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);

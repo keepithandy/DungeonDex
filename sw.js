@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.6-revisit-preview-state-contract-smoke';
+const CACHE_NAME = 'dungeondex-v1.19.7-revisit-preview-state-summary-contract';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.6-revisit-preview-state-contract-smoke';
+const BUILD_QS = '1.19.7-revisit-preview-state-summary-contract';
 const ASSETS = [
   './',
   './index.html',
