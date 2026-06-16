@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.7-revisit-preview-state-summary-contract';
+const CACHE_NAME = 'dungeondex-v1.19.8-revisit-route-preview-summary-mirror';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.7-revisit-preview-state-summary-contract';
+const BUILD_QS = '1.19.8-revisit-route-preview-summary-mirror';
 const ASSETS = [
   './',
   './index.html',

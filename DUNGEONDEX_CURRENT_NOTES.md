@@ -7,12 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.7 - Revisit Preview-State Summary Contract
+- DungeonDex v1.19.8 - Revisit Route-Preview Summary Mirror
 
-## v1.19.7 Revisit Preview-State Summary Contract
-- Current baseline: v1.19.7.
-- Added a read-only activation summary helper for the revisit preview-state vocabulary.
-- Extended smoke coverage to prove the summary stays preview-only and still exposes no live entry, reward, or completion surface.
+## v1.19.8 Revisit Route-Preview Summary Mirror
+- Current baseline: v1.19.8.
+- Added a read-only route-preview summary mirror for the revisit preview-state vocabulary.
+- Extended smoke coverage to prove the mirror stays preview-only and still exposes no live entry, reward, or completion surface.
 - Revisit routes remain locked, inactive, and non-playable.
 - No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 

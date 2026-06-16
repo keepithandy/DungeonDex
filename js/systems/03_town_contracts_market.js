@@ -1468,6 +1468,27 @@
     };
   }
 
+  function revisitRoutePreviewStateSummary(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const routeSummary = revisitRouteSummary(safeState);
+    const allowedStates = ['locked', 'planned', 'eligible-preview', 'playable-later'];
+    const stableHookLabels = Array.from(new Set(routes.map(route => String(route?.hookSource || '').trim()).filter(Boolean)));
+    return {
+      contractId: 'revisit_route_preview_state_summary_v1',
+      allowedStates,
+      totalPreviewCount: routes.length,
+      lockedPreviewCount: routeSummary?.locked ?? routes.filter(route => route && route.locked).length,
+      playablePreviewCount: 0,
+      currentPreviewOnly: true,
+      hasLiveEntry: false,
+      hasRewards: false,
+      hasCompletion: false,
+      stableHookLabels,
+      note: 'Route-preview mirror only. No live entry, reward, or completion is exposed.'
+    };
+  }
+
   function canStartRevisitRoute(state = S, routeKey = '') {
     if (!state || typeof state !== 'object') return false;
     if (!state.player || typeof state.player !== 'object') return false;
@@ -2177,6 +2198,9 @@
       },
       revisitRouteActivationSummary(state = S) {
         return revisitRouteActivationSummary(state);
+      },
+      revisitRoutePreviewStateSummary(state = S) {
+        return revisitRoutePreviewStateSummary(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);
