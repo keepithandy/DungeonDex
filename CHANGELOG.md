@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.17.0`
-* Current development target: `v1.17.0`
+* Current local package baseline: `v1.17.1`
+* Current development target: `v1.17.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -18,7 +18,7 @@ This changelog records what changed and why.
 
 ---
 
-## v1.17.0 - District / World Identity Pass
+## v1.17.1 - District Identity Readability / Smoke Polish
 
 * Added a deterministic district identity layer for display-only naming, subtitles, flavor, and boss-approach copy.
 * Tightened Town and combat header copy so the current district and next-descent language reads more cleanly on mobile.

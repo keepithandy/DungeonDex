@@ -105,9 +105,9 @@
     const fallback = {
       key: 'lowfire',
       name: 'Lowfire District',
-      subtitle: 'Warm start, shallow haul.',
-      shortFlavor: 'The first district keeps its lamps low and its debts warm.',
-      bossApproachLine: 'Boss approach: the Stair keeps tightening.',
+      subtitle: 'Warm start.',
+      shortFlavor: 'Lamps stay low and debts stay warm.',
+      bossApproachLine: 'Boss approach: the Stair tightens.',
       safeFallback: true
     };
     const identities = {
@@ -122,73 +122,73 @@
       ashgate: {
         key: 'ashgate',
         name: 'Ashgate Warrens',
-        subtitle: 'Narrow paths, old retreats.',
-        shortFlavor: 'The warrens stay tight, smoky, and easy to remember wrong.',
-        bossApproachLine: 'Boss approach: ash makes every landing feel closer.',
+        subtitle: 'Narrow paths.',
+        shortFlavor: 'The warrens stay tight and smoky.',
+        bossApproachLine: 'Boss approach: ash closes the distance.',
         safeFallback: false
       },
       'ember-debtworks': {
         key: 'ember-debtworks',
         name: 'Ember Debtworks',
-        subtitle: 'Chains, ledgers, red worklight.',
-        shortFlavor: 'The lower halls glow like a ledger that never closes.',
-        bossApproachLine: 'Boss approach: the debtwork lamps burn harder.',
+        subtitle: 'Chains and ledgers.',
+        shortFlavor: 'The lower halls glow like an open ledger.',
+        bossApproachLine: 'Boss approach: the lamps burn harder.',
         safeFallback: false
       },
       sootveil: {
         key: 'sootveil',
         name: 'Sootveil Depths',
-        subtitle: 'Smoke-thick, quiet, and dim.',
-        shortFlavor: 'Soot gathers thick enough to hide old stair cuts.',
-        bossApproachLine: 'Boss approach: visibility drops before the fight does.',
+        subtitle: 'Smoke-thick.',
+        shortFlavor: 'Soot hides the old stair cuts.',
+        bossApproachLine: 'Boss approach: the light drops first.',
         safeFallback: false
       },
       cinderbone: {
         key: 'cinderbone',
         name: 'Cinderbone Halls',
-        subtitle: 'Old stone, hotter bones.',
-        shortFlavor: 'The halls feel built from older victories and hotter ash.',
-        bossApproachLine: 'Boss approach: the walls sound hollow now.',
+        subtitle: 'Old stone.',
+        shortFlavor: 'Older victories still heat the ash.',
+        bossApproachLine: 'Boss approach: the walls sound hollow.',
         safeFallback: false
       },
       blacktithe: {
         key: 'blacktithe',
         name: 'Blacktithe Reliquary',
-        subtitle: 'Grave tolls and paid dues.',
-        shortFlavor: 'Every chamber feels taxed by something that never left.',
-        bossApproachLine: 'Boss approach: the toll grows louder near bosses.',
+        subtitle: 'Grave tolls.',
+        shortFlavor: 'Every chamber still feels taxed.',
+        bossApproachLine: 'Boss approach: the toll grows louder.',
         safeFallback: false
       },
       lanternless: {
         key: 'lanternless',
         name: 'Lanternless Vaults',
-        subtitle: 'Dark archive, sealed quiet.',
-        shortFlavor: 'The vaults keep the light out and the memory in.',
-        bossApproachLine: 'Boss approach: the dark starts to feel deliberate.',
+        subtitle: 'Sealed quiet.',
+        shortFlavor: 'The vaults keep the light out.',
+        bossApproachLine: 'Boss approach: the dark turns deliberate.',
         safeFallback: false
       },
       'hunger-kilns': {
         key: 'hunger-kilns',
         name: 'Hunger Kilns',
-        subtitle: 'Hot vents, thin rations.',
-        shortFlavor: 'The kilns breathe hard, as if the stone itself is hungry.',
-        bossApproachLine: 'Boss approach: heat rises before the boss does.',
+        subtitle: 'Hot vents.',
+        shortFlavor: 'The kilns breathe like they’re hungry.',
+        bossApproachLine: 'Boss approach: heat rises first.',
         safeFallback: false
       },
       redwake: {
         key: 'redwake',
         name: 'Redwake Channels',
-        subtitle: 'Wet stone, sharp currents.',
-        shortFlavor: 'The channels pull at the stair like old blood in water.',
-        bossApproachLine: 'Boss approach: the current turns before the fight.',
+        subtitle: 'Wet stone.',
+        shortFlavor: 'The channels pull like old blood in water.',
+        bossApproachLine: 'Boss approach: the current turns early.',
         safeFallback: false
       },
       'final-lowflame': {
         key: 'final-lowflame',
         name: 'Lowflame Deep',
-        subtitle: 'Small light, deep reach.',
-        shortFlavor: 'The last stretch keeps the flame low and the walls close.',
-        bossApproachLine: 'Boss approach: the Stair is nearly at its end.',
+        subtitle: 'Small light.',
+        shortFlavor: 'The last stretch keeps the flame low.',
+        bossApproachLine: 'Boss approach: the Stair nears its end.',
         safeFallback: false
       }
     };
@@ -198,7 +198,7 @@
       name: district?.name || fallback.name,
       subtitle: district?.line || fallback.subtitle,
       shortFlavor: district?.mood || district?.line || fallback.shortFlavor,
-      bossApproachLine: 'Boss approach: the Stair keeps tightening.'
+      bossApproachLine: 'Boss approach: the Stair tightens.'
     };
   }
 

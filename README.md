@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.17.0**
+Current baseline: **DungeonDex v1.17.1**
 
 ## Current Build
 
-**v1.17.0 - District / World Identity Pass**
+**v1.17.1 - District Identity Readability / Smoke Polish**
 
 This version strengthens the dungeon’s district/world identity with display-only naming and compact flavor copy without changing gameplay, combat, rewards, progression, talent behavior, or revisit behavior.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.17.0 keeps the district identity layer display-only while preserving the locked Talent Tree Preview and the existing smoke coverage.
+v1.17.1 keeps the district identity layer display-only while preserving the locked Talent Tree Preview and the existing smoke coverage.
 
 ## Running Locally
 

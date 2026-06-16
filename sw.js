@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.17.0-district-world-identity-pass';
+const CACHE_NAME = 'dungeondex-v1.17.1-district-identity-readability-smoke-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.17.0-district-world-identity-pass';
+const BUILD_QS = '1.17.1-district-identity-readability-smoke-polish';
 const ASSETS = [
   './',
   './index.html',
