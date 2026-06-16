@@ -9,14 +9,20 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.19.8`
-* Current development target: `v1.19.8`
+* Current local package baseline: `v1.19.9`
+* Current development target: `v1.19.9`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.19.9 - Revisit First Lane Selection Contract
+
+* Selected Trophy Echo as the first planned revisit activation lane in a read-only contract.
+* Extended smoke coverage to prove the lane stays planned-only and still exposes no live entry, reward, or completion surface.
+* No revisit activation, route entry, route rewards, route completion, combat, economy, debt, trophy, Famous Gear, Elite Board, or main progression behavior changed.
 
 ## v1.19.8 - Revisit Route-Preview Summary Mirror
 

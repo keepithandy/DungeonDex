@@ -1489,6 +1489,27 @@
     };
   }
 
+  function revisitFirstActivationLane(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const trophyRoute = routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null;
+    return {
+      laneKey: 'trophy-echo',
+      laneLabel: 'Trophy Echo',
+      sourceHook: 'Trophy Echo',
+      currentStatus: 'planned',
+      previewOnly: true,
+      hasLiveEntry: false,
+      hasRewards: false,
+      hasCompletion: false,
+      routeKey: 'trophy_echo_route',
+      routeLabel: String(trophyRoute?.title || 'Trophy Echo Route'),
+      reason: 'Derived from existing boss and trophy history only.',
+      note: 'First planned revisit lane. Planning only.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+    };
+  }
+
   function canStartRevisitRoute(state = S, routeKey = '') {
     if (!state || typeof state !== 'object') return false;
     if (!state.player || typeof state.player !== 'object') return false;
@@ -2201,6 +2222,9 @@
       },
       revisitRoutePreviewStateSummary(state = S) {
         return revisitRoutePreviewStateSummary(state);
+      },
+      revisitFirstActivationLane(state = S) {
+        return revisitFirstActivationLane(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);
