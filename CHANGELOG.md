@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.16.0`
-* Current development target: `v1.16.0`
+* Current local package baseline: `v1.16.1`
+* Current development target: `v1.16.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -18,7 +18,7 @@ This changelog records what changed and why.
 
 ---
 
-## v1.16.0 - Talent Passive Preview Mapping
+## v1.16.1 - Talent Preview Layout / Smoke Hardening
 
 * Mapped future passive talent candidates into the locked Talent Tree Preview for clearer planning copy.
 * Added Survivor, Hunter, Delver, and Collector passive preview branches with compact passive-only node copy.

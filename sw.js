@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.16.0-talent-passive-preview-mapping';
+const CACHE_NAME = 'dungeondex-v1.16.1-talent-preview-layout-smoke-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.16.0-talent-passive-preview-mapping';
+const BUILD_QS = '1.16.1-talent-preview-layout-smoke-hardening';
 const ASSETS = [
   './',
   './index.html',

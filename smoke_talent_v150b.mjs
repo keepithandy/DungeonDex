@@ -435,6 +435,11 @@ async function main() {
         passiveSummary,
         branchSummary,
         nodeDetails,
+        api: {
+          passiveSummary: typeof api.passivePreviewSummary === 'function',
+          previewBranchSummary: typeof api.previewBranchSummary === 'function',
+          previewNodeDetails: typeof api.previewNodeDetails === 'function'
+        },
         ruleset: rulesetSnapshot,
         summary,
         nodes: nodesSnapshot
@@ -612,10 +617,10 @@ async function main() {
           panel: !!panel,
           overflow,
           panelOverflow,
-          hasPreviewTotals: text.includes('Branches: 4') && text.includes('Nodes: 12') && text.includes('Status: Locked preview only.'),
-          hasPreviewStatus: text.includes('Locked nodes: 10') && text.includes('Active nodes: 0'),
-          hasPreviewBranches: ['Survival', 'Strikes', 'Relics', 'Contracts', 'Memory'].every(name => text.includes(name)),
-          hasPreviewNote: text.includes('Preview only. No active bonus.') && text.includes('No gameplay effect yet.') && text.includes('No talent spending is live yet.')
+          hasPreviewTotals: text.includes('Branches: 4') && text.includes('Nodes: 12') && text.includes('Status: Locked / preview only'),
+          hasPreviewStatus: text.includes('Locked nodes: 12') && text.includes('Active nodes: 0'),
+          hasPreviewBranches: ['Survivor', 'Hunter', 'Delver', 'Collector'].every(name => text.includes(name)),
+          hasPreviewNote: text.includes('Preview only.') && text.includes('Inactive.') && text.includes('No gameplay effects.')
         };
       })()`);
     };
@@ -708,6 +713,29 @@ async function main() {
     record('Talent ruleset source/caps/costs are stable and inactive', rulesetSourceOk && ruleset.pointCaps?.earlyCap === 6 && ruleset.pointCaps?.activeCap === 0 && ruleset.pointCaps?.spendableCap === 0 && ruleset.costModel?.activeCost === 0 && ruleset.costModel?.costsByTier?.['1'] === 1 && ruleset.costModel?.costsByTier?.['2'] === 2 && ruleset.costModel?.costsByTier?.['3'] === 3, JSON.stringify({ pointSources: ruleset.pointSources, pointCaps: ruleset.pointCaps, costModel: ruleset.costModel }));
     record('Talent ruleset branch/tier/node data is locked', rulesetBranchesOk && rulesetTiersOk && rulesetNodesOk, JSON.stringify({ branches: ruleset.branches, tiers: ruleset.tiers, nodes: rulesetNodes.slice(0, 3) }));
     record('Talent passive preview map exists', !!rulesetAudit?.passiveMap && Object.keys(rulesetAudit.passiveMap).length === 4 && rulesetAudit.passiveSummary?.branchName === 'Survivor' && rulesetAudit.branchSummary?.branchName && rulesetAudit.nodeDetails?.locked === true && rulesetAudit.nodeDetails?.previewOnly === true, JSON.stringify({ passiveSummary: rulesetAudit.passiveSummary, branchSummary: rulesetAudit.branchSummary, nodeDetails: rulesetAudit.nodeDetails }));
+    const previewSafety = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api) return null;
+      const before = JSON.stringify({ talents: S.player?.talents || null, talentPointsEarned: S.player?.talentPointsEarned, talentPointsSpent: S.player?.talentPointsSpent, talentPoints: S.player?.talentPoints, talentUnlockIds: S.player?.talentUnlockIds || [] });
+      const passiveMap = typeof api.passivePreviewMap === 'function' ? api.passivePreviewMap() : null;
+      const summaryUnknown = typeof api.passivePreviewSummary === 'function' ? api.passivePreviewSummary('missing-branch') : null;
+      const summaryMalformed = typeof api.previewBranchSummary === 'function' ? api.previewBranchSummary(null) : null;
+      const nodeUnknown = typeof api.previewNodeDetails === 'function' ? api.previewNodeDetails(null) : null;
+      const nodeMalformed = typeof api.previewNodeDetails === 'function' ? api.previewNodeDetails({}) : null;
+      if (passiveMap?.survivor) passiveMap.survivor.branchName = '__mutated__';
+      const after = JSON.stringify({ talents: S.player?.talents || null, talentPointsEarned: S.player?.talentPointsEarned, talentPointsSpent: S.player?.talentPointsSpent, talentPoints: S.player?.talentPoints, talentUnlockIds: S.player?.talentUnlockIds || [] });
+      return {
+        before,
+        after,
+        passiveMap,
+        summaryUnknown,
+        summaryMalformed,
+        nodeUnknown,
+        nodeMalformed,
+        apiKeys: Object.keys(api || {})
+      };
+    })()`);
+    record('Talent preview helpers stay defensive on unknown inputs', !!previewSafety && previewSafety.before === previewSafety.after && previewSafety.passiveMap && previewSafety.passiveMap.survivor?.branchName !== '__mutated__' && previewSafety.summaryUnknown?.locked === true && previewSafety.summaryUnknown?.previewOnly === true && previewSafety.summaryUnknown?.active === false && previewSafety.summaryUnknown?.gameplayEnabled === false && previewSafety.summaryUnknown?.nodeCount === 0 && previewSafety.summaryMalformed?.locked === true && previewSafety.summaryMalformed?.previewOnly === true && previewSafety.nodeUnknown?.locked === true && previewSafety.nodeUnknown?.previewOnly === true && previewSafety.nodeUnknown?.active === false && previewSafety.nodeUnknown?.gameplayEnabled === false && previewSafety.nodeUnknown?.learned === false && previewSafety.nodeUnknown?.applied === false && previewSafety.nodeUnknown?.effectValue === 0 && previewSafety.nodeMalformed?.locked === true && previewSafety.nodeMalformed?.previewOnly === true && previewSafety.nodeMalformed?.active === false && previewSafety.nodeMalformed?.gameplayEnabled === false && previewSafety.nodeMalformed?.effectValue === 0, JSON.stringify(previewSafety));
     record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === false && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 12 && rulesetSummary.activeCap === 0 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
@@ -739,11 +767,11 @@ async function main() {
     record('Route preview helper shape is stable', Array.isArray(revisitRoutes) && routeShapeOk && revisitMarketSource.includes('function revisitRoutePreviews(state = S)') && revisitMarketSource.includes('function revisitRouteSummary(state = S)'), JSON.stringify({ routesType: Array.isArray(revisitRoutes) ? 'array' : typeof revisitRoutes, summary: revisitRouteSummary, sample: Array.isArray(revisitRoutes) ? revisitRoutes.slice(0, 3) : revisitRoutes }));
     record('Revisit helper avoids preview language', revisitPreviewCleanV2, townRevisitText.slice(0, 300));
     const freshPanelText = await getTalentText();
-    record('Talent panel renders preview header', freshPanelText.includes('Talent Tree Preview') && freshPanelText.includes('Talent Tree Preview is locked. No talent points, purchases, unlocks, or bonuses are active yet.') && freshPanelText.includes('Preview only. Locked. Inactive. No gameplay effect yet.'), freshPanelText.slice(0, 300));
-    record('Talent preview banner is visible', freshPanelText.includes('Locked preview') && freshPanelText.includes('Talents are planning-only. No talent spending is live yet.'), freshPanelText.slice(0, 300));
-    record('Talent ledger copy is visible', freshPanelText.includes('Talent Ledger') && freshPanelText.includes('Foundation only. Talent points cannot be earned or spent yet.') && freshPanelText.includes('0 available') && freshPanelText.includes('Spending inactive'), freshPanelText.slice(0, 400));
-    record('Talent preview branches are readable', ['Survival', 'Strikes', 'Relics', 'Contracts', 'Memory'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
-    record('Talent preview states are locked and inactive', freshPanelText.includes('Preview only. No active bonus.') && freshPanelText.includes('No gameplay effect yet.') && freshPanelText.includes('Nothing is purchasable.') && freshPanelText.includes('No combat, economy, or save effects are active.'), freshPanelText.slice(0, 400));
+    record('Talent panel renders preview header', freshPanelText.includes('Talent Tree Preview') && freshPanelText.includes('Locked preview only. No talent points, purchases, unlocks, or bonuses are active.') && freshPanelText.includes('Planned passives only. Inactive.'), freshPanelText.slice(0, 300));
+    record('Talent preview banner is visible', freshPanelText.includes('Locked preview') && freshPanelText.includes('Planning only. No earning, spending, or bonuses.'), freshPanelText.slice(0, 300));
+    record('Talent ledger copy is visible', freshPanelText.includes('Talent Ledger') && freshPanelText.includes('Ledger preview only. Earning and spending stay off.') && freshPanelText.includes('0 available') && freshPanelText.includes('Spending inactive'), freshPanelText.slice(0, 400));
+    record('Talent preview branches are readable', ['Survivor', 'Hunter', 'Delver', 'Collector'].every(name => freshPanelText.includes(name)), freshPanelText.slice(0, 300));
+    record('Talent preview states are locked and inactive', freshPanelText.includes('Preview only.') && freshPanelText.includes('Inactive.') && freshPanelText.includes('No gameplay effects.'), freshPanelText.slice(0, 400));
     record('Talent preview nodes remain inert', freshPanelText.includes('Locked') && freshPanelText.includes('Preview') && freshPanelText.includes('Planned') && freshPanelText.includes('Inactive'), freshPanelText.slice(0, 400));
     record('Zero-point state shows preview locks', freshPanelText.includes('Locked preview only') && !freshPanelText.includes('Need Point') && !freshPanelText.includes('Unlock Talent') && !freshPanelText.includes('Buy Talent'), freshPanelText.slice(0, 400));
     const freshBossDexText = await getBossTrophyText();
@@ -798,7 +826,7 @@ async function main() {
       const panel = document.getElementById('talentPanel');
       return panel ? panel.innerText : '';
     })()`);
-    record('Max-point preview state displays safely', maxPanelText.includes('Talent Tree Preview') && maxPanelText.includes('Talent Tree Preview is locked. No talent points, purchases, unlocks, or bonuses are active yet.') && maxPanelText.includes('Branches: 4') && maxPanelText.includes('Nodes: 12'), maxPanelText.slice(0, 400));
+    record('Max-point preview state displays safely', maxPanelText.includes('Talent Tree Preview') && maxPanelText.includes('Locked preview only. No talent points, purchases, unlocks, or bonuses are active.') && maxPanelText.includes('Branches: 4') && maxPanelText.includes('Nodes: 12'), maxPanelText.slice(0, 400));
     record('Max-point preview still shows ledger foundation', maxPanelText.includes('Talent Ledger') && maxPanelText.includes('Spending inactive') && maxPanelText.includes('0 available'), maxPanelText.slice(0, 400));
     await clearSave(client);
     await client.send('Page.reload', { ignoreCache: true });
@@ -857,8 +885,8 @@ async function main() {
     const repairedSummary = await getSummary();
     record('Legacy aliases repair to locked zero state', repairedSummary && repairedSummary.pointsEarned === 0 && repairedSummary.pointsSpent === 0 && repairedSummary.pointsAvailable === 0 && Array.isArray(repairedSummary.unlockedIds) && repairedSummary.unlockedIds.length === 0, JSON.stringify(repairedSummary));
     const repairedPanelText = await getTalentText();
-    record('Repaired save preview display is safe', repairedPanelText.includes('Talent Tree Preview') && repairedPanelText.includes('Preview only. No active bonus.') && repairedPanelText.includes('No gameplay effect yet.'), repairedPanelText.slice(0, 400));
-    record('Repaired save ledger display is safe', repairedPanelText.includes('Talent Ledger') && repairedPanelText.includes('Foundation only. Talent points cannot be earned or spent yet.'), repairedPanelText.slice(0, 400));
+    record('Repaired save preview display is safe', repairedPanelText.includes('Talent Tree Preview') && repairedPanelText.includes('Locked preview only. No talent points, purchases, unlocks, or bonuses are active.') && repairedPanelText.includes('Planned passives only. Inactive.'), repairedPanelText.slice(0, 400));
+    record('Repaired save ledger display is safe', repairedPanelText.includes('Talent Ledger') && repairedPanelText.includes('Ledger preview only. Earning and spending stay off.'), repairedPanelText.slice(0, 400));
 
     // Unknown id scenario.
     const unknownSave = JSON.parse(JSON.stringify(await readSave(client)));
@@ -881,7 +909,7 @@ async function main() {
     const unknownSummary = await getSummary();
     record('Unknown talent id repairs to locked zero state', unknownSummary && unknownSummary.pointsEarned === 0 && unknownSummary.pointsSpent === 0 && unknownSummary.pointsAvailable === 0 && Array.isArray(unknownSummary.unlockedIds) && unknownSummary.unlockedIds.length === 0, JSON.stringify(unknownSummary));
     const unknownPanelText = await getTalentText();
-    record('Unknown talent id hidden from UI', !unknownPanelText.includes('__unknown_talent__') && unknownPanelText.includes('Talent Tree Preview') && unknownPanelText.includes('Survival') && unknownPanelText.includes('Preview only'), unknownPanelText.slice(0, 300));
+    record('Unknown talent id hidden from UI', !unknownPanelText.includes('__unknown_talent__') && unknownPanelText.includes('Talent Tree Preview') && unknownPanelText.includes('Survivor') && unknownPanelText.includes('Preview only'), unknownPanelText.slice(0, 300));
     record('Unknown talent id keeps ledger foundation', unknownPanelText.includes('Talent Ledger') && unknownPanelText.includes('Spending inactive'), unknownPanelText.slice(0, 300));
 
     const ledgerRepairBase = JSON.parse(JSON.stringify(await readSave(client)));

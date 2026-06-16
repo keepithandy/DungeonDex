@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.16.0 - Talent Passive Preview Mapping
+- DungeonDex v1.16.1 - Talent Preview Layout / Smoke Hardening
 
-## v1.16.0 Talent Passive Preview Mapping
-- Current baseline: v1.16.0.
+## v1.16.1 Talent Preview Layout / Smoke Hardening
+- Current baseline: v1.16.1.
 - Added a locked passive preview mapping for the Talent Tree Preview so each branch reads as a simple future passive lane.
 - Branches now preview Survivor, Hunter, Delver, and Collector identities with compact passive-only planning text.
 - Added defensive passive preview helper output with locked, preview-only, inactive, and zero-effect status fields.
