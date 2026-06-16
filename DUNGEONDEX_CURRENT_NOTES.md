@@ -7,15 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.0 - Debt Collector Visibility Polish
+- DungeonDex v1.19.1 - Current Roadmap / Next Systems Audit
 
-## v1.19.0 Debt Collector Visibility Polish
-- Current baseline: v1.19.0.
-- Added a deterministic district identity layer for display-only naming, subtitles, flavor, and boss-approach copy.
-- Town now shows a compact current-district display with one-line flavor and a short next-descent line.
-- Combat now surfaces the district subtitle and boss approach line while keeping HP and progress readable first.
-- Smoke coverage now checks the district identity helper, stable fallback output, and state safety.
-- Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
+## v1.19.1 Current Roadmap / Next Systems Audit
+- Current baseline: v1.19.1.
+- Refreshed the project-facing roadmap so the next lane is clear after the debt collector visibility audit.
+- Kept the locked Talent Tree Preview and Talent Ledger read-only.
+- Kept Revisit Routes in preview/planning only.
+- Kept Debt Collector as a visibility and ledger layer only.
+- Kept Elite Board as the optional challenge layer.
+- Boss Trophy, Archive, and Famous Gear memory remain display-focused.
+- No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 
 ## v1.14.0 Revisit Route Content Completion
 - Current baseline: v1.14.0.

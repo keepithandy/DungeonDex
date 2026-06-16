@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.19.0**
+Current baseline: **DungeonDex v1.19.1**
 
 ## Current Build
 
-**v1.19.0 - Debt Collector Visibility Polish**
+**v1.19.1 - Current Roadmap / Next Systems Audit**
 
-This version strengthens the dungeon’s district/world identity with display-only naming and compact flavor copy without changing gameplay, combat, rewards, progression, talent behavior, or revisit behavior.
+This pass updates the project-facing roadmap and current notes so the next lane is clear after the debt collector visibility audit. It does not change gameplay, combat, rewards, progression, talent behavior, revisit behavior, or debt mechanics.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -127,20 +127,25 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Near-term development is focused on finishing the locked Talent System foundation while Trophy Echo planning remains checkpointed and non-playable.
+Current focus is on roadmap and visibility audits, not new gameplay activation. The locked foundations stay in place:
+
+* Talent Tree Preview and Talent Ledger remain locked and read-only.
+* Revisit Routes remain preview/planning only.
+* Debt Collector remains a visibility and ledger layer only.
+* Elite Board remains the optional challenge layer.
+* Boss Trophy, Archive, and Famous Gear memory remain display-focused.
 
 Candidate next lanes:
 
-1. Talent Passive Preview Mapping
-2. Debt Collector Visibility / Risk Pressure
-3. Famous Gear Memory Attachment
-4. Boss Trophy / Dex Identity
-5. District / World Identity
-6. Trophy Echo UI Readiness Preview, still non-playable
+1. Revisit route activation planning
+2. Talent foundation next-step planning
+3. Monster Codex / monster identity expansion planning
+4. Archive / Famous Gear memory polish
+5. Elite Board clarity polish
 
 Recommended next lane:
 
-**Talent Passive Preview Mapping** is the active next systems lane. Keep the next talent patch focused on mapping simple passive candidates to the locked ruleset before any behavior changes, and keep any future playable Trophy Echo work separate and explicitly approved.
+**Revisit route activation planning** is the next systems lane to evaluate, but it should stay in planning only until explicitly approved.
 
 ## Project Status
 

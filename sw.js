@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.0-debt-collector-visibility-polish';
+const CACHE_NAME = 'dungeondex-v1.19.1-current-roadmap-next-systems-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.0-debt-collector-visibility-polish';
+const BUILD_QS = '1.19.1-current-roadmap-next-systems-audit';
 const ASSETS = [
   './',
   './index.html',

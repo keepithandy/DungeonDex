@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.19.0`
-* Current development target: `v1.19.0`
+* Current local package baseline: `v1.19.1`
+* Current development target: `v1.19.1`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.19.1 - Current Roadmap / Next Systems Audit
+
+* Refreshed the project-facing roadmap so the next lane is clear after the debt collector visibility audit.
+* Kept the locked Talent Tree Preview, revisit planning, Debt Collector ledger layer, Elite Board behavior, and archive memory systems unchanged.
+* Reaffirmed the next recommended lane as revisit route activation planning, in planning only.
+* No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 
 ## v1.19.0 - Debt Collector Visibility Polish
 
