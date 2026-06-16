@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.17.1-district-identity-readability-smoke-polish';
+const CACHE_NAME = 'dungeondex-v1.18.0-archive-trophy-player-facing-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.17.1-district-identity-readability-smoke-polish';
+const BUILD_QS = '1.18.0-archive-trophy-player-facing-cleanup';
 const ASSETS = [
   './',
   './index.html',

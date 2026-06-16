@@ -683,6 +683,16 @@
     return depthShortLabel(bestDepth);
   }
 
+  function bossTrophyDisplayName(entry) {
+    if (!isPlainObject(entry)) return 'Boss Trophy';
+    return cleanDisplayText(
+      typeof getBossTrophyDisplayName === 'function'
+        ? getBossTrophyDisplayName(entry)
+        : (entry.trophyName || entry.name || 'Boss Trophy'),
+      'Boss Trophy'
+    );
+  }
+
   function bossTrophyLastEarnedLabel(entry) {
     if (!isPlainObject(entry)) return 'Unknown Boss';
     const floor = Math.max(1, Math.floor(numberOr(entry.floor, 1, 1, 999999)));
@@ -698,7 +708,7 @@
   }
 
   function bossTrophyRecordCard(entry) {
-    const trophyName = typeof getBossTrophyDisplayName === 'function' ? getBossTrophyDisplayName(entry) : (entry.trophyName || entry.name || 'Boss Trophy');
+    const trophyName = bossTrophyDisplayName(entry);
     const bossName = cleanDisplayText(entry.bossName || entry.source || '', 'Unknown Boss');
     const count = `x${format(Math.max(1, numberOr(entry.count, 1, 1, 9999)))}`;
     const lastEarned = bossTrophyLastEarnedLabel(entry);
@@ -739,6 +749,20 @@
     const room = Math.max(1, Math.floor(numberOr(entry.room, 1, 1, 999999)));
     const chapter = Math.max(1, Math.floor(numberOr(entry.chapter, 1, 1, 999999)));
     return `F${format(floor)} • R${format(room)} • C${format(chapter)}`;
+  }
+
+  function retiredRelicDisplayName(entry) {
+    const item = retiredRelicItem(entry);
+    return cleanDisplayText(item.name || entry?.name || 'Unknown relic', 'Unknown relic');
+  }
+
+  function retiredRelicMemoryLabel(entry) {
+    const item = retiredRelicItem(entry);
+    const memory = gearMemoryModel(item);
+    if (!memory) return '';
+    const title = cleanDisplayText(memory.title || '', '');
+    const tags = asArray(memory.tags, []).map(tag => cleanDisplayText(tag || '', '')).filter(Boolean).slice(0, 2);
+    return ['Famous Gear Record'].concat(title ? [title] : [], tags).join(' • ');
   }
 
   function retiredRelicItem(entry) {
@@ -816,33 +840,34 @@
   }
 
   function retiredRelicEmptyState() {
-    return '<div class="empty-relic-shelf"><span>No retired gear yet.</span><small>Retire eligible gear from the Gear screen to add it to this archive.</small></div>';
+    return '<div class="empty-relic-shelf"><span>No retired gear yet.</span><small>Retire unequipped gear from the Gear screen to add a record.</small></div>';
   }
 
   function retiredRelicHelpText() {
     // TODO(v1.7): Let archive memory and famous gear point back toward revisited old zones without changing retirement rules.
-    return '<p class="small muted retired-relic-help">Retired gear is permanent collection history. Famous Gear memory is a read-only collection record, and retiring an item removes it from active use.</p>';
+    return '<p class="small muted retired-relic-help">Retired gear is a read-only record. Famous Gear memory stays display-only.</p>';
   }
 
   function revisitArchiveEchoMarkup(state = S) {
     const revisit = state?.player?.revisitState || {};
     if (revisit.unlocked) return '';
-    return `<div class="small muted">Earlier Dungeon Revisit stays planned. Candidate notes stay read-only for now.</div>`;
+    return `<div class="small muted">Earlier Dungeon Revisit stays removed. Notes remain read-only.</div>`;
   }
 
   function retiredRelicCard(entry) {
     const item = retiredRelicItem(entry);
-    const itemName = cleanDisplayText(item.name || 'Unknown relic', 'Unknown relic');
+    const itemName = retiredRelicDisplayName(entry);
     const slotLabel = cleanDisplayText(item.slot || entry.slot || 'gear', 'gear');
     const typeLabel = cleanDisplayText(item.type || entry.type || '', '');
     const rarityLabel = cleanDisplayText(item.rarity || entry.rarity || 'common', 'common');
-    const note = cleanDisplayText(entry.note || item.summary || 'Archive record preserved.', 'Archive record preserved.');
+    const note = cleanDisplayText(entry.note || item.summary || 'Record preserved.', 'Record preserved.');
     const source = cleanDisplayText(entry.source || 'DevTools Archive Record', 'DevTools Archive Record');
     const stamp = cleanDisplayText(entry.stamp || '', '');
     const valueLabel = typeof moneyText === 'function'
       ? moneyText(numberOr(entry.value, item.value, 0, Number.MAX_SAFE_INTEGER))
       : format(numberOr(entry.value, item.value, 0, Number.MAX_SAFE_INTEGER));
     const memoryPills = gearMemoryPills(item);
+    const memoryLabel = retiredRelicMemoryLabel(entry);
     const slotType = gearSlotTypeText(slotLabel, typeLabel);
     return `<article class="retired-relic-card">
       <div class="retired-relic-card-head">
@@ -858,6 +883,7 @@
         <span class="pill">Rating ${format(retiredRelicRating(entry))}</span>
         <span class="pill">${escapeHtml(valueLabel)}</span>
       </div>
+      ${memoryLabel ? `<div class="small muted retired-relic-memory-label">${escapeHtml(memoryLabel)}</div>` : ''}
       ${memoryPills ? `<div class="tag-row retired-relic-memory">${memoryPills}</div>` : ''}
       <div class="retired-relic-meta small muted">${escapeHtml(retiredRelicDepthLabel(entry))}${stamp ? ` • Retired ${escapeHtml(stamp)}` : ''}</div>
       <div class="retired-relic-note">${escapeHtml(note)}</div>
@@ -912,27 +938,27 @@
     const bossTotalLabel = bossSummary.totalDefinitions > 0
       ? `${format(bossSummary.recordedCount)} / ${format(bossSummary.totalDefinitions)}`
       : `${format(bossSummary.recordedCount)}`;
-    const bossEmptyState = `<div class="boss-trophy-empty-state"><strong>No boss trophies collected yet</strong><p>Boss trophies are permanent collection records. Defeat a boss to add its name, depth, and count to the hall.</p><div class="small muted">Collection Record • No combat bonus • Recorded Collection • Missing Trophy Case.</div></div>`;
+    const bossEmptyState = `<div class="boss-trophy-empty-state"><strong>No boss trophies yet</strong><p>Defeat a boss to add a record to the hall.</p><div class="small muted">Recorded collection. Missing trophy case.</div></div>`;
     el('dexSummary').innerHTML = `
-      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Long-term collection records for bosses, boards, rivals, and retired relic archive entries.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
-      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Collection Records</button><button class="trophy-tab" type="button" disabled>DevTools archive records only</button></div>
+      <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Read-only records for bosses, rivals, boards, and retired gear.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
+      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Records</button><button class="trophy-tab" type="button" disabled>DevTools only</button></div>
       <div class="boss-trophy-summary-card">
         <div class="boss-trophy-summary-copy">
-          <strong>Collection Record Summary</strong>
-          <div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(cleanDisplayText(bossSummary.bestRecord.bossName || '', 'Unknown Boss'))} holds the deepest recorded mark.` : 'Defeat bosses to start the collection. Recorded Collection. Missing Trophy Case. Last recorded: none yet.'}</div>
+          <strong>Boss Trophy Summary</strong>
+          <div class="small muted">${bossSummary.bestRecord ? `${escapeHtml(cleanDisplayText(bossSummary.bestRecord.bossName || '', 'Unknown Boss'))} holds the deepest mark.` : 'Defeat bosses to start the records. Last recorded: none yet.'}</div>
         </div>
         <div class="boss-trophy-summary-stats">
-          <span class="pill trophy-total-pill">${bossTotalLabel} recorded</span>
+          <span class="pill trophy-total-pill">${bossTotalLabel} rec.</span>
           <span class="pill">${format(bossSummary.totalFound)} total</span>
           <span class="pill">${format(bossSummary.missingCount)} missing</span>
-          <span class="small muted">${bossSummary.bestRecord ? `Best Depth: ${escapeHtml(bossTrophyLocationLabel(bossSummary.bestRecord))}` : 'No boss trophies recorded yet.'}</span>
+          <span class="small muted">${bossSummary.bestRecord ? `Best depth: ${escapeHtml(bossTrophyLocationLabel(bossSummary.bestRecord))}` : 'No boss trophy records yet.'}</span>
         </div>
       </div>`;
     el('gearDex').innerHTML = `
       <h2>Archive Shelf</h2>
       ${retiredRelicHelpText()}
       ${revisitArchiveEchoMarkup(S)}
-      <p class="small muted">Retired relic archive records preserve manual retirement snapshots and display-only Famous Gear memory as part of the collection archive.</p>
+      <p class="small muted">Retired gear records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }
 
@@ -1021,7 +1047,7 @@
       <div class="list run-history-list">${historyMarkup}</div>
       <div class="sep"></div>
       <div class="archive-history-head">
-        <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only collection records plus manual retirement for unequipped inventory gear.</p></div>
+        <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only records plus manual retirement for unequipped gear.</p></div>
         <span class="pill">${format(archiveRetiredSummary.total)} recorded</span>
       </div>
       ${retiredRelicSummaryMarkup(archiveRetiredSummary)}

@@ -799,7 +799,7 @@ async function main() {
     record('Trophy Hall loads', freshBossDexText.toLowerCase().includes('trophy hall') && freshBossDexText.toLowerCase().includes('boss trophies'), freshBossDexText.slice(0, 320));
     {
       const freshBossLower = freshBossDexText.toLowerCase();
-      record('Boss trophy empty state renders on fresh save', freshBossLower.includes('defeat bosses to start the collection.') && freshBossLower.includes('recorded collection') && freshBossLower.includes('missing trophy case') && freshBossLower.includes('last recorded: none yet.') && (freshBossLower.includes('trophy hall') || freshBossLower.includes('collection records')), freshBossDexText.slice(0, 320));
+    record('Boss trophy empty state renders on fresh save', freshBossLower.includes('no boss trophies yet') && freshBossLower.includes('defeat a boss to add a record') && freshBossLower.includes('recorded collection') && freshBossLower.includes('missing trophy case') && (freshBossLower.includes('trophy hall') || freshBossLower.includes('records')), freshBossDexText.slice(0, 320));
     }
     const unsafeRunMilestone = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
@@ -974,7 +974,7 @@ async function main() {
     {
       const bossEmptyLower = bossEmptyText.toLowerCase();
       record('Boss trophy empty state stays readable', bossEmptyLower.includes('defeat bosses to start the collection.') && bossEmptyLower.includes('recorded collection') && bossEmptyLower.includes('missing trophy case') && bossEmptyLower.includes('last recorded: none yet.') && (bossEmptyLower.includes('trophy hall') || bossEmptyLower.includes('collection records')), bossEmptyText.slice(0, 320));
-      record('Retired Gear Hall archive shell appears', bossEmptyLower.includes('archive shelf') && bossEmptyLower.includes('retired relic archive records') && bossEmptyLower.includes('display-only famous gear memory') && bossEmptyLower.includes('famous gear memory is a read-only collection record'), bossEmptyText.slice(0, 500));
+      record('Retired Gear Hall archive shell appears', bossEmptyLower.includes('archive shelf') && bossEmptyLower.includes('retired gear records') && bossEmptyLower.includes('famous gear memory stays display-only') && bossEmptyLower.includes('earlier dungeon revisit stays removed'), bossEmptyText.slice(0, 500));
     }
     const dexRetireButton = await evalByValue(client, `(() => !!document.getElementById('monsterDex')?.querySelector('[data-retire]'))()`);
     record('No Retire button appears in Trophy Hall', dexRetireButton === false, JSON.stringify({ dexRetireButton }));
@@ -997,13 +997,13 @@ async function main() {
     }))()`);
     record('Retired item archive record fields are populated', Array.isArray(retiredRelicStateAfterGrant.records) && retiredRelicStateAfterGrant.records.length > 0 && retiredRelicStateAfterGrant.records[0].itemName && retiredRelicStateAfterGrant.records[0].source && retiredRelicStateAfterGrant.records[0].itemLevel >= 1, JSON.stringify(retiredRelicStateAfterGrant.records[0] || null));
     const retiredRelicDexAfterGrant = await getBossTrophyText();
-    record('Retired item archive UI shows record card', retiredRelicDexAfterGrant.includes('DevTools Retired Item Test') && retiredRelicDexAfterGrant.includes('Rating') && retiredRelicDexAfterGrant.includes('iLvl '), retiredRelicDexAfterGrant.slice(0, 700));
+    record('Retired item archive UI shows record card', retiredRelicDexAfterGrant.includes('DevTools Retired Item Test') && retiredRelicDexAfterGrant.includes('Rating') && retiredRelicDexAfterGrant.includes('iLvl ') && retiredRelicDexAfterGrant.includes('Famous Gear Record'), retiredRelicDexAfterGrant.slice(0, 700));
     const forceBossTrophy = await evalByValue(client, `(() => window.DungeonDexScenarioDevTools.grantBossTrophyForTest ? window.DungeonDexScenarioDevTools.grantBossTrophyForTest() : false)()`);
     record('Boss trophy record can be created', !!forceBossTrophy, String(forceBossTrophy));
     const bossTrophyStateAfterGrant = await getBossTrophyState();
     record('Boss trophy record fields are populated', Array.isArray(bossTrophyStateAfterGrant.records) && bossTrophyStateAfterGrant.records.length > 0 && bossTrophyStateAfterGrant.records[0].trophyName && bossTrophyStateAfterGrant.records[0].bossName && bossTrophyStateAfterGrant.records[0].count >= 1, JSON.stringify(bossTrophyStateAfterGrant.records[0] || null));
     const bossDexAfterGrant = await getBossTrophyText();
-    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best Depth') && (bossDexAfterGrant.includes('Last recorded:') || bossDexAfterGrant.includes('Collection Record Summary') || bossDexAfterGrant.includes('1 / 10 recorded')) && /x1|x2|x3|1 \/ 10 recorded/.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
+    record('Boss trophy UI shows compact record row', bossDexAfterGrant.includes('Best depth:') && bossDexAfterGrant.includes('Boss Trophy Summary') && /x1|x2|x3|1 \/ 10 rec\./.test(bossDexAfterGrant), bossDexAfterGrant.slice(0, 380));
     const forceBossTrophyDuplicate = await evalByValue(client, `(() => {
       if (typeof recordBossTrophyUnlock !== 'function') return false;
       const first = Array.isArray(S.player?.bossTrophyRecords) ? S.player.bossTrophyRecords[0] : null;
@@ -1071,7 +1071,7 @@ async function main() {
     await evalByValue(client, `(() => { S.screen = 'dex'; if (typeof render === 'function') render(); return true; })()`);
     const archiveTextAfterRetire = await evalByValue(client, `(() => document.getElementById('gearDex')?.innerText || document.getElementById('monsterDex')?.innerText || '')()`);
     const archiveLower = String(archiveTextAfterRetire || '').toLowerCase();
-    record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()), archiveTextAfterRetire.slice(0, 500));
+    record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()) && archiveLower.includes('famous gear record'), archiveTextAfterRetire.slice(0, 500));
     record('Retired item archive displays Famous Gear memory label', archiveTextAfterRetire.includes('Famous Gear Record') && archiveTextAfterRetire.includes('Boss-Worn'), archiveTextAfterRetire.slice(0, 700));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
