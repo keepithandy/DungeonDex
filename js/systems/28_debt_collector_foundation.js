@@ -81,7 +81,7 @@
   function debtCollectorDisplaySummary(state){
     const debt = debtState(state);
     return {
-      title: debt.balanceCopper > 0 ? 'Debt Collector' : 'Debt Collector',
+      title: 'Debt Collector',
       summary: debt.balanceCopper > 0 ? 'Active debt. Pressure is visible.' : 'No active debt. Pressure is quiet.',
       statusLabel: debt.balanceCopper > 0 ? 'Debt Active' : 'No Debt',
       balanceLabel: `Owed ${moneyHtml(debt.balanceCopper)}`,
