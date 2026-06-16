@@ -1396,6 +1396,58 @@
     };
   }
 
+  function revisitRouteActivationPlan(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const allowedFutureRouteStates = ['locked', 'planned', 'eligible-preview', 'playable-later'];
+    const stableHookSources = {
+      trophy_echo_route: 'Trophy Echo',
+      famous_gear_route: 'Famous Gear Memory',
+      rival_trace_route: 'Rival Trace',
+      debt_pressure_route: 'Debt Pressure',
+      board_echo_route: 'Board Echo'
+    };
+    const eligibleRoutes = routes.filter(route => route && typeof route === 'object').map(route => {
+      const key = String(route.key || '').trim();
+      const status = String(route.status || 'Locked').trim();
+      return {
+        key,
+        title: String(route.title || 'Return Route').trim(),
+        hookSource: String(route.hookSource || stableHookSources[key] || 'unknown').trim(),
+        status,
+        locked: true,
+        planned: status === 'Planned' || status === 'Future Route',
+        eligibilityState: status === 'Planned' ? 'eligible-preview' : 'playable-later',
+        optionalSideContent: true,
+        primaryPathPreserved: true,
+        readOnly: true,
+        entryAvailable: false,
+        rewardAvailable: false,
+        completionAvailable: false,
+        sourceHistoryOnly: true
+      };
+    });
+    return {
+      contractId: 'revisit_route_activation_contract_v1',
+      status: 'Planning only',
+      locked: true,
+      readOnly: true,
+      entryAvailable: false,
+      rewardAvailable: false,
+      completionAvailable: false,
+      primaryPath: 'Enter Dungeon / Continue Run',
+      optionalSideContent: true,
+      allowedFutureRouteStates,
+      stableHookSources: ['Trophy Echo', 'Famous Gear Memory', 'Rival Trace', 'Debt Pressure', 'Board Echo'],
+      routeStates: eligibleRoutes.map(route => ({
+        key: route.key,
+        hookSource: route.hookSource,
+        state: route.eligibilityState
+      })),
+      eligibleRoutes
+    };
+  }
+
   function canStartRevisitRoute(state = S, routeKey = '') {
     if (!state || typeof state !== 'object') return false;
     if (!state.player || typeof state.player !== 'object') return false;
@@ -2099,6 +2151,9 @@
       },
       revisitRouteSummary(state = S) {
         return revisitRouteSummary(state);
+      },
+      revisitRouteActivationPlan(state = S) {
+        return revisitRouteActivationPlan(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);

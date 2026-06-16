@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.19.4**
+Current baseline: **DungeonDex v1.19.6**
 
 ## Current Build
 
-**v1.19.4 - Revisit UI Affordance Guard Smoke**
+**v1.19.6 - Revisit Preview-State Contract Smoke**
 
-This pass adds one more smoke guardrail proving the visible Town/Revisit UI does not expose route entry, reward, claim, or completion affordances. It keeps the route surface locked, read-only, and non-playable.
+This pass defines the first concrete activation contract for future revisit routes without enabling route entry. It stays planning-only and read-only.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.19.4 keeps the revisit preview surface smoke-only while preserving the locked Talent Tree Preview and the existing smoke coverage.
+v1.19.6 keeps the revisit preview surface smoke-only while preserving the locked Talent Tree Preview and the existing smoke coverage.
 
 ## Running Locally
 

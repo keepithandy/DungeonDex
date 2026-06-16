@@ -7,12 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.4 - Revisit UI Affordance Guard Smoke
+- DungeonDex v1.19.6 - Revisit Preview-State Contract Smoke
 
-## v1.19.4 Revisit UI Affordance Guard Smoke
-- Current baseline: v1.19.4.
-- Added explicit smoke assertions proving the visible Town/Revisit UI does not expose route entry, reward, claim, or completion affordances.
-- Confirmed preview helpers stay read-only and do not mutate player state while building previews and summaries.
+## v1.19.6 Revisit Preview-State Contract Smoke
+- Current baseline: v1.19.6.
+- Added an inert allowed-state vocabulary to the revisit activation plan contract for future preview-state transitions.
+- Extended smoke coverage to prove the helper only returns allowed planning state names and still exposes no live entry, reward, or completion surface.
 - Revisit routes remain locked, inactive, and non-playable.
 - No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 

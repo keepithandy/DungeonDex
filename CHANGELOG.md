@@ -9,14 +9,27 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.19.4`
-* Current development target: `v1.19.4`
+* Current local package baseline: `v1.19.6`
+* Current development target: `v1.19.6`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.19.6 - Revisit Preview-State Contract Smoke
+
+* Added an inert allowed-state vocabulary to the revisit activation plan contract for future preview-state transitions.
+* Extended smoke coverage to prove the planning helper only returns allowed state names and still exposes no live entry, reward, or completion surface.
+* No revisit activation, route entry, route rewards, route completion, combat, economy, debt, trophy, Famous Gear, Elite Board, or main progression behavior changed.
+
+## v1.19.5 - Revisit Activation Rule Contract
+
+* Defined a planning-only activation contract for future revisit routes without enabling route entry.
+* Added an inert eligibility helper that keeps route planning read-only and preserves the primary dungeon path.
+* Extended smoke coverage to prove the helper is non-mutating and still exposes no entry, reward, or completion affordances.
+* No revisit activation, route rewards, route completion, combat, economy, debt, trophy, Famous Gear, Elite Board, or main progression behavior changed.
 
 ## v1.19.4 - Revisit UI Affordance Guard Smoke
 
