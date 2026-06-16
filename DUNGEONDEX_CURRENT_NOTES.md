@@ -7,11 +7,11 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.3 - Revisit Reward/Completion Absence Smoke
+- DungeonDex v1.19.4 - Revisit UI Affordance Guard Smoke
 
-## v1.19.3 Revisit Reward/Completion Absence Smoke
-- Current baseline: v1.19.3.
-- Added explicit smoke assertions proving revisit route previews expose no reward path or completion ledger surface.
+## v1.19.4 Revisit UI Affordance Guard Smoke
+- Current baseline: v1.19.4.
+- Added explicit smoke assertions proving the visible Town/Revisit UI does not expose route entry, reward, claim, or completion affordances.
 - Confirmed preview helpers stay read-only and do not mutate player state while building previews and summaries.
 - Revisit routes remain locked, inactive, and non-playable.
 - No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.

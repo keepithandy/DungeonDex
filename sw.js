@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.3-revisit-reward-absence-smoke';
+const CACHE_NAME = 'dungeondex-v1.19.4-revisit-ui-affordance-guard-smoke';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.3-revisit-reward-absence-smoke';
+const BUILD_QS = '1.19.4-revisit-ui-affordance-guard-smoke';
 const ASSETS = [
   './',
   './index.html',
