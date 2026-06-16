@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.1**
+Current baseline: **DungeonDex v1.20.2**
 
 ## Current Build
 
-**v1.20.1 - Monster Backdrop Canvas Foundation**
+**v1.20.2 - Monster Backdrop Canvas Completion**
 
-This pass adds a deterministic, canvas-only monster backdrop layer behind the combat monster stage. It is visual-only, mobile-safe, and does not alter combat math, rewards, scaling, progression, or Revisit behavior.
+This pass completes the deterministic, canvas-only monster backdrop system behind the combat monster stage. It adds the production theme catalog, stronger boss/elite visual framing, resize-aware rendering, diagnostics, and expanded smoke coverage. It remains visual-only and does not alter combat math, rewards, scaling, progression, or Revisit behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -26,8 +26,6 @@ DungeonDex is built around a simple loop:
 The game favors clarity over mechanical bloat. Combat is intentionally direct: Common, Elite, and Boss enemies are the main combat tiers.
 
 ## Design Rules
-
-DungeonDex follows several project rules:
 
 * Keep combat readable and HP-number-driven.
 * Avoid hidden monster mechanics.
@@ -57,7 +55,7 @@ Current major systems include:
 * Revisit route previews
 * Revisit unlock gates
 * Revisit unlock preview helpers
-* Monster backdrop canvas foundation
+* Monster backdrop canvas system
 
 ## Revisit System Status
 
@@ -88,17 +86,17 @@ Current rule:
 
 Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.20.1 keeps the revisit preview surface locked, read-only, preview-only, and non-playable while adding a separate visual-only combat backdrop foundation.
-
 ## Monster Backdrop Status
 
-The monster backdrop system is currently a visual foundation only.
+The monster backdrop system is currently complete as a visual-only canvas layer.
 
 Implemented so far:
 
 * `generateMonsterBackdrop(monster, state, options)`
 * `renderMonsterBackdrop(canvas, backdrop)`
 * `attachMonsterBackdropCanvas()`
+* `monsterBackdropCatalog()`
+* `monsterBackdropDiagnostics()`
 * `window.DDMonsterBackdropCanvas`
 * `smoke_monster_backdrops_v120.mjs`
 
@@ -106,25 +104,21 @@ Current rule:
 
 > Monster backdrops are presentation only.
 
-The canvas renderer mounts behind `.combat-monster-stage`, uses deterministic seeds, maps monster/district/depth identity into themed scenery, and exposes no route entry, reward, scaling, damage, HP, or combat hook behavior. No Three.js dependency is used.
+The canvas renderer mounts behind `.combat-monster-stage`, uses deterministic seeds, maps monster/district/depth identity into themed scenery, reacts to stage resize dimensions, and exposes no route entry, reward, scaling, damage, HP, or combat hook behavior. No Three.js dependency is used.
 
 ## Running Locally
 
 DungeonDex is a static browser project.
 
-From the project folder, run a simple local server:
-
 ```powershell
 python -m http.server 8000
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:8000
 ```
-
-You can also use a VS Code live server extension or any basic static web server.
 
 ## Validation
 
@@ -137,13 +131,6 @@ node --check smoke_talent_v150b.mjs
 node --check smoke_debt_collector_v169.mjs
 node --check smoke_revisit_routes_v173.mjs
 node --check smoke_monster_backdrops_v120.mjs
-node --check js/systems/00_core_constants_data.js
-node --check js/systems/03_town_contracts_market.js
-node --check js/systems/08_normalization_save.js
-node --check js/systems/10_ui_town_shop.js
-node --check js/systems/19_warden_talents_lowfire_board.js
-node --check js/systems/21_build_label_guard.js
-node --check js/systems/27_interface_density_cleanup.js
 node --check js/systems/29_monster_backdrops_canvas.js
 git diff --check
 node .\smoke_talent_v150b.mjs
@@ -163,27 +150,18 @@ Current focus is safe foundation work. The locked foundations stay in place:
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.
 * Monster backdrops remain visual-only and canvas-based.
 
-Revisit activation planning rules:
-
-* Revisit routes should eventually unlock from existing player history.
-* Candidate hooks should continue coming from stable sources such as Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo.
-* Revisit routes should stay optional side content.
-* Revisit routes should not outpace main progression rewards.
-* Revisit routes should stay readable on mobile and avoid hidden mechanics.
-* Revisit activation should stay behind explicit smoke guards.
-
 Candidate next lanes:
 
-1. Monster backdrop polish / boss-frame refinement
-2. Revisit route activation implementation, later
-3. Talent foundation next-step planning
-4. Monster Codex / monster identity expansion planning
+1. Monster backdrop visual QA / mobile polish
+2. Monster Codex / monster identity expansion planning
+3. Revisit route activation implementation, later
+4. Talent foundation next-step planning
 5. Archive / Famous Gear memory polish
 6. Elite Board clarity polish
 
 Recommended next lane:
 
-**Monster backdrop polish** is the next visual lane to evaluate, while Revisit route activation should stay planning-only until explicitly approved.
+**Monster backdrop visual QA** is the next visual lane to evaluate, while Revisit route activation should stay planning-only until explicitly approved.
 
 ## Project Status
 
