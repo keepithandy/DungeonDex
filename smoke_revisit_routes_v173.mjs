@@ -312,6 +312,19 @@ async function main() {
       const routeSlotButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
       const routeCards = Array.from(document.querySelectorAll('#revisitFoundationSlot .revisit-route-card')).map(card => card.innerText || '');
       const routeSlotText = document.getElementById('revisitFoundationSlot')?.innerText || '';
+      const routeLedgerSnapshot = {
+        revisitRouteLedger: S?.player?.revisitRouteLedger,
+        revisitRouteCompletionLedger: S?.player?.revisitRouteCompletionLedger,
+        revisitRouteCompletions: S?.player?.revisitRouteCompletions,
+        routeCompletionLedger: S?.player?.routeCompletionLedger,
+        routeCompletions: S?.player?.routeCompletions
+      };
+      const routePreviewFields = Array.isArray(previews) ? previews.map(preview => ({
+        key: String(preview?.key || ''),
+        rewardKeys: ['reward', 'rewardAmount', 'rewardPreview'].filter(field => Object.prototype.hasOwnProperty.call(preview || {}, field)),
+        completionKeys: ['completion', 'completed', 'complete', 'completionLedger'].filter(field => Object.prototype.hasOwnProperty.call(preview || {}, field)),
+        entryKeys: ['entry', 'enter', 'start', 'travel', 'begin'].filter(field => Object.prototype.hasOwnProperty.call(preview || {}, field))
+      })) : [];
       const after = JSON.stringify({
         player: {
           gold: S.player.gold,
@@ -330,7 +343,7 @@ async function main() {
           combatLog: S.run.combatLog
         }
       });
-      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, previews, previewSummary, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, previewObjectsBefore, previewObjectsAfter, apiKeys, buttons, routeSlotButtons, routeCards, routeSlotText };
+      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, previews, previewSummary, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, previewObjectsBefore, previewObjectsAfter, apiKeys, buttons, routeSlotButtons, routeCards, routeSlotText, routeLedgerSnapshot, routePreviewFields };
     })()`);
     record('Revisit summary helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after, JSON.stringify({ before: mutationCheck.snapshot, after: mutationCheck.after }));
     record('Unlock gate helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after && Array.isArray(mutationCheck.gates) && mutationCheck.gateSummary, JSON.stringify({ gateSummary: mutationCheck.gateSummary, gates: mutationCheck.gates?.slice(0, 3) }));
@@ -338,6 +351,8 @@ async function main() {
     record('Unlock gate helpers do not mutate candidate objects', mutationCheck.candidateObjectsBefore === mutationCheck.candidateObjectsAfter, JSON.stringify({ before: mutationCheck.candidateObjectsBefore, after: mutationCheck.candidateObjectsAfter }));
     record('Unlock gate helpers do not mutate route preview objects', mutationCheck.routeObjectsBefore === mutationCheck.routeObjectsAfter, JSON.stringify({ before: mutationCheck.routeObjectsBefore, after: mutationCheck.routeObjectsAfter }));
     record('Unlock preview helpers do not mutate preview objects', mutationCheck.previewObjectsBefore === mutationCheck.previewObjectsAfter, JSON.stringify({ before: mutationCheck.previewObjectsBefore, after: mutationCheck.previewObjectsAfter }));
+    record('Route previews expose no reward or completion keys', Array.isArray(mutationCheck.routePreviewFields) && mutationCheck.routePreviewFields.length === mutationCheck.previews.length && mutationCheck.routePreviewFields.every(entry => entry.rewardKeys.length === 0 && entry.completionKeys.length === 0 && entry.entryKeys.length === 0), JSON.stringify(mutationCheck.routePreviewFields));
+    record('Route preview helpers leave completion ledger fields undefined', mutationCheck.routeLedgerSnapshot && Object.values(mutationCheck.routeLedgerSnapshot).every(value => value === undefined), JSON.stringify(mutationCheck.routeLedgerSnapshot));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
     record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
     record('Trophy Echo exposes preview copy without becoming playable', Array.isArray(mutationCheck.previews) && mutationCheck.previews.every(preview => preview.locked === true && preview.playable === false) && !!mutationCheck.previews.find(preview => preview.key === 'trophy_echo_route' && preview.previewState === 'preview' && preview.previewLabel === 'Future Unlock Preview' && /future boss history/i.test(preview.previewReason || '') && preview.previewRequirement === 'Build more boss history.' && /route access is unavailable/i.test(preview.previewSafety || '')), JSON.stringify({ trophyPreview: mutationCheck.previews?.find(preview => preview.key === 'trophy_echo_route'), previewSummary: mutationCheck.previewSummary, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));

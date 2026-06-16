@@ -7,14 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.2 - Revisit Route Activation Planning
+- DungeonDex v1.19.3 - Revisit Reward/Completion Absence Smoke
 
-## v1.19.2 Revisit Route Activation Planning
-- Current baseline: v1.19.2.
-- Planned the future revisit route activation rules without enabling route entry.
-- Revisit should remain an optional side-return path sourced from existing history.
-- Candidate hooks should continue to come from Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo.
-- Revisit routes should stay mobile-readable, read-only for now, and behind explicit smoke guards when activation eventually arrives.
+## v1.19.3 Revisit Reward/Completion Absence Smoke
+- Current baseline: v1.19.3.
+- Added explicit smoke assertions proving revisit route previews expose no reward path or completion ledger surface.
+- Confirmed preview helpers stay read-only and do not mutate player state while building previews and summaries.
+- Revisit routes remain locked, inactive, and non-playable.
 - No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 
 ## v1.14.0 Revisit Route Content Completion
