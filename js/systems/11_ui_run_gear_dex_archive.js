@@ -150,11 +150,12 @@
     const depth = S.run.floor || 1;
     const loreDepth = getLoreDepthProgress(depth);
     const runDistrict = getLoreFloorDistrict(loreDepth.floorNumber);
+    const districtDisplay = currentDistrictDisplay(S);
     const floorName = getLoreFloorName(loreDepth.floorNumber);
     const isBossFight = monster && monster.tier === 'Boss';
     const isEliteFight = monster && monster.tier === 'Elite';
     const isContractTarget = !!(monster && monster.contractTarget);
-    const currentFloorText = `Floor ${format(loreDepth.floorNumber)}`;
+    const currentFloorText = districtDisplay.name || `Floor ${format(loreDepth.floorNumber)}`;
     const currentProgressRoomText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)}`;
     const currentProgressChapterText = `Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
     const bossStatusText = loreDepth.isBossChapter
@@ -193,13 +194,14 @@
           <div class="run-flow-primary">
             <span>Current</span>
             <strong>${escapeHtml(currentFloorText)}</strong>
+            <small>${escapeHtml(districtDisplay.subtitle || floorName)}</small>
             <small>${escapeHtml(currentProgressRoomText)}</small>
             <small>${escapeHtml(currentProgressChapterText)}</small>
-            <small>${escapeHtml(floorName)}</small>
           </div>
           <div class="run-flow-secondary">
             <span>Boss</span>
             <strong>${escapeHtml(bossStatusText)}</strong>
+            <small>${escapeHtml(districtDisplay.bossApproachLine || '')}</small>
           </div>
         </div>
         <div class="run-progress-only combat-haul-row" aria-label="Run haul">

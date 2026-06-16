@@ -742,6 +742,26 @@ async function main() {
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));
+    const districtIdentityAudit = await evalByValue(client, `(() => {
+      const api = {
+        currentDistrictDisplay: typeof currentDistrictDisplay === 'function' ? currentDistrictDisplay : null,
+        dungeonDistrictIdentityForDepth: typeof dungeonDistrictIdentityForDepth === 'function' ? dungeonDistrictIdentityForDepth : null,
+        dungeonDistrictSummary: typeof dungeonDistrictSummary === 'function' ? dungeonDistrictSummary : null,
+        dungeonFloorFlavorLine: typeof dungeonFloorFlavorLine === 'function' ? dungeonFloorFlavorLine : null
+      };
+      const before = JSON.stringify({ player: S.player, run: S.run });
+      const known = api.currentDistrictDisplay ? api.currentDistrictDisplay(S) : null;
+      const depthKnown = api.dungeonDistrictIdentityForDepth ? api.dungeonDistrictIdentityForDepth(1) : null;
+      const depthUnknown = api.dungeonDistrictIdentityForDepth ? api.dungeonDistrictIdentityForDepth('bad-depth') : null;
+      const summaryUnknown = api.dungeonDistrictSummary ? api.dungeonDistrictSummary(null) : null;
+      const flavorLine = api.dungeonFloorFlavorLine ? api.dungeonFloorFlavorLine(1) : '';
+      const after = JSON.stringify({ player: S.player, run: S.run });
+      return { before, after, known, depthKnown, depthUnknown, summaryUnknown, flavorLine, api };
+    })()`);
+    record('District identity helper exists', !!districtIdentityAudit?.api?.currentDistrictDisplay && !!districtIdentityAudit?.api?.dungeonDistrictIdentityForDepth && !!districtIdentityAudit?.api?.dungeonDistrictSummary && !!districtIdentityAudit?.api?.dungeonFloorFlavorLine, JSON.stringify(districtIdentityAudit?.api));
+    record('District identity helper returns stable display data', !!districtIdentityAudit?.known && typeof districtIdentityAudit.known.name === 'string' && typeof districtIdentityAudit.known.subtitle === 'string' && typeof districtIdentityAudit.known.shortFlavor === 'string' && typeof districtIdentityAudit.known.bossApproachLine === 'string', JSON.stringify(districtIdentityAudit?.known));
+    record('District identity helper falls back safely', !!districtIdentityAudit?.depthUnknown && districtIdentityAudit.depthUnknown.safeFallback === true && typeof districtIdentityAudit.depthUnknown.name === 'string' && typeof districtIdentityAudit.depthUnknown.shortFlavor === 'string' && !!districtIdentityAudit?.summaryUnknown && districtIdentityAudit.summaryUnknown.safeFallback === true, JSON.stringify({ depthUnknown: districtIdentityAudit?.depthUnknown, summaryUnknown: districtIdentityAudit?.summaryUnknown }));
+    record('District identity helper does not mutate state', districtIdentityAudit?.before === districtIdentityAudit?.after, JSON.stringify({ before: districtIdentityAudit?.before, after: districtIdentityAudit?.after }));
     const townRevisitText = await evalByValue(client, `(() => {
       S.screen = 'town';
       if (typeof render === 'function') render();

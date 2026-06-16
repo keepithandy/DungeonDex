@@ -99,6 +99,131 @@
     return districtByDepth(defaultRunStartDepth(state));
   }
 
+  function dungeonDistrictIdentityForDepth(depth) {
+    const district = districtByDepth(depth);
+    const key = String(district?.id || 'lowfire').toLowerCase();
+    const fallback = {
+      key: 'lowfire',
+      name: 'Lowfire District',
+      subtitle: 'Warm start, shallow haul.',
+      shortFlavor: 'The first district keeps its lamps low and its debts warm.',
+      bossApproachLine: 'Boss approach: the Stair keeps tightening.',
+      safeFallback: true
+    };
+    const identities = {
+      lowfire: {
+        key: 'lowfire',
+        name: 'Lowfire District',
+        subtitle: 'Warm start, shallow haul.',
+        shortFlavor: 'The first district keeps its lamps low and its debts warm.',
+        bossApproachLine: 'Boss approach: the Stair keeps tightening.',
+        safeFallback: false
+      },
+      ashgate: {
+        key: 'ashgate',
+        name: 'Ashgate Warrens',
+        subtitle: 'Narrow paths, old retreats.',
+        shortFlavor: 'The warrens stay tight, smoky, and easy to remember wrong.',
+        bossApproachLine: 'Boss approach: ash makes every landing feel closer.',
+        safeFallback: false
+      },
+      'ember-debtworks': {
+        key: 'ember-debtworks',
+        name: 'Ember Debtworks',
+        subtitle: 'Chains, ledgers, red worklight.',
+        shortFlavor: 'The lower halls glow like a ledger that never closes.',
+        bossApproachLine: 'Boss approach: the debtwork lamps burn harder.',
+        safeFallback: false
+      },
+      sootveil: {
+        key: 'sootveil',
+        name: 'Sootveil Depths',
+        subtitle: 'Smoke-thick, quiet, and dim.',
+        shortFlavor: 'Soot gathers thick enough to hide old stair cuts.',
+        bossApproachLine: 'Boss approach: visibility drops before the fight does.',
+        safeFallback: false
+      },
+      cinderbone: {
+        key: 'cinderbone',
+        name: 'Cinderbone Halls',
+        subtitle: 'Old stone, hotter bones.',
+        shortFlavor: 'The halls feel built from older victories and hotter ash.',
+        bossApproachLine: 'Boss approach: the walls sound hollow now.',
+        safeFallback: false
+      },
+      blacktithe: {
+        key: 'blacktithe',
+        name: 'Blacktithe Reliquary',
+        subtitle: 'Grave tolls and paid dues.',
+        shortFlavor: 'Every chamber feels taxed by something that never left.',
+        bossApproachLine: 'Boss approach: the toll grows louder near bosses.',
+        safeFallback: false
+      },
+      lanternless: {
+        key: 'lanternless',
+        name: 'Lanternless Vaults',
+        subtitle: 'Dark archive, sealed quiet.',
+        shortFlavor: 'The vaults keep the light out and the memory in.',
+        bossApproachLine: 'Boss approach: the dark starts to feel deliberate.',
+        safeFallback: false
+      },
+      'hunger-kilns': {
+        key: 'hunger-kilns',
+        name: 'Hunger Kilns',
+        subtitle: 'Hot vents, thin rations.',
+        shortFlavor: 'The kilns breathe hard, as if the stone itself is hungry.',
+        bossApproachLine: 'Boss approach: heat rises before the boss does.',
+        safeFallback: false
+      },
+      redwake: {
+        key: 'redwake',
+        name: 'Redwake Channels',
+        subtitle: 'Wet stone, sharp currents.',
+        shortFlavor: 'The channels pull at the stair like old blood in water.',
+        bossApproachLine: 'Boss approach: the current turns before the fight.',
+        safeFallback: false
+      },
+      'final-lowflame': {
+        key: 'final-lowflame',
+        name: 'Lowflame Deep',
+        subtitle: 'Small light, deep reach.',
+        shortFlavor: 'The last stretch keeps the flame low and the walls close.',
+        bossApproachLine: 'Boss approach: the Stair is nearly at its end.',
+        safeFallback: false
+      }
+    };
+    return identities[key] || {
+      ...fallback,
+      key,
+      name: district?.name || fallback.name,
+      subtitle: district?.line || fallback.subtitle,
+      shortFlavor: district?.mood || district?.line || fallback.shortFlavor,
+      bossApproachLine: 'Boss approach: the Stair keeps tightening.'
+    };
+  }
+
+  function dungeonDistrictSummary(depth){
+    const identity = dungeonDistrictIdentityForDepth(depth);
+    return {
+      key: identity.key,
+      name: identity.name,
+      subtitle: identity.subtitle,
+      shortFlavor: identity.shortFlavor,
+      bossApproachLine: identity.bossApproachLine,
+      safeFallback: !!identity.safeFallback
+    };
+  }
+
+  function currentDistrictDisplay(state){
+    const district = currentStagingDistrict(state);
+    return dungeonDistrictSummary(state?.run?.active ? state?.run?.floor : defaultRunStartDepth(state) || district?.min || 1);
+  }
+
+  function dungeonFloorFlavorLine(depth){
+    const identity = dungeonDistrictIdentityForDepth(depth);
+    return identity.shortFlavor || 'The dungeon keeps its own quiet.';
+  }
+
   function districtToneClass(district) {
     const tone = String(district?.tone || district?.id || 'lowfire').replace(/[^a-z0-9-]/gi, '').toLowerCase();
     return `district-tone-${tone}`;

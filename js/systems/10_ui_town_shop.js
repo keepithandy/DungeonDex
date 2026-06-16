@@ -91,6 +91,7 @@
 
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
+    const districtDisplay = currentDistrictDisplay(S);
     const stagedStartDepth = defaultRunStartDepth(S);
     const nextDescent = getLoreDepthProgress(stagedStartDepth);
     const questPanel = el('questPanel');
@@ -100,8 +101,8 @@
     if (districtPanel) {
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
     }
-    if (el('districtName')) el('districtName').textContent = stagingDistrict.name || 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}. Lowfire banks the haul and returns you to ${escapeHtml(stagingDistrict.name || 'Lowfire District')}.<br><span class="district-mood">${escapeHtml(stagingDistrict.mood || stagingDistrict.line || '')}</span>`;
+    if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
+    if (el('districtLine')) el('districtLine').innerHTML = `${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'A steady stretch of stair.')}<br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br>Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
     if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = '';
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';

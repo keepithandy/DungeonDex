@@ -7,14 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.16.2 - Talent Preview Player-Facing Copy Polish
+- DungeonDex v1.17.0 - District / World Identity Pass
 
-## v1.16.2 Talent Preview Player-Facing Copy Polish
-- Current baseline: v1.16.2.
-- Trimmed the locked Talent Tree Preview copy so the four branches read more cleanly on mobile.
-- Branches still preview Survivor, Hunter, Delver, and Collector identities with the same 12 inert nodes.
-- Defensive passive preview helper output remains locked, preview-only, inactive, and zero-effect.
-- Extended smoke coverage now also checks the updated branch-summary copy while preserving the existing inert-map coverage.
+## v1.17.0 District / World Identity Pass
+- Current baseline: v1.17.0.
+- Added a deterministic district identity layer for display-only naming, subtitles, flavor, and boss-approach copy.
+- Town now shows a compact current-district display with one-line flavor and a short next-descent line.
+- Combat now surfaces the district subtitle and boss approach line while keeping HP and progress readable first.
+- Smoke coverage now checks the district identity helper, stable fallback output, and state safety.
 - Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
 
 ## v1.14.0 Revisit Route Content Completion

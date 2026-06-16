@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.16.2-talent-preview-copy-polish';
+const CACHE_NAME = 'dungeondex-v1.17.0-district-world-identity-pass';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.16.2-talent-preview-copy-polish';
+const BUILD_QS = '1.17.0-district-world-identity-pass';
 const ASSETS = [
   './',
   './index.html',

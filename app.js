@@ -1,9 +1,9 @@
-// DungeonDex v1.16.2 runtime pointer.
+// DungeonDex v1.17.0 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.16.2';
-window.DUNGEONDEX_BUILD_QS = '1.16.2-talent-preview-copy-polish';
+window.DUNGEONDEX_BUILD = '1.17.0';
+window.DUNGEONDEX_BUILD_QS = '1.17.0-district-world-identity-pass';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -33,7 +33,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.16.2-talent-preview-copy-polish';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.17.0-district-world-identity-pass';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
