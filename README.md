@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.19.9**
+Current baseline: **DungeonDex v1.20.0**
 
 ## Current Build
 
-**v1.19.9 - Revisit First Lane Selection Contract**
+**v1.20.0 - Second Revisit Lane Planning Contract**
 
-This pass defines the first concrete activation contract for future revisit routes without enabling route entry. It stays planning-only and read-only.
+This pass adds the second planned Revisit lane contract for Famous Gear Memory without enabling route entry. It stays planning-only and read-only.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -73,6 +73,11 @@ Implemented so far:
 * `revisitUnlockGateSummary(state)`
 * `revisitUnlockPreview(state)`
 * `revisitUnlockPreviewSummary(state)`
+* `revisitRouteActivationPlan(state)`
+* `revisitRouteActivationSummary(state)`
+* `revisitRoutePreviewStateSummary(state)`
+* `revisitFirstActivationLane(state)`
+* `revisitSecondActivationLane(state)`
 * `revisitTrophyEchoRulePlan(state)`
 * `revisitTrophyEchoRuleSummary(state)`
 
@@ -80,9 +85,9 @@ Current rule:
 
 > Revisit routes are not playable yet.
 
-Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
+Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is now the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.19.9 keeps the revisit preview surface smoke-only while preserving the locked Talent Tree Preview and the existing smoke coverage.
+v1.20.0 keeps the revisit preview surface locked, read-only, preview-only, and non-playable while preserving the locked Talent Tree Preview and the existing smoke coverage.
 
 ## Running Locally
 

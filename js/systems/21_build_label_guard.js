@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.19.9 - Build label guard.
+// DungeonDex v1.20.0 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.19.9';
+  const BUILD = '1.20.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.19.9-revisit-first-lane-selection-contract';
+  const BUILD_QS = '1.20.0-second-revisit-lane-planning-contract';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

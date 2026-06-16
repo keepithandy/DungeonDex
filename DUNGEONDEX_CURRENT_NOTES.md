@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.9 - Revisit First Lane Selection Contract
+- DungeonDex v1.20.0 - Second Revisit Lane Planning Contract
+
+## v1.20.0 Second Revisit Lane Planning Contract
+- Current baseline: v1.20.0.
+- Added Famous Gear Memory as the second planned Revisit lane contract in read-only metadata.
+- Extended smoke coverage to prove Trophy Echo remains the first planned lane when preview order changes and second-lane fixture data is present.
+- Revisit routes remain locked, inactive, preview-only, and non-playable.
+- No gameplay, combat, economy, talent, revisit activation, debt, trophy, Famous Gear, Elite Board, or scaling behavior changed.
 
 ## v1.19.9 Revisit First Lane Selection Contract
 - Current baseline: v1.19.9.

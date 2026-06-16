@@ -1498,6 +1498,8 @@
       laneLabel: 'Trophy Echo',
       sourceHook: 'Trophy Echo',
       currentStatus: 'planned',
+      locked: true,
+      readOnly: true,
       previewOnly: true,
       hasLiveEntry: false,
       hasRewards: false,
@@ -1506,6 +1508,29 @@
       routeLabel: String(trophyRoute?.title || 'Trophy Echo Route'),
       reason: 'Derived from existing boss and trophy history only.',
       note: 'First planned revisit lane. Planning only.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+    };
+  }
+
+  function revisitSecondActivationLane(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const famousGearRoute = routes.find(route => String(route?.key || '') === 'famous_gear_route') || null;
+    return {
+      laneKey: 'famous-gear-memory',
+      laneLabel: 'Famous Gear Memory',
+      sourceHook: 'Famous Gear Memory',
+      currentStatus: 'planned',
+      locked: true,
+      readOnly: true,
+      previewOnly: true,
+      hasLiveEntry: false,
+      hasRewards: false,
+      hasCompletion: false,
+      routeKey: 'famous_gear_route',
+      routeLabel: String(famousGearRoute?.title || 'Famous Gear Memory Route'),
+      reason: 'Derived from existing famous gear and archive memory only.',
+      note: 'Second planned revisit lane. Planning only.',
       allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
     };
   }
@@ -2225,6 +2250,9 @@
       },
       revisitFirstActivationLane(state = S) {
         return revisitFirstActivationLane(state);
+      },
+      revisitSecondActivationLane(state = S) {
+        return revisitSecondActivationLane(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);

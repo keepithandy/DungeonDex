@@ -9,14 +9,20 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.19.9`
-* Current development target: `v1.19.9`
+* Current local package baseline: `v1.20.0`
+* Current development target: `v1.20.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.0 - Second Revisit Lane Planning Contract
+
+* Added Famous Gear Memory as the second planned Revisit lane contract with inert metadata only.
+* Extended smoke coverage to prove Trophy Echo remains the first planned lane when preview order changes and second-lane fixture data exists.
+* No revisit activation, route entry, route rewards, route completion, combat, economy, debt, trophy, Famous Gear, Elite Board, Talent, or main progression behavior changed.
 
 ## v1.19.9 - Revisit First Lane Selection Contract
 

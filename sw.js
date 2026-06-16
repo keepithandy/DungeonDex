@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.9-revisit-first-lane-selection-contract';
+const CACHE_NAME = 'dungeondex-v1.20.0-second-revisit-lane-planning-contract';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.9-revisit-first-lane-selection-contract';
+const BUILD_QS = '1.20.0-second-revisit-lane-planning-contract';
 const ASSETS = [
   './',
   './index.html',
