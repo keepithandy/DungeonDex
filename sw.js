@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.0-second-revisit-lane-planning-contract';
+const CACHE_NAME = 'dungeondex-v1.20.1-monster-backdrop-canvas-foundation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.0-second-revisit-lane-planning-contract';
+const BUILD_QS = '1.20.1-monster-backdrop-canvas-foundation';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   `./js/systems/09_ui_common_intro.js?build=${BUILD_QS}`,
   `./js/systems/10_ui_town_shop.js?build=${BUILD_QS}`,
   `./js/systems/11_ui_run_gear_dex_archive.js?build=${BUILD_QS}`,
+  `./js/systems/29_monster_backdrops_canvas.js?build=${BUILD_QS}`,
   `./js/systems/12_render_bindings_boot.js?build=${BUILD_QS}`,
   `./js/systems/13_devtools_overlay.js?build=${BUILD_QS}`,
   `./js/systems/14_devtools_scenarios.js?build=${BUILD_QS}`,
