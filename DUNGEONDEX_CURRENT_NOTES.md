@@ -7,14 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.16.1 - Talent Preview Layout / Smoke Hardening
+- DungeonDex v1.16.2 - Talent Preview Player-Facing Copy Polish
 
-## v1.16.1 Talent Preview Layout / Smoke Hardening
-- Current baseline: v1.16.1.
-- Added a locked passive preview mapping for the Talent Tree Preview so each branch reads as a simple future passive lane.
-- Branches now preview Survivor, Hunter, Delver, and Collector identities with compact passive-only planning text.
-- Added defensive passive preview helper output with locked, preview-only, inactive, and zero-effect status fields.
-- Extended smoke coverage should verify the passive preview map, branch count, node count, zero-effect state, and inert mutation helpers.
+## v1.16.2 Talent Preview Player-Facing Copy Polish
+- Current baseline: v1.16.2.
+- Trimmed the locked Talent Tree Preview copy so the four branches read more cleanly on mobile.
+- Branches still preview Survivor, Hunter, Delver, and Collector identities with the same 12 inert nodes.
+- Defensive passive preview helper output remains locked, preview-only, inactive, and zero-effect.
+- Extended smoke coverage now also checks the updated branch-summary copy while preserving the existing inert-map coverage.
 - Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and main progression remain unchanged.
 
 ## v1.14.0 Revisit Route Content Completion

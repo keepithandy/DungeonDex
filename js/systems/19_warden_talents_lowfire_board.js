@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.16.1 - Talent preview layout and smoke hardening.
+// DungeonDex v1.16.2 - Talent preview copy polish.
 (function(){
   if (window.DDWardenTalentsLowfireBoard) return;
   window.DDWardenTalentsLowfireBoard = true;
 
-  const SCRIPT_BUILD = '1.16.1-talent-preview-layout-smoke-hardening';
+  const SCRIPT_BUILD = '1.16.2-talent-preview-copy-polish';
   const TALENT_UI_POINT_STEP = 5;
   const TALENT_UI_POINT_CAP = 20;
   const ZERO_TALENT_BONUSES = Object.freeze({ maxHpPct:0, eliteBoardRewardPct:0, charterCostPct:0, sellValuePct:0 });
@@ -54,38 +54,38 @@
   const TALENT_PASSIVE_PREVIEW_MAP = {
     survivor: {
       branchName: 'Survivor',
-      branchSummary: 'HP, guard, safe-return.',
+      branchSummary: 'Stay alive. Recover safely.',
       nodes: [
-        { nodeKey:'survivor_sturdy_start', nodeTitle:'Sturdy Start', tier:1, costPreview:1, requirementPreview:'Preview. Branch locked.', passivePreviewDescription:'Planned future passive for sturdier opening runs.' },
-        { nodeKey:'survivor_safe_recovery', nodeTitle:'Safe Recovery', tier:2, costPreview:2, requirementPreview:'Preview. Future branch gate.', passivePreviewDescription:'Planned future passive for safer early recovery.' },
-        { nodeKey:'survivor_guard_return', nodeTitle:'Guarded Return', tier:3, costPreview:3, requirementPreview:'Preview. Future capstone gate.', passivePreviewDescription:'Planned future passive for clearer extraction resilience.' }
+        { nodeKey:'survivor_sturdy_start', nodeTitle:'Sturdy Start', tier:1, costPreview:1, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: sturdier starts.' },
+        { nodeKey:'survivor_safe_recovery', nodeTitle:'Safe Recovery', tier:2, costPreview:2, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: safer early recovery.' },
+        { nodeKey:'survivor_guard_return', nodeTitle:'Guarded Return', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: safer returns.' }
       ]
     },
     hunter: {
       branchName: 'Hunter',
-      branchSummary: 'Elite Board, rival, contract.',
+      branchSummary: 'Contracts, rivals, Elite Board.',
       nodes: [
-        { nodeKey:'hunter_board_clarity', nodeTitle:'Board Clarity', tier:1, costPreview:1, requirementPreview:'Preview. Board locked.', passivePreviewDescription:'Planned future passive for clearer contract reading.' },
-        { nodeKey:'hunter_board_payout_plan', nodeTitle:'Payout Plan', tier:2, costPreview:2, requirementPreview:'Preview. Payout inactive.', passivePreviewDescription:'Planned future passive for payout planning.' },
-        { nodeKey:'hunter_rival_trace', nodeTitle:'Rival Trace', tier:3, costPreview:3, requirementPreview:'Preview. Rival layer inert.', passivePreviewDescription:'Planned future passive for rival trace awareness.' }
+        { nodeKey:'hunter_board_clarity', nodeTitle:'Board Clarity', tier:1, costPreview:1, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: clearer contract reads.' },
+        { nodeKey:'hunter_board_payout_plan', nodeTitle:'Payout Plan', tier:2, costPreview:2, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: payout planning.' },
+        { nodeKey:'hunter_rival_trace', nodeTitle:'Rival Trace', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: rival awareness.' }
       ]
     },
     delver: {
       branchName: 'Delver',
-      branchSummary: 'Depth, stair sense, charter.',
+      branchSummary: 'Depth, stairs, charter planning.',
       nodes: [
-        { nodeKey:'delver_stair_sense', nodeTitle:'Stair Sense', tier:1, costPreview:1, requirementPreview:'Preview. Depth locked.', passivePreviewDescription:'Planned future passive for stair and route sense.' },
-        { nodeKey:'delver_depth_plan', nodeTitle:'Depth Plan', tier:2, costPreview:2, requirementPreview:'Preview. Depth support inert.', passivePreviewDescription:'Planned future passive for deeper-run planning.' },
-        { nodeKey:'delver_charter_support', nodeTitle:'Charter Support', tier:3, costPreview:3, requirementPreview:'Preview. Charter support inert.', passivePreviewDescription:'Planned future passive for future charter support.' }
+        { nodeKey:'delver_stair_sense', nodeTitle:'Stair Sense', tier:1, costPreview:1, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: stair sense.' },
+        { nodeKey:'delver_depth_plan', nodeTitle:'Depth Plan', tier:2, costPreview:2, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: deeper-run planning.' },
+        { nodeKey:'delver_charter_support', nodeTitle:'Charter Support', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: charter support.' }
       ]
     },
     collector: {
       branchName: 'Collector',
-      branchSummary: 'Loot, gear memory, archive.',
+      branchSummary: 'Loot, gear, archive, trophies.',
       nodes: [
-        { nodeKey:'collector_item_appraisal', nodeTitle:'Item Appraisal', tier:1, costPreview:1, requirementPreview:'Preview. Loot unchanged.', passivePreviewDescription:'Planned future passive for item appraisal.' },
-        { nodeKey:'collector_famous_memory', nodeTitle:'Famous Memory', tier:2, costPreview:2, requirementPreview:'Preview. Gear memory read-only.', passivePreviewDescription:'Planned future passive for Famous Gear memory support.' },
-        { nodeKey:'collector_trophy_archive', nodeTitle:'Trophy Archive', tier:3, costPreview:3, requirementPreview:'Preview. Trophy archive only.', passivePreviewDescription:'Planned future passive for trophy and archive visibility.' }
+        { nodeKey:'collector_item_appraisal', nodeTitle:'Item Appraisal', tier:1, costPreview:1, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: item appraisal.' },
+        { nodeKey:'collector_famous_memory', nodeTitle:'Famous Memory', tier:2, costPreview:2, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: Famous Gear memory.' },
+        { nodeKey:'collector_trophy_archive', nodeTitle:'Trophy Archive', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: trophy visibility.' }
       ]
     }
   };
@@ -106,7 +106,7 @@
     name: node.nodeTitle,
     effect: node.passivePreviewDescription,
     summary: node.requirementPreview,
-    note: 'Locked preview only.'
+    note: 'Preview only.'
   })));
 
   const TALENT_BY_ID = Object.fromEntries(TALENT_DEFS.map(def => [def.id, def]));
@@ -203,7 +203,7 @@
         learned: false,
         effectValue: 0,
         applied: false,
-        status: 'Locked preview only. Inactive.'
+        status: 'Preview only. Inactive.'
       };
     })
   });

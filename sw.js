@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.16.1-talent-preview-layout-smoke-hardening';
+const CACHE_NAME = 'dungeondex-v1.16.2-talent-preview-copy-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.16.1-talent-preview-layout-smoke-hardening';
+const BUILD_QS = '1.16.2-talent-preview-copy-polish';
 const ASSETS = [
   './',
   './index.html',

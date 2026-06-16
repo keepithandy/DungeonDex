@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.16.1`
-* Current development target: `v1.16.1`
+* Current local package baseline: `v1.16.2`
+* Current development target: `v1.16.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.16.2 - Talent Preview Player-Facing Copy Polish
+
+* Trimmed the locked Talent Tree Preview copy so the branch cards read more cleanly on mobile.
+* Kept Survivor, Hunter, Delver, and Collector preview branches intact with the same 12 inert preview nodes.
+* Preserved the defensive preview metadata and smoke coverage added in v1.16.1.
+* Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and revisit behavior remain unchanged.
 
 ## v1.16.1 - Talent Preview Layout / Smoke Hardening
 
