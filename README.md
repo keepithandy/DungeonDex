@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.0**
+Current baseline: **DungeonDex v1.20.1**
 
 ## Current Build
 
-**v1.20.0 - Second Revisit Lane Planning Contract**
+**v1.20.1 - Monster Backdrop Canvas Foundation**
 
-This pass adds the second planned Revisit lane contract for Famous Gear Memory without enabling route entry. It stays planning-only and read-only.
+This pass adds a deterministic, canvas-only monster backdrop layer behind the combat monster stage. It is visual-only, mobile-safe, and does not alter combat math, rewards, scaling, progression, or Revisit behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -57,6 +57,7 @@ Current major systems include:
 * Revisit route previews
 * Revisit unlock gates
 * Revisit unlock preview helpers
+* Monster backdrop canvas foundation
 
 ## Revisit System Status
 
@@ -85,9 +86,27 @@ Current rule:
 
 > Revisit routes are not playable yet.
 
-Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is now the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
+Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.20.0 keeps the revisit preview surface locked, read-only, preview-only, and non-playable while preserving the locked Talent Tree Preview and the existing smoke coverage.
+v1.20.1 keeps the revisit preview surface locked, read-only, preview-only, and non-playable while adding a separate visual-only combat backdrop foundation.
+
+## Monster Backdrop Status
+
+The monster backdrop system is currently a visual foundation only.
+
+Implemented so far:
+
+* `generateMonsterBackdrop(monster, state, options)`
+* `renderMonsterBackdrop(canvas, backdrop)`
+* `attachMonsterBackdropCanvas()`
+* `window.DDMonsterBackdropCanvas`
+* `smoke_monster_backdrops_v120.mjs`
+
+Current rule:
+
+> Monster backdrops are presentation only.
+
+The canvas renderer mounts behind `.combat-monster-stage`, uses deterministic seeds, maps monster/district/depth identity into themed scenery, and exposes no route entry, reward, scaling, damage, HP, or combat hook behavior. No Three.js dependency is used.
 
 ## Running Locally
 
@@ -117,6 +136,7 @@ node --check sw.js
 node --check smoke_talent_v150b.mjs
 node --check smoke_debt_collector_v169.mjs
 node --check smoke_revisit_routes_v173.mjs
+node --check smoke_monster_backdrops_v120.mjs
 node --check js/systems/00_core_constants_data.js
 node --check js/systems/03_town_contracts_market.js
 node --check js/systems/08_normalization_save.js
@@ -124,21 +144,24 @@ node --check js/systems/10_ui_town_shop.js
 node --check js/systems/19_warden_talents_lowfire_board.js
 node --check js/systems/21_build_label_guard.js
 node --check js/systems/27_interface_density_cleanup.js
+node --check js/systems/29_monster_backdrops_canvas.js
 git diff --check
 node .\smoke_talent_v150b.mjs
 node .\smoke_debt_collector_v169.mjs
 node .\smoke_revisit_routes_v173.mjs
+node .\smoke_monster_backdrops_v120.mjs
 ```
 
 ## Current Roadmap Direction
 
-Current focus is planning only. The locked foundations stay in place:
+Current focus is safe foundation work. The locked foundations stay in place:
 
 * Talent Tree Preview and Talent Ledger remain locked and read-only.
 * Revisit Routes remain preview/planning only.
 * Debt Collector remains a visibility and ledger layer only.
 * Elite Board remains the optional challenge layer.
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.
+* Monster backdrops remain visual-only and canvas-based.
 
 Revisit activation planning rules:
 
@@ -151,15 +174,16 @@ Revisit activation planning rules:
 
 Candidate next lanes:
 
-1. Revisit route activation implementation, later
-2. Talent foundation next-step planning
-3. Monster Codex / monster identity expansion planning
-4. Archive / Famous Gear memory polish
-5. Elite Board clarity polish
+1. Monster backdrop polish / boss-frame refinement
+2. Revisit route activation implementation, later
+3. Talent foundation next-step planning
+4. Monster Codex / monster identity expansion planning
+5. Archive / Famous Gear memory polish
+6. Elite Board clarity polish
 
 Recommended next lane:
 
-**Revisit route activation planning** remains the next lane to evaluate, but it should stay planning-only until explicitly approved.
+**Monster backdrop polish** is the next visual lane to evaluate, while Revisit route activation should stay planning-only until explicitly approved.
 
 ## Project Status
 
