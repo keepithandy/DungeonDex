@@ -9,14 +9,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.1`
-* Current development target: `v1.20.1`
+* Current local package baseline: `v1.20.2`
+* Current development target: `v1.20.2`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.2 - Monster Backdrop Canvas Completion
+
+* Completed the deterministic, canvas-only monster backdrop system behind the combat monster stage.
+* Added the production backdrop catalog and diagnostics helpers for visual QA.
+* Added stronger boss/elite framing, horizon motifs, foreground props, fog bands, motes, and resize-aware redraw keys.
+* Extended smoke coverage to prove the system is complete, deterministic, non-mutating, visual-only, cataloged, and resize-aware.
+* Preserved the v1.20.0 second Revisit lane planning contract and kept Revisit routes locked, read-only, preview-only, and non-playable.
+* No combat math, HP, rewards, route entry, route completion, scaling, economy, debt, Talent, Elite Board, trophy, Famous Gear, or main progression behavior changed.
 
 ## v1.20.1 - Monster Backdrop Canvas Foundation
 
@@ -97,48 +106,6 @@ This changelog records what changed and why.
 * Preserved the locked Talent Tree Preview and the revisit panels remaining removed.
 * Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and revisit behavior remain unchanged.
 
-## v1.16.2 - Talent Preview Player-Facing Copy Polish
-
-* Trimmed the locked Talent Tree Preview copy so the branch cards read more cleanly on mobile.
-* Kept Survivor, Hunter, Delver, and Collector preview branches intact with the same 12 inert preview nodes.
-* Preserved the defensive preview metadata and smoke coverage added in v1.16.1.
-* Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and revisit behavior remain unchanged.
-
-## v1.16.1 - Talent Preview Layout / Smoke Hardening
-
-* Mapped future passive talent candidates into the locked Talent Tree Preview for clearer planning copy.
-* Added Survivor, Hunter, Delver, and Collector passive preview branches with compact passive-only node copy.
-* Added defensive passive preview helper metadata so preview output stays locked, preview-only, inactive, and zero-effect.
-* Expanded smoke coverage to check the passive preview map, branch count, node count, inert status fields, and runtime safety.
-* Talent earning, spending, unlocks, learned state, active nodes, passive bonuses, combat, economy, debt, trophies, Famous Gear, Elite Board, and revisit behavior remain unchanged.
-
----
-
-## 1.5.x Direction
-
-DungeonDex `1.5.x` is the progression identity branch after the major `1.4` release.
-
-The goal of this line is to add deeper player progression without turning the base combat loop into a more complex system.
-
----
-
-## Historical 1.5.x Focus
-
-* Talent System Foundation
-* Passive-only progression hooks
-* Save-safe unlock state
-* Mobile-first talent viewing
-* Small, readable progression steps
-* Continued build/cache label consistency
-* No combat complexity inflation
-
-## 1.6.x Direction
-
-* Collection, memory, and compact town economy systems
-* Save-safe UI shells and normalization hooks
-* Display-only progression identity
-* No combat complexity inflation
-
 ---
 
 ## Do Not Use As Version Authority
@@ -154,25 +121,3 @@ The following should not be treated as the current project version:
 * Old generated package names
 
 Use `VERSION.md` for the current active version.
-
----
-
-## Version Notes
-
-Add new notes below this section.
-
----
-
-### v1.15.2 - Remove Planned Return Routes Town Panel
-
-* Tightened the revisit route panel copy so the existing locked previews read more cleanly on mobile.
-* Shortened route detail and readiness strings for the protected route identities without changing lock state or gameplay behavior.
-* Extended smoke coverage to confirm the revisit route content fields remain present, string-based, and read-only.
-* No route entry, reward, combat, economy, debt, trophy, Famous Gear, Elite Board, Talent, or main progression behavior changed.
-
-### v1.14.0 - Revisit Route Content Completion
-
-* Added a deterministic content-definition layer for revisit route previews so the existing side-route cards show clearer title, district, reason, hook source, short description, flavor line, safety line, and readiness note copy.
-* Improved the Town revisit panel copy to explain that these routes are optional side content, preview-only until requirements are met, and not a replacement for main dungeon progress.
-* Extended revisit smoke coverage to check route content definitions and the richer preview copy while leaving gameplay behavior unchanged.
-* No revisit activation, talent, combat, economy, debt, trophy, Famous Gear, Elite Board, or scaling behavior changed.
