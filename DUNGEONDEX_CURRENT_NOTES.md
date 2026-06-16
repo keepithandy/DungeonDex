@@ -7,16 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.19.1 - Current Roadmap / Next Systems Audit
+- DungeonDex v1.19.2 - Revisit Route Activation Planning
 
-## v1.19.1 Current Roadmap / Next Systems Audit
-- Current baseline: v1.19.1.
-- Refreshed the project-facing roadmap so the next lane is clear after the debt collector visibility audit.
-- Kept the locked Talent Tree Preview and Talent Ledger read-only.
-- Kept Revisit Routes in preview/planning only.
-- Kept Debt Collector as a visibility and ledger layer only.
-- Kept Elite Board as the optional challenge layer.
-- Boss Trophy, Archive, and Famous Gear memory remain display-focused.
+## v1.19.2 Revisit Route Activation Planning
+- Current baseline: v1.19.2.
+- Planned the future revisit route activation rules without enabling route entry.
+- Revisit should remain an optional side-return path sourced from existing history.
+- Candidate hooks should continue to come from Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo.
+- Revisit routes should stay mobile-readable, read-only for now, and behind explicit smoke guards when activation eventually arrives.
 - No gameplay, combat, economy, talent, revisit, debt, or scaling behavior changed.
 
 ## v1.14.0 Revisit Route Content Completion

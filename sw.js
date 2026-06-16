@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.19.1-current-roadmap-next-systems-audit';
+const CACHE_NAME = 'dungeondex-v1.19.2-revisit-route-activation-planning';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.19.1-current-roadmap-next-systems-audit';
+const BUILD_QS = '1.19.2-revisit-route-activation-planning';
 const ASSETS = [
   './',
   './index.html',

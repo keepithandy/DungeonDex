@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.19.1**
+Current baseline: **DungeonDex v1.19.2**
 
 ## Current Build
 
-**v1.19.1 - Current Roadmap / Next Systems Audit**
+**v1.19.2 - Revisit Route Activation Planning**
 
-This pass updates the project-facing roadmap and current notes so the next lane is clear after the debt collector visibility audit. It does not change gameplay, combat, rewards, progression, talent behavior, revisit behavior, or debt mechanics.
+This pass plans how revisit routes will eventually activate without turning them on yet. It only defines rules, terminology, UI expectations, and guardrails.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -82,7 +82,7 @@ Current rule:
 
 Trophy Echo now has read-only rule-planning metadata. Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
-v1.19.0 keeps Debt Collector display cleanup separate from gameplay while preserving the locked Talent Tree Preview and the existing smoke coverage.
+v1.19.2 keeps Debt Collector display cleanup separate from gameplay while preserving the locked Talent Tree Preview and the existing smoke coverage.
 
 ## Running Locally
 
@@ -127,7 +127,7 @@ node .\smoke_revisit_routes_v173.mjs
 
 ## Current Roadmap Direction
 
-Current focus is on roadmap and visibility audits, not new gameplay activation. The locked foundations stay in place:
+Current focus is planning only. The locked foundations stay in place:
 
 * Talent Tree Preview and Talent Ledger remain locked and read-only.
 * Revisit Routes remain preview/planning only.
@@ -135,9 +135,18 @@ Current focus is on roadmap and visibility audits, not new gameplay activation. 
 * Elite Board remains the optional challenge layer.
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.
 
+Revisit activation planning rules:
+
+* Revisit routes should eventually unlock from existing player history.
+* Candidate hooks should continue coming from stable sources such as Trophy Echo, Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo.
+* Revisit routes should stay optional side content.
+* Revisit routes should not outpace main progression rewards.
+* Revisit routes should stay readable on mobile and avoid hidden mechanics.
+* Revisit activation should stay behind explicit smoke guards.
+
 Candidate next lanes:
 
-1. Revisit route activation planning
+1. Revisit route activation implementation, later
 2. Talent foundation next-step planning
 3. Monster Codex / monster identity expansion planning
 4. Archive / Famous Gear memory polish
@@ -145,7 +154,7 @@ Candidate next lanes:
 
 Recommended next lane:
 
-**Revisit route activation planning** is the next systems lane to evaluate, but it should stay in planning only until explicitly approved.
+**Revisit route activation planning** remains the next lane to evaluate, but it should stay planning-only until explicitly approved.
 
 ## Project Status
 
