@@ -2,17 +2,17 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.6**
+Current baseline: **DungeonDex v1.20.7**
 
 ## Current Build
 
-**v1.20.6 - Revisit Guard Hardening**
+**v1.20.7 - Rival Trace Planning Lane**
 
-This note adds smoke coverage around the inert Revisit contract. Trophy Echo stays first, Famous Gear Memory stays second, and both remain planned-only with no entry path, rewards, or progression changes.
+This note adds Rival Trace as the third planned Revisit lane. Trophy Echo stays first, Famous Gear Memory stays second, and Rival Trace stays third as a read-only rival-memory lane with no entry path, rewards, or progression changes.
 
 ## Previous Build
 
-**v1.20.3 - Revisit Clarity and Label Sync**
+**v1.20.7 - Rival Trace Planning Lane**
 
 This cleanup aligned the visible build, cache, and runtime labels with `VERSION.md` and refreshed the read-only Revisit planning notes.
 
@@ -156,7 +156,7 @@ node .\smoke_monster_backdrops_v120.mjs
 Current focus is safe foundation work. The locked foundations stay in place:
 
 * Talent Tree Preview and Talent Ledger remain locked and read-only.
-* Revisit Routes remain preview/planning only, with Trophy Echo first and Famous Gear Memory second.
+* Revisit Routes remain preview/planning only, with Trophy Echo first, Famous Gear Memory second, and Rival Trace third.
 * Debt Collector remains a visibility and ledger layer only.
 * Elite Board remains the optional challenge layer.
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.

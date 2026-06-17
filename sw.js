@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.6-revisit-guard-hardening';
+const CACHE_NAME = 'dungeondex-v1.20.7-rival-trace-planning-lane';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.6-revisit-guard-hardening';
+const BUILD_QS = '1.20.7-rival-trace-planning-lane';
 const ASSETS = [
   './',
   './index.html',

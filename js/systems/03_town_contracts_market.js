@@ -1535,6 +1535,29 @@
     };
   }
 
+  function revisitThirdActivationLane(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const rivalTraceRoute = routes.find(route => String(route?.key || '') === 'rival_trace_route') || null;
+    return {
+      laneKey: 'rival-trace',
+      laneLabel: 'Rival Trace',
+      sourceHook: 'Rival Trace',
+      currentStatus: 'planned',
+      locked: true,
+      readOnly: true,
+      previewOnly: true,
+      hasLiveEntry: false,
+      hasRewards: false,
+      hasCompletion: false,
+      routeKey: 'rival_trace_route',
+      routeLabel: String(rivalTraceRoute?.title || 'Rival Trace Route'),
+      reason: 'Derived from named rival elite history only.',
+      note: 'Third planned revisit lane. Planning only.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+    };
+  }
+
   function canStartRevisitRoute(state = S, routeKey = '') {
     if (!state || typeof state !== 'object') return false;
     if (!state.player || typeof state.player !== 'object') return false;
@@ -2253,6 +2276,9 @@
       },
       revisitSecondActivationLane(state = S) {
         return revisitSecondActivationLane(state);
+      },
+      revisitThirdActivationLane(state = S) {
+        return revisitThirdActivationLane(state);
       },
       revisitRouteGateState(state = S, route = null) {
         return revisitRouteGateState(state, route);

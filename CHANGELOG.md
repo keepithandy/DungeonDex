@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.6`
-* Current development target: `v1.20.6`
+* Current local package baseline: `v1.20.7`
+* Current development target: `v1.20.7`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.7 - Rival Trace Planning Lane
+
+* Added Rival Trace as the third planned Revisit lane in read-only metadata and smoke coverage.
+* Kept Trophy Echo first and Famous Gear Memory second.
+* Confirmed Rival Trace stays planned-only, locked, and non-playable.
+* No Revisit activation, route entry, route rewards, route completion, currency, progression, combat, debt, talent, or Elite Board behavior changed.
 
 ## v1.20.6 - Revisit Guard Hardening
 

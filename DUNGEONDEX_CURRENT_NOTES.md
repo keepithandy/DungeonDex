@@ -7,13 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.6 - Revisit Guard Hardening
+- DungeonDex v1.20.7 - Rival Trace Planning Lane
 
-## v1.20.6 Revisit Guard Hardening
-- Current baseline: v1.20.6.
-- Smoke coverage now checks lane order, locked state, and the absence of route affordances.
-- Trophy Echo stays first and Famous Gear Memory stays second as planned-only metadata.
-- Revisit remains a planning surface only, with no entry path, rewards, or completion surface.
+## v1.20.7 Rival Trace Planning Lane
+- Current baseline: v1.20.7.
+- Rival Trace is now the third planned Revisit lane in read-only metadata.
+- Trophy Echo stays first, Famous Gear Memory stays second, and Rival Trace stays third.
+- Rival Trace is a memory/planning lane only, with no hunt, board mission, entry path, rewards, or completion surface.
 - No gameplay, combat, economy, debt, Talent, Elite Board, trophy, Famous Gear, or save-structure behavior changed.
 
 ## v1.20.1 Monster Backdrop Canvas Foundation
