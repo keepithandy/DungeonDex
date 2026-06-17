@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.5-revisit-planning-copy-cleanup';
+const CACHE_NAME = 'dungeondex-v1.20.6-revisit-guard-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.5-revisit-planning-copy-cleanup';
+const BUILD_QS = '1.20.6-revisit-guard-hardening';
 const ASSETS = [
   './',
   './index.html',

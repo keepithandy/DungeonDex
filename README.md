@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.5**
+Current baseline: **DungeonDex v1.20.6**
 
 ## Current Build
 
-**v1.20.5 - Revisit Planning Copy Cleanup**
+**v1.20.6 - Revisit Guard Hardening**
 
-This note trims repeated roadmap wording while keeping the Revisit chain read-only. Trophy Echo stays the first planned lane because boss trophy history is the cleanest anchor for remembered victories. Famous Gear Memory stays second as the retired and named gear memory lane. Both are planned-only, with no entry path and all gates locked.
+This note adds smoke coverage around the inert Revisit contract. Trophy Echo stays first, Famous Gear Memory stays second, and both remain planned-only with no entry path, rewards, or progression changes.
 
 ## Previous Build
 

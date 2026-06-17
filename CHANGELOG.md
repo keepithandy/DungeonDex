@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.5`
-* Current development target: `v1.20.5`
+* Current local package baseline: `v1.20.6`
+* Current development target: `v1.20.6`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.6 - Revisit Guard Hardening
+
+* Hardened revisit smoke coverage around the inert planning contract.
+* Kept Trophy Echo first and Famous Gear Memory second as read-only planned lanes only.
+* Confirmed the Revisit system still has no entry path, rewards, completion, or progression mutation.
+* No Revisit activation, route entry, route rewards, route completion, currency, progression, combat, debt, talent, or Elite Board behavior changed.
 
 ## v1.20.5 - Revisit Planning Copy Cleanup
 
