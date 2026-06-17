@@ -7,16 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.4 - Revisit Lane Order Clarification
+- DungeonDex v1.20.5 - Revisit Planning Copy Cleanup
 
-## v1.20.4 Revisit Lane Order Clarification
-- Current baseline: v1.20.4.
-- Trophy Echo is first because boss trophy history is the cleanest anchor for revisiting earlier dungeon accomplishments.
-- Trophy Echo represents remembered victories only. It is not a live route.
-- Famous Gear Memory is second because retired and named gear history is a natural follow-up memory lane.
-- Famous Gear Memory remains planned-only.
-- Revisit remains a planning surface only.
-- Revisit gates stay locked and unavailable.
+## v1.20.5 Revisit Planning Copy Cleanup
+- Current baseline: v1.20.5.
+- Trophy Echo stays the first planned lane because boss trophy history is the cleanest anchor for remembered victories.
+- Famous Gear Memory stays second as the retired and named gear memory lane.
+- Both lanes remain planned-only metadata.
+- Revisit remains a planning surface only, with no entry path and all gates locked.
 - No gameplay, combat, economy, debt, Talent, Elite Board, trophy, Famous Gear, or save-structure behavior changed.
 
 ## v1.20.1 Monster Backdrop Canvas Foundation

@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.4**
+Current baseline: **DungeonDex v1.20.5**
 
 ## Current Build
 
-**v1.20.4 - Revisit Lane Order Clarification**
+**v1.20.5 - Revisit Planning Copy Cleanup**
 
-This note keeps the Revisit chain read-only and explains the order more plainly. Trophy Echo is first because boss trophy history is the cleanest anchor for revisiting earlier dungeon accomplishments. It represents remembered victories, not a live route. Famous Gear Memory is second because retired and named gear history is a natural follow-up memory lane. Both remain planned-only, and all Revisit gates stay locked.
+This note trims repeated roadmap wording while keeping the Revisit chain read-only. Trophy Echo stays the first planned lane because boss trophy history is the cleanest anchor for remembered victories. Famous Gear Memory stays second as the retired and named gear memory lane. Both are planned-only, with no entry path and all gates locked.
 
 ## Previous Build
 
@@ -156,7 +156,7 @@ node .\smoke_monster_backdrops_v120.mjs
 Current focus is safe foundation work. The locked foundations stay in place:
 
 * Talent Tree Preview and Talent Ledger remain locked and read-only.
-* Revisit Routes remain preview/planning only.
+* Revisit Routes remain preview/planning only, with Trophy Echo first and Famous Gear Memory second.
 * Debt Collector remains a visibility and ledger layer only.
 * Elite Board remains the optional challenge layer.
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.

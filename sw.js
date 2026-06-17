@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.4-revisit-lane-order-clarification';
+const CACHE_NAME = 'dungeondex-v1.20.5-revisit-planning-copy-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.4-revisit-lane-order-clarification';
+const BUILD_QS = '1.20.5-revisit-planning-copy-cleanup';
 const ASSETS = [
   './',
   './index.html',
