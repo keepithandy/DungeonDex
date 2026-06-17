@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.3-revisit-clarity-label-sync';
+const CACHE_NAME = 'dungeondex-v1.20.4-revisit-lane-order-clarification';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.3-revisit-clarity-label-sync';
+const BUILD_QS = '1.20.4-revisit-lane-order-clarification';
 const ASSETS = [
   './',
   './index.html',

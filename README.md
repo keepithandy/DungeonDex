@@ -2,13 +2,19 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.3**
+Current baseline: **DungeonDex v1.20.4**
 
 ## Current Build
 
+**v1.20.4 - Revisit Lane Order Clarification**
+
+This note keeps the Revisit chain read-only and explains the order more plainly. Trophy Echo is first because boss trophy history is the cleanest anchor for revisiting earlier dungeon accomplishments. It represents remembered victories, not a live route. Famous Gear Memory is second because retired and named gear history is a natural follow-up memory lane. Both remain planned-only, and all Revisit gates stay locked.
+
+## Previous Build
+
 **v1.20.3 - Revisit Clarity and Label Sync**
 
-This cleanup aligns the visible build, cache, and runtime labels with `VERSION.md` and refreshes the read-only Revisit planning notes. Trophy Echo is still the first planned lane because boss trophy history already tracks the kind of past-achievement signal it would eventually anchor to, but it remains metadata only. It does not unlock a route, add rewards, create an entry button, or mutate player progression. Famous Gear Memory remains the second planned lane.
+This cleanup aligned the visible build, cache, and runtime labels with `VERSION.md` and refreshed the read-only Revisit planning notes.
 
 ## Previous Build
 

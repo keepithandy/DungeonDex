@@ -9,14 +9,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.3`
-* Current development target: `v1.20.3`
+* Current local package baseline: `v1.20.4`
+* Current development target: `v1.20.4`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.4 - Revisit Lane Order Clarification
+
+* Clarified why Trophy Echo is first: boss trophy history is the cleanest anchor for earlier dungeon accomplishments.
+* Clarified that Trophy Echo is remembered victories only, not a live route.
+* Clarified that Famous Gear Memory is the natural second lane because retired and named gear history follows as a memory trail.
+* Kept the Revisit system planning-only, with all gates locked and unavailable.
+* No Revisit activation, route entry, route rewards, route completion, currency, progression, combat, debt, talent, or Elite Board behavior changed.
 
 ## v1.20.3 - Revisit Clarity and Label Sync
 
