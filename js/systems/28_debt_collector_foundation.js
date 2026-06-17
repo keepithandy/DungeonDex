@@ -1,6 +1,6 @@
 'use strict';
 
-  // DungeonDex v1.19.2 Debt Collector support.
+  // DungeonDex v1.20.8 Debt Collector support.
 (function(){
   if (window.DDDebtCollectorFoundation) return;
   window.DDDebtCollectorFoundation = true;
@@ -84,7 +84,7 @@
       title: 'Debt Collector',
       summary: debt.balanceCopper > 0 ? 'Active debt. Pressure is visible.' : 'No active debt. Pressure is quiet.',
       statusLabel: debt.balanceCopper > 0 ? 'Debt Active' : 'No Debt',
-      balanceLabel: `Owed ${moneyHtml(debt.balanceCopper)}`,
+      balanceLabel: `Owed ${moneyPlain(debt.balanceCopper)}`,
       pressureLabel: debt.balanceCopper > 0 ? debt.pressure : 0,
       lastVisitLabel: debt.lastVisitAt || 'None',
       notesLabel: Array.isArray(debt.notes) && debt.notes.length ? `${debt.notes.length} note${debt.notes.length === 1 ? '' : 's'}` : 'No notes',

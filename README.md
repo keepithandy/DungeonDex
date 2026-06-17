@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.7**
+Current baseline: **DungeonDex v1.20.8**
 
 ## Current Build
 
-**v1.20.7 - Rival Trace Planning Lane**
+**v1.20.8 - Owed Money Text Fix**
 
 This note adds Rival Trace as the third planned Revisit lane. Trophy Echo stays first, Famous Gear Memory stays second, and Rival Trace stays third as a read-only rival-memory lane with no entry path, rewards, or progression changes.
 

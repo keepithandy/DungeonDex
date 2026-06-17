@@ -263,12 +263,12 @@ async function main() {
         panel: document.getElementById('debtCollectorPanel')?.innerHTML || ''
       };
     })()`));
-    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && uiResult.buttonCount === 3 && uiResult.hasRepayButton === true, JSON.stringify(uiResult));
+    record('Borrow 5s button adds wallet and active debt', uiResult.wallet === 500 && uiResult.debt.balanceCopper === 500 && uiResult.debt.active === true && uiResult.buttonCount === 3 && uiResult.hasRepayButton === true && !/Owed <span class="money/i.test(uiResult.panelText || '') && /Owed 5s/.test(uiResult.panelText || ''), JSON.stringify(uiResult));
 
     await client.send('Page.reload', { ignoreCache: true });
     if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after persistence reload.');
     const persisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '' }))()`));
-    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && persisted.panelText.includes('Debt Active'), JSON.stringify(persisted));
+    record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && persisted.panelText.includes('Debt Active') && !/Owed <span class="money/i.test(persisted.panelText || '') && /Owed 5s/.test(persisted.panelText || ''), JSON.stringify(persisted));
 
     const repayResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 300;

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.7-rival-trace-planning-lane';
+const CACHE_NAME = 'dungeondex-v1.20.8-owed-money-text-fix';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.7-rival-trace-planning-lane';
+const BUILD_QS = '1.20.8-owed-money-text-fix';
 const ASSETS = [
   './',
   './index.html',
