@@ -7,18 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.2 - Monster Backdrop Canvas Completion
+- DungeonDex v1.20.3 - Revisit Clarity and Label Sync
 
-## v1.20.2 Monster Backdrop Canvas Completion
-- Current baseline: v1.20.2.
-- Completed `js/systems/29_monster_backdrops_canvas.js` as a deterministic, canvas-only combat backdrop system.
-- The backdrop system now exposes `generateMonsterBackdrop(monster, state, options)`, `renderMonsterBackdrop(canvas, backdrop)`, `attachMonsterBackdropCanvas()`, `monsterBackdropCatalog()`, `monsterBackdropDiagnostics()`, and `window.DDMonsterBackdropCanvas`.
-- The renderer mounts behind `.combat-monster-stage`, uses deterministic seeds, and maps district/monster/depth identity into Lowfire, Bellforge, Mireglass, Red Chapel, Salt Forge, Sunken Court, Rookery, Noctis, or generic Hollow Stair scenery.
-- Completion added a production theme catalog, diagnostics, horizon motifs, foreground props, fog bands, motes, stronger boss/elite framing, resize-aware redraw keys, and ResizeObserver support where available.
-- Extended `smoke_monster_backdrops_v120.mjs` to prove the backdrop contract is deterministic, non-mutating, complete, visual-only, cataloged, boss-intensity-only, and resize-aware.
-- No Three.js dependency was added.
-- No combat math, HP, rewards, route entry, route completion, scaling, economy, debt, Talent, Elite Board, trophy, Famous Gear, or main progression behavior changed.
-- v1.20.0 second Revisit lane planning remains preserved: Trophy Echo is still lane 1 and Famous Gear Memory is still lane 2 as inert metadata only.
+## v1.20.3 Revisit Clarity and Label Sync
+- Current baseline: v1.20.3.
+- Aligned visible, build, cache, and runtime labels with `VERSION.md`.
+- Added a short planning note explaining that Trophy Echo is first because boss trophy history already tracks the kind of past-achievement signal it will eventually represent.
+- Trophy Echo remains read-only planning metadata only. It does not unlock a route, grant rewards, create an entry button, or mutate player progression.
+- Famous Gear Memory remains the second planned Revisit lane.
+- Revisit gates stay locked and unavailable.
+- No gameplay, combat, economy, debt, Talent, Elite Board, trophy, Famous Gear, or save-structure behavior changed.
 
 ## v1.20.1 Monster Backdrop Canvas Foundation
 - Current baseline: v1.20.1.

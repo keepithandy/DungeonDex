@@ -9,14 +9,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.2`
-* Current development target: `v1.20.2`
+* Current local package baseline: `v1.20.3`
+* Current development target: `v1.20.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.3 - Revisit Clarity and Label Sync
+
+* Bumped the public, local, and development version labels to `v1.20.3`.
+* Aligned visible build, cache, and runtime labels so they match `VERSION.md`.
+* Added a short read-only Revisit planning note explaining why Trophy Echo is first, while keeping it metadata only.
+* Kept Famous Gear Memory as the second planned lane and left all Revisit gates locked.
+* No Revisit activation, route entry, route rewards, route completion, currency, progression, combat, debt, talent, or Elite Board behavior changed.
 
 ## v1.20.2 - Monster Backdrop Canvas Completion
 
