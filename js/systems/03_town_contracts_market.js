@@ -710,7 +710,8 @@
       ],
       rival_trace_route: [
         'Stub: remember a named rival elite',
-        'Stub: keep the trace as memory only'
+        'Stub: keep the trace as memory only',
+        'Stub: third planned lane, no live route'
       ],
       debt_pressure_route: [
         'Stub: let the debt ledger build pressure',
@@ -987,7 +988,7 @@
         source: 'named rival elite memory',
         previewState: 'locked',
         previewLabel: 'Still locked',
-        previewReason: 'Future named rival elite memory may sharpen this trace later.',
+        previewReason: 'Future named rival elite memory may sharpen this third planning lane later.',
         previewRequirement: 'Remember named rival elite history.',
         previewSafety: 'Preview only - route access is unavailable.'
       };
@@ -1548,7 +1549,7 @@
       routeKey: 'rival_trace_route',
       routeLabel: String(rivalTraceRoute?.title || 'Rival Trace Route'),
       reason: 'Based on remembered named rival elite history only.',
-      note: 'Third planned lane; memory/planning only. No hunt, board mission, route, reward, unlock, currency, or progression mutation.',
+      note: 'Third planned lane; memory/planning only. No hunt, board mission, route, reward, unlock, currency, progression, or combat mutation.',
       allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
     };
   }

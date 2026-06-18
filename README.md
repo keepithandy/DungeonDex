@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.9**
+Current baseline: **DungeonDex v1.20.10**
 
 ## Current Build
 
-**v1.20.9 - Rival Trace Planning Clarity**
+**v1.20.10 - Revisit Planning Contract Lock**
 
-This patch clarifies that Rival Trace is the third read-only Revisit lane based on remembered named rival elite history. It remains memory/planning only and adds no hunt, route, board mission, reward, unlock, currency, or progression mutation.
+This patch locks the Revisit planning contract so the planned lane order stays Trophy Echo, Famous Gear Memory, then Rival Trace. Rival Trace remains named rival elite memory only and adds no hunt, route, board mission, reward, unlock, currency, or progression mutation.
 
 ## Previous Build
 
