@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.13-trophy-echo-detail-contract-lock';
+const CACHE_NAME = 'dungeondex-v1.20.14-trophy-echo-fallback-smoke-lock';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.13-trophy-echo-detail-contract-lock';
+const BUILD_QS = '1.20.14-trophy-echo-fallback-smoke-lock';
 const ASSETS = [
   './',
   './index.html',

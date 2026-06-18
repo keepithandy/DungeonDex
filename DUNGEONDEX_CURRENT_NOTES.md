@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.13 - Trophy Echo Detail Contract Lock
+- DungeonDex v1.20.14 - Trophy Echo Fallback Smoke Lock
 
-## v1.20.13 Trophy Echo Detail Contract Lock
-- Current baseline: v1.20.13.
+## v1.20.14 Trophy Echo Fallback Smoke Lock
+- Current baseline: v1.20.14.
 - Trophy Echo now has a read-only route detail foundation tied to remembered boss trophies and trophy records.
 - The planned Revisit lane order remains Trophy Echo, Famous Gear Memory, then Rival Trace.
 - Rival Trace remains named rival elite memory only.
