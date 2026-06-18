@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.14-trophy-echo-fallback-smoke-lock';
+const CACHE_NAME = 'dungeondex-v1.20.15-trophy-echo-fallback-edge-completion';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.14-trophy-echo-fallback-smoke-lock';
+const BUILD_QS = '1.20.15-trophy-echo-fallback-edge-completion';
 const ASSETS = [
   './',
   './index.html',
