@@ -300,6 +300,22 @@
     return [];
   }
 
+  function createTalentEarningState() {
+    return {
+      enabled: false,
+      sourceId: 'boss_depth_milestone',
+      milestonesReached: {},
+      pointsAwarded: 0
+    };
+  }
+
+  function normalizeTalentEarningState(state) {
+    const earning = createTalentEarningState();
+    if (!state?.player) return earning;
+    state.player.talentEarning = earning;
+    return earning;
+  }
+
   function repairTalentState(state) {
     const talentState = createTalentState();
     talentState.spent = talentState.unlocked;
@@ -309,6 +325,7 @@
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
     state.player.talentUnlockIds = [];
+    normalizeTalentEarningState(state);
     return talentState;
   }
 

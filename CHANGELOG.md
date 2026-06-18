@@ -9,14 +9,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.18`
-* Current development target: `v1.20.18`
+* Current local package baseline: `v1.20.19`
+* Current development target: `v1.20.19`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.19 - Talent Earning Source Contract
+
+* Defined boss/depth milestones as the primary future Talent earning source behind a disabled gate.
+* Added a defensive, read-only contract with six future milestone examples and six total planned points.
+* Expanded save shape with inert `player.talentEarning` metadata; normalization forces the gate disabled, milestone state empty, and awarded points to zero.
+* Added `earningSourceContract`, `earningEnabled`, and `earningStatus` inspection helpers without adding an award path.
+* Added seven smoke records covering contract shape, milestones, disabled state, zero points, non-mutation, and stable output.
+* Retained the Talent module's stable `v1.16.2` component provenance label.
+* No milestone tracking, Talent point awards, spending, unlocks, bonuses, UI actions, combat, economy, monsters, gear, or progression behavior changed.
 
 ## v1.20.18 - Talent System Re-entry Audit
 

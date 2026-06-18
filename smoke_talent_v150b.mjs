@@ -713,6 +713,45 @@ async function main() {
     record('Talent ruleset source/caps/costs are stable and inactive', rulesetSourceOk && ruleset.pointCaps?.earlyCap === 6 && ruleset.pointCaps?.activeCap === 0 && ruleset.pointCaps?.spendableCap === 0 && ruleset.costModel?.activeCost === 0 && ruleset.costModel?.costsByTier?.['1'] === 1 && ruleset.costModel?.costsByTier?.['2'] === 2 && ruleset.costModel?.costsByTier?.['3'] === 3, JSON.stringify({ pointSources: ruleset.pointSources, pointCaps: ruleset.pointCaps, costModel: ruleset.costModel }));
     record('Talent ruleset branch/tier/node data is locked', rulesetBranchesOk && rulesetTiersOk && rulesetNodesOk, JSON.stringify({ branches: ruleset.branches, tiers: ruleset.tiers, nodes: rulesetNodes.slice(0, 3) }));
     record('Talent passive preview map exists', !!rulesetAudit?.passiveMap && Object.keys(rulesetAudit.passiveMap).length === 4 && rulesetAudit.passiveSummary?.branchName === 'Survivor' && rulesetAudit.branchSummary?.branchName && rulesetAudit.nodeDetails?.locked === true && rulesetAudit.nodeDetails?.previewOnly === true, JSON.stringify({ passiveSummary: rulesetAudit.passiveSummary, branchSummary: rulesetAudit.branchSummary, nodeDetails: rulesetAudit.nodeDetails }));
+    const earningAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api) return null;
+      const before = JSON.stringify(S);
+      const contract = typeof api.earningSourceContract === 'function' ? api.earningSourceContract(S) : null;
+      const after = JSON.stringify(S);
+      const contract2 = typeof api.earningSourceContract === 'function' ? api.earningSourceContract(S) : null;
+      const earning = JSON.parse(JSON.stringify(S.player?.talentEarning || {}));
+      const status = typeof api.earningStatus === 'function' ? api.earningStatus(S) : null;
+      const enabled = typeof api.earningEnabled === 'function' ? api.earningEnabled(S) : null;
+      const pointsBefore = Number(S.player?.talentEarning?.pointsAwarded || 0);
+      const summary1 = typeof api.summary === 'function' ? api.summary(S) : null;
+      const pointsAfter = Number(S.player?.talentEarning?.pointsAwarded || 0);
+      const summary2 = typeof api.summary === 'function' ? api.summary(S) : null;
+      return {
+        hasContractHelper: typeof api.earningSourceContract === 'function',
+        hasEnabledHelper: typeof api.earningEnabled === 'function',
+        hasStatusHelper: typeof api.earningStatus === 'function',
+        contract,
+        contract2,
+        earning,
+        status,
+        enabled,
+        pointsBefore,
+        pointsAfter,
+        summary1,
+        summary2,
+        notMutated: before === after
+      };
+    })()`);
+    const earningContract = earningAudit?.contract;
+    const earningMilestones = Array.isArray(earningContract?.milestones) ? earningContract.milestones : [];
+    record('Talent earning source contract exists', earningAudit?.hasContractHelper === true && earningContract?.sourceId === 'boss_depth_milestone' && earningContract?.sourceLabel === 'Boss / Depth Milestone' && earningContract?.enabled === false, JSON.stringify(earningContract));
+    record('Boss/depth milestone contract lists expected milestones', earningMilestones.length === 6 && earningMilestones.every(entry => entry.futureAwardIfEnabled === 1) && earningMilestones.some(entry => entry.milestone === 'first_boss' && /first.*boss/i.test(entry.label || '')) && earningMilestones.some(entry => entry.milestone === 'depth_5' && /depth.*5/i.test(entry.label || '')) && earningContract?.totalPointsIfAllMilestonesCompleted === 6, JSON.stringify(earningMilestones));
+    record('Talent earning feature flag exists and disabled', earningAudit?.earning?.enabled === false && earningAudit?.earning?.sourceId === 'boss_depth_milestone' && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.earning?.milestonesReached && Object.keys(earningAudit.earning.milestonesReached).length === 0 && earningAudit?.enabled === false, JSON.stringify(earningAudit?.earning));
+    record('Talent earning status shows 0 points awarded while disabled', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === false && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
+    record('Talent earning source contract does not mutate state', earningAudit?.notMutated === true, JSON.stringify({ notMutated: earningAudit?.notMutated }));
+    record('Talent points remain 0 while earning disabled', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
+    record('Talent earning source contract returns stable contract', !!earningContract && JSON.stringify(earningContract) === JSON.stringify(earningAudit?.contract2), JSON.stringify(earningContract));
     const previewSafety = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       if (!api) return null;

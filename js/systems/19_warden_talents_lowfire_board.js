@@ -208,6 +208,23 @@
     })
   });
 
+  const TALENT_EARNING_SOURCE_CONTRACT = deepFreeze({
+    sourceId: 'boss_depth_milestone',
+    sourceLabel: 'Boss / Depth Milestone',
+    enabled: false,
+    description: 'Talent points earned from defeating bosses and advancing depth milestones.',
+    milestones: [
+      { milestone:'first_boss', label:'First Boss Defeated', futureAwardIfEnabled:1 },
+      { milestone:'depth_5', label:'Depth 5 Reached', futureAwardIfEnabled:1 },
+      { milestone:'depth_10', label:'Depth 10 Reached', futureAwardIfEnabled:1 },
+      { milestone:'depth_15', label:'Depth 15 Reached', futureAwardIfEnabled:1 },
+      { milestone:'boss_5', label:'5 Bosses Defeated', futureAwardIfEnabled:1 },
+      { milestone:'boss_10', label:'10 Bosses Defeated', futureAwardIfEnabled:1 }
+    ],
+    totalPointsIfAllMilestonesCompleted: 6,
+    pointsAwardedNow: 0
+  });
+
   window.TALENT_RULESET_PREVIEW = TALENT_RULESET_PREVIEW;
 
   function ensureTalents(state){
@@ -442,6 +459,29 @@
       branchLabels: TALENT_RULESET_PREVIEW.branches.map(branch => branch.label),
       pointSourceLabels: TALENT_RULESET_PREVIEW.pointSources.map(source => source.label),
       costSummary: 'Tier costs planned: 1 / 2 / 3. Active cost: 0.'
+    };
+  }
+
+  function talentEarningSourceContract(state){
+    return clonePlain(TALENT_EARNING_SOURCE_CONTRACT);
+  }
+
+  function talentEarningEnabled(state){
+    const earning = safeLedgerSource(state?.player?.talentEarning);
+    return TALENT_RULESET_PREVIEW.earningEnabled === true && earning.enabled === true;
+  }
+
+  function talentEarningStatus(state){
+    const contract = talentEarningSourceContract(state);
+    const earning = safeLedgerSource(state?.player?.talentEarning);
+    const enabled = talentEarningEnabled(state);
+    return {
+      sourceId: contract.sourceId,
+      sourceLabel: contract.sourceLabel,
+      enabled,
+      pointsAwardedNow: enabled ? Math.max(0, Math.floor(N(ownValue(earning, 'pointsAwarded', 0), 0, 0, Number.MAX_SAFE_INTEGER))) : 0,
+      availableMilestones: contract.milestones.length,
+      totalPointsIfFullyUnlocked: contract.totalPointsIfAllMilestonesCompleted
     };
   }
 
@@ -1015,6 +1055,9 @@
     ruleset: talentRulesetPreview,
     rulesetSummary: talentRulesetSummary,
     rulesetNodes: talentPreviewNodes,
+    earningSourceContract: talentEarningSourceContract,
+    earningEnabled: talentEarningEnabled,
+    earningStatus: talentEarningStatus,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,

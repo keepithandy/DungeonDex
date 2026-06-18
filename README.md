@@ -2,13 +2,19 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.18**
+Current baseline: **DungeonDex v1.20.19**
 
 ## Current Build
 
+**v1.20.19 - Talent Earning Source Contract**
+
+This patch defines boss/depth milestones as the primary future Talent earning source behind a disabled feature gate. Save shape expands with inert `player.talentEarning` metadata, while awarded and available points remain zero.
+
+## Previous Build
+
 **v1.20.18 - Talent System Re-entry Audit**
 
-This documentation-first patch confirms the Talent foundation remains single-sourced, locked, preview-only, and inert. It does not enable point earning, spending, unlocks, learned nodes, passive effects, or gameplay bonuses.
+This documentation-first patch confirmed the Talent foundation remained single-sourced, locked, preview-only, and inert before earning-source work resumed.
 
 ## Previous Build
 
@@ -79,7 +85,7 @@ Current major systems include:
 
 The Talent system is a stable preview foundation backed by one deeply frozen ruleset with four branches and twelve nodes. Save repair forces legacy point/unlock fields and the canonical ledger to a safe zero-state, and existing smoke coverage verifies that combat, Elite Board rewards, charter costs, and sell values remain unaffected.
 
-The Talent module's internal `v1.16.2` label records its component lineage; `VERSION.md` remains the public build authority. The next recommended patch is a separately gated point-earning step from Elite Board contract completion, with spending, unlocks, and bonuses still disabled.
+The Talent module's internal `v1.16.2` label records its component lineage; `VERSION.md` remains the public build authority. Boss/depth milestones are the primary future earning source. Milestone tracking and activation remain undecided future work, while Elite Board sources remain possible secondary sources only.
 
 ## Revisit System Status
 
