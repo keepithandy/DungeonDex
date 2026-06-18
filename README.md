@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.10**
+Current baseline: **DungeonDex v1.20.11**
 
 ## Current Build
 
-**v1.20.10 - Revisit Planning Contract Lock**
+**v1.20.11 - Trophy Echo Route Detail Foundation**
 
-This patch locks the Revisit planning contract so the planned lane order stays Trophy Echo, Famous Gear Memory, then Rival Trace. Rival Trace remains named rival elite memory only and adds no hunt, route, board mission, reward, unlock, currency, or progression mutation.
+This patch adds the first read-only Trophy Echo route detail foundation. Trophy Echo remains a future side-route concept tied to remembered boss trophies and trophy records, and it adds no live entry, reward, completion, unlock, currency, or progression mutation.
 
 ## Previous Build
 

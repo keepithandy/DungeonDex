@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.10`
-* Current development target: `v1.20.10`
+* Current local package baseline: `v1.20.11`
+* Current development target: `v1.20.11`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -18,11 +18,11 @@ This changelog records what changed and why.
 
 ---
 
-## v1.20.10 - Revisit Planning Contract Lock
+## v1.20.11 - Trophy Echo Route Detail Foundation
 
-* Locked the read-only Revisit planning contract so the planned lane order remains Trophy Echo, Famous Gear Memory, then Rival Trace.
-* Kept Rival Trace as named rival elite memory only.
-* Added smoke coverage proving the planning lane order stays at three lanes and exposes no live entry, hunt, board mission, reward, unlock, currency, completion, or progression mutation surface.
+* Added a read-only Trophy Echo route detail foundation tied to remembered boss trophies and trophy records.
+* Kept the planned Revisit lane order at Trophy Echo, Famous Gear Memory, then Rival Trace.
+* Added smoke coverage proving the Trophy Echo detail contract stays locked, planning-only, and exposes no live entry, hunt, board mission, reward, unlock, currency, completion, or progression mutation surface.
 * No Revisit activation, route entry, route rewards, route completion, combat, economy, contracts, debt, Talent, gear, trophy, Famous Gear, save, or Elite Board behavior changed.
 
 ## v1.20.8 - Owed Money Text Fix
