@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.11**
+Current baseline: **DungeonDex v1.20.12**
 
 ## Current Build
 
-**v1.20.11 - Trophy Echo Route Detail Foundation**
+**v1.20.12 - Trophy Echo Detail Hardening**
 
 This patch adds the first read-only Trophy Echo route detail foundation. Trophy Echo remains a future side-route concept tied to remembered boss trophies and trophy records, and it adds no live entry, reward, completion, unlock, currency, or progression mutation.
 
@@ -20,7 +20,7 @@ This patch fixes the Debt Collector Owed line so text-rendered debt summaries sh
 
 **v1.20.7 - Rival Trace Planning Lane**
 
-This cleanup aligned the visible build, cache, and runtime labels with `VERSION.md` and refreshed the read-only Revisit planning notes.
+This cleanup aligned the visible build, cache, and runtime labels with `VERSION.md` and tightened the read-only Trophy Echo detail contract without activating Revisit.
 
 ## Previous Build
 

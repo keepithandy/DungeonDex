@@ -873,7 +873,7 @@
       planningOnly: true,
       locked: true,
       readOnly: true,
-      detail: 'Future side-route concept tied to remembered boss trophies and trophy records.',
+      detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.',
       reason: plan.notes[0] || 'Trophy Echo should be the first planned revisit route because boss history is already tracked.',
       safety: plan.routeAccessLabel,
       routeAccessLabel: plan.routeAccessLabel,
@@ -1220,7 +1220,7 @@
         routeFlavorLine: 'Old victories still mark the path.',
         safetyStatusLine: 'Locked preview. No route access.',
         lockedReadinessNote: 'Needs more boss history.',
-        detail: 'Future side-route concept tied to remembered boss trophies and trophy records.',
+        detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.',
         reason: 'Old victories may call back later.'
       },
       famous_gear_route: {
@@ -1282,7 +1282,7 @@
       safetyStatusLine: String(route?.safetyStatusLine || def.safetyStatusLine || 'Locked preview. No route access.').trim(),
       lockedReadinessNote: String(route?.lockedReadinessNote || def.lockedReadinessNote || 'Needs more dungeon history.').trim(),
       detail: String(route?.detail || def.detail || (String(route?.key || '').trim() === 'trophy_echo_route'
-        ? 'Future side-route concept tied to remembered boss trophies and trophy records.'
+        ? 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.'
         : 'Read-only route preview.')).trim()
     };
   }

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.11-trophy-echo-detail-foundation';
+const CACHE_NAME = 'dungeondex-v1.20.12-trophy-echo-detail-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.11-trophy-echo-detail-foundation';
+const BUILD_QS = '1.20.12-trophy-echo-detail-hardening';
 const ASSETS = [
   './',
   './index.html',

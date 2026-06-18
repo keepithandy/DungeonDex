@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.11 - Trophy Echo Route Detail Foundation
+- DungeonDex v1.20.12 - Trophy Echo Detail Hardening
 
-## v1.20.11 Trophy Echo Route Detail Foundation
-- Current baseline: v1.20.11.
+## v1.20.12 Trophy Echo Detail Hardening
+- Current baseline: v1.20.12.
 - Trophy Echo now has a read-only route detail foundation tied to remembered boss trophies and trophy records.
 - The planned Revisit lane order remains Trophy Echo, Famous Gear Memory, then Rival Trace.
 - Rival Trace remains named rival elite memory only.
