@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.8`
-* Current development target: `v1.20.8`
+* Current local package baseline: `v1.20.9`
+* Current development target: `v1.20.9`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.9 - Rival Trace Planning Clarity
+
+* Clarified that Rival Trace is based on remembered named rival elite history only.
+* Kept Rival Trace as the third read-only Revisit lane behind Trophy Echo and Famous Gear Memory.
+* Added smoke coverage proving Rival Trace exposes no live entry, hunt, board mission, reward, unlock, currency, completion, or progression mutation surface.
+* No Revisit activation, route entry, route rewards, route completion, combat, economy, contracts, debt, Talent, gear, trophy, Famous Gear, save, or Elite Board behavior changed.
 
 ## v1.20.8 - Owed Money Text Fix
 

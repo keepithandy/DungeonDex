@@ -2,13 +2,19 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.8**
+Current baseline: **DungeonDex v1.20.9**
 
 ## Current Build
 
+**v1.20.9 - Rival Trace Planning Clarity**
+
+This patch clarifies that Rival Trace is the third read-only Revisit lane based on remembered named rival elite history. It remains memory/planning only and adds no hunt, route, board mission, reward, unlock, currency, or progression mutation.
+
+## Previous Build
+
 **v1.20.8 - Owed Money Text Fix**
 
-This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup. It does not change debt math, repayment, borrowing, economy, combat, rewards, saves, or Revisit behavior.
+This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup.
 
 ## Previous Build
 
@@ -156,7 +162,7 @@ node .\smoke_monster_backdrops_v120.mjs
 Current focus is safe foundation work. The locked foundations stay in place:
 
 * Talent Tree Preview and Talent Ledger remain locked and read-only.
-* Revisit Routes remain preview/planning only, with Trophy Echo first, Famous Gear Memory second, and Rival Trace third.
+* Revisit Routes remain preview/planning only, with Trophy Echo first, Famous Gear Memory second, and Rival Trace third as named rival elite memory only.
 * Debt Collector remains a visibility and ledger layer only.
 * Elite Board remains the optional challenge layer.
 * Boss Trophy, Archive, and Famous Gear memory remain display-focused.

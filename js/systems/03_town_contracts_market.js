@@ -631,12 +631,8 @@
     const trophyCount = Object.keys(trophies.collected || {}).length;
     const rivalCount = rivals.filter(r => r && !r.completed && r.revengeAvailable).length;
     const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival route active' : 'Board route open') : 'Board route quiet';
-    const currentFloor = Math.max(1, Math.floor(numberOr(safeState.run?.floor, safePlayer.safeExtractDepth || 1, 1, 999999)));
     const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(safeState) : null;
     const districtName = String(currentDistrict && currentDistrict.name ? currentDistrict.name : 'Lowfire District').trim() || 'Lowfire District';
-    const floorLabel = typeof getLoreDepthProgress === 'function'
-      ? getLoreDepthProgress(currentFloor)
-      : { floorNumber: currentFloor, roomWithinFloor: 1, chapterWithinRoom: 1 };
     const meta = revisitState.unlocked ? 'Planned' : 'Future Route';
     const debtBalance = Math.max(0, Math.floor(numberOr(safePlayer?.debtCollector?.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER)));
     const entries = [
@@ -659,8 +655,8 @@
       {
         key: 'rival_trace',
         label: 'Rival Trace',
-        detail: rivalCount ? `${rivalCount} ready` : 'Quiet',
-        source: contracts.active?.rivalContract ? 'Elite Board rival' : `Current floor F${format(floorLabel.floorNumber)}`,
+        detail: rivalCount ? `${rivalCount} remembered` : 'No named rival memory',
+        source: contracts.active?.rivalContract ? 'Active named rival elite memory' : 'Named rival elite memory',
         priority: 30,
         locked: !rivalCount && !contracts.active?.rivalContract
       },
@@ -713,8 +709,8 @@
         'Stub: record more kills or boss marks on a named item'
       ],
       rival_trace_route: [
-        'Stub: leave a clearer rival trail',
-        'Stub: defeat or encounter more named elites'
+        'Stub: remember a named rival elite',
+        'Stub: keep the trace as memory only'
       ],
       debt_pressure_route: [
         'Stub: let the debt ledger build pressure',
@@ -886,9 +882,8 @@
       add('memoryTags', asArray(safePlayer.inventory, []).filter(item => isPlainObject(item) && Array.isArray(item.tags) && item.tags.some(tag => /famous|archive|memory/i.test(String(tag || '')))).length);
     } else if (safeKey === 'rival_trace_route') {
       const contracts = ensureEliteContractState(safeState);
-      add('claimedContracts', Array.isArray(contracts.claimed) ? contracts.claimed.length : 0);
-      add('activeRival', contracts.active && contracts.active.rivalId ? 1 : 0);
-      add('rivalRecords', countArray(contracts.rivals));
+      add('namedRivalRecords', countArray(contracts.rivals));
+      add('activeNamedRival', contracts.active && contracts.active.rivalId ? 1 : 0);
     } else if (safeKey === 'debt_pressure_route') {
       const debt = isPlainObject(safePlayer.debtCollector) ? safePlayer.debtCollector : {};
       add('debtNotes', Array.isArray(debt.notes) ? debt.notes.length : 0);
@@ -984,16 +979,16 @@
         gateType: 'rival',
         gateLabel: 'Rival Trace',
         reason: 'Locked: Rival Trace not ready',
-        requirement: 'Build more rival history.',
+        requirement: 'Remember named rival elite history.',
         progressLabel: 'No signal yet',
         diagnosticLabel: 'Gate Diagnostics',
         diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
         accessLabel: 'Route access is unavailable.',
-        source: 'rival trace',
+        source: 'named rival elite memory',
         previewState: 'locked',
         previewLabel: 'Still locked',
-        previewReason: 'Future rival history may sharpen this trace later.',
-        previewRequirement: 'Build more rival history.',
+        previewReason: 'Future named rival elite memory may sharpen this trace later.',
+        previewRequirement: 'Remember named rival elite history.',
         previewSafety: 'Preview only - route access is unavailable.'
       };
     }
@@ -1164,7 +1159,7 @@
     const routeDefs = [
       { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Future Unlock Preview', previewReason: 'Future boss history may reopen this path later.', previewRequirement: 'Build more boss history.' },
       { key: 'famous_gear_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future archive memory may shape this path later.', previewRequirement: 'Build stronger gear memory.' },
-      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future rival history may sharpen this trace later.', previewRequirement: 'Build more rival history.' },
+      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future named rival elite memory may sharpen this trace later.', previewRequirement: 'Remember named rival elite history.' },
       { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future ledger pressure may mark this district later.', previewRequirement: 'Build more debt history.' },
       { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future board history may strengthen this echo later.', previewRequirement: 'Build more board history.' }
     ];
@@ -1216,13 +1211,13 @@
       },
       rival_trace_route: {
         title: 'Rival Trace Route',
-        district: 'Board and rival districts',
+        district: 'Named rival memory districts',
         hookSource: 'rival_trace / board_echo',
-        shortDescription: 'A rival trace runs through old districts.',
-        routeFlavorLine: 'Rivals leave a sharp trail.',
-        safetyStatusLine: 'Locked preview. No route access.',
-        lockedReadinessNote: 'Needs more rival history.',
-        reason: 'A rival path may cross earlier districts.'
+        shortDescription: 'Named rival elite memory leaves a trace.',
+        routeFlavorLine: 'Remembered rivals leave a sharp trail.',
+        safetyStatusLine: 'Locked preview. No route access, hunt, or board mission.',
+        lockedReadinessNote: 'Needs named rival elite memory.',
+        reason: 'Remembered named rival elites may leave a trace.'
       },
       debt_pressure_route: {
         title: 'Debt Pressure Route',
@@ -1295,8 +1290,8 @@
       {
         key: 'rival_trace_route',
         title: 'Rival Trace Route',
-        district: 'Board and rival districts',
-        reason: 'A rival path may cross earlier districts.',
+        district: 'Named rival memory districts',
+        reason: 'Remembered named rival elites may leave a trace.',
         hooks: ['rival_trace', 'board_echo'],
         status: 'Locked',
         locked: true,
@@ -1344,8 +1339,8 @@
             ? 'Boss history leaves a return trail.'
             : route.key === 'famous_gear_route'
               ? 'Retired gear remembers the route.'
-              : route.key === 'rival_trace_route'
-                ? 'A rival trace runs through old districts.'
+            : route.key === 'rival_trace_route'
+                ? 'Named rival elite memory leaves a trace.'
                 : route.key === 'debt_pressure_route'
                   ? 'Ledger pressure marks an old trail.'
                   : route.key === 'board_echo_route'
@@ -1355,8 +1350,8 @@
             ? 'Old victories still mark the path.'
             : route.key === 'famous_gear_route'
               ? 'Notable gear keeps the old turn.'
-              : route.key === 'rival_trace_route'
-                ? 'Rivals leave a sharp trail.'
+            : route.key === 'rival_trace_route'
+                ? 'Remembered rivals leave a sharp trail.'
                 : route.key === 'debt_pressure_route'
                   ? 'Every ledger mark points back.'
                   : route.key === 'board_echo_route'
@@ -1367,8 +1362,8 @@
             ? 'Needs more boss history.'
             : route.key === 'famous_gear_route'
               ? 'Needs stronger gear memory.'
-              : route.key === 'rival_trace_route'
-                ? 'Needs more rival history.'
+            : route.key === 'rival_trace_route'
+                ? 'Needs named rival elite memory.'
                 : route.key === 'debt_pressure_route'
                   ? 'Needs more debt history.'
                   : route.key === 'board_echo_route'
@@ -1552,8 +1547,8 @@
       hasCompletion: false,
       routeKey: 'rival_trace_route',
       routeLabel: String(rivalTraceRoute?.title || 'Rival Trace Route'),
-      reason: 'Derived from named rival elite history only.',
-      note: 'Third planned revisit lane. Planning only.',
+      reason: 'Based on remembered named rival elite history only.',
+      note: 'Third planned lane; memory/planning only. No hunt, board mission, route, reward, unlock, currency, or progression mutation.',
       allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
     };
   }

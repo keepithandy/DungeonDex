@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.8 - Owed Money Text Fix
+- DungeonDex v1.20.9 - Rival Trace Planning Clarity
+
+## v1.20.9 Rival Trace Planning Clarity
+- Current baseline: v1.20.9.
+- Rival Trace is the third Revisit planning lane after Trophy Echo and Famous Gear Memory.
+- Rival Trace is based on remembered named rival elite history only.
+- Rival Trace remains memory/planning only and creates no hunt, route, board mission, reward, unlock, currency, or progression mutation.
+- No gameplay, combat, economy, contracts, debt, Talent, Elite Board, trophy, Famous Gear, save-structure, or Revisit activation behavior changed.
 
 ## v1.20.8 Owed Money Text Fix
 - Current baseline: v1.20.8.
