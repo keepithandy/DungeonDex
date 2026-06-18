@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.16-revisit-contract-edge-smoke-no-live-route-action-shape';
+const CACHE_NAME = 'dungeondex-v1.20.17-town-revisit-ui-no-live-affordance-smoke';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.16-revisit-contract-edge-smoke-no-live-route-action-shape';
+const BUILD_QS = '1.20.17-town-revisit-ui-no-live-affordance-smoke';
 const ASSETS = [
   './',
   './index.html',

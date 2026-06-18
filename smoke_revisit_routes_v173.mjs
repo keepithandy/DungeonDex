@@ -17,6 +17,21 @@ const runtimeErrors = [];
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function record(name, ok, detail = '') { results.push({ name, ok: !!ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`); }
+function recordWithDiag(name, ok, meta = {}) {
+  if (ok) {
+    record(name, true, JSON.stringify(meta));
+    return;
+  }
+  const payload = {
+    ...meta,
+    sourceSection: meta.sourceSection || 'unknown',
+    failingToken: meta.failingToken || '',
+    failureType: meta.failureType || 'unknown',
+    excerpt: String(meta.excerpt || '').slice(0, 600)
+  };
+  console.error(`DIAG: ${name} :: ${JSON.stringify(payload)}`);
+  record(name, false, JSON.stringify(payload));
+}
 function collectLiveActionKeys(value, path = '', hits = []) {
   if (!value || typeof value !== 'object') return hits;
   if (Array.isArray(value)) {
@@ -180,7 +195,12 @@ async function main() {
       gates: collectLiveActionKeys(fresh.gates),
       previews: collectLiveActionKeys(fresh.previews)
     };
-    record('Revisit contract objects expose no live-action-shaped fields', Object.values(liveActionObjectHits).every(list => Array.isArray(list) && list.length === 0), JSON.stringify(liveActionObjectHits));
+    recordWithDiag('Revisit contract objects expose no live-action-shaped fields', Object.values(liveActionObjectHits).every(list => Array.isArray(list) && list.length === 0), {
+      sourceSection: 'recursive contract object key guard',
+      failureType: 'recursive contract object key guard',
+      failingToken: Object.entries(liveActionObjectHits).find(([, list]) => Array.isArray(list) && list.length > 0)?.[1]?.[0] || '',
+      excerpt: JSON.stringify(liveActionObjectHits)
+    });
     record('normalizeRevisitState repairs missing revisitState', !!fresh.repaired && fresh.repaired.unlocked === false && Array.isArray(fresh.repaired.notedDistricts), JSON.stringify(fresh.repaired));
     record('revisit functions return stable shapes on fresh save', Array.isArray(fresh.hooks) && fresh.summary && fresh.routes && fresh.routeSummary && Array.isArray(fresh.gates) && fresh.gateSummary, JSON.stringify({ hooks: fresh.hooks?.length || 0, summary: fresh.summary, routes: fresh.routes?.length || 0, routeSummary: fresh.routeSummary, gates: fresh.gates?.length || 0, gateSummary: fresh.gateSummary }));
     record('Unlock gate helper exists and returns locked gate shapes', Array.isArray(fresh.gates) && fresh.gateSummary && fresh.gateSummary.total === fresh.gates.length && fresh.gateSummary.ready === 0 && fresh.gateSummary.playable === 0 && fresh.gateSummary.diagnosticOnly === true && fresh.gateSummary.accessAvailable === false && typeof fresh.gateSummary.progressAverage === 'number' && typeof fresh.gateSummary.progressNoted === 'number' && fresh.gates.every(gate => gate.locked === true && gate.ready === false && gate.playable === false && typeof gate.key === 'string' && typeof gate.label === 'string' && typeof gate.gateType === 'string' && typeof gate.reason === 'string' && typeof gate.requirement === 'string' && typeof gate.progressLabel === 'string' && typeof gate.diagnosticLabel === 'string' && typeof gate.diagnosticDetail === 'string' && typeof gate.accessLabel === 'string' && /route access is unavailable/i.test(gate.accessLabel) && !/\b(ready|open|available|unlocked|usable)\b/i.test(gate.progressLabel) && !/\b(ready|open|available|unlocked|usable)\b/i.test(gate.diagnosticDetail) && typeof gate.progressCurrent === 'number' && typeof gate.progressRequired === 'number' && typeof gate.progressPercent === 'number' && Array.isArray(gate.signals) && gate.progressRequired >= 1 && gate.progressCurrent >= 0 && gate.progressPercent >= 0 && gate.progressPercent <= 100), JSON.stringify({ gates: fresh.gates?.slice(0, 3), gateSummary: fresh.gateSummary }));
@@ -383,6 +403,27 @@ async function main() {
       const routeSlotButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean);
       const routeCards = Array.from(document.querySelectorAll('#revisitFoundationSlot .revisit-route-card')).map(card => card.innerText || '');
       const routeSlotText = document.getElementById('revisitFoundationSlot')?.innerText || '';
+      const revisitSlotMarkup = document.getElementById('revisitFoundationSlot')?.innerHTML || '';
+      const townEntryButtons = buttons.filter(label => /^(Enter Dungeon|Continue Run)$/i.test(label));
+      const revisitSlotClean = !/\b(Start|Enter|Begin|Launch|Activate)\s+Revisit\b/i.test(revisitSlotMarkup) && !/\b(Claim|Complete|Unlock)\s+(Reward|Route)\b/i.test(revisitSlotMarkup) && !/\b(onclick|onClick|data-action|data-route|data-start|data-enter|data-claim|data-reward|data-unlock)\b/i.test(revisitSlotMarkup) && !/href\s*=/i.test(revisitSlotMarkup);
+      const townMarkupActionAttrs = Array.from(document.querySelectorAll('#revisitFoundationSlot [onclick], #revisitFoundationSlot [onClick], #revisitFoundationSlot [data-action], #revisitFoundationSlot [data-route], #revisitFoundationSlot [data-start], #revisitFoundationSlot [data-enter], #revisitFoundationSlot [data-claim], #revisitFoundationSlot [data-reward], #revisitFoundationSlot [data-unlock]')).map(node => ({
+        tag: node.tagName,
+        text: String(node.textContent || '').trim(),
+        onclick: node.getAttribute('onclick') || node.getAttribute('onClick') || '',
+        action: node.getAttribute('data-action') || '',
+        route: node.getAttribute('data-route') || '',
+        start: node.getAttribute('data-start') || '',
+        enter: node.getAttribute('data-enter') || '',
+        claim: node.getAttribute('data-claim') || '',
+        reward: node.getAttribute('data-reward') || '',
+        unlock: node.getAttribute('data-unlock') || '',
+        href: node.getAttribute('href') || ''
+      }));
+      const townMarkupHrefAttrs = Array.from(document.querySelectorAll('#revisitFoundationSlot a[href]')).map(node => ({
+        tag: node.tagName,
+        text: String(node.textContent || '').trim(),
+        href: node.getAttribute('href') || ''
+      }));
       const routeLedgerSnapshot = {
         revisitRouteLedger: S?.player?.revisitRouteLedger,
         revisitRouteCompletionLedger: S?.player?.revisitRouteCompletionLedger,
@@ -414,7 +455,7 @@ async function main() {
           combatLog: S.run.combatLog
         }
       });
-      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, previews, previewSummary, activationPlan, activationPlanAgain, activationSummary, activationSummaryAgain, previewStateSummary, previewStateSummaryAgain, firstLane, firstLaneAgain, secondLane, secondLaneAgain, thirdLane, thirdLaneAgain, reversedRoutes, reversedFirstLane, reversedSecondLane, reversedCandidateHooks, laneFixtureWithSecondFirst, fixtureTrophyLane, fixtureSecondLane, laneUnsafeFields, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, previewObjectsBefore, previewObjectsAfter, apiKeys, buttons, routeSlotButtons, routeCards, routeSlotText, routeLedgerSnapshot, routePreviewFields };
+      return { snapshot, after, hooks, summary, routes, routeSummary, gates, gateSummary, previews, previewSummary, activationPlan, activationPlanAgain, activationSummary, activationSummaryAgain, previewStateSummary, previewStateSummaryAgain, firstLane, firstLaneAgain, secondLane, secondLaneAgain, thirdLane, thirdLaneAgain, reversedRoutes, reversedFirstLane, reversedSecondLane, reversedCandidateHooks, laneFixtureWithSecondFirst, fixtureTrophyLane, fixtureSecondLane, laneUnsafeFields, candidateObjectsBefore, candidateObjectsAfter, routeObjectsBefore, routeObjectsAfter, previewObjectsBefore, previewObjectsAfter, apiKeys, buttons, routeSlotButtons, routeCards, routeSlotText, routeLedgerSnapshot, routePreviewFields, revisitSlotMarkup, revisitSlotClean, townEntryButtons, townMarkupActionAttrs, townMarkupHrefAttrs };
     })()`);
     record('Revisit summary helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after, JSON.stringify({ before: mutationCheck.snapshot, after: mutationCheck.after }));
     record('Unlock gate helpers do not mutate player or run state', mutationCheck.snapshot === mutationCheck.after && Array.isArray(mutationCheck.gates) && mutationCheck.gateSummary, JSON.stringify({ gateSummary: mutationCheck.gateSummary, gates: mutationCheck.gates?.slice(0, 3) }));
@@ -450,6 +491,54 @@ async function main() {
     record('Route preview helpers leave completion ledger fields undefined', mutationCheck.routeLedgerSnapshot && Object.values(mutationCheck.routeLedgerSnapshot).every(value => value === undefined), JSON.stringify(mutationCheck.routeLedgerSnapshot));
     record('Route previews remain inert and do not alter combat or movement state', mutationCheck.routes.every(route => route.locked === true) && mutationCheck.summary && mutationCheck.routeSummary && Array.isArray(mutationCheck.hooks), JSON.stringify({ summary: mutationCheck.summary, routeSummary: mutationCheck.routeSummary }));
     record('Readiness does not create active route state', mutationCheck.routes.every(route => route.locked === true && !route.entry && !route.reward && !route.teleport && !route.rerun && !route.completion && !route.scaling), JSON.stringify(mutationCheck.routes?.slice(0, 3)));
+    recordWithDiag('Town Revisit foundation slot contains no live route entry affordances', mutationCheck.revisitSlotClean === true, {
+      sourceSection: 'Town/Revisit innerHTML scan',
+      failureType: 'Town/Revisit innerHTML scan',
+      failingToken: 'live route entry affordances',
+      excerpt: mutationCheck.revisitSlotMarkup
+    });
+    recordWithDiag('Town Revisit markup does not expose route entry text patterns', !/\b(Start|Enter|Begin|Launch|Activate)\s+Revisit\b/i.test(mutationCheck.revisitSlotMarkup || ''), {
+      sourceSection: 'Town/Revisit innerHTML scan',
+      failureType: 'Town/Revisit innerHTML scan',
+      failingToken: '\\b(Start|Enter|Begin|Launch|Activate)\\s+Revisit\\b',
+      excerpt: mutationCheck.revisitSlotMarkup
+    });
+    recordWithDiag('Town Revisit markup does not expose route completion text patterns', !/\b(Claim|Complete|Unlock)\s+(Reward|Route)\b/i.test(mutationCheck.revisitSlotMarkup || ''), {
+      sourceSection: 'Town/Revisit innerHTML scan',
+      failureType: 'Town/Revisit innerHTML scan',
+      failingToken: '\\b(Claim|Complete|Unlock)\\s+(Reward|Route)\\b',
+      excerpt: mutationCheck.revisitSlotMarkup
+    });
+    recordWithDiag('Town Revisit markup exposes no clickable action attributes', Array.isArray(mutationCheck.townMarkupActionAttrs) && mutationCheck.townMarkupActionAttrs.length === 0, {
+      sourceSection: 'action attribute scan',
+      failureType: 'action attribute scan',
+      failingToken: 'onclick|onClick|data-action|data-route|data-start|data-enter|data-claim|data-reward|data-unlock',
+      excerpt: JSON.stringify(mutationCheck.townMarkupActionAttrs)
+    });
+    recordWithDiag('Town Revisit links are not navigable (no href affordances)', Array.isArray(mutationCheck.townMarkupHrefAttrs) && mutationCheck.townMarkupHrefAttrs.length === 0, {
+      sourceSection: 'href scan',
+      failureType: 'href scan',
+      failingToken: 'href=',
+      excerpt: JSON.stringify(mutationCheck.townMarkupHrefAttrs)
+    });
+    const allowedTownEntryButtons = ['Enter Dungeon', 'Continue Run'];
+    const activeTownEntryButtons = Array.isArray(mutationCheck.townEntryButtons) ? mutationCheck.townEntryButtons : [];
+    const hasAllowedTownEntryButton = activeTownEntryButtons.some(btn => allowedTownEntryButtons.includes(btn));
+    const townEntryButtonsAreAllowed = activeTownEntryButtons.every(btn => allowedTownEntryButtons.includes(btn));
+    const revisitSlotHasLiveAffordance = /\b(Start|Enter|Begin|Launch|Activate)\s+Revisit\b/i.test(mutationCheck.revisitSlotMarkup || '') || /\b(Claim|Complete|Unlock)\s+(Reward|Route)\b/i.test(mutationCheck.revisitSlotMarkup || '') || /\b(onclick|onClick|data-action|data-route|data-start|data-enter|data-claim|data-reward|data-unlock)\b/i.test(mutationCheck.revisitSlotMarkup || '') || /href\s*=/i.test(mutationCheck.revisitSlotMarkup || '');
+    const townEntryExpectation = !activeTownEntryButtons.length || (townEntryButtonsAreAllowed && hasAllowedTownEntryButton && (!mutationCheck.routeSlotButtons || mutationCheck.routeSlotButtons.every(btn => !/^(Enter Dungeon|Continue Run)$/i.test(btn))));
+    recordWithDiag('Town entry controls stay in the allowed dungeon-entry set', townEntryExpectation, {
+      sourceSection: 'dungeon-entry control check',
+      failureType: 'dungeon-entry control check',
+      failingToken: 'Enter Dungeon|Continue Run',
+      excerpt: JSON.stringify({ townEntryButtons: activeTownEntryButtons, allowedTownEntryButtons, revisitSlotMarkup: String(mutationCheck.revisitSlotMarkup || '').slice(0, 500) })
+    });
+    recordWithDiag('Revisit slot stays empty or inert when no route is active', !revisitSlotHasLiveAffordance, {
+      sourceSection: 'dungeon-entry control check',
+      failureType: 'dungeon-entry control check',
+      failingToken: 'live route entry affordances',
+      excerpt: mutationCheck.revisitSlotMarkup
+    });
     record('Trophy Echo exposes preview copy without becoming playable', Array.isArray(mutationCheck.previews) && mutationCheck.previews.every(preview => preview.locked === true && preview.playable === false) && !!mutationCheck.previews.find(preview => preview.key === 'trophy_echo_route' && preview.previewState === 'preview' && preview.previewLabel === 'Future Unlock Preview' && /future boss history/i.test(preview.previewReason || '') && preview.previewRequirement === 'Build more boss history.' && /route access is unavailable/i.test(preview.previewSafety || '')), JSON.stringify({ trophyPreview: mutationCheck.previews?.find(preview => preview.key === 'trophy_echo_route'), previewSummary: mutationCheck.previewSummary, routeSlotText: String(mutationCheck.routeSlotText || '').slice(0, 500) }));
     record('Unlock gates remain inert and add no route mechanics', mutationCheck.gates.every(gate => gate.locked === true && gate.ready === false && gate.playable === false && !gate.entry && !gate.enter && !gate.start && !gate.travel && !gate.begin && !gate.action && !gate.enabled && !gate.unlocked && !gate.available && !gate.reward && !gate.rewards && !gate.teleport && !gate.rerun && !gate.combat && !gate.completion && !gate.complete && !gate.scaling && !gate.scale), JSON.stringify(mutationCheck.gates?.slice(0, 3)));
     record('Unlock gate summaries cannot imply playable route access', mutationCheck.gateSummary && mutationCheck.gateSummary.total === mutationCheck.gateSummary.locked && mutationCheck.gateSummary.ready === 0 && mutationCheck.gateSummary.playable === 0 && mutationCheck.gateSummary.diagnosticOnly === true && mutationCheck.gateSummary.accessAvailable === false && typeof mutationCheck.gateSummary.progressAverage === 'number' && typeof mutationCheck.gateSummary.progressNoted === 'number' && !mutationCheck.gateSummary.unlocked && !mutationCheck.gateSummary.available && !mutationCheck.gateSummary.entry && !mutationCheck.gateSummary.reward && !mutationCheck.gateSummary.completion && !mutationCheck.gateSummary.scaling, JSON.stringify(mutationCheck.gateSummary));
@@ -585,7 +674,7 @@ async function main() {
     record('High boss-history signal still does not activate Trophy Echo', trophyPlanCheck.highPlan?.locked === true && trophyPlanCheck.highPlan.ready === false && trophyPlanCheck.highPlan.playable === false && trophyPlanCheck.highPlan.active === false && trophyPlanCheck.highPlan.accessAvailable === false && trophyPlanCheck.highPlan.rewardAvailable === false && trophyPlanCheck.highSummary?.ready === 0 && trophyPlanCheck.highSummary.playable === 0 && trophyPlanCheck.highSummary.active === 0 && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)), JSON.stringify({ highPlan: trophyPlanCheck.highPlan, highSummary: trophyPlanCheck.highSummary, routeSlotButtons: trophyPlanCheck.routeSlotButtons }));
     record('Malformed boss-history structures keep Trophy Echo planning safe', !trophyPlanCheck.malformedError && trophyPlanCheck.malformedPlan?.locked === true && trophyPlanCheck.malformedPlan.ready === false && trophyPlanCheck.malformedPlan.playable === false && trophyPlanCheck.malformedPlan.active === false && trophyPlanCheck.malformedPlan.accessAvailable === false && trophyPlanCheck.malformedPlan.rewardAvailable === false && trophyPlanCheck.malformedSummary?.ready === 0 && trophyPlanCheck.malformedSummary.playable === 0, JSON.stringify({ malformedPlan: trophyPlanCheck.malformedPlan, malformedSummary: trophyPlanCheck.malformedSummary, malformedError: trophyPlanCheck.malformedError }));
     record('Trophy Echo planning tolerates edge-case boss history states', Array.isArray(trophyPlanCheck.edgeCases) && trophyPlanCheck.edgeCases.length >= 6 && trophyPlanCheck.edgeCases.every(entry => !entry.error && entry.deterministic && entry.notMutated && entry.plan?.key === 'trophy_echo_route' && entry.plan.locked === true && entry.plan.ready === false && entry.plan.playable === false && entry.plan.active === false && entry.plan.accessAvailable === false && entry.plan.rewardAvailable === false && entry.plan.rewardPolicy?.rewardAccess === false && entry.summary?.locked === true && entry.summary.ready === 0 && entry.summary.playable === 0 && entry.summary.active === 0 && entry.summary.accessAvailable === false && entry.summary.rewardAvailable === false && typeof entry.plan.signalCurrent === 'number' && typeof entry.plan.signalRequired === 'number' && entry.plan.signalRequired >= 1 && typeof entry.plan.signalPercent === 'number' && entry.plan.signalPercent >= 0 && entry.plan.signalPercent <= 100), JSON.stringify(trophyPlanCheck.edgeCases));
-    record('High Trophy Echo signal does not create route access', trophyPlanCheck.highEdge?.plan?.signalCurrent >= trophyPlanCheck.highEdge?.plan?.signalRequired && trophyPlanCheck.highEdge.plan.signalPercent === 100 && trophyPlanCheck.highEdge.plan.locked === true && trophyPlanCheck.highEdge.plan.ready === false && trophyPlanCheck.highEdge.plan.playable === false && trophyPlanCheck.highEdge.plan.active === false && trophyPlanCheck.highEdge.plan.accessAvailable === false && trophyPlanCheck.highEdge.plan.rewardAvailable === false && trophyPlanCheck.highSummary?.ready === 0 && trophyPlanCheck.highSummary.playable === 0 && trophyPlanCheck.highSummary.active === 0 && trophyPlanCheck.highSummary.accessAvailable === false && trophyPlanCheck.highSummary.rewardAvailable === false && trophyPlanCheck.highGateSummary?.ready === 0 && trophyPlanCheck.highGateSummary.playable === 0 && trophyPlanCheck.highPreviewSummary?.playable === 0 && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0 && trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify({ highEdge: trophyPlanCheck.highEdge, highSummary: trophyPlanCheck.highSummary, highGateSummary: trophyPlanCheck.highGateSummary, highPreviewSummary: trophyPlanCheck.highPreviewSummary, routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
+    record('High Trophy Echo signal does not create route access', trophyPlanCheck.highEdge?.plan?.signalCurrent >= trophyPlanCheck.highEdge?.plan?.signalRequired && trophyPlanCheck.highEdge.plan.signalPercent === 100 && trophyPlanCheck.highEdge.plan.locked === true && trophyPlanCheck.highEdge.plan.ready === false && trophyPlanCheck.highEdge.plan.playable === false && trophyPlanCheck.highEdge.plan.active === false && trophyPlanCheck.highEdge.plan.accessAvailable === false && trophyPlanCheck.highEdge.plan.rewardAvailable === false && trophyPlanCheck.highSummary?.ready === 0 && trophyPlanCheck.highSummary.playable === 0 && trophyPlanCheck.highSummary.active === 0 && trophyPlanCheck.highSummary.accessAvailable === false && trophyPlanCheck.highSummary.rewardAvailable === false && trophyPlanCheck.highGateSummary?.ready === 0 && trophyPlanCheck.highGateSummary.playable === 0 && trophyPlanCheck.highPreviewSummary?.playable === 0 && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0 && trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)) && Array.isArray(mutationCheck.townMarkupActionAttrs) && mutationCheck.townMarkupActionAttrs.length === 0 && Array.isArray(mutationCheck.townMarkupHrefAttrs) && mutationCheck.townMarkupHrefAttrs.length === 0, JSON.stringify({ highEdge: trophyPlanCheck.highEdge, highSummary: trophyPlanCheck.highSummary, highGateSummary: trophyPlanCheck.highGateSummary, highPreviewSummary: trophyPlanCheck.highPreviewSummary, routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs, townMarkupActionAttrs: mutationCheck.townMarkupActionAttrs, townMarkupHrefAttrs: mutationCheck.townMarkupHrefAttrs }));
     record('Trophy Echo rule chain remains handoff-safe', trophyPlanCheck.plan && trophyPlanCheck.summary && trophyPlanCheck.highEdge?.plan?.locked === true && trophyPlanCheck.highEdge.plan.ready === false && trophyPlanCheck.highEdge.plan.playable === false && trophyPlanCheck.highEdge.plan.active === false && trophyPlanCheck.highEdge.plan.rewardAvailable === false && trophyPlanCheck.malformedPlan?.locked === true && trophyPlanCheck.malformedPlan.ready === false && trophyPlanCheck.malformedPlan.playable === false && trophyPlanCheck.malformedPlan.active === false && trophyPlanCheck.malformedPlan.rewardAvailable === false && trophyPlanCheck.routeSlotButtons.every(btn => /Route Locked/i.test(btn)) && trophyPlanCheck.routeSlotActionAttrs.length === 0 && trophyPlanCheck.apiKeys.every(key => !/revisit.*(enter|entry|start|travel|begin|claim|complete|reward|teleport|rerun|scale|activate|launch)/i.test(key)), JSON.stringify({ plan: !!trophyPlanCheck.plan, summary: !!trophyPlanCheck.summary, high: trophyPlanCheck.highEdge?.plan, malformed: trophyPlanCheck.malformedPlan, routeSlotButtons: trophyPlanCheck.routeSlotButtons, routeSlotActionAttrs: trophyPlanCheck.routeSlotActionAttrs }));
     record('Trophy Echo anti-farming policy is present', Array.isArray(trophyPlanCheck.plan?.antiFarmPolicy) && /low-floor farming/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /infinite revisit loops/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /mandatory revisit grind/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /stronger than main progression/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')) && /Enter Dungeon and Continue Run remain primary/i.test(trophyPlanCheck.plan.antiFarmPolicy.join(' ')), JSON.stringify(trophyPlanCheck.plan?.antiFarmPolicy));
     record('Trophy Echo reward policy remains planning only', trophyPlanCheck.plan?.rewardPolicy?.status === 'Planning only' && trophyPlanCheck.plan.rewardPolicy.rewardAccess === false && /Memory, trophy, and Dex identity rewards first/i.test(trophyPlanCheck.plan.rewardPolicy.allowedFutureClass || '') && Array.isArray(trophyPlanCheck.plan.rewardPolicy.disallowed) && trophyPlanCheck.plan.rewardPolicy.disallowed.length >= 4, JSON.stringify(trophyPlanCheck.plan?.rewardPolicy));
