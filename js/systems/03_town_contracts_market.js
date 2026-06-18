@@ -863,24 +863,35 @@
   }
 
   function revisitTrophyEchoRouteDetail(state = S) {
-    const plan = revisitTrophyEchoRulePlan(state);
-    const summary = revisitTrophyEchoRuleSummary(state);
+    const plan = revisitTrophyEchoRulePlan(state) || {};
+    const summary = revisitTrophyEchoRuleSummary(state) || {};
+    const safePlan = {
+      status: 'Planning only',
+      notes: ['Trophy Echo should be the first planned revisit route because boss history is already tracked.'],
+      routeAccessLabel: 'Route access is unavailable.',
+      ruleInactiveLabel: 'Future rule inactive.'
+    };
+    const safeSummary = {
+      signalCurrent: 0,
+      signalRequired: 3,
+      signalPercent: 0
+    };
     return {
       key: 'trophy_echo_route',
       title: 'Trophy Echo Route',
       source: 'boss trophies / trophy records',
-      status: plan.status,
+      status: plan.status || safePlan.status,
       planningOnly: true,
       locked: true,
       readOnly: true,
       detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.',
-      reason: plan.notes[0] || 'Trophy Echo should be the first planned revisit route because boss history is already tracked.',
-      safety: plan.routeAccessLabel,
-      routeAccessLabel: plan.routeAccessLabel,
-      ruleInactiveLabel: plan.ruleInactiveLabel,
-      signalCurrent: summary.signalCurrent,
-      signalRequired: summary.signalRequired,
-      signalPercent: summary.signalPercent
+      reason: Array.isArray(plan.notes) && plan.notes[0] ? plan.notes[0] : safePlan.notes[0],
+      safety: plan.routeAccessLabel || safePlan.routeAccessLabel,
+      routeAccessLabel: plan.routeAccessLabel || safePlan.routeAccessLabel,
+      ruleInactiveLabel: plan.ruleInactiveLabel || safePlan.ruleInactiveLabel,
+      signalCurrent: Number.isFinite(summary.signalCurrent) ? summary.signalCurrent : safeSummary.signalCurrent,
+      signalRequired: Number.isFinite(summary.signalRequired) ? summary.signalRequired : safeSummary.signalRequired,
+      signalPercent: Number.isFinite(summary.signalPercent) ? summary.signalPercent : safeSummary.signalPercent
     };
   }
 
