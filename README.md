@@ -8,7 +8,7 @@ Current baseline: **DungeonDex v1.20.8**
 
 **v1.20.8 - Owed Money Text Fix**
 
-This note adds Rival Trace as the third planned Revisit lane. Trophy Echo stays first, Famous Gear Memory stays second, and Rival Trace stays third as a read-only rival-memory lane with no entry path, rewards, or progression changes.
+This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup. It does not change debt math, repayment, borrowing, economy, combat, rewards, saves, or Revisit behavior.
 
 ## Previous Build
 

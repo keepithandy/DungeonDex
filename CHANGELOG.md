@@ -20,10 +20,10 @@ This changelog records what changed and why.
 
 ## v1.20.8 - Owed Money Text Fix
 
-* Added Rival Trace as the third planned Revisit lane in read-only metadata and smoke coverage.
-* Kept Trophy Echo first and Famous Gear Memory second.
-* Confirmed Rival Trace stays planned-only, locked, and non-playable.
-* No Revisit activation, route entry, route rewards, route completion, currency, progression, combat, debt, talent, or Elite Board behavior changed.
+* Fixed the Debt Collector Owed line so text-rendered debt summaries use clean coin notation instead of displaying raw money span markup.
+* Kept the HTML money formatter available for controlled styled coin output while using plain text for escaped Debt Collector summary/status strings.
+* Extended debt smoke coverage to assert the rendered Owed text does not include literal money markup and still includes the owed amount.
+* No debt gameplay, balance math, economy, rewards, combat, talent, save, Elite Board, trophy, Famous Gear, or Revisit behavior changed.
 
 ## v1.20.6 - Revisit Guard Hardening
 

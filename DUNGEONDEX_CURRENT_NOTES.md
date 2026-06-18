@@ -11,10 +11,10 @@
 
 ## v1.20.8 Owed Money Text Fix
 - Current baseline: v1.20.8.
-- Rival Trace is now the third planned Revisit lane in read-only metadata.
-- Trophy Echo stays first, Famous Gear Memory stays second, and Rival Trace stays third.
-- Rival Trace is a memory/planning lane only, with no hunt, board mission, entry path, rewards, or completion surface.
-- No gameplay, combat, economy, debt, Talent, Elite Board, trophy, Famous Gear, or save-structure behavior changed.
+- Debt Collector Owed summaries now render clean text such as `Owed 5s` instead of literal money span markup.
+- Styled coin HTML remains limited to controlled money markup contexts; escaped text surfaces use plain coin text.
+- Debt smoke coverage asserts the rendered Owed text contains the expected amount and no literal `<span class="money` markup.
+- No gameplay, combat, economy, debt math, Talent, Elite Board, trophy, Famous Gear, save-structure, or Revisit behavior changed.
 
 ## v1.20.1 Monster Backdrop Canvas Foundation
 - Current baseline: v1.20.1.
