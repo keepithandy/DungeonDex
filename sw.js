@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.15-trophy-echo-fallback-edge-completion';
+const CACHE_NAME = 'dungeondex-v1.20.16-revisit-contract-edge-smoke-no-live-route-action-shape';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.15-trophy-echo-fallback-edge-completion';
+const BUILD_QS = '1.20.16-revisit-contract-edge-smoke-no-live-route-action-shape';
 const ASSETS = [
   './',
   './index.html',

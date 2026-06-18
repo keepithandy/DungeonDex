@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.15**
+Current baseline: **DungeonDex v1.20.16**
 
 ## Current Build
 
-**v1.20.15 - Trophy Echo Fallback Edge Completion**
+**v1.20.16 - Revisit Contract Edge Smoke: No Live Route Action Shape**
 
 This patch adds the first read-only Trophy Echo route detail foundation. Trophy Echo remains a future side-route concept tied to remembered boss trophies and trophy records, and it adds no live entry, reward, completion, unlock, currency, or progression mutation.
 

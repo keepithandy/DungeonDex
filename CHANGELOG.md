@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.15`
-* Current development target: `v1.20.15`
+* Current local package baseline: `v1.20.16`
+* Current development target: `v1.20.16`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -18,7 +18,7 @@ This changelog records what changed and why.
 
 ---
 
-## v1.20.15 - Trophy Echo Fallback Edge Completion
+## v1.20.16 - Revisit Contract Edge Smoke: No Live Route Action Shape
 
 * Added a read-only Trophy Echo route detail foundation tied to remembered boss trophies and trophy records.
 * Kept the planned Revisit lane order at Trophy Echo, Famous Gear Memory, then Rival Trace.
