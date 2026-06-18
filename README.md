@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.17**
+Current baseline: **DungeonDex v1.20.18**
 
 ## Current Build
 
-**v1.20.17 - Town Revisit UI No-Live-Affordance Smoke Hardening**
+**v1.20.18 - Talent System Re-entry Audit**
 
-This patch adds the first read-only Trophy Echo route detail foundation. Trophy Echo remains a future side-route concept tied to remembered boss trophies and trophy records, and it adds no live entry, reward, completion, unlock, currency, or progression mutation.
+This documentation-first patch confirms the Talent foundation remains single-sourced, locked, preview-only, and inert. It does not enable point earning, spending, unlocks, learned nodes, passive effects, or gameplay bonuses.
 
 ## Previous Build
 
@@ -74,6 +74,12 @@ Current major systems include:
 * Revisit unlock gates
 * Revisit unlock preview helpers
 * Monster backdrop canvas system
+
+## Talent System Status
+
+The Talent system is a stable preview foundation backed by one deeply frozen ruleset with four branches and twelve nodes. Save repair forces legacy point/unlock fields and the canonical ledger to a safe zero-state, and existing smoke coverage verifies that combat, Elite Board rewards, charter costs, and sell values remain unaffected.
+
+The Talent module's internal `v1.16.2` label records its component lineage; `VERSION.md` remains the public build authority. The next recommended patch is a separately gated point-earning step from Elite Board contract completion, with spending, unlocks, and bonuses still disabled.
 
 ## Revisit System Status
 

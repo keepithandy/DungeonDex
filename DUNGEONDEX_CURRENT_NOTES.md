@@ -7,7 +7,19 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.17 - Town Revisit UI No-Live-Affordance Smoke Hardening
+- DungeonDex v1.20.18 - Talent System Re-entry Audit
+
+## v1.20.18 Talent System Re-entry Audit
+- Current baseline: v1.20.18.
+- The Talent ruleset foundation remains stable and single-sourced through the deeply frozen `TALENT_RULESET_PREVIEW` export: four branches, three tiers, and twelve nodes.
+- Talent runtime behavior remains locked, preview-only, and inert. Earning, spending, unlocks, learned nodes, and passive effects remain disabled and zero-state.
+- Talent save repair remains safe: legacy point/unlock fields are cleared and malformed canonical ledgers normalize to a locked zero-state while retaining only sanitized notes and a minimum schema version of 1.
+- Preview helpers derive from the single ruleset. The internal passive-preview map is closure-private and exposed only through defensive clones; it is not itself frozen.
+- Legacy talent fields remain repair/devtools-only outside the Talent module. Combat, economy, progression, and unrelated UI modules do not read them.
+- The Talent module retains its `v1.16.2` component provenance label. It is old but stable and is not the public build authority.
+- Existing Talent smoke coverage is comprehensive; no new smoke record was needed.
+- Recommended next Talent patch: feature-gate point earning from Elite Board contract completion while keeping spending, unlocks, learned nodes, and passive effects disabled.
+- No Talent gameplay, combat, economy, contract rewards, save shape, UI interaction, or balance behavior changed.
 
 ## v1.20.17 Town Revisit UI No-Live-Affordance Smoke Hardening
 - Current baseline: v1.20.17.

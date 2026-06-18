@@ -9,14 +9,25 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.17`
-* Current development target: `v1.20.17`
+* Current local package baseline: `v1.20.18`
+* Current development target: `v1.20.18`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.18 - Talent System Re-entry Audit
+
+* Confirmed the deeply frozen `TALENT_RULESET_PREVIEW` remains the single ruleset source for four branches and twelve locked preview nodes.
+* Confirmed Talent earning, spending, unlocks, learned nodes, and passive effects remain disabled and zero-state.
+* Confirmed malformed canonical ledgers and legacy Talent fields repair safely without creating gameplay state.
+* Confirmed combat, economy, progression, and unrelated UI modules do not read legacy Talent state.
+* Retained the Talent module's old but stable `v1.16.2` component provenance label; it is not the public version authority.
+* Kept the existing comprehensive Talent smoke unchanged because it already covers ruleset immutability, defensive preview copies, malformed ledgers, no-op mutators, and inert gameplay hooks.
+* Recommended the next separately scoped Talent patch: gated point earning from Elite Board contract completion while spending, unlocks, and bonuses remain disabled.
+* No Talent gameplay, combat, economy, contract rewards, save shape, UI interaction, or balance behavior changed.
 
 ## v1.20.17 - Town Revisit UI No-Live-Affordance Smoke Hardening
 

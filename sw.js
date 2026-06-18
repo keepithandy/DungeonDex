@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.17-town-revisit-ui-no-live-affordance-smoke';
+const CACHE_NAME = 'dungeondex-v1.20.18-talent-system-reentry-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.17-town-revisit-ui-no-live-affordance-smoke';
+const BUILD_QS = '1.20.18-talent-system-reentry-audit';
 const ASSETS = [
   './',
   './index.html',
