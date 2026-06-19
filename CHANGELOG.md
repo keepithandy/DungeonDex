@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.25`
-* Current development target: `v1.20.25`
+* Current local package baseline: `v1.20.26`
+* Current development target: `v1.20.26`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -63,6 +63,12 @@ This changelog records what changed and why.
 * Extended smoke coverage to prove the spending dry run leaves available points, learned state, and passive state unchanged.
 * Kept real spending, unlocks, learned nodes, passive effects, respec, and Talent action UI disabled.
 * No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
+
+## v1.20.26 - First Passive Effect Contract Test
+
+* Added a read-only passive-effect contract helper for `hunter_board_clarity` that reports learned state, passive readiness, and metadata only.
+* Extended smoke coverage to prove the contract is stable, disabled, non-mutating, and leaves Elite Board output behavior unchanged.
+* No passive activation, Elite Board math, combat, economy, gear, dungeon progression, Revisit, Debt, or Talent UI action behavior changed.
 
 ## v1.20.25 - Talent Spending Activation, Learned State Only
 

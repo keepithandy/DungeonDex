@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.25-talent-learned-state-spend';
+const CACHE_NAME = 'dungeondex-v1.20.26-first-passive-effect-contract-test';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.25-talent-learned-state-spend';
+const BUILD_QS = '1.20.26-first-passive-effect-contract-test';
 const ASSETS = [
   './',
   './index.html',

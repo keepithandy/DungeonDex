@@ -667,6 +667,32 @@
     return result;
   }
 
+  function hunterBoardClarityPassiveContract(state){
+    const resolvedNodeKey = 'hunter_board_clarity';
+    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
+    const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
+    return {
+      nodeKey: resolvedNodeKey,
+      learned,
+      passiveReady: learned,
+      passiveEnabled: false,
+      effectKey: 'hunter_board_clarity_display_copy',
+      affectedSurface: 'Elite Board display copy only',
+      mutatesSave: false,
+      appliesEffect: false,
+      combat: false,
+      economy: false,
+      rewards: false,
+      monsters: false,
+      gear: false,
+      dungeonProgression: false,
+      dungeonScaling: false,
+      revisit: false,
+      debtCollector: false,
+      eliteBoardDifficultyRiskRewardMath: false
+    };
+  }
+
   function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
     const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
     const zeroState = {
@@ -1346,6 +1372,7 @@
     calculateTalentPointsFromMilestones,
     calculateTalentSpendDryRun,
     applyTalentNodeSpend,
+    hunterBoardClarityPassiveContract,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,
@@ -1366,6 +1393,11 @@
     },
     resetTalents: reset,
     unlockForTest: learn,
+    passiveContract: (state, nodeKey) => {
+      const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+      if (resolvedNodeKey === 'hunter_board_clarity') return hunterBoardClarityPassiveContract(state);
+      return null;
+    },
     summary: state => {
       return safeTalentSummary(state);
     },

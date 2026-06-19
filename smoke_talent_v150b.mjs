@@ -783,6 +783,10 @@ async function main() {
       lockedFixture.player.talentEarning.enabled = false;
       const pendingDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(mainFixture, true) : null;
       const mainFixtureAfter = JSON.stringify(mainFixture);
+      const passiveContract = typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
+      const passiveContractReplay = typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
+      const passiveBoardBefore = document.getElementById('questPanel')?.innerText || '';
+      const passiveBoardAfter = document.getElementById('questPanel')?.innerText || '';
 
       const staleFixture = JSON.parse(JSON.stringify(mainFixture));
       staleFixture.player.talentEarning.milestonesReached.stale_bad_id = true;
@@ -846,10 +850,16 @@ async function main() {
         dryRunStateNotMutated: dryRunStateBefore === dryRunStateAfter,
         mainFixtureNotMutated: mainFixtureBefore === mainFixtureAfter,
         noActivationApi: !api.activateTalentNode && !api.spendTalentPoints && !api.getTalentBonus,
+        passiveContract,
+        passiveContractReplay,
+        passiveBoardBefore,
+        passiveBoardAfter,
         notMutated: before === after
       };
     })()`);
     const earningContract = earningAudit?.contract;
+    record('Talent passive contract helper exists', !!earningAudit?.passiveContract && !!earningAudit?.passiveContractReplay && earningAudit?.passiveContract?.nodeKey === TALENT_IDS.hunterClarity, JSON.stringify(earningAudit?.passiveContract));
+    record('Talent passive contract metadata is stable and read-only', earningAudit?.passiveContract?.learned === false && earningAudit?.passiveContract?.passiveReady === false && earningAudit?.passiveContract?.passiveEnabled === false && earningAudit?.passiveContract?.effectKey === 'hunter_board_clarity_display_copy' && earningAudit?.passiveContract?.affectedSurface === 'Elite Board display copy only' && earningAudit?.passiveContract?.mutatesSave === false && earningAudit?.passiveContract?.appliesEffect === false && earningAudit?.passiveContract?.combat === false && earningAudit?.passiveContract?.economy === false && earningAudit?.passiveContract?.rewards === false && earningAudit?.passiveContract?.monsters === false && earningAudit?.passiveContract?.gear === false && earningAudit?.passiveContract?.dungeonProgression === false && earningAudit?.passiveContract?.dungeonScaling === false && earningAudit?.passiveContract?.revisit === false && earningAudit?.passiveContract?.debtCollector === false && earningAudit?.passiveContract?.eliteBoardDifficultyRiskRewardMath === false && JSON.stringify(earningAudit?.passiveContract) === JSON.stringify(earningAudit?.passiveContractReplay), JSON.stringify(earningAudit?.passiveContract));
     const earningMilestones = Array.isArray(earningContract?.milestones) ? earningContract.milestones : [];
     const bossIds = Array.isArray(earningAudit?.detectBoss) ? earningAudit.detectBoss.map(entry => entry.milestone) : [];
     const depthIds = Array.isArray(earningAudit?.detectDepth) ? earningAudit.detectDepth.map(entry => entry.milestone) : [];
@@ -935,6 +945,18 @@ async function main() {
     })()`);
     record('Live learned spend persists in save', !!learnedSpendResult && learnedSpendResult.ok === true && learnedSpendResult.nodeKey === 'hunter_board_clarity' && learnedSpendResult.availableBefore === 1 && learnedSpendResult.availableAfter === 0 && learnedSpendResult.learnedStateWritten === true && reloadedLearnedSave?.player?.talentLearnedIds?.hunter_board_clarity === true && Array.isArray(reloadedLearnedSave?.player?.talentUnlockIds) && reloadedLearnedSave.player.talentUnlockIds.includes('hunter_board_clarity') && reloadedLearnedSave?.player?.talentLedger?.availablePoints === 0 && reloadedLearnedSave?.player?.talentLedger?.spentPoints === 1, JSON.stringify({ learnedSpendResult, save: reloadedLearnedSave?.player || null }));
     record('Live learned spend survives save repair and reload', reloadedLearnedSave?.player?.talentLearnedIds?.hunter_board_clarity === true && reloadedLearnedSave?.player?.talentLedger?.availablePoints === 0 && reloadedLearnedSave?.player?.talentLedger?.spentPoints === 1, JSON.stringify(reloadedLearnedSummary));
+    const learnedPassiveContract = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      return api && typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
+    })()`);
+    const learnedBoardTextBefore = await evalByValue(client, `(() => document.getElementById('questPanel')?.innerText || '')()`);
+    const learnedBoardTextAfter = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (api && typeof api.passiveContract === 'function') api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)});
+      return document.getElementById('questPanel')?.innerText || '';
+    })()`);
+    record('Learned hunter_board_clarity is detected by passive contract', learnedPassiveContract?.learned === true && learnedPassiveContract?.passiveReady === true, JSON.stringify(learnedPassiveContract));
+    record('Passive contract remains disabled and no save mutation occurs', learnedPassiveContract?.passiveEnabled === false && learnedPassiveContract?.appliesEffect === false && learnedPassiveContract?.mutatesSave === false && learnedBoardTextBefore === learnedBoardTextAfter, JSON.stringify({ learnedPassiveContract, learnedBoardTextBefore, learnedBoardTextAfter }));
     record('Learned spend does not mutate save snapshot unexpectedly', learnedSaveBefore === JSON.stringify(learnedSaveFixture), JSON.stringify({ before: learnedSaveBefore, after: JSON.stringify(learnedSaveFixture) }));
     const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));
     persistenceFixture.player = persistenceFixture.player || {};

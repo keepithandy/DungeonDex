@@ -7,14 +7,22 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.25 - Talent Spending Activation, Learned State Only
+- DungeonDex v1.20.26 - First Passive Effect Contract Test
+
+## v1.20.26 First Passive Effect Contract Test
+- Current baseline: v1.20.26.
+- Added a read-only passive-effect contract helper for `hunter_board_clarity` that reports learned state, passive readiness, and metadata only.
+- Smoke coverage proves the contract stays disabled, does not mutate save state, and does not change Elite Board output behavior yet.
+- Passive activation, Elite Board math, combat, economy, gear, dungeon progression, Revisit, Debt, and Talent UI actions remain unchanged.
+- This is a contract-only test layer. No passive effect is active yet.
 
 ## v1.20.25 Talent Spending Activation, Learned State Only
-- Current baseline: v1.20.25.
-- Added a single-node learned-state spending helper for `hunter_board_clarity`.
-- Smoke coverage proves default blocking, explicit override spending, one-point consumption, duplicate blocking, and save-repair persistence.
-- Passive effects, respec, Talent action UI, and other gameplay behavior remain unchanged.
-- This is a learned-state activation only. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remain unchanged.
+- Historical baseline retained below for reference.
+- Current baseline now: v1.20.26.
+- v1.20.25 added a single-node learned-state spending helper for `hunter_board_clarity`.
+- Smoke coverage proved default blocking, explicit override spending, one-point consumption, duplicate blocking, and save-repair persistence.
+- Passive effects, respec, Talent action UI, and other gameplay behavior remained unchanged.
+- This was a learned-state activation only. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remained unchanged.
 
 ## v1.20.24 Talent Spending Dry Run
 - Current baseline: v1.20.24.
