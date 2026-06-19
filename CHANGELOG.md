@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.20`
-* Current development target: `v1.20.20`
+* Current local package baseline: `v1.20.21`
+* Current development target: `v1.20.21`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -34,6 +34,14 @@ This changelog records what changed and why.
 * Extended smoke coverage to verify boss and depth milestone detection, unique milestone IDs, disabled-state zero points, override-only fixture scoring, and no state mutation.
 * Kept `talentEarning.enabled` false in normal saves and did not add any live award, persist, spend, unlock, passive, or UI path.
 * No combat, economy, monsters, gear, progression, or live Talent activation behavior changed.
+
+## v1.20.21 - Talent Award Ledger Dry Run
+
+* Added a read-only dry-run helper that reports reached, already-awarded, and pending Talent milestone IDs without mutating state.
+* Locked saves return a full zero-state with no reached or awarded milestone information exposed.
+* Added fixture-only smoke coverage for award deltas, stale IDs, malformed milestone maps, unique outputs, and state immutability.
+* Kept Talent earning, awards, persistence, spending, unlocks, passive effects, and UI activation disabled.
+* No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
 
 ## v1.20.18 - Talent System Re-entry Audit
 

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.20-talent-milestone-tracking-gate-test';
+const CACHE_NAME = 'dungeondex-v1.20.21-talent-award-ledger-dry-run';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.20-talent-milestone-tracking-gate-test';
+const BUILD_QS = '1.20.21-talent-award-ledger-dry-run';
 const ASSETS = [
   './',
   './index.html',

@@ -737,6 +737,47 @@ async function main() {
       const allReached = typeof api.getAllReachedMilestones === 'function' ? api.getAllReachedMilestones(fixture) : null;
       const pointsDisabled = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture) : null;
       const pointsOverride = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture, true) : null;
+      const hasPendingAwards = typeof api.calculatePendingTalentMilestoneAwards === 'function';
+      const dryRunStateBefore = JSON.stringify(S);
+      const disabledDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(S, false) : null;
+      const dryRunStateAfter = JSON.stringify(S);
+
+      const mainFixture = JSON.parse(JSON.stringify(S));
+      mainFixture.player = mainFixture.player || {};
+      mainFixture.player.bossesDefeated = 6;
+      mainFixture.player.safeExtractDepth = 12;
+      mainFixture.player.talentEarning = {
+        enabled: false,
+        sourceId: 'boss_depth_milestone',
+        milestonesReached: { first_boss: true, depth_5: true },
+        pointsAwarded: 0
+      };
+      const mainFixtureBefore = JSON.stringify(mainFixture);
+      const pendingDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(mainFixture, true) : null;
+      const mainFixtureAfter = JSON.stringify(mainFixture);
+
+      const staleFixture = JSON.parse(JSON.stringify(mainFixture));
+      staleFixture.player.talentEarning.milestonesReached.stale_bad_id = true;
+      const staleDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(staleFixture, true) : null;
+
+      const malformedValues = [
+        { name: 'undefined', value: undefined },
+        { name: 'null', value: null },
+        { name: 'array', value: ['first_boss'] },
+        { name: 'string', value: 'bad' },
+        { name: 'number', value: 42 },
+        { name: 'polluted', value: Object.create({ polluted: true }, { first_boss: { value: true, enumerable: true } }) }
+      ];
+      const malformedDryRuns = malformedValues.map(test => {
+        const malformedFixture = JSON.parse(JSON.stringify(mainFixture));
+        malformedFixture.player.talentEarning.milestonesReached = test.value;
+        try {
+          const result = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(malformedFixture, true) : null;
+          return { name: test.name, ok: !!result && typeof result === 'object' && result.pendingPoints === 4, pendingPoints: result?.pendingPoints };
+        } catch (error) {
+          return { name: test.name, ok: false, error: error?.message || String(error) };
+        }
+      });
       return {
         hasContractHelper: typeof api.earningSourceContract === 'function',
         hasEnabledHelper: typeof api.earningEnabled === 'function',
@@ -745,7 +786,8 @@ async function main() {
           detectBoss: typeof api.detectBossMilestones === 'function',
           detectDepth: typeof api.detectDepthMilestones === 'function',
           allReached: typeof api.getAllReachedMilestones === 'function',
-          calculate: typeof api.calculateTalentPointsFromMilestones === 'function'
+          calculate: typeof api.calculateTalentPointsFromMilestones === 'function',
+          pendingAwards: hasPendingAwards
         },
         contract,
         contract2,
@@ -762,6 +804,13 @@ async function main() {
         allReached,
         pointsDisabled,
         pointsOverride,
+        disabledDryRun,
+        pendingDryRun,
+        staleDryRun,
+        malformedDryRuns,
+        dryRunStateNotMutated: dryRunStateBefore === dryRunStateAfter,
+        mainFixtureNotMutated: mainFixtureBefore === mainFixtureAfter,
+        noActivationApi: !api.activateTalentNode && !api.spendTalentPoints && !api.getTalentBonus,
         notMutated: before === after
       };
     })()`);
@@ -785,6 +834,23 @@ async function main() {
     record('Normal saves still award 0', earningAudit?.earning?.enabled === false && earningAudit?.pointsDisabled === 0, JSON.stringify({ earning: earningAudit?.earning, pointsDisabled: earningAudit?.pointsDisabled }));
     record('Earning gate locked in state and contract', earningAudit?.earning?.enabled === false && earningContract?.enabled === false && earningAudit?.earning?.pointsAwarded === 0 && Object.keys(earningAudit?.earning?.milestonesReached || {}).length === 0, JSON.stringify({ earning: earningAudit?.earning, contract: earningContract }));
     record('Talent earning source contract returns stable contract', !!earningContract && JSON.stringify(earningContract) === JSON.stringify(earningAudit?.contract2), JSON.stringify(earningContract));
+    const disabledDryRun = earningAudit?.disabledDryRun;
+    const pendingDryRun = earningAudit?.pendingDryRun;
+    const staleDryRun = earningAudit?.staleDryRun;
+    record('Pending award dry-run exists and is callable', earningAudit?.helperShape?.pendingAwards === true, JSON.stringify(earningAudit?.helperShape));
+    record('Disabled normal state returns full zero-state', disabledDryRun?.enabled === false && disabledDryRun?.sourceId === 'boss_depth_milestone' && Array.isArray(disabledDryRun?.reachedMilestones) && disabledDryRun.reachedMilestones.length === 0 && Array.isArray(disabledDryRun?.alreadyAwardedMilestones) && disabledDryRun.alreadyAwardedMilestones.length === 0 && Array.isArray(disabledDryRun?.pendingMilestones) && disabledDryRun.pendingMilestones.length === 0 && disabledDryRun?.pendingPoints === 0 && disabledDryRun?.previewOnly === true && disabledDryRun?.dryRun === true, JSON.stringify(disabledDryRun));
+    record('Enabled fixture calculates reached milestones correctly', pendingDryRun?.enabled === true && pendingDryRun?.sourceId === 'boss_depth_milestone' && pendingDryRun?.reachedMilestones?.length === 4 && pendingDryRun.reachedMilestones.includes('first_boss') && pendingDryRun.reachedMilestones.includes('boss_5') && pendingDryRun.reachedMilestones.includes('depth_5') && pendingDryRun.reachedMilestones.includes('depth_10'), JSON.stringify(pendingDryRun?.reachedMilestones));
+    record('Enabled fixture calculates pending milestones correctly', pendingDryRun?.pendingMilestones?.length === 2 && pendingDryRun.pendingMilestones.includes('boss_5') && pendingDryRun.pendingMilestones.includes('depth_10') && !pendingDryRun.pendingMilestones.includes('first_boss') && !pendingDryRun.pendingMilestones.includes('depth_5'), JSON.stringify(pendingDryRun?.pendingMilestones));
+    record('Pending points equals pending milestones count', pendingDryRun?.pendingPoints === 2 && pendingDryRun.pendingPoints === pendingDryRun?.pendingMilestones?.length, JSON.stringify({ pendingPoints: pendingDryRun?.pendingPoints, count: pendingDryRun?.pendingMilestones?.length }));
+    record('Already-awarded milestones are correct', pendingDryRun?.alreadyAwardedMilestones?.length === 2 && pendingDryRun.alreadyAwardedMilestones.includes('first_boss') && pendingDryRun.alreadyAwardedMilestones.includes('depth_5'), JSON.stringify(pendingDryRun?.alreadyAwardedMilestones));
+    record('Dry-run milestone arrays are unique', !!pendingDryRun && ['reachedMilestones', 'alreadyAwardedMilestones', 'pendingMilestones'].every(key => Array.isArray(pendingDryRun[key]) && pendingDryRun[key].length === new Set(pendingDryRun[key]).size), JSON.stringify(pendingDryRun));
+    record('Stale awarded milestone IDs do not inflate pending points', staleDryRun?.pendingPoints === 2 && !staleDryRun?.pendingMilestones?.includes('stale_bad_id'), JSON.stringify({ pendingPoints: staleDryRun?.pendingPoints, pending: staleDryRun?.pendingMilestones }));
+    record('Stale awarded milestone IDs appear in awarded list but not pending', staleDryRun?.alreadyAwardedMilestones?.includes('stale_bad_id') && !staleDryRun?.pendingMilestones?.includes('stale_bad_id'), JSON.stringify({ awarded: staleDryRun?.alreadyAwardedMilestones, pending: staleDryRun?.pendingMilestones }));
+    (earningAudit?.malformedDryRuns || []).forEach(test => record(`Malformed milestonesReached (${test.name}) does not crash`, test.ok === true, JSON.stringify(test)));
+    record('Dry-run does not mutate normal state', earningAudit?.dryRunStateNotMutated === true, JSON.stringify({ notMutated: earningAudit?.dryRunStateNotMutated }));
+    record('Dry-run does not mutate fixture', earningAudit?.mainFixtureNotMutated === true, JSON.stringify({ notMutated: earningAudit?.mainFixtureNotMutated }));
+    record('Dry-run leaves normal saves disabled with zero points', earningAudit?.earning?.enabled === false && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ earning: earningAudit?.earning, available: earningAudit?.summary2?.pointsAvailable }));
+    record('No unlock/spending/passive behavior appears', earningAudit?.noActivationApi === true, JSON.stringify({ noActivationApi: earningAudit?.noActivationApi }));
     const previewSafety = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       if (!api) return null;

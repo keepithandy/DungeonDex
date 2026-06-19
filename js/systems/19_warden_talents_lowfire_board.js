@@ -560,6 +560,49 @@
     }, 0);
   }
 
+  function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
+    const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
+    const zeroState = {
+      enabled: false,
+      sourceId,
+      reachedMilestones: [],
+      alreadyAwardedMilestones: [],
+      pendingMilestones: [],
+      pendingPoints: 0,
+      previewOnly: true,
+      dryRun: true
+    };
+    const earning = state?.player?.talentEarning;
+    if (enabledOverride !== true && earning?.enabled !== true) return zeroState;
+
+    let milestonesReached = earning?.milestonesReached;
+    try {
+      if (!milestonesReached || typeof milestonesReached !== 'object' || Array.isArray(milestonesReached) || Object.getPrototypeOf(milestonesReached) !== Object.prototype) {
+        milestonesReached = {};
+      }
+    } catch (_) {
+      milestonesReached = {};
+    }
+
+    const reachedMilestones = Array.from(new Set(getAllReachedMilestones(state)
+      .map(entry => normaliseMilestoneId(entry?.milestone))
+      .filter(Boolean)));
+    const alreadyAwardedMilestones = Array.from(new Set(Object.keys(milestonesReached)
+      .filter(id => milestonesReached[id] === true)));
+    const alreadyAwarded = new Set(alreadyAwardedMilestones);
+    const pendingMilestones = reachedMilestones.filter(id => !alreadyAwarded.has(id));
+    return {
+      enabled: true,
+      sourceId,
+      reachedMilestones,
+      alreadyAwardedMilestones,
+      pendingMilestones,
+      pendingPoints: pendingMilestones.length,
+      previewOnly: true,
+      dryRun: true
+    };
+  }
+
   function talentPointLedger(state){
     const player = state?.player || {};
     const source = safeLedgerSource(player.talentLedger);
@@ -1137,6 +1180,7 @@
     detectDepthMilestones,
     getAllReachedMilestones,
     calculateTalentPointsFromMilestones,
+    calculatePendingTalentMilestoneAwards,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,

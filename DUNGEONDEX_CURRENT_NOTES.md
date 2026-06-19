@@ -7,14 +7,22 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.20 - Talent Milestone Tracking Gate Test (fixture-only, no live earning)
+- DungeonDex v1.20.21 - Talent Award Ledger Dry Run
+
+## v1.20.21 Talent Award Ledger Dry Run
+- Current baseline: v1.20.21.
+- Added `calculatePendingTalentMilestoneAwards(state, enabledOverride)` as a read-only proof of reached-minus-awarded milestone delta logic.
+- Disabled saves receive a full zero-state; fixture overrides can inspect reached, awarded, and pending milestone IDs without mutating state.
+- Smoke coverage validates stale and malformed award maps, unique outputs, pending point counts, normal-save zero state, and no activation API.
+- `talentEarning.enabled` remains false in normal saves; no Talent points, milestones, ledger values, unlocks, spending, bonuses, or UI actions are awarded or persisted.
+- No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
 
 ## v1.20.20 Talent Milestone Tracking Test
 - Current baseline: v1.20.20.
 - Added read-only talent milestone detection helpers for fixture validation only: boss milestones, depth milestones, merged reached milestones, and point calculation from milestones.
 - Extended smoke coverage for helper existence, boss/depth detection, unique milestone IDs, disabled-state zero points, override-only fixture scoring, no state mutation, and locked earning gate verification.
 - `talentEarning.enabled` remains false in normal saves, `milestonesReached` stays empty, and `pointsAwarded` stays zero.
-- The Talent module retains its stable `v1.16.2` component provenance label; only active public/runtime/cache labels moved to v1.20.20.
+- The Talent module retains its stable `v1.16.2` component provenance label; v1.20.20 updated the active public/runtime/cache labels for that patch.
 - No milestone earning activation, spending, unlocks, learned nodes, passive bonuses, UI actions, combat, economy, monsters, gear, or progression behavior changed.
 
 ## v1.20.18 Talent System Re-entry Audit
