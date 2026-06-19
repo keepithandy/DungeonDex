@@ -300,6 +300,25 @@
     return [];
   }
 
+  function normalizeTalentLearnedIds(value) {
+    const learned = {};
+    if (!isPlainObject(value)) return learned;
+    Object.keys(value).forEach(key => {
+      if (value[key] === true) learned[String(key)] = true;
+    });
+    return learned;
+  }
+
+  function normalizeTalentLearnedIdList(value) {
+    const learned = [];
+    const source = Array.isArray(value) ? value : [];
+    source.forEach(entry => {
+      const clean = String(entry || '').trim();
+      if (clean && !learned.includes(clean)) learned.push(clean);
+    });
+    return learned;
+  }
+
   function createTalentEarningState() {
     return {
       enabled: true,
@@ -329,7 +348,8 @@
     state.player.talentPointsEarned = 0;
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
-    state.player.talentUnlockIds = [];
+    state.player.talentUnlockIds = normalizeTalentLearnedIdList(state.player.talentUnlockIds);
+    state.player.talentLearnedIds = normalizeTalentLearnedIds(state.player.talentLearnedIds);
     const earning = normalizeTalentEarningState(state);
     if (earning && earning.enabled === true && typeof window !== 'undefined' && window.DungeonDexTalents && typeof window.DungeonDexTalents.applyPendingTalentMilestoneAwards === 'function') {
       window.DungeonDexTalents.applyPendingTalentMilestoneAwards(state);
@@ -371,9 +391,12 @@
     const ledger = normalizeTalentLedger(state.player.talentLedger);
     const earning = isPlainObject(state.player.talentEarning) ? state.player.talentEarning : {};
     const earned = Math.max(0, Math.floor(numberOr(earning.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const learnedMap = normalizeTalentLearnedIds(state.player.talentLearnedIds);
+    const learnedCount = Object.keys(learnedMap).length;
+    const available = Math.max(0, earned - learnedCount);
     ledger.lifetimePoints = earned;
-    ledger.availablePoints = earned;
-    ledger.spentPoints = 0;
+    ledger.availablePoints = available;
+    ledger.spentPoints = Math.max(0, earned - available);
     ledger.previewOnly = true;
     ledger.unlocked = false;
     ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: earned }];
@@ -426,6 +449,7 @@
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
     state.player.talentUnlockIds = [];
+    state.player.talentLearnedIds = {};
     return true;
   }
 

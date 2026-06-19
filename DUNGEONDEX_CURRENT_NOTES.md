@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.24 - Talent Spending Dry Run
+- DungeonDex v1.20.25 - Talent Spending Activation, Learned State Only
+
+## v1.20.25 Talent Spending Activation, Learned State Only
+- Current baseline: v1.20.25.
+- Added a single-node learned-state spending helper for `hunter_board_clarity`.
+- Smoke coverage proves default blocking, explicit override spending, one-point consumption, duplicate blocking, and save-repair persistence.
+- Passive effects, respec, Talent action UI, and other gameplay behavior remain unchanged.
+- This is a learned-state activation only. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remain unchanged.
 
 ## v1.20.24 Talent Spending Dry Run
 - Current baseline: v1.20.24.

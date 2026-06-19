@@ -564,7 +564,7 @@
     const resolvedNodeKey = normaliseMilestoneId(nodeKey);
     const node = TALENT_BY_ID[resolvedNodeKey] || null;
     const ledger = talentPointLedger(state);
-    const spendingEnabled = enabledOverride === true && TALENT_RULESET_PREVIEW.spendingEnabled === true;
+    const spendingEnabled = enabledOverride === true;
     const availableBefore = Math.max(0, Math.floor(N(ledger.availablePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
     const cost = Math.max(0, Math.floor(N(node?.plannedCost ?? node?.costPreview ?? 0, 0, 0, Number.MAX_SAFE_INTEGER)));
     const nodeLocked = !!node?.locked;
@@ -590,6 +590,81 @@
       learnedStateWritten: false,
       passiveApplied: false
     };
+  }
+
+  function safeTalentLearnedIds(value){
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+    try {
+      if (Object.getPrototypeOf(value) !== Object.prototype) return [];
+    } catch (err) {
+      return [];
+    }
+    return Object.keys(value).filter(key => value[key] === true && TALENT_BY_ID[key]);
+  }
+
+  function applyTalentNodeSpend(state, nodeKey, enabledOverride = false){
+    const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    const node = TALENT_BY_ID[resolvedNodeKey] || null;
+    const ledger = talentPointLedger(state);
+    const availableBefore = Math.max(0, Math.floor(N(ledger.availablePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const cost = Math.max(0, Math.floor(N(node?.plannedCost ?? node?.costPreview ?? 0, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const result = {
+      ok: false,
+      blockedReason: '',
+      nodeKey: resolvedNodeKey,
+      cost,
+      availableBefore,
+      availableAfter: availableBefore,
+      learnedStateWritten: false,
+      passiveApplied: false,
+      alreadyLearned: false,
+      mutatesSave: false,
+      sourceId
+    };
+    if (!state?.player || enabledOverride !== true) {
+      result.blockedReason = 'spending_disabled';
+      return result;
+    }
+    if (!resolvedNodeKey) {
+      result.blockedReason = 'missing_node_key';
+      return result;
+    }
+    if (!node) {
+      result.blockedReason = 'unknown_node';
+      return result;
+    }
+    if (resolvedNodeKey !== 'hunter_board_clarity') {
+      result.blockedReason = 'node_not_activated';
+      return result;
+    }
+    const learnedIds = safeTalentLearnedIds(state.player.talentLearnedIds || state.player.talentUnlockIds || state.player.talents?.unlocked || {});
+    const alreadyLearned = learnedIds.includes(resolvedNodeKey) || !!state.player.talentUnlockIds?.includes?.(resolvedNodeKey);
+    result.alreadyLearned = alreadyLearned;
+    if (alreadyLearned) {
+      result.blockedReason = 'already_learned';
+      return result;
+    }
+    if (availableBefore < cost) {
+      result.blockedReason = 'insufficient_points';
+      return result;
+    }
+    const learnedMap = isPlainObject(state.player.talentLearnedIds) ? state.player.talentLearnedIds : {};
+    learnedMap[resolvedNodeKey] = true;
+    state.player.talentLearnedIds = learnedMap;
+    state.player.talentUnlockIds = Array.from(new Set([...(Array.isArray(state.player.talentUnlockIds) ? state.player.talentUnlockIds : []), resolvedNodeKey]));
+    if (!isPlainObject(state.player.talentLedger)) state.player.talentLedger = {};
+    state.player.talentLedger.previewOnly = true;
+    state.player.talentLedger.unlocked = false;
+    state.player.talentLedger.availablePoints = Math.max(0, availableBefore - cost);
+    state.player.talentLedger.lifetimePoints = Math.max(state.player.talentLedger.lifetimePoints || 0, availableBefore);
+    state.player.talentLedger.spentPoints = Math.max(0, cost);
+    state.player.talentLedger.earnedSources = [{ sourceId, points: Math.max(0, state.player.talentLedger.lifetimePoints || 0) }];
+    result.ok = true;
+    result.learnedStateWritten = true;
+    result.availableAfter = state.player.talentLedger.availablePoints;
+    result.mutatesSave = true;
+    return result;
   }
 
   function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
@@ -1270,6 +1345,7 @@
     getAllReachedMilestones,
     calculateTalentPointsFromMilestones,
     calculateTalentSpendDryRun,
+    applyTalentNodeSpend,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,

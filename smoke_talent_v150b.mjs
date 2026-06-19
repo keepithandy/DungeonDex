@@ -740,6 +740,29 @@ async function main() {
       const spendDryRunLocked = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'survivor_sturdy_start', false) : null;
       const spendDryRunEnabled = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'survivor_sturdy_start', true) : null;
       const spendDryRunUnknown = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'unknown_node', true) : null;
+      const spendFixture = JSON.parse(JSON.stringify(S));
+      spendFixture.player = spendFixture.player || {};
+      spendFixture.player.talentEarning = {
+        enabled: true,
+        sourceId: 'boss_depth_milestone',
+        milestonesReached: { first_boss: true },
+        pointsAwarded: 1
+      };
+      spendFixture.player.talentLedger = {
+        version: 1,
+        unlocked: false,
+        previewOnly: true,
+        lifetimePoints: 1,
+        availablePoints: 1,
+        spentPoints: 0,
+        earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+        notes: []
+      };
+      spendFixture.player.talentLearnedIds = {};
+      spendFixture.player.talentUnlockIds = [];
+      const spendBlocked = typeof api.applyTalentNodeSpend === 'function' ? api.applyTalentNodeSpend(JSON.parse(JSON.stringify(spendFixture)), 'hunter_board_clarity', false) : null;
+      const spendAllowed = typeof api.applyTalentNodeSpend === 'function' ? api.applyTalentNodeSpend(spendFixture, 'hunter_board_clarity', true) : null;
+      const spendDuplicate = typeof api.applyTalentNodeSpend === 'function' ? api.applyTalentNodeSpend(spendFixture, 'hunter_board_clarity', true) : null;
       const hasPendingAwards = typeof api.calculatePendingTalentMilestoneAwards === 'function';
       const dryRunStateBefore = JSON.stringify(S);
       const lockedFixture = JSON.parse(JSON.stringify(S));
@@ -813,6 +836,9 @@ async function main() {
         spendDryRunLocked,
         spendDryRunEnabled,
         spendDryRunUnknown,
+        spendBlocked,
+        spendAllowed,
+        spendDuplicate,
         disabledDryRun,
         pendingDryRun,
         staleDryRun,
@@ -841,6 +867,9 @@ async function main() {
     record('Talent spending dry run is read-only and blocked while locked', earningAudit?.spendDryRunLocked?.mutatesSave === false && earningAudit?.spendDryRunLocked?.learnedStateWritten === false && earningAudit?.spendDryRunLocked?.passiveApplied === false && earningAudit?.spendDryRunLocked?.canAfford === false && earningAudit?.spendDryRunLocked?.blockedReason === 'spending_disabled' && earningAudit?.spendDryRunLocked?.availableBefore === earningAudit?.spendDryRunLocked?.availableAfterPreview, JSON.stringify(earningAudit?.spendDryRunLocked));
     record('Talent spending dry run stays read-only when override-enabled', earningAudit?.spendDryRunEnabled?.mutatesSave === false && earningAudit?.spendDryRunEnabled?.learnedStateWritten === false && earningAudit?.spendDryRunEnabled?.passiveApplied === false && earningAudit?.spendDryRunEnabled?.targetNodeKey === 'survivor_sturdy_start' && earningAudit?.spendDryRunEnabled?.cost === 1 && earningAudit?.spendDryRunEnabled?.availableBefore === 0 && earningAudit?.spendDryRunEnabled?.availableAfterPreview === 0 && earningAudit?.spendDryRunEnabled?.blockedReason === 'spending_disabled', JSON.stringify(earningAudit?.spendDryRunEnabled));
     record('Talent spending dry run handles unknown nodes safely', earningAudit?.spendDryRunUnknown?.mutatesSave === false && earningAudit?.spendDryRunUnknown?.learnedStateWritten === false && earningAudit?.spendDryRunUnknown?.passiveApplied === false && earningAudit?.spendDryRunUnknown?.blockedReason === 'unknown_node', JSON.stringify(earningAudit?.spendDryRunUnknown));
+    record('Talent spending is blocked by default', earningAudit?.spendBlocked?.ok === false && earningAudit?.spendBlocked?.blockedReason === 'spending_disabled' && earningAudit?.spendBlocked?.learnedStateWritten === false, JSON.stringify(earningAudit?.spendBlocked));
+    record('Talent spending override learns Board Clarity', earningAudit?.spendAllowed?.ok === true && earningAudit?.spendAllowed?.blockedReason === '' && earningAudit?.spendAllowed?.nodeKey === 'hunter_board_clarity' && earningAudit?.spendAllowed?.cost === 1 && earningAudit?.spendAllowed?.availableBefore === 1 && earningAudit?.spendAllowed?.availableAfter === 0 && earningAudit?.spendAllowed?.learnedStateWritten === true && earningAudit?.spendAllowed?.alreadyLearned === false && earningAudit?.spendAllowed?.passiveApplied === false, JSON.stringify(earningAudit?.spendAllowed));
+    record('Duplicate spending is blocked', earningAudit?.spendDuplicate?.ok === false && earningAudit?.spendDuplicate?.blockedReason === 'already_learned' && earningAudit?.spendDuplicate?.alreadyLearned === true, JSON.stringify(earningAudit?.spendDuplicate));
     record('Talent earning status shows 0 points awarded before awards', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === true && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
     record('Talent earning source contract does not mutate state', earningAudit?.notMutated === true, JSON.stringify({ notMutated: earningAudit?.notMutated }));
     record('Talent points remain 0 before live awards', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
@@ -866,6 +895,47 @@ async function main() {
     record('Dry-run does not create learned state or passive effects', earningAudit?.spendDryRunLocked?.learnedStateWritten === false && earningAudit?.spendDryRunEnabled?.learnedStateWritten === false && earningAudit?.spendDryRunLocked?.passiveApplied === false && earningAudit?.spendDryRunEnabled?.passiveApplied === false, JSON.stringify({ locked: earningAudit?.spendDryRunLocked, enabled: earningAudit?.spendDryRunEnabled }));
     record('No unlock/spending/passive behavior appears', earningAudit?.noActivationApi === true, JSON.stringify({ noActivationApi: earningAudit?.noActivationApi }));
     const savedBeforePersistence = await readSave(client);
+    const learnedSaveFixture = JSON.parse(JSON.stringify(savedBeforePersistence));
+    learnedSaveFixture.player = learnedSaveFixture.player || {};
+    learnedSaveFixture.player.talentEarning = {
+      enabled: true,
+      sourceId: 'boss_depth_milestone',
+      milestonesReached: { first_boss: true },
+      pointsAwarded: 1
+    };
+    learnedSaveFixture.player.talentLedger = {
+      version: 1,
+      unlocked: false,
+      previewOnly: true,
+      lifetimePoints: 1,
+      availablePoints: 1,
+      spentPoints: 0,
+      earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+      notes: []
+    };
+    learnedSaveFixture.player.talentLearnedIds = {};
+    learnedSaveFixture.player.talentUnlockIds = [];
+    const learnedSpendPackage = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api || typeof api.applyTalentNodeSpend !== 'function') return null;
+      const fixture = ${JSON.stringify(learnedSaveFixture)};
+      const result = api.applyTalentNodeSpend(fixture, 'hunter_board_clarity', true);
+      return { result, fixture };
+    })()`);
+    const learnedSpendResult = learnedSpendPackage?.result || null;
+    const learnedSpendFixture = learnedSpendPackage?.fixture || learnedSaveFixture;
+    const learnedSaveBefore = JSON.stringify(learnedSpendFixture);
+    await writeSave(client, learnedSpendFixture);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const reloadedLearnedSave = await readSave(client);
+    const reloadedLearnedSummary = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      return api && typeof api.summary === 'function' ? api.summary(S) : null;
+    })()`);
+    record('Live learned spend persists in save', !!learnedSpendResult && learnedSpendResult.ok === true && learnedSpendResult.nodeKey === 'hunter_board_clarity' && learnedSpendResult.availableBefore === 1 && learnedSpendResult.availableAfter === 0 && learnedSpendResult.learnedStateWritten === true && reloadedLearnedSave?.player?.talentLearnedIds?.hunter_board_clarity === true && Array.isArray(reloadedLearnedSave?.player?.talentUnlockIds) && reloadedLearnedSave.player.talentUnlockIds.includes('hunter_board_clarity') && reloadedLearnedSave?.player?.talentLedger?.availablePoints === 0 && reloadedLearnedSave?.player?.talentLedger?.spentPoints === 1, JSON.stringify({ learnedSpendResult, save: reloadedLearnedSave?.player || null }));
+    record('Live learned spend survives save repair and reload', reloadedLearnedSave?.player?.talentLearnedIds?.hunter_board_clarity === true && reloadedLearnedSave?.player?.talentLedger?.availablePoints === 0 && reloadedLearnedSave?.player?.talentLedger?.spentPoints === 1, JSON.stringify(reloadedLearnedSummary));
+    record('Learned spend does not mutate save snapshot unexpectedly', learnedSaveBefore === JSON.stringify(learnedSaveFixture), JSON.stringify({ before: learnedSaveBefore, after: JSON.stringify(learnedSaveFixture) }));
     const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));
     persistenceFixture.player = persistenceFixture.player || {};
     persistenceFixture.player.talentEarning = persistenceFixture.player.talentEarning || {};

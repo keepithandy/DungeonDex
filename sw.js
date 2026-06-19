@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.24-talent-spending-dry-run';
+const CACHE_NAME = 'dungeondex-v1.20.25-talent-learned-state-spend';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.24-talent-spending-dry-run';
+const BUILD_QS = '1.20.25-talent-learned-state-spend';
 const ASSETS = [
   './',
   './index.html',

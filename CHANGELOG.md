@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.24`
-* Current development target: `v1.20.24`
+* Current local package baseline: `v1.20.25`
+* Current development target: `v1.20.25`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -62,6 +62,13 @@ This changelog records what changed and why.
 * Added a read-only spending preview helper that reports affordability and block reasons without mutating save data.
 * Extended smoke coverage to prove the spending dry run leaves available points, learned state, and passive state unchanged.
 * Kept real spending, unlocks, learned nodes, passive effects, respec, and Talent action UI disabled.
+* No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
+
+## v1.20.25 - Talent Spending Activation, Learned State Only
+
+* Added a single-node learned-state spending helper for `hunter_board_clarity` that can persist learned state without applying passive effects.
+* Extended smoke coverage to prove default blocking, explicit override spending, one-point consumption, duplicate blocking, and persistence through save repair.
+* Kept passive effects, respec, Talent action UI, and all other gameplay behavior unchanged.
 * No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
 
 ## v1.20.18 - Talent System Re-entry Audit
