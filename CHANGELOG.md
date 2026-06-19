@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.27`
-* Current development target: `v1.20.27`
+* Current local package baseline: `v1.20.28`
+* Current development target: `v1.20.28`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.28 - Elite Board Copy Surface Contract Guard
+
+* Added a smoke-only alternate Elite Board summary fixture that reuses the hunter_board_clarity copy helper contract without creating new UI.
+* Kept `applyHunterBoardClarityCopy` as the single copy surface source of truth and extended smoke coverage to check both current card and alternate summary behavior.
+* Confirmed unlearned copy stays unchanged, learned copy stays textual-only, numeric values stay fixed, and save state remains untouched.
+* Kept combat, economy, gear, dungeon progression, Revisit, Debt, Talent UI actions, and Elite Board math unchanged.
 
 ## v1.20.27 - First Passive Effect Activation
 

@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.27 - First Passive Effect Activation
+- DungeonDex v1.20.28 - Elite Board Copy Surface Contract Guard
+
+## v1.20.28 Elite Board Copy Surface Contract Guard
+- Current baseline: v1.20.28.
+- Added a smoke-only alternate Elite Board summary fixture that reuses the existing `hunter_board_clarity` copy helper contract.
+- The patch keeps `applyHunterBoardClarityCopy` as the single source of truth for Elite Board clarity copy and does not add new UI.
+- Smoke coverage now checks both the current card surface and a guarded alternate summary fixture for read-only copy behavior.
+- Elite Board math, combat, economy, gear, dungeon progression, Revisit, Debt, and Talent UI actions remain unchanged.
 
 ## v1.20.27 First Passive Effect Activation
 - Current baseline: v1.20.27.

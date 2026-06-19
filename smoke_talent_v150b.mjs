@@ -972,6 +972,26 @@ async function main() {
         sameObject: applied === source
       };
     })()`);
+    const alternateCopyProbe = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (!api || typeof api.applyHunterBoardClarityCopy !== 'function') return null;
+      const surface = {
+        title: 'Elite Board summary',
+        targetLocation: 'Floor 2',
+        contractText: 'Defeat the posted mark when it appears.',
+        rewardPreview: '12 coin',
+        flavor: 'A compact board summary',
+        summary: 'Short summary line'
+      };
+      const before = JSON.stringify(surface);
+      const applied = api.applyHunterBoardClarityCopy(S, surface);
+      return {
+        before,
+        after: JSON.stringify(surface),
+        applied,
+        sameObject: applied === surface
+      };
+    })()`);
     const unlearnedBoardText = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       if (api && typeof api.applyHunterBoardClarityCopy === 'function') {
@@ -983,6 +1003,7 @@ async function main() {
     record('Learned hunter_board_clarity is detected by passive contract', learnedPassiveContract?.learned === true && learnedPassiveContract?.passiveReady === true, JSON.stringify(learnedPassiveContract));
     record('Passive contract activates copy-only surface and stays read-only', learnedPassiveContract?.passiveEnabled === true && learnedPassiveContract?.appliesEffect === true && learnedPassiveContract?.affectedSurface === 'Elite Board display copy only' && learnedPassiveContract?.mutatesSave === false, JSON.stringify(learnedPassiveContract));
     record('Passive copy helper returns clearer text without mutating input or numeric fields', learnedCopyProbe?.sameObject === false && learnedCopyProbe?.before === learnedCopyProbe?.after && learnedCopyProbe?.applied?.passiveSurface === 'Elite Board display copy only' && learnedCopyProbe?.applied?.passiveApplied === true && learnedCopyProbe?.applied?.targetLocation === 'Target: Lowfire District' && learnedCopyProbe?.applied?.contractText === 'Objective: Defeat Glassfang Brute when it appears.' && learnedCopyProbe?.applied?.rewardPreview === 'Reward preview: 10 coin' && learnedCopyProbe?.applied?.flavor === 'Clarity note: A brutal mark' && learnedCopyProbe?.applied?.title === 'Wanted (clear read)', JSON.stringify(learnedCopyProbe));
+    record('Alternate Elite Board summary fixture uses the same copy helper contract', alternateCopyProbe?.sameObject === false && alternateCopyProbe?.before === alternateCopyProbe?.after && alternateCopyProbe?.applied?.passiveSurface === 'Elite Board display copy only' && alternateCopyProbe?.applied?.passiveApplied === true && alternateCopyProbe?.applied?.targetLocation === 'Target: Floor 2' && alternateCopyProbe?.applied?.contractText === 'Objective: Defeat the posted mark when it appears.' && alternateCopyProbe?.applied?.rewardPreview === 'Reward preview: 12 coin' && alternateCopyProbe?.applied?.summary === 'Clear read: Short summary line', JSON.stringify(alternateCopyProbe));
     record('Learned board copy is clearer while staying informational only', typeof learnedBoardText === 'string' && learnedBoardText.includes('Target:') && learnedBoardText.includes('Objective:') && learnedBoardText.includes('Reward preview:'), learnedBoardText.slice(0, 700));
     record('Unlearned board copy stays unchanged through passive helper reads', typeof unlearnedBoardText === 'string' && !unlearnedBoardText.includes('Target:'), unlearnedBoardText.slice(0, 700));
     record('Passive contract and board render do not mutate save state', learnedCopyProbe?.before === learnedCopyProbe?.after && learnedPassiveContract?.mutatesSave === false, JSON.stringify({ learnedPassiveContract, learnedCopyProbe }));
