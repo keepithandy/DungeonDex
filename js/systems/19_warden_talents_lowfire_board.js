@@ -119,7 +119,7 @@
     previewOnly: true,
     active: false,
     gameplayEnabled: false,
-    earningEnabled: false,
+    earningEnabled: true,
     spendingEnabled: false,
     unlocksEnabled: false,
     passiveEffectsEnabled: false,
@@ -130,7 +130,7 @@
         sourceType: 'bossDepthMilestone',
         rule: 'Future points come from secured boss-depth milestones, not common monster grinding.',
         cadence: 'One planned point per secured milestone block.',
-        enabled: false,
+        enabled: true,
         active: false,
         locked: true,
         previewOnly: true
@@ -140,7 +140,7 @@
       earlyCap: 6,
       previewCap: 6,
       absoluteCap: 12,
-      activeCap: 0,
+      activeCap: 6,
       spendableCap: 0,
       locked: true,
       previewOnly: true,
@@ -211,7 +211,7 @@
   const TALENT_EARNING_SOURCE_CONTRACT = deepFreeze({
     sourceId: 'boss_depth_milestone',
     sourceLabel: 'Boss / Depth Milestone',
-    enabled: false,
+    enabled: true,
     description: 'Talent points earned from defeating bosses and advancing depth milestones.',
     milestones: [
       { milestone:'first_boss', label:'First Boss Defeated', futureAwardIfEnabled:1 },
@@ -415,7 +415,7 @@
     ruleset.previewOnly = true;
     ruleset.active = false;
     ruleset.gameplayEnabled = false;
-    ruleset.earningEnabled = false;
+    ruleset.earningEnabled = true;
     ruleset.spendingEnabled = false;
     ruleset.unlocksEnabled = false;
     ruleset.passiveEffectsEnabled = false;
@@ -444,7 +444,7 @@
       previewOnly: true,
       active: false,
       gameplayEnabled: false,
-      earningEnabled: false,
+      earningEnabled: true,
       spendingEnabled: false,
       unlocksEnabled: false,
       passiveEffectsEnabled: false,
@@ -453,7 +453,7 @@
       tierCount: TALENT_RULESET_PREVIEW.tiers.length,
       nodeCount: TALENT_RULESET_PREVIEW.nodes.length,
       earlyCap: TALENT_RULESET_PREVIEW.pointCaps.earlyCap,
-      activeCap: 0,
+      activeCap: TALENT_RULESET_PREVIEW.pointCaps.activeCap,
       spendableCap: 0,
       plannedMaxCost: costs.length ? Math.max(...costs) : 0,
       branchLabels: TALENT_RULESET_PREVIEW.branches.map(branch => branch.label),
@@ -603,18 +603,75 @@
     };
   }
 
+  function safeTalentMilestonesReached(value){
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+    try {
+      if (Object.getPrototypeOf(value) !== Object.prototype) return {};
+    } catch (err) {
+      return {};
+    }
+    return value;
+  }
+
+  function applyPendingTalentMilestoneAwards(state){
+    const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
+    const earning = state?.player?.talentEarning;
+    const currentPoints = Math.max(0, Math.floor(N(earning?.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
+    if (!state?.player || earning?.enabled !== true) {
+      return {
+        ok: true,
+        enabled: false,
+        awardedMilestones: [],
+        awardedPoints: 0,
+        totalPointsAwarded: currentPoints,
+        availablePoints: currentPoints,
+        sourceId
+      };
+    }
+    const result = calculatePendingTalentMilestoneAwards(state, false);
+    const awardedMilestones = Array.isArray(result?.pendingMilestones) ? result.pendingMilestones.slice() : [];
+    const milestonesReached = safeTalentMilestonesReached(earning.milestonesReached);
+    awardedMilestones.forEach(id => {
+      milestonesReached[id] = true;
+    });
+    earning.milestonesReached = milestonesReached;
+    earning.pointsAwarded = currentPoints + awardedMilestones.length;
+    const totalPointsAwarded = earning.pointsAwarded;
+    const availablePoints = totalPointsAwarded;
+    const ledger = state.player.talentLedger;
+    if (ledger && typeof ledger === 'object') {
+      ledger.lifetimePoints = totalPointsAwarded;
+      ledger.availablePoints = availablePoints;
+      ledger.spentPoints = 0;
+      ledger.previewOnly = true;
+      ledger.unlocked = false;
+      ledger.earnedSources = [{ sourceId, points: totalPointsAwarded }];
+    }
+    return {
+      ok: true,
+      enabled: true,
+      awardedMilestones,
+      awardedPoints: awardedMilestones.length,
+      totalPointsAwarded,
+      availablePoints,
+      sourceId
+    };
+  }
+
   function talentPointLedger(state){
     const player = state?.player || {};
     const source = safeLedgerSource(player.talentLedger);
     const notes = ownValue(source, 'notes', []);
+    const earning = safeLedgerSource(player.talentEarning);
+    const totalPointsAwarded = Math.max(0, Math.floor(N(ownValue(earning, 'pointsAwarded', 0), 0, 0, Number.MAX_SAFE_INTEGER)));
     return {
       version: Math.max(1, Math.floor(N(ownValue(source, 'version', 1), 1, 1, 999999))),
       unlocked: false,
       previewOnly: true,
-      lifetimePoints: 0,
-      availablePoints: 0,
+      lifetimePoints: totalPointsAwarded,
+      availablePoints: totalPointsAwarded,
       spentPoints: 0,
-      earnedSources: [],
+      earnedSources: [{ sourceId: TALENT_EARNING_SOURCE_CONTRACT.sourceId, points: totalPointsAwarded }],
       notes: Array.isArray(notes) ? notes.map(note => String(note || '').trim()).filter(Boolean).slice(0, 6) : []
     };
   }
@@ -627,7 +684,7 @@
       lifetimePoints: ledger.lifetimePoints,
       availablePoints: ledger.availablePoints,
       spentPoints: ledger.spentPoints,
-      canEarn: false,
+      canEarn: true,
       canSpend: false,
       sourceCount: Array.isArray(ledger.earnedSources) ? ledger.earnedSources.length : 0
     };
@@ -1181,6 +1238,7 @@
     getAllReachedMilestones,
     calculateTalentPointsFromMilestones,
     calculatePendingTalentMilestoneAwards,
+    applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,

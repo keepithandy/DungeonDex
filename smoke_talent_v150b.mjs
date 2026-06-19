@@ -700,17 +700,17 @@ async function main() {
     record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary && !!previewSummary?.hasLedger && !!previewSummary?.hasLedgerSummary, JSON.stringify(previewSummary));
     record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 4 && previewSummary.nodes === 12 && previewSummary.summary?.totalBranches === 4 && previewSummary.summary?.totalNodes === 12 && previewSummary.summary?.lockedNodes === 12 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true && previewSummary.summary?.rulesetId === 'talent_ruleset_preview_v1' && previewSummary.summary?.rulesetVersion === 1, JSON.stringify(previewSummary));
     record('Legacy preview globals are retired', previewSummary?.legacyBranches === null && previewSummary?.legacyNodes === null, JSON.stringify({ legacyBranches: previewSummary?.legacyBranches, legacyNodes: previewSummary?.legacyNodes }));
-    record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === false && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 0, JSON.stringify(previewSummary?.ledgerSummary));
+    record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === true && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 1, JSON.stringify(previewSummary?.ledgerSummary));
     const rulesetAudit = await getRulesetAudit();
     const ruleset = rulesetAudit?.ruleset || {};
     const rulesetSummary = rulesetAudit?.summary || {};
     const rulesetNodes = Array.isArray(rulesetAudit?.nodes) ? rulesetAudit.nodes : [];
-    const rulesetSourceOk = Array.isArray(ruleset.pointSources) && ruleset.pointSources.length === 1 && ruleset.pointSources[0].sourceType === 'bossDepthMilestone' && ruleset.pointSources[0].enabled === false && ruleset.pointSources[0].active === false && !/common monster/i.test(ruleset.pointSources[0].sourceType || '');
+    const rulesetSourceOk = Array.isArray(ruleset.pointSources) && ruleset.pointSources.length === 1 && ruleset.pointSources[0].sourceType === 'bossDepthMilestone' && ruleset.pointSources[0].enabled === true && ruleset.pointSources[0].active === false && !/common monster/i.test(ruleset.pointSources[0].sourceType || '');
     const rulesetBranchesOk = Array.isArray(ruleset.branches) && ruleset.branches.length === 4 && ['Survivor', 'Hunter', 'Delver', 'Collector'].every(label => ruleset.branches.some(branch => branch.label === label));
     const rulesetTiersOk = Array.isArray(ruleset.tiers) && ruleset.tiers.length === 3 && ruleset.tiers.every(tier => tier.locked === true && tier.previewOnly === true && tier.active === false && tier.gameplayEnabled === false);
     const rulesetNodesOk = rulesetNodes.length === 12 && rulesetNodes.every(node => node.locked === true && node.previewOnly === true && node.active === false && node.gameplayEnabled === false && node.purchased === false && node.learned === false && node.unlocked === false && node.effectValue === 0 && node.applied === false);
-    record('Talent ruleset foundation exists', !!rulesetAudit?.ok && ruleset.locked === true && ruleset.previewOnly === true && ruleset.active === false && ruleset.gameplayEnabled === false && ruleset.earningEnabled === false && ruleset.spendingEnabled === false && ruleset.unlocksEnabled === false && ruleset.passiveEffectsEnabled === false, JSON.stringify(rulesetAudit));
-    record('Talent ruleset source/caps/costs are stable and inactive', rulesetSourceOk && ruleset.pointCaps?.earlyCap === 6 && ruleset.pointCaps?.activeCap === 0 && ruleset.pointCaps?.spendableCap === 0 && ruleset.costModel?.activeCost === 0 && ruleset.costModel?.costsByTier?.['1'] === 1 && ruleset.costModel?.costsByTier?.['2'] === 2 && ruleset.costModel?.costsByTier?.['3'] === 3, JSON.stringify({ pointSources: ruleset.pointSources, pointCaps: ruleset.pointCaps, costModel: ruleset.costModel }));
+    record('Talent ruleset foundation exists', !!rulesetAudit?.ok && ruleset.locked === true && ruleset.previewOnly === true && ruleset.active === false && ruleset.gameplayEnabled === false && ruleset.earningEnabled === true && ruleset.spendingEnabled === false && ruleset.unlocksEnabled === false && ruleset.passiveEffectsEnabled === false, JSON.stringify(rulesetAudit));
+    record('Talent ruleset source/caps/costs are stable and inactive', rulesetSourceOk && ruleset.pointCaps?.earlyCap === 6 && ruleset.pointCaps?.activeCap === 6 && ruleset.pointCaps?.spendableCap === 0 && ruleset.costModel?.activeCost === 0 && ruleset.costModel?.costsByTier?.['1'] === 1 && ruleset.costModel?.costsByTier?.['2'] === 2 && ruleset.costModel?.costsByTier?.['3'] === 3, JSON.stringify({ pointSources: ruleset.pointSources, pointCaps: ruleset.pointCaps, costModel: ruleset.costModel }));
     record('Talent ruleset branch/tier/node data is locked', rulesetBranchesOk && rulesetTiersOk && rulesetNodesOk, JSON.stringify({ branches: ruleset.branches, tiers: ruleset.tiers, nodes: rulesetNodes.slice(0, 3) }));
     record('Talent passive preview map exists', !!rulesetAudit?.passiveMap && Object.keys(rulesetAudit.passiveMap).length === 4 && rulesetAudit.passiveSummary?.branchName === 'Survivor' && rulesetAudit.branchSummary?.branchName && rulesetAudit.nodeDetails?.locked === true && rulesetAudit.nodeDetails?.previewOnly === true, JSON.stringify({ passiveSummary: rulesetAudit.passiveSummary, branchSummary: rulesetAudit.branchSummary, nodeDetails: rulesetAudit.nodeDetails }));
     const earningAudit = await evalByValue(client, `(() => {
@@ -739,7 +739,8 @@ async function main() {
       const pointsOverride = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture, true) : null;
       const hasPendingAwards = typeof api.calculatePendingTalentMilestoneAwards === 'function';
       const dryRunStateBefore = JSON.stringify(S);
-      const disabledDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(S, false) : null;
+      const lockedFixture = JSON.parse(JSON.stringify(S));
+      const disabledDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(lockedFixture, false) : null;
       const dryRunStateAfter = JSON.stringify(S);
 
       const mainFixture = JSON.parse(JSON.stringify(S));
@@ -753,6 +754,7 @@ async function main() {
         pointsAwarded: 0
       };
       const mainFixtureBefore = JSON.stringify(mainFixture);
+      lockedFixture.player.talentEarning.enabled = false;
       const pendingDryRun = hasPendingAwards ? api.calculatePendingTalentMilestoneAwards(mainFixture, true) : null;
       const mainFixtureAfter = JSON.stringify(mainFixture);
 
@@ -787,7 +789,8 @@ async function main() {
           detectDepth: typeof api.detectDepthMilestones === 'function',
           allReached: typeof api.getAllReachedMilestones === 'function',
           calculate: typeof api.calculateTalentPointsFromMilestones === 'function',
-          pendingAwards: hasPendingAwards
+          pendingAwards: hasPendingAwards,
+          applyAwards: typeof api.applyPendingTalentMilestoneAwards === 'function'
         },
         contract,
         contract2,
@@ -820,24 +823,24 @@ async function main() {
     const depthIds = Array.isArray(earningAudit?.detectDepth) ? earningAudit.detectDepth.map(entry => entry.milestone) : [];
     const allReachedIds = Array.isArray(earningAudit?.allReached) ? earningAudit.allReached.map(entry => entry.milestone) : [];
     const uniqueAllReachedIds = new Set(allReachedIds);
-    record('Talent earning source contract exists', earningAudit?.hasContractHelper === true && earningContract?.sourceId === 'boss_depth_milestone' && earningContract?.sourceLabel === 'Boss / Depth Milestone' && earningContract?.enabled === false, JSON.stringify(earningContract));
+    record('Talent earning source contract exists', earningAudit?.hasContractHelper === true && earningContract?.sourceId === 'boss_depth_milestone' && earningContract?.sourceLabel === 'Boss / Depth Milestone' && earningContract?.enabled === true, JSON.stringify(earningContract));
     record('Boss/depth milestone contract lists expected milestones', earningMilestones.length === 6 && earningMilestones.every(entry => entry.futureAwardIfEnabled === 1) && earningMilestones.some(entry => entry.milestone === 'first_boss' && /first.*boss/i.test(entry.label || '')) && earningMilestones.some(entry => entry.milestone === 'depth_5' && /depth.*5/i.test(entry.label || '')) && earningContract?.totalPointsIfAllMilestonesCompleted === 6, JSON.stringify(earningMilestones));
     record('Talent milestone helpers exist', earningAudit?.helperShape?.detectBoss === true && earningAudit?.helperShape?.detectDepth === true && earningAudit?.helperShape?.allReached === true && earningAudit?.helperShape?.calculate === true, JSON.stringify(earningAudit?.helperShape));
     record('Boss/depth milestone detection is stable', Array.isArray(earningAudit?.detectBoss) && Array.isArray(earningAudit?.detectDepth) && bossIds.includes('first_boss') && depthIds.includes('depth_5'), JSON.stringify({ bossIds, depthIds }));
     record('Milestone helpers return unique IDs', Array.isArray(earningAudit?.allReached) && earningAudit.allReached.length === uniqueAllReachedIds.size && earningAudit.allReached.every(entry => entry.milestone), JSON.stringify(earningAudit?.allReached));
-    record('Talent earning feature flag exists and disabled', earningAudit?.earning?.enabled === false && earningAudit?.earning?.sourceId === 'boss_depth_milestone' && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.earning?.milestonesReached && Object.keys(earningAudit.earning.milestonesReached).length === 0 && earningAudit?.enabled === false, JSON.stringify(earningAudit?.earning));
+    record('Talent earning feature flag exists and enabled', earningAudit?.earning?.enabled === true && earningAudit?.earning?.sourceId === 'boss_depth_milestone' && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.earning?.milestonesReached && Object.keys(earningAudit.earning.milestonesReached).length === 0 && earningAudit?.enabled === true, JSON.stringify(earningAudit?.earning));
     record('Disabled fixture returns 0 points', earningAudit?.pointsDisabled === 0, JSON.stringify({ pointsDisabled: earningAudit?.pointsDisabled }));
     record('Override-enabled fixture calculates points', earningAudit?.pointsOverride === 6, JSON.stringify({ pointsOverride: earningAudit?.pointsOverride }));
-    record('Talent earning status shows 0 points awarded while disabled', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === false && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
+    record('Talent earning status shows 0 points awarded before awards', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === true && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
     record('Talent earning source contract does not mutate state', earningAudit?.notMutated === true, JSON.stringify({ notMutated: earningAudit?.notMutated }));
-    record('Talent points remain 0 while earning disabled', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
-    record('Normal saves still award 0', earningAudit?.earning?.enabled === false && earningAudit?.pointsDisabled === 0, JSON.stringify({ earning: earningAudit?.earning, pointsDisabled: earningAudit?.pointsDisabled }));
-    record('Earning gate locked in state and contract', earningAudit?.earning?.enabled === false && earningContract?.enabled === false && earningAudit?.earning?.pointsAwarded === 0 && Object.keys(earningAudit?.earning?.milestonesReached || {}).length === 0, JSON.stringify({ earning: earningAudit?.earning, contract: earningContract }));
+    record('Talent points remain 0 before live awards', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
+    record('Normal saves now initialize earning enabled', earningAudit?.earning?.enabled === true && earningAudit?.pointsDisabled === 6, JSON.stringify({ earning: earningAudit?.earning, pointsDisabled: earningAudit?.pointsDisabled }));
+    record('Earning gate is live in state and contract', earningAudit?.earning?.enabled === true && earningContract?.enabled === true && earningAudit?.earning?.pointsAwarded === 0, JSON.stringify({ earning: earningAudit?.earning, contract: earningContract }));
     record('Talent earning source contract returns stable contract', !!earningContract && JSON.stringify(earningContract) === JSON.stringify(earningAudit?.contract2), JSON.stringify(earningContract));
     const disabledDryRun = earningAudit?.disabledDryRun;
     const pendingDryRun = earningAudit?.pendingDryRun;
     const staleDryRun = earningAudit?.staleDryRun;
-    record('Pending award dry-run exists and is callable', earningAudit?.helperShape?.pendingAwards === true, JSON.stringify(earningAudit?.helperShape));
+    record('Pending award dry-run exists and is callable', earningAudit?.helperShape?.pendingAwards === true && earningAudit?.helperShape?.applyAwards === true, JSON.stringify(earningAudit?.helperShape));
     record('Disabled normal state returns full zero-state', disabledDryRun?.enabled === false && disabledDryRun?.sourceId === 'boss_depth_milestone' && Array.isArray(disabledDryRun?.reachedMilestones) && disabledDryRun.reachedMilestones.length === 0 && Array.isArray(disabledDryRun?.alreadyAwardedMilestones) && disabledDryRun.alreadyAwardedMilestones.length === 0 && Array.isArray(disabledDryRun?.pendingMilestones) && disabledDryRun.pendingMilestones.length === 0 && disabledDryRun?.pendingPoints === 0 && disabledDryRun?.previewOnly === true && disabledDryRun?.dryRun === true, JSON.stringify(disabledDryRun));
     record('Enabled fixture calculates reached milestones correctly', pendingDryRun?.enabled === true && pendingDryRun?.sourceId === 'boss_depth_milestone' && pendingDryRun?.reachedMilestones?.length === 4 && pendingDryRun.reachedMilestones.includes('first_boss') && pendingDryRun.reachedMilestones.includes('boss_5') && pendingDryRun.reachedMilestones.includes('depth_5') && pendingDryRun.reachedMilestones.includes('depth_10'), JSON.stringify(pendingDryRun?.reachedMilestones));
     record('Enabled fixture calculates pending milestones correctly', pendingDryRun?.pendingMilestones?.length === 2 && pendingDryRun.pendingMilestones.includes('boss_5') && pendingDryRun.pendingMilestones.includes('depth_10') && !pendingDryRun.pendingMilestones.includes('first_boss') && !pendingDryRun.pendingMilestones.includes('depth_5'), JSON.stringify(pendingDryRun?.pendingMilestones));
@@ -849,8 +852,36 @@ async function main() {
     (earningAudit?.malformedDryRuns || []).forEach(test => record(`Malformed milestonesReached (${test.name}) does not crash`, test.ok === true, JSON.stringify(test)));
     record('Dry-run does not mutate normal state', earningAudit?.dryRunStateNotMutated === true, JSON.stringify({ notMutated: earningAudit?.dryRunStateNotMutated }));
     record('Dry-run does not mutate fixture', earningAudit?.mainFixtureNotMutated === true, JSON.stringify({ notMutated: earningAudit?.mainFixtureNotMutated }));
-    record('Dry-run leaves normal saves disabled with zero points', earningAudit?.earning?.enabled === false && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ earning: earningAudit?.earning, available: earningAudit?.summary2?.pointsAvailable }));
+    record('Dry-run leaves normal saves read-only with zero points before awards', earningAudit?.earning?.enabled === true && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ earning: earningAudit?.earning, available: earningAudit?.summary2?.pointsAvailable }));
     record('No unlock/spending/passive behavior appears', earningAudit?.noActivationApi === true, JSON.stringify({ noActivationApi: earningAudit?.noActivationApi }));
+    const savedBeforePersistence = await readSave(client);
+    const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));
+    persistenceFixture.player = persistenceFixture.player || {};
+    persistenceFixture.player.talentEarning = persistenceFixture.player.talentEarning || {};
+    persistenceFixture.player.talentEarning.enabled = true;
+    persistenceFixture.player.talentEarning.sourceId = 'boss_depth_milestone';
+    persistenceFixture.player.talentEarning.milestonesReached = {
+      first_boss: true,
+      boss_5: true,
+      depth_5: true,
+      depth_10: true
+    };
+    persistenceFixture.player.talentEarning.pointsAwarded = 4;
+    persistenceFixture.player.talentLedger = persistenceFixture.player.talentLedger || {};
+    persistenceFixture.player.talentLedger.lifetimePoints = 4;
+    persistenceFixture.player.talentLedger.availablePoints = 4;
+    persistenceFixture.player.talentLedger.spentPoints = 0;
+    persistenceFixture.player.talentLedger.previewOnly = true;
+    persistenceFixture.player.talentLedger.unlocked = false;
+    persistenceFixture.player.talentLedger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: 4 }];
+    await writeSave(client, persistenceFixture);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const reloadedAwardSave = await readSave(client);
+    record('Live award persists in save', reloadedAwardSave?.player?.talentEarning?.enabled === true && reloadedAwardSave?.player?.talentEarning?.pointsAwarded === 4 && reloadedAwardSave?.player?.talentEarning?.milestonesReached?.first_boss === true && reloadedAwardSave?.player?.talentEarning?.milestonesReached?.boss_5 === true && reloadedAwardSave?.player?.talentEarning?.milestonesReached?.depth_5 === true && reloadedAwardSave?.player?.talentEarning?.milestonesReached?.depth_10 === true, JSON.stringify(reloadedAwardSave?.player?.talentEarning || null));
+    await clearSave(client);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const previewSafety = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       if (!api) return null;
@@ -874,7 +905,7 @@ async function main() {
       };
     })()`);
     record('Talent preview helpers stay defensive on unknown inputs', !!previewSafety && previewSafety.before === previewSafety.after && previewSafety.passiveMap && previewSafety.passiveMap.survivor?.branchName !== '__mutated__' && previewSafety.summaryUnknown?.locked === true && previewSafety.summaryUnknown?.previewOnly === true && previewSafety.summaryUnknown?.active === false && previewSafety.summaryUnknown?.gameplayEnabled === false && previewSafety.summaryUnknown?.nodeCount === 0 && previewSafety.summaryMalformed?.locked === true && previewSafety.summaryMalformed?.previewOnly === true && previewSafety.nodeUnknown?.locked === true && previewSafety.nodeUnknown?.previewOnly === true && previewSafety.nodeUnknown?.active === false && previewSafety.nodeUnknown?.gameplayEnabled === false && previewSafety.nodeUnknown?.learned === false && previewSafety.nodeUnknown?.applied === false && previewSafety.nodeUnknown?.effectValue === 0 && previewSafety.nodeMalformed?.locked === true && previewSafety.nodeMalformed?.previewOnly === true && previewSafety.nodeMalformed?.active === false && previewSafety.nodeMalformed?.gameplayEnabled === false && previewSafety.nodeMalformed?.effectValue === 0, JSON.stringify(previewSafety));
-    record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === false && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 12 && rulesetSummary.activeCap === 0 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
+    record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === true && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 12 && rulesetSummary.activeCap === 6 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
@@ -1101,7 +1132,7 @@ async function main() {
           saved: S.player?.talentLedger || null
         };
       })()`);
-      record(`Malformed talentLedger repairs safely: ${entry.name}`, !!repairedLedger?.ledger && repairedLedger.ledger.previewOnly === true && repairedLedger.ledger.unlocked === false && repairedLedger.ledger.lifetimePoints === 0 && repairedLedger.ledger.availablePoints === 0 && repairedLedger.ledger.spentPoints === 0 && Array.isArray(repairedLedger.ledger.earnedSources) && repairedLedger.ledger.earnedSources.length === 0 && repairedLedger.summary?.canEarn === false && repairedLedger.summary?.canSpend === false && repairedLedger.talentSummary?.pointsEarned === 0 && repairedLedger.talentSummary?.pointsSpent === 0 && repairedLedger.talentSummary?.pointsAvailable === 0 && Array.isArray(repairedLedger.talentSummary?.unlockedIds) && repairedLedger.talentSummary.unlockedIds.length === 0, JSON.stringify(repairedLedger));
+      record(`Malformed talentLedger repairs safely: ${entry.name}`, !!repairedLedger?.ledger && repairedLedger.ledger.previewOnly === true && repairedLedger.ledger.unlocked === false && repairedLedger.ledger.lifetimePoints === 0 && repairedLedger.ledger.availablePoints === 0 && repairedLedger.ledger.spentPoints === 0 && Array.isArray(repairedLedger.ledger.earnedSources) && repairedLedger.ledger.earnedSources.length === 1 && repairedLedger.summary?.canEarn === true && repairedLedger.summary?.canSpend === false && repairedLedger.talentSummary?.pointsEarned === 0 && repairedLedger.talentSummary?.pointsSpent === 0 && repairedLedger.talentSummary?.pointsAvailable === 0 && Array.isArray(repairedLedger.talentSummary?.unlockedIds) && repairedLedger.talentSummary.unlockedIds.length === 0, JSON.stringify(repairedLedger));
     }
 
     // Boss trophy foundation: fresh save, forced award, reload, malformed repair.

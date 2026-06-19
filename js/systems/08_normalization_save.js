@@ -302,7 +302,7 @@
 
   function createTalentEarningState() {
     return {
-      enabled: false,
+      enabled: true,
       sourceId: 'boss_depth_milestone',
       milestonesReached: {},
       pointsAwarded: 0
@@ -312,6 +312,11 @@
   function normalizeTalentEarningState(state) {
     const earning = createTalentEarningState();
     if (!state?.player) return earning;
+    const saved = isPlainObject(state.player.talentEarning) ? state.player.talentEarning : {};
+    earning.enabled = true;
+    earning.sourceId = 'boss_depth_milestone';
+    earning.milestonesReached = isPlainObject(saved.milestonesReached) ? saved.milestonesReached : {};
+    earning.pointsAwarded = Math.max(0, Math.floor(numberOr(saved.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
     state.player.talentEarning = earning;
     return earning;
   }
@@ -325,7 +330,10 @@
     state.player.talentPointsSpent = 0;
     state.player.talentPoints = 0;
     state.player.talentUnlockIds = [];
-    normalizeTalentEarningState(state);
+    const earning = normalizeTalentEarningState(state);
+    if (earning && earning.enabled === true && typeof window !== 'undefined' && window.DungeonDexTalents && typeof window.DungeonDexTalents.applyPendingTalentMilestoneAwards === 'function') {
+      window.DungeonDexTalents.applyPendingTalentMilestoneAwards(state);
+    }
     return talentState;
   }
 
@@ -361,6 +369,14 @@
   function normalizeTalentLedgerState(state) {
     if (!state?.player) return normalizeTalentLedger();
     const ledger = normalizeTalentLedger(state.player.talentLedger);
+    const earning = isPlainObject(state.player.talentEarning) ? state.player.talentEarning : {};
+    const earned = Math.max(0, Math.floor(numberOr(earning.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
+    ledger.lifetimePoints = earned;
+    ledger.availablePoints = earned;
+    ledger.spentPoints = 0;
+    ledger.previewOnly = true;
+    ledger.unlocked = false;
+    ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: earned }];
     state.player.talentLedger = ledger;
     return ledger;
   }

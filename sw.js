@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.21-talent-award-ledger-dry-run';
+const CACHE_NAME = 'dungeondex-v1.20.22-live-talent-earning-activation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.21-talent-award-ledger-dry-run';
+const BUILD_QS = '1.20.22-live-talent-earning-activation';
 const ASSETS = [
   './',
   './index.html',
