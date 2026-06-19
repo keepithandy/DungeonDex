@@ -671,15 +671,16 @@
     const resolvedNodeKey = 'hunter_board_clarity';
     const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
     const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
+    const passiveEnabled = learned;
     return {
       nodeKey: resolvedNodeKey,
       learned,
       passiveReady: learned,
-      passiveEnabled: false,
+      passiveEnabled,
       effectKey: 'hunter_board_clarity_display_copy',
       affectedSurface: 'Elite Board display copy only',
       mutatesSave: false,
-      appliesEffect: false,
+      appliesEffect: passiveEnabled,
       combat: false,
       economy: false,
       rewards: false,
@@ -691,6 +692,26 @@
       debtCollector: false,
       eliteBoardDifficultyRiskRewardMath: false
     };
+  }
+
+  function applyHunterBoardClarityCopy(state, boardCardOrCopy){
+    const passiveContract = hunterBoardClarityPassiveContract(state);
+    const copy = boardCardOrCopy && typeof boardCardOrCopy === 'object' && !Array.isArray(boardCardOrCopy)
+      ? {...boardCardOrCopy}
+      : { text: String(boardCardOrCopy || '')};
+    if (!passiveContract.passiveEnabled) return copy;
+    const target = copy.targetLocation || copy.targetFloor || copy.where || copy.whereText || '';
+    const objective = copy.contractText || copy.objective || copy.summary || '';
+    const reward = copy.rewardPreview || copy.rewardText || copy.reward || '';
+    if (target) copy.targetLocation = `Target: ${target}`;
+    if (objective) copy.contractText = `Objective: ${objective}`;
+    if (reward) copy.rewardPreview = `Reward preview: ${reward}`;
+    if (copy.flavor) copy.flavor = `Clarity note: ${copy.flavor}`;
+    if (copy.title) copy.title = `${copy.title} (clear read)`;
+    if (copy.summary) copy.summary = `Clear read: ${copy.summary}`;
+    copy.passiveSurface = 'Elite Board display copy only';
+    copy.passiveApplied = true;
+    return copy;
   }
 
   function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
@@ -1172,6 +1193,7 @@
     return `<div class="active-contract-summary small"><span><b>Posted:</b> ${F(availableCount)}</span><span><b>Claimed:</b> ${F(completedCount)}</span><span><b>Failed:</b> ${F(failedCount)}</span><span><b>Expired:</b> ${F(expiredCount)}</span><span><b>Rival danger:</b> ${F(rivalCount)}</span></div>`;
   }
   function contractCard(model,contract,state,active=null){
+    const displayModel = applyHunterBoardClarityCopy(state, model);
     const accepted = !!model.accepted;
     const rival = !!(model.rivalContract || active?.rivalContract);
     const completed = !!(model.completed || active?.completed || active?.complete);
@@ -1187,21 +1209,21 @@
     const progress = active ? Math.min(1, Math.floor(N(active.progress,0,0,1))) : 0;
     const pct = active ? Math.min(100, Math.round(progress * 100)) : 0;
     return `<div class="elite-contract-card contract-identity-card ${accepted?'accepted':''} ${completed?'completed':''} ${expired?'expired':''} ${failed?'failed':''}">
-      <div class="contract-wanted-line"><strong>${H(model.title)}</strong>${accepted?'<span class="pill rarity-rare">Accepted</span>':''}</div>
-      <div class="contract-elite-name">${H(model.eliteName)}</div>
+      <div class="contract-wanted-line"><strong>${H(displayModel.title)}</strong>${accepted?'<span class="pill rarity-rare">Accepted</span>':''}</div>
+      <div class="contract-elite-name">${H(displayModel.eliteName)}</div>
       <div class="elite-contract-detail-grid contract-identity-grid small">
-        <span><b>Mark:</b> ${H(model.eliteName)}</span>
-        <span><b>Where:</b> ${H(model.targetLocation || targetText(model))}</span>
-        <span><b>Objective:</b> ${H(model.contractText || `Defeat ${model.eliteName} when it appears.`)}</span>
-        <span><b>Bonus Goal:</b> ${H(model.bonusWrit || 'Pending')}</span>
-        <span><b>Danger:</b> <span class="contract-threat">${H(threatStars(model.threat))}</span></span>
+        <span><b>Mark:</b> ${H(displayModel.eliteName)}</span>
+        <span><b>Where:</b> ${H(displayModel.targetLocation || targetText(displayModel))}</span>
+        <span><b>Objective:</b> ${H(displayModel.contractText || `Defeat ${displayModel.eliteName} when it appears.`)}</span>
+        <span><b>Bonus Goal:</b> ${H(displayModel.bonusWrit || 'Pending')}</span>
+        <span><b>Danger:</b> <span class="contract-threat">${H(threatStars(displayModel.threat))}</span></span>
         <span><b>Status:</b> ${H(statusText)}</span>
         ${rival ? '<span><b>Rival Layer:</b> Revenge hunt</span>' : ''}
-        ${rival ? `<span><b>Killed you:</b> ${F(model.defeats || model.rivalDefeats || active?.rivalDefeats || 1)} time${(model.defeats || model.rivalDefeats || active?.rivalDefeats || 1) === 1 ? '' : 's'}</span>` : ''}
-        ${rival ? `<span><b>Last seen:</b> ${H(model.killedPlayerAtLocation || 'Unknown floor')}</span>` : ''}
-        <span><b>Reward Preview:</b> ${H(model.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
+        ${rival ? `<span><b>Killed you:</b> ${F(displayModel.defeats || displayModel.rivalDefeats || active?.rivalDefeats || 1)} time${(displayModel.defeats || displayModel.rivalDefeats || active?.rivalDefeats || 1) === 1 ? '' : 's'}</span>` : ''}
+        ${rival ? `<span><b>Last seen:</b> ${H(displayModel.killedPlayerAtLocation || 'Unknown floor')}</span>` : ''}
+        <span><b>Reward Preview:</b> ${H(displayModel.rewardPreview)}${reward ? ` (${reward})` : ''}</span>
       </div>
-      <p class="small muted contract-flavor">${H(model.flavor)}</p>
+      <p class="small muted contract-flavor">${H(displayModel.flavor)}</p>
       ${active && contract ? `<div class="elite-contract-meter"><div style="width:${pct}%"></div></div>` : ''}
       <div class="elite-contract-actions"><span class="pill">${accepted ? (rival ? 'Active Rival Hunt' : 'Active Board Hunt') : (rival ? 'Rival Danger Layer' : 'Board Contract')}</span>${button}</div>
     </div>`;
@@ -1373,6 +1395,7 @@
     calculateTalentSpendDryRun,
     applyTalentNodeSpend,
     hunterBoardClarityPassiveContract,
+    applyHunterBoardClarityCopy,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,

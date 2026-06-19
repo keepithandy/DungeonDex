@@ -949,14 +949,43 @@ async function main() {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       return api && typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
     })()`);
-    const learnedBoardTextBefore = await evalByValue(client, `(() => document.getElementById('questPanel')?.innerText || '')()`);
-    const learnedBoardTextAfter = await evalByValue(client, `(() => {
+    const learnedBoardText = await evalByValue(client, `(() => { S.screen = 'town'; if (typeof render === 'function') render(); return document.getElementById('questPanel')?.innerText || ''; })()`);
+    const learnedCopyProbe = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
-      if (api && typeof api.passiveContract === 'function') api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)});
+      if (!api || typeof api.applyHunterBoardClarityCopy !== 'function') return null;
+      const source = {
+        id: 'probe',
+        title: 'Wanted',
+        eliteName: 'Glassfang Brute',
+        targetLocation: 'Lowfire District',
+        contractText: 'Defeat Glassfang Brute when it appears.',
+        bonusWrit: 'Hold the line',
+        rewardPreview: '10 coin',
+        flavor: 'A brutal mark'
+      };
+      const before = JSON.stringify(source);
+      const applied = api.applyHunterBoardClarityCopy(S, source);
+      return {
+        before,
+        after: JSON.stringify(source),
+        applied,
+        sameObject: applied === source
+      };
+    })()`);
+    const unlearnedBoardText = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      if (api && typeof api.applyHunterBoardClarityCopy === 'function') {
+        const sample = { title: 'Wanted', targetLocation: 'Lowfire District', contractText: 'Defeat Glassfang Brute when it appears.', rewardPreview: '10 coin', flavor: 'A brutal mark' };
+        api.applyHunterBoardClarityCopy({ player: { talentLearnedIds: {} } }, sample);
+      }
       return document.getElementById('questPanel')?.innerText || '';
     })()`);
     record('Learned hunter_board_clarity is detected by passive contract', learnedPassiveContract?.learned === true && learnedPassiveContract?.passiveReady === true, JSON.stringify(learnedPassiveContract));
-    record('Passive contract remains disabled and no save mutation occurs', learnedPassiveContract?.passiveEnabled === false && learnedPassiveContract?.appliesEffect === false && learnedPassiveContract?.mutatesSave === false && learnedBoardTextBefore === learnedBoardTextAfter, JSON.stringify({ learnedPassiveContract, learnedBoardTextBefore, learnedBoardTextAfter }));
+    record('Passive contract activates copy-only surface and stays read-only', learnedPassiveContract?.passiveEnabled === true && learnedPassiveContract?.appliesEffect === true && learnedPassiveContract?.affectedSurface === 'Elite Board display copy only' && learnedPassiveContract?.mutatesSave === false, JSON.stringify(learnedPassiveContract));
+    record('Passive copy helper returns clearer text without mutating input or numeric fields', learnedCopyProbe?.sameObject === false && learnedCopyProbe?.before === learnedCopyProbe?.after && learnedCopyProbe?.applied?.passiveSurface === 'Elite Board display copy only' && learnedCopyProbe?.applied?.passiveApplied === true && learnedCopyProbe?.applied?.targetLocation === 'Target: Lowfire District' && learnedCopyProbe?.applied?.contractText === 'Objective: Defeat Glassfang Brute when it appears.' && learnedCopyProbe?.applied?.rewardPreview === 'Reward preview: 10 coin' && learnedCopyProbe?.applied?.flavor === 'Clarity note: A brutal mark' && learnedCopyProbe?.applied?.title === 'Wanted (clear read)', JSON.stringify(learnedCopyProbe));
+    record('Learned board copy is clearer while staying informational only', typeof learnedBoardText === 'string' && learnedBoardText.includes('Target:') && learnedBoardText.includes('Objective:') && learnedBoardText.includes('Reward preview:'), learnedBoardText.slice(0, 700));
+    record('Unlearned board copy stays unchanged through passive helper reads', typeof unlearnedBoardText === 'string' && !unlearnedBoardText.includes('Target:'), unlearnedBoardText.slice(0, 700));
+    record('Passive contract and board render do not mutate save state', learnedCopyProbe?.before === learnedCopyProbe?.after && learnedPassiveContract?.mutatesSave === false, JSON.stringify({ learnedPassiveContract, learnedCopyProbe }));
     record('Learned spend does not mutate save snapshot unexpectedly', learnedSaveBefore === JSON.stringify(learnedSaveFixture), JSON.stringify({ before: learnedSaveBefore, after: JSON.stringify(learnedSaveFixture) }));
     const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));
     persistenceFixture.player = persistenceFixture.player || {};

@@ -9,14 +9,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.26`
-* Current development target: `v1.20.26`
+* Current local package baseline: `v1.20.27`
+* Current development target: `v1.20.27`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.27 - First Passive Effect Activation
+
+* Activated `hunter_board_clarity` as a read-only Elite Board display-copy passive.
+* Added a small helper that rewrites board wording for clarity only when the node is learned.
+* Extended smoke coverage to confirm unlearned text stays unchanged, learned text becomes clearer, numeric reward/risk values stay fixed, and save state remains untouched.
+* Kept combat, economy, gear, dungeon progression, Revisit, Debt, Talent UI actions, and Elite Board math unchanged.
 
 ## v1.20.19 - Talent Earning Source Contract
 

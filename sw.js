@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.26-first-passive-effect-contract-test';
+const CACHE_NAME = 'dungeondex-v1.20.27-first-passive-effect-activation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.26-first-passive-effect-contract-test';
+const BUILD_QS = '1.20.27-first-passive-effect-activation';
 const ASSETS = [
   './',
   './index.html',
