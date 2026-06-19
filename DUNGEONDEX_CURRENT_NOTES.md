@@ -7,14 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.22 - Live Talent Earning Activation, Earning Only
+- DungeonDex v1.20.23 - Talent Earning Stability Audit
 
-## v1.20.22 Live Talent Earning Activation, Earning Only
-- Current baseline: v1.20.22.
-- Boss/depth milestone earning is now active in normal saves and persists through `player.talentEarning`.
-- Awarded milestones and `pointsAwarded` persist safely; repeat awards are suppressed by the pending-delta helper.
+## v1.20.23 Talent Earning Stability Audit
+- Current baseline: v1.20.23.
+- Audited the live boss/depth earning path for one-award-only behavior, safe save repair, and ledger visibility.
+- Confirmed awarded milestones persist in `player.talentEarning.milestonesReached` and `pointsAwarded` persists as the live award total.
 - Spending, unlocks, learned nodes, passive effects, and Talent action UI remain disabled.
-- This is earning-only activation. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remain unchanged.
+- This is a stability audit only. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remain unchanged.
 
 ## v1.20.21 Talent Award Ledger Dry Run
 - Current baseline: v1.20.21.

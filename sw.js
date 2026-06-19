@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.22-live-talent-earning-activation';
+const CACHE_NAME = 'dungeondex-v1.20.23-talent-earning-stability-audit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.22-live-talent-earning-activation';
+const BUILD_QS = '1.20.23-talent-earning-stability-audit';
 const ASSETS = [
   './',
   './index.html',
