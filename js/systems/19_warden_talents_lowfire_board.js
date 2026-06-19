@@ -560,6 +560,38 @@
     }, 0);
   }
 
+  function calculateTalentSpendDryRun(state, nodeKey, enabledOverride = false){
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    const node = TALENT_BY_ID[resolvedNodeKey] || null;
+    const ledger = talentPointLedger(state);
+    const spendingEnabled = enabledOverride === true && TALENT_RULESET_PREVIEW.spendingEnabled === true;
+    const availableBefore = Math.max(0, Math.floor(N(ledger.availablePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const cost = Math.max(0, Math.floor(N(node?.plannedCost ?? node?.costPreview ?? 0, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const nodeLocked = !!node?.locked;
+    let blockedReason = '';
+    let canAfford = false;
+    if (!resolvedNodeKey) blockedReason = 'missing_node_key';
+    else if (!node) blockedReason = 'unknown_node';
+    else if (!spendingEnabled) blockedReason = 'spending_disabled';
+    else if (nodeLocked) blockedReason = 'node_locked';
+    else if (cost > availableBefore) blockedReason = 'insufficient_points';
+    else canAfford = true;
+    const availableAfterPreview = canAfford ? Math.max(0, availableBefore - cost) : availableBefore;
+    return {
+      targetNodeKey: resolvedNodeKey,
+      nodeLabel: node ? String(node.name || node.title || node.nodeTitle || node.id || resolvedNodeKey) : '',
+      cost,
+      availableBefore,
+      availableAfterPreview,
+      canAfford,
+      blockedReason,
+      spendingEnabled,
+      mutatesSave: false,
+      learnedStateWritten: false,
+      passiveApplied: false
+    };
+  }
+
   function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
     const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
     const zeroState = {
@@ -1237,6 +1269,7 @@
     detectDepthMilestones,
     getAllReachedMilestones,
     calculateTalentPointsFromMilestones,
+    calculateTalentSpendDryRun,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,

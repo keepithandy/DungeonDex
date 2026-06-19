@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.23`
-* Current development target: `v1.20.23`
+* Current local package baseline: `v1.20.24`
+* Current development target: `v1.20.24`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -55,6 +55,13 @@ This changelog records what changed and why.
 * Audited the live boss/depth earning path for one-award-only behavior, persistence repair, malformed save handling, and ledger visibility.
 * Confirmed awarded milestones persist in `player.talentEarning.milestonesReached` and total points persist in `player.talentEarning.pointsAwarded` while spending remains disabled.
 * Kept Talent spending, unlocks, learned nodes, passive effects, and Talent action UI disabled.
+* No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
+
+## v1.20.24 - Talent Spending Dry Run
+
+* Added a read-only spending preview helper that reports affordability and block reasons without mutating save data.
+* Extended smoke coverage to prove the spending dry run leaves available points, learned state, and passive state unchanged.
+* Kept real spending, unlocks, learned nodes, passive effects, respec, and Talent action UI disabled.
 * No combat, economy, gear, dungeon progression, Revisit, Debt, or Elite Board behavior changed.
 
 ## v1.20.18 - Talent System Re-entry Audit

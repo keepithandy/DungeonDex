@@ -1,8 +1,8 @@
-// DungeonDex v1.20.23 runtime pointer.
+// DungeonDex v1.20.24 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.20.23';
+window.DUNGEONDEX_BUILD = '1.20.24';
 window.DUNGEONDEX_BUILD_QS = '1.20.22-live-talent-earning-activation';
 
 // Interface density cleanup helpers

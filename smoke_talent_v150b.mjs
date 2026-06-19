@@ -737,6 +737,9 @@ async function main() {
       const allReached = typeof api.getAllReachedMilestones === 'function' ? api.getAllReachedMilestones(fixture) : null;
       const pointsDisabled = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture) : null;
       const pointsOverride = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture, true) : null;
+      const spendDryRunLocked = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'survivor_sturdy_start', false) : null;
+      const spendDryRunEnabled = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'survivor_sturdy_start', true) : null;
+      const spendDryRunUnknown = typeof api.calculateTalentSpendDryRun === 'function' ? api.calculateTalentSpendDryRun(fixture, 'unknown_node', true) : null;
       const hasPendingAwards = typeof api.calculatePendingTalentMilestoneAwards === 'function';
       const dryRunStateBefore = JSON.stringify(S);
       const lockedFixture = JSON.parse(JSON.stringify(S));
@@ -807,6 +810,9 @@ async function main() {
         allReached,
         pointsDisabled,
         pointsOverride,
+        spendDryRunLocked,
+        spendDryRunEnabled,
+        spendDryRunUnknown,
         disabledDryRun,
         pendingDryRun,
         staleDryRun,
@@ -831,6 +837,10 @@ async function main() {
     record('Talent earning feature flag exists and enabled', earningAudit?.earning?.enabled === true && earningAudit?.earning?.sourceId === 'boss_depth_milestone' && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.earning?.milestonesReached && Object.keys(earningAudit.earning.milestonesReached).length === 0 && earningAudit?.enabled === true, JSON.stringify(earningAudit?.earning));
     record('Disabled fixture returns 0 points', earningAudit?.pointsDisabled === 0, JSON.stringify({ pointsDisabled: earningAudit?.pointsDisabled }));
     record('Override-enabled fixture calculates points', earningAudit?.pointsOverride === 6, JSON.stringify({ pointsOverride: earningAudit?.pointsOverride }));
+    record('Talent spending dry run helper exists', earningAudit?.spendDryRunLocked && earningAudit?.spendDryRunEnabled && earningAudit?.spendDryRunUnknown, JSON.stringify({ locked: earningAudit?.spendDryRunLocked, enabled: earningAudit?.spendDryRunEnabled, unknown: earningAudit?.spendDryRunUnknown }));
+    record('Talent spending dry run is read-only and blocked while locked', earningAudit?.spendDryRunLocked?.mutatesSave === false && earningAudit?.spendDryRunLocked?.learnedStateWritten === false && earningAudit?.spendDryRunLocked?.passiveApplied === false && earningAudit?.spendDryRunLocked?.canAfford === false && earningAudit?.spendDryRunLocked?.blockedReason === 'spending_disabled' && earningAudit?.spendDryRunLocked?.availableBefore === earningAudit?.spendDryRunLocked?.availableAfterPreview, JSON.stringify(earningAudit?.spendDryRunLocked));
+    record('Talent spending dry run stays read-only when override-enabled', earningAudit?.spendDryRunEnabled?.mutatesSave === false && earningAudit?.spendDryRunEnabled?.learnedStateWritten === false && earningAudit?.spendDryRunEnabled?.passiveApplied === false && earningAudit?.spendDryRunEnabled?.targetNodeKey === 'survivor_sturdy_start' && earningAudit?.spendDryRunEnabled?.cost === 1 && earningAudit?.spendDryRunEnabled?.availableBefore === 0 && earningAudit?.spendDryRunEnabled?.availableAfterPreview === 0 && earningAudit?.spendDryRunEnabled?.blockedReason === 'spending_disabled', JSON.stringify(earningAudit?.spendDryRunEnabled));
+    record('Talent spending dry run handles unknown nodes safely', earningAudit?.spendDryRunUnknown?.mutatesSave === false && earningAudit?.spendDryRunUnknown?.learnedStateWritten === false && earningAudit?.spendDryRunUnknown?.passiveApplied === false && earningAudit?.spendDryRunUnknown?.blockedReason === 'unknown_node', JSON.stringify(earningAudit?.spendDryRunUnknown));
     record('Talent earning status shows 0 points awarded before awards', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === true && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
     record('Talent earning source contract does not mutate state', earningAudit?.notMutated === true, JSON.stringify({ notMutated: earningAudit?.notMutated }));
     record('Talent points remain 0 before live awards', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
@@ -853,6 +863,7 @@ async function main() {
     record('Dry-run does not mutate normal state', earningAudit?.dryRunStateNotMutated === true, JSON.stringify({ notMutated: earningAudit?.dryRunStateNotMutated }));
     record('Dry-run does not mutate fixture', earningAudit?.mainFixtureNotMutated === true, JSON.stringify({ notMutated: earningAudit?.mainFixtureNotMutated }));
     record('Dry-run leaves normal saves read-only with zero points before awards', earningAudit?.earning?.enabled === true && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ earning: earningAudit?.earning, available: earningAudit?.summary2?.pointsAvailable }));
+    record('Dry-run does not create learned state or passive effects', earningAudit?.spendDryRunLocked?.learnedStateWritten === false && earningAudit?.spendDryRunEnabled?.learnedStateWritten === false && earningAudit?.spendDryRunLocked?.passiveApplied === false && earningAudit?.spendDryRunEnabled?.passiveApplied === false, JSON.stringify({ locked: earningAudit?.spendDryRunLocked, enabled: earningAudit?.spendDryRunEnabled }));
     record('No unlock/spending/passive behavior appears', earningAudit?.noActivationApi === true, JSON.stringify({ noActivationApi: earningAudit?.noActivationApi }));
     const savedBeforePersistence = await readSave(client);
     const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));

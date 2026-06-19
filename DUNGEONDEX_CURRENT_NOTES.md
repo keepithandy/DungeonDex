@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.23 - Talent Earning Stability Audit
+- DungeonDex v1.20.24 - Talent Spending Dry Run
+
+## v1.20.24 Talent Spending Dry Run
+- Current baseline: v1.20.24.
+- Added a read-only spending preview helper that reports affordability and block reasons without mutating save data.
+- Smoke coverage proves the dry run leaves available points, learned state, and passive state unchanged.
+- Real spending, unlocks, learned nodes, passive effects, respec, and Talent action UI remain disabled.
+- This is a dry run only. Combat, economy, gear, dungeon progression, Revisit, Debt, and Elite Board behavior remain unchanged.
 
 ## v1.20.23 Talent Earning Stability Audit
 - Current baseline: v1.20.23.
