@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.28-elite-board-copy-surface-contract-guard';
+const CACHE_NAME = 'dungeondex-v1.20.29-debt-collector-clarity-passive-contract-prep';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.28-elite-board-copy-surface-contract-guard';
+const BUILD_QS = '1.20.29-debt-collector-clarity-passive-contract-prep';
 const ASSETS = [
   './',
   './index.html',

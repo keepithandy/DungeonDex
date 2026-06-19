@@ -85,7 +85,8 @@
       nodes: [
         { nodeKey:'collector_item_appraisal', nodeTitle:'Item Appraisal', tier:1, costPreview:1, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: item appraisal.' },
         { nodeKey:'collector_famous_memory', nodeTitle:'Famous Memory', tier:2, costPreview:2, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: Famous Gear memory.' },
-        { nodeKey:'collector_trophy_archive', nodeTitle:'Trophy Archive', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: trophy visibility.' }
+        { nodeKey:'collector_trophy_archive', nodeTitle:'Trophy Archive', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: trophy visibility.' },
+        { nodeKey:'debt_collector_clarity', nodeTitle:'Debt Collector Clarity', tier:3, costPreview:3, requirementPreview:'Preview only.', passivePreviewDescription:'Planned passive: clearer debt copy.' }
       ]
     }
   };
@@ -694,6 +695,34 @@
     };
   }
 
+  function debtCollectorClarityPassiveContract(state){
+    const resolvedNodeKey = 'debt_collector_clarity';
+    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
+    const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
+    const passiveEnabled = learned;
+    return {
+      nodeKey: resolvedNodeKey,
+      learned,
+      passiveReady: learned,
+      passiveEnabled,
+      effectKey: 'debt_collector_clarity_display_copy',
+      affectedSurface: 'Debt Collector display copy only',
+      mutatesSave: false,
+      appliesEffect: passiveEnabled,
+      combat: false,
+      economy: false,
+      rewards: false,
+      monsters: false,
+      gear: false,
+      progression: false,
+      scaling: false,
+      revisit: false,
+      eliteBoardMath: false,
+      debtMath: false,
+      talentUiActions: false
+    };
+  }
+
   function applyHunterBoardClarityCopy(state, boardCardOrCopy){
     const passiveContract = hunterBoardClarityPassiveContract(state);
     const copy = boardCardOrCopy && typeof boardCardOrCopy === 'object' && !Array.isArray(boardCardOrCopy)
@@ -710,6 +739,27 @@
     if (copy.title) copy.title = `${copy.title} (clear read)`;
     if (copy.summary) copy.summary = `Clear read: ${copy.summary}`;
     copy.passiveSurface = 'Elite Board display copy only';
+    copy.passiveApplied = true;
+    return copy;
+  }
+
+  function applyDebtCollectorClarityCopy(state, debtCardOrCopy){
+    const passiveContract = debtCollectorClarityPassiveContract(state);
+    const copy = debtCardOrCopy && typeof debtCardOrCopy === 'object' && !Array.isArray(debtCardOrCopy)
+      ? {...debtCardOrCopy}
+      : { text: String(debtCardOrCopy || '') };
+    if (!passiveContract.passiveEnabled) return copy;
+    const status = copy.statusLabel || copy.status || copy.state || copy.summary || '';
+    const owed = copy.balanceLabel || copy.balanceText || copy.amountOwed || copy.balance || '';
+    const pressure = copy.pressureLabel || copy.pressureText || copy.pressure || '';
+    const terms = copy.termsLabel || copy.terms || copy.note || '';
+    const reminder = copy.reminderLabel || copy.reminder || copy.flavor || '';
+    if (status) copy.statusLabel = `Debt status: ${status}`;
+    if (owed) copy.balanceLabel = `Amount owed: ${owed}`;
+    if (pressure) copy.pressureLabel = `Pressure: ${pressure}`;
+    if (terms) copy.termsLabel = `Terms: ${terms}`;
+    if (reminder) copy.reminderLabel = `Reminder: ${reminder}`;
+    copy.passiveSurface = 'Debt Collector display copy only';
     copy.passiveApplied = true;
     return copy;
   }
@@ -1396,6 +1446,8 @@
     applyTalentNodeSpend,
     hunterBoardClarityPassiveContract,
     applyHunterBoardClarityCopy,
+    debtCollectorClarityPassiveContract,
+    applyDebtCollectorClarityCopy,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,
@@ -1419,6 +1471,7 @@
     passiveContract: (state, nodeKey) => {
       const resolvedNodeKey = normaliseMilestoneId(nodeKey);
       if (resolvedNodeKey === 'hunter_board_clarity') return hunterBoardClarityPassiveContract(state);
+      if (resolvedNodeKey === 'debt_collector_clarity') return debtCollectorClarityPassiveContract(state);
       return null;
     },
     summary: state => {

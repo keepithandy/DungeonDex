@@ -237,9 +237,48 @@ async function main() {
       hasSummary: typeof window.DungeonDexDebtCollector?.debtCollectorDisplaySummary === 'function',
       hasPressure: typeof window.DungeonDexDebtCollector?.debtPressureDisplay === 'function',
       hasStatusLine: typeof window.DungeonDexDebtCollector?.debtCollectorStatusLine === 'function',
-      hasFallback: typeof window.DungeonDexDebtCollector?.debtCollectorFallbackState === 'function'
+      hasFallback: typeof window.DungeonDexDebtCollector?.debtCollectorFallbackState === 'function',
+      hasPassiveContract: typeof window.DungeonDexDebtCollector?.debtCollectorClarityPassiveContract === 'function',
+      hasPassiveCopy: typeof window.DungeonDexDebtCollector?.applyDebtCollectorClarityCopy === 'function'
     }))()`));
     record('Debt display helpers exist', !!smoke?.summary && !!smoke?.pressure && typeof smoke?.statusLine === 'string' && debtHelperShape.hasSummary && debtHelperShape.hasPressure && debtHelperShape.hasStatusLine && debtHelperShape.hasFallback, JSON.stringify({ summary: smoke?.summary, pressure: smoke?.pressure, statusLine: smoke?.statusLine, debtHelperShape }));
+
+    const debtClarityAudit = asObject(await evaluate(client, `(() => {
+      const api = window.DungeonDexDebtCollector;
+      const learnedState = { player: { talentLearnedIds: { debt_collector_clarity: true }, talentUnlockIds: ['debt_collector_clarity'] } };
+      const lockedState = { player: { talentLearnedIds: {}, talentUnlockIds: [] } };
+      const source = {
+        statusLabel: 'Debt Active',
+        balanceLabel: 'Owed 15 coin',
+        pressureLabel: 'Pressure 3',
+        termsLabel: 'Settle on return',
+        reminderLabel: 'Keep coin ready.',
+        balanceCopper: 1500,
+        pressure: 3
+      };
+      const before = JSON.stringify(source);
+      const learnedContract = api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(learnedState) : null;
+      const lockedContract = api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(lockedState) : null;
+      const learnedCopy = api?.applyDebtCollectorClarityCopy ? api.applyDebtCollectorClarityCopy(learnedState, source) : null;
+      const lockedCopy = api?.applyDebtCollectorClarityCopy ? api.applyDebtCollectorClarityCopy(lockedState, source) : null;
+      return {
+        learnedContract,
+        lockedContract,
+        learnedCopy,
+        lockedCopy,
+        before,
+        after: JSON.stringify(source),
+        learnedStateBefore: JSON.stringify(learnedState),
+        learnedStateAfter: JSON.stringify(learnedState),
+        sameObject: learnedCopy === source
+      };
+    })()`));
+    record('Debt Collector clarity passive contract reports disabled/enabled correctly', debtClarityAudit?.lockedContract?.learned === false && debtClarityAudit?.lockedContract?.passiveReady === false && debtClarityAudit?.lockedContract?.passiveEnabled === false && debtClarityAudit?.lockedContract?.appliesEffect === false && debtClarityAudit?.learnedContract?.learned === true && debtClarityAudit?.learnedContract?.passiveReady === true && debtClarityAudit?.learnedContract?.passiveEnabled === true && debtClarityAudit?.learnedContract?.appliesEffect === true, JSON.stringify(debtClarityAudit));
+    record('Debt Collector clarity contract stays non-dangerous and non-mutating', debtClarityAudit?.learnedContract?.combat === false && debtClarityAudit?.learnedContract?.economy === false && debtClarityAudit?.learnedContract?.rewards === false && debtClarityAudit?.learnedContract?.monsters === false && debtClarityAudit?.learnedContract?.gear === false && debtClarityAudit?.learnedContract?.progression === false && debtClarityAudit?.learnedContract?.scaling === false && debtClarityAudit?.learnedContract?.revisit === false && debtClarityAudit?.learnedContract?.eliteBoardMath === false && debtClarityAudit?.learnedContract?.debtMath === false && debtClarityAudit?.learnedContract?.talentUiActions === false && debtClarityAudit?.learnedContract?.mutatesSave === false, JSON.stringify(debtClarityAudit?.learnedContract));
+    record('Debt Collector clarity helper is clone-safe and text-only', debtClarityAudit?.sameObject === false && debtClarityAudit?.before === debtClarityAudit?.after && debtClarityAudit?.learnedCopy?.passiveSurface === 'Debt Collector display copy only' && debtClarityAudit?.learnedCopy?.passiveApplied === true && debtClarityAudit?.learnedCopy?.statusLabel === 'Debt status: Debt Active' && debtClarityAudit?.learnedCopy?.balanceLabel === 'Amount owed: Owed 15 coin' && debtClarityAudit?.learnedCopy?.pressureLabel === 'Pressure: Pressure 3' && debtClarityAudit?.learnedCopy?.termsLabel === 'Terms: Settle on return' && debtClarityAudit?.learnedCopy?.reminderLabel === 'Reminder: Keep coin ready.' && debtClarityAudit?.learnedCopy?.balanceCopper === 1500 && debtClarityAudit?.learnedCopy?.pressure === 3, JSON.stringify(debtClarityAudit?.learnedCopy));
+    record('Debt Collector clarity helper leaves unlearned copy unchanged', JSON.stringify(debtClarityAudit?.lockedCopy) === JSON.stringify(debtClarityAudit?.learnedCopy ? { ...debtClarityAudit.learnedCopy, passiveApplied: undefined } : debtClarityAudit?.lockedCopy) || JSON.stringify(debtClarityAudit?.lockedCopy) === JSON.stringify({ statusLabel: 'Debt Active', balanceLabel: 'Owed 15 coin', pressureLabel: 'Pressure 3', termsLabel: 'Settle on return', reminderLabel: 'Keep coin ready.', balanceCopper: 1500, pressure: 3 }), JSON.stringify(debtClarityAudit?.lockedCopy));
+    record('Debt Collector clarity helper does not mutate input or player state', debtClarityAudit?.before === debtClarityAudit?.after && debtClarityAudit?.learnedStateBefore === debtClarityAudit?.learnedStateAfter, JSON.stringify({ before: debtClarityAudit?.before, after: debtClarityAudit?.after, learnedStateBefore: debtClarityAudit?.learnedStateBefore, learnedStateAfter: debtClarityAudit?.learnedStateAfter }));
+    record('Debt Collector smoke fixture remains unchanged', !!smoke?.checks?.borrowOk && !!smoke?.checks?.persistOk && !!smoke?.checks?.partialOk && !!smoke?.checks?.clearOk && !!smoke?.checks?.pressureOk && !!smoke?.checks?.combatOk, JSON.stringify(smoke));
 
     const uiResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;

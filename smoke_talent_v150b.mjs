@@ -22,7 +22,8 @@ const TALENT_IDS = {
   charter: 'delver_charter_support',
   appraiser: 'collector_item_appraisal',
   collectorMemory: 'collector_famous_memory',
-  collectorArchive: 'collector_trophy_archive'
+  collectorArchive: 'collector_trophy_archive',
+  debtClarity: 'debt_collector_clarity'
 };
 
 let PAGE_URL = '';
@@ -698,7 +699,7 @@ async function main() {
       };
     })()`);
     record('Talent tree preview API exists', !!previewSummary?.hasPreview && !!previewSummary?.hasPreviewSummary && !!previewSummary?.hasLedger && !!previewSummary?.hasLedgerSummary, JSON.stringify(previewSummary));
-    record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 4 && previewSummary.nodes === 12 && previewSummary.summary?.totalBranches === 4 && previewSummary.summary?.totalNodes === 12 && previewSummary.summary?.lockedNodes === 12 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true && previewSummary.summary?.rulesetId === 'talent_ruleset_preview_v1' && previewSummary.summary?.rulesetVersion === 1, JSON.stringify(previewSummary));
+    record('Talent tree preview summary is locked', !!previewSummary && previewSummary.previewOnly === true && previewSummary.branches === 4 && previewSummary.nodes === 13 && previewSummary.summary?.totalBranches === 4 && previewSummary.summary?.totalNodes === 13 && previewSummary.summary?.lockedNodes === 13 && previewSummary.summary?.activeNodes === 0 && previewSummary.summary?.spendablePoints === 0 && previewSummary.summary?.previewOnly === true && previewSummary.summary?.rulesetId === 'talent_ruleset_preview_v1' && previewSummary.summary?.rulesetVersion === 1, JSON.stringify(previewSummary));
     record('Legacy preview globals are retired', previewSummary?.legacyBranches === null && previewSummary?.legacyNodes === null, JSON.stringify({ legacyBranches: previewSummary?.legacyBranches, legacyNodes: previewSummary?.legacyNodes }));
     record('Talent ledger summary is safe', !!previewSummary?.ledgerSummary && previewSummary.ledgerSummary.previewOnly === true && previewSummary.ledgerSummary.unlocked === false && previewSummary.ledgerSummary.lifetimePoints === 0 && previewSummary.ledgerSummary.availablePoints === 0 && previewSummary.ledgerSummary.spentPoints === 0 && previewSummary.ledgerSummary.canEarn === true && previewSummary.ledgerSummary.canSpend === false && previewSummary.ledgerSummary.sourceCount === 1, JSON.stringify(previewSummary?.ledgerSummary));
     const rulesetAudit = await getRulesetAudit();
@@ -785,6 +786,34 @@ async function main() {
       const mainFixtureAfter = JSON.stringify(mainFixture);
       const passiveContract = typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
       const passiveContractReplay = typeof api.passiveContract === 'function' ? api.passiveContract(S, ${JSON.stringify(TALENT_IDS.hunterClarity)}) : null;
+      const debtContractLearnedState = { player: { talentLearnedIds: { ${JSON.stringify(TALENT_IDS.debtClarity)}: true }, talentUnlockIds: [${JSON.stringify(TALENT_IDS.debtClarity)}] } };
+      const debtContractLockedState = { player: { talentLearnedIds: {}, talentUnlockIds: [] } };
+      const debtPassiveContract = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLockedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
+      const debtPassiveContractLearned = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLearnedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
+      const debtPassiveContractReplay = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLearnedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
+      const debtSource = {
+        statusLabel: 'Debt Active',
+        balanceLabel: 'Owed 12 coin',
+        pressureLabel: 'Pressure 2',
+        termsLabel: 'Due on return',
+        reminderLabel: 'Bring coin.',
+        balanceCopper: 1200,
+        pressure: 2
+      };
+      const debtSourceBefore = JSON.stringify(debtSource);
+      const debtApplied = typeof api.applyDebtCollectorClarityCopy === 'function' ? api.applyDebtCollectorClarityCopy(debtContractLearnedState, debtSource) : null;
+      const debtUnlearned = typeof api.applyDebtCollectorClarityCopy === 'function' ? api.applyDebtCollectorClarityCopy(debtContractLockedState, debtSource) : null;
+      const debtAlternateSource = {
+        summary: 'Debt Active',
+        statusLabel: 'Owed marker',
+        balanceLabel: 'Owed 25 coin',
+        pressureLabel: 'Pressure 4',
+        terms: 'No delay.',
+        reminder: 'Pay soon.',
+        balanceCopper: 2500,
+        pressure: 4
+      };
+      const debtAlternateApplied = typeof api.applyDebtCollectorClarityCopy === 'function' ? api.applyDebtCollectorClarityCopy(debtContractLearnedState, debtAlternateSource) : null;
       const passiveBoardBefore = document.getElementById('questPanel')?.innerText || '';
       const passiveBoardAfter = document.getElementById('questPanel')?.innerText || '';
 
@@ -852,6 +881,15 @@ async function main() {
         noActivationApi: !api.activateTalentNode && !api.spendTalentPoints && !api.getTalentBonus,
         passiveContract,
         passiveContractReplay,
+        debtPassiveContract,
+        debtPassiveContractLearned,
+        debtPassiveContractReplay,
+        debtSource,
+        debtSourceBefore,
+        debtApplied,
+        debtUnlearned,
+        debtAlternateSource,
+        debtAlternateApplied,
         passiveBoardBefore,
         passiveBoardAfter,
         notMutated: before === after
@@ -1004,6 +1042,13 @@ async function main() {
     record('Passive contract activates copy-only surface and stays read-only', learnedPassiveContract?.passiveEnabled === true && learnedPassiveContract?.appliesEffect === true && learnedPassiveContract?.affectedSurface === 'Elite Board display copy only' && learnedPassiveContract?.mutatesSave === false, JSON.stringify(learnedPassiveContract));
     record('Passive copy helper returns clearer text without mutating input or numeric fields', learnedCopyProbe?.sameObject === false && learnedCopyProbe?.before === learnedCopyProbe?.after && learnedCopyProbe?.applied?.passiveSurface === 'Elite Board display copy only' && learnedCopyProbe?.applied?.passiveApplied === true && learnedCopyProbe?.applied?.targetLocation === 'Target: Lowfire District' && learnedCopyProbe?.applied?.contractText === 'Objective: Defeat Glassfang Brute when it appears.' && learnedCopyProbe?.applied?.rewardPreview === 'Reward preview: 10 coin' && learnedCopyProbe?.applied?.flavor === 'Clarity note: A brutal mark' && learnedCopyProbe?.applied?.title === 'Wanted (clear read)', JSON.stringify(learnedCopyProbe));
     record('Alternate Elite Board summary fixture uses the same copy helper contract', alternateCopyProbe?.sameObject === false && alternateCopyProbe?.before === alternateCopyProbe?.after && alternateCopyProbe?.applied?.passiveSurface === 'Elite Board display copy only' && alternateCopyProbe?.applied?.passiveApplied === true && alternateCopyProbe?.applied?.targetLocation === 'Target: Floor 2' && alternateCopyProbe?.applied?.contractText === 'Objective: Defeat the posted mark when it appears.' && alternateCopyProbe?.applied?.rewardPreview === 'Reward preview: 12 coin' && alternateCopyProbe?.applied?.summary === 'Clear read: Short summary line', JSON.stringify(alternateCopyProbe));
+    record('Unlearned debt_collector_clarity contract reports disabled/not applying', earningAudit?.debtPassiveContract?.learned === false && earningAudit?.debtPassiveContract?.passiveReady === false && earningAudit?.debtPassiveContract?.passiveEnabled === false && earningAudit?.debtPassiveContract?.appliesEffect === false && earningAudit?.debtPassiveContract?.mutatesSave === false, JSON.stringify(earningAudit?.debtPassiveContract));
+    record('Learned debt_collector_clarity contract reports enabled/applying', earningAudit?.debtPassiveContractLearned?.nodeKey === TALENT_IDS.debtClarity && earningAudit?.debtPassiveContractLearned?.learned === true && earningAudit?.debtPassiveContractLearned?.passiveReady === true && earningAudit?.debtPassiveContractLearned?.passiveEnabled === true && earningAudit?.debtPassiveContractLearned?.appliesEffect === true && earningAudit?.debtPassiveContractReplay?.passiveEnabled === true && JSON.stringify(earningAudit?.debtPassiveContractLearned) === JSON.stringify(earningAudit?.debtPassiveContractReplay), JSON.stringify(earningAudit?.debtPassiveContractLearned));
+    record('Debt Collector helper improves display copy without changing numeric values', earningAudit?.debtApplied?.passiveSurface === 'Debt Collector display copy only' && earningAudit?.debtApplied?.passiveApplied === true && earningAudit?.debtApplied?.statusLabel === 'Debt status: Debt Active' && earningAudit?.debtApplied?.balanceLabel === 'Amount owed: Owed 12 coin' && earningAudit?.debtApplied?.pressureLabel === 'Pressure: Pressure 2' && earningAudit?.debtApplied?.termsLabel === 'Terms: Due on return' && earningAudit?.debtApplied?.reminderLabel === 'Reminder: Bring coin.' && earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2, JSON.stringify(earningAudit?.debtApplied));
+    record('Debt Collector helper leaves unlearned copy unchanged', JSON.stringify(earningAudit?.debtUnlearned) === JSON.stringify(earningAudit?.debtSource) && earningAudit?.debtUnlearned?.passiveApplied !== true, JSON.stringify({ before: earningAudit?.debtSource, after: earningAudit?.debtUnlearned }));
+    record('Debt Collector helper does not mutate input object', earningAudit?.debtSourceBefore === JSON.stringify(earningAudit?.debtSource), JSON.stringify({ before: earningAudit?.debtSourceBefore, after: JSON.stringify(earningAudit?.debtSource) }));
+    record('Debt Collector alternate summary fixture reuses the same copy helper', earningAudit?.debtAlternateApplied?.passiveSurface === 'Debt Collector display copy only' && earningAudit?.debtAlternateApplied?.statusLabel === 'Debt status: Owed marker' && earningAudit?.debtAlternateApplied?.balanceLabel === 'Amount owed: Owed 25 coin' && earningAudit?.debtAlternateApplied?.pressureLabel === 'Pressure: Pressure 4' && earningAudit?.debtAlternateApplied?.termsLabel === 'Terms: No delay.' && earningAudit?.debtAlternateApplied?.reminderLabel === 'Reminder: Pay soon.', JSON.stringify(earningAudit?.debtAlternateApplied));
+    record('Debt Collector helper stays text-only and leaves save/player state untouched', earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2 && earningAudit?.debtPassiveContract?.mutatesSave === false, JSON.stringify({ debtPassiveContract: earningAudit?.debtPassiveContract, debtApplied: earningAudit?.debtApplied }));
     record('Learned board copy is clearer while staying informational only', typeof learnedBoardText === 'string' && learnedBoardText.includes('Target:') && learnedBoardText.includes('Objective:') && learnedBoardText.includes('Reward preview:'), learnedBoardText.slice(0, 700));
     record('Unlearned board copy stays unchanged through passive helper reads', typeof unlearnedBoardText === 'string' && !unlearnedBoardText.includes('Target:'), unlearnedBoardText.slice(0, 700));
     record('Passive contract and board render do not mutate save state', learnedCopyProbe?.before === learnedCopyProbe?.after && learnedPassiveContract?.mutatesSave === false, JSON.stringify({ learnedPassiveContract, learnedCopyProbe }));
@@ -1058,7 +1103,7 @@ async function main() {
       };
     })()`);
     record('Talent preview helpers stay defensive on unknown inputs', !!previewSafety && previewSafety.before === previewSafety.after && previewSafety.passiveMap && previewSafety.passiveMap.survivor?.branchName !== '__mutated__' && previewSafety.summaryUnknown?.locked === true && previewSafety.summaryUnknown?.previewOnly === true && previewSafety.summaryUnknown?.active === false && previewSafety.summaryUnknown?.gameplayEnabled === false && previewSafety.summaryUnknown?.nodeCount === 0 && previewSafety.summaryMalformed?.locked === true && previewSafety.summaryMalformed?.previewOnly === true && previewSafety.nodeUnknown?.locked === true && previewSafety.nodeUnknown?.previewOnly === true && previewSafety.nodeUnknown?.active === false && previewSafety.nodeUnknown?.gameplayEnabled === false && previewSafety.nodeUnknown?.learned === false && previewSafety.nodeUnknown?.applied === false && previewSafety.nodeUnknown?.effectValue === 0 && previewSafety.nodeMalformed?.locked === true && previewSafety.nodeMalformed?.previewOnly === true && previewSafety.nodeMalformed?.active === false && previewSafety.nodeMalformed?.gameplayEnabled === false && previewSafety.nodeMalformed?.effectValue === 0, JSON.stringify(previewSafety));
-    record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === true && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 12 && rulesetSummary.activeCap === 6 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
+    record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === true && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 13 && rulesetSummary.activeCap === 6 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();

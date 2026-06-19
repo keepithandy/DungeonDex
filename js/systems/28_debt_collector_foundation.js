@@ -110,6 +110,52 @@
       : 'No debt due. Pressure is quiet.';
   }
 
+  function debtCollectorClarityPassiveContract(state){
+    const learned = !!state?.player?.talentLearnedIds?.debt_collector_clarity || !!state?.player?.talentUnlockIds?.includes?.('debt_collector_clarity');
+    return {
+      nodeKey: 'debt_collector_clarity',
+      learned,
+      passiveReady: learned,
+      passiveEnabled: learned,
+      effectKey: 'debt_collector_clarity_display_copy',
+      affectedSurface: 'Debt Collector display copy only',
+      mutatesSave: false,
+      appliesEffect: learned,
+      combat: false,
+      economy: false,
+      rewards: false,
+      monsters: false,
+      gear: false,
+      progression: false,
+      scaling: false,
+      revisit: false,
+      eliteBoardMath: false,
+      debtMath: false,
+      talentUiActions: false
+    };
+  }
+
+  function applyDebtCollectorClarityCopy(state, debtCardOrCopy){
+    const passiveContract = debtCollectorClarityPassiveContract(state);
+    const copy = debtCardOrCopy && typeof debtCardOrCopy === 'object' && !Array.isArray(debtCardOrCopy)
+      ? { ...debtCardOrCopy }
+      : { text: String(debtCardOrCopy || '') };
+    if (!passiveContract.passiveEnabled) return copy;
+    const status = copy.statusLabel || copy.status || copy.state || copy.summary || '';
+    const owed = copy.balanceLabel || copy.balanceText || copy.amountOwed || copy.balance || '';
+    const pressure = copy.pressureLabel || copy.pressureText || copy.pressure || '';
+    const terms = copy.termsLabel || copy.terms || copy.note || '';
+    const reminder = copy.reminderLabel || copy.reminder || copy.flavor || '';
+    if (status) copy.statusLabel = `Debt status: ${status}`;
+    if (owed) copy.balanceLabel = `Amount owed: ${owed}`;
+    if (pressure) copy.pressureLabel = `Pressure: ${pressure}`;
+    if (terms) copy.termsLabel = `Terms: ${terms}`;
+    if (reminder) copy.reminderLabel = `Reminder: ${reminder}`;
+    copy.passiveSurface = 'Debt Collector display copy only';
+    copy.passiveApplied = true;
+    return copy;
+  }
+
   function debtCollectorFallbackState(){
     return {
       active: false,
@@ -347,6 +393,8 @@
     debtCollectorDisplaySummary,
     debtPressureDisplay,
     debtCollectorStatusLine,
+    debtCollectorClarityPassiveContract,
+    applyDebtCollectorClarityCopy,
     debtCollectorFallbackState,
     warning: pressureWarning,
     smoke

@@ -9,12 +9,20 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.28`
-* Current development target: `v1.20.28`
+* Current local package baseline: `v1.20.29`
+* Current development target: `v1.20.29`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.20.29 - Debt Collector Clarity Passive Contract Prep
+
+* Added a smoke-only `debt_collector_clarity` passive contract helper and a read-only copy helper for future Debt Collector summary rendering.
+* Kept the live Debt Collector renderer untouched and routed the new helper only through smoke-only fixture coverage.
+* Confirmed the new display helper is clone-safe, text-only, non-mutating, and does not change debt math, pressure, repayment, or save state.
 
 ---
 

@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.28 - Elite Board Copy Surface Contract Guard
+- DungeonDex v1.20.29 - Debt Collector Clarity Passive Contract Prep
+
+## v1.20.29 Debt Collector Clarity Passive Contract Prep
+- Current baseline: v1.20.29.
+- Added a smoke-only `debt_collector_clarity` passive contract helper and a read-only display-copy helper for future Debt Collector summary reuse.
+- The patch keeps the live Debt Collector renderer untouched and does not add new UI, actions, spending, or debt math.
+- Smoke coverage now checks the contract metadata, clone-safe display copy, and a guarded alternate Debt Collector summary fixture for read-only text behavior.
+- Combat, economy, gear, dungeon progression, Revisit, Elite Board math, Debt math, and Talent UI actions remain unchanged.
 
 ## v1.20.28 Elite Board Copy Surface Contract Guard
 - Current baseline: v1.20.28.
