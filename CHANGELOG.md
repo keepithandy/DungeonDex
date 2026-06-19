@@ -9,8 +9,8 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 ## Version Source of Truth
 
 * Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.19`
-* Current development target: `v1.20.19`
+* Current local package baseline: `v1.20.20`
+* Current development target: `v1.20.20`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
@@ -27,6 +27,13 @@ This changelog records what changed and why.
 * Added seven smoke records covering contract shape, milestones, disabled state, zero points, non-mutation, and stable output.
 * Retained the Talent module's stable `v1.16.2` component provenance label.
 * No milestone tracking, Talent point awards, spending, unlocks, bonuses, UI actions, combat, economy, monsters, gear, or progression behavior changed.
+
+## v1.20.20 - Talent Milestone Tracking Gate Test (fixture-only, no live earning)
+
+* Added read-only talent milestone detection helpers for fixture validation only.
+* Extended smoke coverage to verify boss and depth milestone detection, unique milestone IDs, disabled-state zero points, override-only fixture scoring, and no state mutation.
+* Kept `talentEarning.enabled` false in normal saves and did not add any live award, persist, spend, unlock, passive, or UI path.
+* No combat, economy, monsters, gear, progression, or live Talent activation behavior changed.
 
 ## v1.20.18 - Talent System Re-entry Audit
 

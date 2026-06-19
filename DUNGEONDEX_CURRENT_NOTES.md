@@ -7,17 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.19 - Talent Earning Source Contract
+- DungeonDex v1.20.20 - Talent Milestone Tracking Gate Test (fixture-only, no live earning)
 
-## v1.20.19 Talent Earning Source Contract
-- Current baseline: v1.20.19.
-- Boss/depth milestones are now the documented primary Talent earning source; Elite Board sources remain undecided future secondary options.
-- Added a read-only earning source contract with six future milestone examples worth one planned point each and a planned total of six.
-- Expanded save shape with the inert feature-gated `player.talentEarning` field: earning remains disabled, milestone state remains empty, and awarded points remain zero.
-- Added `earningSourceContract`, `earningEnabled`, and `earningStatus` inspection helpers. The contract helper is defensive and non-mutating.
-- Added seven smoke records proving the contract, disabled gate, stable output, non-mutation, and zero Talent ledger availability.
-- The Talent module retains its stable `v1.16.2` component provenance label; only active public/runtime/cache labels moved to v1.20.19.
-- No milestone tracking, point awards, spending, unlocks, learned nodes, passive bonuses, UI actions, combat, economy, monsters, gear, or progression behavior changed.
+## v1.20.20 Talent Milestone Tracking Test
+- Current baseline: v1.20.20.
+- Added read-only talent milestone detection helpers for fixture validation only: boss milestones, depth milestones, merged reached milestones, and point calculation from milestones.
+- Extended smoke coverage for helper existence, boss/depth detection, unique milestone IDs, disabled-state zero points, override-only fixture scoring, no state mutation, and locked earning gate verification.
+- `talentEarning.enabled` remains false in normal saves, `milestonesReached` stays empty, and `pointsAwarded` stays zero.
+- The Talent module retains its stable `v1.16.2` component provenance label; only active public/runtime/cache labels moved to v1.20.20.
+- No milestone earning activation, spending, unlocks, learned nodes, passive bonuses, UI actions, combat, economy, monsters, gear, or progression behavior changed.
 
 ## v1.20.18 Talent System Re-entry Audit
 - Current baseline: v1.20.18.

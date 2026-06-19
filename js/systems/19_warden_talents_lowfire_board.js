@@ -485,6 +485,81 @@
     };
   }
 
+  function normaliseMilestoneId(value){
+    return String(value || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+  }
+
+  function milestoneSetFromSource(source){
+    const resolved = new Set();
+    if (!source || typeof source !== 'object') return resolved;
+    const reached = ownValue(source, 'milestonesReached', {});
+    if (reached && typeof reached === 'object' && !Array.isArray(reached)) {
+      Object.keys(reached).forEach(key => {
+        if (reached[key]) resolved.add(normaliseMilestoneId(key));
+      });
+    }
+    return resolved;
+  }
+
+  function detectBossMilestones(state){
+    const player = state?.player || {};
+    const gained = [];
+    const defeatedBosses = Math.max(0, Math.floor(N(player.bossesDefeated ?? player.bosses ?? player.bossKills, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const reached = milestoneSetFromSource(player.talentEarning);
+    const bossMilestones = [
+      { milestone: 'first_boss', threshold: 1, label: 'First Boss Defeated' },
+      { milestone: 'boss_5', threshold: 5, label: '5 Bosses Defeated' },
+      { milestone: 'boss_10', threshold: 10, label: '10 Bosses Defeated' }
+    ];
+    bossMilestones.forEach(entry => {
+      if (defeatedBosses >= entry.threshold || reached.has(entry.milestone)) {
+        gained.push({ milestone: entry.milestone, label: entry.label, type: 'boss' });
+      }
+    });
+    return gained;
+  }
+
+  function detectDepthMilestones(state){
+    const player = state?.player || {};
+    const gained = [];
+    const depth = Math.max(0, Math.floor(N(player.safeExtractDepth ?? player.depth ?? player.floor, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const reached = milestoneSetFromSource(player.talentEarning);
+    const depthMilestones = [
+      { milestone: 'depth_5', threshold: 5, label: 'Depth 5 Reached' },
+      { milestone: 'depth_10', threshold: 10, label: 'Depth 10 Reached' },
+      { milestone: 'depth_15', threshold: 15, label: 'Depth 15 Reached' }
+    ];
+    depthMilestones.forEach(entry => {
+      if (depth >= entry.threshold || reached.has(entry.milestone)) {
+        gained.push({ milestone: entry.milestone, label: entry.label, type: 'depth' });
+      }
+    });
+    return gained;
+  }
+
+  function getAllReachedMilestones(state){
+    const boss = detectBossMilestones(state);
+    const depth = detectDepthMilestones(state);
+    const seen = new Set();
+    const merged = [];
+    [...boss, ...depth].forEach(entry => {
+      const id = normaliseMilestoneId(entry?.milestone);
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      merged.push({ milestone: id, label: String(entry.label || ''), type: entry.type || '' });
+    });
+    return merged;
+  }
+
+  function calculateTalentPointsFromMilestones(state, enabledOverride = false){
+    const enabled = enabledOverride === true || talentEarningEnabled(state);
+    if (!enabled) return 0;
+    return getAllReachedMilestones(state).reduce((sum, entry) => {
+      const contractEntry = TALENT_EARNING_SOURCE_CONTRACT.milestones.find(item => normaliseMilestoneId(item.milestone) === entry.milestone);
+      return sum + Math.max(0, Math.floor(N(contractEntry?.futureAwardIfEnabled, 0, 0, Number.MAX_SAFE_INTEGER)));
+    }, 0);
+  }
+
   function talentPointLedger(state){
     const player = state?.player || {};
     const source = safeLedgerSource(player.talentLedger);
@@ -1058,6 +1133,10 @@
     earningSourceContract: talentEarningSourceContract,
     earningEnabled: talentEarningEnabled,
     earningStatus: talentEarningStatus,
+    detectBossMilestones,
+    detectDepthMilestones,
+    getAllReachedMilestones,
+    calculateTalentPointsFromMilestones,
     preview: talentTreePreview,
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,

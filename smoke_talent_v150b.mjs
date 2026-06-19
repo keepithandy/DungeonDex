@@ -727,10 +727,26 @@ async function main() {
       const summary1 = typeof api.summary === 'function' ? api.summary(S) : null;
       const pointsAfter = Number(S.player?.talentEarning?.pointsAwarded || 0);
       const summary2 = typeof api.summary === 'function' ? api.summary(S) : null;
+      const fixture = JSON.parse(JSON.stringify(S));
+      fixture.player = fixture.player || {};
+      fixture.player.bossesDefeated = 10;
+      fixture.player.safeExtractDepth = 15;
+      fixture.player.talentEarning = { enabled: false, milestonesReached: {}, pointsAwarded: 0 };
+      const detectBoss = typeof api.detectBossMilestones === 'function' ? api.detectBossMilestones(fixture) : null;
+      const detectDepth = typeof api.detectDepthMilestones === 'function' ? api.detectDepthMilestones(fixture) : null;
+      const allReached = typeof api.getAllReachedMilestones === 'function' ? api.getAllReachedMilestones(fixture) : null;
+      const pointsDisabled = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture) : null;
+      const pointsOverride = typeof api.calculateTalentPointsFromMilestones === 'function' ? api.calculateTalentPointsFromMilestones(fixture, true) : null;
       return {
         hasContractHelper: typeof api.earningSourceContract === 'function',
         hasEnabledHelper: typeof api.earningEnabled === 'function',
         hasStatusHelper: typeof api.earningStatus === 'function',
+        helperShape: {
+          detectBoss: typeof api.detectBossMilestones === 'function',
+          detectDepth: typeof api.detectDepthMilestones === 'function',
+          allReached: typeof api.getAllReachedMilestones === 'function',
+          calculate: typeof api.calculateTalentPointsFromMilestones === 'function'
+        },
         contract,
         contract2,
         earning,
@@ -740,17 +756,34 @@ async function main() {
         pointsAfter,
         summary1,
         summary2,
+        fixture,
+        detectBoss,
+        detectDepth,
+        allReached,
+        pointsDisabled,
+        pointsOverride,
         notMutated: before === after
       };
     })()`);
     const earningContract = earningAudit?.contract;
     const earningMilestones = Array.isArray(earningContract?.milestones) ? earningContract.milestones : [];
+    const bossIds = Array.isArray(earningAudit?.detectBoss) ? earningAudit.detectBoss.map(entry => entry.milestone) : [];
+    const depthIds = Array.isArray(earningAudit?.detectDepth) ? earningAudit.detectDepth.map(entry => entry.milestone) : [];
+    const allReachedIds = Array.isArray(earningAudit?.allReached) ? earningAudit.allReached.map(entry => entry.milestone) : [];
+    const uniqueAllReachedIds = new Set(allReachedIds);
     record('Talent earning source contract exists', earningAudit?.hasContractHelper === true && earningContract?.sourceId === 'boss_depth_milestone' && earningContract?.sourceLabel === 'Boss / Depth Milestone' && earningContract?.enabled === false, JSON.stringify(earningContract));
     record('Boss/depth milestone contract lists expected milestones', earningMilestones.length === 6 && earningMilestones.every(entry => entry.futureAwardIfEnabled === 1) && earningMilestones.some(entry => entry.milestone === 'first_boss' && /first.*boss/i.test(entry.label || '')) && earningMilestones.some(entry => entry.milestone === 'depth_5' && /depth.*5/i.test(entry.label || '')) && earningContract?.totalPointsIfAllMilestonesCompleted === 6, JSON.stringify(earningMilestones));
+    record('Talent milestone helpers exist', earningAudit?.helperShape?.detectBoss === true && earningAudit?.helperShape?.detectDepth === true && earningAudit?.helperShape?.allReached === true && earningAudit?.helperShape?.calculate === true, JSON.stringify(earningAudit?.helperShape));
+    record('Boss/depth milestone detection is stable', Array.isArray(earningAudit?.detectBoss) && Array.isArray(earningAudit?.detectDepth) && bossIds.includes('first_boss') && depthIds.includes('depth_5'), JSON.stringify({ bossIds, depthIds }));
+    record('Milestone helpers return unique IDs', Array.isArray(earningAudit?.allReached) && earningAudit.allReached.length === uniqueAllReachedIds.size && earningAudit.allReached.every(entry => entry.milestone), JSON.stringify(earningAudit?.allReached));
     record('Talent earning feature flag exists and disabled', earningAudit?.earning?.enabled === false && earningAudit?.earning?.sourceId === 'boss_depth_milestone' && earningAudit?.earning?.pointsAwarded === 0 && earningAudit?.earning?.milestonesReached && Object.keys(earningAudit.earning.milestonesReached).length === 0 && earningAudit?.enabled === false, JSON.stringify(earningAudit?.earning));
+    record('Disabled fixture returns 0 points', earningAudit?.pointsDisabled === 0, JSON.stringify({ pointsDisabled: earningAudit?.pointsDisabled }));
+    record('Override-enabled fixture calculates points', earningAudit?.pointsOverride === 6, JSON.stringify({ pointsOverride: earningAudit?.pointsOverride }));
     record('Talent earning status shows 0 points awarded while disabled', earningAudit?.hasStatusHelper === true && earningAudit?.status?.enabled === false && earningAudit?.status?.pointsAwardedNow === 0 && earningAudit?.status?.availableMilestones === 6 && earningAudit?.status?.totalPointsIfFullyUnlocked === 6, JSON.stringify(earningAudit?.status));
     record('Talent earning source contract does not mutate state', earningAudit?.notMutated === true, JSON.stringify({ notMutated: earningAudit?.notMutated }));
     record('Talent points remain 0 while earning disabled', earningAudit?.pointsBefore === 0 && earningAudit?.pointsAfter === 0 && earningAudit?.summary1?.pointsAvailable === 0 && earningAudit?.summary2?.pointsAvailable === 0, JSON.stringify({ pointsBefore: earningAudit?.pointsBefore, pointsAfter: earningAudit?.pointsAfter, availableBefore: earningAudit?.summary1?.pointsAvailable, availableAfter: earningAudit?.summary2?.pointsAvailable }));
+    record('Normal saves still award 0', earningAudit?.earning?.enabled === false && earningAudit?.pointsDisabled === 0, JSON.stringify({ earning: earningAudit?.earning, pointsDisabled: earningAudit?.pointsDisabled }));
+    record('Earning gate locked in state and contract', earningAudit?.earning?.enabled === false && earningContract?.enabled === false && earningAudit?.earning?.pointsAwarded === 0 && Object.keys(earningAudit?.earning?.milestonesReached || {}).length === 0, JSON.stringify({ earning: earningAudit?.earning, contract: earningContract }));
     record('Talent earning source contract returns stable contract', !!earningContract && JSON.stringify(earningContract) === JSON.stringify(earningAudit?.contract2), JSON.stringify(earningContract));
     const previewSafety = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
