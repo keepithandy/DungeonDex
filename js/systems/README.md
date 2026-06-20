@@ -32,6 +32,7 @@ It preserves classic browser script load order instead of converting the game to
 - `26_spark_writ_pill_cleanup.js` — Spark writ pill cleanup.
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
+- `30_passive_activation_gate_hotfix.js` — Passive activation gate verification hotfix.
 
 Notes:
 - `index.html` now loads these files directly in order.
