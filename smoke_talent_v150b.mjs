@@ -791,6 +791,15 @@ async function main() {
       const debtPassiveContract = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLockedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
       const debtPassiveContractLearned = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLearnedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
       const debtPassiveContractReplay = typeof api.passiveContract === 'function' ? api.passiveContract(debtContractLearnedState, ${JSON.stringify(TALENT_IDS.debtClarity)}) : null;
+      const readinessState = {
+        player: {
+          talentLearnedIds: { ${JSON.stringify(TALENT_IDS.hunterClarity)}: true },
+          talentUnlockIds: [${JSON.stringify(TALENT_IDS.hunterClarity)}]
+        }
+      };
+      const readinessBefore = JSON.stringify(readinessState);
+      const readiness = typeof api.readinessMatrix === 'function' ? api.readinessMatrix(readinessState) : null;
+      const readinessAfter = JSON.stringify(readinessState);
       const debtSource = {
         statusLabel: 'Debt Active',
         balanceLabel: 'Owed 12 coin',
@@ -898,6 +907,9 @@ async function main() {
         debtPassiveContract,
         debtPassiveContractLearned,
         debtPassiveContractReplay,
+        readiness,
+        readinessBefore,
+        readinessAfter,
         debtSource,
         debtSourceBefore,
         debtApplied,
@@ -912,6 +924,11 @@ async function main() {
     const earningContract = earningAudit?.contract;
     record('Talent passive contract helper exists', !!earningAudit?.passiveContract && !!earningAudit?.passiveContractReplay && earningAudit?.passiveContract?.nodeKey === TALENT_IDS.hunterClarity, JSON.stringify(earningAudit?.passiveContract));
     record('Talent passive contract metadata is stable and read-only', earningAudit?.passiveContract?.learned === false && earningAudit?.passiveContract?.passiveReady === false && earningAudit?.passiveContract?.passiveEnabled === false && earningAudit?.passiveContract?.effectKey === 'hunter_board_clarity_display_copy' && earningAudit?.passiveContract?.affectedSurface === 'Elite Board display copy only' && earningAudit?.passiveContract?.mutatesSave === false && earningAudit?.passiveContract?.appliesEffect === false && earningAudit?.passiveContract?.combat === false && earningAudit?.passiveContract?.economy === false && earningAudit?.passiveContract?.rewards === false && earningAudit?.passiveContract?.monsters === false && earningAudit?.passiveContract?.gear === false && earningAudit?.passiveContract?.dungeonProgression === false && earningAudit?.passiveContract?.dungeonScaling === false && earningAudit?.passiveContract?.revisit === false && earningAudit?.passiveContract?.debtCollector === false && earningAudit?.passiveContract?.eliteBoardDifficultyRiskRewardMath === false && JSON.stringify(earningAudit?.passiveContract) === JSON.stringify(earningAudit?.passiveContractReplay), JSON.stringify(earningAudit?.passiveContract));
+    record('talentPassiveActivationReadiness reports audit state without mutation', !!earningAudit?.readiness && Array.isArray(earningAudit?.readiness?.passivesReady) && earningAudit?.readinessBefore === earningAudit?.readinessAfter, JSON.stringify(earningAudit?.readiness));
+    record('Readiness matrix reports exactly 2 contract-ready passives', earningAudit?.readiness?.readinessSummary?.contractReady === 2, JSON.stringify(earningAudit?.readiness?.readinessSummary));
+    record('Readiness matrix reports 1 display-ready passive (hunter only)', earningAudit?.readiness?.readinessSummary?.displayReady === 1, JSON.stringify(earningAudit?.readiness?.readinessSummary));
+    record('Readiness matrix reports 0 gameplay-active passives', earningAudit?.readiness?.readinessSummary?.gameplayActive === 0, JSON.stringify(earningAudit?.readiness?.readinessSummary));
+    record('Readiness report forbids action keywords in all passive entries', !Array.isArray(earningAudit?.readiness?.passivesReady) || earningAudit.readiness.passivesReady.every(p => { const text = JSON.stringify(p).toLowerCase(); return !/\\b(unlock|activate|spend|earn|claim|purchase|start|enter|begin)\\b/.test(text); }), JSON.stringify(earningAudit?.readiness?.passivesReady));
     const earningMilestones = Array.isArray(earningContract?.milestones) ? earningContract.milestones : [];
     const bossIds = Array.isArray(earningAudit?.detectBoss) ? earningAudit.detectBoss.map(entry => entry.milestone) : [];
     const depthIds = Array.isArray(earningAudit?.detectDepth) ? earningAudit.detectDepth.map(entry => entry.milestone) : [];
@@ -1066,6 +1083,15 @@ async function main() {
     record('Debt Collector helper stays text-only and leaves save/player state untouched', earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2 && earningAudit?.debtPassiveContract?.mutatesSave === false && earningAudit?.debtApplied?.saveStateToken === 'preserve-me', JSON.stringify({ debtPassiveContract: earningAudit?.debtPassiveContract, debtApplied: earningAudit?.debtApplied }));
     record('Learned board copy is clearer while staying informational only', typeof learnedBoardText === 'string' && learnedBoardText.includes('Target:') && learnedBoardText.includes('Objective:') && learnedBoardText.includes('Reward preview:'), learnedBoardText.slice(0, 700));
     record('Unlearned board copy stays unchanged through passive helper reads', typeof unlearnedBoardText === 'string' && !unlearnedBoardText.includes('Target:'), unlearnedBoardText.slice(0, 700));
+    const talentActionTextAudit = await evalByValue(client, `(() => {
+      const panel = document.getElementById('talentPanel');
+      const texts = Array.from(panel ? panel.querySelectorAll('button, [role="button"], a') : []).map(node => (node.innerText || node.textContent || '').trim()).filter(Boolean);
+      return {
+        matches: texts.filter(text => /\\b(purchase|unlock|activate|claim|start|reward)\\b/i.test(text)),
+        texts
+      };
+    })()`);
+    record('No new talent action text appears in the UI', Array.isArray(talentActionTextAudit?.matches) && talentActionTextAudit.matches.length === 0, Array.isArray(talentActionTextAudit?.texts) ? talentActionTextAudit.texts.slice(0, 20).join(' | ') : '');
     record('Passive contract and board render do not mutate save state', learnedCopyProbe?.before === learnedCopyProbe?.after && learnedPassiveContract?.mutatesSave === false, JSON.stringify({ learnedPassiveContract, learnedCopyProbe }));
     record('Learned spend does not mutate save snapshot unexpectedly', learnedSaveBefore === JSON.stringify(learnedSaveFixture), JSON.stringify({ before: learnedSaveBefore, after: JSON.stringify(learnedSaveFixture) }));
     const persistenceFixture = JSON.parse(JSON.stringify(savedBeforePersistence));

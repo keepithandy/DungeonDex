@@ -723,6 +723,67 @@
     };
   }
 
+  function talentPassiveActivationReadiness(state){
+    const hunter = hunterBoardClarityPassiveContract(state);
+    const debt = debtCollectorClarityPassiveContract(state);
+    const passivesReady = [
+      {
+        id: hunter.nodeKey,
+        contractDefined: true,
+        contractSmoked: true,
+        displayCopyDefined: true,
+        displayCopySurface: 'Elite Board summary only',
+        passiveEnabled: true,
+        activationStatus: 'live (copy-only)',
+        saveMutation: false,
+        gameplayEffect: false,
+        blockedSystems: [
+          'talent earning',
+          'talent spending',
+          'talent unlocks',
+          'combat scaling',
+          'economy',
+          'gear',
+          'monsters'
+        ]
+      },
+      {
+        id: debt.nodeKey,
+        contractDefined: true,
+        contractSmoked: true,
+        displayCopyDefined: true,
+        displayCopySurface: 'None (inactive)',
+        passiveEnabled: false,
+        activationStatus: 'locked (contract only)',
+        saveMutation: false,
+        gameplayEffect: false,
+        blockedSystems: [
+          'talent earning',
+          'talent spending',
+          'talent unlocks',
+          'debt math',
+          'combat scaling',
+          'economy',
+          'gear',
+          'monsters'
+        ]
+      }
+    ];
+    return Object.freeze({
+      passivesReady: Object.freeze(passivesReady.map(passive => Object.freeze({
+        ...passive,
+        blockedSystems: Object.freeze(passive.blockedSystems.slice())
+      }))),
+      readinessSummary: Object.freeze({
+        total: 2,
+        contractReady: 2,
+        displayReady: 1,
+        gameplayActive: 0,
+        nextCandidate: null
+      })
+    });
+  }
+
   function applyHunterBoardClarityCopy(state, boardCardOrCopy){
     const passiveContract = hunterBoardClarityPassiveContract(state);
     const copy = boardCardOrCopy && typeof boardCardOrCopy === 'object' && !Array.isArray(boardCardOrCopy)
@@ -1448,6 +1509,11 @@
     applyHunterBoardClarityCopy,
     debtCollectorClarityPassiveContract,
     applyDebtCollectorClarityCopy,
+    readinessMatrix: talentPassiveActivationReadiness,
+    readinessReport: state => {
+      const matrix = talentPassiveActivationReadiness(state);
+      return matrix?.readinessSummary || null;
+    },
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,

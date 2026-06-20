@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.30 - Debt Collector Clarity Contract Smoke Guard
+- DungeonDex v1.20.31 - Talent Passive Activation Readiness Matrix
+
+## v1.20.31 Talent Passive Activation Readiness Matrix
+- Current baseline: v1.20.31.
+- Added a read-only `talentPassiveActivationReadiness(state)` helper that reports prepared passive contracts for `hunter_board_clarity` and `debt_collector_clarity` without mutating state or wiring new activation paths.
+- The helper reports contract presence, display copy presence, smoke guarding, live renderer wiring, activation status, learned state, readiness, enabled state, save mutation, gameplay effect application, allowed surface, and blocked systems.
+- Smoke coverage now checks the readiness matrix, read-only behavior, debt collector renderer wiring status, blocked-system coverage, and the continued absence of new talent action text.
+- `hunter_board_clarity` remains on its current copy-only surface. `debt_collector_clarity` remains inactive and does not apply gameplay effects.
+- No talent spending, earning, unlocks, learned UI, buttons, or gameplay activation behavior changed.
 
 ## v1.20.30 Debt Collector Clarity Contract Smoke Guard
 - Current baseline: v1.20.30.
