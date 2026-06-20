@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.31 - Talent Passive Activation Readiness Matrix
+- DungeonDex v1.20.32 - Passive Activation Gate Dry Run
+
+## v1.20.32 Passive Activation Gate Dry Run
+- Current baseline: v1.20.32.
+- Added a read-only `talentPassiveActivationGateDryRun(state)` helper for `hunter_board_clarity` and `debt_collector_clarity`.
+- The dry run explains contract, display-copy, smoke, learned, readiness, renderer-wiring, blocked-system, save-mutation, and gameplay-effect gates without mutating state.
+- `hunter_board_clarity` remains limited to its existing Elite Board copy-only surface. `debt_collector_clarity` reports `liveRendererWired:false` and remains absent from the live Debt Collector renderer.
+- No Talent UI, earning, spending, learned-state write, passive gameplay effect, debt behavior, or save shape changed.
 
 ## v1.20.31 Talent Passive Activation Readiness Matrix
 - Current baseline: v1.20.31.

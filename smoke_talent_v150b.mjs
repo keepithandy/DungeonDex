@@ -800,6 +800,9 @@ async function main() {
       const readinessBefore = JSON.stringify(readinessState);
       const readiness = typeof api.readinessMatrix === 'function' ? api.readinessMatrix(readinessState) : null;
       const readinessAfter = JSON.stringify(readinessState);
+      const activationGateBefore = JSON.stringify(readinessState);
+      const activationGateDryRun = typeof api.talentPassiveActivationGateDryRun === 'function' ? api.talentPassiveActivationGateDryRun(readinessState) : null;
+      const activationGateAfter = JSON.stringify(readinessState);
       const debtSource = {
         statusLabel: 'Debt Active',
         balanceLabel: 'Owed 12 coin',
@@ -910,6 +913,10 @@ async function main() {
         readiness,
         readinessBefore,
         readinessAfter,
+        hasActivationGateDryRun: typeof api.talentPassiveActivationGateDryRun === 'function',
+        activationGateDryRun,
+        activationGateBefore,
+        activationGateAfter,
         debtSource,
         debtSourceBefore,
         debtApplied,
@@ -929,6 +936,17 @@ async function main() {
     record('Readiness matrix reports 1 display-ready passive (hunter only)', earningAudit?.readiness?.readinessSummary?.displayReady === 1, JSON.stringify(earningAudit?.readiness?.readinessSummary));
     record('Readiness matrix reports 0 gameplay-active passives', earningAudit?.readiness?.readinessSummary?.gameplayActive === 0, JSON.stringify(earningAudit?.readiness?.readinessSummary));
     record('Readiness report forbids action keywords in all passive entries', !Array.isArray(earningAudit?.readiness?.passivesReady) || earningAudit.readiness.passivesReady.every(p => { const text = JSON.stringify(p).toLowerCase(); return !/\\b(unlock|activate|spend|earn|claim|purchase|start|enter|begin)\\b/.test(text); }), JSON.stringify(earningAudit?.readiness?.passivesReady));
+    const activationGateEntries = earningAudit?.activationGateDryRun?.passives;
+    const hunterActivationGate = Array.isArray(activationGateEntries) ? activationGateEntries.find(entry => entry.nodeKey === TALENT_IDS.hunterClarity) : null;
+    const debtActivationGate = Array.isArray(activationGateEntries) ? activationGateEntries.find(entry => entry.nodeKey === TALENT_IDS.debtClarity) : null;
+    const requiredBlockedSystems = ['combat', 'economy', 'rewards', 'progression', 'revisit', 'debt math', 'pressure', 'repayment', 'monsters', 'gear', 'scaling'];
+    record('talentPassiveActivationGateDryRun exists', earningAudit?.hasActivationGateDryRun === true, JSON.stringify(earningAudit?.activationGateDryRun));
+    record('Activation gate dry run reports both prepared passives', !!hunterActivationGate && !!debtActivationGate && activationGateEntries.length === 2, JSON.stringify(activationGateEntries));
+    record('Activation gate dry run does not mutate state', earningAudit?.activationGateBefore === earningAudit?.activationGateAfter && earningAudit?.activationGateDryRun?.mutatesSave === false, JSON.stringify({ before: earningAudit?.activationGateBefore, after: earningAudit?.activationGateAfter }));
+    record('Debt Collector activation gate reports missing live renderer wiring', debtActivationGate?.liveRendererWired === false && debtActivationGate?.canActivateNow === false && /missing live.*renderer wiring|renderer surface remains inactive/i.test(debtActivationGate?.activationBlockedReason || ''), JSON.stringify(debtActivationGate));
+    record('Activation gate dry run remains non-mutating and gameplay-inert', Array.isArray(activationGateEntries) && activationGateEntries.every(entry => entry.mutatesSave === false && entry.appliesGameplayEffect === false), JSON.stringify(activationGateEntries));
+    record('Activation gate dry run blocks every forbidden system', Array.isArray(activationGateEntries) && activationGateEntries.every(entry => { const blocked = (entry.blockedSystems || []).map(value => String(value).toLowerCase()); return requiredBlockedSystems.every(system => blocked.includes(system)); }), JSON.stringify(activationGateEntries));
+    record('Activation gate entries expose the complete stable metadata contract', Array.isArray(activationGateEntries) && activationGateEntries.every(entry => ['nodeKey', 'label', 'readinessKnown', 'contractHelperPresent', 'displayCopyHelperPresent', 'smokeGuarded', 'learned', 'passiveReady', 'passiveEnabled', 'liveRendererWired', 'canActivateNow', 'activationBlockedReason', 'requiredFutureSteps', 'allowedSurface', 'blockedSystems', 'mutatesSave', 'appliesGameplayEffect'].every(field => Object.prototype.hasOwnProperty.call(entry, field))) && hunterActivationGate?.liveRendererWired === true && hunterActivationGate?.canActivateNow === false && activationGateEntries.every(entry => entry.allowedSurface === 'display-copy only'), JSON.stringify(activationGateEntries));
     const earningMilestones = Array.isArray(earningContract?.milestones) ? earningContract.milestones : [];
     const bossIds = Array.isArray(earningAudit?.detectBoss) ? earningAudit.detectBoss.map(entry => entry.milestone) : [];
     const depthIds = Array.isArray(earningAudit?.detectDepth) ? earningAudit.detectDepth.map(entry => entry.milestone) : [];
@@ -1087,7 +1105,7 @@ async function main() {
       const panel = document.getElementById('talentPanel');
       const texts = Array.from(panel ? panel.querySelectorAll('button, [role="button"], a') : []).map(node => (node.innerText || node.textContent || '').trim()).filter(Boolean);
       return {
-        matches: texts.filter(text => /\\b(purchase|unlock|activate|claim|start|reward)\\b/i.test(text)),
+        matches: texts.filter(text => /\\b(purchase|unlock|activate|claim|start|reward|spend)\\b/i.test(text)),
         texts
       };
     })()`);

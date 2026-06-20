@@ -784,6 +784,89 @@
     });
   }
 
+  function talentPassiveActivationGateDryRun(state){
+    const readiness = talentPassiveActivationReadiness(state);
+    const readinessByNode = new Map(readiness.passivesReady.map(passive => [passive.id, passive]));
+    const blockedSystems = [
+      'combat',
+      'economy',
+      'rewards',
+      'progression',
+      'Revisit',
+      'debt math',
+      'pressure',
+      'repayment',
+      'monsters',
+      'gear',
+      'scaling'
+    ];
+    const allowedSurface = 'display-copy only';
+    const activationPolicyEnabled = false;
+    const definitions = [
+      {
+        nodeKey: 'hunter_board_clarity',
+        label: 'Board Clarity',
+        contract: hunterBoardClarityPassiveContract(state),
+        liveRendererWired: true,
+        activationBlockedReason: 'Further activation is blocked; the existing Elite Board renderer remains copy-only.',
+        requiredFutureSteps: [
+          'Explicitly authorize any future copy-only activation change.',
+          'Add activation-gate smoke coverage for the authorized renderer path.'
+        ]
+      },
+      {
+        nodeKey: 'debt_collector_clarity',
+        label: 'Debt Collector Clarity',
+        contract: debtCollectorClarityPassiveContract(state),
+        liveRendererWired: false,
+        activationBlockedReason: 'Activation is blocked by missing live Debt Collector renderer wiring; the renderer surface remains inactive.',
+        requiredFutureSteps: [
+          'Explicitly authorize live Debt Collector display-copy wiring.',
+          'Wire the copy helper into the live renderer without changing debt behavior.',
+          'Add renderer integration smoke coverage.'
+        ]
+      }
+    ];
+    const passives = definitions.map(definition => {
+      const readinessEntry = readinessByNode.get(definition.nodeKey);
+      const safetyGatesSatisfied = !!readinessEntry
+        && readinessEntry.contractDefined === true
+        && readinessEntry.displayCopyDefined === true
+        && readinessEntry.contractSmoked === true
+        && definition.liveRendererWired === true
+        && allowedSurface === 'display-copy only'
+        && blockedSystems.length === 11
+        && readinessEntry.saveMutation === false
+        && readinessEntry.gameplayEffect === false;
+      return Object.freeze({
+        nodeKey: definition.nodeKey,
+        label: definition.label,
+        readinessKnown: !!readinessEntry,
+        contractHelperPresent: readinessEntry?.contractDefined === true,
+        displayCopyHelperPresent: readinessEntry?.displayCopyDefined === true,
+        smokeGuarded: readinessEntry?.contractSmoked === true,
+        learned: definition.contract.learned === true,
+        passiveReady: definition.contract.passiveReady === true,
+        passiveEnabled: definition.contract.passiveEnabled === true,
+        liveRendererWired: definition.liveRendererWired,
+        canActivateNow: safetyGatesSatisfied && activationPolicyEnabled,
+        activationBlockedReason: definition.activationBlockedReason,
+        requiredFutureSteps: Object.freeze(definition.requiredFutureSteps.slice()),
+        allowedSurface,
+        blockedSystems: Object.freeze(blockedSystems.slice()),
+        mutatesSave: false,
+        appliesGameplayEffect: false
+      });
+    });
+    return Object.freeze({
+      dryRun: true,
+      passives: Object.freeze(passives),
+      canActivateAnyNow: false,
+      mutatesSave: false,
+      appliesGameplayEffect: false
+    });
+  }
+
   function applyHunterBoardClarityCopy(state, boardCardOrCopy){
     const passiveContract = hunterBoardClarityPassiveContract(state);
     const copy = boardCardOrCopy && typeof boardCardOrCopy === 'object' && !Array.isArray(boardCardOrCopy)
@@ -1514,6 +1597,7 @@
       const matrix = talentPassiveActivationReadiness(state);
       return matrix?.readinessSummary || null;
     },
+    talentPassiveActivationGateDryRun,
     calculatePendingTalentMilestoneAwards,
     applyPendingTalentMilestoneAwards,
     preview: talentTreePreview,

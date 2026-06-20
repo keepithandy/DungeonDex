@@ -2,19 +2,19 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.19**
+Current baseline: **DungeonDex v1.20.32**
 
 ## Current Build
 
-**v1.20.19 - Talent Earning Source Contract**
+**v1.20.32 - Passive Activation Gate Dry Run**
 
-This patch defines boss/depth milestones as the primary future Talent earning source behind a disabled feature gate. Save shape expands with inert `player.talentEarning` metadata, while awarded and available points remain zero.
+This patch adds read-only activation-gate metadata for the two prepared display-copy passives. It does not wire the Debt Collector renderer, mutate saves, add Talent actions, or apply gameplay effects.
 
 ## Previous Build
 
-**v1.20.18 - Talent System Re-entry Audit**
+**v1.20.31 - Talent Passive Activation Readiness Matrix**
 
-This documentation-first patch confirmed the Talent foundation remained single-sourced, locked, preview-only, and inert before earning-source work resumed.
+This patch added a read-only readiness matrix for the prepared Board Clarity and Debt Collector Clarity passive contracts.
 
 ## Previous Build
 

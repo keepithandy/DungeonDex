@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.31-talent-passive-activation-readiness-matrix';
+const CACHE_NAME = 'dungeondex-v1.20.32-passive-activation-gate-dry-run';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.31-talent-passive-activation-readiness-matrix';
+const BUILD_QS = '1.20.32-passive-activation-gate-dry-run';
 const ASSETS = [
   './',
   './index.html',

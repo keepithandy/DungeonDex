@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.12.5`
-* Current local package baseline: `v1.20.29`
-* Current development target: `v1.20.29`
+* Public/live itch version: `v1.20.32`
+* Current local package baseline: `v1.20.32`
+* Current development target: `v1.20.32`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.20.32 - Passive Activation Gate Dry Run
+
+* Added read-only activation-gate metadata for `hunter_board_clarity` and `debt_collector_clarity`.
+* Reports missing Debt Collector live renderer wiring and keeps both passives blocked from further activation.
+* Preserved save shape, Talent UI, gameplay effects, debt behavior, and all forbidden gameplay systems.
 
 ---
 
