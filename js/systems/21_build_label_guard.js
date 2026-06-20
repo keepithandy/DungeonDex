@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.20.29 - Build label guard.
+// DungeonDex v1.20.30 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.20.29';
+  const BUILD = '1.20.30';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.20.29-debt-collector-clarity-passive-contract-prep';
+  const BUILD_QS = '1.20.30-debt-collector-clarity-contract-smoke-guard';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

@@ -798,7 +798,14 @@ async function main() {
         termsLabel: 'Due on return',
         reminderLabel: 'Bring coin.',
         balanceCopper: 1200,
-        pressure: 2
+        pressure: 2,
+        debtBalance: 1200,
+        debtPressure: 2,
+        repaymentState: 'pending',
+        saveStateToken: 'preserve-me',
+        combatState: { hp: 10 },
+        rewardState: { coin: 3 },
+        progressionState: { depth: 4 }
       };
       const debtSourceBefore = JSON.stringify(debtSource);
       const debtApplied = typeof api.applyDebtCollectorClarityCopy === 'function' ? api.applyDebtCollectorClarityCopy(debtContractLearnedState, debtSource) : null;
@@ -811,7 +818,14 @@ async function main() {
         terms: 'No delay.',
         reminder: 'Pay soon.',
         balanceCopper: 2500,
-        pressure: 4
+        pressure: 4,
+        debtBalance: 2500,
+        debtPressure: 4,
+        repaymentState: 'pending',
+        saveStateToken: 'preserve-me-too',
+        combatState: { hp: 22 },
+        rewardState: { coin: 7 },
+        progressionState: { depth: 8 }
       };
       const debtAlternateApplied = typeof api.applyDebtCollectorClarityCopy === 'function' ? api.applyDebtCollectorClarityCopy(debtContractLearnedState, debtAlternateSource) : null;
       const passiveBoardBefore = document.getElementById('questPanel')?.innerText || '';
@@ -1045,10 +1059,11 @@ async function main() {
     record('Unlearned debt_collector_clarity contract reports disabled/not applying', earningAudit?.debtPassiveContract?.learned === false && earningAudit?.debtPassiveContract?.passiveReady === false && earningAudit?.debtPassiveContract?.passiveEnabled === false && earningAudit?.debtPassiveContract?.appliesEffect === false && earningAudit?.debtPassiveContract?.mutatesSave === false, JSON.stringify(earningAudit?.debtPassiveContract));
     record('Learned debt_collector_clarity contract reports enabled/applying', earningAudit?.debtPassiveContractLearned?.nodeKey === TALENT_IDS.debtClarity && earningAudit?.debtPassiveContractLearned?.learned === true && earningAudit?.debtPassiveContractLearned?.passiveReady === true && earningAudit?.debtPassiveContractLearned?.passiveEnabled === true && earningAudit?.debtPassiveContractLearned?.appliesEffect === true && earningAudit?.debtPassiveContractReplay?.passiveEnabled === true && JSON.stringify(earningAudit?.debtPassiveContractLearned) === JSON.stringify(earningAudit?.debtPassiveContractReplay), JSON.stringify(earningAudit?.debtPassiveContractLearned));
     record('Debt Collector helper improves display copy without changing numeric values', earningAudit?.debtApplied?.passiveSurface === 'Debt Collector display copy only' && earningAudit?.debtApplied?.passiveApplied === true && earningAudit?.debtApplied?.statusLabel === 'Debt status: Debt Active' && earningAudit?.debtApplied?.balanceLabel === 'Amount owed: Owed 12 coin' && earningAudit?.debtApplied?.pressureLabel === 'Pressure: Pressure 2' && earningAudit?.debtApplied?.termsLabel === 'Terms: Due on return' && earningAudit?.debtApplied?.reminderLabel === 'Reminder: Bring coin.' && earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2, JSON.stringify(earningAudit?.debtApplied));
-    record('Debt Collector helper leaves unlearned copy unchanged', JSON.stringify(earningAudit?.debtUnlearned) === JSON.stringify(earningAudit?.debtSource) && earningAudit?.debtUnlearned?.passiveApplied !== true, JSON.stringify({ before: earningAudit?.debtSource, after: earningAudit?.debtUnlearned }));
+    record('Debt Collector helper leaves unlearned copy unchanged', JSON.stringify(earningAudit?.debtUnlearned) === JSON.stringify(earningAudit?.debtSource) && earningAudit?.debtUnlearned?.passiveApplied !== true && earningAudit?.debtUnlearned?.passiveSurface === undefined, JSON.stringify({ before: earningAudit?.debtSource, after: earningAudit?.debtUnlearned }));
     record('Debt Collector helper does not mutate input object', earningAudit?.debtSourceBefore === JSON.stringify(earningAudit?.debtSource), JSON.stringify({ before: earningAudit?.debtSourceBefore, after: JSON.stringify(earningAudit?.debtSource) }));
-    record('Debt Collector alternate summary fixture reuses the same copy helper', earningAudit?.debtAlternateApplied?.passiveSurface === 'Debt Collector display copy only' && earningAudit?.debtAlternateApplied?.statusLabel === 'Debt status: Owed marker' && earningAudit?.debtAlternateApplied?.balanceLabel === 'Amount owed: Owed 25 coin' && earningAudit?.debtAlternateApplied?.pressureLabel === 'Pressure: Pressure 4' && earningAudit?.debtAlternateApplied?.termsLabel === 'Terms: No delay.' && earningAudit?.debtAlternateApplied?.reminderLabel === 'Reminder: Pay soon.', JSON.stringify(earningAudit?.debtAlternateApplied));
-    record('Debt Collector helper stays text-only and leaves save/player state untouched', earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2 && earningAudit?.debtPassiveContract?.mutatesSave === false, JSON.stringify({ debtPassiveContract: earningAudit?.debtPassiveContract, debtApplied: earningAudit?.debtApplied }));
+    record('Debt Collector helper preserves non-display gameplay state fields', earningAudit?.debtApplied?.debtBalance === 1200 && earningAudit?.debtApplied?.debtPressure === 2 && earningAudit?.debtApplied?.repaymentState === 'pending' && earningAudit?.debtApplied?.saveStateToken === 'preserve-me' && earningAudit?.debtApplied?.combatState?.hp === 10 && earningAudit?.debtApplied?.rewardState?.coin === 3 && earningAudit?.debtApplied?.progressionState?.depth === 4, JSON.stringify(earningAudit?.debtApplied));
+    record('Debt Collector alternate summary fixture reuses the same copy helper', earningAudit?.debtAlternateApplied?.passiveSurface === 'Debt Collector display copy only' && earningAudit?.debtAlternateApplied?.statusLabel === 'Debt status: Owed marker' && earningAudit?.debtAlternateApplied?.balanceLabel === 'Amount owed: Owed 25 coin' && earningAudit?.debtAlternateApplied?.pressureLabel === 'Pressure: Pressure 4' && earningAudit?.debtAlternateApplied?.termsLabel === 'Terms: No delay.' && earningAudit?.debtAlternateApplied?.reminderLabel === 'Reminder: Pay soon.' && earningAudit?.debtAlternateApplied?.debtBalance === 2500 && earningAudit?.debtAlternateApplied?.debtPressure === 4 && earningAudit?.debtAlternateApplied?.repaymentState === 'pending' && earningAudit?.debtAlternateApplied?.saveStateToken === 'preserve-me-too' && earningAudit?.debtAlternateApplied?.combatState?.hp === 22 && earningAudit?.debtAlternateApplied?.rewardState?.coin === 7 && earningAudit?.debtAlternateApplied?.progressionState?.depth === 8, JSON.stringify(earningAudit?.debtAlternateApplied));
+    record('Debt Collector helper stays text-only and leaves save/player state untouched', earningAudit?.debtApplied?.balanceCopper === 1200 && earningAudit?.debtApplied?.pressure === 2 && earningAudit?.debtPassiveContract?.mutatesSave === false && earningAudit?.debtApplied?.saveStateToken === 'preserve-me', JSON.stringify({ debtPassiveContract: earningAudit?.debtPassiveContract, debtApplied: earningAudit?.debtApplied }));
     record('Learned board copy is clearer while staying informational only', typeof learnedBoardText === 'string' && learnedBoardText.includes('Target:') && learnedBoardText.includes('Objective:') && learnedBoardText.includes('Reward preview:'), learnedBoardText.slice(0, 700));
     record('Unlearned board copy stays unchanged through passive helper reads', typeof unlearnedBoardText === 'string' && !unlearnedBoardText.includes('Target:'), unlearnedBoardText.slice(0, 700));
     record('Passive contract and board render do not mutate save state', learnedCopyProbe?.before === learnedCopyProbe?.after && learnedPassiveContract?.mutatesSave === false, JSON.stringify({ learnedPassiveContract, learnedCopyProbe }));

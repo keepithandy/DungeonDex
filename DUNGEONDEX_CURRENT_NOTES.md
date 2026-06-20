@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.29 - Debt Collector Clarity Passive Contract Prep
+- DungeonDex v1.20.30 - Debt Collector Clarity Contract Smoke Guard
+
+## v1.20.30 Debt Collector Clarity Contract Smoke Guard
+- Current baseline: v1.20.30.
+- Tightened smoke-only coverage for `debt_collector_clarity` to prove the helper remains read-only, clone-safe, and display-only.
+- The patch keeps the live Debt Collector renderer untouched and does not add new UI, actions, spending, debt math, pressure changes, repayment changes, economy changes, combat changes, or progression changes.
+- Smoke coverage now checks that the unlearned contract leaves display copy unchanged, the learned contract only changes display text fields, and the helper does not mutate its input or any save/gameplay values.
+- Debt Collector gameplay, combat, economy, gear, dungeon progression, Revisit, Elite Board, and Talent behavior remain unchanged.
 
 ## v1.20.29 Debt Collector Clarity Passive Contract Prep
 - Current baseline: v1.20.29.

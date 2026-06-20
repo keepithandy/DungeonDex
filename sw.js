@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.29-debt-collector-clarity-passive-contract-prep';
+const CACHE_NAME = 'dungeondex-v1.20.30-debt-collector-clarity-contract-smoke-guard';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.29-debt-collector-clarity-passive-contract-prep';
+const BUILD_QS = '1.20.30-debt-collector-clarity-contract-smoke-guard';
 const ASSETS = [
   './',
   './index.html',
