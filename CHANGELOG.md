@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.38`
-* Current local package baseline: `v1.20.38`
-* Current development target: `v1.20.38`
+* Public/live itch version: `v1.20.39`
+* Current local package baseline: `v1.20.39`
+* Current development target: `v1.20.39`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.39 - Talent Point Source Decision
+
+* Selected Boss Trophy Milestone as the first Talent point source.
+* Deferred Floor Milestone and Major Archive Milestone for later decisioning.
+* Kept point earning, spending, unlocks, Debt behavior, Revisit behavior, combat, economy, and save shape unchanged.
 
 ## v1.20.38 - Talent State Contract Consolidation
 

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.38-talent-state-contract-consolidation';
+const CACHE_NAME = 'dungeondex-v1.20.39-talent-point-source-decision';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.38-talent-state-contract-consolidation';
+const BUILD_QS = '1.20.39-talent-point-source-decision';
 const ASSETS = [
   './',
   './index.html',

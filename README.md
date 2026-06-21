@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.38**
+Current baseline: **DungeonDex v1.20.39**
 
 ## Current Build
 
-**v1.20.38 - Talent State Contract Consolidation**
+**v1.20.39 - Talent Point Source Decision**
 
-This patch consolidates the canonical Talent state vocabulary and keeps all point earning, spending, unlocks, and gameplay behavior disabled.
+This patch selects Boss Trophy Milestone as the first Talent point source and keeps point earning, spending, unlocks, and gameplay behavior disabled.
 
 ## Previous Build
 

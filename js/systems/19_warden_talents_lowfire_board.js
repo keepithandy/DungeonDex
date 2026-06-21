@@ -685,6 +685,49 @@
     });
   }
 
+  function talentPointSourceDecision(){
+    return Object.freeze({
+      selectedSource: 'boss_trophy_milestone',
+      label: 'Boss Trophy Milestone',
+      status: 'planned',
+      awardsPoints: false,
+      mutatesSave: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresSpendPath: true,
+      rationale: Object.freeze([
+        'Boss victories align with DungeonDex depth progression.',
+        'Trophy records already represent durable boss progress.',
+        'Milestone-based points avoid generic XP grind.',
+        'The source can be smoke-tested before live awards.'
+      ]),
+      rejectedAlternatives: Object.freeze([
+        Object.freeze({
+          source: 'floor_milestone',
+          reason: 'Deferred because floor progress is broader and could become grind-like before Talent spending is proven.'
+        }),
+        Object.freeze({
+          source: 'major_archive_milestone',
+          reason: 'Deferred because Archive identity is better as secondary progression after Boss Trophy earning is stable.'
+        })
+      ])
+    });
+  }
+
+  function talentPointSourceDecisionSummary(){
+    const decision = talentPointSourceDecision();
+    return Object.freeze({
+      selectedSource: decision.selectedSource,
+      label: decision.label,
+      status: decision.status,
+      awardsPoints: decision.awardsPoints,
+      mutatesSave: decision.mutatesSave,
+      grantsCurrency: decision.grantsCurrency,
+      enablesSpending: decision.enablesSpending,
+      requiresSpendPath: decision.requiresSpendPath
+    });
+  }
+
   // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
@@ -1617,6 +1660,8 @@
     earningSourceContract: talentEarningSourceContract,
     earningEnabled: talentEarningEnabled,
     earningStatus: talentEarningStatus,
+    talentPointSourceDecision,
+    talentPointSourceDecisionSummary,
     detectBossMilestones,
     detectDepthMilestones,
     getAllReachedMilestones,
