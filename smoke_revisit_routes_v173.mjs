@@ -21,6 +21,26 @@ const runtimeErrors = [];
 
 function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 function record(name, ok, detail = ''){ results.push({ name, ok: !!ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`); }
+async function waitForProcessExit(child, timeoutMs = 5000){
+  if (!child || child.exitCode !== null || child.signalCode !== null) return true;
+  return await new Promise(resolve => {
+    const onExit = () => { clearTimeout(timer); resolve(true); };
+    const timer = setTimeout(() => { child.off('exit', onExit); resolve(false); }, timeoutMs);
+    child.once('exit', onExit);
+  });
+}
+async function removeTempProfile(userDataDir, attempts = 8){
+  const retryable = new Set(['EBUSY', 'EPERM', 'ENOTEMPTY']);
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      await rm(userDataDir, { recursive:true, force:true });
+      return;
+    } catch (err) {
+      if (!retryable.has(err?.code) || attempt === attempts) throw err;
+      await sleep(attempt * 100);
+    }
+  }
+}
 async function pickPort(){ return await new Promise((resolve, reject) => { const server = net.createServer(); server.on('error', reject); server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(err => err ? reject(err) : resolve(port)); }); }); }
 function safePathFromUrl(urlPath){ const clean = decodeURIComponent(String(urlPath || '/').split('?')[0] || '/'); const rel = clean === '/' ? '/index.html' : clean; const resolved = path.resolve(ROOT, `.${rel}`); if (!resolved.startsWith(ROOT)) throw new Error('path outside root'); return resolved; }
 function mimeType(filePath){ const ext = path.extname(filePath).toLowerCase(); if (ext === '.html') return 'text/html; charset=utf-8'; if (ext === '.js' || ext === '.mjs') return 'application/javascript; charset=utf-8'; if (ext === '.css') return 'text/css; charset=utf-8'; if (ext === '.json') return 'application/json; charset=utf-8'; return 'application/octet-stream'; }
@@ -66,12 +86,18 @@ async function main(){
     record('Revisit helpers do not mutate state', audit.before === audit.after, JSON.stringify({ before:audit.before, after:audit.after }));
     record('Revisit town slot has no route controls', audit.routeButtons.length === 0 && audit.routeAttrs === 0, JSON.stringify({ routeButtons:audit.routeButtons, routeAttrs:audit.routeAttrs }));
     record('Primary dungeon entry path remains visible', audit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(audit.townButtons));
-    record('Revisit UI still shows locked planning copy', /Planned Return Routes/i.test(audit.text) && /Route access is unavailable/i.test(audit.text), JSON.stringify(audit.text.slice(0, 500)));
+    record('Revisit foundation slot remains empty', audit.text.trim() === '', JSON.stringify(audit.text.slice(0, 500)));
     record('No console or runtime errors', consoleErrors.length === 0 && runtimeErrors.length === 0, JSON.stringify({ consoleErrors, runtimeErrors }));
   } finally {
-    if (client) client.close();
-    chrome.kill();
-    await rm(userDataDir, { recursive:true, force:true });
+    if (client) {
+      try { await client.send('Browser.close'); } catch {}
+      client.close();
+    }
+    if (!await waitForProcessExit(chrome, 3000)) {
+      chrome.kill();
+      await waitForProcessExit(chrome, 3000);
+    }
+    await removeTempProfile(userDataDir);
     await new Promise(resolve => server.server.close(resolve));
   }
   const failed = results.filter(result => !result.ok);

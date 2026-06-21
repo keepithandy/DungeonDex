@@ -2349,15 +2349,6 @@
       revisitTrophyEchoRouteDetail(state = S) {
         return revisitTrophyEchoRouteDetail(state);
       },
-      canStartRevisitRoute(state = S, routeKey = '') {
-        return canStartRevisitRoute(state, routeKey);
-      },
-      startRevisitRoute(state = S, routeKey = '') {
-        return startRevisitRoute(state, routeKey);
-      },
-      activeRevisitRouteSummary(state = S) {
-        return activeRevisitRouteSummary(state);
-      },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;
         if (typeof recoverRunToTown === 'function') recoverRunToTown(state, 'Death reset your descent. Charters can reopen deeper stairs.');
