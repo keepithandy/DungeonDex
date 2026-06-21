@@ -2,9 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.39**
+Current baseline: **DungeonDex v1.20.40**
 
 ## Current Build
+
+**v1.20.40 - Talent Point Award Contract Dry Run**
+
+This patch adds a read-only Boss Trophy Milestone award eligibility preview. It does not award points, add claim tracking, enable spending, or add Talent unlock UI.
+
+## Previous Build
 
 **v1.20.39 - Talent Point Source Decision**
 

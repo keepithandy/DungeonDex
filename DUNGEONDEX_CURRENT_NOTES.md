@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.39 - Talent Point Source Decision
+- DungeonDex v1.20.40 - Talent Point Award Contract Dry Run
+
+## v1.20.40 Talent Point Award Contract Dry Run
+- Current baseline: v1.20.40.
+- Added a read-only Boss Trophy Milestone award preview based only on valid existing boss trophy IDs or boss trophy records.
+- The preview amount is one future point; no points are awarded and no save state is mutated.
+- Claim tracking, spending, and Talent unlock UI remain unimplemented.
+- Future live earning still needs the exact boss trigger, award amount confirmation, duplicate-award prevention, claim-tracking migration, award mutation, spend path, UI affordance, and smoke coverage.
 
 ## v1.20.39 Talent Point Source Decision
 - Current baseline: v1.20.39.

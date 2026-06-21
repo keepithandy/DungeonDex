@@ -679,20 +679,44 @@ async function main() {
     const talentStateContractAudit = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       const beforeLedger = JSON.stringify(S.player?.talentLedger || null);
+      const beforeState = JSON.stringify(S);
       const learnedDebt = { player: { talentLearnedIds: { debt_collector_clarity: true }, talentUnlockIds: ['debt_collector_clarity'] } };
       const lockedDebt = { player: { talentLearnedIds: {}, talentUnlockIds: [] } };
       const decision = typeof api?.talentPointSourceDecision === 'function' ? api.talentPointSourceDecision(S) : null;
       const decisionSummary = typeof api?.talentPointSourceDecisionSummary === 'function' ? api.talentPointSourceDecisionSummary(S) : null;
+      const awardPreview = typeof api?.talentPointAwardPreview === 'function' ? api.talentPointAwardPreview(S) : null;
+      const awardPreviewSummary = typeof api?.talentPointAwardPreviewSummary === 'function' ? api.talentPointAwardPreviewSummary(S) : null;
+      const eligibleAwardPreview = typeof api?.talentPointAwardPreview === 'function'
+        ? api.talentPointAwardPreview({ player: { bossTrophies: ['first_boss_trophy'], bossTrophyRecords: [] } })
+        : null;
+      const safeAwardPreviews = typeof api?.talentPointAwardPreview === 'function'
+        ? [
+          api.talentPointAwardPreview(),
+          api.talentPointAwardPreview(null),
+          api.talentPointAwardPreview('malformed'),
+          api.talentPointAwardPreview({ player: null }),
+          api.talentPointAwardPreview({ player: { bossTrophies: [null, '', {}], bossTrophyRecords: [null, {}, 'bad'] } })
+        ]
+        : [];
       const previewNode = api?.talentNodeStateContract ? api.talentNodeStateContract('preview_only_probe', { player: {} }, { previewOnly: true }) : null;
       const afterLedger = JSON.stringify(S.player?.talentLedger || null);
+      const afterState = JSON.stringify(S);
       return {
         hasHelper: typeof api?.talentNodeStateContract === 'function',
         hasPointSourceDecision: typeof api?.talentPointSourceDecision === 'function',
         hasPointSourceDecisionSummary: typeof api?.talentPointSourceDecisionSummary === 'function',
+        hasPointAwardPreview: typeof api?.talentPointAwardPreview === 'function',
+        hasPointAwardPreviewSummary: typeof api?.talentPointAwardPreviewSummary === 'function',
         beforeLedger,
         afterLedger,
+        beforeState,
+        afterState,
         decision,
         decisionSummary,
+        awardPreview,
+        awardPreviewSummary,
+        eligibleAwardPreview,
+        safeAwardPreviews,
         learnedDebt: api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(learnedDebt) : null,
         lockedDebt: api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(lockedDebt) : null,
         previewNode,
@@ -1194,6 +1218,9 @@ async function main() {
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     record('Talent point source decision is boss trophy milestone and read-only', talentStateContractAudit?.hasPointSourceDecision === true && talentStateContractAudit?.hasPointSourceDecisionSummary === true && talentStateContractAudit?.decision?.selectedSource === 'boss_trophy_milestone' && talentStateContractAudit?.decision?.label === 'Boss Trophy Milestone' && talentStateContractAudit?.decision?.status === 'planned' && talentStateContractAudit?.decision?.awardsPoints === false && talentStateContractAudit?.decision?.mutatesSave === false && talentStateContractAudit?.decision?.grantsCurrency === false && talentStateContractAudit?.decision?.enablesSpending === false && talentStateContractAudit?.decision?.requiresSpendPath === true && Array.isArray(talentStateContractAudit?.decision?.rationale) && talentStateContractAudit.decision.rationale.length === 4 && Array.isArray(talentStateContractAudit?.decision?.rejectedAlternatives) && talentStateContractAudit.decision.rejectedAlternatives.length === 2 && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger, JSON.stringify(talentStateContractAudit?.decision));
+    record('Talent point award preview is read-only and award-disabled', talentStateContractAudit?.hasPointAwardPreview === true && talentStateContractAudit?.hasPointAwardPreviewSummary === true && talentStateContractAudit?.awardPreview?.source === 'boss_trophy_milestone' && talentStateContractAudit?.awardPreview?.status === 'preview' && talentStateContractAudit?.awardPreview?.amountPreview === 1 && talentStateContractAudit?.awardPreview?.alreadyClaimed === false && talentStateContractAudit?.awardPreview?.claimTrackingReady === false && talentStateContractAudit?.awardPreview?.claimKey === 'boss_trophy_milestone:first_award' && talentStateContractAudit?.awardPreview?.awardsPoints === false && talentStateContractAudit?.awardPreview?.mutatesSave === false && talentStateContractAudit?.awardPreview?.grantsCurrency === false && talentStateContractAudit?.awardPreview?.enablesSpending === false && talentStateContractAudit?.awardPreview?.requiresLiveAwardPatch === true && talentStateContractAudit?.awardPreview?.requiresClaimTrackingPatch === true && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger && talentStateContractAudit?.beforeState === talentStateContractAudit?.afterState, JSON.stringify(talentStateContractAudit?.awardPreview));
+    record('Talent point award preview detects only valid trophy evidence', talentStateContractAudit?.eligibleAwardPreview?.eligible === true && Array.isArray(talentStateContractAudit?.eligibleAwardPreview?.evidence) && talentStateContractAudit.eligibleAwardPreview.evidence.some(entry => entry?.source === 'bossTrophies' && entry?.count === 1), JSON.stringify(talentStateContractAudit?.eligibleAwardPreview));
+    record('Talent point award preview has stable malformed-state fallback', Array.isArray(talentStateContractAudit?.safeAwardPreviews) && talentStateContractAudit.safeAwardPreviews.length === 5 && talentStateContractAudit.safeAwardPreviews.every(preview => preview?.source === 'boss_trophy_milestone' && preview?.status === 'preview' && preview?.eligible === false && preview?.amountPreview === 1 && preview?.awardsPoints === false && preview?.mutatesSave === false && preview?.requiresLiveAwardPatch === true && preview?.requiresClaimTrackingPatch === true && Array.isArray(preview?.evidence) && preview.evidence.length === 0), JSON.stringify(talentStateContractAudit?.safeAwardPreviews));
     record('Canonical talent state contract helper exists', talentStateContractAudit?.hasHelper === true && talentStateContractAudit?.learnedDebt?.learned === true && talentStateContractAudit?.learnedDebt?.passiveReady === true && talentStateContractAudit?.learnedDebt?.passiveEnabled === true && talentStateContractAudit?.learnedDebt?.liveRendererWired === true && talentStateContractAudit?.learnedDebt?.appliesEffect === false && talentStateContractAudit?.learnedDebt?.mutatesSave === false && talentStateContractAudit?.lockedDebt?.learned === false && talentStateContractAudit?.lockedDebt?.passiveReady === false && talentStateContractAudit?.lockedDebt?.passiveEnabled === false && talentStateContractAudit?.lockedDebt?.liveRendererWired === false && talentStateContractAudit?.lockedDebt?.appliesEffect === false && talentStateContractAudit?.lockedDebt?.mutatesSave === false && talentStateContractAudit?.previewNode?.previewOnly === true && talentStateContractAudit?.previewNode?.selectable === false && talentStateContractAudit?.previewNode?.selected === false && talentStateContractAudit?.previewNode?.learned === false && talentStateContractAudit?.previewNode?.passiveReady === false && talentStateContractAudit?.previewNode?.passiveEnabled === false && talentStateContractAudit?.previewNode?.appliesEffect === false && talentStateContractAudit?.previewNode?.liveRendererWired === false && talentStateContractAudit?.previewNode?.mutatesSave === false, JSON.stringify(talentStateContractAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));

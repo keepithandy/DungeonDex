@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.39`
-* Current local package baseline: `v1.20.39`
-* Current development target: `v1.20.39`
+* Public/live itch version: `v1.20.40`
+* Current local package baseline: `v1.20.40`
+* Current development target: `v1.20.40`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.40 - Talent Point Award Contract Dry Run
+
+* Added a read-only Boss Trophy Milestone award preview that reports eligibility from valid existing boss trophy IDs or boss trophy records.
+* Previewed one future point while keeping awards, claim tracking, spending, unlock UI, and save mutation disabled.
+* Added smoke coverage for malformed state, serialized-state stability, existing Talent contracts, Debt clarity, and Revisit lockdown.
 
 ## v1.20.39 - Talent Point Source Decision
 

@@ -728,6 +728,65 @@
     });
   }
 
+  function talentPointAwardPreview(state){
+    const player = state && typeof state === 'object' && !Array.isArray(state)
+      && state.player && typeof state.player === 'object' && !Array.isArray(state.player)
+      ? state.player
+      : {};
+    const bossTrophyIds = Array.isArray(player.bossTrophies)
+      ? player.bossTrophies.filter(id => typeof id === 'string' && id.trim()).length
+      : 0;
+    const bossTrophyRecords = Array.isArray(player.bossTrophyRecords)
+      ? player.bossTrophyRecords.filter(record => {
+        if (!record || typeof record !== 'object' || Array.isArray(record)) return false;
+        return [record.id, record.trophyId, record.bossId, record.bossName]
+          .some(value => typeof value === 'string' && value.trim());
+      }).length
+      : 0;
+    const evidence = [];
+    if (bossTrophyIds > 0) evidence.push(Object.freeze({ source: 'bossTrophies', count: bossTrophyIds }));
+    if (bossTrophyRecords > 0) evidence.push(Object.freeze({ source: 'bossTrophyRecords', count: bossTrophyRecords }));
+    const eligible = evidence.length > 0;
+    return Object.freeze({
+      source: 'boss_trophy_milestone',
+      label: 'Boss Trophy Milestone',
+      status: 'preview',
+      eligible,
+      amountPreview: 1,
+      alreadyClaimed: false,
+      claimTrackingReady: false,
+      claimKey: 'boss_trophy_milestone:first_award',
+      awardsPoints: false,
+      mutatesSave: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresLiveAwardPatch: true,
+      requiresClaimTrackingPatch: true,
+      evidence: Object.freeze(evidence),
+      notes: Object.freeze([
+        eligible
+          ? 'Existing boss trophy records support preview eligibility.'
+          : 'No valid boss trophy or boss record evidence is available.',
+        'Claim tracking and live point awards are not implemented.'
+      ])
+    });
+  }
+
+  function talentPointAwardPreviewSummary(state){
+    const preview = talentPointAwardPreview(state);
+    return Object.freeze({
+      source: preview.source,
+      label: preview.label,
+      status: preview.status,
+      eligible: preview.eligible,
+      amountPreview: preview.amountPreview,
+      awardsPoints: preview.awardsPoints,
+      mutatesSave: preview.mutatesSave,
+      requiresLiveAwardPatch: preview.requiresLiveAwardPatch,
+      requiresClaimTrackingPatch: preview.requiresClaimTrackingPatch
+    });
+  }
+
   // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
@@ -1662,6 +1721,8 @@
     earningStatus: talentEarningStatus,
     talentPointSourceDecision,
     talentPointSourceDecisionSummary,
+    talentPointAwardPreview,
+    talentPointAwardPreviewSummary,
     detectBossMilestones,
     detectDepthMilestones,
     getAllReachedMilestones,

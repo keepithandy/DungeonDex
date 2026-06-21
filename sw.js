@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.39-talent-point-source-decision';
+const CACHE_NAME = 'dungeondex-v1.20.40-talent-point-award-preview';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.39-talent-point-source-decision';
+const BUILD_QS = '1.20.40-talent-point-award-preview';
 const ASSETS = [
   './',
   './index.html',
