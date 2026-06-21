@@ -668,20 +668,23 @@
     return result;
   }
 
+  // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
     const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
     const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
     const passiveEnabled = learned;
     return {
+      contractOwner: 'DungeonDexTalents',
       nodeKey: resolvedNodeKey,
       learned,
       passiveReady: learned,
       passiveEnabled,
+      liveRendererWired: true,
       effectKey: 'hunter_board_clarity_display_copy',
       affectedSurface: 'Elite Board display copy only',
       mutatesSave: false,
-      appliesEffect: passiveEnabled,
+      appliesEffect: false,
       combat: false,
       economy: false,
       rewards: false,
@@ -699,16 +702,17 @@
     const resolvedNodeKey = 'debt_collector_clarity';
     const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
     const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
-    const passiveEnabled = learned;
     return {
+      contractOwner: 'DungeonDexTalents',
       nodeKey: resolvedNodeKey,
       learned,
       passiveReady: learned,
-      passiveEnabled,
+      passiveEnabled: false,
+      liveRendererWired: false,
       effectKey: 'debt_collector_clarity_display_copy',
       affectedSurface: 'Debt Collector display copy only',
       mutatesSave: false,
-      appliesEffect: passiveEnabled,
+      appliesEffect: false,
       combat: false,
       economy: false,
       rewards: false,
@@ -733,7 +737,8 @@
         contractSmoked: true,
         displayCopyDefined: true,
         displayCopySurface: 'Elite Board summary only',
-        passiveEnabled: true,
+        passiveReady: hunter.passiveReady,
+        passiveEnabled: hunter.passiveEnabled,
         activationStatus: 'live (copy-only)',
         saveMutation: false,
         gameplayEffect: false,
@@ -752,9 +757,10 @@
         contractDefined: true,
         contractSmoked: true,
         displayCopyDefined: true,
-        displayCopySurface: 'None (inactive)',
-        passiveEnabled: false,
-        activationStatus: 'locked (contract only)',
+        displayCopySurface: 'Debt Collector preview helper only',
+        passiveReady: debt.passiveReady,
+        passiveEnabled: debt.passiveEnabled,
+        activationStatus: 'preview-ready when learned; live renderer locked',
         saveMutation: false,
         gameplayEffect: false,
         blockedSystems: [
@@ -807,7 +813,6 @@
         nodeKey: 'hunter_board_clarity',
         label: 'Board Clarity',
         contract: hunterBoardClarityPassiveContract(state),
-        liveRendererWired: true,
         activationBlockedReason: 'Further activation is blocked; the existing Elite Board renderer remains copy-only.',
         requiredFutureSteps: [
           'Explicitly authorize any future copy-only activation change.',
@@ -818,7 +823,6 @@
         nodeKey: 'debt_collector_clarity',
         label: 'Debt Collector Clarity',
         contract: debtCollectorClarityPassiveContract(state),
-        liveRendererWired: false,
         activationBlockedReason: 'Activation is blocked by missing live Debt Collector renderer wiring; the renderer surface remains inactive.',
         requiredFutureSteps: [
           'Explicitly authorize live Debt Collector display-copy wiring.',
@@ -833,7 +837,7 @@
         && readinessEntry.contractDefined === true
         && readinessEntry.displayCopyDefined === true
         && readinessEntry.contractSmoked === true
-        && definition.liveRendererWired === true
+        && definition.contract.liveRendererWired === true
         && allowedSurface === 'display-copy only'
         && blockedSystems.length === 11
         && readinessEntry.saveMutation === false
@@ -848,7 +852,7 @@
         learned: definition.contract.learned === true,
         passiveReady: definition.contract.passiveReady === true,
         passiveEnabled: definition.contract.passiveEnabled === true,
-        liveRendererWired: definition.liveRendererWired,
+        liveRendererWired: definition.contract.liveRendererWired === true,
         canActivateNow: safetyGatesSatisfied && activationPolicyEnabled,
         activationBlockedReason: definition.activationBlockedReason,
         requiredFutureSteps: Object.freeze(definition.requiredFutureSteps.slice()),
@@ -892,7 +896,7 @@
     const copy = debtCardOrCopy && typeof debtCardOrCopy === 'object' && !Array.isArray(debtCardOrCopy)
       ? {...debtCardOrCopy}
       : { text: String(debtCardOrCopy || '') };
-    if (!passiveContract.passiveEnabled) return copy;
+    if (!passiveContract.passiveReady) return copy;
     const status = copy.statusLabel || copy.status || copy.state || copy.summary || '';
     const owed = copy.balanceLabel || copy.balanceText || copy.amountOwed || copy.balance || '';
     const pressure = copy.pressureLabel || copy.pressureText || copy.pressure || '';

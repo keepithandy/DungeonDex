@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.32 - Passive Activation Gate Dry Run
+- DungeonDex v1.20.34 - Passive Renderer Contract Alignment
+
+## v1.20.34 Passive Renderer Contract Alignment
+- Current baseline: v1.20.34.
+- `DungeonDexTalents` is the canonical owner of Debt Collector clarity contract and display-copy helper behavior; the Debt Collector API delegates to it.
+- `passiveReady` means learned and eligible for read-only preview copy. `passiveEnabled` means consumed by a live renderer. `appliesEffect` is reserved for gameplay/state changes. `liveRendererWired` means intentional live renderer integration.
+- Learned Debt Collector clarity is preview-ready, but `passiveEnabled`, `appliesEffect`, and `liveRendererWired` remain false.
+- Hunter Board clarity remains on its existing live copy-only surface with no gameplay effect.
+- No Debt Collector renderer wiring, debt math, economy, combat, rewards, progression, Talent actions, save shape, or Revisit behavior changed.
 
 ## v1.20.32 Passive Activation Gate Dry Run
 - Current baseline: v1.20.32.

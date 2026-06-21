@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.33`
-* Current local package baseline: `v1.20.33`
-* Current development target: `v1.20.33`
+* Public/live itch version: `v1.20.34`
+* Current local package baseline: `v1.20.34`
+* Current development target: `v1.20.34`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.20.34 - Passive Renderer Contract Alignment
+
+* Made `DungeonDexTalents` the canonical owner of Debt Collector clarity contract and copy-helper behavior.
+* Defined `passiveReady` as learned/preview eligibility, `passiveEnabled` as live renderer consumption, `appliesEffect` as gameplay mutation, and `liveRendererWired` as intentional renderer integration.
+* Kept Debt Collector clarity preview-ready when learned while `passiveEnabled`, `appliesEffect`, and `liveRendererWired` remain false.
+* Added cross-API smoke coverage proving the Debt Collector public helpers exactly delegate to the canonical Talent output without changing wallet, balance, pressure, repayment, or save state.
+* Preserved Hunter Board copy behavior, the v1.20.32 activation gate, Revisit lockdown, and all gameplay systems.
 
 ---
 

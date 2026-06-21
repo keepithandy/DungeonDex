@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.33-revisit-activation-surface-lockdown';
+const CACHE_NAME = 'dungeondex-v1.20.34-passive-renderer-contract-alignment';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.33-revisit-activation-surface-lockdown';
+const BUILD_QS = '1.20.34-passive-renderer-contract-alignment';
 const ASSETS = [
   './',
   './index.html',

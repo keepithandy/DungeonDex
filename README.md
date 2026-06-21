@@ -2,9 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.33**
+Current baseline: **DungeonDex v1.20.34**
 
 ## Current Build
+
+**v1.20.34 - Passive Renderer Contract Alignment**
+
+This patch makes the Talent module the canonical owner of passive clarity metadata and Debt Collector clarity copy helpers. Debt clarity can be preview-ready when learned, but remains disabled, gameplay-inert, and absent from the live renderer.
+
+## Previous Build
 
 **v1.20.33 - Revisit Activation Surface Lockdown**
 
