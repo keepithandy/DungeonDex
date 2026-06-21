@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.40-talent-point-award-preview';
+const CACHE_NAME = 'dungeondex-v1.20.41-talent-claim-tracking-plan';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.40-talent-point-award-preview';
+const BUILD_QS = '1.20.41-talent-claim-tracking-plan';
 const ASSETS = [
   './',
   './index.html',

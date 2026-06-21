@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.40`
-* Current local package baseline: `v1.20.40`
-* Current development target: `v1.20.40`
+* Public/live itch version: `v1.20.41`
+* Current local package baseline: `v1.20.41`
+* Current development target: `v1.20.41`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.41 - Talent Award Claim Tracking Plan
+
+* Defined a read-only future claim model at `player.talentLedger.awardClaims` using deterministic `boss_trophy_milestone:{bossTrophyId}` keys.
+* Documented the proposed claim record, duplicate-prevention rules, save-repair requirement, and atomic future award requirement.
+* Added no claim save shape, point mutation, spending path, unlock UI, or gameplay behavior.
 
 ## v1.20.40 - Talent Point Award Contract Dry Run
 

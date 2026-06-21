@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.40 - Talent Point Award Contract Dry Run
+- DungeonDex v1.20.41 - Talent Award Claim Tracking Plan
+
+## v1.20.41 Talent Award Claim Tracking Plan
+- Current baseline: v1.20.41.
+- Planned claim tracking belongs at `player.talentLedger.awardClaims` with deterministic `boss_trophy_milestone:{bossTrophyId}` keys.
+- The proposed record stores key, source, trophy source ID, one-point amount, claim timestamp, and schema version.
+- No claim tracking is added to save state, no points are awarded, and no spending or Talent unlock UI is introduced.
+- Future live earning still needs claim repair/migration, key generation from actual trophy evidence, atomic point-and-claim mutation, a spend path, UI affordance, and duplicate-prevention smoke coverage.
 
 ## v1.20.40 Talent Point Award Contract Dry Run
 - Current baseline: v1.20.40.

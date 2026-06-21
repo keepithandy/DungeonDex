@@ -787,6 +787,54 @@
     });
   }
 
+  function talentAwardClaimTrackingPlan(){
+    return Object.freeze({
+      source: 'boss_trophy_milestone',
+      label: 'Boss Trophy Milestone',
+      status: 'planned',
+      claimTrackingReady: false,
+      currentSaveShapeAddsClaimTracking: false,
+      currentPatchMutatesSave: false,
+      plannedClaimPath: 'player.talentLedger.awardClaims',
+      plannedClaimKeyPattern: 'boss_trophy_milestone:{bossTrophyId}',
+      firstPreviewClaimKey: 'boss_trophy_milestone:first_award',
+      duplicatePreventionRequired: true,
+      requiresSaveRepairPatch: true,
+      requiresLiveAwardPatch: true,
+      requiresSpendPathPatch: true,
+      proposedClaimRecordShape: Object.freeze({
+        key: 'boss_trophy_milestone:{bossTrophyId}',
+        source: 'boss_trophy_milestone',
+        sourceId: '{bossTrophyId}',
+        amount: 1,
+        claimedAt: 'ISO timestamp when future live award occurs',
+        version: 1
+      }),
+      rules: Object.freeze([
+        'A Boss Trophy Milestone award may be claimed only once per claim key.',
+        'The claim key must be deterministic.',
+        'The claim key must be derived from existing trophy or boss record evidence.',
+        'The future live award patch must record the claim and award points in the same controlled mutation path.',
+        'Malformed or missing claim tracking must repair to a safe empty structure before live awards are enabled.'
+      ]),
+      notes: Object.freeze([])
+    });
+  }
+
+  function talentAwardClaimTrackingPlanSummary(){
+    const plan = talentAwardClaimTrackingPlan();
+    return Object.freeze({
+      source: plan.source,
+      label: plan.label,
+      status: plan.status,
+      claimTrackingReady: plan.claimTrackingReady,
+      plannedClaimPath: plan.plannedClaimPath,
+      plannedClaimKeyPattern: plan.plannedClaimKeyPattern,
+      duplicatePreventionRequired: plan.duplicatePreventionRequired,
+      currentPatchMutatesSave: plan.currentPatchMutatesSave
+    });
+  }
+
   // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
@@ -1723,6 +1771,8 @@
     talentPointSourceDecisionSummary,
     talentPointAwardPreview,
     talentPointAwardPreviewSummary,
+    talentAwardClaimTrackingPlan,
+    talentAwardClaimTrackingPlanSummary,
     detectBossMilestones,
     detectDepthMilestones,
     getAllReachedMilestones,
