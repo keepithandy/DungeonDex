@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.36**
+Current baseline: **DungeonDex v1.20.37**
 
 ## Current Build
 
-**v1.20.36 - Live Debt Clarity Renderer Wiring**
+**v1.20.37 - Build Query Label Uniformity Cleanup**
 
-This patch wires the existing Debt clarity renderer copy model into the live Debt panel in a text-only way. Learned Debt now uses the renderer-shaped copy fields for the live summary, status, owed, pressure, flavor, terms, and metadata fragments while preserving the unlearned panel output and keeping gameplay state unchanged.
+This patch standardizes runtime-visible and cache-facing build labels on `v1.20.37` without changing gameplay, rendering logic, debt behavior, or save shape.
 
 ## Previous Build
 

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.36-live-debt-clarity-renderer-wiring';
+const CACHE_NAME = 'dungeondex-v1.20.37-build-query-label-uniformity-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.36-live-debt-clarity-renderer-wiring';
+const BUILD_QS = '1.20.37-build-query-label-uniformity-cleanup';
 const ASSETS = [
   './',
   './index.html',
