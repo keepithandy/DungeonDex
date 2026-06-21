@@ -2,9 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.32**
+Current baseline: **DungeonDex v1.20.33**
 
 ## Current Build
+
+**v1.20.33 - Revisit Activation Surface Lockdown**
+
+This patch fully de-exports dormant Revisit start/active-summary surfaces from the public Elite Contracts API and adds a read-only lockdown report. Revisit remains planning-only; Enter Dungeon / Continue Run remains the only active dungeon entry path.
+
+## Previous Build
 
 **v1.20.32 - Passive Activation Gate Dry Run**
 
@@ -109,6 +115,7 @@ Implemented so far:
 * `revisitSecondActivationLane(state)`
 * `revisitTrophyEchoRulePlan(state)`
 * `revisitTrophyEchoRuleSummary(state)`
+* `revisitActivationSurfaceLockdownReport(state)`
 
 Current rule:
 
@@ -117,88 +124,3 @@ Current rule:
 Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
 ## Monster Backdrop Status
-
-The monster backdrop system is currently complete as a visual-only canvas layer.
-
-Implemented so far:
-
-* `generateMonsterBackdrop(monster, state, options)`
-* `renderMonsterBackdrop(canvas, backdrop)`
-* `attachMonsterBackdropCanvas()`
-* `monsterBackdropCatalog()`
-* `monsterBackdropDiagnostics()`
-* `window.DDMonsterBackdropCanvas`
-* `smoke_monster_backdrops_v120.mjs`
-
-Current rule:
-
-> Monster backdrops are presentation only.
-
-The canvas renderer mounts behind `.combat-monster-stage`, uses deterministic seeds, maps monster/district/depth identity into themed scenery, reacts to stage resize dimensions, and exposes no route entry, reward, scaling, damage, HP, or combat hook behavior. No Three.js dependency is used.
-
-## Running Locally
-
-DungeonDex is a static browser project.
-
-```powershell
-python -m http.server 8000
-```
-
-Open:
-
-```text
-http://localhost:8000
-```
-
-## Validation
-
-Common validation commands used during development:
-
-```powershell
-node --check app.js
-node --check sw.js
-node --check smoke_talent_v150b.mjs
-node --check smoke_debt_collector_v169.mjs
-node --check smoke_revisit_routes_v173.mjs
-node --check smoke_monster_backdrops_v120.mjs
-node --check js/systems/29_monster_backdrops_canvas.js
-git diff --check
-node .\smoke_talent_v150b.mjs
-node .\smoke_debt_collector_v169.mjs
-node .\smoke_revisit_routes_v173.mjs
-node .\smoke_monster_backdrops_v120.mjs
-```
-
-## Current Roadmap Direction
-
-Current focus is safe foundation work. The locked foundations stay in place:
-
-* Talent Tree Preview and Talent Ledger remain locked and read-only.
-* Revisit Routes remain preview/planning only, with Trophy Echo first, Famous Gear Memory second, and Rival Trace third as named rival elite memory only.
-* Debt Collector remains a visibility and ledger layer only.
-* Elite Board remains the optional challenge layer.
-* Boss Trophy, Archive, and Famous Gear memory remain display-focused.
-* Monster backdrops remain visual-only and canvas-based.
-
-Candidate next lanes:
-
-1. Monster backdrop visual QA / mobile polish
-2. Monster Codex / monster identity expansion planning
-3. Revisit route activation implementation, later
-4. Talent foundation next-step planning
-5. Archive / Famous Gear memory polish
-6. Elite Board clarity polish
-
-Recommended next lane:
-
-**Monster backdrop visual QA** is the next visual lane to evaluate, while Revisit route activation should stay planning-only until explicitly approved.
-
-## Project Status
-
-DungeonDex is an active work-in-progress. Systems are being built in small, validated patches with a strong preference for safe, reviewable commits.
-
-## License
-
-No public license has been selected yet.
-
-Until a license is added, all rights are reserved by the project owner. Public visibility on GitHub does not automatically grant reuse rights.
