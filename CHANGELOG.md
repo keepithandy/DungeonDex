@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.32`
-* Current local package baseline: `v1.20.32`
-* Current development target: `v1.20.32`
+* Public/live itch version: `v1.20.33`
+* Current local package baseline: `v1.20.33`
+* Current development target: `v1.20.33`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.20.33 - Revisit Activation Surface Lockdown
+
+* Added `31_revisit_activation_surface_lockdown.js` to fully de-export dormant Revisit start/active-summary API surfaces from `window.DungeonDexEliteContracts`.
+* Added a read-only `revisitActivationSurfaceLockdownReport(state)` inspection helper that reports forbidden exports removed, no live entry, no rewards, no completion, no mutation, and the preserved primary path.
+* Kept all existing Revisit previews, summaries, unlock gates, lane metadata, and route-planning diagnostics intact.
+* Preserved save shape, combat, economy, gear, monsters, rewards, dungeon progression, Talent activation, Debt Collector renderer wiring, and Revisit playability lockout.
 
 ---
 

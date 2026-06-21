@@ -33,6 +33,7 @@ It preserves classic browser script load order instead of converting the game to
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
 - `30_passive_activation_gate_hotfix.js` — Passive activation gate verification hotfix.
+- `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 
 Notes:
 - `index.html` now loads these files directly in order.
