@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.32-passive-activation-gate-dry-run';
+const CACHE_NAME = 'dungeondex-v1.20.33-revisit-activation-surface-lockdown';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.32-passive-activation-gate-dry-run';
+const BUILD_QS = '1.20.33-revisit-activation-surface-lockdown';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   `./js/systems/01_state_recovery.js?build=${BUILD_QS}`,
   `./js/systems/02_currency_pending_rewards.js?build=${BUILD_QS}`,
   `./js/systems/03_town_contracts_market.js?build=${BUILD_QS}`,
+  `./js/systems/31_revisit_activation_surface_lockdown.js?build=${BUILD_QS}`,
   `./js/systems/04_depth_progression_charters.js?build=${BUILD_QS}`,
   `./js/systems/05_elite_modifiers.js?build=${BUILD_QS}`,
   `./js/systems/06_scaling_generation_audits.js?build=${BUILD_QS}`,
@@ -37,6 +38,7 @@ const ASSETS = [
   `./js/systems/25_town_wallet_chip_fix.js?build=${BUILD_QS}`,
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
+  `./js/systems/30_passive_activation_gate_hotfix.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
