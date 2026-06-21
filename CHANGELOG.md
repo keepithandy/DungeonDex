@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.34`
-* Current local package baseline: `v1.20.34`
-* Current development target: `v1.20.34`
+* Public/live itch version: `v1.20.35`
+* Current local package baseline: `v1.20.35`
+* Current development target: `v1.20.35`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.20.35 - Debt Clarity Renderer Copy-Model Dry Run
+
+* Added a Talent-owned `debtCollectorClarityRendererCopyModel(state, rendererCopy)` helper for renderer-shaped preview copy.
+* Added a Debt Collector source adapter matching the live panel's summary, status, owed, pressure, flavor, terms, and metadata fragments.
+* Learned preview copy improves summary and terms wording without nesting labels such as `Status: Debt status:` or `Pressure: Pressure`.
+* Added smoke coverage for exact learned/unlearned output, canonical delegation, live-panel stability, and unchanged wallet, balance, pressure, repayment, and save state.
+* Kept `passiveEnabled:false`, `appliesEffect:false`, `liveRendererWired:false`, and left `panelMarkup()` unchanged.
 
 ---
 

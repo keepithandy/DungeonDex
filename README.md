@@ -2,9 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.34**
+Current baseline: **DungeonDex v1.20.35**
 
 ## Current Build
+
+**v1.20.35 - Debt Clarity Renderer Copy-Model Dry Run**
+
+This patch adds a renderer-shaped, read-only Debt clarity copy model with nonredundant status, owed, pressure, summary, terms, and metadata fragments. The model remains dry-run only and is not consumed by the live Debt panel.
+
+## Previous Build
 
 **v1.20.34 - Passive Renderer Contract Alignment**
 

@@ -912,6 +912,22 @@
     return copy;
   }
 
+  function debtCollectorClarityRendererCopyModel(state, rendererCopy){
+    const passiveContract = debtCollectorClarityPassiveContract(state);
+    const copy = rendererCopy && typeof rendererCopy === 'object' && !Array.isArray(rendererCopy)
+      ? {...rendererCopy}
+      : {};
+    if (!passiveContract.passiveReady) return copy;
+    copy.summaryText = copy.active
+      ? 'Debt is active. Owed coin and pressure are shown below.'
+      : 'No debt is active. Nothing is owed and pressure is quiet.';
+    copy.termsText = 'Repayment uses purse coin. Pressure is informational only.';
+    copy.passiveSurface = 'Debt Collector renderer copy-model dry run';
+    copy.clarityApplied = true;
+    copy.previewOnly = true;
+    return copy;
+  }
+
   function calculatePendingTalentMilestoneAwards(state, enabledOverride = false){
     const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
     const zeroState = {
@@ -1596,6 +1612,7 @@
     applyHunterBoardClarityCopy,
     debtCollectorClarityPassiveContract,
     applyDebtCollectorClarityCopy,
+    debtCollectorClarityRendererCopyModel,
     readinessMatrix: talentPassiveActivationReadiness,
     readinessReport: state => {
       const matrix = talentPassiveActivationReadiness(state);

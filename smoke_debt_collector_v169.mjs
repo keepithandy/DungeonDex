@@ -239,7 +239,9 @@ async function main() {
       hasStatusLine: typeof window.DungeonDexDebtCollector?.debtCollectorStatusLine === 'function',
       hasFallback: typeof window.DungeonDexDebtCollector?.debtCollectorFallbackState === 'function',
       hasPassiveContract: typeof window.DungeonDexDebtCollector?.debtCollectorClarityPassiveContract === 'function',
-      hasPassiveCopy: typeof window.DungeonDexDebtCollector?.applyDebtCollectorClarityCopy === 'function'
+      hasPassiveCopy: typeof window.DungeonDexDebtCollector?.applyDebtCollectorClarityCopy === 'function',
+      hasRendererCopySource: typeof window.DungeonDexDebtCollector?.debtCollectorRendererCopySource === 'function',
+      hasRendererCopyModel: typeof window.DungeonDexDebtCollector?.debtCollectorClarityRendererCopyModel === 'function'
     }))()`));
     record('Debt display helpers exist', !!smoke?.summary && !!smoke?.pressure && typeof smoke?.statusLine === 'string' && debtHelperShape.hasSummary && debtHelperShape.hasPressure && debtHelperShape.hasStatusLine && debtHelperShape.hasFallback, JSON.stringify({ summary: smoke?.summary, pressure: smoke?.pressure, statusLine: smoke?.statusLine, debtHelperShape }));
 
@@ -270,6 +272,25 @@ async function main() {
       const canonicalLockedContract = canonical?.debtCollectorClarityPassiveContract ? canonical.debtCollectorClarityPassiveContract(lockedState) : null;
       const canonicalLearnedCopy = canonical?.applyDebtCollectorClarityCopy ? canonical.applyDebtCollectorClarityCopy(learnedState, source) : null;
       const canonicalLockedCopy = canonical?.applyDebtCollectorClarityCopy ? canonical.applyDebtCollectorClarityCopy(lockedState, source) : null;
+      const rendererLearnedState = {
+        player: {
+          gold: 875,
+          debtCollector: { active:true, balanceCopper:1500, pressure:3, lastVisitAt:'Test Visit', notes:['Test note'] },
+          talentLearnedIds: { debt_collector_clarity: true },
+          talentUnlockIds: ['debt_collector_clarity']
+        }
+      };
+      const rendererLockedState = JSON.parse(JSON.stringify(rendererLearnedState));
+      rendererLockedState.player.talentLearnedIds = {};
+      rendererLockedState.player.talentUnlockIds = [];
+      const rendererLearnedBefore = JSON.stringify(rendererLearnedState);
+      const rendererLockedBefore = JSON.stringify(rendererLockedState);
+      const rendererSource = api?.debtCollectorRendererCopySource ? api.debtCollectorRendererCopySource(rendererLearnedState) : null;
+      const learnedRendererModel = api?.debtCollectorClarityRendererCopyModel ? api.debtCollectorClarityRendererCopyModel(rendererLearnedState) : null;
+      const lockedRendererModel = api?.debtCollectorClarityRendererCopyModel ? api.debtCollectorClarityRendererCopyModel(rendererLockedState) : null;
+      const canonicalRendererModel = canonical?.debtCollectorClarityRendererCopyModel ? canonical.debtCollectorClarityRendererCopyModel(rendererLearnedState, rendererSource) : null;
+      const livePanelBefore = document.getElementById('debtCollectorPanel')?.innerHTML || '';
+      const livePanelAfter = document.getElementById('debtCollectorPanel')?.innerHTML || '';
       return {
         learnedContract,
         lockedContract,
@@ -279,6 +300,16 @@ async function main() {
         canonicalLockedContract,
         canonicalLearnedCopy,
         canonicalLockedCopy,
+        rendererSource,
+        learnedRendererModel,
+        lockedRendererModel,
+        canonicalRendererModel,
+        rendererLearnedBefore,
+        rendererLearnedAfter: JSON.stringify(rendererLearnedState),
+        rendererLockedBefore,
+        rendererLockedAfter: JSON.stringify(rendererLockedState),
+        livePanelBefore,
+        livePanelAfter,
         before,
         after: JSON.stringify(source),
         learnedStateBefore,
@@ -291,6 +322,13 @@ async function main() {
     record('Debt Collector clarity contract separates readiness from live activation', debtClarityAudit?.lockedContract?.learned === false && debtClarityAudit?.lockedContract?.passiveReady === false && debtClarityAudit?.lockedContract?.passiveEnabled === false && debtClarityAudit?.lockedContract?.appliesEffect === false && debtClarityAudit?.lockedContract?.liveRendererWired === false && debtClarityAudit?.learnedContract?.contractOwner === 'DungeonDexTalents' && debtClarityAudit?.learnedContract?.learned === true && debtClarityAudit?.learnedContract?.passiveReady === true && debtClarityAudit?.learnedContract?.passiveEnabled === false && debtClarityAudit?.learnedContract?.appliesEffect === false && debtClarityAudit?.learnedContract?.liveRendererWired === false, JSON.stringify(debtClarityAudit));
     record('Debt Collector public contract delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedContract) === JSON.stringify(debtClarityAudit?.canonicalLearnedContract) && JSON.stringify(debtClarityAudit?.lockedContract) === JSON.stringify(debtClarityAudit?.canonicalLockedContract), JSON.stringify({ debtLearned:debtClarityAudit?.learnedContract, canonicalLearned:debtClarityAudit?.canonicalLearnedContract }));
     record('Debt Collector public copy helper matches canonical Talent output', JSON.stringify(debtClarityAudit?.learnedCopy) === JSON.stringify(debtClarityAudit?.canonicalLearnedCopy) && JSON.stringify(debtClarityAudit?.lockedCopy) === JSON.stringify(debtClarityAudit?.canonicalLockedCopy), JSON.stringify({ debtLearned:debtClarityAudit?.learnedCopy, canonicalLearned:debtClarityAudit?.canonicalLearnedCopy }));
+    record('Debt Collector renderer copy-model helpers exist', debtHelperShape.hasRendererCopySource === true && debtHelperShape.hasRendererCopyModel === true, JSON.stringify(debtHelperShape));
+    record('Unlearned Debt renderer copy model returns default fragments', JSON.stringify(debtClarityAudit?.lockedRendererModel) === JSON.stringify(debtClarityAudit?.rendererSource), JSON.stringify(debtClarityAudit?.lockedRendererModel));
+    record('Learned Debt renderer copy model returns exact nonredundant fragments', debtClarityAudit?.learnedRendererModel?.title === 'Debt Collector' && debtClarityAudit?.learnedRendererModel?.summaryText === 'Debt is active. Owed coin and pressure are shown below.' && debtClarityAudit?.learnedRendererModel?.statusText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.balanceText === 'Owed 15s' && debtClarityAudit?.learnedRendererModel?.pressureText === 'Pressure 3' && debtClarityAudit?.learnedRendererModel?.pressureDetail === 'Rising' && debtClarityAudit?.learnedRendererModel?.flavorText === 'Owed 15s. Pressure is visible.' && debtClarityAudit?.learnedRendererModel?.termsText === 'Repayment uses purse coin. Pressure is informational only.' && debtClarityAudit?.learnedRendererModel?.statusMetaText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.lastVisitText === 'Test Visit' && debtClarityAudit?.learnedRendererModel?.notesText === '1 note' && debtClarityAudit?.learnedRendererModel?.clarityApplied === true && debtClarityAudit?.learnedRendererModel?.previewOnly === true, JSON.stringify(debtClarityAudit?.learnedRendererModel));
+    record('Debt renderer copy model avoids nested labels', !/Status:\s*Debt status:|Pressure:\s*Pressure/i.test(JSON.stringify(debtClarityAudit?.learnedRendererModel || {})), JSON.stringify(debtClarityAudit?.learnedRendererModel));
+    record('Debt renderer copy model delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedRendererModel) === JSON.stringify(debtClarityAudit?.canonicalRendererModel), JSON.stringify({ debt:debtClarityAudit?.learnedRendererModel, canonical:debtClarityAudit?.canonicalRendererModel }));
+    record('Debt renderer copy model stays read-only and value-stable', debtClarityAudit?.rendererLearnedBefore === debtClarityAudit?.rendererLearnedAfter && debtClarityAudit?.rendererLockedBefore === debtClarityAudit?.rendererLockedAfter && debtClarityAudit?.learnedRendererModel?.balanceCopper === 1500 && debtClarityAudit?.learnedRendererModel?.pressure === 3 && debtClarityAudit?.learnedRendererModel?.wallet === 875 && debtClarityAudit?.learnedRendererModel?.repaymentState === 'available', JSON.stringify(debtClarityAudit?.learnedRendererModel));
+    record('Debt live panel remains unchanged by copy-model dry run', debtClarityAudit?.livePanelBefore === debtClarityAudit?.livePanelAfter, JSON.stringify({ before:debtClarityAudit?.livePanelBefore, after:debtClarityAudit?.livePanelAfter }));
     record('Debt Collector clarity contract stays non-dangerous and non-mutating', debtClarityAudit?.learnedContract?.combat === false && debtClarityAudit?.learnedContract?.economy === false && debtClarityAudit?.learnedContract?.rewards === false && debtClarityAudit?.learnedContract?.monsters === false && debtClarityAudit?.learnedContract?.gear === false && debtClarityAudit?.learnedContract?.progression === false && debtClarityAudit?.learnedContract?.scaling === false && debtClarityAudit?.learnedContract?.revisit === false && debtClarityAudit?.learnedContract?.eliteBoardMath === false && debtClarityAudit?.learnedContract?.debtMath === false && debtClarityAudit?.learnedContract?.talentUiActions === false && debtClarityAudit?.learnedContract?.mutatesSave === false, JSON.stringify(debtClarityAudit?.learnedContract));
     record('Debt Collector clarity helper is clone-safe and text-only', debtClarityAudit?.sameObject === false && debtClarityAudit?.before === debtClarityAudit?.after && debtClarityAudit?.learnedCopy?.passiveSurface === 'Debt Collector display copy only' && debtClarityAudit?.learnedCopy?.passiveApplied === true && debtClarityAudit?.learnedCopy?.statusLabel === 'Debt status: Debt Active' && debtClarityAudit?.learnedCopy?.balanceLabel === 'Amount owed: Owed 15 coin' && debtClarityAudit?.learnedCopy?.pressureLabel === 'Pressure: Pressure 3' && debtClarityAudit?.learnedCopy?.termsLabel === 'Terms: Settle on return' && debtClarityAudit?.learnedCopy?.reminderLabel === 'Reminder: Keep coin ready.' && debtClarityAudit?.learnedCopy?.balanceCopper === 1500 && debtClarityAudit?.learnedCopy?.pressure === 3, JSON.stringify(debtClarityAudit?.learnedCopy));
     record('Debt Collector clarity helper leaves unlearned copy unchanged', JSON.stringify(debtClarityAudit?.lockedCopy) === debtClarityAudit?.before && debtClarityAudit?.lockedCopy?.passiveApplied !== true && debtClarityAudit?.lockedCopy?.passiveSurface === undefined, JSON.stringify(debtClarityAudit?.lockedCopy));

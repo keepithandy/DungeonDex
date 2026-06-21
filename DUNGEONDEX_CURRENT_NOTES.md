@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.34 - Passive Renderer Contract Alignment
+- DungeonDex v1.20.35 - Debt Clarity Renderer Copy-Model Dry Run
+
+## v1.20.35 Debt Clarity Renderer Copy-Model Dry Run
+- Current baseline: v1.20.35.
+- Added a renderer-shaped Debt clarity copy model owned by `DungeonDexTalents` and exposed through the Debt Collector namespace.
+- The model mirrors the live panel's summary, status, owed, pressure, flavor, terms, and metadata fragments without producing nested labels.
+- Learned state changes only dry-run summary and terms copy; unlearned fragments remain unchanged.
+- `panelMarkup()` remains unchanged. Debt clarity remains `passiveEnabled:false`, `appliesEffect:false`, and `liveRendererWired:false`.
+- No wallet, debt balance, pressure, repayment, economy, combat, rewards, progression, Talent actions, save shape, or Revisit behavior changed.
 
 ## v1.20.34 Passive Renderer Contract Alignment
 - Current baseline: v1.20.34.

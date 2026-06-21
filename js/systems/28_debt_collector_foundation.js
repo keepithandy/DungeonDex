@@ -127,6 +127,39 @@
       : { text: String(debtCardOrCopy || '') };
   }
 
+  function debtCollectorRendererCopySource(state){
+    const debt = debtState(state);
+    const summary = debtCollectorDisplaySummary(state);
+    const pressure = debtPressureDisplay(state);
+    const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
+    return {
+      title: summary.title,
+      summaryText: summary.summary,
+      statusText: summary.statusLabel,
+      balanceText: summary.balanceLabel,
+      pressureText: pressure.label,
+      pressureDetail: pressure.detail,
+      flavorText: debtCollectorStatusLine(state),
+      termsText: 'Repay spends purse coin. Pressure is visible only.',
+      statusMetaText: summary.statusLabel,
+      lastVisitText: summary.lastVisitLabel,
+      notesText: summary.notesLabel,
+      active: summary.active,
+      balanceCopper: summary.balanceCopper,
+      pressure: summary.pressure,
+      wallet,
+      repaymentState: summary.balanceCopper <= 0 ? 'clear' : wallet > 0 ? 'available' : 'wallet-empty'
+    };
+  }
+
+  function debtCollectorClarityRendererCopyModel(state){
+    const talents = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+    const source = debtCollectorRendererCopySource(state);
+    return typeof talents?.debtCollectorClarityRendererCopyModel === 'function'
+      ? talents.debtCollectorClarityRendererCopyModel(state, source)
+      : source;
+  }
+
   function debtCollectorFallbackState(){
     return {
       active: false,
@@ -366,6 +399,8 @@
     debtCollectorStatusLine,
     debtCollectorClarityPassiveContract,
     applyDebtCollectorClarityCopy,
+    debtCollectorRendererCopySource,
+    debtCollectorClarityRendererCopyModel,
     debtCollectorFallbackState,
     warning: pressureWarning,
     smoke
