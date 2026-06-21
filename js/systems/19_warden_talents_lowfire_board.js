@@ -835,6 +835,96 @@
     });
   }
 
+  function talentAwardClaimShapePreview(state){
+    const plan = talentAwardClaimTrackingPlan();
+    const root = safeLedgerSource(state);
+    const player = safeLedgerSource(ownValue(root, 'player', null));
+    const rawLedger = ownValue(player, 'talentLedger', null);
+    const ledger = safeLedgerSource(rawLedger);
+    const hasTalentLedger = rawLedger === ledger;
+    const saveFieldExists = hasTalentLedger && Object.prototype.hasOwnProperty.call(ledger, 'awardClaims');
+    const rawClaims = saveFieldExists ? ownValue(ledger, 'awardClaims', undefined) : undefined;
+    const awardClaimsType = !saveFieldExists
+      ? 'missing'
+      : rawClaims === null
+        ? 'null'
+        : Array.isArray(rawClaims)
+          ? 'array'
+          : typeof rawClaims;
+    const claims = safeLedgerSource(rawClaims);
+    const validClaimRecord = (mapKey, record) => {
+      const safeRecord = safeLedgerSource(record);
+      const sourceId = String(ownValue(safeRecord, 'sourceId', '') || '').trim();
+      const claimedAt = String(ownValue(safeRecord, 'claimedAt', '') || '').trim();
+      return /^boss_trophy_milestone:[A-Za-z0-9_.-]+$/.test(mapKey)
+        && mapKey === `boss_trophy_milestone:${sourceId}`
+        && ownValue(safeRecord, 'key', '') === mapKey
+        && ownValue(safeRecord, 'source', '') === 'boss_trophy_milestone'
+        && Number.isInteger(ownValue(safeRecord, 'amount', 0))
+        && ownValue(safeRecord, 'amount', 0) > 0
+        && claimedAt.length > 0
+        && Number.isFinite(Date.parse(claimedAt))
+        && ownValue(safeRecord, 'version', 0) === 1;
+    };
+    let validClaimCount = 0;
+    let malformedClaimCount = 0;
+    const safeClaimMap = rawClaims === claims && claims !== null && !Array.isArray(claims);
+    if (saveFieldExists && awardClaimsType === 'object' && safeClaimMap) {
+      Object.keys(claims).forEach(key => {
+        if (validClaimRecord(key, ownValue(claims, key, null))) validClaimCount += 1;
+        else malformedClaimCount += 1;
+      });
+    } else if (saveFieldExists) {
+      malformedClaimCount = 1;
+    }
+    return Object.freeze({
+      path: plan.plannedClaimPath,
+      status: 'dry_run',
+      saveFieldExists,
+      wouldAddSaveField: !saveFieldExists,
+      mutatesSave: false,
+      awardsPoints: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresRepairPatch: true,
+      requiresLiveAwardPatch: true,
+      expectedShape: 'object_map',
+      expectedEmptyValue: Object.freeze({}),
+      allowedRecordVersion: 1,
+      claimKeyPattern: plan.plannedClaimKeyPattern,
+      proposedRecordShape: plan.proposedClaimRecordShape,
+      repairRules: Object.freeze([
+        'Missing awardClaims should repair to an empty object map in the future repair patch.',
+        'Null, array, string, number, or malformed awardClaims should repair to an empty object map.',
+        'Only records with deterministic keys, source, sourceId, positive integer amount, claimedAt, and version 1 should be retained.',
+        'Malformed records should be dropped during future repair.',
+        'Live awards must write the point award and claim record together.'
+      ]),
+      observedState: Object.freeze({
+        hasTalentLedger,
+        hasAwardClaims: saveFieldExists,
+        awardClaimsType,
+        validClaimCount,
+        malformedClaimCount
+      }),
+      notes: Object.freeze([])
+    });
+  }
+
+  function talentAwardClaimShapePreviewSummary(state){
+    const preview = talentAwardClaimShapePreview(state);
+    return Object.freeze({
+      path: preview.path,
+      status: preview.status,
+      saveFieldExists: preview.saveFieldExists,
+      wouldAddSaveField: preview.wouldAddSaveField,
+      mutatesSave: preview.mutatesSave,
+      expectedShape: preview.expectedShape,
+      validClaimCount: preview.observedState.validClaimCount,
+      malformedClaimCount: preview.observedState.malformedClaimCount
+    });
+  }
+
   // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
@@ -1773,6 +1863,8 @@
     talentPointAwardPreviewSummary,
     talentAwardClaimTrackingPlan,
     talentAwardClaimTrackingPlanSummary,
+    talentAwardClaimShapePreview,
+    talentAwardClaimShapePreviewSummary,
     detectBossMilestones,
     detectDepthMilestones,
     getAllReachedMilestones,

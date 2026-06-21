@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.41`
-* Current local package baseline: `v1.20.41`
-* Current development target: `v1.20.41`
+* Public/live itch version: `v1.20.42`
+* Current local package baseline: `v1.20.42`
+* Current development target: `v1.20.42`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.42 - Talent Claim Tracking Save Shape Dry Run
+
+* Added a read-only preview for the future `player.talentLedger.awardClaims` object map and record validation rules.
+* Reports missing, malformed, and mixed-validity claim input without repairing or mutating it.
+* Added no live save field, claim tracking, point mutation, spending path, unlock UI, or gameplay behavior.
 
 ## v1.20.41 - Talent Award Claim Tracking Plan
 

@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.41 - Talent Award Claim Tracking Plan
+- DungeonDex v1.20.42 - Talent Claim Tracking Save Shape Dry Run
+
+## v1.20.42 Talent Claim Tracking Save Shape Dry Run
+- Current baseline: v1.20.42.
+- Added a read-only preview of the future `player.talentLedger.awardClaims` object map and version-1 record shape.
+- Missing and malformed containers or records are reported with future repair rules but are not changed in-place.
+- No `awardClaims` field is added, no points are awarded, and no spending or Talent unlock UI is introduced.
+- Future live earning still needs actual claim repair/normalization, deterministic keys from boss trophy evidence, duplicate prevention, atomic point-and-claim mutation, a spend path, UI affordance, and live-mutation smoke coverage.
 
 ## v1.20.41 Talent Award Claim Tracking Plan
 - Current baseline: v1.20.41.
