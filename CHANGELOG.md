@@ -8,15 +8,20 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.37`
-* Current local package baseline: `v1.20.37`
-* Current development target: `v1.20.37`
+* Public/live itch version: `v1.20.38`
+* Current local package baseline: `v1.20.38`
+* Current development target: `v1.20.38`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.38 - Talent State Contract Consolidation
+
+* Added a canonical Talent state contract helper to unify preview, selection, learning, live-render, and save-mutation vocabulary.
+* Kept talent earning, spending, unlocks, Debt behavior, Revisit behavior, combat, economy, and save shape unchanged.
 
 ## v1.20.37 - Build Query Label Uniformity Cleanup
 

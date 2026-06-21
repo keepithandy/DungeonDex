@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.37**
+Current baseline: **DungeonDex v1.20.38**
 
 ## Current Build
 
-**v1.20.37 - Build Query Label Uniformity Cleanup**
+**v1.20.38 - Talent State Contract Consolidation**
 
-This patch standardizes runtime-visible and cache-facing build labels on `v1.20.37` without changing gameplay, rendering logic, debt behavior, or save shape.
+This patch consolidates the canonical Talent state vocabulary and keeps all point earning, spending, unlocks, and gameplay behavior disabled.
 
 ## Previous Build
 

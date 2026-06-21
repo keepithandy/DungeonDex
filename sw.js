@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.37-build-query-label-uniformity-cleanup';
+const CACHE_NAME = 'dungeondex-v1.20.38-talent-state-contract-consolidation';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.37-build-query-label-uniformity-cleanup';
+const BUILD_QS = '1.20.38-talent-state-contract-consolidation';
 const ASSETS = [
   './',
   './index.html',

@@ -668,23 +668,35 @@
     return result;
   }
 
+  function talentNodeStateContract(nodeKey, state, overrides = {}){
+    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
+    const learned = learnedIds.includes(nodeKey) || !!state?.player?.talentUnlockIds?.includes?.(nodeKey);
+    return Object.freeze({
+      nodeKey,
+      previewOnly: overrides.previewOnly === true,
+      selectable: overrides.selectable === true,
+      selected: overrides.selected === true,
+      learned,
+      passiveReady: overrides.passiveReady === true ? true : learned,
+      passiveEnabled: overrides.passiveEnabled === true ? learned : false,
+      appliesEffect: overrides.appliesEffect === true,
+      liveRendererWired: overrides.liveRendererWired === true ? learned : false,
+      mutatesSave: overrides.mutatesSave === true
+    });
+  }
+
   // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
-    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
-    const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
-    const passiveEnabled = learned;
+    const stateContract = talentNodeStateContract(resolvedNodeKey, state, {
+      passiveEnabled: true,
+      liveRendererWired: true
+    });
     return {
       contractOwner: 'DungeonDexTalents',
-      nodeKey: resolvedNodeKey,
-      learned,
-      passiveReady: learned,
-      passiveEnabled,
-      liveRendererWired: true,
+      ...stateContract,
       effectKey: 'hunter_board_clarity_display_copy',
       affectedSurface: 'Elite Board display copy only',
-      mutatesSave: false,
-      appliesEffect: false,
       combat: false,
       economy: false,
       rewards: false,
@@ -700,20 +712,15 @@
 
   function debtCollectorClarityPassiveContract(state){
     const resolvedNodeKey = 'debt_collector_clarity';
-    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
-    const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
-    const passiveEnabled = learned;
+    const stateContract = talentNodeStateContract(resolvedNodeKey, state, {
+      passiveEnabled: true,
+      liveRendererWired: true
+    });
     return {
       contractOwner: 'DungeonDexTalents',
-      nodeKey: resolvedNodeKey,
-      learned,
-      passiveReady: learned,
-      passiveEnabled,
-      liveRendererWired: learned,
+      ...stateContract,
       effectKey: 'debt_collector_clarity_display_copy',
       affectedSurface: 'Debt Collector display copy only',
-      mutatesSave: false,
-      appliesEffect: false,
       combat: false,
       economy: false,
       rewards: false,
@@ -1616,6 +1623,7 @@
     calculateTalentPointsFromMilestones,
     calculateTalentSpendDryRun,
     applyTalentNodeSpend,
+    talentNodeStateContract,
     hunterBoardClarityPassiveContract,
     applyHunterBoardClarityCopy,
     debtCollectorClarityPassiveContract,

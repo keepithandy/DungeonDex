@@ -676,6 +676,19 @@ async function main() {
     let smoke = await getSmoke();
     record('Fresh save repair', typeof smoke === 'string' ? smoke.includes('unknown id safe: true') : !!smoke?.ok, typeof smoke === 'string' ? smoke : JSON.stringify(smoke));
     const talentFoundationAudit = await getTalentFoundationAudit();
+    const talentStateContractAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      const learnedDebt = { player: { talentLearnedIds: { debt_collector_clarity: true }, talentUnlockIds: ['debt_collector_clarity'] } };
+      const lockedDebt = { player: { talentLearnedIds: {}, talentUnlockIds: [] } };
+      const previewNode = api?.talentNodeStateContract ? api.talentNodeStateContract('preview_only_probe', { player: {} }, { previewOnly: true }) : null;
+      return {
+        hasHelper: typeof api?.talentNodeStateContract === 'function',
+        learnedDebt: api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(learnedDebt) : null,
+        lockedDebt: api?.debtCollectorClarityPassiveContract ? api.debtCollectorClarityPassiveContract(lockedDebt) : null,
+        previewNode,
+        previewObjectStable: previewNode ? JSON.stringify(previewNode) : ''
+      };
+    })()`);
     const previewSummary = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       if (!api || typeof api.preview !== 'function' || typeof api.previewSummary !== 'function' || typeof api.ledger !== 'function' || typeof api.ledgerSummary !== 'function') return null;
@@ -1170,6 +1183,7 @@ async function main() {
     record('Talent ruleset summary remains non-gameplay', rulesetSummary.locked === true && rulesetSummary.previewOnly === true && rulesetSummary.active === false && rulesetSummary.gameplayEnabled === false && rulesetSummary.earningEnabled === true && rulesetSummary.spendingEnabled === false && rulesetSummary.unlocksEnabled === false && rulesetSummary.passiveEffectsEnabled === false && rulesetSummary.branchCount === 4 && rulesetSummary.tierCount === 3 && rulesetSummary.nodeCount === 13 && rulesetSummary.activeCap === 6 && rulesetSummary.spendableCap === 0, JSON.stringify(rulesetSummary));
     record('Talent ruleset helpers are defensive copies', rulesetAudit?.hasGlobal === true && rulesetAudit?.frozenGlobal === true && rulesetAudit?.defensiveCopy === true, JSON.stringify({ hasGlobal: rulesetAudit?.hasGlobal, frozenGlobal: rulesetAudit?.frozenGlobal, defensiveCopy: rulesetAudit?.defensiveCopy }));
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
+    record('Canonical talent state contract helper exists', talentStateContractAudit?.hasHelper === true && talentStateContractAudit?.learnedDebt?.learned === true && talentStateContractAudit?.learnedDebt?.passiveReady === true && talentStateContractAudit?.learnedDebt?.passiveEnabled === true && talentStateContractAudit?.learnedDebt?.liveRendererWired === true && talentStateContractAudit?.learnedDebt?.appliesEffect === false && talentStateContractAudit?.learnedDebt?.mutatesSave === false && talentStateContractAudit?.lockedDebt?.learned === false && talentStateContractAudit?.lockedDebt?.passiveReady === false && talentStateContractAudit?.lockedDebt?.passiveEnabled === false && talentStateContractAudit?.lockedDebt?.liveRendererWired === false && talentStateContractAudit?.lockedDebt?.appliesEffect === false && talentStateContractAudit?.lockedDebt?.mutatesSave === false && talentStateContractAudit?.previewNode?.previewOnly === true && talentStateContractAudit?.previewNode?.selectable === false && talentStateContractAudit?.previewNode?.selected === false && talentStateContractAudit?.previewNode?.learned === false && talentStateContractAudit?.previewNode?.passiveReady === false && talentStateContractAudit?.previewNode?.passiveEnabled === false && talentStateContractAudit?.previewNode?.appliesEffect === false && talentStateContractAudit?.previewNode?.liveRendererWired === false && talentStateContractAudit?.previewNode?.mutatesSave === false, JSON.stringify(talentStateContractAudit));
     const retiredHallSmoke = await getRetiredGearHallSmoke();
     record('Retired gear hall memory smoke', !!retiredHallSmoke?.ok, JSON.stringify(retiredHallSmoke));
     record('Town loads', /Lowfire|Enter Dungeon|Rest/.test(initialDiag.bodyText || ''), initialDiag.bodyText.slice(0, 200));

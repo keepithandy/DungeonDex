@@ -7,12 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.37 - Build Query Label Uniformity Cleanup
+- DungeonDex v1.20.38 - Talent State Contract Consolidation
 
-## v1.20.37 Build Query Label Uniformity Cleanup
-- Current baseline: v1.20.37.
-- Runtime-visible labels and cache-facing query strings are standardized on v1.20.37.
-- No Debt Collector logic, renderer behavior, Talent state, Revisit state, combat, economy, rewards, progression, or save shape changed.
+## v1.20.38 Talent State Contract Consolidation
+- Current baseline: v1.20.38.
+- Canonical Talent state vocabulary now comes from one helper and remains read-only.
+- No Debt Collector logic, renderer behavior, Talent state activation, Revisit state, combat, economy, rewards, progression, or save shape changed.
 
 ## v1.20.35 Debt Clarity Renderer Copy-Model Dry Run
 - Current baseline: v1.20.35.
