@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.35 - Debt Clarity Renderer Copy-Model Dry Run
+- DungeonDex v1.20.36 - Live Debt Clarity Renderer Wiring
+
+## v1.20.36 Live Debt Clarity Renderer Wiring
+- Current baseline: v1.20.36.
+- The existing Debt clarity renderer copy model is now consumed by the live Debt panel for learned state only.
+- The live panel keeps the same structure and only swaps the learned text fragments for the existing summary, status, owed, pressure, flavor, terms, and metadata fields.
+- Learned Debt clarity now reports `passiveEnabled:true` and `liveRendererWired:true` while `appliesEffect:false` remains unchanged.
+- No wallet, debt balance, pressure, repayment, economy, combat, rewards, progression, Talent actions, save shape, or Revisit behavior changed.
 
 ## v1.20.35 Debt Clarity Renderer Copy-Model Dry Run
 - Current baseline: v1.20.35.

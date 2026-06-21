@@ -8,15 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.35`
-* Current local package baseline: `v1.20.35`
-* Current development target: `v1.20.35`
+* Public/live itch version: `v1.20.36`
+* Current local package baseline: `v1.20.36`
+* Current development target: `v1.20.36`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.36 - Live Debt Clarity Renderer Wiring
+
+* Wired the existing Debt Collector renderer copy model into the live Debt panel for learned state only.
+* Kept the live panel text-only, nonredundant, and gameplay-neutral while preserving the unlearned output exactly.
+* Updated Debt Collector clarity metadata so learned state now reports `passiveEnabled:true` and `liveRendererWired:true` while `appliesEffect:false` remains unchanged.
+* Added smoke coverage for live renderer wiring, duplicate-label avoidance, read-only model output, and unchanged debt state, wallet, pressure, repayment, and save snapshots.
 
 ## v1.20.35 - Debt Clarity Renderer Copy-Model Dry Run
 

@@ -8,10 +8,10 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.20.35</title>
-  <link rel="stylesheet" href="./styles.css?build=1.20.35-debt-clarity-renderer-copy-model-dry-run" />
+  <title>DungeonDex v1.20.36</title>
+  <link rel="stylesheet" href="./styles.css?build=1.20.36-live-debt-clarity-renderer-wiring" />
   <style>
-    /* v1.20.35 Debt clarity renderer copy-model dry run: live wiring remains locked. */
+    /* v1.20.36 Debt clarity live renderer wiring: text-only and nonredundant. */
     .panel {
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.035);
     }
@@ -51,7 +51,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <h1 id="buildTag">DungeonDex v1.20.35</h1>
+        <h1 id="buildTag">DungeonDex v1.20.36</h1>
       </div>
       <div class="top-actions">
         <span class="save-status" id="saveStatus">Saved</span>
@@ -139,8 +139,8 @@
   </div>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.20.35';
-    window.DUNGEONDEX_BUILD_QS = '1.20.35-debt-clarity-renderer-copy-model-dry-run';
+    window.DUNGEONDEX_BUILD = '1.20.36';
+    window.DUNGEONDEX_BUILD_QS = '1.20.36-live-debt-clarity-renderer-wiring';
     (function(){
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
@@ -181,7 +181,7 @@
         });
         return;
       }
-      window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js?build=1.20.35-debt-clarity-renderer-copy-model-dry-run').catch(function(){}); });
+        window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js?build=1.20.36-live-debt-clarity-renderer-wiring').catch(function(){}); });
     })();
   </script>
 

@@ -239,35 +239,48 @@
     const debt = debtState(state);
     const summary = debtCollectorDisplaySummary(state);
     const pressure = debtPressureDisplay(state);
+    const rendererCopy = debtCollectorClarityRendererCopyModel(state);
+    const passiveContract = debtCollectorClarityPassiveContract(state);
+    const liveRendererWired = passiveContract?.learned === true && passiveContract?.liveRendererWired === true;
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     const canRepay = debt.balanceCopper > 0 && wallet > 0;
+    const titleText = liveRendererWired ? rendererCopy.title : summary.title;
+    const summaryText = liveRendererWired ? rendererCopy.summaryText : summary.summary;
+    const statusText = liveRendererWired ? rendererCopy.statusText : summary.statusLabel;
+    const balanceText = liveRendererWired ? rendererCopy.balanceText : summary.balanceLabel;
+    const pressureText = liveRendererWired ? rendererCopy.pressureText : pressure.label;
+    const pressureDetail = liveRendererWired ? rendererCopy.pressureDetail : pressure.detail;
+    const flavorText = liveRendererWired ? rendererCopy.flavorText : debtCollectorStatusLine(state);
+    const termsText = liveRendererWired ? rendererCopy.termsText : 'Repay spends purse coin. Pressure is visible only.';
+    const lastVisitText = liveRendererWired ? rendererCopy.lastVisitText : summary.lastVisitLabel;
+    const notesText = liveRendererWired ? rendererCopy.notesText : summary.notesLabel;
     const notes = debt.notes.length
       ? `<div class="small muted debt-collector-notes">${debt.notes.map(note => `<div class="debt-collector-note">${escapeHtml(note)}</div>`).join('')}</div>`
       : '';
     const borrowButtons = BORROW_OPTIONS.map(option => `<button class="ghost mini" data-debt-borrow="${option.amount}">${escapeHtml(option.label)}</button>`).join('');
     return `<div class="split debt-collector-head">
       <div>
-        <h2>${escapeHtml(summary.title)}</h2>
-        <p>${escapeHtml(summary.summary)}</p>
+        <h2>${escapeHtml(titleText)}</h2>
+        <p>${escapeHtml(summaryText)}</p>
       </div>
-      <span class="pill debt-collector-status-pill ${statusClass}">${escapeHtml(summary.statusLabel)}</span>
+      <span class="pill debt-collector-status-pill ${statusClass}">${escapeHtml(statusText)}</span>
     </div>
-    <p class="small muted debt-collector-flavor">${escapeHtml(debtCollectorStatusLine(state))}</p>
+    <p class="small muted debt-collector-flavor">${escapeHtml(flavorText)}</p>
     <div class="tag-row debt-collector-chips" aria-label="Debt Collector status">
-      <span class="pill debt-collector-chip ${summary.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(summary.statusLabel)}</span>
-      <span class="pill debt-collector-chip">${escapeHtml(summary.balanceLabel)}</span>
-      <span class="pill debt-collector-chip">${escapeHtml(pressure.label)}${pressure.detail ? ` • ${escapeHtml(pressure.detail)}` : ''}</span>
+      <span class="pill debt-collector-chip ${summary.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(statusText)}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(balanceText)}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(pressureText)}${pressureDetail ? ` • ${escapeHtml(pressureDetail)}` : ''}</span>
     </div>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
       <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
     </div>
-    <p class="small muted debt-collector-terms">Repay spends purse coin. Pressure is visible only.</p>
+    <p class="small muted debt-collector-terms">${escapeHtml(termsText)}</p>
     <div class="debt-collector-meta small">
-      <span><b>Status:</b> ${escapeHtml(summary.statusLabel)}</span>
-      <span><b>Last Visit:</b> ${escapeHtml(summary.lastVisitLabel)}</span>
-      <span><b>Notes:</b> ${escapeHtml(summary.notesLabel)}</span>
+      <span><b>Status:</b> ${escapeHtml(statusText)}</span>
+      <span><b>Last Visit:</b> ${escapeHtml(lastVisitText)}</span>
+      <span><b>Notes:</b> ${escapeHtml(notesText)}</span>
     </div>
     ${notes}`;
   }

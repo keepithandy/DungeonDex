@@ -702,13 +702,14 @@
     const resolvedNodeKey = 'debt_collector_clarity';
     const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
     const learned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
+    const passiveEnabled = learned;
     return {
       contractOwner: 'DungeonDexTalents',
       nodeKey: resolvedNodeKey,
       learned,
       passiveReady: learned,
-      passiveEnabled: false,
-      liveRendererWired: false,
+      passiveEnabled,
+      liveRendererWired: learned,
       effectKey: 'debt_collector_clarity_display_copy',
       affectedSurface: 'Debt Collector display copy only',
       mutatesSave: false,
@@ -907,7 +908,7 @@
     if (pressure) copy.pressureLabel = `Pressure: ${pressure}`;
     if (terms) copy.termsLabel = `Terms: ${terms}`;
     if (reminder) copy.reminderLabel = `Reminder: ${reminder}`;
-    copy.passiveSurface = 'Debt Collector display copy only';
+    copy.passiveSurface = 'Debt Collector live renderer copy only';
     copy.passiveApplied = true;
     return copy;
   }
@@ -918,11 +919,18 @@
       ? {...rendererCopy}
       : {};
     if (!passiveContract.passiveReady) return copy;
-    copy.summaryText = copy.active
-      ? 'Debt is active. Owed coin and pressure are shown below.'
-      : 'No debt is active. Nothing is owed and pressure is quiet.';
-    copy.termsText = 'Repayment uses purse coin. Pressure is informational only.';
-    copy.passiveSurface = 'Debt Collector renderer copy-model dry run';
+    if (copy.active) {
+      copy.summaryText = 'Active debt. Pressure is visible.';
+      copy.flavorText = copy.balanceText && copy.pressureText
+        ? `${copy.balanceText}. ${copy.pressureDetail || 'Pressure is visible.'}`
+        : 'Debt is active. Pressure is visible.';
+      copy.termsText = 'Repay spends purse coin. Pressure is visible only.';
+    } else {
+      copy.summaryText = 'No active debt. Pressure is quiet.';
+      copy.flavorText = 'No debt due. Pressure is quiet.';
+      copy.termsText = 'Repay spends purse coin. Pressure is visible only.';
+    }
+    copy.passiveSurface = 'Debt Collector live renderer copy only';
     copy.clarityApplied = true;
     copy.previewOnly = true;
     return copy;

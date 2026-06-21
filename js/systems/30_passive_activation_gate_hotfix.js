@@ -63,8 +63,8 @@
         && hunter.liveDisplayReady === true
         && !!debt
         && debt.helperReady === true
-        && debt.liveRendererWired === false
-        && debt.liveDisplayReady === false,
+        && debt.liveRendererWired === true
+        && debt.liveDisplayReady === true,
       dryRun: true,
       mutatesSave: false,
       appliesGameplayEffect: false,
