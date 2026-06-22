@@ -8,15 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.51`
-* Current local package baseline: `v1.20.51`
-* Current development target: `v1.20.51`
+* Public/live itch version: `v1.21.0`
+* Current local package baseline: `v1.21.0`
+* Current development target: `v1.21.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.21.0 - Talent Loop Release Candidate
+
+* DungeonDex now ships the first complete Talent loop for Hunter Board Clarity as an itch-ready release candidate.
+* The Talent panel explains available, earned, and spent points, the Boss Trophy Milestone source, the Hunter Board Clarity effect, and the learned/active display-only contract.
+* The first controlled spend button remains limited to Hunter Board Clarity, stays gated by the readiness model, and uses the existing controlled mutation helper.
+* Double-click, duplicate spend, reload persistence, malformed state, and safety-guard coverage were hardened without adding a second Talent node, Revisit activation, combat changes, reward changes, economy changes, or Debt changes.
 
 ## v1.20.51 - First Controlled Talent Spend UI Button
 

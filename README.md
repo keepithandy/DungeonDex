@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.51**
+Current baseline: **DungeonDex v1.21.0**
 
 ## Current Build
 
-**v1.20.51 - First Controlled Talent Spend UI Button**
+**v1.21.0 - Talent Loop Release Candidate**
 
 This patch adds the first controlled `hunter_board_clarity` Talent spend button. The button is gated by the readiness model and calls the existing controlled spend helper only when ready.
 

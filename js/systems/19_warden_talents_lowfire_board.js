@@ -1472,6 +1472,22 @@
     return `Spend readiness: blocked - ${String(model.blockedReason || 'unavailable').replace(/_/g, ' ')}`;
   }
 
+  function talentSpendUiLearnedText(model){
+    if (!model || typeof model !== 'object') return 'Learned: no';
+    if (model.learned === true) return 'Learned: yes';
+    return 'Learned: no';
+  }
+
+  function talentSpendUiEffectText(model){
+    if (!model || typeof model !== 'object') return 'Effect: display/copy clarity only.';
+    if (model.learned === true) return 'Effect: Elite Board contract wording is clearer. No reward, risk, or combat values are changed.';
+    return 'Effect: Elite Board contract wording is clearer. No reward, risk, or combat values are changed.';
+  }
+
+  function talentSpendUiSourceText(){
+    return 'First Talent source: Boss Trophy Milestone.';
+  }
+
   function talentPreviewNodeMarkup(node, branch){
     return `<article class="talent-preview-node is-locked">
       <div class="talent-path-head">
@@ -1509,6 +1525,10 @@
     const spendActionLabel = readiness?.actionLabel || 'Spend 1 Talent Point';
     const spendStatusText = talentSpendUiStatusText(readiness);
     const spendStatusDisabled = readiness?.disabledLabel || 'Spend unavailable';
+    const spendLearnedText = talentSpendUiLearnedText(readiness);
+    const spendEffectText = talentSpendUiEffectText(readiness);
+    const spendSourceText = talentSpendUiSourceText();
+    const spendButtonBusy = readiness?.enabled === true && readiness?.blockedReason === 'ready' && readiness?.renderButtonNow === false ? false : false;
     panel.innerHTML = `
       <div class="card-head talent-head">
         <div>
@@ -1517,6 +1537,11 @@
           <div class="talent-passive-note small">Planned passives only. Inactive.</div>
         </div>
         <span class="pill rarity-rare">Locked</span>
+      </div>
+      <div class="talent-legend small">
+        <span><b>Talent Points:</b> ${H(String(ledger.availablePoints || 0))} available / ${H(String(ledger.lifetimePoints || 0))} earned</span>
+        <span><b>Spent:</b> ${H(String(ledger.spentPoints || 0))}</span>
+        <span><b>${H(spendSourceText)}</b></span>
       </div>
       <div class="talent-preview-banner small">
         <strong>Locked preview</strong>
@@ -1605,15 +1630,20 @@
         <div class="talent-milestone-line small" aria-label="Spend readiness status">
           <span>${H(spendStatusText)}</span>
           <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Visible: ${spendButtonVisible ? 'yes' : 'no'}</span>
+          <span>${H(spendLearnedText)}</span>
           <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Enabled: ${spendButtonEnabled ? 'yes' : 'no'}</span>
+          <span>${H(spendEffectText)}</span>
         </div>
         ${spendButtonVisible ? `
           <div class="talent-spend-actions">
-            <button class="primary mini" data-talent-spend-hunter-board="hunter_board_clarity" ${spendButtonEnabled ? '' : 'disabled'}>${H(spendActionLabel)}</button>
+            <button class="primary mini" data-talent-spend-hunter-board="hunter_board_clarity" data-talent-spend-busy="${spendButtonBusy ? '1' : '0'}" ${spendButtonEnabled ? '' : 'disabled'}>${H(spendActionLabel)}</button>
           </div>
         ` : ''}
+        <div class="talent-milestone-line small" aria-label="Talent node explanation">
+          <span><b>Hunter Board Clarity:</b> Elite Board contract wording only.</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>No reward, risk, economy, or combat values change.</span>
+        </div>
       </section>
       <div class="talent-preview-grid">
         ${preview.branches.map(branch => `
@@ -1968,7 +1998,7 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-talent-spend-hunter-board]').forEach(btn => btn.onclick = () => guard(() => { const api = window.DungeonDexTalents || window.DungeonDexWardenTalents; const model = api && typeof api.hunterBoardClaritySpendUiReadinessModel === 'function' ? api.hunterBoardClaritySpendUiReadinessModel(S) : null; if (!model || model.enabled !== true || model.blockedReason !== 'ready') { render(); return; } const result = typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null; if (result?.ok === true) { if (typeof save === 'function') save(S); } render(); })); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-talent-spend-hunter-board]').forEach(btn => btn.onclick = () => guard(() => { if (btn.dataset.talentSpendBusy === '1') { render(); return; } btn.dataset.talentSpendBusy = '1'; btn.disabled = true; const api = window.DungeonDexTalents || window.DungeonDexWardenTalents; const model = api && typeof api.hunterBoardClaritySpendUiReadinessModel === 'function' ? api.hunterBoardClaritySpendUiReadinessModel(S) : null; if (!model || model.enabled !== true || model.blockedReason !== 'ready') { btn.dataset.talentSpendBusy = '0'; render(); return; } const result = typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null; if (result?.ok === true) { if (typeof save === 'function') save(S); } btn.dataset.talentSpendBusy = '0'; render(); })); };
 
   const api = {
     build: SCRIPT_BUILD,

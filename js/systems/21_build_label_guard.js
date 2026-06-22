@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.51 - Build label guard.
+// DungeonDex v1.21.0 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;

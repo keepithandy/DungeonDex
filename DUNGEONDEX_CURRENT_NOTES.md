@@ -7,13 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.51 - First Controlled Talent Spend UI Button
+- DungeonDex v1.21.0 - Talent Loop Release Candidate
 
-## v1.20.51 First Controlled Talent Spend UI Button
-- Current baseline: v1.20.51.
-- Adds the first controlled `hunter_board_clarity` spend button.
-- The button is gated by the readiness model and routes only through the controlled spend helper.
-- No broad Talent UI, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
+## v1.21.0 Talent Loop Release Candidate
+- Current baseline: v1.21.0.
+- Adds the first complete controlled `hunter_board_clarity` Talent loop: Boss Trophy point source, spend preview, readiness, spend button, save/reload persistence, and duplicate blocking.
+- The Talent panel now explains available, earned, and spent points, the Boss Trophy Milestone source, the Hunter Board Clarity effect, and the learned/active display-only contract.
+- No second Talent node, no Revisit activation, no combat change, no economy change, no Debt Collector change, and no broad Talent tree activation were added.
 
 ## v1.20.47 Hunter Board Clarity Spend Preview
 - Added a read-only spend preview for `hunter_board_clarity`.
