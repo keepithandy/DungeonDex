@@ -193,6 +193,111 @@
     };
   }
 
+  function resolveMutationEvidence(state){
+    const trophies = Array.isArray(state?.player?.bossTrophies) ? state.player.bossTrophies : [];
+    for (const entry of trophies){
+      const sourceId = String(entry || '').trim();
+      if (sourceId) {
+        return { sourceId, claimKey: `boss_trophy_milestone:${sourceId}`, evidence: [{ source: 'bossTrophies', sourceId }] };
+      }
+    }
+    const records = Array.isArray(state?.player?.bossTrophyRecords) ? state.player.bossTrophyRecords : [];
+    for (const record of records){
+      if (!record || typeof record !== 'object') continue;
+      const recordId = String(record.id || '').trim();
+      const trophyId = String(record.trophyId || '').trim();
+      const bossId = String(record.bossId || '').trim();
+      const sourceId = recordId || trophyId || bossId;
+      if (sourceId) {
+        return {
+          sourceId,
+          claimKey: `boss_trophy_milestone:${sourceId}`,
+          evidence: [{ source: 'bossTrophyRecords', sourceId, recordId: recordId || '', trophyId: trophyId || '', bossId: bossId || '' }]
+        };
+      }
+    }
+    return { sourceId: '', claimKey: '', evidence: [] };
+  }
+
+  function talentAwardMutationPreview(state){
+    const hasMalformedState = !state || typeof state !== 'object' || Array.isArray(state) || !isPlainObject(state.player) && state.player != null;
+    const claims = normalizeTalentAwardClaims(state?.player?.talentLedger?.awardClaims);
+    const repairReady = true;
+    const resolved = resolveMutationEvidence(state);
+    const alreadyClaimed = !!resolved.claimKey && Object.prototype.hasOwnProperty.call(claims, resolved.claimKey);
+    const hasEvidence = Array.isArray(resolved.evidence) && resolved.evidence.length > 0;
+    const eligible = !!resolved.sourceId && repairReady && hasEvidence && !alreadyClaimed && !hasMalformedState;
+    const blockedReason = hasMalformedState
+      ? 'malformed_state'
+      : alreadyClaimed
+        ? 'already_claimed'
+        : !resolved.sourceId
+          ? 'no_boss_trophy_evidence'
+          : eligible
+            ? 'ready'
+            : 'no_boss_trophy_evidence';
+    const proposedClaimRecord = eligible ? {
+      key: resolved.claimKey,
+      source: CLAIM_SOURCE,
+      sourceId: resolved.sourceId,
+      amount: 1,
+      claimedAt: 'future_live_award_timestamp',
+      version: 1
+    } : null;
+    return {
+      source: CLAIM_SOURCE,
+      label: 'Boss Trophy Milestone',
+      status: 'mutation_preview',
+      eligible,
+      blockedReason,
+      amountPreview: 1,
+      claimKey: resolved.claimKey || '',
+      sourceId: resolved.sourceId || '',
+      alreadyClaimed,
+      claimTrackingReady: true,
+      awardClaimsShapeReady: repairReady,
+      wouldAwardPoints: eligible,
+      wouldCreateClaimRecord: eligible,
+      wouldMutateSave: true,
+      mutatesSave: false,
+      awardsPoints: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresLiveAwardPatch: true,
+      requiresSpendPathPatch: true,
+      atomicMutationRequired: true,
+      plannedMutation: {
+        incrementLifetimePointsBy: 1,
+        incrementAvailablePointsBy: 1,
+        createAwardClaim: true,
+        claimRecordVersion: 1
+      },
+      proposedClaimRecord,
+      evidence: resolved.evidence || [],
+      notes: eligible ? ['Preview only. No state mutation occurs.'] : []
+    };
+  }
+
+  function talentAwardMutationPreviewSummary(state){
+    const preview = talentAwardMutationPreview(state);
+    return {
+      source: preview.source,
+      label: preview.label,
+      status: preview.status,
+      eligible: preview.eligible,
+      blockedReason: preview.blockedReason,
+      claimKey: preview.claimKey,
+      sourceId: preview.sourceId,
+      alreadyClaimed: preview.alreadyClaimed,
+      claimTrackingReady: preview.claimTrackingReady,
+      awardClaimsShapeReady: preview.awardClaimsShapeReady,
+      wouldAwardPoints: preview.wouldAwardPoints,
+      wouldCreateClaimRecord: preview.wouldCreateClaimRecord,
+      mutatesSave: preview.mutatesSave,
+      awardsPoints: preview.awardsPoints
+    };
+  }
+
   function patchApi(){
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
     if (!api) return false;
@@ -205,6 +310,8 @@
     api.talentAwardClaimShapePreviewSummary = claimShapePreviewSummary;
     api.talentPointAwardPreview = pointAwardPreview;
     api.talentPointAwardPreviewSummary = pointAwardPreviewSummary;
+    api.talentAwardMutationPreview = talentAwardMutationPreview;
+    api.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
     return true;
   }
 
@@ -216,4 +323,6 @@
   window.normalizeTalentAwardClaims = normalizeTalentAwardClaims;
   window.repairTalentAwardClaimsOnState = repairTalentAwardClaimsOnState;
   window.talentAwardClaimRepairSummary = talentAwardClaimRepairSummary;
+  window.talentAwardMutationPreview = talentAwardMutationPreview;
+  window.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
 })();

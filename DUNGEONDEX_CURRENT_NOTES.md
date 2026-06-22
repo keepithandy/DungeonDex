@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.43 - Talent Award Claim Repair Contract Completion
+- DungeonDex v1.20.44 - Talent Award Mutation Contract Preview
+
+## v1.20.44 Talent Award Mutation Contract Preview
+- Current baseline: v1.20.44.
+- Added a read-only preview for the future atomic Boss Trophy Milestone award mutation path.
+- The preview derives deterministic claim keys and source IDs from trophy evidence, but does not write claims, award points, or mutate save state.
+- No spending or Talent unlock UI is introduced.
 
 ## v1.20.43 Talent Award Claim Repair Contract Completion
 - Current baseline: v1.20.43.

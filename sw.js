@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.43-talent-claim-repair-contract';
+const CACHE_NAME = 'dungeondex-v1.20.44-talent-award-mutation-preview';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.43-talent-claim-repair-contract';
+const BUILD_QS = '1.20.44-talent-award-mutation-preview';
 const ASSETS = [
   './',
   './index.html',

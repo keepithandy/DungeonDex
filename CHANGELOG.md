@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.43`
-* Current local package baseline: `v1.20.43`
-* Current development target: `v1.20.43`
+* Public/live itch version: `v1.20.44`
+* Current local package baseline: `v1.20.44`
+* Current development target: `v1.20.44`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.44 - Talent Award Mutation Contract Preview
+
+* Added a read-only preview of the future atomic Boss Trophy Milestone award mutation path.
+* Derived deterministic claim keys and source IDs from trophy evidence while keeping mutation, points, claim creation, spending, unlock UI, and save writes disabled.
+* Kept the v1.20.43 repaired award claim save shape unchanged.
 
 ## v1.20.43 - Talent Award Claim Repair Contract Completion
 
