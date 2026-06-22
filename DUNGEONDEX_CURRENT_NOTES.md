@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.44 - Talent Award Mutation Contract Preview
+- DungeonDex v1.20.45 - Talent Award Mutation Live Gate
+
+## v1.20.45 Talent Award Mutation Live Gate
+- Current baseline: v1.20.45.
+- Adds a disabled-by-default live mutation gate for Boss Trophy Milestone Talent awards.
+- Default gameplay still awards no points and creates no claim records.
+- Explicit override exists only for smoke and fixture validation.
 
 ## v1.20.44 Talent Award Mutation Contract Preview
 - Current baseline: v1.20.44.

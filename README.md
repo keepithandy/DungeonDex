@@ -2,11 +2,11 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.44**
+Current baseline: **DungeonDex v1.20.45**
 
 ## Current Build
 
-**v1.20.44 - Talent Award Mutation Contract Preview**
+**v1.20.45 - Talent Award Mutation Live Gate**
 
 This patch adds a read-only preview of the future atomic Boss Trophy Milestone award mutation path. It does not award points, create claim records, mutate save state, enable spending, or add Talent unlock UI.
 

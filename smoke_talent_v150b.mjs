@@ -695,20 +695,63 @@ async function main() {
       const claimShapePreviewSummary = typeof api?.talentAwardClaimShapePreviewSummary === 'function' ? api.talentAwardClaimShapePreviewSummary(S) : null;
       const mutationPreview = typeof api?.talentAwardMutationPreview === 'function' ? api.talentAwardMutationPreview(S) : null;
       const mutationPreviewSummary = typeof api?.talentAwardMutationPreviewSummary === 'function' ? api.talentAwardMutationPreviewSummary(S) : null;
+      const mutationGate = typeof api?.talentAwardMutationGate === 'function' ? api.talentAwardMutationGate(S) : null;
+      const mutationGateSummary = mutationGate ? {
+        source: mutationGate.source,
+        enabled: mutationGate.enabled,
+        eligible: mutationGate.eligible,
+        blockedReason: mutationGate.blockedReason,
+        claimKey: mutationGate.claimKey,
+        sourceId: mutationGate.sourceId
+      } : null;
+      const applyAwardMutation = typeof api?.applyTalentAwardMutation === 'function' ? api.applyTalentAwardMutation : null;
       const mutationEvidenceState = { player: { bossTrophies: ['ashen_wyrm'], bossTrophyRecords: [], talentLedger: { awardClaims: {} } } };
       const mutationEvidenceBefore = JSON.stringify(mutationEvidenceState);
       const mutationEvidencePreview = typeof api?.talentAwardMutationPreview === 'function' ? api.talentAwardMutationPreview(mutationEvidenceState) : null;
       const mutationEvidenceAfter = JSON.stringify(mutationEvidenceState);
+      const mutationDefaultGateState = { player: { bossTrophies: ['ashen_wyrm'], bossTrophyRecords: [], talentLedger: { awardClaims: {} } } };
+      const mutationDefaultGateBefore = JSON.stringify(mutationDefaultGateState);
+      const mutationDefaultGateResult = applyAwardMutation ? applyAwardMutation(mutationDefaultGateState) : null;
+      const mutationDefaultGateAfter = JSON.stringify(mutationDefaultGateState);
+      const mutationOverrideState = { player: { bossTrophies: ['ashen_wyrm'], bossTrophyRecords: [], talentLedger: { awardClaims: {} } } };
+      const mutationOverrideBefore = JSON.stringify(mutationOverrideState);
+      const mutationOverrideResult = applyAwardMutation ? applyAwardMutation(mutationOverrideState, { enabledOverride: true }) : null;
+      const mutationOverrideAfter = JSON.stringify(mutationOverrideState);
+      const mutationOverrideRepeatBefore = JSON.stringify(mutationOverrideState);
+      const mutationOverrideRepeatResult = applyAwardMutation ? applyAwardMutation(mutationOverrideState, { enabledOverride: true }) : null;
+      const mutationOverrideRepeatAfter = JSON.stringify(mutationOverrideState);
+      const mutationExistingClaimState = { player: { bossTrophies: ['ashen_wyrm'], bossTrophyRecords: [], talentLedger: { awardClaims: {
+        'boss_trophy_milestone:ashen_wyrm': {
+          key: 'boss_trophy_milestone:ashen_wyrm',
+          source: 'boss_trophy_milestone',
+          sourceId: 'ashen_wyrm',
+          amount: 1,
+          claimedAt: '2026-06-21T12:00:00.000Z',
+          version: 1
+        }
+      } } } };
+      const mutationExistingClaimBefore = JSON.stringify(mutationExistingClaimState);
+      const mutationExistingClaimResult = applyAwardMutation ? applyAwardMutation(mutationExistingClaimState, { enabledOverride: true }) : null;
+      const mutationExistingClaimAfter = JSON.stringify(mutationExistingClaimState);
       const mutationRecordEvidenceState = { player: { bossTrophies: [], bossTrophyRecords: [{ id: 'ember_drake', trophyId: 'ember_drake' }], talentLedger: { awardClaims: {} } } };
       const mutationRecordEvidenceBefore = JSON.stringify(mutationRecordEvidenceState);
       const mutationRecordEvidencePreview = typeof api?.talentAwardMutationPreview === 'function' ? api.talentAwardMutationPreview(mutationRecordEvidenceState) : null;
       const mutationRecordEvidenceAfter = JSON.stringify(mutationRecordEvidenceState);
+      const mutationRecordApplyState = { player: { bossTrophies: [], bossTrophyRecords: [{ id: 'ember_drake', trophyId: 'ember_drake' }], talentLedger: { awardClaims: {} } } };
+      const mutationRecordApplyBefore = JSON.stringify(mutationRecordApplyState);
+      const mutationRecordApplyResult = applyAwardMutation ? applyAwardMutation(mutationRecordApplyState, { enabledOverride: true }) : null;
+      const mutationRecordApplyAfter = JSON.stringify(mutationRecordApplyState);
       const mutationAlreadyClaimedState = { player: { bossTrophies: ['ashen_wyrm'], bossTrophyRecords: [], talentLedger: { awardClaims: {
         'boss_trophy_milestone:ashen_wyrm': { key: 'boss_trophy_milestone:ashen_wyrm', source: 'boss_trophy_milestone', sourceId: 'ashen_wyrm', amount: 1, claimedAt: '2026-06-21T12:00:00.000Z', version: 1 }
       } } } };
       const mutationAlreadyClaimedBefore = JSON.stringify(mutationAlreadyClaimedState);
       const mutationAlreadyClaimedPreview = typeof api?.talentAwardMutationPreview === 'function' ? api.talentAwardMutationPreview(mutationAlreadyClaimedState) : null;
       const mutationAlreadyClaimedAfter = JSON.stringify(mutationAlreadyClaimedState);
+      const malformedAwardClaimsState = { player: { talentLedger: { awardClaims: [] } } };
+      const malformedAwardClaimsBefore = JSON.stringify(malformedAwardClaimsState);
+      const malformedAwardClaimsDefault = applyAwardMutation ? applyAwardMutation(malformedAwardClaimsState) : null;
+      const malformedAwardClaimsOverride = applyAwardMutation ? applyAwardMutation(malformedAwardClaimsState, { enabledOverride: true }) : null;
+      const malformedAwardClaimsAfter = JSON.stringify(malformedAwardClaimsState);
       const malformedMutationPreviews = typeof api?.talentAwardMutationPreview === 'function'
         ? [
           api.talentAwardMutationPreview(),
@@ -768,6 +811,10 @@ async function main() {
         hasClaimTrackingPlanSummary: typeof api?.talentAwardClaimTrackingPlanSummary === 'function',
         hasClaimShapePreview: typeof api?.talentAwardClaimShapePreview === 'function',
         hasClaimShapePreviewSummary: typeof api?.talentAwardClaimShapePreviewSummary === 'function',
+        hasMutationPreview: typeof api?.talentAwardMutationPreview === 'function',
+        hasMutationPreviewSummary: typeof api?.talentAwardMutationPreviewSummary === 'function',
+        hasMutationGate: typeof api?.talentAwardMutationGate === 'function',
+        hasApplyMutation: typeof api?.applyTalentAwardMutation === 'function',
         beforeLedger,
         afterLedger,
         beforeState,
@@ -784,15 +831,42 @@ async function main() {
         claimShapePreviewSummary,
         mutationPreview,
         mutationPreviewSummary,
+        mutationGate,
+        mutationGateSummary,
         mutationEvidencePreview,
         mutationEvidenceBefore,
         mutationEvidenceAfter,
+        mutationDefaultGateResult,
+        mutationDefaultGateBefore,
+        mutationDefaultGateAfter,
+        mutationDefaultGateState,
+        mutationOverrideResult,
+        mutationOverrideBefore,
+        mutationOverrideAfter,
+        mutationOverrideState,
+        mutationOverrideRepeatResult,
+        mutationOverrideRepeatBefore,
+        mutationOverrideRepeatAfter,
+        mutationOverrideRepeatState: mutationOverrideState,
+        mutationExistingClaimResult,
+        mutationExistingClaimBefore,
+        mutationExistingClaimAfter,
+        mutationExistingClaimState,
         mutationRecordEvidencePreview,
         mutationRecordEvidenceBefore,
         mutationRecordEvidenceAfter,
+        mutationRecordApplyResult,
+        mutationRecordApplyBefore,
+        mutationRecordApplyAfter,
+        mutationRecordApplyState,
         mutationAlreadyClaimedPreview,
         mutationAlreadyClaimedBefore,
         mutationAlreadyClaimedAfter,
+        malformedAwardClaimsState,
+        malformedAwardClaimsDefault,
+        malformedAwardClaimsOverride,
+        malformedAwardClaimsBefore,
+        malformedAwardClaimsAfter,
         malformedMutationPreviews,
         bossEvidencePreview,
         bossEvidenceBefore,
@@ -1305,11 +1379,15 @@ async function main() {
     record('Talent foundation API is read-only zero state', !!talentFoundationAudit?.ok && talentFoundationAudit.notMutated === true && talentFoundationAudit.hasReadHelpers === true && talentFoundationAudit.hasCurrentMutators === true && talentFoundationAudit.summary?.pointsEarned === 0 && talentFoundationAudit.summary?.pointsSpent === 0 && talentFoundationAudit.summary?.pointsAvailable === 0 && Array.isArray(talentFoundationAudit.summary?.unlockedIds) && talentFoundationAudit.summary.unlockedIds.length === 0 && talentFoundationAudit.bonuses?.maxHpPct === 0 && talentFoundationAudit.bonuses?.eliteBoardRewardPct === 0 && talentFoundationAudit.bonuses?.charterCostPct === 0 && talentFoundationAudit.bonuses?.sellValuePct === 0, JSON.stringify(talentFoundationAudit));
     record('Talent point source decision is boss trophy milestone and read-only', talentStateContractAudit?.hasPointSourceDecision === true && talentStateContractAudit?.hasPointSourceDecisionSummary === true && talentStateContractAudit?.decision?.selectedSource === 'boss_trophy_milestone' && talentStateContractAudit?.decision?.label === 'Boss Trophy Milestone' && talentStateContractAudit?.decision?.status === 'planned' && talentStateContractAudit?.decision?.awardsPoints === false && talentStateContractAudit?.decision?.mutatesSave === false && talentStateContractAudit?.decision?.grantsCurrency === false && talentStateContractAudit?.decision?.enablesSpending === false && talentStateContractAudit?.decision?.requiresSpendPath === true && Array.isArray(talentStateContractAudit?.decision?.rationale) && talentStateContractAudit.decision.rationale.length === 4 && Array.isArray(talentStateContractAudit?.decision?.rejectedAlternatives) && talentStateContractAudit.decision.rejectedAlternatives.length === 2 && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger, JSON.stringify(talentStateContractAudit?.decision));
     record('Talent point award preview is read-only and award-disabled', talentStateContractAudit?.hasPointAwardPreview === true && talentStateContractAudit?.hasPointAwardPreviewSummary === true && talentStateContractAudit?.awardPreview?.source === 'boss_trophy_milestone' && talentStateContractAudit?.awardPreview?.status === 'preview' && talentStateContractAudit?.awardPreview?.amountPreview === 1 && talentStateContractAudit?.awardPreview?.alreadyClaimed === false && talentStateContractAudit?.awardPreview?.claimTrackingReady === true && talentStateContractAudit?.awardPreview?.claimKey === 'boss_trophy_milestone:first_award' && talentStateContractAudit?.awardPreview?.awardsPoints === false && talentStateContractAudit?.awardPreview?.mutatesSave === false && talentStateContractAudit?.awardPreview?.grantsCurrency === false && talentStateContractAudit?.awardPreview?.enablesSpending === false && talentStateContractAudit?.awardPreview?.requiresLiveAwardPatch === true && talentStateContractAudit?.awardPreview?.requiresClaimTrackingPatch === false && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger && talentStateContractAudit?.beforeState === talentStateContractAudit?.afterState, JSON.stringify(talentStateContractAudit?.awardPreview));
-    record('Talent award mutation preview helper exists', typeof talentStateContractAudit?.mutationPreview === 'object' && typeof talentStateContractAudit?.mutationPreviewSummary === 'object' && talentStateContractAudit?.hasHelper === true && typeof talentStateContractAudit?.mutationPreview?.source === 'string', JSON.stringify({ mutationPreview: talentStateContractAudit?.mutationPreview, mutationPreviewSummary: talentStateContractAudit?.mutationPreviewSummary }));
-    record('Talent award mutation preview without evidence is blocked and read-only', talentStateContractAudit?.mutationPreview?.eligible === false && talentStateContractAudit?.mutationPreview?.blockedReason === 'no_boss_trophy_evidence' && talentStateContractAudit?.mutationPreview?.wouldAwardPoints === false && talentStateContractAudit?.mutationPreview?.wouldCreateClaimRecord === false && talentStateContractAudit?.mutationPreview?.mutatesSave === false && talentStateContractAudit?.mutationPreview?.awardsPoints === false, JSON.stringify(talentStateContractAudit?.mutationPreview));
+    record('Talent award mutation preview helper exists', typeof talentStateContractAudit?.mutationPreview === 'object' && typeof talentStateContractAudit?.mutationPreviewSummary === 'object' && talentStateContractAudit?.hasMutationPreview === true && talentStateContractAudit?.hasMutationPreviewSummary === true && typeof talentStateContractAudit?.mutationPreview?.source === 'string', JSON.stringify({ mutationPreview: talentStateContractAudit?.mutationPreview, mutationPreviewSummary: talentStateContractAudit?.mutationPreviewSummary }));
+    record('Talent award mutation gate helper exists', talentStateContractAudit?.hasMutationGate === true && talentStateContractAudit?.hasApplyMutation === true && typeof talentStateContractAudit?.mutationGate === 'object' && talentStateContractAudit?.mutationGate?.enabled === false, JSON.stringify(talentStateContractAudit?.mutationGateSummary || talentStateContractAudit?.mutationGate));
+    record('Talent award mutation default gate is blocked and read-only', talentStateContractAudit?.mutationDefaultGateResult?.ok === false && talentStateContractAudit?.mutationDefaultGateResult?.status === 'blocked' && talentStateContractAudit?.mutationDefaultGateResult?.blockedReason === 'award_gate_disabled' && talentStateContractAudit?.mutationDefaultGateResult?.enabled === false && talentStateContractAudit?.mutationDefaultGateResult?.awardedPoints === 0 && talentStateContractAudit?.mutationDefaultGateResult?.createdClaimRecord === false && talentStateContractAudit?.mutationDefaultGateResult?.mutatesSave === false && talentStateContractAudit?.mutationDefaultGateResult?.awardsPoints === false && talentStateContractAudit?.mutationDefaultGateBefore === talentStateContractAudit?.mutationDefaultGateAfter, JSON.stringify(talentStateContractAudit?.mutationDefaultGateResult));
+    record('Talent award mutation explicit override awards one point and one claim', talentStateContractAudit?.mutationOverrideResult?.ok === true && talentStateContractAudit?.mutationOverrideResult?.status === 'awarded' && talentStateContractAudit?.mutationOverrideResult?.blockedReason === '' && talentStateContractAudit?.mutationOverrideResult?.enabled === true && talentStateContractAudit?.mutationOverrideResult?.claimKey === 'boss_trophy_milestone:ashen_wyrm' && talentStateContractAudit?.mutationOverrideResult?.sourceId === 'ashen_wyrm' && talentStateContractAudit?.mutationOverrideResult?.awardedPoints === 1 && talentStateContractAudit?.mutationOverrideResult?.createdClaimRecord === true && talentStateContractAudit?.mutationOverrideResult?.mutatesSave === true && talentStateContractAudit?.mutationOverrideResult?.awardsPoints === true && talentStateContractAudit?.mutationOverrideResult?.grantsCurrency === false && talentStateContractAudit?.mutationOverrideResult?.enablesSpending === false && talentStateContractAudit?.mutationOverrideResult?.spendPathEnabled === false && talentStateContractAudit?.mutationOverrideResult?.unlockUiEnabled === false && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.lifetimePoints === 1 && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.availablePoints === 1 && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.spentPoints === 0 && Object.keys(talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.awardClaims || {}).length === 1 && !!talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.awardClaims?.['boss_trophy_milestone:ashen_wyrm'] && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.awardClaims?.['boss_trophy_milestone:ashen_wyrm']?.version === 1 && talentStateContractAudit?.mutationOverrideBefore !== talentStateContractAudit?.mutationOverrideAfter, JSON.stringify(talentStateContractAudit?.mutationOverrideResult));
+    record('Talent award mutation explicit override blocks duplicate claims', talentStateContractAudit?.mutationOverrideRepeatResult?.ok === false && talentStateContractAudit?.mutationOverrideRepeatResult?.blockedReason === 'already_claimed' && talentStateContractAudit?.mutationOverrideRepeatResult?.awardedPoints === 0 && talentStateContractAudit?.mutationOverrideRepeatResult?.createdClaimRecord === false && talentStateContractAudit?.mutationOverrideRepeatResult?.mutatesSave === false && talentStateContractAudit?.mutationOverrideRepeatResult?.awardsPoints === false && talentStateContractAudit?.mutationOverrideRepeatBefore === talentStateContractAudit?.mutationOverrideRepeatAfter && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.lifetimePoints === 1 && talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.availablePoints === 1 && Object.keys(talentStateContractAudit?.mutationOverrideState?.player?.talentLedger?.awardClaims || {}).length === 1, JSON.stringify(talentStateContractAudit?.mutationOverrideRepeatResult));
+    record('Talent award mutation explicit override blocks pre-existing claim', talentStateContractAudit?.mutationExistingClaimResult?.ok === false && talentStateContractAudit?.mutationExistingClaimResult?.blockedReason === 'already_claimed' && talentStateContractAudit?.mutationExistingClaimResult?.awardedPoints === 0 && talentStateContractAudit?.mutationExistingClaimResult?.createdClaimRecord === false && talentStateContractAudit?.mutationExistingClaimResult?.mutatesSave === false && talentStateContractAudit?.mutationExistingClaimResult?.awardsPoints === false && talentStateContractAudit?.mutationExistingClaimBefore === talentStateContractAudit?.mutationExistingClaimAfter, JSON.stringify(talentStateContractAudit?.mutationExistingClaimResult));
     record('Talent award mutation preview derives deterministic claim data from boss trophies', talentStateContractAudit?.mutationEvidencePreview?.source === 'boss_trophy_milestone' && talentStateContractAudit?.mutationEvidencePreview?.sourceId === 'ashen_wyrm' && talentStateContractAudit?.mutationEvidencePreview?.claimKey === 'boss_trophy_milestone:ashen_wyrm' && talentStateContractAudit?.mutationEvidencePreview?.eligible === true && talentStateContractAudit?.mutationEvidencePreview?.blockedReason === 'ready' && talentStateContractAudit?.mutationEvidencePreview?.amountPreview === 1 && talentStateContractAudit?.mutationEvidencePreview?.wouldAwardPoints === true && talentStateContractAudit?.mutationEvidencePreview?.wouldCreateClaimRecord === true && talentStateContractAudit?.mutationEvidencePreview?.claimTrackingReady === true && talentStateContractAudit?.mutationEvidencePreview?.awardClaimsShapeReady === true && talentStateContractAudit?.mutationEvidencePreview?.proposedClaimRecord?.claimedAt === 'future_live_award_timestamp' && talentStateContractAudit?.mutationEvidenceBefore === talentStateContractAudit?.mutationEvidenceAfter, JSON.stringify(talentStateContractAudit?.mutationEvidencePreview));
-    record('Talent award mutation preview derives deterministic claim data from trophy records', talentStateContractAudit?.mutationRecordEvidencePreview?.sourceId === 'ember_drake' && talentStateContractAudit?.mutationRecordEvidencePreview?.claimKey === 'boss_trophy_milestone:ember_drake' && talentStateContractAudit?.mutationRecordEvidencePreview?.eligible === true && talentStateContractAudit?.mutationRecordEvidencePreview?.wouldAwardPoints === true && talentStateContractAudit?.mutationRecordEvidencePreview?.wouldCreateClaimRecord === true && talentStateContractAudit?.mutationRecordEvidenceBefore === talentStateContractAudit?.mutationRecordEvidenceAfter, JSON.stringify(talentStateContractAudit?.mutationRecordEvidencePreview));
-    record('Talent award mutation preview blocks already-claimed trophies', talentStateContractAudit?.mutationAlreadyClaimedPreview?.alreadyClaimed === true && talentStateContractAudit?.mutationAlreadyClaimedPreview?.eligible === false && talentStateContractAudit?.mutationAlreadyClaimedPreview?.blockedReason === 'already_claimed' && talentStateContractAudit?.mutationAlreadyClaimedPreview?.wouldAwardPoints === false && talentStateContractAudit?.mutationAlreadyClaimedPreview?.wouldCreateClaimRecord === false && talentStateContractAudit?.mutationAlreadyClaimedPreview?.mutatesSave === false && talentStateContractAudit?.mutationAlreadyClaimedBefore === talentStateContractAudit?.mutationAlreadyClaimedAfter, JSON.stringify(talentStateContractAudit?.mutationAlreadyClaimedPreview));
+    record('Talent award mutation preview derives deterministic claim data from trophy records', talentStateContractAudit?.mutationRecordApplyResult?.ok === true && talentStateContractAudit?.mutationRecordApplyResult?.claimKey === 'boss_trophy_milestone:ember_drake' && talentStateContractAudit?.mutationRecordApplyResult?.sourceId === 'ember_drake' && talentStateContractAudit?.mutationRecordApplyResult?.awardedPoints === 1 && talentStateContractAudit?.mutationRecordApplyResult?.createdClaimRecord === true && talentStateContractAudit?.mutationRecordApplyBefore !== talentStateContractAudit?.mutationRecordApplyAfter, JSON.stringify(talentStateContractAudit?.mutationRecordApplyResult));
+    record('Talent award mutation preview blocks malformed awardClaims safely', talentStateContractAudit?.malformedAwardClaimsDefault?.ok === false && talentStateContractAudit?.malformedAwardClaimsDefault?.blockedReason === 'award_gate_disabled' && talentStateContractAudit?.malformedAwardClaimsOverride?.ok === false && talentStateContractAudit?.malformedAwardClaimsOverride?.awardedPoints === 0 && talentStateContractAudit?.malformedAwardClaimsBefore === talentStateContractAudit?.malformedAwardClaimsAfter, JSON.stringify({ malformedAwardClaimsDefault: talentStateContractAudit?.malformedAwardClaimsDefault, malformedAwardClaimsOverride: talentStateContractAudit?.malformedAwardClaimsOverride }));
     record('Talent award mutation preview is stable on malformed input', Array.isArray(talentStateContractAudit?.malformedMutationPreviews) && talentStateContractAudit.malformedMutationPreviews.length === 6 && talentStateContractAudit.malformedMutationPreviews.every(preview => preview && typeof preview === 'object' && preview.mutatesSave === false && preview.awardsPoints === false), JSON.stringify(talentStateContractAudit?.malformedMutationPreviews));
     record('Talent award claim tracking plan is repaired and aligned', talentStateContractAudit?.hasClaimTrackingPlan === true && talentStateContractAudit?.hasClaimTrackingPlanSummary === true && talentStateContractAudit?.claimTrackingPlan?.source === 'boss_trophy_milestone' && talentStateContractAudit?.claimTrackingPlan?.status === 'repaired' && talentStateContractAudit?.claimTrackingPlan?.repair_active === true && talentStateContractAudit?.claimTrackingPlan?.claimTrackingReady === true && talentStateContractAudit?.claimTrackingPlan?.currentSaveShapeAddsClaimTracking === true && talentStateContractAudit?.claimTrackingPlan?.currentPatchMutatesSave === true && talentStateContractAudit?.claimTrackingPlan?.plannedClaimPath === 'player.talentLedger.awardClaims' && talentStateContractAudit?.claimTrackingPlan?.plannedClaimKeyPattern === 'boss_trophy_milestone:{bossTrophyId}' && talentStateContractAudit?.claimTrackingPlan?.firstPreviewClaimKey === talentStateContractAudit?.awardPreview?.claimKey && talentStateContractAudit?.claimTrackingPlan?.duplicatePreventionRequired === true && talentStateContractAudit?.claimTrackingPlan?.requiresSaveRepairPatch === true && talentStateContractAudit?.claimTrackingPlan?.requiresLiveAwardPatch === true && talentStateContractAudit?.claimTrackingPlan?.requiresSpendPathPatch === true && talentStateContractAudit?.claimTrackingPlan?.proposedClaimRecordShape?.key === 'boss_trophy_milestone:{bossTrophyId}' && talentStateContractAudit?.claimTrackingPlan?.proposedClaimRecordShape?.source === 'boss_trophy_milestone' && talentStateContractAudit?.claimTrackingPlan?.proposedClaimRecordShape?.sourceId === '{bossTrophyId}' && talentStateContractAudit?.claimTrackingPlan?.proposedClaimRecordShape?.amount === 1 && talentStateContractAudit?.claimTrackingPlan?.proposedClaimRecordShape?.version === 1 && Array.isArray(talentStateContractAudit?.claimTrackingPlan?.rules) && talentStateContractAudit.claimTrackingPlan.rules.length === 5 && talentStateContractAudit?.hadAwardClaimsBefore === false && talentStateContractAudit?.hadAwardClaimsAfter === false && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger && talentStateContractAudit?.beforeState === talentStateContractAudit?.afterState, JSON.stringify(talentStateContractAudit?.claimTrackingPlan));
     record('Talent award claim save shape preview is repaired and aligned', talentStateContractAudit?.hasClaimShapePreview === true && talentStateContractAudit?.hasClaimShapePreviewSummary === true && talentStateContractAudit?.claimShapePreview?.path === 'player.talentLedger.awardClaims' && talentStateContractAudit?.claimShapePreview?.status === 'dry_run' && talentStateContractAudit?.claimShapePreview?.repair_active === true && talentStateContractAudit?.claimShapePreview?.claimTrackingReady === true && talentStateContractAudit?.claimShapePreview?.saveFieldExists === true && talentStateContractAudit?.claimShapePreview?.wouldAddSaveField === false && talentStateContractAudit?.claimShapePreview?.mutatesSave === false && talentStateContractAudit?.claimShapePreview?.awardsPoints === false && talentStateContractAudit?.claimShapePreview?.grantsCurrency === false && talentStateContractAudit?.claimShapePreview?.enablesSpending === false && talentStateContractAudit?.claimShapePreview?.requiresRepairPatch === false && talentStateContractAudit?.claimShapePreview?.requiresLiveAwardPatch === true && talentStateContractAudit?.claimShapePreview?.requiresClaimTrackingPatch === false && talentStateContractAudit?.claimShapePreview?.expectedShape === 'object_map' && talentStateContractAudit?.claimShapePreview?.expectedEmptyValue && !Array.isArray(talentStateContractAudit.claimShapePreview.expectedEmptyValue) && Object.keys(talentStateContractAudit.claimShapePreview.expectedEmptyValue).length === 0 && talentStateContractAudit?.claimShapePreview?.allowedRecordVersion === 1 && talentStateContractAudit?.claimShapePreview?.claimKeyPattern === talentStateContractAudit?.claimTrackingPlan?.plannedClaimKeyPattern && talentStateContractAudit?.claimShapePreview?.proposedRecordShape?.source === 'boss_trophy_milestone' && talentStateContractAudit?.claimShapePreview?.proposedRecordShape?.amount === 1 && Array.isArray(talentStateContractAudit?.claimShapePreview?.repairRules) && talentStateContractAudit.claimShapePreview.repairRules.length === 5 && talentStateContractAudit?.beforeLedger === talentStateContractAudit?.afterLedger && talentStateContractAudit?.beforeState === talentStateContractAudit?.afterState, JSON.stringify(talentStateContractAudit?.claimShapePreview));

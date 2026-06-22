@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.43 - Talent award claim repair contract.
+// DungeonDex v1.20.45 - Talent award claim repair contract.
 (function(){
   if (window.DDTalentAwardClaimRepairContract) return;
   window.DDTalentAwardClaimRepairContract = true;
@@ -298,6 +298,123 @@
     };
   }
 
+  function talentAwardMutationGate(state, options){
+    const preview = talentAwardMutationPreview(state);
+    return {
+      source: preview.source,
+      enabled: !!(options && options.enabledOverride === true),
+      eligible: preview.eligible,
+      blockedReason: preview.blockedReason,
+      claimKey: preview.claimKey,
+      sourceId: preview.sourceId,
+      preview
+    };
+  }
+
+  function applyTalentAwardMutation(state, options){
+    const gate = talentAwardMutationGate(state, options);
+    const disabledResult = {
+      ok: false,
+      source: CLAIM_SOURCE,
+      status: 'blocked',
+      blockedReason: 'award_gate_disabled',
+      enabled: false,
+      claimKey: '',
+      sourceId: '',
+      awardedPoints: 0,
+      createdClaimRecord: false,
+      totalLifetimePoints: 0,
+      availablePoints: 0,
+      mutatesSave: false,
+      awardsPoints: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      spendPathEnabled: false,
+      unlockUiEnabled: false
+    };
+
+    if (!gate.enabled) return disabledResult;
+
+    const preview = gate.preview;
+    if (!preview || typeof preview !== 'object') {
+      return {
+        ...disabledResult,
+        blockedReason: 'invalid_preview'
+      };
+    }
+
+    if (!preview.eligible || preview.blockedReason !== 'ready' || !preview.claimKey || !preview.sourceId || preview.amountPreview !== 1 || preview.alreadyClaimed) {
+      const blockedReason = preview.blockedReason === 'already_claimed'
+        ? 'already_claimed'
+        : !preview.claimKey || !preview.sourceId
+          ? 'missing_claim_key'
+          : !preview.eligible
+            ? 'invalid_preview'
+            : 'invalid_preview';
+      return {
+        ...disabledResult,
+        blockedReason,
+        claimKey: preview.claimKey || '',
+        sourceId: preview.sourceId || ''
+      };
+    }
+
+    if (!isPlainObject(state) || !isPlainObject(state.player)) {
+      return {
+        ...disabledResult,
+        blockedReason: 'malformed_state'
+      };
+    }
+
+    if (!isPlainObject(state.player.talentLedger)) state.player.talentLedger = {};
+    const claimMap = normalizeTalentAwardClaims(state.player.talentLedger.awardClaims);
+    if (!Object.prototype.hasOwnProperty.call(claimMap, preview.claimKey)) {
+      claimMap[preview.claimKey] = {
+        key: preview.claimKey,
+        source: CLAIM_SOURCE,
+        sourceId: preview.sourceId,
+        amount: 1,
+        claimedAt: new Date().toISOString(),
+        version: 1
+      };
+    } else {
+      return {
+        ...disabledResult,
+        blockedReason: 'already_claimed',
+        claimKey: preview.claimKey,
+        sourceId: preview.sourceId
+      };
+    }
+
+    const currentLifetime = Number(state.player.talentLedger.lifetimePoints || 0);
+    const currentAvailable = Number(state.player.talentLedger.availablePoints || 0);
+    const currentSpent = Number(state.player.talentLedger.spentPoints || 0);
+    state.player.talentLedger.awardClaims = claimMap;
+    state.player.talentLedger.lifetimePoints = currentLifetime + 1;
+    state.player.talentLedger.availablePoints = currentAvailable + 1;
+    state.player.talentLedger.spentPoints = Number.isFinite(currentSpent) ? currentSpent : 0;
+
+    return {
+      ok: true,
+      source: CLAIM_SOURCE,
+      status: 'awarded',
+      blockedReason: '',
+      enabled: true,
+      claimKey: preview.claimKey,
+      sourceId: preview.sourceId,
+      awardedPoints: 1,
+      createdClaimRecord: true,
+      totalLifetimePoints: state.player.talentLedger.lifetimePoints,
+      availablePoints: state.player.talentLedger.availablePoints,
+      mutatesSave: true,
+      awardsPoints: true,
+      grantsCurrency: false,
+      enablesSpending: false,
+      spendPathEnabled: false,
+      unlockUiEnabled: false
+    };
+  }
+
   function patchApi(){
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
     if (!api) return false;
@@ -312,6 +429,8 @@
     api.talentPointAwardPreviewSummary = pointAwardPreviewSummary;
     api.talentAwardMutationPreview = talentAwardMutationPreview;
     api.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
+    api.talentAwardMutationGate = talentAwardMutationGate;
+    api.applyTalentAwardMutation = applyTalentAwardMutation;
     return true;
   }
 
@@ -325,4 +444,6 @@
   window.talentAwardClaimRepairSummary = talentAwardClaimRepairSummary;
   window.talentAwardMutationPreview = talentAwardMutationPreview;
   window.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
+  window.talentAwardMutationGate = talentAwardMutationGate;
+  window.applyTalentAwardMutation = applyTalentAwardMutation;
 })();

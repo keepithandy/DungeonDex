@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.44`
-* Current local package baseline: `v1.20.44`
-* Current development target: `v1.20.44`
+* Public/live itch version: `v1.20.45`
+* Current local package baseline: `v1.20.45`
+* Current development target: `v1.20.45`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.45 - Talent Award Mutation Live Gate
+
+* Added a disabled-by-default live mutation gate for Boss Trophy Milestone Talent awards.
+* Default gameplay still awards no points and creates no claim records.
+* Explicit override support exists only for smoke and fixture validation.
 
 ## v1.20.44 - Talent Award Mutation Contract Preview
 
