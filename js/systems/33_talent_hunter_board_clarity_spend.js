@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.48 - First controlled Hunter Board Clarity spend.
+// DungeonDex v1.20.50 - First controlled Hunter Board Clarity spend.
 (function(){
   if (window.DDTalentHunterBoardClaritySpend) return;
   window.DDTalentHunterBoardClaritySpend = true;
@@ -62,6 +62,93 @@
       availablePoints,
       effectiveAvailable
     };
+  }
+
+  function spendUiReadinessBase(state, nodeKey){
+    const resolvedNodeKey = String(nodeKey || '').trim();
+    const player = isPlainObject(state?.player) ? state.player : null;
+    const ledger = isPlainObject(player?.talentLedger) ? player.talentLedger : null;
+    const snapshot = spendableLedgerSnapshot(ledger || {});
+    const preview = resolvedNodeKey === TARGET_NODE && typeof window.DungeonDexTalents?.hunterBoardClaritySpendPreview === 'function'
+      ? window.DungeonDexTalents.hunterBoardClaritySpendPreview(state)
+      : null;
+    const learned = hasLearnedNode(player, TARGET_NODE);
+    const malformed = !player || !ledger;
+    const supported = resolvedNodeKey === TARGET_NODE;
+    let blockedReason = 'unknown_node';
+    let enabled = false;
+
+    if (!supported) {
+      blockedReason = 'unknown_node';
+    } else if (malformed) {
+      blockedReason = 'malformed_state';
+    } else if (learned) {
+      blockedReason = 'already_learned';
+    } else if (snapshot.effectiveAvailable < SPEND_COST) {
+      blockedReason = 'insufficient_points';
+    } else if (!preview || preview.eligible !== true || preview.blockedReason !== 'ready') {
+      blockedReason = 'preview_unavailable';
+    } else {
+      blockedReason = 'ready';
+      enabled = true;
+    }
+
+    const actionLabel = 'Spend 1 Talent Point';
+    return {
+      version: 1,
+      nodeKey: supported ? TARGET_NODE : resolvedNodeKey,
+      supported,
+      visible: supported,
+      actionLabel,
+      disabledLabel: 'Spend unavailable',
+      enabled,
+      blockedReason,
+      cost: SPEND_COST,
+      availablePoints: snapshot.effectiveAvailable,
+      spentPoints: safeInt(snapshot.spentPoints, 0),
+      lifetimePoints: safeInt(snapshot.lifetimePoints, 0),
+      learned: learned,
+      previewReady: !!preview,
+      liveSpendPatchReady: !!preview && preview.liveSpendPatchReady === true,
+      wouldMutateOnClick: true,
+      mutatesDuringPreview: false,
+      uiActionWired: false,
+      clickHandlerEnabled: false,
+      renderButtonNow: false
+    };
+  }
+
+  function talentSpendUiReadinessModel(state, nodeKey){
+    const resolvedNodeKey = String(nodeKey || '').trim();
+    if (resolvedNodeKey !== TARGET_NODE) {
+      return Object.freeze({
+        version: 1,
+        nodeKey: resolvedNodeKey,
+        supported: false,
+        visible: false,
+        actionLabel: 'Spend 1 Talent Point',
+        disabledLabel: 'Spend unavailable',
+        enabled: false,
+        blockedReason: resolvedNodeKey ? 'unknown_node' : 'malformed_state',
+        cost: SPEND_COST,
+        availablePoints: safeInt(state?.player?.talentLedger?.availablePoints, 0),
+        spentPoints: safeInt(state?.player?.talentLedger?.spentPoints, 0),
+        lifetimePoints: safeInt(state?.player?.talentLedger?.lifetimePoints, 0),
+        learned: hasLearnedNode(state?.player, TARGET_NODE),
+        previewReady: false,
+        liveSpendPatchReady: false,
+        wouldMutateOnClick: true,
+        mutatesDuringPreview: false,
+        uiActionWired: false,
+        clickHandlerEnabled: false,
+        renderButtonNow: false
+      });
+    }
+    return Object.freeze(spendUiReadinessBase(state, TARGET_NODE));
+  }
+
+  function hunterBoardClaritySpendUiReadinessModel(state){
+    return talentSpendUiReadinessModel(state, TARGET_NODE);
   }
 
   function blockedResult(reason, preview, snapshot){
@@ -272,6 +359,8 @@
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
     if (!api) return false;
     patchPreview(api);
+    api.talentSpendUiReadinessModel = talentSpendUiReadinessModel;
+    api.hunterBoardClaritySpendUiReadinessModel = hunterBoardClaritySpendUiReadinessModel;
     api.applyHunterBoardClaritySpend = applyHunterBoardClaritySpend;
     api.applyTalentSpendMutation = applyTalentSpendMutation;
     api.hunterBoardClaritySpendResultSummary = hunterBoardClaritySpendResultSummary;
@@ -285,6 +374,8 @@
     window.setTimeout(patchApi, 0);
   }
 
+  window.talentSpendUiReadinessModel = talentSpendUiReadinessModel;
+  window.hunterBoardClaritySpendUiReadinessModel = hunterBoardClaritySpendUiReadinessModel;
   window.applyHunterBoardClaritySpend = applyHunterBoardClaritySpend;
   window.applyTalentSpendMutation = applyTalentSpendMutation;
 })();

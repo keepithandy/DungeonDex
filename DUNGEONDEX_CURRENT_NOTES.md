@@ -7,13 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.49 - Browser/Reload Spend Persistence Stabilization Audit
+- DungeonDex v1.20.50 - Talent Spend UI Readiness Model
 
-## v1.20.49 Browser/Reload Spend Persistence Stabilization Audit
-- Current baseline: v1.20.49.
-- Focuses on proving the first controlled live Talent spend survives browser runtime, save, reload, duplicate blocking, and guard checks.
-- Added browser smoke coverage for the live runtime spend path and reload persistence.
-- No new gameplay, Talent UI, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
+## v1.20.50 Talent Spend UI Readiness Model
+- Current baseline: v1.20.50.
+- Adds a read-only readiness model for the future `hunter_board_clarity` spend button.
+- The readiness model reports enabled/blocked state and a future action label without rendering or wiring a live spend button.
+- No new gameplay, live Talent UI action, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
 
 ## v1.20.47 Hunter Board Clarity Spend Preview
 - Added a read-only spend preview for `hunter_board_clarity`.

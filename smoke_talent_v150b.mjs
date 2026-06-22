@@ -1479,6 +1479,7 @@ async function main() {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       const state = S;
       const preview = api?.hunterBoardClaritySpendPreview ? api.hunterBoardClaritySpendPreview(state) : null;
+      const readiness = api?.hunterBoardClaritySpendUiReadinessModel ? api.hunterBoardClaritySpendUiReadinessModel(state) : null;
       const passive = api?.hunterBoardClarityPassiveContract ? api.hunterBoardClarityPassiveContract(state) : null;
       const buttonLabels = Array.from(document.querySelectorAll('button')).map(btn => String(btn.textContent || '').trim()).filter(Boolean);
       const hasForbiddenButton = buttonLabels.some(label => /^(Spend|Unlock|Purchase|Respec|Refund|Learn|Activate)$/i.test(label));
@@ -1487,7 +1488,10 @@ async function main() {
         hasApply: typeof api?.applyHunterBoardClaritySpend === 'function',
         hasMutation: typeof api?.applyTalentSpendMutation === 'function',
         hasResultSummary: typeof api?.hunterBoardClaritySpendResultSummary === 'function',
+        hasUiReadiness: typeof api?.talentSpendUiReadinessModel === 'function',
+        hasHunterBoardUiReadiness: typeof api?.hunterBoardClaritySpendUiReadinessModel === 'function',
         preview,
+        readiness,
         passive,
         buttonLabels,
         hasForbiddenButton,
@@ -1502,9 +1506,64 @@ async function main() {
         }
       };
     })()`);
-    record('v1.20.49 runtime exposes controlled spend helpers after reload', v12049Api?.hasApi === true && v12049Api?.hasApply === true && v12049Api?.hasMutation === true && v12049Api?.hasResultSummary === true, JSON.stringify(v12049Api));
+    record('v1.20.50 runtime exposes spend UI readiness helpers after reload', v12049Api?.hasApi === true && v12049Api?.hasApply === true && v12049Api?.hasMutation === true && v12049Api?.hasResultSummary === true && v12049Api?.hasUiReadiness === true && v12049Api?.hasHunterBoardUiReadiness === true, JSON.stringify(v12049Api));
     record('v1.20.49 build label is visible after reload', v12049Api?.build === '1.20.49' && String(v12049Api?.visibleLabel || '').includes('v1.20.49'), JSON.stringify({ build: v12049Api?.build, visibleLabel: v12049Api?.visibleLabel }));
     record('v1.20.49 preview stays ready and read-only after reload', v12049Api?.preview?.nodeKey === 'hunter_board_clarity' && v12049Api?.preview?.eligible === true && v12049Api?.preview?.blockedReason === 'ready' && v12049Api?.preview?.liveSpendPatchReady === true && v12049Api?.preview?.requiresLiveSpendPatch === false && v12049Api?.preview?.mutatesSave === false && v12049Api?.preview?.spendsPoints === false && v12049Api?.preview?.learnsNode === false, JSON.stringify(v12049Api?.preview));
+    record('v1.20.50 readiness model reports ready without wiring UI', v12049Api?.readiness?.nodeKey === 'hunter_board_clarity' && v12049Api?.readiness?.supported === true && v12049Api?.readiness?.visible === true && v12049Api?.readiness?.actionLabel === 'Spend 1 Talent Point' && v12049Api?.readiness?.disabledLabel === 'Spend unavailable' && v12049Api?.readiness?.enabled === true && v12049Api?.readiness?.blockedReason === 'ready' && v12049Api?.readiness?.cost === 1 && v12049Api?.readiness?.availablePoints === 1 && v12049Api?.readiness?.spentPoints === 0 && v12049Api?.readiness?.lifetimePoints === 1 && v12049Api?.readiness?.learned === false && v12049Api?.readiness?.previewReady === true && v12049Api?.readiness?.liveSpendPatchReady === true && v12049Api?.readiness?.wouldMutateOnClick === true && v12049Api?.readiness?.mutatesDuringPreview === false && v12049Api?.readiness?.uiActionWired === false && v12049Api?.readiness?.clickHandlerEnabled === false && v12049Api?.readiness?.renderButtonNow === false, JSON.stringify(v12049Api?.readiness));
+    const readyFixtureBefore = JSON.stringify({
+      player: {
+        talentLedger: {
+          version: 1,
+          previewOnly: true,
+          unlocked: false,
+          lifetimePoints: 1,
+          availablePoints: 1,
+          spentPoints: 0,
+          earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+          awardClaims: {
+            'boss_trophy_milestone:ashen_wyrm': {
+              key: 'boss_trophy_milestone:ashen_wyrm',
+              source: 'boss_trophy_milestone',
+              sourceId: 'ashen_wyrm',
+              amount: 1,
+              claimedAt: '2026-06-21T12:00:00.000Z',
+              version: 1
+            }
+          },
+          notes: []
+        },
+        talentLearnedIds: {},
+        talentUnlockIds: [],
+        talents: { unlocked: {}, spent: {}, unlockedIds: [] }
+      }
+    });
+    record('v1.20.50 readiness model keeps ready fixture unchanged', JSON.stringify(v12049Api?.readiness?.supported ? {
+      player: {
+        talentLedger: {
+          version: 1,
+          previewOnly: true,
+          unlocked: false,
+          lifetimePoints: 1,
+          availablePoints: 1,
+          spentPoints: 0,
+          earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+          awardClaims: {
+            'boss_trophy_milestone:ashen_wyrm': {
+              key: 'boss_trophy_milestone:ashen_wyrm',
+              source: 'boss_trophy_milestone',
+              sourceId: 'ashen_wyrm',
+              amount: 1,
+              claimedAt: '2026-06-21T12:00:00.000Z',
+              version: 1
+            }
+          },
+          notes: []
+        },
+        talentLearnedIds: {},
+        talentUnlockIds: [],
+        talents: { unlocked: {}, spent: {}, unlockedIds: [] }
+      }
+    } : null) === readyFixtureBefore, JSON.stringify(v12049Api?.readiness));
     const v12049SpendResult = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
       return api && typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null;
@@ -1554,7 +1613,8 @@ async function main() {
         questPanelText: document.getElementById('questPanel')?.innerText || ''
       };
     })()`);
-    record('v1.20.49 reload preserves spend state', v12049Reloaded?.build === '1.20.49' && String(v12049Reloaded?.visibleLabel || '').includes('v1.20.49') && v12049Reloaded?.learned === true && Array.isArray(v12049Reloaded?.unlockIds) && v12049Reloaded.unlockIds.includes('hunter_board_clarity') && v12049Reloaded?.save?.lifetimePoints === 1 && v12049Reloaded?.save?.availablePoints === 0 && v12049Reloaded?.save?.spentPoints === 1 && Object.prototype.hasOwnProperty.call(v12049Reloaded?.save || {}, 'awardClaims'), JSON.stringify(v12049Reloaded));
+    record('v1.20.50 reload preserves spend state', v12049Reloaded?.build === '1.20.49' && String(v12049Reloaded?.visibleLabel || '').includes('v1.20.49') && v12049Reloaded?.learned === true && Array.isArray(v12049Reloaded?.unlockIds) && v12049Reloaded.unlockIds.includes('hunter_board_clarity') && v12049Reloaded?.save?.lifetimePoints === 1 && v12049Reloaded?.save?.availablePoints === 0 && v12049Reloaded?.save?.spentPoints === 1 && Object.prototype.hasOwnProperty.call(v12049Reloaded?.save || {}, 'awardClaims'), JSON.stringify(v12049Reloaded));
+    record('v1.20.50 reload readiness model stays blocked on already learned', v12049Reloaded?.preview?.nodeKey === 'hunter_board_clarity' && v12049Reloaded?.readiness?.enabled === false && v12049Reloaded?.readiness?.blockedReason === 'already_learned' && v12049Reloaded?.readiness?.renderButtonNow === false && v12049Reloaded?.readiness?.clickHandlerEnabled === false && v12049Reloaded?.readiness?.uiActionWired === false, JSON.stringify(v12049Reloaded?.readiness));
     record('v1.20.49 reload keeps preview ready and forbids talent action buttons', v12049Reloaded?.preview?.nodeKey === 'hunter_board_clarity' && v12049Reloaded?.preview?.eligible === false && v12049Reloaded?.preview?.blockedReason === 'already_learned' && v12049Reloaded?.preview?.liveSpendPatchReady === true && v12049Reloaded?.preview?.requiresLiveSpendPatch === false && v12049Reloaded?.preview?.mutatesSave === false && v12049Reloaded?.preview?.spendsPoints === false && v12049Reloaded?.preview?.learnsNode === false && !v12049Reloaded?.hasForbiddenButton, JSON.stringify(v12049Reloaded?.preview));
     const v12049ReloadedDuplicate = await evalByValue(client, `(() => {
       const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;

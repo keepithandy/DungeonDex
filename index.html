@@ -8,10 +8,10 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.20.49</title>
+  <title>DungeonDex v1.20.50</title>
   <link rel="stylesheet" href="./styles.css?build=1.20.48-hunter-board-clarity-live-spend" />
   <style>
-    /* v1.20.49 browser reload spend persistence audit: controlled helper only. */
+    /* v1.20.50 talent spend UI readiness model: read-only helper only. */
     .panel {
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.035);
     }
@@ -51,7 +51,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <h1 id="buildTag">DungeonDex v1.20.49</h1>
+        <h1 id="buildTag">DungeonDex v1.20.50</h1>
       </div>
       <div class="top-actions">
         <span class="save-status" id="saveStatus">Saved</span>
@@ -139,8 +139,8 @@
   </div>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.20.49';
-    window.DUNGEONDEX_BUILD_QS = '1.20.49-browser-reload-spend-persistence';
+    window.DUNGEONDEX_BUILD = '1.20.50';
+    window.DUNGEONDEX_BUILD_QS = '1.20.50-talent-spend-ui-readiness';
     (function(){
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
@@ -209,7 +209,7 @@
   <script src="./js/systems/18_relic_forge_compact_text.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
   <script src="./js/systems/19_warden_talents_lowfire_board.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
   <script src="./js/systems/32_talent_award_claim_repair_contract.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
-  <script src="./js/systems/33_talent_hunter_board_clarity_spend.js?build=1.20.49-browser-reload-spend-persistence"></script>
+  <script src="./js/systems/33_talent_hunter_board_clarity_spend.js?build=1.20.50-talent-spend-ui-readiness"></script>
   <script src="./js/systems/28_debt_collector_foundation.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
   <script src="./js/systems/20_town_currency_clean_strip.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
   <script src="./js/systems/21_build_label_guard.js?build=1.20.48-hunter-board-clarity-live-spend"></script>
