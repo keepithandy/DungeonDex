@@ -1,6 +1,6 @@
 const CACHE_NAME = 'dungeondex-v1.21.0-talent-loop-release-candidate';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.51-first-controlled-talent-spend-ui';
+const BUILD_QS = '1.21.0-talent-loop-release-candidate';
 const ASSETS = [
   './',
   './index.html',

@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.20.51';
+  const BUILD = '1.21.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.20.51-first-controlled-talent-spend-ui';
+  const BUILD_QS = '1.21.0-talent-loop-release-candidate';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

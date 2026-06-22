@@ -2,8 +2,8 @@
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.20.51';
-window.DUNGEONDEX_BUILD_QS = '1.20.51-first-controlled-talent-spend-ui';
+window.DUNGEONDEX_BUILD = '1.21.0';
+window.DUNGEONDEX_BUILD_QS = '1.21.0-talent-loop-release-candidate';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -33,7 +33,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.20.51-first-controlled-talent-spend-ui';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.21.0-talent-loop-release-candidate';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
