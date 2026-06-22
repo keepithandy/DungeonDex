@@ -7,13 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.50 - Talent Spend UI Readiness Model
+- DungeonDex v1.20.51 - First Controlled Talent Spend UI Button
 
-## v1.20.50 Talent Spend UI Readiness Model
-- Current baseline: v1.20.50.
-- Adds a read-only readiness model for the future `hunter_board_clarity` spend button.
-- The readiness model reports enabled/blocked state and a future action label without rendering or wiring a live spend button.
-- No new gameplay, live Talent UI action, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
+## v1.20.51 First Controlled Talent Spend UI Button
+- Current baseline: v1.20.51.
+- Adds the first controlled `hunter_board_clarity` spend button.
+- The button is gated by the readiness model and routes only through the controlled spend helper.
+- No broad Talent UI, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
 
 ## v1.20.47 Hunter Board Clarity Spend Preview
 - Added a read-only spend preview for `hunter_board_clarity`.

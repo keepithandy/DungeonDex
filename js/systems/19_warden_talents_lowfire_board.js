@@ -1461,6 +1461,17 @@
     };
   }
 
+  function talentSpendUiStatusText(model){
+    if (!model || typeof model !== 'object') return 'Spend unavailable';
+    if (model.enabled === true && model.blockedReason === 'ready') return 'Spend readiness: ready';
+    if (model.blockedReason === 'already_learned') return 'Spend readiness: blocked - already learned';
+    if (model.blockedReason === 'insufficient_points') return 'Spend readiness: blocked - need 1 Talent Point';
+    if (model.blockedReason === 'preview_unavailable') return 'Spend readiness: blocked - preview unavailable';
+    if (model.blockedReason === 'malformed_state') return 'Spend readiness: blocked - unavailable';
+    if (model.blockedReason === 'unknown_node') return 'Spend readiness: blocked - unavailable';
+    return `Spend readiness: blocked - ${String(model.blockedReason || 'unavailable').replace(/_/g, ' ')}`;
+  }
+
   function talentPreviewNodeMarkup(node, branch){
     return `<article class="talent-preview-node is-locked">
       <div class="talent-path-head">
@@ -1490,6 +1501,14 @@
     const rulesSummary = talentRulesetSummary(state);
     const preview = talentTreePreview(state);
     const summary = talentTreePreviewSummary(state);
+    const readiness = typeof window.DungeonDexTalents?.hunterBoardClaritySpendUiReadinessModel === 'function'
+      ? window.DungeonDexTalents.hunterBoardClaritySpendUiReadinessModel(state)
+      : null;
+    const spendButtonVisible = !!readiness && readiness.supported === true;
+    const spendButtonEnabled = !!readiness && readiness.enabled === true && readiness.blockedReason === 'ready' && readiness.renderButtonNow === false;
+    const spendActionLabel = readiness?.actionLabel || 'Spend 1 Talent Point';
+    const spendStatusText = talentSpendUiStatusText(readiness);
+    const spendStatusDisabled = readiness?.disabledLabel || 'Spend unavailable';
     panel.innerHTML = `
       <div class="card-head talent-head">
         <div>
@@ -1570,6 +1589,32 @@
         <span>Inactive.</span>
         <span>No gameplay effects.</span>
       </div>
+      <section class="talent-ledger-card talent-spend-ready-card">
+        <div class="split talent-ledger-head">
+          <div>
+            <strong>Spend Readiness</strong>
+            <p class="small muted">${H(spendStatusText)}</p>
+          </div>
+          <span class="pill ${spendButtonEnabled ? 'rarity-rare' : 'rarity-common'}">${spendButtonEnabled ? 'Ready' : 'Blocked'}</span>
+        </div>
+        <div class="talent-summary-row small muted talent-ledger-chips">
+          <span>${H(spendStatusDisabled)}</span>
+          <span>${H(spendActionLabel)}</span>
+          <span>${spendButtonVisible ? 'Hunter Board only' : 'Inactive'}</span>
+        </div>
+        <div class="talent-milestone-line small" aria-label="Spend readiness status">
+          <span>${H(spendStatusText)}</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Visible: ${spendButtonVisible ? 'yes' : 'no'}</span>
+          <span class="talent-separator" aria-hidden="true">&bull;</span>
+          <span>Enabled: ${spendButtonEnabled ? 'yes' : 'no'}</span>
+        </div>
+        ${spendButtonVisible ? `
+          <div class="talent-spend-actions">
+            <button class="primary mini" data-talent-spend-hunter-board="hunter_board_clarity" ${spendButtonEnabled ? '' : 'disabled'}>${H(spendActionLabel)}</button>
+          </div>
+        ` : ''}
+      </section>
       <div class="talent-preview-grid">
         ${preview.branches.map(branch => `
           <section class="talent-preview-branch">
@@ -1923,7 +1968,7 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-talent-spend-hunter-board]').forEach(btn => btn.onclick = () => guard(() => { const api = window.DungeonDexTalents || window.DungeonDexWardenTalents; const model = api && typeof api.hunterBoardClaritySpendUiReadinessModel === 'function' ? api.hunterBoardClaritySpendUiReadinessModel(S) : null; if (!model || model.enabled !== true || model.blockedReason !== 'ready') { render(); return; } const result = typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null; if (result?.ok === true) { if (typeof save === 'function') save(S); } render(); })); };
 
   const api = {
     build: SCRIPT_BUILD,

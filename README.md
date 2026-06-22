@@ -2,15 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.50**
+Current baseline: **DungeonDex v1.20.51**
 
 ## Current Build
 
-**v1.20.50 - Talent Spend UI Readiness Model**
+**v1.20.51 - First Controlled Talent Spend UI Button**
 
-This patch adds a read-only readiness model for the future `hunter_board_clarity` spend button. It reports whether the button would be ready or blocked, but it does not render or wire a live spend button.
+This patch adds the first controlled `hunter_board_clarity` Talent spend button. The button is gated by the readiness model and calls the existing controlled spend helper only when ready.
 
-No new gameplay, Talent UI action, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
+No broad Talent UI, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
 
 ## Previous Build
 

@@ -8,15 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.50`
-* Current local package baseline: `v1.20.50`
-* Current development target: `v1.20.50`
+* Public/live itch version: `v1.20.51`
+* Current local package baseline: `v1.20.51`
+* Current development target: `v1.20.51`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.51 - First Controlled Talent Spend UI Button
+
+* Added the first controlled `hunter_board_clarity` Talent spend button.
+* The button is gated by the v1.20.50 readiness model and spends only through the existing controlled mutation helper.
+* Added smoke coverage for ready, blocked, reload, duplicate-blocking, and safety assertions.
+* No broad Talent UI, no second node, no Revisit activation, and no combat/economy/reward/Debt changes were added.
 
 ## v1.20.50 - Talent Spend UI Readiness Model
 

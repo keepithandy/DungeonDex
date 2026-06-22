@@ -1,13 +1,13 @@
 'use strict';
 
-// DungeonDex v1.20.50 - First controlled Hunter Board Clarity spend.
+// DungeonDex v1.20.51 - First controlled Hunter Board Clarity spend UI button.
 (function(){
   if (window.DDTalentHunterBoardClaritySpend) return;
   window.DDTalentHunterBoardClaritySpend = true;
 
   const TARGET_NODE = 'hunter_board_clarity';
   const SPEND_COST = 1;
-  const BUILD = '1.20.48-hunter-board-clarity-live-spend';
+  const BUILD = '1.20.51-first-controlled-talent-spend-ui';
 
   function isPlainObject(value){
     if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
