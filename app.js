@@ -78,3 +78,41 @@ window.ddGetMonsterCue = function(name){
       return;
     }
     if (kind === "player-hit" || kind === "hurt"){
+      ddPulse(player || stage, "player-hit", 260);
+      return;
+    }
+    if (kind === "heavy" || kind === "crit"){
+      ddPulse(stage, "heavy-impact", 220);
+      ddPulse(enemy || stage, "enemy-hit", 220);
+      return;
+    }
+    if (kind === "elite"){
+      ddPulse(stage, "elite-stinger", 520);
+      return;
+    }
+    if (kind === "reward" || kind === "loot"){
+      ddPulse(reward, "reward-reveal", 340);
+      return;
+    }
+  };
+
+  window.ddPlayImpactTone = function(kind){
+    try{
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      window.__ddAudioCtx142 = window.__ddAudioCtx142 || new Ctx();
+      var ctx = window.__ddAudioCtx142;
+      if (!ctx) return;
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = kind === "heavy" ? 92 : kind === "reward" ? 520 : 180;
+      gain.gain.value = 0.018;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } catch(e) {}
+  };
+})();
