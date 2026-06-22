@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.47-hunter-board-clarity-spend-preview';
+const CACHE_NAME = 'dungeondex-v1.20.48-hunter-board-clarity-live-spend';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.47-hunter-board-clarity-spend-preview';
+const BUILD_QS = '1.20.48-hunter-board-clarity-live-spend';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,7 @@ const ASSETS = [
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
   `./js/systems/19_warden_talents_lowfire_board.js?build=${BUILD_QS}`,
   `./js/systems/32_talent_award_claim_repair_contract.js?build=${BUILD_QS}`,
+  `./js/systems/33_talent_hunter_board_clarity_spend.js?build=${BUILD_QS}`,
   `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
   `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,
