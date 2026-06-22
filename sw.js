@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.45-talent-award-mutation-live-gate';
+const CACHE_NAME = 'dungeondex-v1.20.46-first-controlled-talent-award';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.45-talent-award-mutation-live-gate';
+const BUILD_QS = '1.20.46-first-controlled-talent-award';
 const ASSETS = [
   './',
   './index.html',

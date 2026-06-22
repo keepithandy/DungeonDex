@@ -8,15 +8,27 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.45`
-* Current local package baseline: `v1.20.45`
-* Current development target: `v1.20.45`
+* Public/live itch version: `v1.20.46`
+* Current local package baseline: `v1.20.46`
+* Current development target: `v1.20.46`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.46 - First Controlled Boss Trophy Talent Award
+
+* Enabled the first controlled Boss Trophy Milestone Talent point award path behind the live gate.
+* The award is atomic: one point, one claim record.
+* Duplicate claims block repeat awards.
+
+## v1.20.46 - First Controlled Boss Trophy Talent Award
+
+* Enabled the first controlled Boss Trophy Milestone Talent point award path behind the live gate.
+* The award is atomic: one point, one claim record.
+* Duplicate claims block repeat awards.
 
 ## v1.20.45 - Talent Award Mutation Live Gate
 

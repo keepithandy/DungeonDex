@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.45 - Talent award claim repair contract.
+// DungeonDex v1.20.46 - Talent award claim repair contract.
 (function(){
   if (window.DDTalentAwardClaimRepairContract) return;
   window.DDTalentAwardClaimRepairContract = true;
@@ -313,6 +313,7 @@
 
   function applyTalentAwardMutation(state, options){
     const gate = talentAwardMutationGate(state, options);
+    const liveEnabled = !!(options && options.liveGate === true);
     const disabledResult = {
       ok: false,
       source: CLAIM_SOURCE,
@@ -333,7 +334,7 @@
       unlockUiEnabled: false
     };
 
-    if (!gate.enabled) return disabledResult;
+    if (!gate.enabled && !liveEnabled) return disabledResult;
 
     const preview = gate.preview;
     if (!preview || typeof preview !== 'object') {
@@ -415,6 +416,10 @@
     };
   }
 
+  function applyBossTrophyTalentAwardIfReady(state){
+    return applyTalentAwardMutation(state, { liveGate: true });
+  }
+
   function patchApi(){
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
     if (!api) return false;
@@ -431,6 +436,7 @@
     api.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
     api.talentAwardMutationGate = talentAwardMutationGate;
     api.applyTalentAwardMutation = applyTalentAwardMutation;
+    api.applyBossTrophyTalentAwardIfReady = applyBossTrophyTalentAwardIfReady;
     return true;
   }
 
@@ -446,4 +452,5 @@
   window.talentAwardMutationPreviewSummary = talentAwardMutationPreviewSummary;
   window.talentAwardMutationGate = talentAwardMutationGate;
   window.applyTalentAwardMutation = applyTalentAwardMutation;
+  window.applyBossTrophyTalentAwardIfReady = applyBossTrophyTalentAwardIfReady;
 })();

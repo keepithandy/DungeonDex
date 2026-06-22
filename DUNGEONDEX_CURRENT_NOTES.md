@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.45 - Talent Award Mutation Live Gate
+- DungeonDex v1.20.46 - First Controlled Boss Trophy Talent Award
+
+## v1.20.46 First Controlled Boss Trophy Talent Award
+- Current baseline: v1.20.46.
+- Enables the first controlled Boss Trophy Milestone Talent point award.
+- The award is atomic: one point, one claim record.
+- Duplicate claims block repeat awards.
 
 ## v1.20.45 Talent Award Mutation Live Gate
 - Current baseline: v1.20.45.

@@ -394,16 +394,18 @@
     const earned = Math.max(0, Math.floor(numberOr(earning.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
     const learnedMap = normalizeTalentLearnedIds(state.player.talentLearnedIds);
     const learnedCount = Object.keys(learnedMap).length;
-    const available = Math.max(0, earned - learnedCount);
     const repairedClaims = typeof window !== 'undefined' && typeof window.normalizeTalentAwardClaims === 'function'
       ? window.normalizeTalentAwardClaims(state.player.talentLedger?.awardClaims)
       : {};
-    ledger.lifetimePoints = earned;
+    const liveClaimPoints = Object.keys(repairedClaims).length;
+    const totalPoints = earned + liveClaimPoints;
+    const available = Math.max(0, totalPoints - learnedCount);
+    ledger.lifetimePoints = totalPoints;
     ledger.availablePoints = available;
-    ledger.spentPoints = Math.max(0, earned - available);
+    ledger.spentPoints = Math.max(0, totalPoints - available);
     ledger.previewOnly = true;
     ledger.unlocked = false;
-    ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: earned }];
+    ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: totalPoints }];
     ledger.awardClaims = repairedClaims;
     state.player.talentLedger = ledger;
     return ledger;
@@ -593,6 +595,10 @@
     state.player.deepStairCharters = normalizeCharterDepthList(savedPlayer.deepStairCharters);
     repairTalentState(state);
     normalizeTalentLedgerState(state);
+    if (typeof window !== 'undefined' && typeof window.applyBossTrophyTalentAwardIfReady === 'function') {
+      window.applyBossTrophyTalentAwardIfReady(state);
+      normalizeTalentLedgerState(state);
+    }
     if (state.player.permanentStartFloor >= 40) state.player.goldSink.boughtStart40Charter = true;
     ensurePermanentCharters(state);
     state.player.stats = { ...base.player.stats, ...(isPlainObject(savedPlayer.stats) ? savedPlayer.stats : {}) };
@@ -700,6 +706,10 @@
     state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
     repairTalentState(state);
     normalizeTalentLedgerState(state);
+    if (typeof window !== 'undefined' && typeof window.applyBossTrophyTalentAwardIfReady === 'function') {
+      window.applyBossTrophyTalentAwardIfReady(state);
+      normalizeTalentLedgerState(state);
+    }
     if (!isPlainObject(state.run)) state.run = {};
     ensureRunShell(state);
     state.run.active = !!state.run.active;
