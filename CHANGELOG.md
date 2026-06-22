@@ -8,15 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.47`
-* Current local package baseline: `v1.20.47`
-* Current development target: `v1.20.47`
+* Public/live itch version: `v1.20.48`
+* Current local package baseline: `v1.20.48`
+* Current development target: `v1.20.48`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.48 - First Controlled Hunter Board Clarity Spend
+
+* Added the first controlled live Talent spend helper for `hunter_board_clarity`.
+* The helper spends exactly one safe Talent Point only when the existing spend preview reports eligible/ready.
+* The spend writes learned state and ledger math together: one point spent, one node learned, no partial unlock path.
+* The Talent preview helpers now report that the controlled spend patch is present while remaining read-only themselves.
+* Added focused smoke coverage for eligible spend, duplicate blocking, insufficient-point blocking, malformed-state blocking, unsupported-node blocking, and no UI/gameplay side effects.
+* No Talent spend UI, unlock UI, extra live nodes, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
 
 ## v1.20.47 - Hunter Board Clarity Spend Preview
 
