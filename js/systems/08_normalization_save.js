@@ -379,6 +379,7 @@
       availablePoints: 0,
       spentPoints: 0,
       earnedSources: [],
+      awardClaims: {},
       notes: asArray(rawNotes, [])
         .map(entry => cleanDisplayText(entry || '', '').slice(0, 80))
         .filter(Boolean)
@@ -394,12 +395,16 @@
     const learnedMap = normalizeTalentLearnedIds(state.player.talentLearnedIds);
     const learnedCount = Object.keys(learnedMap).length;
     const available = Math.max(0, earned - learnedCount);
+    const repairedClaims = typeof window !== 'undefined' && typeof window.normalizeTalentAwardClaims === 'function'
+      ? window.normalizeTalentAwardClaims(state.player.talentLedger?.awardClaims)
+      : {};
     ledger.lifetimePoints = earned;
     ledger.availablePoints = available;
     ledger.spentPoints = Math.max(0, earned - available);
     ledger.previewOnly = true;
     ledger.unlocked = false;
     ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: earned }];
+    ledger.awardClaims = repairedClaims;
     state.player.talentLedger = ledger;
     return ledger;
   }

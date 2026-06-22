@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.42 - Talent Claim Tracking Save Shape Dry Run
+- DungeonDex v1.20.43 - Talent Award Claim Repair Contract Completion
+
+## v1.20.43 Talent Award Claim Repair Contract Completion
+- Current baseline: v1.20.43.
+- Wired the claim repair contract into runtime loading and aligned build/cache labels to the release.
+- `player.talentLedger.awardClaims` now repairs to a normalized object map: missing or malformed containers become `{}`, valid boss trophy milestone records are retained, and invalid records are dropped.
+- No points are awarded, no live claim records are created from boss trophy evidence, and no spending or Talent unlock UI is introduced.
 
 ## v1.20.42 Talent Claim Tracking Save Shape Dry Run
 - Current baseline: v1.20.42.

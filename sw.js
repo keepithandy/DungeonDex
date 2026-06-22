@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.42-talent-claim-shape-preview';
+const CACHE_NAME = 'dungeondex-v1.20.43-talent-claim-repair-contract';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.42-talent-claim-shape-preview';
+const BUILD_QS = '1.20.43-talent-claim-repair-contract';
 const ASSETS = [
   './',
   './index.html',
@@ -29,6 +29,7 @@ const ASSETS = [
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
   `./js/systems/19_warden_talents_lowfire_board.js?build=${BUILD_QS}`,
+  `./js/systems/32_talent_award_claim_repair_contract.js?build=${BUILD_QS}`,
   `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
   `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,

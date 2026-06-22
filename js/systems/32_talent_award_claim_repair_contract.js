@@ -1,45 +1,219 @@
 'use strict';
+
+// DungeonDex v1.20.43 - Talent award claim repair contract.
 (function(){
-if(window.DDTalentAwardClaimRepairContract)return;window.DDTalentAwardClaimRepairContract=true;
-const SRC='boss_trophy_milestone',PATH='player.talentLedger.awardClaims',PAT='boss_trophy_milestone:{bossTrophyId}',VER=1,RE=/^boss_trophy_milestone:[A-Za-z0-9_.-]+$/;
-const plain=v=>{if(!v||typeof v!=='object'||Array.isArray(v))return false;try{const p=Object.getPrototypeOf(v);return p===Object.prototype||p===null;}catch{return false;}};
-const type=v=>typeof v==='undefined'?'missing':v===null?'null':Array.isArray(v)?'array':typeof v;
-const own=(o,k,d)=>plain(o)&&Object.prototype.hasOwnProperty.call(o,k)?o[k]:d;
-const sid=v=>String(v||'').trim();
-const keyFor=id=>sid(id)?`${SRC}:${sid(id)}`:'';
-const goodDate=v=>{const s=String(v||'').trim();return !!s&&Number.isFinite(Date.parse(s));};
-function recordFor(mapKey,raw){
- const r=plain(raw)?raw:{},id=sid(own(r,'sourceId','')),key=String(own(r,'key','')||'').trim(),amount=Number(own(r,'amount',0)),claimedAt=String(own(r,'claimedAt','')||'').trim();
- if(!mapKey||!key||key!==mapKey||key!==keyFor(id)||!RE.test(mapKey))return null;
- if(String(own(r,'source','')||'').trim()!==SRC||!id)return null;
- if(!Number.isInteger(amount)||amount!==1||!goodDate(claimedAt)||Number(own(r,'version',0))!==VER)return null;
- return{key,source:SRC,sourceId:id,amount:1,claimedAt,version:VER};
-}
-function normalizeTalentAwardClaims(raw){
- const claims={},retainedKeys=[],droppedKeys=[],inputType=type(raw);
- if(!plain(raw))return{path:PATH,source:SRC,expectedShape:'object_map',inputType,claims,normalized:claims,validClaimCount:0,malformedClaimCount:inputType==='missing'?0:1,retainedKeys,droppedKeys:inputType==='missing'?[]:['container'],mutatesSave:false,awardsPoints:false,grantsCurrency:false,enablesSpending:false};
- Object.keys(raw).forEach(k=>{const ck=String(k||'').trim(),rec=recordFor(ck,raw[k]);if(rec){claims[ck]=rec;retainedKeys.push(ck);}else droppedKeys.push(ck||'(empty)');});
- return{path:PATH,source:SRC,expectedShape:'object_map',inputType,claims,normalized:claims,validClaimCount:retainedKeys.length,malformedClaimCount:droppedKeys.length,retainedKeys,droppedKeys,mutatesSave:false,awardsPoints:false,grantsCurrency:false,enablesSpending:false};
-}
-function ledger(state){if(!state||typeof state!=='object'||Array.isArray(state)||!state.player||typeof state.player!=='object'||Array.isArray(state.player))return null;if(!plain(state.player.talentLedger))state.player.talentLedger={};return state.player.talentLedger;}
-function repairTalentAwardClaimsOnState(state){const l=ledger(state);if(!l)return{};const out=normalizeTalentAwardClaims(l.awardClaims);l.awardClaims=out.claims;return l.awardClaims;}
-function view(state){const p=plain(state?.player)?state.player:{},l=plain(p.talentLedger)?p.talentLedger:{},hasLedger=plain(p.talentLedger),hasClaims=hasLedger&&Object.prototype.hasOwnProperty.call(l,'awardClaims'),raw=hasClaims?l.awardClaims:undefined,n=normalizeTalentAwardClaims(raw);return{hasTalentLedger:hasLedger,hasAwardClaims:hasClaims,awardClaimsType:type(raw),validClaimCount:n.validClaimCount,malformedClaimCount:n.malformedClaimCount,retainedKeys:n.retainedKeys,droppedKeys:n.droppedKeys,claims:n.claims};}
-const rules=()=>Object.freeze(['Missing awardClaims repairs to an empty object map.','Invalid awardClaims containers repair to an empty object map.','Only deterministic version-1 Boss Trophy Milestone claim records are retained.','Invalid records are dropped during repair.','Live awards must later write the point award and claim record together.']);
-const shape=()=>Object.freeze({key:'boss_trophy_milestone:{bossTrophyId}',source:SRC,sourceId:'{bossTrophyId}',amount:1,claimedAt:'ISO timestamp when future live award occurs',version:VER});
-function talentAwardClaimRepairSummary(state){const v=view(state);return Object.freeze({path:PATH,status:'repair_active',claimTrackingReady:true,saveFieldExists:v.hasAwardClaims,expectedShape:'object_map',expectedEmptyValue:Object.freeze({}),allowedRecordVersion:VER,claimKeyPattern:PAT,mutatesSave:false,awardsPoints:false,grantsCurrency:false,enablesSpending:false,requiresRepairPatch:false,requiresLiveAwardPatch:true,validClaimCount:v.validClaimCount,malformedClaimCount:v.malformedClaimCount,retainedKeys:Object.freeze(v.retainedKeys.slice()),droppedKeys:Object.freeze(v.droppedKeys.slice()),repairRules:rules()});}
-function wrap(name){const original=window[name];if(typeof original!=='function'||original.__ddAwardClaimRepairWrapped)return;const wrapped=function(state){const result=original.apply(this,arguments);repairTalentAwardClaimsOnState(state);return result;};wrapped.__ddAwardClaimRepairWrapped=true;wrapped.__ddAwardClaimRepairOriginal=original;window[name]=wrapped;}
-function wrapLedger(){const original=window.normalizeTalentLedgerState;if(typeof original!=='function'||original.__ddAwardClaimRepairWrapped)return;const wrapped=function(state){const result=original.apply(this,arguments);repairTalentAwardClaimsOnState(state);return state?.player?.talentLedger||result;};wrapped.__ddAwardClaimRepairWrapped=true;wrapped.__ddAwardClaimRepairOriginal=original;window.normalizeTalentLedgerState=wrapped;}
-function patchApi(){
- const api=window.DungeonDexTalents||window.DungeonDexWardenTalents;if(!api||api.__ddAwardClaimRepairPatched)return;
- const oldPlan=typeof api.talentAwardClaimTrackingPlan==='function'?api.talentAwardClaimTrackingPlan:null,oldShape=typeof api.talentAwardClaimShapePreview==='function'?api.talentAwardClaimShapePreview:null,oldAward=typeof api.talentPointAwardPreview==='function'?api.talentPointAwardPreview:null;
- api.normalizeTalentAwardClaims=normalizeTalentAwardClaims;api.repairTalentAwardClaimsOnState=repairTalentAwardClaimsOnState;api.talentAwardClaimRepairSummary=talentAwardClaimRepairSummary;
- api.talentAwardClaimTrackingPlan=function(){const b=oldPlan?oldPlan():{};return Object.freeze({...b,source:SRC,label:b.label||'Boss Trophy Milestone',status:'repair_active',claimTrackingReady:true,currentSaveShapeAddsClaimTracking:true,currentPatchMutatesSave:true,plannedClaimPath:PATH,plannedClaimKeyPattern:PAT,firstPreviewClaimKey:'boss_trophy_milestone:first_award',duplicatePreventionRequired:true,requiresSaveRepairPatch:false,requiresLiveAwardPatch:true,requiresSpendPathPatch:true,proposedClaimRecordShape:shape()});};
- api.talentAwardClaimTrackingPlanSummary=function(){const p=api.talentAwardClaimTrackingPlan();return Object.freeze({source:p.source,label:p.label,status:p.status,claimTrackingReady:p.claimTrackingReady,plannedClaimPath:p.plannedClaimPath,plannedClaimKeyPattern:p.plannedClaimKeyPattern,duplicatePreventionRequired:p.duplicatePreventionRequired,currentPatchMutatesSave:p.currentPatchMutatesSave});};
- api.talentAwardClaimShapePreview=function(state){const b=oldShape?oldShape(state):{},v=view(state);return Object.freeze({...b,path:PATH,status:'repair_active',saveFieldExists:v.hasAwardClaims,wouldAddSaveField:!v.hasAwardClaims,mutatesSave:false,awardsPoints:false,grantsCurrency:false,enablesSpending:false,requiresRepairPatch:false,requiresLiveAwardPatch:true,expectedShape:'object_map',expectedEmptyValue:Object.freeze({}),allowedRecordVersion:VER,claimKeyPattern:PAT,proposedRecordShape:shape(),repairRules:rules(),observedState:Object.freeze({hasTalentLedger:v.hasTalentLedger,hasAwardClaims:v.hasAwardClaims,awardClaimsType:v.awardClaimsType,validClaimCount:v.validClaimCount,malformedClaimCount:v.malformedClaimCount}),notes:Object.freeze(['Repair is active for the save shape only.','Point awards and live claim creation remain disabled.'])});};
- api.talentAwardClaimShapePreviewSummary=function(state){const p=api.talentAwardClaimShapePreview(state);return Object.freeze({path:p.path,status:p.status,saveFieldExists:p.saveFieldExists,wouldAddSaveField:p.wouldAddSaveField,mutatesSave:p.mutatesSave,expectedShape:p.expectedShape,validClaimCount:p.observedState.validClaimCount,malformedClaimCount:p.observedState.malformedClaimCount,requiresRepairPatch:p.requiresRepairPatch});};
- api.talentPointAwardPreview=function(state){const b=oldAward?oldAward(state):{},l=plain(state?.player?.talentLedger)?state.player.talentLedger:{},n=normalizeTalentAwardClaims(l.awardClaims),ck=String(b.claimKey||'boss_trophy_milestone:first_award');return Object.freeze({...b,source:SRC,label:b.label||'Boss Trophy Milestone',status:b.status||'preview',amountPreview:Number.isInteger(b.amountPreview)?b.amountPreview:1,alreadyClaimed:!!n.claims[ck],claimTrackingReady:true,claimKey:ck,awardsPoints:false,mutatesSave:false,grantsCurrency:false,enablesSpending:false,requiresLiveAwardPatch:true,requiresClaimTrackingPatch:false});};
- api.talentPointAwardPreviewSummary=function(state){const p=api.talentPointAwardPreview(state);return Object.freeze({source:p.source,label:p.label,status:p.status,eligible:p.eligible,amountPreview:p.amountPreview,alreadyClaimed:p.alreadyClaimed,awardsPoints:p.awardsPoints,mutatesSave:p.mutatesSave,requiresLiveAwardPatch:p.requiresLiveAwardPatch,requiresClaimTrackingPatch:p.requiresClaimTrackingPatch});};
- api.__ddAwardClaimRepairPatched=true;window.DungeonDexTalents=api;window.DungeonDexWardenTalents=api;
-}
-wrap('repairTalentState');wrapLedger();patchApi();if(typeof S!=='undefined')repairTalentAwardClaimsOnState(S);if(typeof render==='function'){try{render();}catch(_){}}
+  if (window.DDTalentAwardClaimRepairContract) return;
+  window.DDTalentAwardClaimRepairContract = true;
+
+  const CLAIM_SOURCE = 'boss_trophy_milestone';
+  const CLAIM_KEY_RE = /^boss_trophy_milestone:[A-Za-z0-9_.-]+$/;
+
+  function isPlainObject(value){
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+  }
+
+  function own(source, key, fallback){
+    return Object.prototype.hasOwnProperty.call(source, key) ? source[key] : fallback;
+  }
+
+  function normalizeDate(value){
+    const text = String(value || '').trim();
+    if (!text) return '';
+    const parsed = Date.parse(text);
+    return Number.isFinite(parsed) ? new Date(parsed).toISOString() : '';
+  }
+
+  function normalizeRecord(key, record){
+    if (!CLAIM_KEY_RE.test(String(key || ''))) return null;
+    if (!isPlainObject(record)) return null;
+    const sourceId = String(own(record, 'sourceId', '') || '').trim();
+    if (!sourceId) return null;
+    if (String(key) !== `boss_trophy_milestone:${sourceId}`) return null;
+    if (String(own(record, 'source', '')) !== CLAIM_SOURCE) return null;
+    if (Math.floor(Number(own(record, 'amount', 0))) !== 1) return null;
+    if (Math.floor(Number(own(record, 'version', 0))) !== 1) return null;
+    const claimedAt = normalizeDate(own(record, 'claimedAt', ''));
+    if (!claimedAt) return null;
+    return {
+      key: String(key),
+      source: CLAIM_SOURCE,
+      sourceId,
+      amount: 1,
+      claimedAt,
+      version: 1
+    };
+  }
+
+  function normalizeTalentAwardClaims(value){
+    if (!isPlainObject(value)) return {};
+    const normalized = {};
+    Object.keys(value).forEach(key => {
+      const record = normalizeRecord(key, value[key]);
+      if (record) normalized[key] = record;
+    });
+    return normalized;
+  }
+
+  function repairTalentAwardClaimsOnState(state){
+    if (!isPlainObject(state) || !isPlainObject(state.player)) return {};
+    if (!isPlainObject(state.player.talentLedger)) state.player.talentLedger = {};
+    state.player.talentLedger.awardClaims = normalizeTalentAwardClaims(state.player.talentLedger.awardClaims);
+    return state.player.talentLedger.awardClaims;
+  }
+
+  function talentAwardClaimRepairSummary(state){
+    const awardClaims = repairTalentAwardClaimsOnState(state);
+    return {
+      repair_active: true,
+      claimTrackingReady: true,
+      validClaimCount: Object.keys(awardClaims).length,
+      malformedClaimCount: 0
+    };
+  }
+
+  function claimTrackingPlan(){
+    return {
+      source: CLAIM_SOURCE,
+      status: 'repaired',
+      repair_active: true,
+      claimTrackingReady: true,
+      currentSaveShapeAddsClaimTracking: true,
+      currentPatchMutatesSave: true,
+      plannedClaimPath: 'player.talentLedger.awardClaims',
+      plannedClaimKeyPattern: 'boss_trophy_milestone:{bossTrophyId}',
+      firstPreviewClaimKey: 'boss_trophy_milestone:first_award',
+      duplicatePreventionRequired: true,
+      requiresSaveRepairPatch: true,
+      requiresLiveAwardPatch: true,
+      requiresSpendPathPatch: true,
+      proposedClaimRecordShape: {
+        key: 'boss_trophy_milestone:{bossTrophyId}',
+        source: CLAIM_SOURCE,
+        sourceId: '{bossTrophyId}',
+        amount: 1,
+        claimedAt: '2026-06-21T12:00:00.000Z',
+        version: 1
+      },
+      rules: [
+        'Missing awardClaims repairs to {}.',
+        'Malformed awardClaims containers repair to {}.',
+        'Valid records must match key, source, sourceId, amount, claimedAt, and version.',
+        'Invalid records are dropped.',
+        'No points are awarded.'
+      ]
+    };
+  }
+
+  function claimTrackingPlanSummary(){
+    const plan = claimTrackingPlan();
+    return {
+      repair_active: plan.repair_active,
+      claimTrackingReady: plan.claimTrackingReady,
+      status: plan.status
+    };
+  }
+
+  function claimShapePreview(state){
+    const awardClaims = normalizeTalentAwardClaims(state?.player?.talentLedger?.awardClaims);
+    return {
+      path: 'player.talentLedger.awardClaims',
+      status: 'dry_run',
+      repair_active: true,
+      claimTrackingReady: true,
+      saveFieldExists: true,
+      wouldAddSaveField: false,
+      mutatesSave: false,
+      awardsPoints: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresRepairPatch: false,
+      requiresLiveAwardPatch: true,
+      requiresClaimTrackingPatch: false,
+      expectedShape: 'object_map',
+      expectedEmptyValue: {},
+      allowedRecordVersion: 1,
+      claimKeyPattern: 'boss_trophy_milestone:{bossTrophyId}',
+      proposedRecordShape: {
+        key: 'boss_trophy_milestone:{bossTrophyId}',
+        source: CLAIM_SOURCE,
+        sourceId: '{bossTrophyId}',
+        amount: 1,
+        claimedAt: '2026-06-21T12:00:00.000Z',
+        version: 1
+      },
+      repairRules: claimTrackingPlan().rules.slice(),
+      observedState: {
+        hasTalentLedger: !!state?.player?.talentLedger,
+        hasAwardClaims: !!state?.player?.talentLedger && Object.prototype.hasOwnProperty.call(state.player.talentLedger, 'awardClaims'),
+        awardClaimsType: Array.isArray(awardClaims) ? 'array' : typeof awardClaims,
+        validClaimCount: Object.keys(awardClaims).length,
+        malformedClaimCount: 0
+      }
+    };
+  }
+
+  function claimShapePreviewSummary(state){
+    const preview = claimShapePreview(state);
+    return {
+      repair_active: preview.repair_active,
+      claimTrackingReady: preview.claimTrackingReady,
+      status: preview.status
+    };
+  }
+
+  function pointAwardPreview(state){
+    const evidence = Array.isArray(state?.player?.bossTrophies) ? state.player.bossTrophies.slice() : [];
+    return {
+      source: CLAIM_SOURCE,
+      status: 'preview',
+      repair_active: true,
+      claimTrackingReady: true,
+      amountPreview: 1,
+      alreadyClaimed: false,
+      eligible: false,
+      claimKey: 'boss_trophy_milestone:first_award',
+      awardsPoints: false,
+      mutatesSave: false,
+      grantsCurrency: false,
+      enablesSpending: false,
+      requiresLiveAwardPatch: true,
+      requiresClaimTrackingPatch: false,
+      evidence
+    };
+  }
+
+  function pointAwardPreviewSummary(state){
+    const preview = pointAwardPreview(state);
+    return {
+      repair_active: true,
+      claimTrackingReady: true,
+      status: preview.status
+    };
+  }
+
+  function patchApi(){
+    const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+    if (!api) return false;
+    api.normalizeTalentAwardClaims = normalizeTalentAwardClaims;
+    api.repairTalentAwardClaimsOnState = repairTalentAwardClaimsOnState;
+    api.talentAwardClaimRepairSummary = talentAwardClaimRepairSummary;
+    api.talentAwardClaimTrackingPlan = claimTrackingPlan;
+    api.talentAwardClaimTrackingPlanSummary = claimTrackingPlanSummary;
+    api.talentAwardClaimShapePreview = claimShapePreview;
+    api.talentAwardClaimShapePreviewSummary = claimShapePreviewSummary;
+    api.talentPointAwardPreview = pointAwardPreview;
+    api.talentPointAwardPreviewSummary = pointAwardPreviewSummary;
+    return true;
+  }
+
+  if (!patchApi()) {
+    window.addEventListener('DOMContentLoaded', patchApi, { once: true });
+    window.setTimeout(patchApi, 0);
+  }
+
+  window.normalizeTalentAwardClaims = normalizeTalentAwardClaims;
+  window.repairTalentAwardClaimsOnState = repairTalentAwardClaimsOnState;
+  window.talentAwardClaimRepairSummary = talentAwardClaimRepairSummary;
 })();

@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.42`
-* Current local package baseline: `v1.20.42`
-* Current development target: `v1.20.42`
+* Public/live itch version: `v1.20.43`
+* Current local package baseline: `v1.20.43`
+* Current development target: `v1.20.43`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.43 - Talent Award Claim Repair Contract Completion
+
+* Wired the claim repair contract into runtime loading and build/cache labels.
+* Added save-shape repair for `player.talentLedger.awardClaims` so missing or malformed containers normalize to `{}` and only valid boss trophy milestone records survive.
+* Kept points, live claim creation, spending UI, unlock UI, and gameplay mutation disabled.
 
 ## v1.20.42 - Talent Claim Tracking Save Shape Dry Run
 

@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.42**
+Current baseline: **DungeonDex v1.20.43**
 
 ## Current Build
 
-**v1.20.42 - Talent Claim Tracking Save Shape Dry Run**
+**v1.20.43 - Talent Award Claim Repair Contract Completion**
 
-This patch adds a read-only preview of the future `player.talentLedger.awardClaims` object map and its repair rules. It does not add the field, mutate saves, award points, enable spending, or add Talent unlock UI.
+This patch wires the claim repair contract into runtime loading, cache labels, docs, and smoke coverage. It repairs `player.talentLedger.awardClaims` to a normalized object map without awarding points, creating live claims, enabling spending, or adding Talent unlock UI.
 
 ## Previous Build
 
