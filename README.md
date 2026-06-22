@@ -2,13 +2,27 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.47**
+Current baseline: **DungeonDex v1.20.48**
 
 ## Current Build
 
+**v1.20.48 - First Controlled Hunter Board Clarity Spend**
+
+This patch adds the first controlled live Talent spend helper for `hunter_board_clarity`. The helper spends exactly one safe Talent Point only when the existing spend preview says the node is eligible, writes the learned state, and keeps the passive limited to Elite Board display-copy clarity.
+
+No broad spending UI, unlock UI, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
+
+## Previous Build
+
 **v1.20.47 - Hunter Board Clarity Spend Preview**
 
-This patch adds a read-only preview of the first safe Talent spend target, `hunter_board_clarity`. It does not spend points, learn nodes, mutate save state, enable spending, or add Talent unlock UI.
+This patch added a read-only preview of the first safe Talent spend target, `hunter_board_clarity`. It did not spend points, learn nodes, mutate save state, enable spending, or add Talent unlock UI.
+
+## Previous Build
+
+**v1.20.46 - First Controlled Boss Trophy Talent Award**
+
+This patch enabled the first controlled Boss Trophy Milestone Talent point award path behind the live gate. The award is atomic: one point, one claim record, and duplicate claims block repeat awards.
 
 ## Previous Build
 
@@ -30,9 +44,9 @@ This patch selects Boss Trophy Milestone as the first Talent point source and ke
 
 ## Previous Build
 
-**v1.20.34 - Passive Renderer Contract Alignment**
+**v1.20.36 - Live Debt Clarity Renderer Wiring**
 
-This patch makes the Talent module the canonical owner of passive clarity metadata and Debt Collector clarity copy helpers. Debt clarity can be preview-ready when learned, but remains disabled, gameplay-inert, and absent from the live renderer.
+This patch wires the existing Debt Collector clarity copy model into the live Debt panel for learned state only. The live panel remains text-only, nonredundant, and gameplay-neutral.
 
 ## Previous Build
 
@@ -42,33 +56,9 @@ This patch fully de-exports dormant Revisit start/active-summary surfaces from t
 
 ## Previous Build
 
-**v1.20.32 - Passive Activation Gate Dry Run**
-
-This patch adds read-only activation-gate metadata for the two prepared display-copy passives. It does not wire the Debt Collector renderer, mutate saves, add Talent actions, or apply gameplay effects.
-
-## Previous Build
-
-**v1.20.31 - Talent Passive Activation Readiness Matrix**
-
-This patch added a read-only readiness matrix for the prepared Board Clarity and Debt Collector Clarity passive contracts.
-
-## Previous Build
-
 **v1.20.8 - Owed Money Text Fix**
 
 This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup.
-
-## Previous Build
-
-**v1.20.7 - Rival Trace Planning Lane**
-
-This cleanup aligned the visible build, cache, and runtime labels with `VERSION.md` and tightened the read-only Trophy Echo detail contract without activating Revisit.
-
-## Previous Build
-
-**v1.20.2 - Monster Backdrop Canvas Completion**
-
-This pass completes the deterministic, canvas-only monster backdrop system behind the combat monster stage. It adds the production theme catalog, stronger boss/elite visual framing, resize-aware rendering, diagnostics, and expanded smoke coverage. It remains visual-only and does not alter combat math, rewards, scaling, progression, or Revisit behavior.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
 
@@ -119,9 +109,11 @@ Current major systems include:
 
 ## Talent System Status
 
-The Talent system is a stable preview foundation backed by one deeply frozen ruleset with four branches and twelve nodes. Save repair forces legacy point/unlock fields and the canonical ledger to a safe zero-state, and existing smoke coverage verifies that combat, Elite Board rewards, charter costs, and sell values remain unaffected.
+The Talent system has one live earning source path and one controlled live spend helper. Boss Trophy Milestone awards can add a single Talent Point with claim tracking, and `applyHunterBoardClaritySpend(state)` can spend exactly one safe point into `hunter_board_clarity` when the preview gate reports eligibility.
 
-The Talent module's internal `v1.16.2` label records its component lineage; `VERSION.md` remains the public build authority. Boss/depth milestones are the primary future earning source. Milestone tracking and activation remain undecided future work, while Elite Board sources remain possible secondary sources only.
+The Talent tree UI remains locked and preview-only. There is no broad spend UI, unlock UI, respec path, extra live nodes, passive stat bonus, reward multiplier, combat effect, economy effect, or Revisit effect.
+
+The Talent module's internal `v1.16.2` label records its component lineage; `VERSION.md` remains the public build authority.
 
 ## Revisit System Status
 
@@ -154,3 +146,5 @@ Current rule:
 Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
 
 ## Monster Backdrop Status
+
+The monster backdrop canvas system is visual-only. It provides deterministic combat-stage atmosphere without changing combat math, HP, rewards, routes, completion, scaling, economy, debt, Talent state, Elite Board behavior, trophy records, or Famous Gear memory.
