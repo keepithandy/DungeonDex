@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.46-first-controlled-talent-award';
+const CACHE_NAME = 'dungeondex-v1.20.47-hunter-board-clarity-spend-preview';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.46-first-controlled-talent-award';
+const BUILD_QS = '1.20.47-hunter-board-clarity-spend-preview';
 const ASSETS = [
   './',
   './index.html',

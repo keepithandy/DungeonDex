@@ -7,12 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.46 - First Controlled Boss Trophy Talent Award
+- DungeonDex v1.20.47 - Hunter Board Clarity Spend Preview
 
-## v1.20.46 First Controlled Boss Trophy Talent Award
-- Current baseline: v1.20.46.
-- Enables the first controlled Boss Trophy Milestone Talent point award.
-- The award is atomic: one point, one claim record.
+## v1.20.47 Hunter Board Clarity Spend Preview
+- Current baseline: v1.20.47.
+- Adds a read-only spend preview for `hunter_board_clarity`.
+- The preview reports affordability and future learn/passive intent without spending points or mutating save state.
+- No spending UI or unlock UI is added.
 - Duplicate claims block repeat awards.
 
 ## v1.20.45 Talent Award Mutation Live Gate

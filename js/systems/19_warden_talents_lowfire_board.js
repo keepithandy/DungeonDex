@@ -685,6 +685,88 @@
     });
   }
 
+  function talentSpendPreview(state, nodeKey){
+    const resolvedNodeKey = String(nodeKey || '').trim();
+    const node = TALENT_BY_ID[resolvedNodeKey] || null;
+    const ledger = talentPointLedger(state);
+    const availablePoints = Math.max(0, Math.floor(N(ledger.availablePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const lifetimePoints = Math.max(0, Math.floor(N(ledger.lifetimePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const spentPoints = Math.max(0, Math.floor(N(ledger.spentPoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const learnedIds = safeTalentLearnedIds(state?.player?.talentLearnedIds || state?.player?.talentUnlockIds || state?.player?.talents?.unlocked || {});
+    const alreadyLearned = learnedIds.includes(resolvedNodeKey) || !!state?.player?.talentUnlockIds?.includes?.(resolvedNodeKey);
+    const cost = node ? Math.max(0, Math.floor(N(node?.plannedCost ?? node?.costPreview ?? 0, 0, 0, Number.MAX_SAFE_INTEGER))) : 0;
+    const effectiveAvailable = Math.max(0, Math.min(availablePoints, Math.max(0, lifetimePoints - spentPoints)));
+    const inspectableState = !!state && typeof state === 'object' && !Array.isArray(state) && !!state.player && typeof state.player === 'object' && !Array.isArray(state.player) && !!ledger && typeof ledger === 'object';
+    const spendable = inspectableState && resolvedNodeKey === 'hunter_board_clarity' && !!node && !alreadyLearned && effectiveAvailable >= cost && cost === 1;
+    let blockedReason = 'malformed_state';
+    if (inspectableState) {
+      if (!resolvedNodeKey) blockedReason = 'malformed_state';
+      else if (!node) blockedReason = 'unknown_node';
+      else if (resolvedNodeKey !== 'hunter_board_clarity') blockedReason = 'unknown_node';
+      else if (alreadyLearned) blockedReason = 'already_learned';
+      else if (effectiveAvailable < cost) blockedReason = 'insufficient_points';
+      else blockedReason = 'ready';
+    }
+    return {
+      nodeKey: resolvedNodeKey,
+      label: node ? String(node.name || node.title || node.nodeTitle || 'Hunter Board Clarity') : 'Hunter Board Clarity',
+      status: 'spend_preview',
+      eligible: spendable,
+      blockedReason,
+      cost,
+      availablePoints: effectiveAvailable,
+      lifetimePoints,
+      spentPoints,
+      alreadyLearned,
+      wouldSpendPoints: spendable,
+      wouldLearnNode: spendable,
+      wouldEnablePassive: spendable,
+      mutatesSave: false,
+      spendsPoints: false,
+      learnsNode: false,
+      appliesEffect: false,
+      grantsCurrency: false,
+      affectsCombat: false,
+      affectsRewards: false,
+      affectsEconomy: false,
+      affectsDebt: false,
+      affectsRevisit: false,
+      affectedSurface: 'hunter_board',
+      requiresLiveSpendPatch: true,
+      notes: spendable ? ['Preview only. No spend is applied.'] : []
+    };
+  }
+
+  function talentSpendPreviewSummary(state, nodeKey){
+    const preview = talentSpendPreview(state, nodeKey);
+    return Object.freeze({
+      nodeKey: preview.nodeKey,
+      label: preview.label,
+      status: preview.status,
+      eligible: preview.eligible,
+      blockedReason: preview.blockedReason,
+      cost: preview.cost,
+      availablePoints: preview.availablePoints,
+      lifetimePoints: preview.lifetimePoints,
+      spentPoints: preview.spentPoints,
+      alreadyLearned: preview.alreadyLearned,
+      wouldSpendPoints: preview.wouldSpendPoints,
+      wouldLearnNode: preview.wouldLearnNode,
+      wouldEnablePassive: preview.wouldEnablePassive,
+      mutatesSave: preview.mutatesSave,
+      spendsPoints: preview.spendsPoints,
+      learnsNode: preview.learnsNode
+    });
+  }
+
+  function hunterBoardClaritySpendPreview(state){
+    return talentSpendPreview(state, 'hunter_board_clarity');
+  }
+
+  function hunterBoardClaritySpendPreviewSummary(state){
+    return talentSpendPreviewSummary(state, 'hunter_board_clarity');
+  }
+
   function talentPointSourceDecision(){
     return Object.freeze({
       selectedSource: 'boss_trophy_milestone',
@@ -1889,6 +1971,10 @@
     previewSummary: talentTreePreviewSummary,
     ledger: talentPointLedger,
     ledgerSummary: talentPointLedgerSummary,
+    talentSpendPreview: talentSpendPreview,
+    talentSpendPreviewSummary: talentSpendPreviewSummary,
+    hunterBoardClaritySpendPreview: hunterBoardClaritySpendPreview,
+    hunterBoardClaritySpendPreviewSummary: hunterBoardClaritySpendPreviewSummary,
     ensure: ensureTalents,
     getState: ensureTalents,
     getAvailablePoints: availableTalentPoints,

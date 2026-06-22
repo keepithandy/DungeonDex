@@ -2,13 +2,13 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.46**
+Current baseline: **DungeonDex v1.20.47**
 
 ## Current Build
 
-**v1.20.46 - First Controlled Boss Trophy Talent Award**
+**v1.20.47 - Hunter Board Clarity Spend Preview**
 
-This patch adds a read-only preview of the future atomic Boss Trophy Milestone award mutation path. It does not award points, create claim records, mutate save state, enable spending, or add Talent unlock UI.
+This patch adds a read-only preview of the first safe Talent spend target, `hunter_board_clarity`. It does not spend points, learn nodes, mutate save state, enable spending, or add Talent unlock UI.
 
 ## Previous Build
 
