@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.20.48-hunter-board-clarity-live-spend';
+const CACHE_NAME = 'dungeondex-v1.20.49-browser-reload-spend-persistence';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.20.48-hunter-board-clarity-live-spend';
+const BUILD_QS = '1.20.49-browser-reload-spend-persistence';
 const ASSETS = [
   './',
   './index.html',

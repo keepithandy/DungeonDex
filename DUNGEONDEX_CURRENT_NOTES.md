@@ -7,21 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.20.48 - First Controlled Hunter Board Clarity Spend
+- DungeonDex v1.20.49 - Browser/Reload Spend Persistence Stabilization Audit
 
-## v1.20.48 First Controlled Hunter Board Clarity Spend
-- Current baseline: v1.20.48.
-- Adds the first controlled live Talent spend helper for `hunter_board_clarity`.
-- New helper: `applyHunterBoardClaritySpend(state)`.
-- New generic controlled wrapper: `applyTalentSpendMutation(state, nodeKey)`.
-- New summary helper: `hunterBoardClaritySpendResultSummary(result)`.
-- The spend requires the existing preview gate to return eligible/ready.
-- It spends exactly 1 safe Talent Point, bounded by `availablePoints` and `lifetimePoints - spentPoints`.
-- It writes learned state through `talentLearnedIds`, `talentUnlockIds`, and legacy talent learned maps for compatibility.
-- It updates ledger math atomically: one point spent, one learned node, no partial spend state.
-- Preview helpers now report the controlled live spend patch is present while remaining non-mutating.
-- No spending UI, unlock UI, respec, extra live node, passive stat bonus, reward math change, combat change, economy change, Debt Collector behavior change, or Revisit activation was added.
-- Added focused smoke coverage in `smoke_talent_spend_v12048.mjs`.
+## v1.20.49 Browser/Reload Spend Persistence Stabilization Audit
+- Current baseline: v1.20.49.
+- Focuses on proving the first controlled live Talent spend survives browser runtime, save, reload, duplicate blocking, and guard checks.
+- Added browser smoke coverage for the live runtime spend path and reload persistence.
+- No new gameplay, Talent UI, respec, extra live nodes, combat change, economy change, Debt Collector change, or Revisit activation was added.
 
 ## v1.20.47 Hunter Board Clarity Spend Preview
 - Added a read-only spend preview for `hunter_board_clarity`.

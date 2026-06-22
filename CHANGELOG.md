@@ -8,15 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.20.48`
-* Current local package baseline: `v1.20.48`
-* Current development target: `v1.20.48`
+* Public/live itch version: `v1.20.49`
+* Current local package baseline: `v1.20.49`
+* Current development target: `v1.20.49`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
 ---
+
+## v1.20.49 - Browser/Reload Spend Persistence Stabilization Audit
+
+* Proved the first controlled `hunter_board_clarity` Talent spend survives browser runtime, save, reload, duplicate blocking, and safety guard checks.
+* Added browser-focused smoke coverage for the live runtime spend path and its reload persistence.
+* No new gameplay, Talent UI, Revisit activation, combat changes, reward changes, Debt changes, or economy changes were added.
 
 ## v1.20.48 - First Controlled Hunter Board Clarity Spend
 

@@ -2,15 +2,15 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.20.48**
+Current baseline: **DungeonDex v1.20.49**
 
 ## Current Build
 
-**v1.20.48 - First Controlled Hunter Board Clarity Spend**
+**v1.20.49 - Browser/Reload Spend Persistence Stabilization Audit**
 
-This patch adds the first controlled live Talent spend helper for `hunter_board_clarity`. The helper spends exactly one safe Talent Point only when the existing spend preview says the node is eligible, writes the learned state, and keeps the passive limited to Elite Board display-copy clarity.
+This patch proves the first controlled live Talent spend helper for `hunter_board_clarity` survives browser runtime, save, reload, duplicate blocking, and guard checks.
 
-No broad spending UI, unlock UI, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
+No new gameplay, Talent UI, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
 
 ## Previous Build
 

@@ -1445,6 +1445,129 @@ async function main() {
     record('Hunter Board clarity spend preview is blocked with no points', talentStateContractAudit?.spendPreviewNoPoints?.nodeKey === 'hunter_board_clarity' && talentStateContractAudit?.spendPreviewNoPoints?.eligible === false && talentStateContractAudit?.spendPreviewNoPoints?.blockedReason === 'insufficient_points' && talentStateContractAudit?.spendPreviewNoPoints?.cost === 1 && talentStateContractAudit?.spendPreviewNoPoints?.availablePoints === 0 && talentStateContractAudit?.spendPreviewNoPoints?.wouldSpendPoints === false && talentStateContractAudit?.spendPreviewNoPoints?.wouldLearnNode === false && talentStateContractAudit?.spendPreviewNoPoints?.mutatesSave === false && talentStateContractAudit?.spendPreviewNoPoints?.spendsPoints === false && talentStateContractAudit?.spendPreviewNoPoints?.learnsNode === false && talentStateContractAudit?.spendPreviewNoPoints?.affectsCombat === false && talentStateContractAudit?.spendPreviewNoPoints?.affectsRewards === false && talentStateContractAudit?.spendPreviewNoPoints?.affectsEconomy === false && talentStateContractAudit?.spendPreviewNoPoints?.affectsDebt === false && talentStateContractAudit?.spendPreviewNoPoints?.affectsRevisit === false && talentStateContractAudit?.spendPreviewNoPointsBefore === talentStateContractAudit?.spendPreviewNoPointsAfter, JSON.stringify(talentStateContractAudit?.spendPreviewNoPoints));
     record('Hunter Board clarity spend preview is ready at one point', talentStateContractAudit?.spendPreviewOnePoint?.nodeKey === 'hunter_board_clarity' && talentStateContractAudit?.spendPreviewOnePoint?.eligible === true && talentStateContractAudit?.spendPreviewOnePoint?.blockedReason === 'ready' && talentStateContractAudit?.spendPreviewOnePoint?.cost === 1 && talentStateContractAudit?.spendPreviewOnePoint?.availablePoints === 1 && talentStateContractAudit?.spendPreviewOnePoint?.lifetimePoints === 1 && talentStateContractAudit?.spendPreviewOnePoint?.spentPoints === 0 && talentStateContractAudit?.spendPreviewOnePoint?.alreadyLearned === false && talentStateContractAudit?.spendPreviewOnePoint?.wouldSpendPoints === true && talentStateContractAudit?.spendPreviewOnePoint?.wouldLearnNode === true && talentStateContractAudit?.spendPreviewOnePoint?.wouldEnablePassive === true && talentStateContractAudit?.spendPreviewOnePoint?.mutatesSave === false && talentStateContractAudit?.spendPreviewOnePoint?.spendsPoints === false && talentStateContractAudit?.spendPreviewOnePoint?.learnsNode === false && talentStateContractAudit?.spendPreviewOnePoint?.grantsCurrency === false && talentStateContractAudit?.spendPreviewOnePoint?.affectsCombat === false && talentStateContractAudit?.spendPreviewOnePoint?.affectsRewards === false && talentStateContractAudit?.spendPreviewOnePoint?.affectsEconomy === false && talentStateContractAudit?.spendPreviewOnePoint?.affectsDebt === false && talentStateContractAudit?.spendPreviewOnePoint?.affectsRevisit === false && talentStateContractAudit?.spendPreviewOnePointAfter === talentStateContractAudit?.spendPreviewOnePointBefore, JSON.stringify(talentStateContractAudit?.spendPreviewOnePoint));
     record('Hunter Board clarity spend preview detects already learned state', talentStateContractAudit?.spendPreviewLearned?.eligible === false && talentStateContractAudit?.spendPreviewLearned?.blockedReason === 'already_learned' && talentStateContractAudit?.spendPreviewLearned?.wouldSpendPoints === false && talentStateContractAudit?.spendPreviewLearned?.wouldLearnNode === false && talentStateContractAudit?.spendPreviewLearned?.mutatesSave === false && talentStateContractAudit?.spendPreviewLearnedBefore === talentStateContractAudit?.spendPreviewLearnedAfter, JSON.stringify(talentStateContractAudit?.spendPreviewLearned));
+    const v12049ReloadFixture = {
+      player: {
+        talentLedger: {
+          version: 1,
+          previewOnly: true,
+          unlocked: false,
+          lifetimePoints: 1,
+          availablePoints: 1,
+          spentPoints: 0,
+          earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+          awardClaims: {
+            'boss_trophy_milestone:ashen_wyrm': {
+              key: 'boss_trophy_milestone:ashen_wyrm',
+              source: 'boss_trophy_milestone',
+              sourceId: 'ashen_wyrm',
+              amount: 1,
+              claimedAt: '2026-06-21T12:00:00.000Z',
+              version: 1
+            }
+          },
+          notes: []
+        },
+        talentLearnedIds: {},
+        talentUnlockIds: [],
+        talents: { unlocked: {}, spent: {}, unlockedIds: [] }
+      }
+    };
+    await writeSave(client, v12049ReloadFixture);
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const v12049Api = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      const state = S;
+      const preview = api?.hunterBoardClaritySpendPreview ? api.hunterBoardClaritySpendPreview(state) : null;
+      const passive = api?.hunterBoardClarityPassiveContract ? api.hunterBoardClarityPassiveContract(state) : null;
+      const buttonLabels = Array.from(document.querySelectorAll('button')).map(btn => String(btn.textContent || '').trim()).filter(Boolean);
+      const hasForbiddenButton = buttonLabels.some(label => /^(Spend|Unlock|Purchase|Respec|Refund|Learn|Activate)$/i.test(label));
+      return {
+        hasApi: !!api,
+        hasApply: typeof api?.applyHunterBoardClaritySpend === 'function',
+        hasMutation: typeof api?.applyTalentSpendMutation === 'function',
+        hasResultSummary: typeof api?.hunterBoardClaritySpendResultSummary === 'function',
+        preview,
+        passive,
+        buttonLabels,
+        hasForbiddenButton,
+        screen: state?.screen || '',
+        build: window.DUNGEONDEX_BUILD || '',
+        visibleLabel: window.DUNGEONDEX_VISIBLE_LABEL || '',
+        deck: {
+          dungeonEntry: !!document.getElementById('startRunBtn') || !!document.getElementById('runFromIdleBtn'),
+          revisitEntry: !!document.querySelector('[data-screen="revisit"], #revisitBtn, #revisitPanel button, button[aria-label*="Revisit"]'),
+          debtPanelText: document.getElementById('debtPanel')?.innerText || '',
+          questPanelText: document.getElementById('questPanel')?.innerText || ''
+        }
+      };
+    })()`);
+    record('v1.20.49 runtime exposes controlled spend helpers after reload', v12049Api?.hasApi === true && v12049Api?.hasApply === true && v12049Api?.hasMutation === true && v12049Api?.hasResultSummary === true, JSON.stringify(v12049Api));
+    record('v1.20.49 build label is visible after reload', v12049Api?.build === '1.20.49' && String(v12049Api?.visibleLabel || '').includes('v1.20.49'), JSON.stringify({ build: v12049Api?.build, visibleLabel: v12049Api?.visibleLabel }));
+    record('v1.20.49 preview stays ready and read-only after reload', v12049Api?.preview?.nodeKey === 'hunter_board_clarity' && v12049Api?.preview?.eligible === true && v12049Api?.preview?.blockedReason === 'ready' && v12049Api?.preview?.liveSpendPatchReady === true && v12049Api?.preview?.requiresLiveSpendPatch === false && v12049Api?.preview?.mutatesSave === false && v12049Api?.preview?.spendsPoints === false && v12049Api?.preview?.learnsNode === false, JSON.stringify(v12049Api?.preview));
+    const v12049SpendResult = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      return api && typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null;
+    })()`);
+    record('v1.20.49 spend succeeds in browser runtime', v12049SpendResult?.ok === true && v12049SpendResult?.status === 'spent' && v12049SpendResult?.nodeKey === 'hunter_board_clarity' && v12049SpendResult?.cost === 1 && v12049SpendResult?.availableBefore === 1 && v12049SpendResult?.availableAfter === 0 && v12049SpendResult?.spentBefore === 0 && v12049SpendResult?.spentAfter === 1 && v12049SpendResult?.mutatesSave === true && v12049SpendResult?.spendsPoints === true && v12049SpendResult?.learnsNode === true && v12049SpendResult?.enablesPassive === true && v12049SpendResult?.unlockUiEnabled === false && v12049SpendResult?.spendingUiEnabled === false && v12049SpendResult?.affectsCombat === false && v12049SpendResult?.affectsRewards === false && v12049SpendResult?.affectsEconomy === false && v12049SpendResult?.affectsDebt === false && v12049SpendResult?.affectsRevisit === false, JSON.stringify(v12049SpendResult));
+    const v12049AfterSpend = await evalByValue(client, `(() => ({
+      save: S.player?.talentLedger || null,
+      learned: S.player?.talentLearnedIds?.hunter_board_clarity === true,
+      unlockIds: Array.isArray(S.player?.talentUnlockIds) ? S.player.talentUnlockIds.slice() : [],
+      talents: S.player?.talents || null,
+      passive: window.DungeonDexTalents?.hunterBoardClarityPassiveContract ? window.DungeonDexTalents.hunterBoardClarityPassiveContract(S) : null,
+      buttonLabels: Array.from(document.querySelectorAll('button')).map(btn => String(btn.textContent || '').trim()).filter(Boolean),
+      debtPanelText: document.getElementById('debtPanel')?.innerText || '',
+      questPanelText: document.getElementById('questPanel')?.innerText || ''
+    }))()`);
+    record('v1.20.49 post-spend state updates ledger and learned flags', v12049AfterSpend?.save?.lifetimePoints === 1 && v12049AfterSpend?.save?.availablePoints === 0 && v12049AfterSpend?.save?.spentPoints === 1 && v12049AfterSpend?.learned === true && Array.isArray(v12049AfterSpend?.unlockIds) && v12049AfterSpend.unlockIds.includes('hunter_board_clarity') && v12049AfterSpend?.talents?.unlocked?.hunter_board_clarity === true && v12049AfterSpend?.passive?.learned === true && v12049AfterSpend?.passive?.passiveReady === true && v12049AfterSpend?.passive?.passiveEnabled === true && v12049AfterSpend?.passive?.appliesEffect === false && !v12049AfterSpend?.buttonLabels.some(label => /^(Spend|Unlock|Purchase|Respec|Refund|Learn|Activate)$/i.test(label)) && v12049AfterSpend?.debtPanelText === v12049Api?.deck?.debtPanelText && v12049AfterSpend?.questPanelText === v12049Api?.deck?.questPanelText, JSON.stringify(v12049AfterSpend));
+    const v12049Duplicate = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      return api && typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null;
+    })()`);
+    record('v1.20.49 duplicate spend blocks as already learned', v12049Duplicate?.ok === false && v12049Duplicate?.blockedReason === 'already_learned' && v12049AfterSpend?.save?.availablePoints === 0 && v12049AfterSpend?.save?.spentPoints === 1 && v12049AfterSpend?.learned === true, JSON.stringify(v12049Duplicate));
+    await client.send('Page.reload', { ignoreCache: true });
+    await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
+    const v12049Reloaded = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      const state = S;
+      const preview = api?.hunterBoardClaritySpendPreview ? api.hunterBoardClaritySpendPreview(state) : null;
+      const passive = api?.hunterBoardClarityPassiveContract ? api.hunterBoardClarityPassiveContract(state) : null;
+      const buttonLabels = Array.from(document.querySelectorAll('button')).map(btn => String(btn.textContent || '').trim()).filter(Boolean);
+      const hasForbiddenButton = buttonLabels.some(label => /^(Spend|Unlock|Purchase|Respec|Refund|Learn|Activate)$/i.test(label));
+      return {
+        save: state?.player?.talentLedger || null,
+        learned: state?.player?.talentLearnedIds?.hunter_board_clarity === true,
+        unlockIds: Array.isArray(state?.player?.talentUnlockIds) ? state.player.talentUnlockIds.slice() : [],
+        talents: state?.player?.talents || null,
+        preview,
+        passive,
+        buttonLabels,
+        hasForbiddenButton,
+        build: window.DUNGEONDEX_BUILD || '',
+        visibleLabel: window.DUNGEONDEX_VISIBLE_LABEL || '',
+        entryButtons: {
+          dungeon: !!document.getElementById('startRunBtn') || !!document.getElementById('runFromIdleBtn'),
+          revisit: !!document.querySelector('[data-screen="revisit"], #revisitBtn, #revisitPanel button, button[aria-label*="Revisit"]')
+        },
+        debtPanelText: document.getElementById('debtPanel')?.innerText || '',
+        questPanelText: document.getElementById('questPanel')?.innerText || ''
+      };
+    })()`);
+    record('v1.20.49 reload preserves spend state', v12049Reloaded?.build === '1.20.49' && String(v12049Reloaded?.visibleLabel || '').includes('v1.20.49') && v12049Reloaded?.learned === true && Array.isArray(v12049Reloaded?.unlockIds) && v12049Reloaded.unlockIds.includes('hunter_board_clarity') && v12049Reloaded?.save?.lifetimePoints === 1 && v12049Reloaded?.save?.availablePoints === 0 && v12049Reloaded?.save?.spentPoints === 1 && Object.prototype.hasOwnProperty.call(v12049Reloaded?.save || {}, 'awardClaims'), JSON.stringify(v12049Reloaded));
+    record('v1.20.49 reload keeps preview ready and forbids talent action buttons', v12049Reloaded?.preview?.nodeKey === 'hunter_board_clarity' && v12049Reloaded?.preview?.eligible === false && v12049Reloaded?.preview?.blockedReason === 'already_learned' && v12049Reloaded?.preview?.liveSpendPatchReady === true && v12049Reloaded?.preview?.requiresLiveSpendPatch === false && v12049Reloaded?.preview?.mutatesSave === false && v12049Reloaded?.preview?.spendsPoints === false && v12049Reloaded?.preview?.learnsNode === false && !v12049Reloaded?.hasForbiddenButton, JSON.stringify(v12049Reloaded?.preview));
+    const v12049ReloadedDuplicate = await evalByValue(client, `(() => {
+      const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
+      return api && typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null;
+    })()`);
+    const v12049ReloadedAfterDuplicate = await evalByValue(client, `(() => ({
+      save: S.player?.talentLedger || null,
+      learned: S.player?.talentLearnedIds?.hunter_board_clarity === true,
+      unlockIds: Array.isArray(S.player?.talentUnlockIds) ? S.player.talentUnlockIds.slice() : [],
+      talents: S.player?.talents || null,
+      passive: window.DungeonDexTalents?.hunterBoardClarityPassiveContract ? window.DungeonDexTalents.hunterBoardClarityPassiveContract(S) : null
+    }))()`);
+    record('v1.20.49 reload duplicate blocks without mutation', v12049ReloadedDuplicate?.ok === false && v12049ReloadedDuplicate?.blockedReason === 'already_learned' && v12049ReloadedAfterDuplicate?.save?.availablePoints === 0 && v12049ReloadedAfterDuplicate?.save?.spentPoints === 1 && v12049ReloadedAfterDuplicate?.learned === true && Array.isArray(v12049ReloadedAfterDuplicate?.unlockIds) && v12049ReloadedAfterDuplicate.unlockIds.includes('hunter_board_clarity') && v12049ReloadedAfterDuplicate?.passive?.appliesEffect === false, JSON.stringify(v12049ReloadedDuplicate));
     record('Hunter Board clarity spend preview rejects unknown nodes', talentStateContractAudit?.spendPreviewUnknown?.eligible === false && talentStateContractAudit?.spendPreviewUnknown?.blockedReason === 'unknown_node' && talentStateContractAudit?.spendPreviewUnknown?.wouldSpendPoints === false && talentStateContractAudit?.spendPreviewUnknown?.wouldLearnNode === false && talentStateContractAudit?.spendPreviewUnknown?.mutatesSave === false, JSON.stringify(talentStateContractAudit?.spendPreviewUnknown));
     record('Hunter Board clarity spend preview is stable on malformed input', Array.isArray(talentStateContractAudit?.spendPreviewMalformedStates) && talentStateContractAudit.spendPreviewMalformedStates.length === 7 && talentStateContractAudit.spendPreviewMalformedStates.every(preview => preview && typeof preview === 'object' && preview.mutatesSave === false && preview.spendsPoints === false && preview.learnsNode === false), JSON.stringify(talentStateContractAudit?.spendPreviewMalformedStates));
     record('Hunter Board clarity spend preview preserves ledger math compatibility', talentStateContractAudit?.spendPreviewMalformedLedger?.availablePoints === 1 && talentStateContractAudit?.spendPreviewMalformedLedger?.eligible === false && talentStateContractAudit?.spendPreviewMalformedLedger?.blockedReason === 'insufficient_points' && talentStateContractAudit?.spendPreviewMalformedLedgerBefore === talentStateContractAudit?.spendPreviewMalformedLedgerAfter, JSON.stringify(talentStateContractAudit?.spendPreviewMalformedLedger));
