@@ -60,7 +60,9 @@
       lifetimePoints,
       spentPoints,
       availablePoints,
-      effectiveAvailable
+      effectiveAvailable,
+      remainingLifetime,
+      clampedAvailable: availablePoints !== effectiveAvailable
     };
   }
 
@@ -105,6 +107,9 @@
       blockedReason,
       cost: SPEND_COST,
       availablePoints: snapshot.effectiveAvailable,
+      rawAvailablePoints: snapshot.availablePoints,
+      remainingLifetime: snapshot.remainingLifetime,
+      clampedAvailable: snapshot.clampedAvailable,
       spentPoints: safeInt(snapshot.spentPoints, 0),
       lifetimePoints: safeInt(snapshot.lifetimePoints, 0),
       learned: learned,
@@ -121,6 +126,7 @@
   function talentSpendUiReadinessModel(state, nodeKey){
     const resolvedNodeKey = String(nodeKey || '').trim();
     if (resolvedNodeKey !== TARGET_NODE) {
+      const snapshot = spendableLedgerSnapshot(state?.player?.talentLedger || {});
       return Object.freeze({
         version: 1,
         nodeKey: resolvedNodeKey,
@@ -131,9 +137,12 @@
         enabled: false,
         blockedReason: resolvedNodeKey ? 'unknown_node' : 'malformed_state',
         cost: SPEND_COST,
-        availablePoints: safeInt(state?.player?.talentLedger?.availablePoints, 0),
-        spentPoints: safeInt(state?.player?.talentLedger?.spentPoints, 0),
-        lifetimePoints: safeInt(state?.player?.talentLedger?.lifetimePoints, 0),
+        availablePoints: snapshot.effectiveAvailable,
+        rawAvailablePoints: snapshot.availablePoints,
+        remainingLifetime: snapshot.remainingLifetime,
+        clampedAvailable: snapshot.clampedAvailable,
+        spentPoints: snapshot.spentPoints,
+        lifetimePoints: snapshot.lifetimePoints,
         learned: hasLearnedNode(state?.player, TARGET_NODE),
         previewReady: false,
         liveSpendPatchReady: false,
@@ -161,6 +170,9 @@
       eligible: false,
       availableBefore: safeInt(snapshot?.effectiveAvailable, 0),
       availableAfter: safeInt(snapshot?.effectiveAvailable, 0),
+      rawAvailableBefore: safeInt(snapshot?.availablePoints, 0),
+      remainingLifetime: safeInt(snapshot?.remainingLifetime, 0),
+      clampedAvailable: snapshot?.clampedAvailable === true,
       spentBefore: safeInt(snapshot?.spentPoints, 0),
       spentAfter: safeInt(snapshot?.spentPoints, 0),
       lifetimePoints: safeInt(snapshot?.lifetimePoints, 0),
@@ -304,6 +316,9 @@
       eligible: true,
       availableBefore: snapshot.effectiveAvailable,
       availableAfter: newAvailablePoints,
+      rawAvailableBefore: snapshot.availablePoints,
+      remainingLifetime: snapshot.remainingLifetime,
+      clampedAvailable: snapshot.clampedAvailable,
       spentBefore: snapshot.spentPoints,
       spentAfter: newSpentPoints,
       lifetimePoints: snapshot.lifetimePoints,
@@ -335,6 +350,118 @@
     return applyHunterBoardClaritySpend(state);
   }
 
+  function makeSpendFixture(overrides = {}){
+    const player = isPlainObject(overrides.player) ? overrides.player : {};
+    const ledger = isPlainObject(player.talentLedger) ? player.talentLedger : {};
+    return {
+      player: {
+        talentEarning: {
+          enabled: true,
+          sourceId: 'boss_depth_milestone',
+          milestonesReached: { first_boss: true },
+          pointsAwarded: 1
+        },
+        talentLedger: {
+          version: 1,
+          unlocked: false,
+          previewOnly: true,
+          lifetimePoints: 1,
+          availablePoints: 1,
+          spentPoints: 0,
+          earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
+          awardClaims: {},
+          notes: [],
+          ...ledger
+        },
+        talentLearnedIds: clonePlain(player.talentLearnedIds),
+        talentUnlockIds: cloneArray(player.talentUnlockIds),
+        talents: isPlainObject(player.talents) ? { ...player.talents } : {},
+        ...player
+      }
+    };
+  }
+
+  function talentControlledSpendHardeningAudit(){
+    const ready = makeSpendFixture();
+    const readyBefore = JSON.stringify(ready);
+    const firstSpend = applyHunterBoardClaritySpend(ready);
+    const duplicateSpend = applyHunterBoardClaritySpend(ready);
+    const readyAfterDuplicate = JSON.stringify(ready);
+
+    const oversized = makeSpendFixture({
+      player: {
+        talentLedger: {
+          lifetimePoints: 1,
+          availablePoints: 99,
+          spentPoints: 0
+        }
+      }
+    });
+    const oversizedReadiness = talentSpendUiReadinessModel(oversized, TARGET_NODE);
+    const oversizedSpend = applyHunterBoardClaritySpend(oversized);
+
+    const negative = makeSpendFixture({
+      player: {
+        talentLedger: {
+          lifetimePoints: -10,
+          availablePoints: -4,
+          spentPoints: -2
+        }
+      }
+    });
+    const negativeBefore = JSON.stringify(negative);
+    const negativeReadiness = talentSpendUiReadinessModel(negative, TARGET_NODE);
+    const negativeSpend = applyHunterBoardClaritySpend(negative);
+    const negativeAfter = JSON.stringify(negative);
+
+    const malformedResults = [
+      applyTalentSpendMutation(null, TARGET_NODE),
+      applyTalentSpendMutation([], TARGET_NODE),
+      applyTalentSpendMutation({ player: null }, TARGET_NODE),
+      applyTalentSpendMutation({ player: { talentLedger: null } }, TARGET_NODE)
+    ];
+    const unknownResult = applyTalentSpendMutation(makeSpendFixture(), 'unknown_node');
+
+    const checks = {
+      firstSpendOk: firstSpend?.ok === true && firstSpend.availableBefore === 1 && firstSpend.availableAfter === 0 && firstSpend.spentAfter === 1,
+      duplicateBlocked: duplicateSpend?.ok === false && duplicateSpend.blockedReason === 'already_learned' && duplicateSpend.spendsPoints === false && duplicateSpend.learnsNode === false,
+      oversizedClamped: oversizedReadiness?.clampedAvailable === true && oversizedReadiness?.availablePoints === 1 && oversizedSpend?.ok === true && oversizedSpend?.availableAfter === 0,
+      negativeBlockedNoMutation: negativeReadiness?.availablePoints === 0 && negativeSpend?.ok === false && negativeSpend?.blockedReason === 'insufficient_points' && negativeBefore === negativeAfter,
+      malformedBlocked: malformedResults.every(result => result?.ok === false && result?.blockedReason === 'malformed_state' && result?.mutatesSave === false),
+      unknownBlocked: unknownResult?.ok === false && unknownResult?.blockedReason === 'unknown_node' && unknownResult?.mutatesSave === false,
+      duplicateDidNotChangeSecondTime: readyAfterDuplicate === JSON.stringify(ready)
+    };
+
+    const ok = Object.values(checks).every(Boolean);
+    return Object.freeze({
+      version: 1,
+      build: BUILD,
+      nodeKey: TARGET_NODE,
+      ok,
+      checks,
+      firstSpend: hunterBoardClaritySpendResultSummary(firstSpend),
+      duplicateSpend: hunterBoardClaritySpendResultSummary(duplicateSpend),
+      oversized: {
+        readiness: oversizedReadiness,
+        spend: hunterBoardClaritySpendResultSummary(oversizedSpend)
+      },
+      negative: {
+        readiness: negativeReadiness,
+        spend: hunterBoardClaritySpendResultSummary(negativeSpend)
+      },
+      malformedBlockedReasons: malformedResults.map(result => result?.blockedReason || ''),
+      unknown: hunterBoardClaritySpendResultSummary(unknownResult),
+      mutatesCallerState: false,
+      expandsTalentNodes: false,
+      enablesAdditionalSpendingTargets: false,
+      affectsCombat: false,
+      affectsRewards: false,
+      affectsEconomy: false,
+      affectsDebt: false,
+      affectsRevisit: false
+    });
+  }
+
   function hunterBoardClaritySpendResultSummary(result){
     return Object.freeze({
       ok: result?.ok === true,
@@ -344,6 +471,9 @@
       cost: safeInt(result?.cost, SPEND_COST),
       availableBefore: safeInt(result?.availableBefore, 0),
       availableAfter: safeInt(result?.availableAfter, 0),
+      rawAvailableBefore: safeInt(result?.rawAvailableBefore, result?.availableBefore || 0),
+      remainingLifetime: safeInt(result?.remainingLifetime, 0),
+      clampedAvailable: result?.clampedAvailable === true,
       spentBefore: safeInt(result?.spentBefore, 0),
       spentAfter: safeInt(result?.spentAfter, 0),
       mutatesSave: result?.mutatesSave === true,
@@ -363,6 +493,7 @@
     api.hunterBoardClaritySpendUiReadinessModel = hunterBoardClaritySpendUiReadinessModel;
     api.applyHunterBoardClaritySpend = applyHunterBoardClaritySpend;
     api.applyTalentSpendMutation = applyTalentSpendMutation;
+    api.talentControlledSpendHardeningAudit = talentControlledSpendHardeningAudit;
     api.hunterBoardClaritySpendResultSummary = hunterBoardClaritySpendResultSummary;
     api.firstControlledSpendTarget = TARGET_NODE;
     api.firstControlledSpendBuild = BUILD;
@@ -378,4 +509,5 @@
   window.hunterBoardClaritySpendUiReadinessModel = hunterBoardClaritySpendUiReadinessModel;
   window.applyHunterBoardClaritySpend = applyHunterBoardClaritySpend;
   window.applyTalentSpendMutation = applyTalentSpendMutation;
+  window.talentControlledSpendHardeningAudit = talentControlledSpendHardeningAudit;
 })();
