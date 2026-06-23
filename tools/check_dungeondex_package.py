@@ -11,39 +11,30 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 
-REQUIRED_FILES = ("index.html", "app.js", "styles.css")
+REQUIRED_FILES = ("index.html", "app.js", "styles.css", "sw.js", "manifest.json")
 LOCAL_ATTRS = {"href", "src"}
 SKIP_SCHEMES = {"data", "blob", "mailto", "tel", "javascript", "http", "https"}
-OLD_VERSION_RE = re.compile(
-    r"(?:dungeon-dex-v?1[.]4[.]3b|v1[.]4[.]3b|1[.]4[.]3b(?:-[a-z0-9-]+)?)",
+STALE_RUNTIME_RE = re.compile(
+    r"(?:"
+    r"1[.]20[.]48|1[.]20[.]49|1[.]20[.]50|1[.]20[.]51|"
+    r"v1[.]20[.]48|v1[.]20[.]49|v1[.]20[.]50|v1[.]20[.]51|"
+    r"hunter-board-clarity-live-spend|"
+    r"first-controlled-talent-spend-ui|"
+    r"browser-reload-spend-persistence|"
+    r"talent-spend-ui-readiness"
+    r")",
     re.IGNORECASE,
 )
-VERSION_SCAN_IGNORED_DIRS = {
-    ".git",
-    ".cache",
-    ".mypy_cache",
-    ".parcel-cache",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".vite",
-    "__pycache__",
-    "node_modules",
-}
-VERSION_SCAN_IGNORED_SUFFIXES = {
-    ".zip",
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".gif",
-    ".webp",
-    ".ico",
-    ".woff",
-    ".woff2",
-    ".ttf",
-    ".eot",
-    ".pyc",
-}
-NOTE_FILE_PREFIXES = ("RELEASE_NOTES_", "SMOKE_TEST_NOTES_", "PATCH_NOTES_", "BUGFIX_AUDIT_")
+PROHIBITED_DIRS = {".git", "node_modules"}
+PROHIBITED_FILE_PATTERNS = (
+    re.compile(r"[\\/]\.git(?:[\\/]|$)", re.IGNORECASE),
+    re.compile(r"[\\/]node_modules(?:[\\/]|$)", re.IGNORECASE),
+    re.compile(r"\.zip$", re.IGNORECASE),
+    re.compile(r"\.patch$", re.IGNORECASE),
+    re.compile(r"\.diff$", re.IGNORECASE),
+    re.compile(r"(?:^|[\\/])backup", re.IGNORECASE),
+    re.compile(r"(?:^|[\\/]).*debug", re.IGNORECASE),
+)
 
 
 class LocalReferenceParser(HTMLParser):
@@ -152,21 +143,21 @@ def is_index_script_or_style(rel_path: str, source: str) -> bool:
     return source.startswith("index.html <script") or suffix in {".js", ".css"}
 
 
-def skip_version_scan(path: Path) -> bool:
-    if any(part in VERSION_SCAN_IGNORED_DIRS for part in path.parts):
-        return True
-    if path.suffix.lower() in VERSION_SCAN_IGNORED_SUFFIXES:
-        return True
-    if path.suffix.lower() == ".txt" and path.name.startswith(NOTE_FILE_PREFIXES):
-        return True
-    return False
+def runtime_files(root: Path) -> list[Path]:
+    files: list[Path] = []
+    for rel_path in REQUIRED_FILES:
+        path = root / rel_path
+        if path.is_file():
+            files.append(path)
+    systems_dir = root / "js" / "systems"
+    if systems_dir.is_dir():
+        files.extend(sorted(systems_dir.glob("*.js")))
+    return sorted(set(files))
 
 
-def old_version_warnings(root: Path) -> list[str]:
+def stale_runtime_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
-    for path in sorted(root.rglob("*")):
-        if not path.is_file() or skip_version_scan(path):
-            continue
+    for path in runtime_files(root):
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
@@ -176,10 +167,22 @@ def old_version_warnings(root: Path) -> list[str]:
             continue
         rel_path = path.relative_to(root).as_posix()
         for line_no, line in enumerate(text.splitlines(), 1):
-            match = OLD_VERSION_RE.search(line)
+            match = STALE_RUNTIME_RE.search(line)
             if match:
-                warnings.append(f"{rel_path}:{line_no} contains stale pre-1.4.3c string: {match.group(0)}")
+                warnings.append(f"{rel_path}:{line_no} contains stale runtime/build string: {match.group(0)}")
                 break
+    return warnings
+
+
+def prohibited_content_warnings(root: Path) -> list[str]:
+    warnings: list[str] = []
+    for path in sorted(root.rglob("*")):
+        rel_path = path.relative_to(root).as_posix()
+        if any(part in PROHIBITED_DIRS for part in path.parts):
+            warnings.append(f"prohibited package content present: {rel_path}")
+            continue
+        if path.is_file() and any(pattern.search(rel_path) for pattern in PROHIBITED_FILE_PATTERNS):
+            warnings.append(f"prohibited package content present: {rel_path}")
     return warnings
 
 
@@ -250,7 +253,8 @@ def main() -> int:
             if rel_path and not add_checked(checked, seen, root, rel_path, source):
                 missing_required.append(f"{source} references missing local asset: {rel_path}")
 
-    warnings.extend(old_version_warnings(root))
+    warnings.extend(stale_runtime_warnings(root))
+    warnings.extend(prohibited_content_warnings(root))
 
     print("DungeonDex package check")
     print(f"Root: {root}")

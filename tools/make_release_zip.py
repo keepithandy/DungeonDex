@@ -8,20 +8,19 @@ import zipfile
 from pathlib import Path
 
 
-OUTPUT_NAME = "DungeonDex_v1_4_10_Package_Hygiene_Hotfix.zip"
-EXCLUDED_DIRS = {
-    ".git",
-    ".cache",
-    ".mypy_cache",
-    ".parcel-cache",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".vite",
-    "__pycache__",
-    "node_modules",
-}
-EXCLUDED_NAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
-EXCLUDED_SUFFIXES = {".zip", ".pyc", ".pyo", ".tmp", ".temp", ".log"}
+PACKAGE_DIR = Path("archive/packages")
+OUTPUT_NAME = "DungeonDex.zip"
+ROOT_FILES = (
+    "index.html",
+    "app.js",
+    "sw.js",
+    "manifest.json",
+    "styles.css",
+)
+RUNTIME_DIRS = (
+    Path("js/systems"),
+    Path("assets"),
+)
 
 
 def project_root() -> Path:
@@ -30,19 +29,26 @@ def project_root() -> Path:
     return Path.cwd().resolve()
 
 
-def should_include(path: Path, root: Path) -> bool:
-    rel = path.relative_to(root)
-    if rel.name.lower().startswith("ion"):
-        return False
-    if any("cache" in part.lower() for part in rel.parts):
-        return False
-    if any(part in EXCLUDED_DIRS for part in rel.parts):
-        return False
-    if path.name in EXCLUDED_NAMES:
-        return False
-    if path.suffix.lower() in EXCLUDED_SUFFIXES:
-        return False
-    return path.is_file()
+def iter_release_files(root: Path) -> list[Path]:
+    files: list[Path] = []
+
+    for rel_path in ROOT_FILES:
+        path = root / rel_path
+        if not path.is_file():
+            raise FileNotFoundError(f"missing required runtime file: {rel_path}")
+        files.append(path)
+
+    for rel_dir in RUNTIME_DIRS:
+        runtime_dir = root / rel_dir
+        if not runtime_dir.is_dir():
+            continue
+        for path in sorted(runtime_dir.rglob("*")):
+            if path.is_file() and path.suffix.lower() == ".js":
+                files.append(path)
+            elif path.is_file() and rel_dir.name == "assets":
+                files.append(path)
+
+    return sorted(set(files))
 
 
 def main() -> int:
@@ -51,12 +57,13 @@ def main() -> int:
         print(f"FAIL: {root} does not look like the DungeonDex project root")
         return 1
 
-    output_path = root / OUTPUT_NAME
-    files = [path for path in sorted(root.rglob("*")) if should_include(path, root)]
+    output_path = root / PACKAGE_DIR / OUTPUT_NAME
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    files = iter_release_files(root)
 
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in files:
-            archive.write(path, path.relative_to(root).as_posix())
+            archive.write(path, Path("DungeonDex") / path.relative_to(root))
 
     print(f"Wrote {output_path}")
     print(f"Included {len(files)} files")

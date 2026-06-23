@@ -173,6 +173,7 @@
   <script>
     (function(){
       if (!('serviceWorker' in navigator)) return;
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.21.0-talent-loop-release-candidate';
       var host = window.location.hostname;
       var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
       if (isLocalDev) {

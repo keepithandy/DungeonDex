@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.47 - Talent award claim repair contract.
+// DungeonDex v1.21.0 - Talent award claim repair contract.
 (function(){
   if (window.DDTalentAwardClaimRepairContract) return;
   window.DDTalentAwardClaimRepairContract = true;
