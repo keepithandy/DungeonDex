@@ -383,8 +383,8 @@
 
   function talentControlledSpendHardeningAudit(){
     const ready = makeSpendFixture();
-    const readyBefore = JSON.stringify(ready);
     const firstSpend = applyHunterBoardClaritySpend(ready);
+    const readyAfterFirstSpend = JSON.stringify(ready);
     const duplicateSpend = applyHunterBoardClaritySpend(ready);
     const readyAfterDuplicate = JSON.stringify(ready);
 
@@ -429,7 +429,7 @@
       negativeBlockedNoMutation: negativeReadiness?.availablePoints === 0 && negativeSpend?.ok === false && negativeSpend?.blockedReason === 'insufficient_points' && negativeBefore === negativeAfter,
       malformedBlocked: malformedResults.every(result => result?.ok === false && result?.blockedReason === 'malformed_state' && result?.mutatesSave === false),
       unknownBlocked: unknownResult?.ok === false && unknownResult?.blockedReason === 'unknown_node' && unknownResult?.mutatesSave === false,
-      duplicateDidNotChangeSecondTime: readyAfterDuplicate === JSON.stringify(ready)
+      duplicateDidNotChangeSecondTime: readyAfterDuplicate === readyAfterFirstSpend
     };
 
     const ok = Object.values(checks).every(Boolean);
