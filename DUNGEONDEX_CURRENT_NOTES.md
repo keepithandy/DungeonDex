@@ -7,10 +7,10 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.21.0 - Talent Loop Release Candidate
+- DungeonDex v1.21.1 - Hunter Board Clarity Spend Smoke Hardening
 
-## v1.21.0 Talent Loop Release Candidate
-- Current baseline: v1.21.0.
+## v1.21.1 Hunter Board Clarity Spend Smoke Hardening
+- Current baseline: v1.21.1.
 - Adds the first complete controlled `hunter_board_clarity` Talent loop: Boss Trophy point source, spend preview, readiness, spend button, save/reload persistence, and duplicate blocking.
 - The Talent panel now explains available, earned, and spent points, the Boss Trophy Milestone source, the Hunter Board Clarity effect, and the learned/active display-only contract.
 - No second Talent node, no Revisit activation, no combat change, no economy change, no Debt Collector change, and no broad Talent tree activation were added.

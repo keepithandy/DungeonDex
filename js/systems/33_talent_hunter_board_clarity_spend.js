@@ -1,13 +1,13 @@
 'use strict';
 
-// DungeonDex v1.21.0 - Talent loop release candidate.
+// DungeonDex v1.21.1 - Talent loop release candidate.
 (function(){
   if (window.DDTalentHunterBoardClaritySpend) return;
   window.DDTalentHunterBoardClaritySpend = true;
 
   const TARGET_NODE = 'hunter_board_clarity';
   const SPEND_COST = 1;
-  const BUILD = '1.21.0-talent-loop-release-candidate';
+  const BUILD = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
 
   function isPlainObject(value){
     if (!value || typeof value !== 'object' || Array.isArray(value)) return false;

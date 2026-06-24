@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.21.0 hotfix - passive activation gate verification layer.
+// DungeonDex v1.21.1 hotfix - passive activation gate verification layer.
 (function(){
   if (window.DDPassiveActivationGateHotfix) return;
   window.DDPassiveActivationGateHotfix = true;
 
-  const BUILD = '1.21.0-talent-loop-release-candidate';
+  const BUILD = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
   const REQUIRED_BLOCKED_SYSTEMS = Object.freeze([
     'combat',
     'economy',

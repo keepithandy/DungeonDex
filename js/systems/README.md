@@ -36,7 +36,7 @@ It preserves classic browser script load order instead of converting the game to
 - `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
 - `33_talent_hunter_board_clarity_spend.js` — Controlled one-node Hunter Board Clarity spend helper and readiness model.
-- `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.0 button, readiness, reload persistence, and release-candidate hardening audits for the controlled Hunter Board Clarity spend.
+- `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.1 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.
 
 Notes:
 - `index.html` now loads these files directly in order.

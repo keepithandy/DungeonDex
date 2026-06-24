@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.21.0-talent-loop-release-candidate';
+const CACHE_NAME = 'dungeondex-v1.21.1-hunter-board-clarity-spend-smoke-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.21.0-talent-loop-release-candidate';
+const BUILD_QS = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
 const ASSETS = [
   './',
   './index.html',

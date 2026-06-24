@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.21.0 - Revisit Activation Surface Lockdown.
+// DungeonDex v1.21.1 - Revisit Activation Surface Lockdown.
 (function(){
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.21.0-talent-loop-release-candidate';
+  const BUILD = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const forbiddenExportNames = Object.freeze([
     'can' + 'Start' + 'Revisit' + 'Route',
