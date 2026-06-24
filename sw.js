@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.21.1-hunter-board-clarity-spend-smoke-hardening';
+const CACHE_NAME = 'dungeondex-v1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
+const BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
 const ASSETS = [
   './',
   './index.html',
