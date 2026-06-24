@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.20.2 - Monster Backdrop Canvas Completion.
+// DungeonDex v1.21.0 - Monster Backdrop Canvas Completion.
 // Complete deterministic, visual-only canvas scene system for combat monster stages.
 (function(root){
   const BUILD_TAG = 'monster_backdrop_canvas_complete_v1';
