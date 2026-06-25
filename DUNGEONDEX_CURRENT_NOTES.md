@@ -14,6 +14,11 @@
 - It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
 - Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
 
+## v1.21.2 Revisit Trophy Echo Activation Contract Draft
+- Future Trophy Echo activation is limited to read-only preview fields such as lane name, planned purpose, source history, locked status, preview text, and future contract notes.
+- Blocked fields stay absent for now: route entry, start/enter/claim/complete/unlock/rerun/resolve buttons, rewards, reward tables, claim records, completion flags, and save mutation.
+- Trophy Echo remains the first planned Revisit lane, Famous Gear Memory remains the second planned lane, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
+
 ## v1.21.2 Talent Loop Release-Stability Hardening
 - Verified the controlled `hunter_board_clarity` spend path remains the only live Talent spend target.
 - Malformed ledger handling, duplicate spend blocking, negative-point clamping, and reload persistence are covered by the existing controlled spend hardening audit and smoke checks.

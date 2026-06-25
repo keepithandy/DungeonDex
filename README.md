@@ -12,6 +12,14 @@ Trophy Echo may document future intent, future lane ordering, and read-only prev
 
 Famous Gear Memory stays the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
 
+## Trophy Echo Contract Draft
+
+Future Trophy Echo activation may only expose read-only preview fields: lane name, planned purpose, source history, locked status, preview text, and future contract notes.
+
+It must not expose route entry, start, enter, claim, complete, unlock, rerun, or resolve buttons. It must not add rewards, reward tables, completion flags, claim records, or save mutation.
+
+Trophy Echo stays the first planned lane, Famous Gear Memory stays the second planned lane, and Revisit remains non-playable until a future activation issue explicitly changes that.
+
 ## Current Build
 
 **v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke**
