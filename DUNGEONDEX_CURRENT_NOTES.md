@@ -9,6 +9,11 @@
 ## Current Baseline
 - DungeonDex v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke
 
+## v1.21.2 Talent Loop Release-Stability Hardening
+- Verified the controlled `hunter_board_clarity` spend path remains the only live Talent spend target.
+- Malformed ledger handling, duplicate spend blocking, negative-point clamping, and reload persistence are covered by the existing controlled spend hardening audit and smoke checks.
+- No additional Talent nodes, respec, passive bonuses, combat effects, economy effects, or Revisit effects were introduced.
+
 ## v1.21.2 Hunter Board Clarity Post-Reload UI Contract Smoke
 - Current baseline: v1.21.2.
 - Adds the first complete controlled `hunter_board_clarity` Talent loop: Boss Trophy point source, spend preview, readiness, spend button, save/reload persistence, and duplicate blocking.
