@@ -1533,8 +1533,8 @@
       <div class="card-head talent-head">
         <div>
           <h2>Talent Tree Preview</h2>
-          <p>Locked preview only. No talent points, purchases, unlocks, or bonuses are active.</p>
-          <div class="talent-passive-note small">Planned passives only. Inactive.</div>
+          <p>Locked preview only. Hunter Board Clarity is the only spendable path right now. The wider tree stays preview-only.</p>
+          <div class="talent-passive-note small">Display-only copy clarity only. No stat, reward, combat, economy, or Revisit effects.</div>
         </div>
         <span class="pill rarity-rare">Locked</span>
       </div>
@@ -1551,7 +1551,7 @@
         <div class="split talent-ledger-head">
           <div>
             <strong>Talent Ledger</strong>
-            <p class="small muted">Ledger preview only. Earning and spending stay off.</p>
+            <p class="small muted">Ledger preview only. Only Hunter Board Clarity can spend now; the rest of the tree stays locked.</p>
           </div>
           <span class="pill">Preview</span>
         </div>
@@ -1603,7 +1603,7 @@
         <span class="talent-separator" aria-hidden="true">&bull;</span>
         <span><b>Nodes:</b> ${F(summary.totalNodes)}</span>
         <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Status:</b> Locked / preview only</span>
+        <span><b>Status:</b> Locked / preview only; Hunter Board Clarity is the only spendable path</span>
       </div>
       <div class="talent-milestone-line small" aria-label="Talent preview status">
         <span><b>Locked nodes:</b> ${F(summary.lockedNodes)}</span>
@@ -1640,9 +1640,9 @@
           </div>
         ` : ''}
         <div class="talent-milestone-line small" aria-label="Talent node explanation">
-          <span><b>Hunter Board Clarity:</b> Elite Board contract wording only.</span>
+          <span><b>Hunter Board Clarity:</b> Elite Board contract wording only, not a stat bonus.</span>
           <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>No reward, risk, economy, or combat values change.</span>
+          <span>No reward, risk, economy, combat, or Revisit values change.</span>
         </div>
       </section>
       <div class="talent-preview-grid">
