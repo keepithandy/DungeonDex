@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.21.1 - Build label guard.
+// DungeonDex v1.21.2 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.21.1';
+  const BUILD = '1.21.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
+  const BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
@@ -34,19 +34,6 @@
     };
   }
 
-  function wrap(name){
-    const fn = window[name] || globalThis[name];
-    if (typeof fn !== 'function' || fn.__ddBuildGuarded) return;
-    const guarded = function(){
-      const result = fn.apply(this, arguments);
-      syncBuildLabel();
-      return result;
-    };
-    guarded.__ddBuildGuarded = true;
-    try { window[name] = guarded; } catch (_) {}
-    try { globalThis[name] = guarded; } catch (_) {}
-  }
-
   function installObserver(){
     const tag = document.getElementById('buildTag');
     if (!tag || tag.__ddBuildLabelObserved) return;
@@ -56,10 +43,6 @@
   }
 
   function install(){
-    wrap('renderStatBoxes');
-    wrap('syncScreenState');
-    wrap('switchScreen');
-    wrap('render');
     syncBuildLabel();
     window.DUNGEONDEX_BUILD_HEALTH = healthCheck;
     installObserver();
