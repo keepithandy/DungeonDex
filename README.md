@@ -75,6 +75,70 @@ DungeonDex is built around a simple loop:
 
 The game favors clarity over mechanical bloat. Combat is intentionally direct: Common, Elite, and Boss enemies are the main combat tiers.
 
+## One-Minute Visitor Summary
+
+DungeonDex is a mobile-first browser RPG prototype with a compact dungeon loop and a strong release-hygiene habit. The project is not just a game surface; it is also a living example of safe incremental development, smoke-tested feature gates, preview-only systems, and careful separation between live gameplay and planned mechanics.
+
+A visitor should read this repo as:
+
+* A playable dungeon crawler foundation.
+* A portfolio project showing disciplined JavaScript development.
+* A testbed for safe RPG systems such as Talents, Revisit routes, Debt Collector clarity, Elite Board contracts, and long-term gear memory.
+
+## Live vs Planned Systems
+
+Live gameplay systems:
+
+* Town preparation
+* Dungeon entry through Enter Dungeon / Continue Run
+* Readable HP-based combat
+* Gear inventory and equipment
+* Merchant stock
+* Relic Forge
+* Elite Board contracts
+* Rival elite memory
+* Boss trophy records
+* Retired gear archive
+* Famous Gear memory
+* Monster backdrop canvas visuals
+* Boss Trophy Milestone Talent point source
+* Controlled Hunter Board Clarity Talent spend
+
+Preview, planning, or guarded systems:
+
+* Broader Talent tree UI remains locked and preview-only.
+* Revisit routes are not playable yet.
+* Revisit lanes, route previews, unlock gates, and activation summaries are planning surfaces only.
+* Debt Collector clarity is display/copy focused and does not change debt math or economy behavior.
+* Monster backdrop visuals do not change combat, rewards, scaling, routes, saves, debt, Talents, or Elite Board behavior.
+
+## Screenshot and Media Capture Plan
+
+Future screenshots or short clips should focus on showing the project clearly instead of flooding the repo with every possible panel.
+
+Recommended capture targets:
+
+* Town overview: the main preparation surface and current system entry points.
+* Combat screen: readable HP-first combat with the monster backdrop visible.
+* Gear and equipment: inventory, equipped items, and loot progression.
+* Elite Board: optional challenge contracts and Hunter Board Clarity copy behavior.
+* Debt Collector: display-focused debt clarity without implying economy changes.
+* Talent panel: locked preview state, Boss Trophy point source, and controlled Hunter Board Clarity spend surface.
+* Revisit preview: planned lanes and locked route language that clearly communicates non-playable status.
+* Archive/Famous Gear memory: long-term gear history and retired item identity.
+
+Suggested future media paths, once assets are ready:
+
+* `docs/media/town-overview.png`
+* `docs/media/combat-backdrop.png`
+* `docs/media/gear-inventory.png`
+* `docs/media/elite-board.png`
+* `docs/media/talent-panel.png`
+* `docs/media/revisit-preview.png`
+* `docs/media/archive-memory.png`
+
+These paths are placeholders for planning only. No screenshot files are required for the current baseline.
+
 ## Design Rules
 
 * Keep combat readable and HP-number-driven.
@@ -148,3 +212,22 @@ Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the se
 ## Monster Backdrop Status
 
 The monster backdrop canvas system is visual-only. It provides deterministic combat-stage atmosphere without changing combat math, HP, rewards, routes, completion, scaling, economy, debt, Talent state, Elite Board behavior, trophy records, or Famous Gear memory.
+
+## Smoke and Validation Commands
+
+Use these commands for the current manual validation pass:
+
+```powershell
+git status --short
+git diff --check
+node --check app.js
+node --check sw.js
+node --check smoke_talent_v150b.mjs
+node .\smoke_talent_v150b.mjs
+```
+
+Additional focused checks may be added by a patch plan when a specific system is touched.
+
+## Version Authority
+
+`VERSION.md` is the public build authority. `CHANGELOG.md` is the permanent release history. `DUNGEONDEX_CURRENT_NOTES.md` is the current working summary. Runtime labels, cache labels, and internal module labels should never replace those files as the source of truth.
