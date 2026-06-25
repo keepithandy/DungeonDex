@@ -9,6 +9,11 @@
 ## Current Baseline
 - DungeonDex v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke
 
+## v1.21.2 Revisit Trophy Echo Readiness Packet
+- Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
+- It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
+- Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
+
 ## v1.21.2 Talent Loop Release-Stability Hardening
 - Verified the controlled `hunter_board_clarity` spend path remains the only live Talent spend target.
 - Malformed ledger handling, duplicate spend blocking, negative-point clamping, and reload persistence are covered by the existing controlled spend hardening audit and smoke checks.

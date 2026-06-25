@@ -4,6 +4,14 @@
 
 Current baseline: **DungeonDex v1.21.2**
 
+## Revisit Readiness
+
+Trophy Echo is the first planned Revisit lane, but it is still a design/readiness packet only. Revisit remains locked, read-only, preview-only, non-playable, rewardless, completionless, claimless, and mutation-free.
+
+Trophy Echo may document future intent, future lane ordering, and read-only preview language. It may not add route entry, start buttons, claim buttons, completion flags, rewards, or save mutation.
+
+Famous Gear Memory stays the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
+
 ## Current Build
 
 **v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke**
