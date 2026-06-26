@@ -7946,6 +7946,774 @@ button:focus-visible,
 .combat-monster-stage .monster-aura,
 .combat-monster-stage .monster-silhouette,
 .combat-monster-stage .stage-floor { z-index: 2; }
+
+/* v1.21.2 — Monster Model System v2
+   CSS-only modular silhouettes. Keeps .monster-silhouette as the compatibility root. */
+.monster-silhouette.monster-model {
+  --monster-main: rgba(42,36,33,.98);
+  --monster-mid: rgba(26,25,28,.98);
+  --monster-dark: rgba(7,8,10,.99);
+  --monster-accent: rgba(255,126,66,.92);
+  --monster-eye: rgba(255,188,92,.96);
+  --monster-bone: rgba(196,180,151,.86);
+  --monster-edge: rgba(255,255,255,.07);
+  --monster-shadow: rgba(0,0,0,.52);
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible;
+  isolation: isolate;
+  max-width: calc(100% - 28px);
+  will-change: transform, filter;
+}
+
+.monster-silhouette.monster-model::before,
+.monster-silhouette.monster-model::after {
+  content: none !important;
+  display: none !important;
+}
+
+.monster-model > span {
+  position: absolute;
+  pointer-events: none;
+}
+
+.monster-silhouette.monster-model * {
+  box-sizing: border-box;
+}
+
+.monster-shadow {
+  left: 50%;
+  bottom: -8px;
+  width: 112%;
+  height: 20px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,.66), transparent 68%);
+  filter: blur(2px);
+  z-index: 0;
+}
+
+.monster-back {
+  left: 50%;
+  bottom: 20px;
+  width: 78%;
+  height: 74%;
+  transform: translateX(-50%);
+  border-radius: 46% 46% 36% 36%;
+  background:
+    radial-gradient(ellipse at 50% 18%, color-mix(in srgb, var(--monster-accent) 22%, transparent), transparent 62%),
+    linear-gradient(180deg, color-mix(in srgb, var(--monster-mid) 88%, transparent), transparent 78%);
+  opacity: .6;
+  z-index: 1;
+}
+
+.monster-back::before,
+.monster-back::after {
+  content: "";
+  position: absolute;
+  inset: 12% auto auto 50%;
+  width: 32%;
+  height: 74%;
+  transform-origin: 50% 88%;
+  border-radius: 50% 50% 20% 20%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--monster-accent) 18%, transparent), transparent 76%);
+  opacity: .28;
+}
+
+.monster-back::before {
+  transform: translateX(-108%) rotate(-15deg);
+}
+
+.monster-back::after {
+  transform: translateX(8%) rotate(15deg);
+}
+
+.monster-body {
+  left: 50%;
+  bottom: 8px;
+  width: 60%;
+  height: 64%;
+  transform: translateX(-50%);
+  border: 1px solid var(--monster-edge);
+  border-radius: 38% 38% 28% 28% / 34% 34% 42% 42%;
+  background:
+    linear-gradient(90deg, transparent 0 19%, rgba(255,255,255,.045) 20% 22%, transparent 23% 77%, rgba(255,255,255,.035) 78% 80%, transparent 81%),
+    linear-gradient(155deg, var(--monster-main), var(--monster-mid) 54%, var(--monster-dark));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -18px 22px rgba(0,0,0,.32),
+    0 14px 26px var(--monster-shadow);
+  z-index: 3;
+}
+
+.monster-body::before,
+.monster-body::after {
+  content: "";
+  position: absolute;
+  inset: 18% 16% auto;
+  height: 1px;
+  background: rgba(255,255,255,.075);
+  box-shadow: 0 12px 0 rgba(0,0,0,.18), 0 24px 0 rgba(255,255,255,.045);
+}
+
+.monster-head {
+  left: 50%;
+  top: 7%;
+  width: 44%;
+  height: 34%;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 42% 42% 34% 34% / 50% 50% 28% 28%;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--monster-main) 86%, #fff 5%), var(--monster-dark));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 6px 14px rgba(0,0,0,.38);
+  z-index: 5;
+}
+
+.monster-face {
+  left: 50%;
+  top: 23%;
+  width: 30%;
+  height: 12%;
+  transform: translateX(-50%);
+  z-index: 7;
+}
+
+.monster-face::before,
+.monster-face::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--monster-eye);
+  box-shadow: 0 0 10px var(--monster-eye);
+}
+
+.monster-face::before { left: 0; }
+.monster-face::after { right: 0; }
+
+.monster-face {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--monster-eye) 54%, transparent));
+}
+
+.monster-arm {
+  bottom: 12px;
+  width: 20%;
+  height: 52%;
+  border: 1px solid rgba(255,255,255,.045);
+  border-radius: 45% 45% 38% 38%;
+  background: linear-gradient(180deg, var(--monster-mid), var(--monster-dark));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 14px rgba(0,0,0,.34);
+  z-index: 2;
+}
+
+.monster-arm::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 18px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 0 0 12px 12px;
+  border-bottom: 2px solid var(--monster-bone);
+  opacity: .82;
+}
+
+.monster-arm::before {
+  content: "";
+  position: absolute;
+  inset: 18% 38% 14% auto;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255,255,255,.1), transparent);
+  opacity: .45;
+}
+
+.monster-arm-left {
+  left: 9%;
+  transform: rotate(14deg);
+  transform-origin: top center;
+}
+
+.monster-arm-right {
+  right: 9%;
+  transform: rotate(-14deg);
+  transform-origin: top center;
+}
+
+.monster-crest {
+  left: 50%;
+  top: -5%;
+  width: 62%;
+  height: 24%;
+  transform: translateX(-50%);
+  z-index: 4;
+}
+
+.monster-crest::before,
+.monster-crest::after {
+  content: "";
+  position: absolute;
+  bottom: 12%;
+  width: 13px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 60% 60% 8% 8%;
+  background: linear-gradient(180deg, var(--monster-bone), var(--monster-dark));
+}
+
+.monster-crest::before {
+  left: 12%;
+  transform: rotate(-18deg);
+}
+
+.monster-crest::after {
+  right: 12%;
+  transform: rotate(18deg);
+}
+
+.monster-core {
+  z-index: 8;
+  border: 1px solid color-mix(in srgb, var(--monster-accent) 34%, transparent);
+  color: var(--monster-eye);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--monster-accent) 32%, transparent), transparent 68%),
+    rgba(0,0,0,.22);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--monster-accent) 42%, transparent);
+}
+
+.monster-ornament {
+  left: 50%;
+  bottom: 12%;
+  width: 74%;
+  height: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+}
+
+/* Body archetypes */
+.monster-body--brute .monster-body {
+  width: 72%;
+  height: 66%;
+  border-radius: 44% 44% 30% 30% / 34% 34% 46% 46%;
+}
+.monster-body--brute .monster-head { top: 3%; width: 48%; height: 33%; }
+.monster-body--brute .monster-arm { width: 24%; height: 58%; bottom: 8px; }
+.monster-body--brute .monster-arm-left { left: 3%; transform: rotate(19deg); }
+.monster-body--brute .monster-arm-right { right: 3%; transform: rotate(-19deg); }
+.monster-body--brute .monster-back { width: 92%; height: 72%; border-radius: 44% 44% 24% 24%; }
+
+.monster-body--stalker .monster-body {
+  width: 48%;
+  height: 66%;
+  bottom: 6px;
+  border-radius: 36% 36% 28% 28% / 42% 42% 34% 34%;
+  transform: translateX(-50%) skewX(-4deg);
+}
+.monster-body--stalker .monster-head { top: 9%; width: 38%; height: 28%; transform: translateX(-50%) translateY(2px); }
+.monster-body--stalker .monster-arm { height: 62%; width: 16%; bottom: 6px; }
+.monster-body--stalker .monster-arm-left { left: 17%; transform: rotate(26deg); }
+.monster-body--stalker .monster-arm-right { right: 11%; transform: rotate(-8deg); }
+.monster-body--stalker .monster-back {
+  width: 58%;
+  transform: translateX(-50%) skewX(-10deg);
+}
+
+.monster-body--crawler .monster-body {
+  width: 82%;
+  height: 42%;
+  bottom: 4px;
+  border-radius: 48% 48% 30% 30% / 36% 36% 54% 54%;
+}
+.monster-body--crawler .monster-head { top: 29%; width: 35%; height: 25%; }
+.monster-body--crawler .monster-arm { width: 18%; height: 30%; bottom: 3px; }
+.monster-body--crawler .monster-arm-left { left: 5%; transform: rotate(68deg); }
+.monster-body--crawler .monster-arm-right { right: 5%; transform: rotate(-68deg); }
+.monster-body--crawler .monster-back {
+  width: 96%;
+  height: 46%;
+  bottom: 8px;
+  border-radius: 58% 58% 30% 30%;
+}
+.monster-body--crawler .monster-ornament::before,
+.monster-body--crawler .monster-ornament::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  width: 78%;
+  height: 12px;
+  border-top: 2px solid rgba(255,255,255,.07);
+  border-radius: 50%;
+}
+.monster-body--crawler .monster-ornament::before { left: -8%; transform: rotate(10deg); }
+.monster-body--crawler .monster-ornament::after { right: -8%; transform: rotate(-10deg); }
+
+.monster-body--construct .monster-body {
+  width: 62%;
+  height: 66%;
+  border-radius: 10px 10px 16px 16px;
+  background:
+    linear-gradient(90deg, transparent 0 28%, rgba(255,255,255,.08) 29% 31%, transparent 32% 68%, rgba(0,0,0,.22) 69% 71%, transparent 72%),
+    repeating-linear-gradient(180deg, var(--monster-main) 0 14px, var(--monster-mid) 15px 26px);
+}
+.monster-body--construct .monster-head {
+  width: 42%;
+  height: 25%;
+  top: 9%;
+  border-radius: 8px 8px 12px 12px;
+}
+.monster-body--construct .monster-arm { width: 19%; height: 54%; border-radius: 9px; }
+.monster-body--construct .monster-back {
+  border-radius: 14px 14px 22px 22px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 12px, color-mix(in srgb, var(--monster-accent) 13%, transparent) 13px 15px),
+    linear-gradient(180deg, color-mix(in srgb, var(--monster-mid) 90%, transparent), transparent 78%);
+}
+
+.monster-body--ritualist .monster-body {
+  width: 62%;
+  height: 72%;
+  bottom: 2px;
+  border-radius: 46% 46% 16% 16% / 30% 30% 70% 70%;
+  clip-path: polygon(28% 0, 72% 0, 94% 100%, 6% 100%);
+}
+.monster-body--ritualist .monster-head {
+  top: 4%;
+  width: 46%;
+  height: 34%;
+  border-radius: 50% 50% 34% 34%;
+}
+.monster-body--ritualist .monster-arm { width: 14%; height: 52%; bottom: 13px; opacity: .82; }
+.monster-body--ritualist .monster-arm-left { left: 20%; transform: rotate(7deg); }
+.monster-body--ritualist .monster-arm-right { right: 20%; transform: rotate(-7deg); }
+.monster-body--ritualist .monster-back {
+  width: 70%;
+  height: 80%;
+  bottom: 2px;
+  border-radius: 50% 50% 18% 18%;
+}
+
+.monster-body--shade .monster-body {
+  width: 60%;
+  height: 72%;
+  bottom: 6px;
+  border: 0;
+  border-radius: 50% 50% 38% 38% / 38% 38% 62% 62%;
+  background:
+    radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--monster-accent) 22%, transparent), transparent 56%),
+    linear-gradient(180deg, var(--monster-mid), rgba(6,7,14,.18) 84%, transparent);
+  box-shadow: 0 14px 28px rgba(0,0,0,.42), 0 0 24px color-mix(in srgb, var(--monster-accent) 16%, transparent);
+}
+.monster-body--shade .monster-head {
+  top: 10%;
+  width: 40%;
+  height: 30%;
+  border: 0;
+  background: radial-gradient(ellipse, var(--monster-mid), transparent 72%);
+}
+.monster-body--shade .monster-arm {
+  height: 58%;
+  width: 12%;
+  border: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--monster-accent) 26%, transparent), transparent);
+  box-shadow: none;
+}
+.monster-body--shade .monster-shadow { opacity: .55; filter: blur(4px); }
+
+/* District skins */
+.monster-skin--lowfire {
+  --monster-main: rgba(56,38,30,.98);
+  --monster-mid: rgba(31,25,24,.98);
+  --monster-accent: rgba(255,112,56,.95);
+  --monster-eye: rgba(255,185,82,.98);
+  --monster-bone: rgba(211,158,113,.88);
+  --monster-shadow: rgba(48,12,4,.56);
+}
+.monster-skin--mireglass {
+  --monster-main: rgba(27,53,48,.98);
+  --monster-mid: rgba(15,33,36,.98);
+  --monster-accent: rgba(89,230,180,.92);
+  --monster-eye: rgba(160,255,220,.98);
+  --monster-bone: rgba(128,204,184,.86);
+  --monster-edge: rgba(144,255,218,.14);
+}
+.monster-skin--veyruhn {
+  --monster-main: rgba(57,45,34,.98);
+  --monster-mid: rgba(33,30,28,.98);
+  --monster-accent: rgba(255,168,72,.94);
+  --monster-eye: rgba(255,219,126,.98);
+  --monster-bone: rgba(187,165,128,.88);
+  --monster-edge: rgba(255,190,108,.12);
+}
+.monster-skin--red-chapel {
+  --monster-main: rgba(58,27,34,.98);
+  --monster-mid: rgba(29,15,21,.98);
+  --monster-accent: rgba(255,73,96,.94);
+  --monster-eye: rgba(255,174,154,.98);
+  --monster-bone: rgba(219,174,162,.86);
+  --monster-edge: rgba(255,112,128,.15);
+}
+.monster-skin--salt-forge {
+  --monster-main: rgba(54,51,44,.98);
+  --monster-mid: rgba(31,31,31,.98);
+  --monster-accent: rgba(255,202,112,.94);
+  --monster-eye: rgba(255,234,172,.98);
+  --monster-bone: rgba(204,195,171,.88);
+  --monster-edge: rgba(255,238,188,.14);
+}
+.monster-skin--sunken-court {
+  --monster-main: rgba(35,49,57,.98);
+  --monster-mid: rgba(18,27,34,.98);
+  --monster-accent: rgba(116,192,255,.92);
+  --monster-eye: rgba(186,226,255,.98);
+  --monster-bone: rgba(152,184,198,.86);
+  --monster-edge: rgba(150,214,255,.13);
+}
+.monster-skin--rookery {
+  --monster-main: rgba(42,39,48,.98);
+  --monster-mid: rgba(21,22,31,.98);
+  --monster-accent: rgba(200,198,255,.9);
+  --monster-eye: rgba(232,232,255,.98);
+  --monster-bone: rgba(178,178,205,.86);
+  --monster-edge: rgba(210,210,255,.12);
+}
+.monster-skin--noctis {
+  --monster-main: rgba(28,30,58,.96);
+  --monster-mid: rgba(10,12,28,.98);
+  --monster-accent: rgba(126,137,255,.94);
+  --monster-eye: rgba(190,198,255,.98);
+  --monster-bone: rgba(144,150,208,.84);
+  --monster-shadow: rgba(4,5,18,.68);
+}
+.monster-skin--generic {
+  --monster-main: rgba(42,42,46,.98);
+  --monster-mid: rgba(23,24,28,.98);
+  --monster-accent: rgba(255,148,74,.88);
+  --monster-eye: rgba(255,205,132,.96);
+}
+
+.monster-skin--lowfire .monster-body::after,
+.monster-feature--ember-core .monster-body::after {
+  inset: 16% 24% auto;
+  height: 42%;
+  background:
+    linear-gradient(138deg, transparent 0 44%, color-mix(in srgb, var(--monster-accent) 70%, transparent) 45% 48%, transparent 49%),
+    linear-gradient(52deg, transparent 0 54%, color-mix(in srgb, var(--monster-accent) 48%, transparent) 55% 57%, transparent 58%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--monster-accent) 24%, transparent);
+}
+
+.monster-skin--mireglass .monster-body,
+.monster-skin--sunken-court .monster-body {
+  box-shadow:
+    inset 0 1px 0 rgba(210,255,244,.12),
+    inset 0 -18px 22px rgba(0,0,0,.32),
+    0 14px 26px var(--monster-shadow),
+    0 0 18px color-mix(in srgb, var(--monster-accent) 13%, transparent);
+}
+
+.monster-skin--mireglass .monster-head {
+  background:
+    radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--monster-eye) 16%, transparent), transparent 48%),
+    linear-gradient(150deg, color-mix(in srgb, var(--monster-main) 86%, #fff 8%), var(--monster-dark));
+}
+
+.monster-skin--veyruhn .monster-body,
+.monster-skin--salt-forge .monster-body {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 12px, color-mix(in srgb, var(--monster-accent) 13%, transparent) 13px 15px),
+    linear-gradient(155deg, var(--monster-main), var(--monster-mid) 54%, var(--monster-dark));
+}
+
+.monster-skin--red-chapel .monster-head::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -13px;
+  width: 8px;
+  height: 16px;
+  transform: translateX(-50%);
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--monster-bone) 86%, transparent), transparent);
+  opacity: .78;
+}
+
+.monster-skin--rookery .monster-back::before,
+.monster-skin--rookery .monster-back::after {
+  width: 44%;
+  height: 82%;
+  border-radius: 70% 20% 60% 20%;
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--monster-bone) 35%, transparent), transparent 68%),
+    repeating-linear-gradient(90deg, transparent 0 7px, color-mix(in srgb, var(--monster-eye) 12%, transparent) 8px 9px);
+  opacity: .5;
+}
+
+.monster-skin--noctis .monster-back {
+  box-shadow: 0 0 32px color-mix(in srgb, var(--monster-accent) 18%, transparent);
+}
+
+/* Head, arm, crest, and feature details */
+.monster-head--visor .monster-face {
+  top: 25%;
+  width: 46%;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--monster-eye), transparent);
+  box-shadow: 0 0 14px var(--monster-eye);
+}
+.monster-head--visor .monster-face::before,
+.monster-head--visor .monster-face::after { content: none; }
+
+.monster-head--glass .monster-face::before,
+.monster-head--glass .monster-face::after {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #fff 0 1px, var(--monster-eye) 2px, transparent 6px);
+}
+
+.monster-head--hood .monster-head {
+  clip-path: polygon(50% 0, 92% 46%, 72% 100%, 28% 100%, 8% 46%);
+  border-radius: 36% 36% 28% 28%;
+}
+.monster-head--hood .monster-face { top: 31%; }
+
+.monster-head--void .monster-face {
+  top: 25%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 1px, var(--monster-eye) 2px 5px, transparent 8px);
+  box-shadow: 0 0 18px var(--monster-eye);
+}
+.monster-head--void .monster-face::before,
+.monster-head--void .monster-face::after { content: none; }
+
+.monster-head--beak .monster-head {
+  clip-path: polygon(22% 8%, 78% 8%, 94% 46%, 50% 100%, 6% 46%);
+}
+
+.monster-head--skull .monster-face {
+  top: 22%;
+}
+
+.monster-head--skull .monster-face::before,
+.monster-head--skull .monster-face::after {
+  border-radius: 50% 50% 44% 44%;
+}
+
+.monster-head--skull .monster-head::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  width: 24%;
+  height: 5px;
+  transform: translateX(-50%);
+  border-top: 1px solid color-mix(in srgb, var(--monster-bone) 72%, transparent);
+  box-shadow: 0 4px 0 rgba(0,0,0,.22);
+  opacity: .82;
+}
+
+.monster-arms--hooks .monster-arm::after {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-right: 3px solid var(--monster-bone);
+  border-bottom: 3px solid var(--monster-bone);
+  border-radius: 0 0 12px 0;
+}
+.monster-arms--many .monster-arm {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 10px 14px rgba(0,0,0,.34),
+    14px 8px 0 -5px color-mix(in srgb, var(--monster-mid) 82%, transparent),
+    -14px 8px 0 -5px color-mix(in srgb, var(--monster-mid) 82%, transparent);
+}
+.monster-arms--ritual .monster-arm::after {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--monster-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--monster-accent);
+}
+.monster-arms--tendrils .monster-arm::after {
+  width: 8px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--monster-accent) 45%, transparent), transparent);
+}
+
+.monster-arms--claws .monster-arm::after {
+  width: 20px;
+  height: 10px;
+  border: 0;
+  border-bottom: 2px solid var(--monster-bone);
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  box-shadow:
+    -5px 2px 0 -1px var(--monster-bone),
+    5px 2px 0 -1px var(--monster-bone);
+}
+
+.monster-crest--antlers .monster-crest::before,
+.monster-crest--antlers .monster-crest::after {
+  width: 18px;
+  height: 26px;
+  border: 0;
+  border-top: 3px solid var(--monster-bone);
+  border-left: 3px solid var(--monster-bone);
+  background: transparent;
+}
+.monster-crest--antlers .monster-crest::before { transform: rotate(-34deg); }
+.monster-crest--antlers .monster-crest::after { transform: scaleX(-1) rotate(-34deg); }
+
+.monster-crest--candle-crown .monster-crest {
+  background:
+    radial-gradient(circle at 50% 0, var(--monster-eye) 0 3px, transparent 6px),
+    radial-gradient(circle at 30% 16%, var(--monster-eye) 0 2px, transparent 5px),
+    radial-gradient(circle at 70% 16%, var(--monster-eye) 0 2px, transparent 5px);
+}
+.monster-crest--candle-crown .monster-crest::before,
+.monster-crest--candle-crown .monster-crest::after {
+  width: 6px;
+  height: 22px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--monster-bone), var(--monster-main));
+}
+
+.monster-crest--iron-crown .monster-crest::before,
+.monster-crest--iron-crown .monster-crest::after,
+.monster-crest--crown .monster-crest::before,
+.monster-crest--crown .monster-crest::after {
+  width: 18px;
+  height: 22px;
+  border-radius: 3px 3px 9px 9px;
+  background: linear-gradient(180deg, var(--monster-accent), var(--monster-mid));
+}
+
+.monster-crest--void-crown .monster-crest::before,
+.monster-crest--void-crown .monster-crest::after {
+  width: 10px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--monster-accent), transparent);
+  filter: blur(.4px);
+}
+
+.monster-crest--horns .monster-crest::before,
+.monster-crest--horns .monster-crest::after {
+  clip-path: polygon(50% 0, 100% 100%, 18% 78%);
+}
+
+.monster-feature--chain-ornament .monster-ornament {
+  border-top: 2px dashed color-mix(in srgb, var(--monster-bone) 72%, transparent);
+  border-radius: 50%;
+  transform: translateX(-50%) rotate(-10deg);
+}
+.monster-feature--chapel-sigil .monster-ornament::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 1px solid var(--monster-accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--monster-accent) 45%, transparent);
+}
+.monster-feature--smoke-tendrils .monster-back,
+.monster-feature--void-eye .monster-back {
+  filter: blur(1.2px);
+  opacity: .82;
+}
+.monster-feature--iron-plates .monster-body::after {
+  inset: auto 14% 22%;
+  height: 28%;
+  border-top: 1px solid rgba(255,255,255,.10);
+  border-bottom: 1px solid rgba(0,0,0,.32);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent);
+}
+.monster-feature--glass-eyes .monster-face::before,
+.monster-feature--glass-eyes .monster-face::after {
+  box-shadow: 0 0 14px var(--monster-eye), 0 0 24px color-mix(in srgb, var(--monster-accent) 38%, transparent);
+}
+
+.combat-device-elite .monster-model {
+  filter: saturate(1.18) brightness(1.06);
+}
+.combat-device-elite .monster-body,
+.combat-device-elite .monster-head,
+.combat-device-elite .monster-arm {
+  border-color: color-mix(in srgb, var(--monster-accent) 28%, transparent);
+}
+.combat-device-elite .monster-arm::after {
+  filter: drop-shadow(0 0 7px var(--monster-accent));
+}
+.combat-device-elite .monster-back {
+  opacity: .82;
+}
+.combat-device-elite .monster-ornament {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--monster-accent) 28%, transparent);
+}
+.combat-device-boss .monster-silhouette.monster-model,
+.app-shell.combat-active .combat-device-boss .monster-silhouette.monster-model {
+  width: 112px;
+  height: 102px;
+  filter: saturate(1.28) brightness(1.08);
+  max-width: calc(100% - 34px);
+}
+.combat-device-boss .monster-back {
+  width: 96%;
+  height: 86%;
+  opacity: .92;
+}
+.combat-device-boss .monster-core {
+  width: 25px;
+  height: 27px;
+}
+.combat-device-boss .monster-crest {
+  top: -10%;
+  height: 30%;
+}
+.combat-device-boss .monster-arm {
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.38));
+}
+
+.combat-device-shell:has(.attack-btn.tap-now) .monster-model,
+.combat-device-shell:has(.skill-btn.tap-now) .monster-model {
+  transform: translateX(calc(-50% + 3px)) scale(.97);
+  filter: brightness(1.28) saturate(1.3);
+}
+
+@media (max-width: 380px) {
+  .combat-device-boss .monster-silhouette.monster-model,
+  .app-shell.combat-active .combat-device-boss .monster-silhouette.monster-model {
+    width: clamp(76px, 24vw, 86px);
+    height: clamp(74px, 23vw, 82px);
+    bottom: clamp(17px, 4dvh, 23px);
+  }
+  .monster-model .monster-core {
+    width: 16px;
+    height: 18px;
+  }
+  .monster-silhouette.monster-model {
+    max-width: calc(100% - 22px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monster-model,
+  .monster-model .monster-core {
+    animation: none !important;
+  }
+  .monster-silhouette.monster-model {
+    transform: translateX(-50%) !important;
+  }
+}
 @keyframes dungeonDrift {
   from { background-position: 0 0, 0 0; }
   to { background-position: 43px -54px, -67px -82px; }

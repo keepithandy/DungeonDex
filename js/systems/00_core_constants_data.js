@@ -96,8 +96,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.12.3';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.12.3';
+  const BUILD = '1.21.2';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.21.2';
   // Legacy preview globals were retired in v1.12.4; the ruleset-backed helper path is the only active talent preview source.
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;

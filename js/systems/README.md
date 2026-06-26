@@ -1,12 +1,13 @@
 # DungeonDex system file map
 
 This folder is an exploratory split of the former monolithic `app.js` into major functional systems.
-It preserves classic browser script load order instead of converting the game to ES modules, so the files should stay loaded in numeric order.
+It preserves classic browser script load order instead of converting the game to ES modules. While numeric naming suggests sequential loading, the actual order in `index.html` reflects dependency constraints and is the source of truth.
 
 - `00_core_constants_data.js` — Core constants, utility helpers, item/monster/district data.
 - `01_state_recovery.js` — Screen/run shell recovery and ID helpers.
 - `02_currency_pending_rewards.js` — Currency conversion, pending rewards, discovery banking, reward text helpers.
 - `03_town_contracts_market.js` — Gold sinks, elite contracts, district wares, selling helpers.
+- `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `04_depth_progression_charters.js` — Depth labels, district progression, milestones, charters, pricing, encounter coin rewards.
 - `05_elite_modifiers.js` — Elite modifier registry, selection, rewards, and markup.
 - `06_scaling_generation_audits.js` — Rarity scaling, loot rules, base state, gear/monster generation, scaling audit.
@@ -15,6 +16,7 @@ It preserves classic browser script load order instead of converting the game to
 - `09_ui_common_intro.js` — Screen switching, common UI helpers, popups, intro modal.
 - `10_ui_town_shop.js` — Elite contract board, town panels, district wares, shop cards.
 - `11_ui_run_gear_dex_archive.js` — Run, gear, inventory, Dex, archive renderers.
+- `29_monster_backdrops_canvas.js` — Monster backdrop canvas rendering and layer management.
 - `12_render_bindings_boot.js` — Sticky bar, render loop, guarded actions, bindings, audits, boot.
 - `13_devtools_overlay.js` — Hidden internal DevTools overlay for save inspection, run controls, test loot, snapshots, and error logs.
 - `14_devtools_scenarios.js` — DevTools scenario presets and focused state setup helpers.
@@ -33,10 +35,9 @@ It preserves classic browser script load order instead of converting the game to
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
 - `30_passive_activation_gate_hotfix.js` — Passive activation gate verification hotfix.
-- `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
 - `33_talent_hunter_board_clarity_spend.js` — Controlled one-node Hunter Board Clarity spend helper and readiness model.
-- `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.1 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.
+- `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.2 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.
 
 Notes:
 - `index.html` now loads these files directly in order.

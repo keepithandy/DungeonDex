@@ -54,13 +54,14 @@ Rival Trace means named rival elite memory only. It does not create a hunt, boar
 Talent is a foundation/preview system unless explicitly activated.
 
 Current contract:
-- locked/read-only preview
-- normalized save shape
-- no earning activation
-- no spendable points
-- no learned nodes
-- no unlock actions
-- no passive or active bonuses
+- locked/read-only preview for the broad Talent tree
+- normalized save shape with repaired ledger and claim containers
+- one controlled Boss Trophy Milestone point award source
+- one controlled spend entrypoint for `hunter_board_clarity`
+- learned node marking for the controlled Hunter Board Clarity path
+- passive readiness gating through explicit contract helpers
+- copy-only passive surfaces for Hunter Board and Debt Collector clarity
+- no additional Talent nodes, respec, broad unlock actions, or active bonuses
 - no combat/economy/stat mutation
 
 ### Debt Collector

@@ -97,6 +97,97 @@
     return 'stalker';
   }
 
+  function monsterVisualProfile(monster, district, depth) {
+    const safeDepth = Math.max(1, Math.floor(numberOr(depth, 1, 1, 999999)));
+    const key = combatBackdropToken([
+      monster?.name,
+      monster?.family,
+      monster?.type,
+      monster?.tier,
+      district?.id,
+      district?.tone,
+      district?.name
+    ].filter(Boolean).join(' '));
+    const tier = String(monster?.tier || 'Common');
+    const skin = combatBackdropKind(null, district, safeDepth, monster);
+    let body = 'stalker';
+    let head = 'skull';
+    let arms = 'claws';
+    let crest = 'horns';
+    let feature = 'ember-core';
+
+    if (combatBackdropHas(key, ['construct', 'knight', 'warden', 'colossus', 'forge', 'furnace', 'salt', 'iron'])) {
+      body = combatBackdropHas(key, ['colossus', 'boss']) ? 'brute' : 'construct';
+      head = 'visor';
+      arms = 'hooks';
+      crest = 'iron-crown';
+      feature = 'iron-plates';
+    } else if (combatBackdropHas(key, ['cultist', 'ritual', 'chapel', 'acolyte', 'herald', 'drummer'])) {
+      body = 'ritualist';
+      head = 'hood';
+      arms = 'ritual';
+      crest = 'candle-crown';
+      feature = 'chapel-sigil';
+    } else if (combatBackdropHas(key, ['mireborn', 'wyrm', 'spitter', 'mire', 'swamp', 'lurker'])) {
+      body = combatBackdropHas(key, ['stalker', 'spitter']) ? 'stalker' : 'crawler';
+      head = 'glass';
+      arms = 'many';
+      crest = 'antlers';
+      feature = 'glass-eyes';
+    } else if (combatBackdropHas(key, ['shade', 'watcher', 'seer', 'noctis', 'lanternless', 'void'])) {
+      body = 'shade';
+      head = 'void';
+      arms = 'tendrils';
+      crest = 'void-crown';
+      feature = 'void-eye';
+    } else if (combatBackdropHas(key, ['harpy', 'wing', 'rookery', 'rafter'])) {
+      body = 'stalker';
+      head = 'beak';
+      arms = 'claws';
+      crest = 'antlers';
+      feature = 'smoke-tendrils';
+    } else if (combatBackdropHas(key, ['beast', 'hound', 'ravager', 'maw', 'devourer', 'brute', 'husk', 'ghoul'])) {
+      body = combatBackdropHas(key, ['hound', 'stalker']) ? 'stalker' : 'brute';
+      head = 'skull';
+      arms = 'claws';
+      crest = 'horns';
+      feature = skin === 'mireglass' ? 'glass-eyes' : 'ember-core';
+    }
+
+    if (skin === 'red-chapel') {
+      head = head === 'visor' ? head : 'hood';
+      crest = 'candle-crown';
+      feature = 'chapel-sigil';
+    } else if (skin === 'veyruhn' || skin === 'salt-forge') {
+      head = head === 'hood' ? head : 'visor';
+      arms = arms === 'many' ? arms : 'hooks';
+      feature = 'chain-ornament';
+    } else if (skin === 'noctis') {
+      head = 'void';
+      crest = 'void-crown';
+      feature = 'void-eye';
+    } else if (skin === 'mireglass') {
+      feature = 'glass-eyes';
+    }
+
+    if (tier === 'Boss') {
+      crest = crest === 'candle-crown' || crest === 'void-crown' ? crest : 'crown';
+    }
+
+    return { body, head, arms, crest, skin, feature };
+  }
+
+  function monsterVisualClassList(profile) {
+    return [
+      `monster-body--${profile.body}`,
+      `monster-head--${profile.head}`,
+      `monster-arms--${profile.arms}`,
+      `monster-crest--${profile.crest}`,
+      `monster-skin--${profile.skin}`,
+      `monster-feature--${profile.feature}`
+    ].join(' ');
+  }
+
   function dungeonAtmosphereProfile(state, district, depth, monster) {
     const safeDepth = Math.max(1, Math.floor(numberOr(depth ?? state?.run?.floor, 1, 1, 999999)));
     const meta = getLoreDepthProgress(safeDepth);
@@ -171,6 +262,8 @@
     const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
     const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
     const personalityClass = `combat-personality--${personalityKind}`;
+    const visualProfile = monsterVisualProfile(monster, runDistrict, depth);
+    const visualClasses = monsterVisualClassList(visualProfile);
     const monsterFamily = escapeHtml(monster?.family || 'Depthborn');
     const monsterTier = escapeHtml(String(monster?.tier || 'Enemy').toUpperCase());
     const monsterSubline = isContractTarget
@@ -248,9 +341,17 @@
           <div class="stage-motes" aria-hidden="true"></div>
           <div class="stage-drift" aria-hidden="true"></div>
           <div class="monster-aura"></div>
-          <div class="monster-silhouette">
-            <span class="monster-horns" aria-hidden="true"></span>
+          <div class="monster-silhouette monster-model ${visualClasses}" aria-hidden="true">
+            <span class="monster-shadow"></span>
+            <span class="monster-back"></span>
+            <span class="monster-arm monster-arm-left"></span>
+            <span class="monster-arm monster-arm-right"></span>
+            <span class="monster-body"></span>
+            <span class="monster-head"></span>
+            <span class="monster-face"></span>
+            <span class="monster-crest"></span>
             <span class="monster-core" aria-hidden="true">${isBossFight ? '♛' : isEliteFight ? '◆' : '▲'}</span>
+            <span class="monster-ornament"></span>
           </div>
           <div class="stage-floor"></div>
         </section>
