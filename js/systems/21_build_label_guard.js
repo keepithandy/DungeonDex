@@ -34,19 +34,6 @@
     };
   }
 
-  function wrap(name){
-    const fn = window[name] || globalThis[name];
-    if (typeof fn !== 'function' || fn.__ddBuildGuarded) return;
-    const guarded = function(){
-      const result = fn.apply(this, arguments);
-      syncBuildLabel();
-      return result;
-    };
-    guarded.__ddBuildGuarded = true;
-    try { window[name] = guarded; } catch (_) {}
-    try { globalThis[name] = guarded; } catch (_) {}
-  }
-
   function installObserver(){
     const tag = document.getElementById('buildTag');
     if (!tag || tag.__ddBuildLabelObserved) return;
@@ -56,10 +43,6 @@
   }
 
   function install(){
-    wrap('renderStatBoxes');
-    wrap('syncScreenState');
-    wrap('switchScreen');
-    wrap('render');
     syncBuildLabel();
     window.DUNGEONDEX_BUILD_HEALTH = healthCheck;
     installObserver();
