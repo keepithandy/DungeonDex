@@ -60,16 +60,16 @@
       </div>
     </header>
 
-    <nav class="tabs panel" aria-label="Primary screens" role="tablist">
-      <button class="tab active" data-screen="town" id="tab-town" type="button" role="tab" aria-controls="screen-town" aria-selected="true">Town</button>
-      <button class="tab" data-screen="run" id="tab-run" type="button" role="tab" aria-controls="screen-run" aria-selected="false" tabindex="-1">Run</button>
-      <button class="tab" data-screen="gear" id="tab-gear" type="button" role="tab" aria-controls="screen-gear" aria-selected="false" tabindex="-1">Gear</button>
-      <button class="tab" data-screen="dex" id="tab-dex" type="button" role="tab" aria-controls="screen-dex" aria-selected="false" tabindex="-1">Trophy Hall</button>
-      <button class="tab" data-screen="archive" id="tab-archive" type="button" role="tab" aria-controls="screen-archive" aria-selected="false" tabindex="-1">Archive</button>
+    <nav class="tabs panel" aria-label="Primary screens">
+      <button class="tab active" data-screen="town" id="tab-town" type="button" aria-controls="screen-town">Town</button>
+      <button class="tab" data-screen="run" id="tab-run" type="button" aria-controls="screen-run">Run</button>
+      <button class="tab" data-screen="gear" id="tab-gear" type="button" aria-controls="screen-gear">Gear</button>
+      <button class="tab" data-screen="dex" id="tab-dex" type="button" aria-controls="screen-dex">Trophy Hall</button>
+      <button class="tab" data-screen="archive" id="tab-archive" type="button" aria-controls="screen-archive">Archive</button>
     </nav>
 
     <main class="screens" aria-label="DungeonDex screens">
-      <section class="screen active" id="screen-town" role="tabpanel" aria-labelledby="tab-town">
+      <section class="screen active" id="screen-town" aria-labelledby="tab-town">
         <div class="stack-8">
           <div class="panel section-header">
             <div>
@@ -97,7 +97,7 @@
         </div>
       </section>
 
-      <section class="screen" id="screen-run" role="tabpanel" aria-labelledby="tab-run" aria-hidden="true">
+      <section class="screen" id="screen-run" aria-labelledby="tab-run">
         <div class="stack-8">
           <section class="panel" id="runStatus" aria-label="Run status panel"></section>
           <section class="panel combat-panel" id="combatPanel" aria-label="Combat panel"></section>
@@ -105,7 +105,7 @@
         </div>
       </section>
 
-      <section class="screen" id="screen-gear" role="tabpanel" aria-labelledby="tab-gear" aria-hidden="true">
+      <section class="screen" id="screen-gear" aria-labelledby="tab-gear">
         <div class="stack-8">
           <section class="panel gear-player-panel" id="gearPlayerPanel" aria-label="Gear player panel"></section>
           <section class="panel talent-panel" id="talentPanel" aria-label="Talent panel"></section>
@@ -115,7 +115,7 @@
         </div>
       </section>
 
-      <section class="screen" id="screen-dex" role="tabpanel" aria-labelledby="tab-dex" aria-hidden="true">
+      <section class="screen" id="screen-dex" aria-labelledby="tab-dex">
         <div class="stack-8">
           <section class="panel" id="dexSummary" aria-label="Trophy Hall summary"></section>
           <section class="panel" id="monsterDex" aria-label="Monster trophy records"></section>
@@ -123,7 +123,7 @@
         </div>
       </section>
 
-      <section class="screen" id="screen-archive" role="tabpanel" aria-labelledby="tab-archive" aria-hidden="true">
+      <section class="screen" id="screen-archive" aria-labelledby="tab-archive">
         <div class="stack-8">
           <section class="panel" id="archivePanel" aria-label="Archive panel"></section>
           <section class="panel" id="settingsPanel" aria-label="Settings panel"></section>
@@ -135,7 +135,7 @@
   </div>
 
   <div class="intro-modal-backdrop" id="introModal" hidden>
-    <section class="panel intro-progress intro-modal-window" id="introModalContent" role="dialog" aria-modal="true" aria-label="DungeonDex introduction"></section>
+    <section class="panel intro-progress intro-modal-window" id="introModalContent" aria-label="DungeonDex introduction"></section>
   </div>
 
   <script>
