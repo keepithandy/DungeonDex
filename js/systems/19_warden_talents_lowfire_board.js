@@ -105,7 +105,14 @@
     id: node.nodeKey,
     path: path.id,
     name: node.nodeTitle,
+    tier: node.tier || 1,
+    nodeKey: node.nodeKey,
+    nodeTitle: node.nodeTitle,
+    costPreview: node.costPreview || 0,
+    plannedCost: node.costPreview || 0,
+    requirementPreview: node.requirementPreview || '',
     effect: node.passivePreviewDescription,
+    passivePreviewDescription: node.passivePreviewDescription || '',
     summary: node.requirementPreview,
     note: 'Preview only.'
   })));
