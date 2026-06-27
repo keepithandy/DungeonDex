@@ -9,6 +9,12 @@
 ## Current Baseline
 - DungeonDex v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke
 
+## Issue #18 Stability Guardrail Audit
+- This is a documentation-only guardrail checkpoint before the next feature-style patch.
+- Protected systems for review: controlled `hunter_board_clarity` spending, read-only Talent preview/passive helpers, Debt Collector display-copy clarity, Revisit planning lock, service worker/cache label alignment, classic script-load order, and smoke-test coverage.
+- Do not use this audit to change gameplay behavior, save mutation, cache behavior, script ordering, combat, economy, rewards, Debt Collector math, Revisit activation, Talents, gear, monsters, dungeon entry, or scaling.
+- Recommended safety net before the next feature patch: run the Talent, Debt Collector, and Revisit smoke files listed in `docs/RELEASE_CHECKLIST.md`.
+
 ## v1.21.2 Revisit Trophy Echo Readiness Packet
 - Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
 - It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
