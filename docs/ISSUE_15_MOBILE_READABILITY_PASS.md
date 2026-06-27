@@ -39,7 +39,7 @@ Use these rules for future Talent/status copy edits:
 
 ## Acceptance check mapping
 
-- Mobile copy is clearer: documented rules define the intended compact phrasing.
+- Mobile copy is clearer because the safe phrasing rules now define the intended compact wording.
 - Existing Talent smoke should remain valid because no runtime behavior is changed by this pass.
 - No new buttons, nodes, unlocks, passives, respecs, or rewards are added.
 - Desktop behavior remains unchanged.
