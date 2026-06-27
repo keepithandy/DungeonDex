@@ -49,27 +49,27 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
+    <header class="topbar" aria-labelledby="buildTag">
       <div>
         <h1 id="buildTag">DungeonDex v1.21.2</h1>
       </div>
-      <div class="top-actions">
-        <span class="save-status" id="saveStatus">Saved</span>
-        <button class="ghost mini" id="saveBtn">Save</button>
-        <button class="ghost mini" id="resetBtn">Reset</button>
+      <div class="top-actions" aria-label="Save controls">
+        <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
+        <button class="ghost mini" id="saveBtn" type="button">Save</button>
+        <button class="ghost mini" id="resetBtn" type="button">Reset</button>
       </div>
     </header>
 
-    <nav class="tabs panel">
-      <button class="tab active" data-screen="town">Town</button>
-      <button class="tab" data-screen="run">Run</button>
-      <button class="tab" data-screen="gear">Gear</button>
-      <button class="tab" data-screen="dex">Trophy Hall</button>
-      <button class="tab" data-screen="archive">Archive</button>
+    <nav class="tabs panel" aria-label="Primary screens" role="tablist">
+      <button class="tab active" data-screen="town" id="tab-town" type="button" role="tab" aria-controls="screen-town" aria-selected="true">Town</button>
+      <button class="tab" data-screen="run" id="tab-run" type="button" role="tab" aria-controls="screen-run" aria-selected="false" tabindex="-1">Run</button>
+      <button class="tab" data-screen="gear" id="tab-gear" type="button" role="tab" aria-controls="screen-gear" aria-selected="false" tabindex="-1">Gear</button>
+      <button class="tab" data-screen="dex" id="tab-dex" type="button" role="tab" aria-controls="screen-dex" aria-selected="false" tabindex="-1">Trophy Hall</button>
+      <button class="tab" data-screen="archive" id="tab-archive" type="button" role="tab" aria-controls="screen-archive" aria-selected="false" tabindex="-1">Archive</button>
     </nav>
 
-    <main class="screens">
-      <section class="screen active" id="screen-town">
+    <main class="screens" aria-label="DungeonDex screens">
+      <section class="screen active" id="screen-town" role="tabpanel" aria-labelledby="tab-town">
         <div class="stack-8">
           <div class="panel section-header">
             <div>
@@ -78,64 +78,64 @@
               <div class="district-wallet-slot" id="districtWalletSlot"></div>
               <div class="district-wallet-slot" id="revisitFoundationSlot"></div>
             </div>
-            <div class="inline-actions">
-              <button class="primary" id="startRunBtn">Enter Dungeon</button>
-              <button class="ghost" id="restBtn">Rest</button>
+            <div class="inline-actions" aria-label="Town actions">
+              <button class="primary" id="startRunBtn" type="button">Enter Dungeon</button>
+              <button class="ghost" id="restBtn" type="button">Rest</button>
               <span class="rest-cost-chip" id="restCostPill" title="Rest cost">Cost --</span>
             </div>
             <div class="district-charter-slot" id="districtCharterSlot"></div>
           </div>
 
-          <section class="panel" id="debtCollectorPanel"></section>
+          <section class="panel" id="debtCollectorPanel" aria-label="Debt Collector panel"></section>
 
           <div class="grid-2">
-            <section class="panel" id="merchantPanel"></section>
-            <section class="panel" id="forgePanel"></section>
+            <section class="panel" id="merchantPanel" aria-label="Merchant panel"></section>
+            <section class="panel" id="forgePanel" aria-label="Forge panel"></section>
           </div>
 
-          <section class="panel" id="questPanel"></section>
+          <section class="panel" id="questPanel" aria-label="Quest panel"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-run">
+      <section class="screen" id="screen-run" role="tabpanel" aria-labelledby="tab-run" aria-hidden="true">
         <div class="stack-8">
-          <section class="panel" id="runStatus"></section>
-          <section class="panel combat-panel" id="combatPanel"></section>
-          <section class="panel" id="combatLog"></section>
+          <section class="panel" id="runStatus" aria-label="Run status panel"></section>
+          <section class="panel combat-panel" id="combatPanel" aria-label="Combat panel"></section>
+          <section class="panel" id="combatLog" aria-label="Combat log"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-gear">
+      <section class="screen" id="screen-gear" role="tabpanel" aria-labelledby="tab-gear" aria-hidden="true">
         <div class="stack-8">
-          <section class="panel gear-player-panel" id="gearPlayerPanel"></section>
-          <section class="panel talent-panel" id="talentPanel"></section>
-          <section class="panel" id="equipmentPanel"></section>
-          <section class="panel" id="filtersPanel"></section>
-          <section class="panel" id="inventoryPanel"></section>
+          <section class="panel gear-player-panel" id="gearPlayerPanel" aria-label="Gear player panel"></section>
+          <section class="panel talent-panel" id="talentPanel" aria-label="Talent panel"></section>
+          <section class="panel" id="equipmentPanel" aria-label="Equipment panel"></section>
+          <section class="panel" id="filtersPanel" aria-label="Inventory filters panel"></section>
+          <section class="panel" id="inventoryPanel" aria-label="Inventory panel"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-dex">
+      <section class="screen" id="screen-dex" role="tabpanel" aria-labelledby="tab-dex" aria-hidden="true">
         <div class="stack-8">
-          <section class="panel" id="dexSummary"></section>
-          <section class="panel" id="monsterDex"></section>
-          <section class="panel" id="gearDex"></section>
+          <section class="panel" id="dexSummary" aria-label="Trophy Hall summary"></section>
+          <section class="panel" id="monsterDex" aria-label="Monster trophy records"></section>
+          <section class="panel" id="gearDex" aria-label="Gear trophy records"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-archive">
+      <section class="screen" id="screen-archive" role="tabpanel" aria-labelledby="tab-archive" aria-hidden="true">
         <div class="stack-8">
-          <section class="panel" id="archivePanel"></section>
-          <section class="panel" id="settingsPanel"></section>
+          <section class="panel" id="archivePanel" aria-label="Archive panel"></section>
+          <section class="panel" id="settingsPanel" aria-label="Settings panel"></section>
         </div>
       </section>
     </main>
 
-    <footer class="sticky-actions panel" id="stickyBar"></footer>
+    <footer class="sticky-actions panel" id="stickyBar" aria-label="Context actions"></footer>
   </div>
 
   <div class="intro-modal-backdrop" id="introModal" hidden>
-    <section class="panel intro-progress intro-modal-window" id="introModalContent"></section>
+    <section class="panel intro-progress intro-modal-window" id="introModalContent" role="dialog" aria-modal="true" aria-label="DungeonDex introduction"></section>
   </div>
 
   <script>
