@@ -134,6 +134,20 @@
     <footer class="sticky-actions panel" id="stickyBar" aria-label="Context actions"></footer>
   </div>
 
+  <!-- Inert renderer-prep templates. These do not render until a future renderer explicitly clones them. -->
+  <template id="dd-panel-shell-template" data-template-status="inert">
+    <section class="panel" data-template-slot="panel">
+      <div class="stack-8" data-template-slot="content"></div>
+    </section>
+  </template>
+
+  <template id="dd-empty-state-card-template" data-template-status="inert">
+    <article class="panel" data-template-slot="empty-state">
+      <h3 data-template-slot="title"></h3>
+      <p class="muted" data-template-slot="body"></p>
+    </article>
+  </template>
+
   <div class="intro-modal-backdrop" id="introModal" hidden>
     <section class="panel intro-progress intro-modal-window" id="introModalContent" aria-label="DungeonDex introduction"></section>
   </div>
