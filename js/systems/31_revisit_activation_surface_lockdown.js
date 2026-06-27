@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.21.1 - Revisit Activation Surface Lockdown.
+// DungeonDex v1.22.0 - Revisit Activation Surface Lockdown.
 (function(){
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;

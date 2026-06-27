@@ -152,6 +152,19 @@
     <section class="panel intro-progress intro-modal-window" id="introModalContent" aria-label="DungeonDex introduction"></section>
   </div>
 
+  <template id="panelShellTemplate">
+    <section class="panel" data-template-role="panel-shell">
+      <div data-template-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="emptyStateTemplate">
+    <div class="empty-state" data-template-role="empty-state">
+      <strong data-template-slot="title"></strong>
+      <p class="small muted" data-template-slot="message"></p>
+    </div>
+  </template>
+
   <script>
     window.DUNGEONDEX_BUILD = '1.21.2';
     window.DUNGEONDEX_BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';

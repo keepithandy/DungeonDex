@@ -2,19 +2,19 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.21.2**
+Current baseline: **DungeonDex v1.22.0**
 
 ## Revisit Readiness
 
-Trophy Echo is the first planned Revisit lane, but it is still a design/readiness packet only. Revisit remains locked, read-only, preview-only, non-playable, rewardless, completionless, claimless, and mutation-free.
+Trophy Echo is the first planned Revisit lane and now carries a small content seed for future replay-memory work. Revisit remains locked, read-only, preview-only, non-playable, rewardless, completionless, claimless, and mutation-free.
 
-Trophy Echo may document future intent, future lane ordering, and read-only preview language. It may not add route entry, start buttons, claim buttons, completion flags, rewards, or save mutation.
+Trophy Echo may document future intent, future lane ordering, read-only preview language, and compact flavor hooks around boss trophies, prior victories, and archive memory. It may not add route entry, start buttons, claim buttons, completion flags, rewards, or save mutation.
 
 Famous Gear Memory stays the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
 
 ## Trophy Echo Contract Draft
 
-Future Trophy Echo activation may only expose read-only preview fields: lane name, planned purpose, source history, locked status, preview text, and future contract notes.
+Future Trophy Echo activation may only expose read-only preview fields: lane name, planned purpose, source history, locked status, preview text, future contract notes, and small replay-flavored echo examples.
 
 It must not expose route entry, start, enter, claim, complete, unlock, rerun, or resolve buttons. It must not add rewards, reward tables, completion flags, claim records, or save mutation.
 
@@ -22,11 +22,11 @@ Trophy Echo stays the first planned lane, Famous Gear Memory stays the second pl
 
 ## Current Build
 
-**v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke**
+**v1.22.0 - Trophy Echo Content Seed**
 
-This patch adds the first controlled `hunter_board_clarity` Talent spend button. The button is gated by the readiness model and calls the existing controlled spend helper only when ready.
+This patch seeds Trophy Echo with future-facing memory flavor and compact replay hooks. It keeps the lane locked and non-playable while making the upcoming content direction easier to read.
 
-No broad Talent UI, extra nodes, respec, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
+No route entry, claim flow, completion flow, reward flow, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
 
 ## Previous Build
 

@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke
+- DungeonDex v1.22.0 - Trophy Echo Content Seed
 
 ## v1.21.x Remaining Board Cleanup Notes
 - Issue #12: Debt Collector Clarity is selected as a design-ready display/copy-only passive candidate, but live activation remains blocked until a separate activation issue explicitly authorizes renderer wiring.
@@ -16,20 +16,26 @@
 - Issue #17: The selected second passive candidate is `debt_collector_clarity`; no second Talent spend target or passive activation is added by the selection note.
 - Issues #19/#20: HTML shell work may add safer semantics and inert templates only; all current screen IDs, tab `data-screen` values, classic script load order, build query strings, and runtime renderer ownership stay intact.
 
-## v1.21.2 Revisit Trophy Echo Readiness Packet
-- Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
-- It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
+## v1.22.0 Revisit Trophy Echo Readiness Packet
+- Trophy Echo is the first planned Revisit lane and now carries compact content seed flavor for future replay-memory work.
+- It may preview intended Revisit purpose, future lane ordering, replay-flavored echo examples, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
 - Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
 
-## v1.21.2 Revisit Trophy Echo Activation Contract Draft
-- Future Trophy Echo activation is limited to read-only preview fields such as lane name, planned purpose, source history, locked status, preview text, and future contract notes.
+## v1.22.0 Revisit Trophy Echo Activation Contract Draft
+- Future Trophy Echo activation is limited to read-only preview fields such as lane name, planned purpose, source history, locked status, preview text, future contract notes, and replay-memory echo examples.
 - Blocked fields stay absent for now: route entry, start/enter/claim/complete/unlock/rerun/resolve buttons, rewards, reward tables, claim records, completion flags, and save mutation.
 - Trophy Echo remains the first planned lane, Famous Gear Memory remains the second planned lane, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
 
-## v1.21.2 Talent Loop Release-Stability Hardening
+## v1.22.0 Talent Loop Release-Stability Hardening
 - Verified the controlled `hunter_board_clarity` spend path remains the only live Talent spend target.
 - Malformed ledger handling, duplicate spend blocking, negative-point clamping, and reload persistence are covered by the existing controlled spend hardening audit and smoke checks.
 - No additional Talent nodes, respec, passive bonuses, combat effects, economy effects, or Revisit effects were introduced.
+
+## v1.22.0 Trophy Echo Content Seed Smoke
+- Current baseline: v1.22.0.
+- Trophy Echo content exists in the planning surface as readable future-facing flavor and remains locked/non-playable.
+- No enter, start, claim, complete, reward, or save-mutation action was added.
+- Existing Talent, Debt, Revisit, and build-label checks remain part of the validation surface.
 
 ## v1.21.2 Hunter Board Clarity Post-Reload UI Contract Smoke
 - Current baseline: v1.21.2.

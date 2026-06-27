@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.21.2`
-* Current local package baseline: `v1.21.2`
-* Current development target: `v1.21.2`
+* Public/live itch version: `v1.22.0`
+* Current local package baseline: `v1.22.0`
+* Current development target: `v1.22.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.22.0 - Trophy Echo Content Seed
+
+* Trophy Echo now has a small content seed for future replay-memory flavor.
+* Added short player-facing echo hooks around boss trophies, prior victories, and archive memory.
+* Kept Revisit locked, preview-only, and non-playable, with no route entry, claim, completion, reward, or save mutation.
+* Preserved Talent spend behavior, Debt Collector behavior, combat behavior, economy behavior, and the existing build-label contract.
 
 ---
 

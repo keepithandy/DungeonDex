@@ -620,6 +620,36 @@
 
   // Revisit candidate ledger is read-only foundation data until route mechanics are explicitly introduced.
   // Keep this side-route planning surface attached to existing systems only; do not turn it into gameplay flow.
+  function revisitTrophyEchoContentSeed(state = S) {
+    const safeState = state && typeof state === 'object' ? state : {};
+    const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
+    const trophies = safePlayer.trophies && typeof safePlayer.trophies === 'object' ? safePlayer.trophies : {};
+    const bossTrophies = safePlayer.bossTrophies && typeof safePlayer.bossTrophies === 'object' ? safePlayer.bossTrophies : {};
+    const trophyNames = Object.values(trophies).map(entry => String(entry?.name || entry?.label || '').trim()).filter(Boolean).slice(0, 3);
+    const bossNames = Object.values(bossTrophies).map(entry => String(entry?.name || entry?.label || '').trim()).filter(Boolean).slice(0, 2);
+    return {
+      previewText: 'Future replay-memory lane for boss trophies and victory echoes.',
+      summary: 'Trophy Echo is a future lane for replay memory, boss trophy reflection, and short archive-style echoes.',
+      flavorHooks: [
+        'A trophy can remember the hand that earned it.',
+        'A boss mark may one day echo the fight that made it.',
+        'Old victories can become replay memory instead of static loot.',
+        'Archive notes may grow into reflection scenes after a run ends.',
+        'A reflected trophy could describe what changed before the next descent.'
+      ],
+      echoExamples: [
+        'The ogre trophy still carries the heat of the last room.',
+        'A broken crown remembers the boss that fell for it.',
+        'Victory notes could replay the run before the next descent.',
+        'An archive echo might summarize what the trophy proved.'
+      ],
+      detail: [
+        trophyNames.length ? `Known trophies: ${trophyNames.join(', ')}.` : 'Known trophies are still sparse.',
+        bossNames.length ? `Boss echoes: ${bossNames.join(', ')}.` : 'Boss echoes remain unwritten.'
+      ].join(' '),
+      note: 'Future content seed only. No route entry, reward, or save mutation.'
+    };
+  }
   function revisitCandidateHooks(state = S) {
     const safeState = state && typeof state === 'object' ? state : {};
     const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
@@ -639,8 +669,8 @@
       {
         key: 'trophy_echo',
         label: 'Trophy Echo',
-        detail: trophyCount ? `${trophyCount} recorded` : 'No boss marks yet',
-        source: `Trophies in ${districtName}`,
+        detail: `${trophyCount ? `${trophyCount} recorded` : 'No boss marks yet'} - future replay-memory lane.`,
+        source: `Trophies in ${districtName} / future echo lane`,
         priority: 10,
         locked: !trophyCount
       },
@@ -820,6 +850,21 @@
       signalPercent: signal.signalPercent,
       signalSources: signal.signalSources,
       futureCondition: 'Build boss-history memory before this future route can be considered.',
+      previewText: 'Future replay-memory lane for boss trophies and victory echoes.',
+      summary: 'Trophy Echo is a future lane for replay memory, boss trophy reflection, and short archive-style echoes.',
+      flavorHooks: [
+        'A trophy can remember the hand that earned it.',
+        'A boss mark may one day echo the fight that made it.',
+        'Old victories can become replay memory instead of static loot.',
+        'Archive notes may grow into reflection scenes after a run ends.',
+        'A reflected trophy could describe what changed before the next descent.'
+      ],
+      echoExamples: [
+        'The ogre trophy still carries the heat of the last room.',
+        'A broken crown remembers the boss that fell for it.',
+        'Victory notes could replay the run before the next descent.',
+        'An archive echo might summarize what the trophy proved.'
+      ],
       antiFarmPolicy: [
         'No best-in-slot low-floor farming.',
         'No infinite revisit loops.',
@@ -840,6 +885,7 @@
       },
       notes: [
         'Trophy Echo should be the first planned revisit route because boss history is already tracked.',
+        'Its future content should feel like replay memory and trophy reflection, not a reward route.',
         'This plan is read-only and does not create route activation.'
       ]
     };
@@ -867,7 +913,7 @@
     const summary = revisitTrophyEchoRuleSummary(state) || {};
     const safePlan = {
       status: 'Planning only',
-      notes: ['Trophy Echo should be the first planned revisit route because boss history is already tracked.'],
+      notes: ['Trophy Echo should be the first planned revisit route because boss history is already tracked.', 'Its future content should feel like replay memory and trophy reflection, not a reward route.'],
       routeAccessLabel: 'Route access is unavailable.',
       ruleInactiveLabel: 'Future rule inactive.'
     };
@@ -884,7 +930,11 @@
       planningOnly: true,
       locked: true,
       readOnly: true,
-      detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.',
+      previewText: String(plan.previewText || 'Future replay-memory lane for boss trophies and victory echoes.'),
+      summary: String(plan.summary || 'Trophy Echo is a future lane for replay memory, boss trophy reflection, and short archive-style echoes.'),
+      flavorHooks: Array.isArray(plan.flavorHooks) ? plan.flavorHooks : [],
+      echoExamples: Array.isArray(plan.echoExamples) ? plan.echoExamples : [],
+      detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies, trophy records, and replay-style echoes.',
       reason: Array.isArray(plan.notes) && plan.notes[0] ? plan.notes[0] : safePlan.notes[0],
       safety: plan.routeAccessLabel || safePlan.routeAccessLabel,
       routeAccessLabel: plan.routeAccessLabel || safePlan.routeAccessLabel,
@@ -1227,12 +1277,12 @@
         title: 'Trophy Echo Route',
         district: 'Trophy record districts',
         hookSource: 'trophy_echo',
-        shortDescription: 'Boss history leaves a return trail.',
+        shortDescription: 'Boss trophies leave replay memory behind.',
         routeFlavorLine: 'Old victories still mark the path.',
         safetyStatusLine: 'Locked preview. No route access.',
         lockedReadinessNote: 'Needs more boss history.',
-        detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.',
-        reason: 'Old victories may call back later.'
+        detail: 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies, trophy records, and replay-style echoes.',
+        reason: 'Old victories may call back later as replay memory.'
       },
       famous_gear_route: {
         title: 'Famous Gear Memory Route',
@@ -1307,7 +1357,7 @@
         key: 'trophy_echo_route',
         title: 'Trophy Echo Route',
         district: 'Trophy record districts',
-        reason: 'Old victories may call back later.',
+        reason: 'Old victories may call back later as replay memory.',
         hooks: ['trophy_echo'],
         status: 'Planned',
         locked: true,
@@ -1540,7 +1590,7 @@
       routeKey: 'trophy_echo_route',
       routeLabel: String(trophyRoute?.title || 'Trophy Echo Route'),
       reason: 'Derived from existing boss and trophy history only.',
-      note: 'First planned revisit lane. Planning only.',
+      note: 'First planned revisit lane. Planning only. Future content should feel like replay memory and trophy reflection, not a reward route.',
       allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
     };
   }
