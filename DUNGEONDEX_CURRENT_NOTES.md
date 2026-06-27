@@ -9,6 +9,13 @@
 ## Current Baseline
 - DungeonDex v1.21.2 - Hunter Board Clarity Post-Reload UI Contract Smoke
 
+## v1.21.x Remaining Board Cleanup Notes
+- Issue #12: Debt Collector Clarity is selected as a design-ready display/copy-only passive candidate, but live activation remains blocked until a separate activation issue explicitly authorizes renderer wiring.
+- Issue #13: Trophy Echo remains the first planned Revisit lane, with no entry, start, claim, reward, completion, unlock, or save-mutation path.
+- Issue #15: Mobile Talent/status copy should keep chips short, separate locked-preview text from spend-readiness text, and avoid implying broad Talent activation.
+- Issue #17: The selected second passive candidate is `debt_collector_clarity`; no second Talent spend target or passive activation is added by the selection note.
+- Issues #19/#20: HTML shell work may add safer semantics and inert templates only; all current screen IDs, tab `data-screen` values, classic script load order, build query strings, and runtime renderer ownership stay intact.
+
 ## v1.21.2 Revisit Trophy Echo Readiness Packet
 - Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
 - It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
@@ -17,7 +24,7 @@
 ## v1.21.2 Revisit Trophy Echo Activation Contract Draft
 - Future Trophy Echo activation is limited to read-only preview fields such as lane name, planned purpose, source history, locked status, preview text, and future contract notes.
 - Blocked fields stay absent for now: route entry, start/enter/claim/complete/unlock/rerun/resolve buttons, rewards, reward tables, claim records, completion flags, and save mutation.
-- Trophy Echo remains the first planned Revisit lane, Famous Gear Memory remains the second planned lane, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
+- Trophy Echo remains the first planned lane, Famous Gear Memory remains the second planned lane, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
 
 ## v1.21.2 Talent Loop Release-Stability Hardening
 - Verified the controlled `hunter_board_clarity` spend path remains the only live Talent spend target.
@@ -116,5 +123,5 @@
 ## Revisit Rule
 - Revisit routes are not playable yet.
 - Trophy Echo remains the first planned Revisit lane.
-- Famous Gear Memory remains the second planned Revisit lane as inert metadata only.
+- Famous Gear Memory remains the second planned lane as inert metadata only.
 - Rival Trace, Debt Pressure, and Board Echo remain planning hooks only.
