@@ -1447,6 +1447,14 @@ async function main() {
     record('Hunter Board clarity spend preview detects already learned state', talentStateContractAudit?.spendPreviewLearned?.eligible === false && talentStateContractAudit?.spendPreviewLearned?.blockedReason === 'already_learned' && talentStateContractAudit?.spendPreviewLearned?.wouldSpendPoints === false && talentStateContractAudit?.spendPreviewLearned?.wouldLearnNode === false && talentStateContractAudit?.spendPreviewLearned?.mutatesSave === false && talentStateContractAudit?.spendPreviewLearnedBefore === talentStateContractAudit?.spendPreviewLearnedAfter, JSON.stringify(talentStateContractAudit?.spendPreviewLearned));
     const v12049ReloadFixture = {
       player: {
+        talentEarning: {
+          enabled: true,
+          sourceId: 'boss_depth_milestone',
+          milestonesReached: {
+            ashen_wyrm: true
+          },
+          pointsAwarded: 1
+        },
         talentLedger: {
           version: 1,
           previewOnly: true,
@@ -1455,16 +1463,7 @@ async function main() {
           availablePoints: 1,
           spentPoints: 0,
           earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
-          awardClaims: {
-            'boss_trophy_milestone:ashen_wyrm': {
-              key: 'boss_trophy_milestone:ashen_wyrm',
-              source: 'boss_trophy_milestone',
-              sourceId: 'ashen_wyrm',
-              amount: 1,
-              claimedAt: '2026-06-21T12:00:00.000Z',
-              version: 1
-            }
-          },
+          awardClaims: {},
           notes: []
         },
         talentLearnedIds: {},
@@ -1512,6 +1511,14 @@ async function main() {
     record('v1.21.0 readiness model reports ready and leaves UI unwired', v12049Api?.readiness?.nodeKey === 'hunter_board_clarity' && v12049Api?.readiness?.supported === true && v12049Api?.readiness?.visible === true && v12049Api?.readiness?.actionLabel === 'Spend 1 Talent Point' && v12049Api?.readiness?.disabledLabel === 'Spend unavailable' && v12049Api?.readiness?.enabled === true && v12049Api?.readiness?.blockedReason === 'ready' && v12049Api?.readiness?.cost === 1 && v12049Api?.readiness?.availablePoints === 1 && v12049Api?.readiness?.spentPoints === 0 && v12049Api?.readiness?.lifetimePoints === 1 && v12049Api?.readiness?.learned === false && v12049Api?.readiness?.previewReady === true && v12049Api?.readiness?.liveSpendPatchReady === true && v12049Api?.readiness?.wouldMutateOnClick === true && v12049Api?.readiness?.mutatesDuringPreview === false && v12049Api?.readiness?.uiActionWired === false && v12049Api?.readiness?.clickHandlerEnabled === false && v12049Api?.readiness?.renderButtonNow === false, JSON.stringify(v12049Api?.readiness));
     const readyFixtureBefore = JSON.stringify({
       player: {
+        talentEarning: {
+          enabled: true,
+          sourceId: 'boss_depth_milestone',
+          milestonesReached: {
+            ashen_wyrm: true
+          },
+          pointsAwarded: 1
+        },
         talentLedger: {
           version: 1,
           previewOnly: true,
@@ -1520,16 +1527,7 @@ async function main() {
           availablePoints: 1,
           spentPoints: 0,
           earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
-          awardClaims: {
-            'boss_trophy_milestone:ashen_wyrm': {
-              key: 'boss_trophy_milestone:ashen_wyrm',
-              source: 'boss_trophy_milestone',
-              sourceId: 'ashen_wyrm',
-              amount: 1,
-              claimedAt: '2026-06-21T12:00:00.000Z',
-              version: 1
-            }
-          },
+          awardClaims: {},
           notes: []
         },
         talentLearnedIds: {},
@@ -1539,6 +1537,14 @@ async function main() {
     });
     record('v1.21.0 readiness model keeps ready fixture unchanged', JSON.stringify(v12049Api?.readiness?.supported ? {
       player: {
+        talentEarning: {
+          enabled: true,
+          sourceId: 'boss_depth_milestone',
+          milestonesReached: {
+            ashen_wyrm: true
+          },
+          pointsAwarded: 1
+        },
         talentLedger: {
           version: 1,
           previewOnly: true,
@@ -1547,16 +1553,7 @@ async function main() {
           availablePoints: 1,
           spentPoints: 0,
           earnedSources: [{ sourceId: 'boss_depth_milestone', points: 1 }],
-          awardClaims: {
-            'boss_trophy_milestone:ashen_wyrm': {
-              key: 'boss_trophy_milestone:ashen_wyrm',
-              source: 'boss_trophy_milestone',
-              sourceId: 'ashen_wyrm',
-              amount: 1,
-              claimedAt: '2026-06-21T12:00:00.000Z',
-              version: 1
-            }
-          },
+          awardClaims: {},
           notes: []
         },
         talentLearnedIds: {},
