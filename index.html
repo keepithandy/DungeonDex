@@ -55,17 +55,17 @@
       </div>
       <div class="top-actions">
         <span class="save-status" id="saveStatus">Saved</span>
-        <button class="ghost mini" id="saveBtn">Save</button>
-        <button class="ghost mini" id="resetBtn">Reset</button>
+        <button type="button" class="ghost mini" id="saveBtn">Save</button>
+        <button type="button" class="ghost mini" id="resetBtn">Reset</button>
       </div>
     </header>
 
-    <nav class="tabs panel">
-      <button class="tab active" data-screen="town">Town</button>
-      <button class="tab" data-screen="run">Run</button>
-      <button class="tab" data-screen="gear">Gear</button>
-      <button class="tab" data-screen="dex">Trophy Hall</button>
-      <button class="tab" data-screen="archive">Archive</button>
+    <nav class="tabs panel" aria-label="Primary screens">
+      <button type="button" class="tab active" data-screen="town">Town</button>
+      <button type="button" class="tab" data-screen="run">Run</button>
+      <button type="button" class="tab" data-screen="gear">Gear</button>
+      <button type="button" class="tab" data-screen="dex">Trophy Hall</button>
+      <button type="button" class="tab" data-screen="archive">Archive</button>
     </nav>
 
     <main class="screens">
@@ -79,8 +79,8 @@
               <div class="district-wallet-slot" id="revisitFoundationSlot"></div>
             </div>
             <div class="inline-actions">
-              <button class="primary" id="startRunBtn">Enter Dungeon</button>
-              <button class="ghost" id="restBtn">Rest</button>
+              <button type="button" class="primary" id="startRunBtn">Enter Dungeon</button>
+              <button type="button" class="ghost" id="restBtn">Rest</button>
               <span class="rest-cost-chip" id="restCostPill" title="Rest cost">Cost --</span>
             </div>
             <div class="district-charter-slot" id="districtCharterSlot"></div>
@@ -137,6 +137,19 @@
   <div class="intro-modal-backdrop" id="introModal" hidden>
     <section class="panel intro-progress intro-modal-window" id="introModalContent"></section>
   </div>
+
+  <template id="panelShellTemplate">
+    <section class="panel" data-template-role="panel-shell">
+      <div data-template-slot="body"></div>
+    </section>
+  </template>
+
+  <template id="emptyStateTemplate">
+    <div class="empty-state" data-template-role="empty-state">
+      <strong data-template-slot="title"></strong>
+      <p class="small muted" data-template-slot="message"></p>
+    </div>
+  </template>
 
   <script>
     window.DUNGEONDEX_BUILD = '1.21.2';
