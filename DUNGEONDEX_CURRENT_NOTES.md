@@ -16,9 +16,15 @@
 - Issue #17: The selected second passive candidate is `debt_collector_clarity`; no second Talent spend target or passive activation is added by the selection note.
 - Issues #19/#20: HTML shell work may add safer semantics and inert templates only; all current screen IDs, tab `data-screen` values, classic script load order, build query strings, and runtime renderer ownership stay intact.
 
+<<<<<<< HEAD
 ## v1.22.0 Revisit Trophy Echo Readiness Packet
 - Trophy Echo is the first planned Revisit lane and now carries compact content seed flavor for future replay-memory work.
 - It may preview intended Revisit purpose, future lane ordering, replay-flavored echo examples, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
+=======
+## v1.21.2 Revisit Trophy Echo Readiness Packet
+- Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
+- It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
+>>>>>>> 5c6b03246e72c5fbce879459857503dde157213c
 - Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
 
 ## v1.22.0 Revisit Trophy Echo Activation Contract Draft
@@ -130,4 +136,8 @@
 - Revisit routes are not playable yet.
 - Trophy Echo remains the first planned Revisit lane.
 - Famous Gear Memory remains the second planned lane as inert metadata only.
+<<<<<<< HEAD
 - Rival Trace, Debt Pressure, and Board Echo remain planning hooks only.
+=======
+- Rival Trace, Debt Pressure, and Board Echo remain planning hooks only.
+>>>>>>> 5c6b03246e72c5fbce879459857503dde157213c
