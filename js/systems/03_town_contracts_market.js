@@ -1345,6 +1345,11 @@
       detail: String(route?.detail || def.detail || (String(route?.key || '').trim() === 'trophy_echo_route'
         ? 'Planned memory detail lane. Future side-route concept tied to remembered boss trophies and trophy records.'
         : 'Read-only route preview.')).trim()
+      ,
+      previewText: String(route?.previewText || def.previewText || '').trim(),
+      summary: String(route?.summary || def.summary || '').trim(),
+      flavorHooks: Array.isArray(route?.flavorHooks) && route.flavorHooks.length ? route.flavorHooks : (Array.isArray(def.flavorHooks) ? def.flavorHooks : []),
+      echoExamples: Array.isArray(route?.echoExamples) && route.echoExamples.length ? route.echoExamples : (Array.isArray(def.echoExamples) ? def.echoExamples : [])
     };
   }
 
