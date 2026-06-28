@@ -2,8 +2,8 @@
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.21.2';
-window.DUNGEONDEX_BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
+window.DUNGEONDEX_BUILD = '1.22.0';
+window.DUNGEONDEX_BUILD_QS = '1.22.0-trophy-echo-content-seed';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [

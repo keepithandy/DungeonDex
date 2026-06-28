@@ -1362,7 +1362,22 @@
         status: 'Planned',
         locked: true,
         priority: 10,
-        hookSource: 'trophy_echo'
+        hookSource: 'trophy_echo',
+        previewText: 'Future replay-memory lane for boss trophies and victory echoes.',
+        summary: 'Trophy Echo is a future lane for replay memory, boss trophy reflection, and short archive-style echoes.',
+        flavorHooks: [
+          'A trophy can remember the hand that earned it.',
+          'A boss mark may one day echo the fight that made it.',
+          'Old victories can become replay memory instead of static loot.',
+          'Archive notes may grow into reflection scenes after a run ends.',
+          'A reflected trophy could describe what changed before the next descent.'
+        ],
+        echoExamples: [
+          'The ogre trophy still carries the heat of the last room.',
+          'A broken crown remembers the boss that fell for it.',
+          'Victory notes could replay the run before the next descent.',
+          'An archive echo might summarize what the trophy proved.'
+        ]
       },
       {
         key: 'famous_gear_route',

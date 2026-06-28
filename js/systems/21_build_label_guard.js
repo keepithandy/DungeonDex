@@ -6,9 +6,9 @@
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.21.2';
+  const BUILD = '1.22.0';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
+  const BUILD_QS = '1.22.0-trophy-echo-content-seed';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
