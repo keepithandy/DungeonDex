@@ -9,6 +9,12 @@
 ## Current Baseline
 - DungeonDex v1.23.1 - Trophy Echo Prototype Stabilization
 
+## v1.23.2 Progression Systems Clarity Pass
+- Display-only town/Talent/Debt wording clarifies active, learned, preview-only, locked, and next-target states without changing saves, math, rewards, economy, district IDs, depth ranges, unlock thresholds, or activation gates.
+- Talent copy now separates the live Boss Trophy point source and controlled Hunter Board Clarity spend path from the wider locked preview tree.
+- Town copy clarifies Trophy Echo as the only playable Revisit lane, Famous Gear Memory as planned-only, Debt Collector clarity as copy-only, and district/depth progression as a next-target status line.
+- `VERSION.md` remains at v1.23.1 until an explicit version bump is requested.
+
 ## v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo is now the first live Revisit lane.
 - It appears in town, locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history plus Memory Marks in save data.

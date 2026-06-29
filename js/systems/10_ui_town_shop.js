@@ -13,6 +13,7 @@
     const memoryMarks = Math.max(0, Math.floor(numberOr(status.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
     const completedCount = Math.max(0, Math.floor(numberOr(status.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
     const historyCount = Math.max(0, Math.floor(numberOr(status.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const echoStateLabel = active ? 'Active' : status.locked ? 'Locked' : 'Playable';
     const summaryLine = active
       ? cleanDisplayText(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
       : status.locked
@@ -31,6 +32,16 @@
     const resultMarkup = lastResult
       ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(lastResult.summary || '', ''))}</div>`
       : '';
+    const revisitStatusText = active
+      ? 'Active: Trophy Echo is running in town. Locked: every other Revisit lane.'
+      : status.locked
+        ? 'Locked: Trophy Echo needs boss history. Preview: other Revisit lanes.'
+        : 'Playable: Trophy Echo only. Locked: Famous Gear Memory and other lanes.';
+    const revisitNextText = active
+      ? 'Next: resolve the active echo in town before starting another.'
+      : status.locked
+        ? 'Next: defeat a boss and keep the trophy record.'
+        : 'Next: start Trophy Echo from town; rewards stay Revisit-only.';
     return `
       <section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
         <div class="card-head">
@@ -42,11 +53,14 @@
         <article class="quest-card revisit-echo-card ${status.locked ? 'locked' : 'ready'}">
           <div class="quest-topline">
             <strong>Trophy Echo</strong>
-            <span class="small ${status.active ? '' : 'muted'}">${status.active ? 'Active' : status.locked ? 'Locked' : 'Playable'}</span>
+            <span class="small ${status.active ? '' : 'muted'}">${echoStateLabel}</span>
           </div>
           <p class="small">${escapeHtml(summaryLine)}</p>
           <p class="small muted">${escapeHtml(flavor)}</p>
           <div class="small muted">Boss history ${historyCount} • Memory Marks ${memoryMarks} • Recorded echoes ${completedCount}</div>
+          <div class="small muted">${escapeHtml(revisitStatusText)}</div>
+          <div class="small muted">Memory Marks are Revisit-only records; combat, gear, debt, and Talent values stay unchanged.</div>
+          <div class="small muted">${escapeHtml(revisitNextText)}</div>
           ${active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(active.memoryTitle || bossName, bossName))}</div>` : ''}
           <div class="inline-actions revisit-echo-actions">
             ${actionMarkup}
@@ -58,7 +72,7 @@
             <strong>Famous Gear Memory</strong>
             <span class="small muted">Planned</span>
           </div>
-          <p class="small muted">Planned only. This lane remains inactive in this patch.</p>
+          <p class="small muted">Planned only. This lane remains inactive in this patch: no start, reward, claim, progression, or farming loop.</p>
         </article>
       </section>`;
   }
@@ -146,11 +160,36 @@
     </div>`;
   }
 
+  function townProgressionStatusLine(state, stagedStartDepth) {
+    const formatSafe = typeof format === 'function'
+      ? format
+      : value => String(Math.max(0, Math.floor(Number(value) || 0)));
+    const depthLabel = depth => typeof charterDepthCompactLabel === 'function'
+      ? charterDepthCompactLabel(depth)
+      : `D${formatSafe(depth)}`;
+    const safeDepth = typeof safeExtractDepthValue === 'function'
+      ? safeExtractDepthValue(state)
+      : Math.max(1, Math.floor(numberOr(state?.player?.safeExtractDepth, state?.player?.depth, 1, 1, 999999)));
+    const boss = typeof nextBossFloorFromDepth === 'function' ? nextBossFloorFromDepth(stagedStartDepth) : null;
+    const bossText = boss?.floor
+      ? `${boss.name || `Boss Floor ${formatSafe(boss.floor)}`} at ${depthLabel(boss.floor)}`
+      : 'the next boss floor';
+    const unlockedCharter = typeof getUnlockedCharterDepth === 'function' ? getUnlockedCharterDepth(state) : 0;
+    const nextCharter = typeof getNextCharterUnlockDepth === 'function'
+      ? getNextCharterUnlockDepth(unlockedCharter)
+      : 40;
+    const charterText = safeDepth >= nextCharter
+      ? `${depthLabel(nextCharter)} charter ready`
+      : `secure D${formatSafe(nextCharter)} for the next charter`;
+    return `Secured depth D${formatSafe(safeDepth)}. Next target: ${bossText}; ${charterText}.`;
+  }
+
   function renderTown() {
     const stagingDistrict = currentStagingDistrict(S);
     const districtDisplay = currentDistrictDisplay(S);
     const stagedStartDepth = defaultRunStartDepth(S);
     const nextDescent = getLoreDepthProgress(stagedStartDepth);
+    const progressionStatusLine = townProgressionStatusLine(S, stagedStartDepth);
     const questPanel = el('questPanel');
     const merchantPanel = el('merchantPanel');
     const forgePanel = el('forgePanel');
@@ -159,7 +198,7 @@
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
     }
     if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `<span class="district-subtitle">${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}</span><br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br><span class="district-next-descent">Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.</span>`;
+    if (el('districtLine')) el('districtLine').innerHTML = `<span class="district-subtitle">${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}</span><br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br><span class="district-next-descent">Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.</span><br><span class="district-next-descent">${escapeHtml(progressionStatusLine)}</span>`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
     if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup();
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';

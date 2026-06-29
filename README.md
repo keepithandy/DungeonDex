@@ -111,12 +111,12 @@ Live gameplay systems:
 * Monster backdrop canvas visuals
 * Boss Trophy Milestone Talent point source
 * Controlled Hunter Board Clarity Talent spend
+* Trophy Echo Revisit lane
 
 Preview, planning, or guarded systems:
 
 * Broader Talent tree UI remains locked and preview-only.
-* Revisit routes are not playable yet.
-* Revisit lanes, route previews, unlock gates, and activation summaries are planning surfaces only.
+* Other Revisit lanes, route previews, unlock gates, and activation summaries are planning surfaces only.
 * Debt Collector clarity is display/copy focused and does not change debt math or economy behavior.
 * Monster backdrop visuals do not change combat, rewards, scaling, routes, saves, debt, Talents, or Elite Board behavior.
 
@@ -132,7 +132,7 @@ Recommended capture targets:
 * Elite Board: optional challenge contracts and Hunter Board Clarity copy behavior.
 * Debt Collector: display-focused debt clarity without implying economy changes.
 * Talent panel: locked preview state, Boss Trophy point source, and controlled Hunter Board Clarity spend surface.
-* Revisit preview: planned lanes and locked route language that clearly communicates non-playable status.
+* Revisit status: Trophy Echo playable when boss history exists, with other lanes clearly locked or planned.
 * Archive/Famous Gear memory: long-term gear history and retired item identity.
 
 Suggested future media paths, once assets are ready:
