@@ -159,7 +159,7 @@
       districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
     }
     if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
-    if (el('districtLine')) el('districtLine').innerHTML = `${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}<br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br>Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.`;
+    if (el('districtLine')) el('districtLine').innerHTML = `<span class="district-subtitle">${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}</span><br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br><span class="district-next-descent">Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.</span>`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
     if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup();
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';

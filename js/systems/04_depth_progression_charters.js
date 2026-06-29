@@ -231,25 +231,26 @@
 
   function bossAtmosphereLine(depth) {
     const name = bossFloorNameByDepth(depth);
+    const district = districtByDepth(depth);
     if (!name) return 'The Stair tightens. Something below is listening.';
-    return `Boss sign: ${name} waits below. Bosses return every 5 floors.`;
+    return `Boss sign: ${name} waits below in ${district.name}. Bosses return every 5 floors.`;
   }
 
   function districtArrivalLine(district) {
     if (!district) return 'A new stretch of stair opens beneath your boots.';
     const arrivals = {
-      lowfire: 'The Lowfire lamps gutter behind you, close enough to feel owned.',
-      ashgate: 'Ashgate narrows around the stair; every wall is scraped by retreat.',
-      'ember-debtworks': 'The Debtworks glow red below; chains tick like ledgers closing.',
-      sootveil: 'Sootveil swallows the light and leaves only breath and ash.',
-      cinderbone: 'Cinderbone Halls open in furnace heat and old champion dust.',
-      blacktithe: 'Blacktithe weighs each step like coin dropped into a grave.',
-      lanternless: 'The Lanternless Vault answers with cold glass and no flame.',
+      lowfire: 'Lowfire District stays close behind you, lamps low and warm.',
+      ashgate: 'Ashgate Warrens narrows around the stair; every wall is scraped by retreat.',
+      'ember-debtworks': 'Ember Debtworks glows red below; chains tick like ledgers closing.',
+      sootveil: 'Sootveil Depths swallows the light and leaves only breath and ash.',
+      cinderbone: 'Cinderbone Halls opens in furnace heat and old champion dust.',
+      blacktithe: 'Blacktithe Deep weighs each step like coin dropped into a grave.',
+      lanternless: 'Lanternless Vault answers with cold glass and no flame.',
       'hunger-kilns': 'The Hunger Kilns breathe open, hot and empty-handed.',
-      redwake: 'Redwake water moves under the stones before you see it.',
+      redwake: 'Redwake Catacombs moves under the stones before you see it.',
       'final-lowflame': 'The Final Lowflame burns small under impossible weight.'
     };
-    return arrivals[district.id] || district.line || 'A new district answers the descent.';
+    return arrivals[district.id] || district.line || `${district.name} answers the descent.`;
   }
 
   function isDistrictEntryDepth(depth, district) {
@@ -533,6 +534,8 @@
 
   function depthProgressMarkup(depth) {
     const d = depthProgressMeta(depth);
+    const district = districtByDepth(depth);
+    const identity = dungeonDistrictIdentityForDepth(depth);
     const roomLine = d.chaptersUntilRoom === 0
       ? 'Room clears after this chapter.'
       : `${format(d.chaptersUntilRoom)} chapter${d.chaptersUntilRoom === 1 ? '' : 's'} until the next room.`;
@@ -542,10 +545,11 @@
     return `<div class="depth-progress-card" aria-label="Hollow Stair progress">
       <div class="split depth-progress-head">
         <div>
-          <div class="depth-kicker">Hollow Stair Progress</div>
+          <div class="depth-kicker">Hollow Stair Progress • ${escapeHtml(district.name)}</div>
           <strong>${escapeHtml(depthLabel(depth))}</strong>
+          <p>${escapeHtml(identity.subtitle)}</p>
         </div>
-        <span class="pill">D${format(d.rawDepth)}</span>
+        <span class="pill">${escapeHtml(district.name)}</span>
       </div>
       <div class="depth-progress-grid">
         <div class="depth-progress-stat"><span>Chapter</span><strong>${format(d.chapter)} / ${format(DEPTH_CHAPTERS_PER_ROOM)}</strong></div>
