@@ -35,6 +35,7 @@ It preserves classic browser script load order instead of converting the game to
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
 - `30_passive_activation_gate_hotfix.js` — Passive activation gate verification hotfix.
+- `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
 - `33_talent_hunter_board_clarity_spend.js` — Controlled one-node Hunter Board Clarity spend helper and readiness model.
 - `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.2 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.

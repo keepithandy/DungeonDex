@@ -178,6 +178,15 @@ This changelog records what changed and why.
 
 ---
 
+## v1.20.33 - Revisit Activation Surface Lockdown
+
+* Added `31_revisit_activation_surface_lockdown.js` to fully de-export dormant Revisit start/active-summary API surfaces from `window.DungeonDexEliteContracts`.
+* Added a read-only `revisitActivationSurfaceLockdownReport(state)` inspection helper that reports forbidden exports removed, no live entry, no rewards, no completion, no mutation, and the preserved primary path.
+* Kept all existing Revisit previews, summaries, unlock gates, lane metadata, and route-planning diagnostics intact.
+* Preserved save shape, combat, economy, gear, monsters, rewards, dungeon progression, Talent activation, Debt Collector renderer wiring, and Revisit playability lockout.
+
+---
+
 ## v1.20.32 Hotfix - Passive Activation Gate Verification
 
 * Added a non-mutating verification layer for the passive activation gate dry run.

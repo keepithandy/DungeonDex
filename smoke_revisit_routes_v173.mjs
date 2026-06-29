@@ -210,6 +210,7 @@ async function main(){
       await waitForProcessExit(chrome, 3000);
     }
     await removeTempProfile(userDataDir);
+
     await new Promise(resolve => server.server.close(resolve));
   }
   const failed = results.filter(result => !result.ok);

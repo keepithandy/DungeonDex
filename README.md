@@ -222,6 +222,7 @@ Current rule:
 Trophy Echo is the first live Revisit lane. Famous Gear Memory remains the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only.
 
 ## Monster Backdrop Status
+````md
 
 The monster backdrop canvas system is visual-only. It provides deterministic combat-stage atmosphere without changing combat math, HP, rewards, routes, completion, scaling, economy, debt, Talent state, Elite Board behavior, trophy records, or Famous Gear memory.
 
@@ -243,3 +244,4 @@ Additional focused checks may be added by a patch plan when a specific system is
 ## Version Authority
 
 `VERSION.md` is the public build authority. `CHANGELOG.md` is the permanent release history. `DUNGEONDEX_CURRENT_NOTES.md` is the current working summary. Runtime labels, cache labels, and internal module labels should never replace those files as the source of truth.
+````
