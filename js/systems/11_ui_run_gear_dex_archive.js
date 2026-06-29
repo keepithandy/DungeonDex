@@ -951,8 +951,10 @@
 
   function revisitArchiveEchoMarkup(state = S) {
     const revisit = state?.player?.revisitState || {};
-    if (revisit.unlocked) return '';
-    return `<div class="small muted">Earlier Dungeon Revisit stays removed. Notes remain read-only.</div>`;
+    if (revisit?.trophyEcho?.active) {
+      return '<div class="small muted">Trophy Echo is active in town. Famous Gear Memory remains inactive.</div>';
+    }
+    return '<div class="small muted">Trophy Echo now lives in town as the first active Revisit lane. Famous Gear Memory remains inactive.</div>';
   }
 
   function retiredRelicCard(entry) {

@@ -3,7 +3,64 @@
 // Elite contract board, town panels, district wares, shop cards
   // Read-only revisit helper surface remains in backend systems only.
   function earlierDungeonRevisitMarkup() {
-    return '';
+    const api = window.DungeonDexEliteContracts || {};
+    const status = typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
+    if (!status) return '';
+    const active = status.activeEcho || null;
+    const lastResult = status.lastResult || null;
+    const bossName = cleanDisplayText(status.source?.bossName || active?.bossName || 'Unknown Boss', 'Unknown Boss');
+    const trophyName = cleanDisplayText(status.source?.trophyName || active?.trophyName || 'Boss Trophy', 'Boss Trophy');
+    const memoryMarks = Math.max(0, Math.floor(numberOr(status.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const completedCount = Math.max(0, Math.floor(numberOr(status.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const historyCount = Math.max(0, Math.floor(numberOr(status.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const summaryLine = active
+      ? cleanDisplayText(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
+      : status.locked
+        ? 'Locked until you have at least one boss trophy or boss record.'
+        : `${bossName} is ready to answer as a memory echo.`;
+    const flavor = active
+      ? cleanDisplayText(active.reflection || '', '')
+      : status.locked
+        ? 'The lane is cold. Bring back proof of a defeated boss and the echo can answer.'
+        : `The ${trophyName} still remembers ${bossName}. Step into the reflection and settle the memory before the next descent.`;
+    const actionMarkup = active
+      ? `<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>`
+      : status.locked
+        ? `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`
+        : `<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>`;
+    const resultMarkup = lastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(lastResult.summary || '', ''))}</div>`
+      : '';
+    return `
+      <section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
+        <div class="card-head">
+          <div>
+            <h2>Revisit</h2>
+            <p>Short memory lanes tied to DungeonDex history.</p>
+          </div>
+        </div>
+        <article class="quest-card revisit-echo-card ${status.locked ? 'locked' : 'ready'}">
+          <div class="quest-topline">
+            <strong>Trophy Echo</strong>
+            <span class="small ${status.active ? '' : 'muted'}">${status.active ? 'Active' : status.locked ? 'Locked' : 'Playable'}</span>
+          </div>
+          <p class="small">${escapeHtml(summaryLine)}</p>
+          <p class="small muted">${escapeHtml(flavor)}</p>
+          <div class="small muted">Boss history ${historyCount} • Memory Marks ${memoryMarks} • Recorded echoes ${completedCount}</div>
+          ${active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(active.memoryTitle || bossName, bossName))}</div>` : ''}
+          <div class="inline-actions revisit-echo-actions">
+            ${actionMarkup}
+          </div>
+          ${resultMarkup}
+        </article>
+        <article class="quest-card revisit-lane-card locked">
+          <div class="quest-topline">
+            <strong>Famous Gear Memory</strong>
+            <span class="small muted">Planned</span>
+          </div>
+          <p class="small muted">Archive memory remains inactive in this patch.</p>
+        </article>
+      </section>`;
   }
 
   function eliteContractBoardMarkup(state) {
@@ -104,7 +161,7 @@
     if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
     if (el('districtLine')) el('districtLine').innerHTML = `${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}<br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br>Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.`;
     if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
-    if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = '';
+    if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup();
     if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
     const restCostNode = el('restCostPill');
     if (restCostNode) {

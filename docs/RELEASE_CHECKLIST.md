@@ -23,7 +23,7 @@ node .\smoke_talent_v150b.mjs
 
 ## Guardrails
 - Preview-only systems must stay preview-only unless the issue explicitly activates them.
-- Revisit routes are not playable yet.
+- Trophy Echo is the only playable Revisit lane.
 - The broad Talent tree UI remains locked and preview-only.
 - Do not add new Talent nodes, respec, passive stat effects, reward multipliers, combat effects, economy effects, or Revisit effects unless the issue explicitly says so.
 - Service worker and cache label changes should only happen during versioned release patches.

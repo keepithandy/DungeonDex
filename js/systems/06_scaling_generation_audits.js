@@ -289,6 +289,24 @@
           lastVisitAt: '',
           notes: []
         },
+        revisitState: {
+          unlocked: false,
+          lastViewedAt: '',
+          notedDistricts: [],
+          activeRouteKey: '',
+          startedAt: 0,
+          sourceFloor: 0,
+          sideRoute: false,
+          locked: true,
+          cappedReward: true,
+          trophyEcho: {
+            active: null,
+            history: [],
+            memoryMarks: 0,
+            completedKeys: {},
+            lastResult: null
+          }
+        },
         eliteContracts: createEliteContractState(),
         talents: { pointsEarned: 0, pointsSpent: 0, unlocked: {}, unlockedIds: [] }
       },

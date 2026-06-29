@@ -5,7 +5,7 @@
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.21.1-hunter-board-clarity-spend-smoke-hardening';
+  const BUILD = '1.23.0-trophy-echo-playable-prototype';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const forbiddenExportNames = Object.freeze([
     'can' + 'Start' + 'Revisit' + 'Route',
@@ -52,6 +52,9 @@
     const plan = api && typeof api.revisitTrophyEchoRulePlan === 'function'
       ? api.revisitTrophyEchoRulePlan(state)
       : {};
+    const status = api && typeof api.trophyEchoStatus === 'function'
+      ? api.trophyEchoStatus(state)
+      : {};
     const firstLane = api && typeof api.revisitFirstActivationLane === 'function'
       ? api.revisitFirstActivationLane(state)
       : null;
@@ -67,75 +70,70 @@
       laneOrder: 1,
       secondLaneKey: 'famous-gear-memory',
       secondLaneLabel: 'Famous Gear Memory',
-      status: 'Planning only',
-      planningOnly: true,
-      readOnly: true,
-      locked: true,
-      previewOnly: true,
-      playable: false,
-      active: false,
+      status: status.active ? 'Active' : status.available ? 'Playable' : 'Locked',
+      planningOnly: false,
+      readOnly: false,
+      locked: status.locked !== false,
+      previewOnly: false,
+      playable: status.available === true,
+      active: status.active === true,
       primaryPath: PRIMARY_PATH,
       primaryPathPreserved: true,
-      routeEntryAvailable: false,
-      startButtonAvailable: false,
+      routeEntryAvailable: status.available === true && status.active !== true,
+      startButtonAvailable: status.available === true && status.active !== true,
       rewardAvailable: false,
-      completionAvailable: false,
+      completionAvailable: status.active === true,
       claimAvailable: false,
-      mutatesSave: false,
-      futureSaveFields: Object.freeze([
-        'future player.revisitState.activeRouteKey only after explicit activation',
-        'future player.revisitState.sourceTrophyId for deterministic boss-history binding',
-        'future player.revisitState.claimKeys for duplicate-prevention records',
-        'future player.revisitState.completedRouteKeys only after completion rules exist'
+      mutatesSave: true,
+      liveSaveFields: Object.freeze([
+        'player.revisitState.activeRouteKey',
+        'player.revisitState.trophyEcho.active',
+        'player.revisitState.trophyEcho.history',
+        'player.revisitState.trophyEcho.completedKeys',
+        'player.revisitState.trophyEcho.lastResult',
+        'player.revisitState.trophyEcho.memoryMarks'
       ]),
       entryConditions: Object.freeze([
-        'Require an explicit future activation patch before any route can be entered.',
-        'Require a valid boss trophy or boss record source before Trophy Echo can be considered.',
+        'Require a valid boss trophy or boss record source before Trophy Echo can be started.',
         'Require Enter Dungeon / Continue Run to remain the primary dungeon path.',
-        'Require route preview and gate state to stay locked until activation guardrails pass.'
+        'Allow only Trophy Echo as the live Revisit lane in this patch.'
       ]),
       rewardCaps: Object.freeze([
-        'Memory, trophy, and Dex identity rewards should be considered before power rewards.',
+        'Revisit-only Memory Marks stay separate from power systems.',
         'No uncapped gear rewards.',
         'No mythic farming path.',
         'No economy bypass or repeatable low-floor power spike.'
       ]),
       completionRules: Object.freeze([
-        'Future completion must be explicit, finite, and recorded once per deterministic route source.',
-        'Failure or extraction behavior must be defined before activation.',
+        'Completion is explicit and finite.',
+        'A deterministic completion key records the first clear per boss memory.',
         'Completion must not advance main dungeon progression by itself.'
       ]),
       claimRules: Object.freeze([
-        'Future claims must use deterministic keys tied to the source boss trophy or record.',
-        'Duplicate claims must be blocked before any reward is exposed.',
-        'Claim records must be repaired safely if malformed.'
+        'Duplicate Memory Mark rewards are blocked by deterministic completion keys.',
+        'No separate claim button exists in this prototype.',
+        'Completion records repair safely through save normalization.'
       ]),
       failureCancelBehavior: Object.freeze([
-        'Future route failure must return safely to normal town/run recovery rules.',
-        'Cancel or abandon behavior must not create rewards, completion, or duplicate claims.',
-        'Death handling must not bypass existing dungeon recovery rules.'
+        'The prototype resolves only from town and does not alter death recovery.',
+        'Cancel or abandon paths are not exposed in this first loop.',
+        'Normal dungeon recovery rules remain unchanged.'
       ]),
-      uiLockRequirements: Object.freeze([
-        'No Revisit start, enter, complete, claim, unlock, or reward button may appear in this planning patch.',
-        'Town Revisit copy must say planned, locked, preview, or unavailable.',
-        'Route previews must remain read-only and subordinate to Enter Dungeon / Continue Run.'
+      uiRequirements: Object.freeze([
+        'Town Revisit copy must keep Trophy Echo distinct from the primary dungeon path.',
+        'Famous Gear Memory remains visibly inactive.',
+        'Start and Resolve buttons are limited to Trophy Echo only.'
       ]),
-      activationBlockers: Object.freeze([
-        'No live route entry surface exists.',
-        'No reward contract exists.',
-        'No completion contract exists.',
-        'No save mutation contract exists.',
-        'No UI control exists.'
-      ]),
+      activationBlockers: Object.freeze(status.available ? [] : ['No qualifying boss trophy history yet.']),
       signalCurrent: safeNumber(plan && plan.signalCurrent, 0, 0, Number.MAX_SAFE_INTEGER),
       signalRequired: safeNumber(plan && plan.signalRequired, 3, 1, Number.MAX_SAFE_INTEGER),
       signalPercent: safeNumber(plan && plan.signalPercent, 0, 0, 100),
       firstLane,
       secondLane,
       notes: Object.freeze([
-        'Trophy Echo remains the first planned Revisit lane.',
-        'Famous Gear Memory remains the second planned Revisit lane.',
-        'This checklist is metadata only and does not activate Revisit gameplay.'
+        'Trophy Echo is the first live Revisit lane.',
+        'Famous Gear Memory remains the second lane and stays inactive.',
+        'The prototype uses a short memory-reflection loop instead of new combat.'
       ])
     });
   }
@@ -157,25 +155,32 @@
       ? api.revisitRoutePreviews(state)
       : [];
     const routeList = Array.isArray(routes) ? routes : [];
-    const routeFlagsSafe = routeList.every(route => route
-      && route.locked === true
-      && route.playable !== true
-      && route.active !== true
-      && route.entryAvailable !== true
-      && route.rewardAvailable !== true
-      && route.completionAvailable !== true);
+    const trophyRoute = routeList.find(route => String(route?.key || '') === 'trophy_echo_route') || null;
+    const famousGearRoute = routeList.find(route => String(route?.key || '') === 'famous_gear_route') || null;
+    const routeFlagsSafe = routeList.every(route => {
+      if (!route) return false;
+      if (String(route.key || '') === 'trophy_echo_route') return route.rewardAvailable !== true;
+      return route.locked === true
+        && route.playable !== true
+        && route.active !== true
+        && route.entryAvailable !== true
+        && route.completionAvailable !== true;
+    });
     return Object.freeze({
       build: BUILD,
-      planningOnly: true,
-      readOnly: true,
+      planningOnly: false,
+      readOnly: false,
       primaryPath: PRIMARY_PATH,
       forbiddenExportsRemoved: remaining.length === 0,
       remainingForbiddenExports: Object.freeze(remaining.slice()),
       detectedActionExports: Object.freeze(liveActionKeys.slice()),
-      liveEntry: false,
+      liveEntry: trophyRoute?.entryAvailable === true,
       rewardAvailable: false,
-      completionAvailable: false,
-      mutatesSave: false,
+      completionAvailable: trophyRoute?.completionAvailable === true,
+      mutatesSave: true,
+      trophyEchoPlayable: trophyRoute?.playable === true,
+      trophyEchoActive: trophyRoute?.active === true,
+      famousGearInactive: famousGearRoute?.playable !== true && famousGearRoute?.entryAvailable !== true && famousGearRoute?.completionAvailable !== true,
       routeFlagsSafe,
       apiSurfaceSafe: remaining.length === 0 && liveActionKeys.length === 0 && routeFlagsSafe,
       activationSummary,

@@ -33,14 +33,13 @@ Current design guardrails:
 - Elite Board is the optional challenge layer.
 
 ### Revisit
-Revisit is a planning foundation only.
+Revisit now has one narrow live lane and several planning-only lanes.
 
 Current contract:
-- locked
-- read-only
-- non-playable
-- no entry/start/begin/claim/complete/unlock/reward/progression behavior
-- no new currency
+- Trophy Echo is playable from town when boss trophy history exists
+- Trophy Echo records only Revisit-local state and Memory Marks
+- Famous Gear Memory, Rival Trace, Debt Pressure, and Board Echo remain non-playable
+- no new power currency
 - no farming loop
 
 Planned lane order:

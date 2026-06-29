@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.22.0`
-* Current local package baseline: `v1.22.0`
-* Current development target: `v1.22.0`
+* Public/live itch version: `v1.23.0`
+* Current local package baseline: `v1.23.0`
+* Current development target: `v1.23.0`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+---
+
+## v1.23.0 - Trophy Echo Playable Prototype
+
+* Activated Trophy Echo as the first live Revisit lane in town.
+* Trophy Echo now locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history in save data.
+* Added a Revisit-only `Memory Mark` result that persists through save and reload without touching debt math, combat, gear stats, monster scaling, or broad Talent activation.
+* Famous Gear Memory remains inactive/planned, and the primary dungeon path remains Enter Dungeon / Continue Run.
 
 ---
 

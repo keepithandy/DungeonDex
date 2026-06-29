@@ -2,31 +2,23 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.22.0**
+Current baseline: **DungeonDex v1.23.0**
 
-## Revisit Readiness
+## Revisit Status
 
-Trophy Echo is the first planned Revisit lane and now carries a small content seed for future replay-memory work. Revisit remains locked, read-only, preview-only, non-playable, rewardless, completionless, claimless, and mutation-free.
+Trophy Echo is now the first live Revisit lane. It stays small and deterministic: if the player has boss trophy history, town can surface a short memory-reflection loop tied to that boss record.
 
-Trophy Echo may document future intent, future lane ordering, read-only preview language, and compact flavor hooks around boss trophies, prior victories, and archive memory. It may not add route entry, start buttons, claim buttons, completion flags, rewards, or save mutation.
+The prototype starts and resolves entirely from town. It records completion history, preserves it across reloads, and awards a Revisit-only Memory Mark instead of touching combat, gear, debt, or broader progression systems.
 
 Famous Gear Memory stays the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only primary dungeon entry path.
 
-## Trophy Echo Contract Draft
-
-Future Trophy Echo activation may only expose read-only preview fields: lane name, planned purpose, source history, locked status, preview text, future contract notes, and small replay-flavored echo examples.
-
-It must not expose route entry, start, enter, claim, complete, unlock, rerun, or resolve buttons. It must not add rewards, reward tables, completion flags, claim records, or save mutation.
-
-Trophy Echo stays the first planned lane, Famous Gear Memory stays the second planned lane, and Revisit remains non-playable until a future activation issue explicitly changes that.
-
 ## Current Build
 
-**v1.22.0 - Trophy Echo Content Seed**
+**v1.23.0 - Trophy Echo Playable Prototype**
 
-This patch seeds Trophy Echo with future-facing memory flavor and compact replay hooks. It keeps the lane locked and non-playable while making the upcoming content direction easier to read.
+This patch activates the first playable Revisit loop. Trophy Echo can lock against missing boss history, open from real boss records, start an active memory, resolve in town, record completion history, and persist Memory Marks across reloads.
 
-No route entry, claim flow, completion flow, reward flow, combat changes, economy changes, reward math changes, Debt Collector changes, or Revisit activation was added.
+No dungeon combat path, debt math, gear stats, monster scaling, or broader Talent activation was added.
 
 ## Previous Build
 
@@ -197,7 +189,7 @@ The Talent module's internal `v1.16.2` label records its component lineage; `VER
 
 ## Revisit System Status
 
-The revisit system is currently in a foundation/preview/gate-checkpoint phase.
+The revisit system now has one live lane and several remaining planning surfaces.
 
 Implemented so far:
 
@@ -213,6 +205,10 @@ Implemented so far:
 * `revisitRouteActivationPlan(state)`
 * `revisitRouteActivationSummary(state)`
 * `revisitRoutePreviewStateSummary(state)`
+* `trophyEchoStatus(state)`
+* `startTrophyEcho(state)`
+* `completeTrophyEcho(state)`
+* `trophyEchoResultSummary(state)`
 * `revisitFirstActivationLane(state)`
 * `revisitSecondActivationLane(state)`
 * `revisitTrophyEchoRulePlan(state)`
@@ -221,9 +217,9 @@ Implemented so far:
 
 Current rule:
 
-> Revisit routes are not playable yet.
+> Trophy Echo is playable. Other Revisit lanes are not.
 
-Trophy Echo remains the first planned Revisit lane. Famous Gear Memory is the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only. The current UI shows where future revisit content may attach, but there is no route entry path.
+Trophy Echo is the first live Revisit lane. Famous Gear Memory remains the second planned lane as inert metadata only. Rival Trace, Debt Pressure, and Board Echo remain planning hooks only.
 
 ## Monster Backdrop Status
 

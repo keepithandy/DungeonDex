@@ -650,29 +650,139 @@
       note: 'Future content seed only. No route entry, reward, or save mutation.'
     };
   }
+
+  function ensureRevisitStateShape(state = S) {
+    if (!state || typeof state !== 'object') return {};
+    if (!state.player || typeof state.player !== 'object') state.player = {};
+    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object'
+      ? state.player.revisitState
+      : {};
+    revisitState.unlocked = revisitState.unlocked === true;
+    revisitState.lastViewedAt = String(revisitState.lastViewedAt || '').trim();
+    revisitState.notedDistricts = asArray(revisitState.notedDistricts, []).map(String).map(value => value.trim()).filter(Boolean).slice(0, 12);
+    revisitState.activeRouteKey = String(revisitState.activeRouteKey || '').trim();
+    revisitState.startedAt = Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)));
+    revisitState.sourceFloor = Math.max(0, Math.floor(numberOr(revisitState.sourceFloor, 0, 0, 999999)));
+    revisitState.sideRoute = revisitState.sideRoute === true;
+    revisitState.locked = revisitState.locked !== false;
+    revisitState.cappedReward = revisitState.cappedReward !== false;
+    const trophyEcho = revisitState.trophyEcho && typeof revisitState.trophyEcho === 'object'
+      ? revisitState.trophyEcho
+      : {};
+    trophyEcho.active = trophyEcho.active && typeof trophyEcho.active === 'object' ? trophyEcho.active : null;
+    trophyEcho.history = asArray(trophyEcho.history, []).filter(entry => entry && typeof entry === 'object').slice(0, 20);
+    trophyEcho.memoryMarks = Math.max(0, Math.floor(numberOr(trophyEcho.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
+    trophyEcho.completedKeys = trophyEcho.completedKeys && typeof trophyEcho.completedKeys === 'object' ? trophyEcho.completedKeys : {};
+    trophyEcho.lastResult = trophyEcho.lastResult && typeof trophyEcho.lastResult === 'object' ? trophyEcho.lastResult : null;
+    revisitState.trophyEcho = trophyEcho;
+    state.player.revisitState = revisitState;
+    return revisitState;
+  }
+
+  function trophyEchoBossHistory(state = S) {
+    const safePlayer = state?.player && typeof state.player === 'object' ? state.player : {};
+    const seen = new Set();
+    const records = asArray(safePlayer.bossTrophyRecords, []).filter(isPlainObject).map(raw => {
+      const trophyId = String(raw.trophyId || raw.id || '').trim();
+      if (!trophyId || seen.has(trophyId)) return null;
+      seen.add(trophyId);
+      return {
+        trophyId,
+        recordId: String(raw.id || trophyId).trim(),
+        trophyName: cleanDisplayText(raw.trophyName || raw.name || 'Boss Trophy', 'Boss Trophy'),
+        bossName: cleanDisplayText(raw.bossName || raw.sourceBoss || 'Unknown Boss', 'Unknown Boss'),
+        bestDepth: Math.max(0, Math.floor(numberOr(raw.bestKillDepth, raw.rawDepth, 0, 0, 999999))),
+        earnedAt: Math.max(0, Math.floor(numberOr(raw.earnedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+        sourceLabel: cleanDisplayText(raw.source || 'Boss Trophy Record', 'Boss Trophy Record')
+      };
+    }).filter(Boolean);
+    asArray(safePlayer.bossTrophies, []).forEach(rawId => {
+      const trophyId = String(rawId || '').trim();
+      if (!trophyId || seen.has(trophyId)) return;
+      const def = asArray(typeof BOSS_TROPHY_DEFINITIONS !== 'undefined' ? BOSS_TROPHY_DEFINITIONS : [], []).find(entry => String(entry?.id || '').trim() === trophyId) || null;
+      seen.add(trophyId);
+      records.push({
+        trophyId,
+        recordId: trophyId,
+        trophyName: cleanDisplayText(def?.name || 'Boss Trophy', 'Boss Trophy'),
+        bossName: cleanDisplayText(def?.source || 'Unknown Boss', 'Unknown Boss'),
+        bestDepth: Math.max(0, Math.floor(numberOr(def?.requiredDepth, 0, 0, 999999))),
+        earnedAt: 0,
+        sourceLabel: cleanDisplayText(def?.source || 'Boss Trophy Memory', 'Boss Trophy Memory')
+      });
+    });
+    return records
+      .sort((left, right) => numberOr(right.bestDepth, 0) - numberOr(left.bestDepth, 0) || numberOr(right.earnedAt, 0) - numberOr(left.earnedAt, 0) || String(left.trophyId || '').localeCompare(String(right.trophyId || '')))
+      .slice(0, 12);
+  }
+
+  function trophyEchoCompletionKey(source) {
+    const trophyId = String(source?.trophyId || '').trim();
+    return trophyId ? `trophy_echo:${trophyId}` : '';
+  }
+
+  function createTrophyEchoReflection(source) {
+    const trophyName = cleanDisplayText(source?.trophyName || 'Boss Trophy', 'Boss Trophy');
+    const bossName = cleanDisplayText(source?.bossName || 'Unknown Boss', 'Unknown Boss');
+    const bestDepth = Math.max(0, Math.floor(numberOr(source?.bestDepth, 0, 0, 999999)));
+    const depthLine = bestDepth > 0 ? `Best depth remembered: ${format(bestDepth)}.` : 'The exact floor has faded, but the kill still holds.';
+    return {
+      memoryTitle: `${bossName} Echo`,
+      summaryLine: `${trophyName} stirs with a remembered weight.`,
+      reflection: `${bossName} returns as a brief ember-memory instead of a fresh hunt. You steady the trophy, recall the last clean strike, and let the fear break before the next descent. ${depthLine}`
+    };
+  }
+
+  function trophyEchoStatusModel(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    const history = trophyEchoBossHistory(state);
+    const active = revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object'
+      ? revisitState.trophyEcho.active
+      : null;
+    const source = active
+      ? history.find(entry => String(entry.trophyId || '') === String(active.trophyId || '')) || active
+      : (history[0] || null);
+    return {
+      routeKey: 'trophy_echo_route',
+      historyCount: history.length,
+      memoryMarks: Math.max(0, Math.floor(numberOr(revisitState.trophyEcho?.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedCount: Object.keys(revisitState.trophyEcho?.completedKeys || {}).filter(key => revisitState.trophyEcho.completedKeys[key] === true).length,
+      locked: history.length <= 0,
+      available: history.length > 0,
+      active: !!active,
+      source,
+      activeEcho: active,
+      lastResult: revisitState.trophyEcho?.lastResult || null
+    };
+  }
   function revisitCandidateHooks(state = S) {
     const safeState = state && typeof state === 'object' ? state : {};
     const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
-    const revisitState = safePlayer.revisitState && typeof safePlayer.revisitState === 'object' ? safePlayer.revisitState : {};
+    const revisitState = ensureRevisitStateShape(safeState);
     const contracts = ensureEliteContractState(safeState);
     const rivals = ensureEliteRivalState(safeState);
     const trophies = ensureEliteTrophyState(safeState);
     const retired = asArray(safePlayer.retiredRelics, []).filter(entry => entry && typeof entry === 'object');
-    const trophyCount = Object.keys(trophies.collected || {}).length;
+    const trophyEcho = trophyEchoStatusModel(safeState);
+    const trophyCount = trophyEcho.historyCount;
     const rivalCount = rivals.filter(r => r && !r.completed && r.revengeAvailable).length;
     const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival route active' : 'Board route open') : 'Board route quiet';
     const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(safeState) : null;
     const districtName = String(currentDistrict && currentDistrict.name ? currentDistrict.name : 'Lowfire District').trim() || 'Lowfire District';
-    const meta = revisitState.unlocked ? 'Planned' : 'Future Route';
+    const meta = trophyEcho.active ? 'Active' : trophyEcho.available ? 'Available' : (revisitState.unlocked ? 'Planned' : 'Future Route');
     const debtBalance = Math.max(0, Math.floor(numberOr(safePlayer?.debtCollector?.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER)));
     const entries = [
       {
         key: 'trophy_echo',
         label: 'Trophy Echo',
-        detail: `${trophyCount ? `${trophyCount} recorded` : 'No boss marks yet'} - future replay-memory lane.`,
-        source: `Trophies in ${districtName} / future echo lane`,
+        detail: trophyEcho.active
+          ? `Active memory: ${cleanDisplayText(trophyEcho.activeEcho?.bossName || trophyEcho.source?.bossName || 'Unknown Boss', 'Unknown Boss')}.`
+          : trophyEcho.available
+            ? `${trophyCount} qualifying boss ${trophyCount === 1 ? 'memory' : 'memories'} • ${trophyEcho.memoryMarks} mark${trophyEcho.memoryMarks === 1 ? '' : 's'}.`
+            : 'Locked until a boss trophy or boss record exists.',
+        source: `Boss history in ${districtName}`,
         priority: 10,
-        locked: !trophyCount
+        locked: !trophyEcho.available
       },
       {
         key: 'famous_gear_memory',
@@ -1195,10 +1305,10 @@
     const gateMeta = revisitUnlockGateMeta(routeKey);
     const routeContent = revisitRouteContentDefinitions()?.[routeKey] || null;
     const hasRoute = !!preview;
-    const locked = true;
+    const locked = preview ? preview.locked !== false : true;
     const eligible = !!preview && !!gateMeta && !!routeContent;
-    const enterable = false;
-    const previewOnly = true;
+    const enterable = preview?.entryAvailable === true;
+    const previewOnly = routeKey !== 'trophy_echo_route';
     return {
       routeKey: routeKey || 'unknown_route',
       eligible,
@@ -1210,7 +1320,7 @@
       previewOnly,
       routeTitle: String(preview?.title || routeContent?.title || gateMeta?.gateLabel || 'Route Preview').trim(),
       gateLabel: String(gateMeta?.gateLabel || routeContent?.title || 'Route Gate').trim(),
-      statusLabel: enterable ? 'Entry Ready' : (hasRoute ? 'Entry Locked' : 'Gate Prepared'),
+      statusLabel: preview?.completionAvailable === true ? 'Echo Active' : enterable ? 'Entry Ready' : (hasRoute ? 'Entry Locked' : 'Gate Prepared'),
       sourceLabel: String(preview?.hookSource || routeContent?.hookSource || gateMeta?.source || '').trim(),
       previewState: String(preview?.status || gateMeta?.previewState || 'locked').trim(),
       routeFound: hasRoute,
@@ -1357,19 +1467,30 @@
     const hooks = revisitCandidateHooks(state);
     if (!Array.isArray(hooks) || !hooks.length) return [];
     const sourceHooks = hooks.filter(hook => hook && typeof hook === 'object');
+    const trophyEcho = trophyEchoStatusModel(state);
     const routeDefs = [
       {
         key: 'trophy_echo_route',
         title: 'Trophy Echo Route',
         district: 'Trophy record districts',
-        reason: 'Old victories may call back later as replay memory.',
+        reason: trophyEcho.locked
+          ? 'Boss victories must be recorded before this memory can answer.'
+          : 'A defeated boss can answer as a brief memory-reflection lane.',
         hooks: ['trophy_echo'],
-        status: 'Planned',
-        locked: true,
+        status: trophyEcho.active ? 'Active' : trophyEcho.locked ? 'Locked' : 'Playable',
+        locked: trophyEcho.locked,
         priority: 10,
         hookSource: 'trophy_echo',
-        previewText: 'Future replay-memory lane for boss trophies and victory echoes.',
-        summary: 'Trophy Echo is a future lane for replay memory, boss trophy reflection, and short archive-style echoes.',
+        previewText: trophyEcho.locked
+          ? 'Locked until a boss trophy or boss record exists.'
+          : trophyEcho.active
+            ? 'A boss memory is active in Lowfire. Resolve it before the next descent.'
+            : 'Revisit a defeated boss as a short echo memory in town.',
+        summary: trophyEcho.locked
+          ? 'Trophy Echo waits for proof of a defeated boss.'
+          : trophyEcho.active
+            ? `${cleanDisplayText(trophyEcho.activeEcho?.bossName || trophyEcho.source?.bossName || 'Unknown Boss', 'Unknown Boss')} is currently stirring in the echo lane.`
+            : 'Trophy Echo is the first active Revisit lane: a short, deterministic memory reflection tied to boss history.',
         flavorHooks: [
           'A trophy can remember the hand that earned it.',
           'A boss mark may one day echo the fight that made it.',
@@ -1382,7 +1503,19 @@
           'A broken crown remembers the boss that fell for it.',
           'Victory notes could replay the run before the next descent.',
           'An archive echo might summarize what the trophy proved.'
-        ]
+        ],
+        playable: !trophyEcho.locked,
+        active: trophyEcho.active,
+        readOnly: false,
+        entryAvailable: !trophyEcho.locked && !trophyEcho.active,
+        startAvailable: !trophyEcho.locked && !trophyEcho.active,
+        enterAvailable: !trophyEcho.locked && !trophyEcho.active,
+        completionAvailable: trophyEcho.active,
+        completeAvailable: trophyEcho.active,
+        claimAvailable: false,
+        rewardAvailable: false,
+        resultAvailable: !!trophyEcho.lastResult,
+        mutatesSave: true
       },
       {
         key: 'famous_gear_route',
@@ -1465,9 +1598,15 @@
                   : route.key === 'board_echo_route'
                     ? 'Paid marks can still linger.'
                     : 'Read-only route note.',
-          safetyStatusLine: 'Locked preview. No route access.',
+          safetyStatusLine: route.key === 'trophy_echo_route'
+            ? (trophyEcho.active
+                ? 'Active echo in progress. Resolve it from town.'
+                : trophyEcho.locked
+                  ? 'Locked. Boss memory required.'
+                  : 'Playable. Start a short memory reflection from town.')
+            : 'Locked preview. No route access.',
           lockedReadinessNote: route.key === 'trophy_echo_route'
-            ? 'Needs more boss history.'
+            ? (trophyEcho.locked ? 'Needs more boss history.' : trophyEcho.active ? 'Active echo already underway.' : 'Boss history is ready.')
             : route.key === 'famous_gear_route'
               ? 'Needs stronger gear memory.'
             : route.key === 'rival_trace_route'
@@ -1478,11 +1617,29 @@
                     ? 'Needs more board history.'
                     : 'Needs more dungeon history.',
           status: String(route.status || 'Locked').trim(),
-          locked: true,
+          locked: route.key === 'trophy_echo_route' ? trophyEcho.locked : true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
+          previewText: String(route.previewText || '').trim(),
+          summary: String(route.summary || '').trim(),
+          flavorHooks: Array.isArray(route.flavorHooks) ? route.flavorHooks.slice() : [],
+          echoExamples: Array.isArray(route.echoExamples) ? route.echoExamples.slice() : [],
+          playable: route.playable === true,
+          active: route.active === true,
+          readOnly: route.readOnly === true,
+          entryAvailable: route.entryAvailable === true,
+          startAvailable: route.startAvailable === true,
+          enterAvailable: route.enterAvailable === true,
+          completionAvailable: route.completionAvailable === true,
+          completeAvailable: route.completeAvailable === true,
+          claimAvailable: route.claimAvailable === true,
+          rewardAvailable: route.rewardAvailable === true,
+          resultAvailable: route.resultAvailable === true,
+          mutatesSave: route.mutatesSave === true,
           criteria: criteriaStub.criteria,
           criteriaNote: criteriaStub.note,
-          readiness: revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
+          readiness: route.key === 'trophy_echo_route'
+            ? (trophyEcho.active ? 'Active' : trophyEcho.locked ? 'Faint Trace' : 'Ready')
+            : revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
         }, routeHooks.map(hook => hook.key));
       })
       .filter(Boolean)
@@ -1494,6 +1651,8 @@
     return {
       total: routes.length,
       planned: routes.filter(route => route.status === 'Planned').length,
+      active: routes.filter(route => route.active === true).length,
+      playable: routes.filter(route => route.playable === true).length,
       future: routes.filter(route => route.status === 'Future Route').length,
       locked: routes.filter(route => route.locked).length
     };
@@ -1502,7 +1661,8 @@
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
-    const allowedFutureRouteStates = ['locked', 'planned', 'eligible-preview', 'playable-later'];
+    const trophyEcho = trophyEchoStatusModel(state);
+    const allowedFutureRouteStates = ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active'];
     const stableHookSources = {
       trophy_echo_route: 'Trophy Echo',
       famous_gear_route: 'Famous Gear Memory',
@@ -1518,26 +1678,28 @@
         title: String(route.title || 'Return Route').trim(),
         hookSource: String(route.hookSource || stableHookSources[key] || 'unknown').trim(),
         status,
-        locked: true,
+        locked: route.locked !== false,
         planned: status === 'Planned' || status === 'Future Route',
-        eligibilityState: status === 'Planned' ? 'eligible-preview' : 'playable-later',
+        eligibilityState: key === 'trophy_echo_route'
+          ? (route.active ? 'active' : route.locked ? 'locked' : 'playable-now')
+          : status === 'Planned' ? 'eligible-preview' : 'playable-later',
         optionalSideContent: true,
         primaryPathPreserved: true,
-        readOnly: true,
-        entryAvailable: false,
+        readOnly: key !== 'trophy_echo_route',
+        entryAvailable: key === 'trophy_echo_route' ? route.entryAvailable === true : false,
         rewardAvailable: false,
-        completionAvailable: false,
+        completionAvailable: key === 'trophy_echo_route' ? route.completionAvailable === true : false,
         sourceHistoryOnly: true
       };
     });
     return {
       contractId: 'revisit_route_activation_contract_v1',
-      status: 'Planning only',
-      locked: true,
-      readOnly: true,
-      entryAvailable: false,
+      status: trophyEcho.active ? 'Trophy Echo active' : trophyEcho.available ? 'Trophy Echo playable' : 'Trophy Echo locked',
+      locked: trophyEcho.locked,
+      readOnly: false,
+      entryAvailable: trophyEcho.available && !trophyEcho.active,
       rewardAvailable: false,
-      completionAvailable: false,
+      completionAvailable: trophyEcho.active,
       primaryPath: 'Enter Dungeon / Continue Run',
       optionalSideContent: true,
       allowedFutureRouteStates,
@@ -1557,15 +1719,15 @@
     const eligibleRoutes = asArray(plan?.eligibleRoutes, []);
     return {
       contractId: String(plan?.contractId || 'revisit_route_activation_contract_v1'),
-      allowedStates: asArray(plan?.allowedFutureRouteStates, ['locked', 'planned', 'eligible-preview', 'playable-later']).slice(),
-      currentLockedCount: routeStates.length,
-      currentPlayableCount: 0,
-      currentPreviewOnly: true,
-      hasLiveEntry: false,
+      allowedStates: asArray(plan?.allowedFutureRouteStates, ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active']).slice(),
+      currentLockedCount: routeStates.filter(route => route.state === 'locked').length,
+      currentPlayableCount: routeStates.filter(route => route.state === 'playable-now' || route.state === 'active').length,
+      currentPreviewOnly: false,
+      hasLiveEntry: plan?.entryAvailable === true,
       hasRewards: false,
-      hasCompletion: false,
+      hasCompletion: plan?.completionAvailable === true,
       status: String(plan?.status || 'Planning only'),
-      note: 'Preview-state vocabulary only. No route entry, reward, or completion is exposed.',
+      note: 'Trophy Echo is the first live Revisit lane. The remaining lanes stay preview-only.',
       routeStateCount: routeStates.length,
       eligibleRouteCount: eligibleRoutes.length
     };
@@ -1575,20 +1737,20 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
     const routeSummary = revisitRouteSummary(safeState);
-    const allowedStates = ['locked', 'planned', 'eligible-preview', 'playable-later'];
+    const allowedStates = ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active'];
     const stableHookLabels = Array.from(new Set(routes.map(route => String(route?.hookSource || '').trim()).filter(Boolean)));
     return {
       contractId: 'revisit_route_preview_state_summary_v1',
       allowedStates,
       totalPreviewCount: routes.length,
       lockedPreviewCount: routeSummary?.locked ?? routes.filter(route => route && route.locked).length,
-      playablePreviewCount: 0,
-      currentPreviewOnly: true,
-      hasLiveEntry: false,
+      playablePreviewCount: routeSummary?.playable ?? routes.filter(route => route && route.playable === true).length,
+      currentPreviewOnly: false,
+      hasLiveEntry: routes.some(route => route && route.entryAvailable === true),
       hasRewards: false,
-      hasCompletion: false,
+      hasCompletion: routes.some(route => route && route.completionAvailable === true),
       stableHookLabels,
-      note: 'Route-preview mirror only. No live entry, reward, or completion is exposed.'
+      note: 'Trophy Echo can now be started and completed from town. The remaining lanes stay preview-only.'
     };
   }
 
@@ -1596,22 +1758,23 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
     const trophyRoute = routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null;
+    const trophyEcho = trophyEchoStatusModel(state);
     return {
       laneKey: 'trophy-echo',
       laneLabel: 'Trophy Echo',
       sourceHook: 'Trophy Echo',
-      currentStatus: 'planned',
-      locked: true,
-      readOnly: true,
-      previewOnly: true,
-      hasLiveEntry: false,
+      currentStatus: trophyEcho.active ? 'active' : trophyEcho.locked ? 'locked' : 'playable',
+      locked: trophyEcho.locked,
+      readOnly: false,
+      previewOnly: false,
+      hasLiveEntry: trophyEcho.available,
       hasRewards: false,
-      hasCompletion: false,
+      hasCompletion: trophyEcho.active,
       routeKey: 'trophy_echo_route',
       routeLabel: String(trophyRoute?.title || 'Trophy Echo Route'),
       reason: 'Derived from existing boss and trophy history only.',
-      note: 'First planned revisit lane. Planning only. Future content should feel like replay memory and trophy reflection, not a reward route.',
-      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+      note: 'First live Revisit lane. Trophy Echo is a short memory reflection tied to defeated boss history, not a reward farm.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active']
     };
   }
 
@@ -1666,50 +1829,74 @@
     if (!state.player || typeof state.player !== 'object') return false;
     const safeKey = String(routeKey || '').trim();
     if (!safeKey) return false;
-    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
-    if (revisitState.locked !== false) return false;
     const routes = revisitRoutePreviews(state);
     const route = routes.find(r => String(r?.key || '') === safeKey);
     if (!route) return false;
-    if (route.locked !== false) return false;
-    return true;
+    if (safeKey !== 'trophy_echo_route') return false;
+    return route.startAvailable === true;
   }
 
   function startRevisitRoute(state = S, routeKey = '') {
     if (!canStartRevisitRoute(state, routeKey)) return null;
     if (!state?.player) return null;
     const safeKey = String(routeKey || '').trim();
-    const currentFloor = Math.max(0, Math.floor(numberOr(state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
-    const routes = revisitRoutePreviews(state);
-    const route = routes.find(r => String(r?.key || '') === safeKey);
-    if (!route) return null;
-    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
+    if (safeKey !== 'trophy_echo_route') return null;
+    const revisitState = ensureRevisitStateShape(state);
+    const status = trophyEchoStatusModel(state);
+    const source = status.source;
+    if (!source) return null;
+    const currentFloor = Math.max(0, Math.floor(numberOr(source.bestDepth, state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
+    const reflection = createTrophyEchoReflection(source);
+    const startedAt = Date.now();
+    revisitState.unlocked = true;
+    revisitState.locked = false;
     revisitState.activeRouteKey = safeKey;
-    revisitState.startedAt = Date.now();
+    revisitState.startedAt = startedAt;
     revisitState.sourceFloor = currentFloor;
     revisitState.sideRoute = true;
-    revisitState.locked = false;
     revisitState.cappedReward = true;
-    state.player.revisitState = revisitState;
+    revisitState.lastViewedAt = new Date(startedAt).toLocaleString();
+    revisitState.trophyEcho.active = {
+      routeKey: safeKey,
+      completionKey: trophyEchoCompletionKey(source),
+      trophyId: String(source.trophyId || '').trim(),
+      recordId: String(source.recordId || source.trophyId || '').trim(),
+      trophyName: cleanDisplayText(source.trophyName || 'Boss Trophy', 'Boss Trophy'),
+      bossName: cleanDisplayText(source.bossName || 'Unknown Boss', 'Unknown Boss'),
+      memoryTitle: reflection.memoryTitle,
+      reflection: reflection.reflection,
+      summaryLine: reflection.summaryLine,
+      sourceLabel: cleanDisplayText(source.sourceLabel || 'Boss Trophy Record', 'Boss Trophy Record'),
+      bestDepth: Math.max(0, Math.floor(numberOr(source.bestDepth, 0, 0, 999999))),
+      sourceFloor: currentFloor,
+      startedAt
+    };
+    revisitState.trophyEcho.lastResult = null;
+    pushLog(state, `Trophy Echo started: ${revisitState.trophyEcho.active.bossName}.`);
     return {
       routeKey: safeKey,
-      routeTitle: String(route?.title || 'Return Route'),
-      startedAt: revisitState.startedAt,
-      sourceFloor: revisitState.sourceFloor,
+      routeTitle: 'Trophy Echo Route',
+      startedAt,
+      sourceFloor: currentFloor,
       sideRoute: true,
       locked: false,
-      cappedReward: true
+      cappedReward: true,
+      trophyId: revisitState.trophyEcho.active.trophyId,
+      bossName: revisitState.trophyEcho.active.bossName
     };
   }
 
   function activeRevisitRouteSummary(state = S) {
     if (!state?.player) return null;
-    const revisitState = state.player.revisitState && typeof state.player.revisitState === 'object' ? state.player.revisitState : {};
+    const revisitState = ensureRevisitStateShape(state);
     if (!revisitState.activeRouteKey) return null;
     const safeKey = String(revisitState.activeRouteKey || '').trim();
     const routes = revisitRoutePreviews(state);
     const route = routes.find(r => String(r?.key || '') === safeKey);
     if (!route) return null;
+    const activeEcho = revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object'
+      ? revisitState.trophyEcho.active
+      : null;
     return {
       routeKey: safeKey,
       routeTitle: String(route?.title || 'Return Route'),
@@ -1718,8 +1905,63 @@
       sourceFloor: Math.max(0, Math.floor(numberOr(revisitState.sourceFloor, 0, 0, 999999))),
       sideRoute: !!revisitState.sideRoute,
       locked: revisitState.locked !== false,
-      cappedReward: revisitState.cappedReward !== false
+      cappedReward: revisitState.cappedReward !== false,
+      bossName: cleanDisplayText(activeEcho?.bossName || '', ''),
+      trophyName: cleanDisplayText(activeEcho?.trophyName || '', ''),
+      memoryTitle: cleanDisplayText(activeEcho?.memoryTitle || '', ''),
+      reflection: cleanDisplayText(activeEcho?.reflection || '', '')
     };
+  }
+
+  function completeTrophyEchoRoute(state = S) {
+    if (!state?.player) return null;
+    const revisitState = ensureRevisitStateShape(state);
+    const active = revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object'
+      ? revisitState.trophyEcho.active
+      : null;
+    if (!active || String(revisitState.activeRouteKey || '').trim() !== 'trophy_echo_route') return null;
+    const completionKey = String(active.completionKey || trophyEchoCompletionKey(active)).trim();
+    if (!completionKey) return null;
+    const firstCompletion = revisitState.trophyEcho.completedKeys[completionKey] !== true;
+    const rewardMark = firstCompletion ? 1 : 0;
+    if (firstCompletion) revisitState.trophyEcho.memoryMarks = Math.max(0, Math.floor(numberOr(revisitState.trophyEcho.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER))) + 1;
+    revisitState.trophyEcho.completedKeys[completionKey] = true;
+    const completedAt = Date.now();
+    const summary = rewardMark > 0
+      ? `${active.bossName} settles into record. Memory Mark +1.`
+      : `${active.bossName} settles again, but its mark was already recorded.`;
+    const result = {
+      completionKey,
+      trophyId: String(active.trophyId || '').trim(),
+      recordId: String(active.recordId || active.trophyId || '').trim(),
+      trophyName: cleanDisplayText(active.trophyName || 'Boss Trophy', 'Boss Trophy'),
+      bossName: cleanDisplayText(active.bossName || 'Unknown Boss', 'Unknown Boss'),
+      memoryTitle: cleanDisplayText(active.memoryTitle || active.bossName || 'Trophy Echo', 'Trophy Echo'),
+      reflection: cleanDisplayText(active.reflection || '', ''),
+      summary,
+      bestDepth: Math.max(0, Math.floor(numberOr(active.bestDepth, 0, 0, 999999))),
+      rewardMark,
+      startedAt: Math.max(0, Math.floor(numberOr(active.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt
+    };
+    revisitState.trophyEcho.history.unshift(result);
+    revisitState.trophyEcho.history = revisitState.trophyEcho.history.slice(0, 20);
+    revisitState.trophyEcho.lastResult = result;
+    revisitState.trophyEcho.active = null;
+    revisitState.activeRouteKey = '';
+    revisitState.startedAt = 0;
+    revisitState.sourceFloor = 0;
+    revisitState.sideRoute = false;
+    revisitState.unlocked = true;
+    revisitState.locked = false;
+    revisitState.lastViewedAt = new Date(completedAt).toLocaleString();
+    pushLog(state, summary);
+    return result;
+  }
+
+  function trophyEchoResultSummary(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    return revisitState.trophyEcho?.lastResult || null;
   }
 
   function ensureEliteContractState(state) {
@@ -2418,6 +2660,21 @@
       },
       revisitTrophyEchoRouteDetail(state = S) {
         return revisitTrophyEchoRouteDetail(state);
+      },
+      trophyEchoStatus(state = S) {
+        return trophyEchoStatusModel(state);
+      },
+      startTrophyEcho(state = S) {
+        return startRevisitRoute(state, 'trophy_echo_route');
+      },
+      completeTrophyEcho(state = S) {
+        return completeTrophyEchoRoute(state);
+      },
+      trophyEchoResultSummary(state = S) {
+        return trophyEchoResultSummary(state);
+      },
+      activeTrophyEcho(state = S) {
+        return activeRevisitRouteSummary(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;

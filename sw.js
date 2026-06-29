@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
+const CACHE_NAME = 'dungeondex-v1.23.0-trophy-echo-playable-prototype';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.21.2-hunter-board-clarity-post-reload-ui-contract-smoke';
+const BUILD_QS = '1.23.0-trophy-echo-playable-prototype';
 const ASSETS = [
   './',
   './index.html',

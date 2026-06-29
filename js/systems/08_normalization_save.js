@@ -509,7 +509,87 @@
       sourceFloor: 0,
       sideRoute: false,
       locked: true,
-      cappedReward: true
+      cappedReward: true,
+      trophyEcho: {
+        active: null,
+        history: [],
+        memoryMarks: 0,
+        completedKeys: {},
+        lastResult: null
+      }
+    };
+  }
+
+  function normalizeRevisitText(value, fallback = '', limit = 120) {
+    return cleanDisplayText(value || fallback || '', fallback || '').slice(0, limit);
+  }
+
+  function normalizeRevisitCompletedKeys(value) {
+    const map = {};
+    if (!isPlainObject(value)) return map;
+    Object.keys(value).forEach(key => {
+      const cleanKey = String(key || '').trim().slice(0, 80);
+      if (cleanKey) map[cleanKey] = value[key] === true;
+    });
+    return map;
+  }
+
+  function normalizeTrophyEchoHistoryEntry(value) {
+    if (!isPlainObject(value)) return null;
+    const completionKey = normalizeRevisitText(value.completionKey || value.claimKey || '', '', 80);
+    const trophyId = normalizeRevisitText(value.trophyId || value.sourceTrophyId || '', '', 80);
+    const bossName = normalizeRevisitText(value.bossName || value.sourceBoss || 'Unknown Boss', 'Unknown Boss', 60);
+    const trophyName = normalizeRevisitText(value.trophyName || value.memoryTitle || 'Boss Trophy', 'Boss Trophy', 60);
+    const summary = normalizeRevisitText(value.summary || value.resultSummary || '', '', 180);
+    if (!completionKey || !trophyId || !summary) return null;
+    return {
+      completionKey,
+      trophyId,
+      recordId: normalizeRevisitText(value.recordId || '', '', 80),
+      trophyName,
+      bossName,
+      memoryTitle: normalizeRevisitText(value.memoryTitle || trophyName, trophyName, 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summary,
+      bestDepth: Math.max(0, Math.floor(numberOr(value.bestDepth, 0, 0, 999999))),
+      rewardMark: Math.max(0, Math.floor(numberOr(value.rewardMark, 0, 0, 1))),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt: Math.max(0, Math.floor(numberOr(value.completedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeTrophyEchoActive(value) {
+    if (!isPlainObject(value)) return null;
+    const routeKey = normalizeRevisitText(value.routeKey || 'trophy_echo_route', 'trophy_echo_route', 40);
+    const trophyId = normalizeRevisitText(value.trophyId || value.sourceTrophyId || '', '', 80);
+    if (!trophyId) return null;
+    return {
+      routeKey,
+      completionKey: normalizeRevisitText(value.completionKey || `trophy_echo:${trophyId}`, `trophy_echo:${trophyId}`, 80),
+      trophyId,
+      recordId: normalizeRevisitText(value.recordId || '', '', 80),
+      trophyName: normalizeRevisitText(value.trophyName || value.memoryTitle || 'Boss Trophy', 'Boss Trophy', 60),
+      bossName: normalizeRevisitText(value.bossName || value.sourceBoss || 'Unknown Boss', 'Unknown Boss', 60),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || value.trophyName || 'Boss Trophy', 'Boss Trophy', 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summaryLine: normalizeRevisitText(value.summaryLine || '', '', 140),
+      sourceLabel: normalizeRevisitText(value.sourceLabel || '', '', 80),
+      bestDepth: Math.max(0, Math.floor(numberOr(value.bestDepth, 0, 0, 999999))),
+      sourceFloor: Math.max(0, Math.floor(numberOr(value.sourceFloor, 0, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeRevisitTrophyEchoState(value) {
+    const source = isPlainObject(value) ? value : {};
+    const history = asArray(source.history, []).map(normalizeTrophyEchoHistoryEntry).filter(Boolean).slice(0, 20);
+    const completedKeys = normalizeRevisitCompletedKeys(source.completedKeys);
+    return {
+      active: normalizeTrophyEchoActive(source.active),
+      history,
+      memoryMarks: Math.max(0, Math.floor(numberOr(source.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedKeys,
+      lastResult: normalizeTrophyEchoHistoryEntry(source.lastResult)
     };
   }
 
@@ -525,6 +605,7 @@
     base.sideRoute = !!source.sideRoute;
     base.locked = source.locked !== false;
     base.cappedReward = source.cappedReward !== false;
+    base.trophyEcho = normalizeRevisitTrophyEchoState(source.trophyEcho);
     return base;
   }
 

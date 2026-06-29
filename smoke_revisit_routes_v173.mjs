@@ -75,21 +75,116 @@ async function main(){
     await evalScript(client, `localStorage.removeItem(${JSON.stringify(STORAGE_KEY)}); return true;`);
     await client.send('Page.reload', { ignoreCache:true });
     if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after reload.');
-    const audit = await evalByValue(client, `(() => { const api = window.DungeonDexEliteContracts || {}; const forbidden = ${JSON.stringify(FORBIDDEN)}; const before = JSON.stringify({ player:S.player, run:S.run }); const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : []; const gates = api.revisitUnlockGates ? api.revisitUnlockGates(S) : []; const plan = api.revisitRouteActivationPlan ? api.revisitRouteActivationPlan(S) : null; const trophyPlan = api.revisitTrophyEchoRulePlan ? api.revisitTrophyEchoRulePlan(S) : null; const summary = api.revisitRouteActivationSummary ? api.revisitRouteActivationSummary(S) : null; const mirror = api.revisitRoutePreviewStateSummary ? api.revisitRoutePreviewStateSummary(S) : null; const firstLane = api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null; const secondLane = api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null; const checklist = api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null; const report = api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null; const after = JSON.stringify({ player:S.player, run:S.run }); const apiKeys = Object.keys(api); const forbiddenPresent = forbidden.filter(name => Object.prototype.hasOwnProperty.call(api, name)); const routeButtons = Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean); const routeAttrs = Array.from(document.querySelectorAll('#revisitFoundationSlot [onclick], #revisitFoundationSlot [data-action], #revisitFoundationSlot [data-route], #revisitFoundationSlot [data-enter], #revisitFoundationSlot a[href]')).length; const townButtons = Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean); const text = document.getElementById('revisitFoundationSlot')?.innerText || ''; const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null; const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null; const previewContractSafe = Array.isArray(routes) && routes.every(route => !route || (typeof route === 'object' && route.locked === true && route.playable !== true && route.active !== true && route.entryAvailable !== true && route.startAvailable !== true && route.enterAvailable !== true && route.claimAvailable !== true && route.completeAvailable !== true && route.unlockAvailable !== true && route.rewardAvailable !== true && route.rewardTableAvailable !== true && route.claimRecordAvailable !== true && route.completionAvailable !== true && route.mutatesSave !== true)); const trophyLaneSafe = trophyRoute && trophyRoute.key === 'trophy_echo_route' && trophyRoute.title === 'Trophy Echo Route' && trophyRoute.locked === true && trophyRoute.playable !== true && trophyRoute.active !== true && trophyRoute.entryAvailable !== true && trophyRoute.startAvailable !== true && trophyRoute.enterAvailable !== true && trophyRoute.claimAvailable !== true && trophyRoute.completeAvailable !== true && trophyRoute.unlockAvailable !== true && trophyRoute.rewardAvailable !== true && trophyRoute.rewardTableAvailable !== true && trophyRoute.claimRecordAvailable !== true && trophyRoute.completionAvailable !== true && trophyRoute.mutatesSave !== true; const famousLaneSafe = famousGearRoute && famousGearRoute.key === 'famous_gear_route' && famousGearRoute.title === 'Famous Gear Memory Route' && famousGearRoute.locked === true && famousGearRoute.playable !== true && famousGearRoute.active !== true && famousGearRoute.entryAvailable !== true && famousGearRoute.startAvailable !== true && famousGearRoute.enterAvailable !== true && famousGearRoute.claimAvailable !== true && famousGearRoute.completeAvailable !== true && famousGearRoute.unlockAvailable !== true && famousGearRoute.rewardAvailable !== true && famousGearRoute.rewardTableAvailable !== true && famousGearRoute.claimRecordAvailable !== true && famousGearRoute.completionAvailable !== true && famousGearRoute.mutatesSave !== true; return { before, after, routes, gates, plan, trophyPlan, summary, mirror, firstLane, secondLane, checklist, report, apiKeys, forbiddenPresent, routeButtons, routeAttrs, townButtons, text, trophyRoute, famousGearRoute, previewContractSafe, trophyLaneSafe, famousLaneSafe }; })()`);
-    record('Forbidden Revisit exports are absent', audit.forbiddenPresent.length === 0, JSON.stringify(audit.forbiddenPresent));
-    record('Lockdown report passes', audit.report?.apiSurfaceSafe === true && audit.report?.forbiddenExportsRemoved === true && audit.report?.liveEntry === false && audit.report?.rewardAvailable === false && audit.report?.completionAvailable === false && audit.report?.mutatesSave === false, JSON.stringify(audit.report));
-    record('Route previews remain locked', Array.isArray(audit.routes) && audit.routes.length >= 3 && audit.routes.every(route => route.locked === true && route.playable !== true && route.active !== true), JSON.stringify(audit.routes?.map(route => ({ key:route.key, locked:route.locked }))));
-    record('Activation plan remains inert', audit.plan?.status === 'Planning only' && audit.plan?.entryAvailable === false && audit.plan?.rewardAvailable === false && audit.plan?.completionAvailable === false && audit.plan?.primaryPath === 'Enter Dungeon / Continue Run', JSON.stringify(audit.plan));
-    record('Activation summary remains preview-only', audit.summary?.currentPreviewOnly === true && audit.summary?.hasLiveEntry === false && audit.summary?.hasRewards === false && audit.summary?.hasCompletion === false, JSON.stringify(audit.summary));
-    record('Preview mirror remains inert', audit.mirror?.currentPreviewOnly === true && audit.mirror?.hasLiveEntry === false && audit.mirror?.hasRewards === false && audit.mirror?.hasCompletion === false, JSON.stringify(audit.mirror));
-    record('Revisit lanes stay planned-only', audit.firstLane?.laneKey === 'trophy-echo' && audit.firstLane?.hasLiveEntry === false && audit.secondLane?.laneKey === 'famous-gear-memory' && audit.secondLane?.hasLiveEntry === false, JSON.stringify({ firstLane:audit.firstLane, secondLane:audit.secondLane }));
-    record('Trophy Echo activation checklist remains planning-only', audit.checklist?.checklistId === 'trophy_echo_activation_checklist_v1' && audit.checklist?.laneOrder === 1 && audit.checklist?.secondLaneKey === 'famous-gear-memory' && audit.checklist?.planningOnly === true && audit.checklist?.locked === true && audit.checklist?.readOnly === true && audit.checklist?.playable === false && audit.checklist?.active === false, JSON.stringify(audit.checklist));
-    record('Trophy Echo checklist exposes no live controls or mutation', audit.checklist?.routeEntryAvailable === false && audit.checklist?.startButtonAvailable === false && audit.checklist?.rewardAvailable === false && audit.checklist?.completionAvailable === false && audit.checklist?.claimAvailable === false && audit.checklist?.mutatesSave === false && audit.checklist?.primaryPath === 'Enter Dungeon / Continue Run', JSON.stringify({ routeEntryAvailable:audit.checklist?.routeEntryAvailable, startButtonAvailable:audit.checklist?.startButtonAvailable, rewardAvailable:audit.checklist?.rewardAvailable, completionAvailable:audit.checklist?.completionAvailable, claimAvailable:audit.checklist?.claimAvailable, mutatesSave:audit.checklist?.mutatesSave, primaryPath:audit.checklist?.primaryPath }));
-    record('Trophy Echo content seed exists and stays preview-only', audit.previewContractSafe && audit.trophyLaneSafe && audit.famousLaneSafe && String(audit.trophyPlan?.previewText || '').length > 0 && Array.isArray(audit.trophyPlan?.flavorHooks) && audit.trophyPlan.flavorHooks.length >= 3 && Array.isArray(audit.trophyPlan?.echoExamples) && audit.trophyPlan.echoExamples.length >= 3 && audit.firstLane?.laneKey === 'trophy-echo' && audit.firstLane?.locked === true && audit.firstLane?.readOnly === true && audit.firstLane?.hasRewards === false && audit.firstLane?.hasCompletion === false && audit.secondLane?.laneKey === 'famous-gear-memory' && audit.secondLane?.locked === true && audit.secondLane?.readOnly === true, JSON.stringify({ trophyPlan:audit.trophyPlan, trophyRoute:audit.trophyRoute, famousGearRoute:audit.famousGearRoute, firstLane:audit.firstLane, secondLane:audit.secondLane }));
-    record('Revisit helpers do not mutate state', audit.before === audit.after, JSON.stringify({ before:audit.before, after:audit.after }));
-    record('Revisit town slot has no route controls', audit.routeButtons.length === 0 && audit.routeAttrs === 0, JSON.stringify({ routeButtons:audit.routeButtons, routeAttrs:audit.routeAttrs }));
-    record('Primary dungeon entry path remains visible', audit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(audit.townButtons));
-    record('Revisit foundation slot remains empty', audit.text.trim() === '', JSON.stringify(audit.text.slice(0, 500)));
+    const baselineAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const forbidden = ${JSON.stringify(FORBIDDEN)};
+      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
+      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
+      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
+      const forbiddenPresent = forbidden.filter(name => Object.prototype.hasOwnProperty.call(api, name));
+      return {
+        forbiddenPresent,
+        report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
+        plan: api.revisitRouteActivationPlan ? api.revisitRouteActivationPlan(S) : null,
+        summary: api.revisitRouteActivationSummary ? api.revisitRouteActivationSummary(S) : null,
+        mirror: api.revisitRoutePreviewStateSummary ? api.revisitRoutePreviewStateSummary(S) : null,
+        checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
+        firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
+        secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
+        trophyStatus: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
+        trophyRoute,
+        famousGearRoute,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo]')).length,
+        townButtons: Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    record('Forbidden Revisit exports are absent', baselineAudit.forbiddenPresent.length === 0, JSON.stringify(baselineAudit.forbiddenPresent));
+    record('Baseline Trophy Echo is locked without boss history', baselineAudit.trophyStatus?.locked === true && baselineAudit.trophyStatus?.available === false && baselineAudit.trophyStatus?.historyCount === 0 && baselineAudit.trophyRoute?.locked === true && baselineAudit.trophyRoute?.entryAvailable !== true, JSON.stringify({ trophyStatus:baselineAudit.trophyStatus, trophyRoute:baselineAudit.trophyRoute }));
+    record('Baseline town card shows locked Trophy Echo', baselineAudit.routeButtons.includes('Echo Locked') && baselineAudit.routeControls === 0 && /Locked until you have at least one boss trophy or boss record/i.test(baselineAudit.text), JSON.stringify({ routeButtons:baselineAudit.routeButtons, routeControls:baselineAudit.routeControls, text:baselineAudit.text.slice(0, 500) }));
+    record('Baseline activation audit preserves primary dungeon path', baselineAudit.plan?.primaryPath === 'Enter Dungeon / Continue Run' && baselineAudit.summary?.hasLiveEntry === false && baselineAudit.report?.apiSurfaceSafe === true && baselineAudit.report?.famousGearInactive === true, JSON.stringify({ plan:baselineAudit.plan, summary:baselineAudit.summary, report:baselineAudit.report }));
+    record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
+
+    await evalScript(client, `window.DungeonDexScenarioDevTools.clearBossTrophies(); window.DungeonDexScenarioDevTools.grantBossTrophyForTest(); return true;`);
+    const availableAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
+      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
+      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
+      return {
+        checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
+        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
+        report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
+        firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
+        trophyRoute,
+        famousGearRoute,
+        routes,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo]')).length,
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    const unrelatedRoutesInactive = Array.isArray(availableAudit.routes) && availableAudit.routes.filter(route => String(route?.key || '') !== 'trophy_echo_route').every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
+    record('Trophy Echo becomes available with boss history', availableAudit.status?.available === true && availableAudit.status?.locked === false && availableAudit.status?.historyCount >= 1 && availableAudit.trophyRoute?.playable === true && availableAudit.trophyRoute?.entryAvailable === true && availableAudit.trophyRoute?.startAvailable === true, JSON.stringify({ status:availableAudit.status, trophyRoute:availableAudit.trophyRoute }));
+    record('Town card exposes Start Trophy Echo and keeps Famous Gear inactive', availableAudit.routeButtons.includes('Start Trophy Echo') && availableAudit.routeControls >= 1 && /Famous Gear Memory[\s\S]*Planned/i.test(availableAudit.text) && availableAudit.famousGearRoute?.playable !== true && availableAudit.famousGearRoute?.entryAvailable !== true && unrelatedRoutesInactive, JSON.stringify({ routeButtons:availableAudit.routeButtons, famousGearRoute:availableAudit.famousGearRoute, routes:availableAudit.routes }));
+    record('Checklist and lane metadata reflect first live Revisit lane', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearInactive === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, report:availableAudit.report }));
+
+    const startedAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.startTrophyEcho ? api.startTrophyEcho(S) : null;
+      if (typeof render === 'function') render();
+      return {
+        result,
+        active: api.activeTrophyEcho ? api.activeTrophyEcho(S) : null,
+        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: JSON.stringify(S.player?.revisitState || null),
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    record('Trophy Echo can start and creates an active echo state', !!startedAudit.result && startedAudit.status?.active === true && startedAudit.active?.routeKey === 'trophy_echo_route' && /Resolve Echo/i.test(startedAudit.routeButtons.join(' ')), JSON.stringify(startedAudit));
+    record('Active Trophy Echo shows readable boss-memory flavor', /Active memory:/i.test(startedAudit.text) && /Echo/i.test(startedAudit.text) && /Resolve Echo/i.test(startedAudit.text), JSON.stringify(startedAudit.text.slice(0, 500)));
+
+    const completedAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.completeTrophyEcho ? api.completeTrophyEcho(S) : null;
+      if (typeof render === 'function') render();
+      return {
+        result,
+        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
+        summary: api.trophyEchoResultSummary ? api.trophyEchoResultSummary(S) : null,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null,
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    record('Trophy Echo can complete and records history', !!completedAudit.result && completedAudit.status?.active === false && completedAudit.summary?.completedAt > 0 && Array.isArray(completedAudit.revisitState?.trophyEcho?.history) && completedAudit.revisitState.trophyEcho.history.length >= 1 && completedAudit.revisitState.trophyEcho.memoryMarks >= 1, JSON.stringify(completedAudit));
+    record('Completion shows a result summary and reopens the lane', /Last Result:/i.test(completedAudit.text) && completedAudit.routeButtons.includes('Start Trophy Echo') && /Memory Mark/i.test(completedAudit.text), JSON.stringify(completedAudit.text.slice(0, 500)));
+    record('Debt stays unchanged and Trophy Echo does not alter Talent state beyond existing boss-trophy award rules', baselineAudit.debtSnapshot === availableAudit.debtSnapshot && availableAudit.debtSnapshot === startedAudit.debtSnapshot && startedAudit.debtSnapshot === completedAudit.debtSnapshot && availableAudit.talentSnapshot === startedAudit.talentSnapshot && startedAudit.talentSnapshot === completedAudit.talentSnapshot, JSON.stringify({ debt:[baselineAudit.debtSnapshot, availableAudit.debtSnapshot, startedAudit.debtSnapshot, completedAudit.debtSnapshot], talent:[availableAudit.talentSnapshot, startedAudit.talentSnapshot, completedAudit.talentSnapshot] }));
+
+    await client.send('Page.reload', { ignoreCache:true });
+    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Trophy Echo reload.');
+    const reloadAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      return {
+        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
+        summary: api.trophyEchoResultSummary ? api.trophyEchoResultSummary(S) : null,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null
+      };
+    })()`);
+    record('Completion persists after save and reload', reloadAudit.status?.memoryMarks >= 1 && Array.isArray(reloadAudit.revisitState?.trophyEcho?.history) && reloadAudit.revisitState.trophyEcho.history.length >= 1 && reloadAudit.summary?.rewardMark >= 1 && reloadAudit.routeButtons.includes('Start Trophy Echo'), JSON.stringify(reloadAudit));
+    record('Reloaded state keeps Famous Gear inactive and Trophy Echo available', /Famous Gear Memory[\s\S]*Planned/i.test(reloadAudit.text) && reloadAudit.status?.available === true && reloadAudit.status?.active === false, JSON.stringify(reloadAudit.text.slice(0, 500)));
     record('No console or runtime errors', consoleErrors.length === 0 && runtimeErrors.length === 0, JSON.stringify({ consoleErrors, runtimeErrors }));
   } finally {
     if (client) {

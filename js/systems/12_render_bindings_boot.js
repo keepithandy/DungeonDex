@@ -218,6 +218,16 @@
     $$('[data-buy]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantItem(S, btn.dataset.buy); render(); }));
     $$('[data-buy-district]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyDistrictWare(S, btn.dataset.buyDistrict); render(); }));
     $$('[data-start-contract]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startEliteContract(S, btn.dataset.startContract); render(); }));
+    $$('[data-start-revisit]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (typeof startRevisitRoute !== 'function') return;
+      startRevisitRoute(S, btn.dataset.startRevisit);
+      render();
+    }));
+    $$('[data-complete-trophy-echo]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (typeof completeTrophyEchoRoute !== 'function') return;
+      completeTrophyEchoRoute(S);
+      render();
+    }));
     bindInventoryActions();
     bindCombatActions();
     if (el('refreshMerchantBtn')) el('refreshMerchantBtn').onclick = () => runGuardedAction(() => { rollMerchant(S); render(); });
