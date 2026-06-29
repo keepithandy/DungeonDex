@@ -7,21 +7,21 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.0 - Trophy Echo Playable Prototype
+- DungeonDex v1.23.1 - Trophy Echo Prototype Stabilization
 
-## v1.23.0 Trophy Echo Playable Prototype
+## v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo is now the first live Revisit lane.
 - It appears in town, locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history plus Memory Marks in save data.
 - Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active primary dungeon path.
 
 ## v1.21.x Remaining Board Cleanup Notes
 - Issue #12: Debt Collector Clarity is selected as a design-ready display/copy-only passive candidate, but live activation remains blocked until a separate activation issue explicitly authorizes renderer wiring.
-- Issue #13 is resolved by v1.23.0 for Trophy Echo only. Other Revisit lanes remain inactive.
+- Issue #13 is resolved by v1.23.0 for Trophy Echo only. v1.23.1 stabilizes that lane without expanding it. Other Revisit lanes remain inactive.
 - Issue #15: Mobile Talent/status copy should keep chips short, separate locked-preview text from spend-readiness text, and avoid implying broad Talent activation.
 - Issue #17: The selected second passive candidate is `debt_collector_clarity`; no second Talent spend target or passive activation is added by the selection note.
 - Issues #19/#20: HTML shell work may add safer semantics and inert templates only; all current screen IDs, tab `data-screen` values, classic script load order, build query strings, and runtime renderer ownership stay intact.
 
-## v1.23.0 Revisit Activation Contract
+## v1.23.1 Revisit Activation Contract
 - Trophy Echo is now the first live Revisit lane and uses boss trophy or boss record history as its qualifying source.
 - Live fields now include an active echo state, completion history, deterministic completion keys, a last-result summary, and a Revisit-only Memory Mark counter under `player.revisitState.trophyEcho`.
 - Famous Gear Memory remains inactive, and other Revisit hooks remain planning-only.
@@ -31,8 +31,8 @@
 - Malformed ledger handling, duplicate spend blocking, negative-point clamping, and reload persistence are covered by the existing controlled spend hardening audit and smoke checks.
 - No additional Talent nodes, respec, passive bonuses, combat effects, economy effects, or Revisit effects were introduced.
 
-## v1.23.0 Trophy Echo Playable Smoke
-- Current baseline: v1.23.0.
+## v1.23.1 Trophy Echo Prototype Stabilization Smoke
+- Current baseline: v1.23.1.
 - Trophy Echo is locked with no boss history, opens with boss history, starts, completes, records history, and persists after reload.
 - Famous Gear Memory remains inactive, and Talent, Debt, combat, gear, and monster systems remain outside the patch scope.
 

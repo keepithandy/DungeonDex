@@ -746,7 +746,7 @@
       routeKey: 'trophy_echo_route',
       historyCount: history.length,
       memoryMarks: Math.max(0, Math.floor(numberOr(revisitState.trophyEcho?.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER))),
-      completedCount: Object.keys(revisitState.trophyEcho?.completedKeys || {}).filter(key => revisitState.trophyEcho.completedKeys[key] === true).length,
+      completedCount: Object.keys(revisitState.trophyEcho?.completedKeys || {}).filter(key => /^trophy_echo:[^:]+$/i.test(String(key || '').trim()) && revisitState.trophyEcho.completedKeys[key] === true).length,
       locked: history.length <= 0,
       available: history.length > 0,
       active: !!active,
@@ -1842,6 +1842,7 @@
     const safeKey = String(routeKey || '').trim();
     if (safeKey !== 'trophy_echo_route') return null;
     const revisitState = ensureRevisitStateShape(state);
+    if (revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object') return null;
     const status = trophyEchoStatusModel(state);
     const source = status.source;
     if (!source) return null;
@@ -1921,7 +1922,7 @@
       : null;
     if (!active || String(revisitState.activeRouteKey || '').trim() !== 'trophy_echo_route') return null;
     const completionKey = String(active.completionKey || trophyEchoCompletionKey(active)).trim();
-    if (!completionKey) return null;
+    if (!completionKey || !/^trophy_echo:[^:]+$/i.test(completionKey)) return null;
     const firstCompletion = revisitState.trophyEcho.completedKeys[completionKey] !== true;
     const rewardMark = firstCompletion ? 1 : 0;
     if (firstCompletion) revisitState.trophyEcho.memoryMarks = Math.max(0, Math.floor(numberOr(revisitState.trophyEcho.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER))) + 1;

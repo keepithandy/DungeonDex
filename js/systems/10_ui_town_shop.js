@@ -17,7 +17,7 @@
       ? cleanDisplayText(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
       : status.locked
         ? 'Locked until you have at least one boss trophy or boss record.'
-        : `${bossName} is ready to answer as a memory echo.`;
+        : `${bossName} is ready as the only playable Revisit lane.`;
     const flavor = active
       ? cleanDisplayText(active.reflection || '', '')
       : status.locked
@@ -58,7 +58,7 @@
             <strong>Famous Gear Memory</strong>
             <span class="small muted">Planned</span>
           </div>
-          <p class="small muted">Archive memory remains inactive in this patch.</p>
+          <p class="small muted">Planned only. This lane remains inactive in this patch.</p>
         </article>
       </section>`;
   }

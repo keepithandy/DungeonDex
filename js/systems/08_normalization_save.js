@@ -529,7 +529,8 @@
     if (!isPlainObject(value)) return map;
     Object.keys(value).forEach(key => {
       const cleanKey = String(key || '').trim().slice(0, 80);
-      if (cleanKey) map[cleanKey] = value[key] === true;
+      if (!cleanKey || !/^trophy_echo:[^:]+$/i.test(cleanKey)) return;
+      map[cleanKey] = value[key] === true;
     });
     return map;
   }
@@ -562,10 +563,11 @@
     if (!isPlainObject(value)) return null;
     const routeKey = normalizeRevisitText(value.routeKey || 'trophy_echo_route', 'trophy_echo_route', 40);
     const trophyId = normalizeRevisitText(value.trophyId || value.sourceTrophyId || '', '', 80);
-    if (!trophyId) return null;
+    const completionKey = normalizeRevisitText(value.completionKey || `trophy_echo:${trophyId}`, `trophy_echo:${trophyId}`, 80);
+    if (!trophyId || !/^trophy_echo:[^:]+$/i.test(completionKey)) return null;
     return {
       routeKey,
-      completionKey: normalizeRevisitText(value.completionKey || `trophy_echo:${trophyId}`, `trophy_echo:${trophyId}`, 80),
+      completionKey,
       trophyId,
       recordId: normalizeRevisitText(value.recordId || '', '', 80),
       trophyName: normalizeRevisitText(value.trophyName || value.memoryTitle || 'Boss Trophy', 'Boss Trophy', 60),

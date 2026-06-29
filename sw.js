@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.0-trophy-echo-playable-prototype';
+const CACHE_NAME = 'dungeondex-v1.23.1-trophy-echo-prototype-stabilization';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.0-trophy-echo-playable-prototype';
+const BUILD_QS = '1.23.1-trophy-echo-prototype-stabilization';
 const ASSETS = [
   './',
   './index.html',

@@ -5,7 +5,7 @@
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.23.0-trophy-echo-playable-prototype';
+  const BUILD = '1.23.1-trophy-echo-prototype-stabilization';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const forbiddenExportNames = Object.freeze([
     'can' + 'Start' + 'Revisit' + 'Route',

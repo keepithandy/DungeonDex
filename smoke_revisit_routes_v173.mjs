@@ -151,6 +151,13 @@ async function main(){
     })()`);
     record('Trophy Echo can start and creates an active echo state', !!startedAudit.result && startedAudit.status?.active === true && startedAudit.active?.routeKey === 'trophy_echo_route' && /Resolve Echo/i.test(startedAudit.routeButtons.join(' ')), JSON.stringify(startedAudit));
     record('Active Trophy Echo shows readable boss-memory flavor', /Active memory:/i.test(startedAudit.text) && /Echo/i.test(startedAudit.text) && /Resolve Echo/i.test(startedAudit.text), JSON.stringify(startedAudit.text.slice(0, 500)));
+    const duplicateStartAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.startTrophyEcho ? api.startTrophyEcho(S) : null;
+      if (typeof render === 'function') render();
+      return { result, status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null, revisitState: S.player?.revisitState || null };
+    })()`);
+    record('Duplicate Trophy Echo start is blocked while active', duplicateStartAudit.result === null && duplicateStartAudit.status?.active === true && duplicateStartAudit.revisitState?.trophyEcho?.active?.routeKey === 'trophy_echo_route', JSON.stringify(duplicateStartAudit));
 
     const completedAudit = await evalByValue(client, `(() => {
       const api = window.DungeonDexEliteContracts || {};
@@ -169,6 +176,13 @@ async function main(){
     })()`);
     record('Trophy Echo can complete and records history', !!completedAudit.result && completedAudit.status?.active === false && completedAudit.summary?.completedAt > 0 && Array.isArray(completedAudit.revisitState?.trophyEcho?.history) && completedAudit.revisitState.trophyEcho.history.length >= 1 && completedAudit.revisitState.trophyEcho.memoryMarks >= 1, JSON.stringify(completedAudit));
     record('Completion shows a result summary and reopens the lane', /Last Result:/i.test(completedAudit.text) && completedAudit.routeButtons.includes('Start Trophy Echo') && /Memory Mark/i.test(completedAudit.text), JSON.stringify(completedAudit.text.slice(0, 500)));
+    const duplicateCompleteAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.completeTrophyEcho ? api.completeTrophyEcho(S) : null;
+      if (typeof render === 'function') render();
+      return { result, status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null, revisitState: S.player?.revisitState || null };
+    })()`);
+    record('Duplicate Trophy Echo resolve is blocked after completion', duplicateCompleteAudit.result === null && duplicateCompleteAudit.status?.active === false && duplicateCompleteAudit.revisitState?.trophyEcho?.memoryMarks === completedAudit.revisitState?.trophyEcho?.memoryMarks, JSON.stringify(duplicateCompleteAudit));
     record('Debt stays unchanged and Trophy Echo does not alter Talent state beyond existing boss-trophy award rules', baselineAudit.debtSnapshot === availableAudit.debtSnapshot && availableAudit.debtSnapshot === startedAudit.debtSnapshot && startedAudit.debtSnapshot === completedAudit.debtSnapshot && availableAudit.talentSnapshot === startedAudit.talentSnapshot && startedAudit.talentSnapshot === completedAudit.talentSnapshot, JSON.stringify({ debt:[baselineAudit.debtSnapshot, availableAudit.debtSnapshot, startedAudit.debtSnapshot, completedAudit.debtSnapshot], talent:[availableAudit.talentSnapshot, startedAudit.talentSnapshot, completedAudit.talentSnapshot] }));
 
     await client.send('Page.reload', { ignoreCache:true });

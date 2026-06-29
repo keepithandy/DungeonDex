@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.0**
+Current baseline: **DungeonDex v1.23.1**
 
 ## Revisit Status
 
@@ -14,9 +14,9 @@ Famous Gear Memory stays the second planned lane as inert metadata only, and Ent
 
 ## Current Build
 
-**v1.23.0 - Trophy Echo Playable Prototype**
+**v1.23.1 - Trophy Echo Prototype Stabilization**
 
-This patch activates the first playable Revisit loop. Trophy Echo can lock against missing boss history, open from real boss records, start an active memory, resolve in town, record completion history, and persist Memory Marks across reloads.
+This patch hardens the first playable Revisit loop. Trophy Echo still locks against missing boss history, opens from real boss records, starts an active memory, resolves in town, records completion history, and persists Memory Marks across reloads.
 
 No dungeon combat path, debt math, gear stats, monster scaling, or broader Talent activation was added.
 
