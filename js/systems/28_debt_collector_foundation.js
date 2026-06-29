@@ -155,6 +155,7 @@
   function debtCollectorClarityRendererCopyModel(state){
     const talents = window.DungeonDexTalents || window.DungeonDexWardenTalents;
     const source = debtCollectorRendererCopySource(state);
+    // Copy-model only: this does not wire gameplay, it only forwards renderer-safe text.
     return typeof talents?.debtCollectorClarityRendererCopyModel === 'function'
       ? talents.debtCollectorClarityRendererCopyModel(state, source)
       : source;

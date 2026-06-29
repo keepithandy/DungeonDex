@@ -102,6 +102,17 @@
 - `passiveReady` means learned and eligible for read-only preview copy. `passiveEnabled` means consumed by a live renderer. `appliesEffect` is reserved for gameplay/state changes. `liveRendererWired` means intentional live renderer integration.
 - Hunter Board clarity remains on its existing Elite Board copy-only surface with no gameplay effect.
 
+## Talent Contract Vocabulary
+- `passiveReady`: learned and eligible for read-only contract or preview copy.
+- `passiveEnabled`: the copy surface is allowed to use the passive contract; this does not imply gameplay activation.
+- `appliesEffect`: reserved for real gameplay or state changes.
+- `liveRendererWired`: the renderer helper is intentionally connected; for Debt Collector clarity this remains locked unless explicitly activated.
+- `preview` / `dry run`: read-only contract inspection only; no save mutation, no point spending, no live activation.
+- `learned state`: the node has been learned in save data.
+- `spend state`: the controlled spend path has been used and updated the saved point ledger.
+- `contract helper`: a read-only helper that reports contract readiness or copy rules.
+- `renderer helper`: a copy-rendering helper that formats text for an existing surface without widening gameplay.
+
 ## v1.20.33 Revisit Activation Surface Lockdown
 - Fully de-exported dormant Revisit start/active-summary API surfaces from `window.DungeonDexEliteContracts`.
 - Revisit remains planning-only; Enter Dungeon / Continue Run remains the only active dungeon entry path.

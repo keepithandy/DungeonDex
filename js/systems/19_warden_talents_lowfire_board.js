@@ -1007,7 +1007,7 @@
     });
   }
 
-  // Ready means learned; enabled means consumed live; appliesEffect is reserved for gameplay changes.
+  // Ready means learned for read-only contract checks; enabled means the copy surface may use the passive contract; appliesEffect stays reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
     const resolvedNodeKey = 'hunter_board_clarity';
     const stateContract = talentNodeStateContract(resolvedNodeKey, state, {
