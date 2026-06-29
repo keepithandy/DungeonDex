@@ -301,15 +301,15 @@
   ];
 
   const DISTRICT_DATA = [
-    { id:'lowfire', min:1, max:10, name:'Lowfire District', line:'Where every debt starts warm.', tone:'lowfire', mood:'Warm embers, close markets, shallow debts.' },
-    { id:'ashgate', min:11, max:20, name:'Ashgate Warrens', line:'The walls remember every retreat.', tone:'ashgate', mood:'Coal smoke, narrow paths, bargain lanterns.' },
-    { id:'ember-debtworks', min:21, max:30, name:'Ember Debtworks', line:'Nothing burns here unless it owes.', tone:'debtworks', mood:'Chains, ledgers, red worklight.' },
-    { id:'cinderbone', min:41, max:50, name:'Cinderbone Halls', line:'Old champions become architecture.', tone:'cinderbone', mood:'Bone pillars and furnace glow.' },
-    { id:'blacktithe', min:51, max:60, name:'Blacktithe Deep', line:'Every step is counted twice.', tone:'blacktithe', mood:'Gold shadow, sealed doors, heavy tolls.' },
-    { id:'lanternless', min:61, max:70, name:'Lanternless Vault', line:'Hope is stored here, unpaid.', tone:'lanternless', mood:'Dim vaults and dead lampglass.' },
-    { id:'hunger-kilns', min:71, max:80, name:'The Hunger Kilns', line:'The Stair learns what you need.', tone:'hunger', mood:'Open heat, empty racks, watching mouths.' },
-    { id:'redwake', min:81, max:90, name:'Redwake Catacombs', line:'The dead do not rest. They accrue.', tone:'redwake', mood:'Red water and bone invoices.' },
-    { id:'final-lowflame', min:91, max:100, name:'The Final Lowflame', line:'The first ember waits at the bottom.', tone:'final-lowflame', mood:'A small flame under impossible weight.' }
+    { id:'lowfire', min:1, max:10, name:'Lowfire District', line:'Lamps stay low and debts stay warm.', tone:'lowfire', mood:'Warm lamps, close markets, shallow hauls.' },
+    { id:'ashgate', min:11, max:20, name:'Ashgate Warrens', line:'Every wall is scraped by retreat.', tone:'ashgate', mood:'Coal smoke, narrow paths, scraped stone.' },
+    { id:'ember-debtworks', min:21, max:30, name:'Ember Debtworks', line:'Chains tick like ledgers closing.', tone:'debtworks', mood:'Red worklight, iron ledgers, closing chains.' },
+    { id:'cinderbone', min:41, max:50, name:'Cinderbone Halls', line:'Old champions become furnace architecture.', tone:'cinderbone', mood:'Champion dust, bone pillars, furnace glow.' },
+    { id:'blacktithe', min:51, max:60, name:'Blacktithe Deep', line:'Every step is counted like grave coin.', tone:'blacktithe', mood:'Grave tolls, sealed doors, heavy shadow.' },
+    { id:'lanternless', min:61, max:70, name:'Lanternless Vault', line:'Hope is stored here without flame.', tone:'lanternless', mood:'Sealed quiet, cold glass, dead lamplight.' },
+    { id:'hunger-kilns', min:71, max:80, name:'The Hunger Kilns', line:'The Stair waits for tribute in the heat.', tone:'hunger', mood:'Open heat, empty racks, watching mouths.' },
+    { id:'redwake', min:81, max:90, name:'Redwake Catacombs', line:'The dead do not rest; they accrue.', tone:'redwake', mood:'Red water, bone invoices, wet stone.' },
+    { id:'final-lowflame', min:91, max:100, name:'The Final Lowflame', line:'The first ember waits under impossible weight.', tone:'final-lowflame', mood:'Small light, deep silence, impossible weight.' }
   ];
 
   const BOSS_FLOOR_NAMES = {

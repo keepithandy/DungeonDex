@@ -114,81 +114,81 @@
       lowfire: {
         key: 'lowfire',
         name: 'Lowfire District',
-        subtitle: 'Warm start, shallow haul.',
-        shortFlavor: 'The first district keeps its lamps low and its debts warm.',
-        bossApproachLine: 'Boss approach: the Stair keeps tightening.',
+        subtitle: 'Warm lamps, shallow haul.',
+        shortFlavor: 'Lowfire keeps its markets close and its debts warm.',
+        bossApproachLine: 'Boss approach: the lamps gutter lower.',
         safeFallback: false
       },
       ashgate: {
         key: 'ashgate',
         name: 'Ashgate Warrens',
-        subtitle: 'Narrow paths.',
-        shortFlavor: 'The warrens stay tight and smoky.',
-        bossApproachLine: 'Boss approach: ash closes the distance.',
+        subtitle: 'Narrow paths, scraped walls.',
+        shortFlavor: 'Ashgate presses the stair into tight, smoky turns.',
+        bossApproachLine: 'Boss approach: ash closes around the landing.',
         safeFallback: false
       },
       'ember-debtworks': {
         key: 'ember-debtworks',
         name: 'Ember Debtworks',
-        subtitle: 'Chains and ledgers.',
-        shortFlavor: 'The lower halls glow like an open ledger.',
-        bossApproachLine: 'Boss approach: the lamps burn harder.',
+        subtitle: 'Chains, ledgers, red worklight.',
+        shortFlavor: 'The Debtworks glow like an open ledger under heat.',
+        bossApproachLine: 'Boss approach: chains tick faster below.',
         safeFallback: false
       },
       sootveil: {
         key: 'sootveil',
         name: 'Sootveil Depths',
-        subtitle: 'Smoke-thick.',
-        shortFlavor: 'Soot hides the old stair cuts.',
-        bossApproachLine: 'Boss approach: the light drops first.',
+        subtitle: 'Smoke-thick, light-starved.',
+        shortFlavor: 'Sootveil hides the old stair cuts under dead ash.',
+        bossApproachLine: 'Boss approach: the light thins before the room opens.',
         safeFallback: false
       },
       cinderbone: {
         key: 'cinderbone',
         name: 'Cinderbone Halls',
-        subtitle: 'Old stone.',
-        shortFlavor: 'Older victories still heat the ash.',
-        bossApproachLine: 'Boss approach: the walls sound hollow.',
+        subtitle: 'Old stone, champion dust.',
+        shortFlavor: 'Cinderbone keeps old victories warm in the ash.',
+        bossApproachLine: 'Boss approach: hollow walls answer the blade.',
         safeFallback: false
       },
       blacktithe: {
         key: 'blacktithe',
-        name: 'Blacktithe Reliquary',
-        subtitle: 'Grave tolls.',
-        shortFlavor: 'Every chamber still feels taxed.',
-        bossApproachLine: 'Boss approach: the toll grows louder.',
+        name: 'Blacktithe Deep',
+        subtitle: 'Grave tolls, sealed doors.',
+        shortFlavor: 'Blacktithe counts every step like coin in a grave.',
+        bossApproachLine: 'Boss approach: the toll answers from below.',
         safeFallback: false
       },
       lanternless: {
         key: 'lanternless',
-        name: 'Lanternless Vaults',
-        subtitle: 'Sealed quiet.',
-        shortFlavor: 'The vaults keep the light out.',
-        bossApproachLine: 'Boss approach: the dark turns deliberate.',
+        name: 'Lanternless Vault',
+        subtitle: 'Sealed quiet, dead lampglass.',
+        shortFlavor: 'The Lanternless Vault stores hope where flame cannot reach.',
+        bossApproachLine: 'Boss approach: the dark begins to choose a shape.',
         safeFallback: false
       },
       'hunger-kilns': {
         key: 'hunger-kilns',
-        name: 'Hunger Kilns',
-        subtitle: 'Hot vents.',
-        shortFlavor: 'The kilns breathe like they’re hungry.',
-        bossApproachLine: 'Boss approach: heat rises first.',
+        name: 'The Hunger Kilns',
+        subtitle: 'Open heat, empty racks.',
+        shortFlavor: 'The Hunger Kilns breathe like they are waiting for tribute.',
+        bossApproachLine: 'Boss approach: heat rises before the name does.',
         safeFallback: false
       },
       redwake: {
         key: 'redwake',
-        name: 'Redwake Channels',
-        subtitle: 'Wet stone.',
-        shortFlavor: 'The channels pull like old blood in water.',
-        bossApproachLine: 'Boss approach: the current turns early.',
+        name: 'Redwake Catacombs',
+        subtitle: 'Red water, bone invoices.',
+        shortFlavor: 'Redwake water moves under the stones like old blood.',
+        bossApproachLine: 'Boss approach: the current turns against you.',
         safeFallback: false
       },
       'final-lowflame': {
         key: 'final-lowflame',
-        name: 'Lowflame Deep',
-        subtitle: 'Small light.',
-        shortFlavor: 'The last stretch keeps the flame low.',
-        bossApproachLine: 'Boss approach: the Stair nears its end.',
+        name: 'The Final Lowflame',
+        subtitle: 'Small light, impossible weight.',
+        shortFlavor: 'The Final Lowflame burns small beneath the whole Stair.',
+        bossApproachLine: 'Boss approach: the Stair goes quiet at the bottom.',
         safeFallback: false
       }
     };
@@ -238,16 +238,16 @@
   function districtArrivalLine(district) {
     if (!district) return 'A new stretch of stair opens beneath your boots.';
     const arrivals = {
-      lowfire: 'The Lowfire lamps gutter behind you.',
-      ashgate: 'Ashgate narrows around the stair; every wall feels scraped by retreat.',
+      lowfire: 'The Lowfire lamps gutter behind you, close enough to feel owned.',
+      ashgate: 'Ashgate narrows around the stair; every wall is scraped by retreat.',
       'ember-debtworks': 'The Debtworks glow red below; chains tick like ledgers closing.',
-      sootveil: 'Sootveil swallows the light and leaves only your breathing.',
+      sootveil: 'Sootveil swallows the light and leaves only breath and ash.',
       cinderbone: 'Cinderbone Halls open in furnace heat and old champion dust.',
       blacktithe: 'Blacktithe weighs each step like coin dropped into a grave.',
       lanternless: 'The Lanternless Vault answers with cold glass and no flame.',
-      'hunger-kilns': 'The Hunger Kilns breathe open, hot and empty.',
+      'hunger-kilns': 'The Hunger Kilns breathe open, hot and empty-handed.',
       redwake: 'Redwake water moves under the stones before you see it.',
-      'final-lowflame': 'The Final Lowflame burns small, stubborn, and impossibly deep.'
+      'final-lowflame': 'The Final Lowflame burns small under impossible weight.'
     };
     return arrivals[district.id] || district.line || 'A new district answers the descent.';
   }
