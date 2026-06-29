@@ -243,6 +243,15 @@
     const rendererCopy = debtCollectorClarityRendererCopyModel(state);
     const passiveContract = debtCollectorClarityPassiveContract(state);
     const liveRendererWired = passiveContract?.learned === true && passiveContract?.liveRendererWired === true;
+    const clarityLearned = passiveContract?.learned === true;
+    const clarityStatusText = liveRendererWired
+      ? 'Clarity: learned copy-only'
+      : clarityLearned
+        ? 'Clarity: learned helper only'
+        : 'Clarity: locked';
+    const clarityDetailText = liveRendererWired
+      ? 'Debt Collector Clarity is display text only; debt math, pressure, repayment, and economy stay unchanged.'
+      : 'Debt Collector Clarity is not active here; debt math, pressure, repayment, and economy stay unchanged.';
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     const canRepay = debt.balanceCopper > 0 && wallet > 0;
@@ -272,7 +281,9 @@
       <span class="pill debt-collector-chip ${summary.active ? 'debt-collector-chip-active' : ''}">${escapeHtml(statusText)}</span>
       <span class="pill debt-collector-chip">${escapeHtml(balanceText)}</span>
       <span class="pill debt-collector-chip">${escapeHtml(pressureText)}${pressureDetail ? ` • ${escapeHtml(pressureDetail)}` : ''}</span>
+      <span class="pill debt-collector-chip">${escapeHtml(clarityStatusText)}</span>
     </div>
+    <p class="small muted debt-collector-terms">${escapeHtml(clarityDetailText)}</p>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
       <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>

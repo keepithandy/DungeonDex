@@ -1488,6 +1488,19 @@
     return 'First Talent source: Boss Trophy Milestone.';
   }
 
+  function talentNextProgressionText(model, ledgerSummary){
+    const available = Math.max(0, Math.floor(N(ledgerSummary?.availablePoints, 0, 0, Number.MAX_SAFE_INTEGER)));
+    if (model?.learned === true) return 'Next: Hunter Board Clarity is learned; the wider Talent tree remains locked preview.';
+    if (model?.enabled === true && model?.blockedReason === 'ready') return 'Next: spend 1 Talent Point on Hunter Board Clarity when you want clearer Elite Board copy.';
+    if (available <= 0) return 'Next: earn a Boss Trophy Milestone point, then spend it on Hunter Board Clarity.';
+    return 'Next: Hunter Board Clarity is the only current spend target; other nodes stay locked.';
+  }
+
+  function talentActiveStatusText(model){
+    if (model?.learned === true) return 'Active: Hunter Board Clarity display copy on the Elite Board.';
+    return 'Active: Boss Trophy point source and the controlled Hunter Board Clarity spend path.';
+  }
+
   function talentPreviewNodeMarkup(node, branch){
     return `<article class="talent-preview-node is-locked">
       <div class="talent-path-head">
@@ -1528,6 +1541,8 @@
     const spendLearnedText = talentSpendUiLearnedText(readiness);
     const spendEffectText = talentSpendUiEffectText(readiness);
     const spendSourceText = talentSpendUiSourceText();
+    const talentNextText = talentNextProgressionText(readiness, ledgerSummary);
+    const talentActiveText = talentActiveStatusText(readiness);
     const spendButtonBusy = readiness?.enabled === true && readiness?.blockedReason === 'ready' && readiness?.renderButtonNow === false ? false : false;
     panel.innerHTML = `
       <div class="card-head talent-head">
@@ -1545,7 +1560,14 @@
       </div>
       <div class="talent-preview-banner small">
         <strong>Locked preview</strong>
-        <span>Planning only. No earning, spending, or bonuses.</span>
+        <span>Wider tree planning only. No broad purchases, unlocks, or bonuses.</span>
+      </div>
+      <div class="talent-summary-row small muted" aria-label="Talent system status">
+        <span>${H(talentActiveText)}</span>
+        <span>${H(readiness?.learned === true ? 'Learned: Hunter Board Clarity' : 'Learned: none yet')}</span>
+        <span>Preview: wider tree and future passives</span>
+        <span>Locked: all other nodes, bonuses, and respec</span>
+        <span>${H(talentNextText)}</span>
       </div>
       <section class="talent-ledger-card">
         <div class="split talent-ledger-head">
@@ -1626,6 +1648,7 @@
           <span>${H(spendStatusDisabled)}</span>
           <span>${H(spendActionLabel)}</span>
           <span>${spendButtonVisible ? 'Hunter Board only' : 'Inactive'}</span>
+          <span>${H(talentNextText)}</span>
         </div>
         <div class="talent-milestone-line small" aria-label="Spend readiness status">
           <span>${H(spendStatusText)}</span>
