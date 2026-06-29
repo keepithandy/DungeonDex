@@ -152,7 +152,7 @@ Key files:
 Why it matters:
 
 - Debt Collector clarity is the most likely place to accidentally cross from display-copy into live renderer wiring.
-- The current code already has explicit `liveRendererWired` language, so stale comments here can mislead future agents.
+- The current code already has explicit `liveRendererWired` language, so stale comments here can mislead future agents if they read it as a gameplay switch.
 
 Key files:
 
