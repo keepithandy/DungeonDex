@@ -13,6 +13,7 @@
     { label: 'Borrow 25s', amount: coinValue(0, 25, 0) }
   ];
   const PRESSURE_RELIEF_PER_REPAYMENT = 1;
+  const HIGH_PRESSURE_THRESHOLD = 3;
 
   function coinValue(gold = 0, silver = 0, copper = 0){
     if (typeof coins === 'function') return coins(gold, silver, copper);
@@ -63,6 +64,29 @@
     return normalizeDebt(state && state.player ? state.player.debtCollector : null);
   }
 
+  function highPressureStateForDebt(debt){
+    const pressure = Math.max(0, Math.floor(Number(debt?.pressure) || 0));
+    const highPressureActive = pressure >= HIGH_PRESSURE_THRESHOLD;
+    return {
+      highPressureThreshold: HIGH_PRESSURE_THRESHOLD,
+      highPressureActive,
+      borrowingBlockedByPressure: highPressureActive,
+      pressure
+    };
+  }
+
+  function debtCollectorHighPressureState(state){
+    return highPressureStateForDebt(debtState(state));
+  }
+
+  function underCollectionCopy(){
+    return `Under Collection: borrowing is paused until pressure drops below ${HIGH_PRESSURE_THRESHOLD}.`;
+  }
+
+  function underCollectionActionCopy(){
+    return 'Repay to ease pressure and restore normal terms.';
+  }
+
   function addDebtNote(debt, note){
     if (!debt) return;
     const clean = safeText(note).slice(0, 80);
@@ -75,12 +99,13 @@
   function pressureWarning(debt){
     if (!debt || debt.balanceCopper <= 0) return 'The ledger is quiet. No debt pressure is active.';
     if (debt.pressure <= 1) return 'Debt pressure is active: a collector has been asking around.';
-    if (debt.pressure <= 3) return 'Debt pressure is active: the ledger grows heavier.';
-    return 'Debt pressure is active: someone remembers what you owe.';
+    if (debt.pressure < HIGH_PRESSURE_THRESHOLD) return 'Debt pressure is active: the ledger grows heavier.';
+    return underCollectionCopy();
   }
 
   function debtCollectorDisplaySummary(state){
     const debt = debtState(state);
+    const pressureState = highPressureStateForDebt(debt);
     return {
       title: 'Debt Collector',
       summary: debt.balanceCopper > 0 ? 'Active debt. Pressure is visible.' : 'No active debt. Pressure is quiet.',
@@ -92,20 +117,28 @@
       active: debt.active === true,
       balanceCopper: debt.balanceCopper,
       pressure: debt.pressure,
+      highPressureThreshold: pressureState.highPressureThreshold,
+      highPressureActive: pressureState.highPressureActive,
+      borrowingBlockedByPressure: pressureState.borrowingBlockedByPressure,
       notes: Array.isArray(debt.notes) ? debt.notes.slice() : []
     };
   }
 
   function debtPressureDisplay(state){
     const debt = debtState(state);
-    if (debt.balanceCopper <= 0) return { label: 'Pressure 0', detail: 'Quiet', active: false };
-    if (debt.pressure <= 1) return { label: 'Pressure 1', detail: 'Watching', active: true };
-    if (debt.pressure <= 3) return { label: `Pressure ${debt.pressure}`, detail: 'Rising', active: true };
-    return { label: `Pressure ${debt.pressure}`, detail: 'High', active: true };
+    const pressureState = highPressureStateForDebt(debt);
+    if (debt.balanceCopper <= 0) return { label: 'Pressure 0', detail: 'Quiet', active: false, ...pressureState };
+    if (pressureState.highPressureActive) return { label: `Pressure ${debt.pressure}`, detail: 'Under Collection', active: true, ...pressureState };
+    if (debt.pressure <= 1) return { label: 'Pressure 1', detail: 'Watching', active: true, ...pressureState };
+    return { label: `Pressure ${debt.pressure}`, detail: 'Rising', active: true, ...pressureState };
   }
 
   function debtCollectorStatusLine(state){
     const debt = debtState(state);
+    const pressureState = highPressureStateForDebt(debt);
+    if (debt.balanceCopper > 0 && pressureState.highPressureActive) {
+      return `Owed ${moneyPlain(debt.balanceCopper)}. Under Collection.`;
+    }
     return debt.balanceCopper > 0
       ? `Owed ${moneyPlain(debt.balanceCopper)}. Pressure is visible.`
       : 'No debt due. Pressure is quiet.';
@@ -132,6 +165,7 @@
     const debt = debtState(state);
     const summary = debtCollectorDisplaySummary(state);
     const pressure = debtPressureDisplay(state);
+    const highPressure = highPressureStateForDebt(debt);
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     return {
       title: summary.title,
@@ -148,6 +182,11 @@
       active: summary.active,
       balanceCopper: summary.balanceCopper,
       pressure: summary.pressure,
+      highPressureThreshold: highPressure.highPressureThreshold,
+      highPressureActive: highPressure.highPressureActive,
+      borrowingBlockedByPressure: highPressure.borrowingBlockedByPressure,
+      collectionText: highPressure.highPressureActive ? underCollectionCopy() : '',
+      collectionActionText: highPressure.highPressureActive ? underCollectionActionCopy() : '',
       wallet,
       repaymentState: summary.balanceCopper <= 0 ? 'clear' : wallet > 0 ? 'available' : 'wallet-empty'
     };
@@ -167,6 +206,7 @@
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     const maxRepayCopper = Math.max(0, Math.min(wallet, debt.balanceCopper));
     const copyModel = debtCollectorClarityRendererCopyModel(state);
+    const highPressure = highPressureStateForDebt(debt);
     const enabled = debt.balanceCopper > 0 && wallet > 0 && maxRepayCopper > 0;
     const pressureReliefAvailable = enabled && debt.pressure > 0;
     const pressureReliefAmount = pressureReliefAvailable ? Math.min(PRESSURE_RELIEF_PER_REPAYMENT, debt.pressure) : 0;
@@ -183,6 +223,9 @@
       balanceCopper: debt.balanceCopper,
       walletCopper: wallet,
       maxRepayCopper,
+      highPressureThreshold: highPressure.highPressureThreshold,
+      highPressureActive: highPressure.highPressureActive,
+      borrowingBlockedByPressure: highPressure.borrowingBlockedByPressure,
       pressureReliefEnabled: true,
       pressureReliefAvailable,
       pressureReliefAmount,
@@ -211,6 +254,54 @@
     };
   }
 
+  function debtCollectorBorrowContract(state, amount = 0){
+    const debt = debtState(state);
+    const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
+    const borrowAmountCopper = Math.max(0, Math.floor(Number(amount) || 0));
+    const highPressure = highPressureStateForDebt(debt);
+    const enabled = borrowAmountCopper > 0 && !highPressure.borrowingBlockedByPressure;
+    return {
+      contractOwner: 'DungeonDexDebtCollector',
+      contractVersion: 1,
+      actionId: 'debt_collector_borrow',
+      actionLabel: 'Borrow',
+      liveGameplayAction: true,
+      borrowActionLive: true,
+      panelActionWired: true,
+      enabled,
+      blockedReason: enabled ? '' : borrowAmountCopper <= 0 ? 'invalid_amount' : 'under_collection',
+      borrowAmountCopper,
+      balanceCopper: debt.balanceCopper,
+      walletCopper: wallet,
+      highPressureThreshold: highPressure.highPressureThreshold,
+      highPressureActive: highPressure.highPressureActive,
+      borrowingBlockedByPressure: highPressure.borrowingBlockedByPressure,
+      collectionText: highPressure.highPressureActive ? underCollectionCopy() : '',
+      collectionActionText: highPressure.highPressureActive ? underCollectionActionCopy() : '',
+      appliesEffect: enabled,
+      mutatesStateOnAction: enabled,
+      mutatesSave: enabled,
+      affectsDebtBalance: enabled,
+      affectsWallet: enabled,
+      affectsPressure: false,
+      debtMath: true,
+      repayment: false,
+      borrowing: true,
+      pressure: true,
+      economy: enabled,
+      combat: false,
+      rewards: false,
+      progression: false,
+      revisit: false,
+      trophyEcho: false,
+      talentPointEconomy: false,
+      talentEarning: false,
+      talentSpending: false,
+      copyModelRendererWired: false,
+      liveRendererWired: false
+    };
+  }
+
   function debtCollectorFallbackState(){
     return {
       active: false,
@@ -225,6 +316,21 @@
     if (!state || !state.player) return { ok: false, reason: 'missing state' };
     const borrowed = Math.max(0, Math.floor(Number(amount) || 0));
     if (borrowed <= 0) return { ok: false, reason: 'invalid amount' };
+    const borrowContract = debtCollectorBorrowContract(state, borrowed);
+    if (borrowContract.borrowingBlockedByPressure) {
+      if (typeof pushLog === 'function') pushLog(state, 'Debt Collector borrowing paused: Under Collection.');
+      return {
+        ok: false,
+        reason: 'under collection',
+        blockedReason: borrowContract.blockedReason,
+        amount: borrowed,
+        balanceCopper: borrowContract.balanceCopper,
+        walletCopper: borrowContract.walletCopper,
+        highPressureThreshold: borrowContract.highPressureThreshold,
+        highPressureActive: borrowContract.highPressureActive,
+        borrowingBlockedByPressure: borrowContract.borrowingBlockedByPressure
+      };
+    }
     const debt = ensureDebtCollectorState(state);
     if (typeof addPlayerGold === 'function') addPlayerGold(state, borrowed);
     else state.player.gold = Math.max(0, Math.floor(Number(state.player.gold) || 0)) + borrowed;
@@ -233,7 +339,15 @@
     debt.lastVisitAt = nowStamp();
     addDebtNote(debt, `Borrowed ${moneyPlain(borrowed)} from the Lowfire ledger.`);
     if (typeof pushLog === 'function') pushLog(state, `Debt Collector loan taken: ${moneyHtml(borrowed)}.`);
-    return { ok: true, amount: borrowed, balanceCopper: debt.balanceCopper };
+    return {
+      ok: true,
+      amount: borrowed,
+      balanceCopper: debt.balanceCopper,
+      walletCopper: Math.max(0, Math.floor(Number(state.player.gold) || 0)),
+      highPressureThreshold: borrowContract.highPressureThreshold,
+      highPressureActive: false,
+      borrowingBlockedByPressure: false
+    };
   }
 
   function repayDebt(state){
@@ -298,6 +412,7 @@
     const pressure = debtPressureDisplay(state);
     const rendererCopy = debtCollectorClarityRendererCopyModel(state);
     const passiveContract = debtCollectorClarityPassiveContract(state);
+    const highPressure = debtCollectorHighPressureState(state);
     const liveRendererWired = passiveContract?.learned === true && passiveContract?.liveRendererWired === true;
     const clarityLearned = passiveContract?.learned === true;
     const clarityCopyModelUsed = rendererCopy?.copyModelRendererWired === true;
@@ -323,10 +438,18 @@
     const termsText = copyModelSource.termsText || 'Repay spends purse coin and eases pressure by 1 when pressure is active.';
     const lastVisitText = copyModelSource.lastVisitText || summary.lastVisitLabel;
     const notesText = copyModelSource.notesText || summary.notesLabel;
+    const collectionText = rendererCopy?.collectionText || (highPressure.highPressureActive ? underCollectionCopy() : '');
+    const collectionActionText = rendererCopy?.collectionActionText || (highPressure.highPressureActive ? underCollectionActionCopy() : '');
+    const collectionNotice = highPressure.highPressureActive
+      ? `<p class="small debt-collector-collection-copy">${escapeHtml(collectionText)}</p><p class="small muted debt-collector-collection-copy">${escapeHtml(collectionActionText)}</p>`
+      : '';
     const notes = debt.notes.length
       ? `<div class="small muted debt-collector-notes">${debt.notes.map(note => `<div class="debt-collector-note">${escapeHtml(note)}</div>`).join('')}</div>`
       : '';
-    const borrowButtons = BORROW_OPTIONS.map(option => `<button class="ghost mini" data-debt-borrow="${option.amount}">${escapeHtml(option.label)}</button>`).join('');
+    const borrowButtons = BORROW_OPTIONS.map(option => {
+      const borrowContract = debtCollectorBorrowContract(state, option.amount);
+      return `<button class="ghost mini" data-debt-borrow="${option.amount}" data-debt-borrow-blocked="${escapeHtml(borrowContract.blockedReason)}" ${borrowContract.enabled ? '' : 'disabled'}>${escapeHtml(option.label)}</button>`;
+    }).join('');
     return `<div class="split debt-collector-head">
       <div>
         <h2>${escapeHtml(titleText)}</h2>
@@ -341,6 +464,7 @@
       <span class="pill debt-collector-chip">${escapeHtml(pressureText)}${pressureDetail ? ` • ${escapeHtml(pressureDetail)}` : ''}</span>
       <span class="pill debt-collector-chip">${escapeHtml(clarityStatusText)}</span>
     </div>
+    ${collectionNotice}
     <p class="small muted debt-collector-terms">${escapeHtml(clarityDetailText)}</p>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
@@ -369,6 +493,8 @@
       .debt-collector-chip-active{border-color:rgba(255,130,92,.28);background:rgba(255,130,92,.09);color:#ffd7be}
       .debt-collector-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
       .debt-collector-actions button{flex:1 1 86px}
+      .debt-collector-actions button:disabled{opacity:.52;cursor:not-allowed}
+      .debt-collector-collection-copy{margin:6px 0 0;line-height:1.25;color:#ffd7be}
       .debt-collector-terms{margin:6px 0 0;line-height:1.25}
       .debt-collector-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px}
       .debt-collector-notes{display:grid;gap:4px;margin-top:8px}
@@ -423,12 +549,38 @@
     state.player.gold = coinValue(0, 25, 0);
     const clear = repayDebt(state);
     const clearOk = clear.ok && state.player.debtCollector.balanceCopper === 0 && state.player.debtCollector.active === false && state.player.debtCollector.pressure === 0;
+    const belowThresholdState = {
+      player: {
+        gold: 0,
+        debtCollector: { active: true, balanceCopper: coinValue(0, 5, 0), pressure: HIGH_PRESSURE_THRESHOLD - 1, lastVisitAt: '', notes: [] }
+      }
+    };
+    const belowThreshold = debtCollectorHighPressureState(belowThresholdState);
+    const atThresholdState = {
+      player: {
+        gold: coinValue(0, 1, 0),
+        debtCollector: { active: true, balanceCopper: coinValue(0, 5, 0), pressure: HIGH_PRESSURE_THRESHOLD, lastVisitAt: '', notes: [] }
+      }
+    };
+    const atThreshold = debtCollectorHighPressureState(atThresholdState);
+    const blockedBefore = JSON.stringify({ wallet: atThresholdState.player.gold, debt: { ...atThresholdState.player.debtCollector } });
+    const blockedBorrow = borrowDebt(atThresholdState, coinValue(0, 5, 0));
+    const blockedAfter = JSON.stringify({ wallet: atThresholdState.player.gold, debt: { ...atThresholdState.player.debtCollector } });
+    atThresholdState.player.gold = coinValue(0, 3, 0);
+    const repayUnderCollection = repayDebt(atThresholdState);
+    const afterRepayPressure = debtCollectorHighPressureState(atThresholdState);
+    const borrowAfterRelief = borrowDebt(atThresholdState, coinValue(0, 5, 0));
+    const belowThresholdOk = belowThreshold.highPressureActive === false && belowThreshold.borrowingBlockedByPressure === false && debtCollectorBorrowContract(belowThresholdState, coinValue(0, 5, 0)).enabled === true;
+    const atThresholdOk = atThreshold.highPressureActive === true && atThreshold.borrowingBlockedByPressure === true && atThreshold.highPressureThreshold === HIGH_PRESSURE_THRESHOLD;
+    const blockedBorrowOk = blockedBorrow.ok === false && blockedBorrow.reason === 'under collection' && blockedBorrow.borrowingBlockedByPressure === true && blockedBefore === blockedAfter;
+    const repayUnderCollectionOk = repayUnderCollection.ok === true && repayUnderCollection.pressureRelief === PRESSURE_RELIEF_PER_REPAYMENT && atThresholdState.player.debtCollector.pressure === HIGH_PRESSURE_THRESHOLD - 1 && afterRepayPressure.highPressureActive === false;
+    const borrowAfterReliefOk = borrowAfterRelief.ok === true && atThresholdState.player.gold === coinValue(0, 5, 0) && atThresholdState.player.debtCollector.balanceCopper === coinValue(0, 7, 0);
     borrowDebt(state, coinValue(0, 10, 0));
     const pressureBefore = state.player.debtCollector.pressure;
     recordDebtReturn(state, 'extract');
     const pressureOk = state.player.debtCollector.pressure === pressureBefore + 1;
     const combatOk = JSON.stringify(state.player.stats || {}) === statsBefore && JSON.stringify(state.run?.choices || []) === choicesBefore;
-    const checks = { borrowOk, persistOk, partialOk, clearOk, pressureOk, combatOk };
+    const checks = { borrowOk, persistOk, partialOk, clearOk, belowThresholdOk, atThresholdOk, blockedBorrowOk, repayUnderCollectionOk, borrowAfterReliefOk, pressureOk, combatOk };
     return {
       ok: Object.values(checks).every(Boolean),
       checks,
@@ -436,6 +588,8 @@
       fallback: debtCollectorFallbackState(),
       summary: debtCollectorDisplaySummary(state),
       pressure: debtPressureDisplay(state),
+      highPressure: debtCollectorHighPressureState(atThresholdState),
+      borrowContract: debtCollectorBorrowContract(atThresholdState, coinValue(0, 5, 0)),
       statusLine: debtCollectorStatusLine(state)
     };
   }
@@ -486,6 +640,8 @@
     debtCollectorRendererCopySource,
     debtCollectorClarityRendererCopyModel,
     debtCollectorRepaymentContract,
+    debtCollectorBorrowContract,
+    debtCollectorHighPressureState,
     debtCollectorFallbackState,
     warning: pressureWarning,
     smoke

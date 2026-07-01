@@ -242,9 +242,12 @@ async function main() {
       hasPassiveCopy: typeof window.DungeonDexDebtCollector?.applyDebtCollectorClarityCopy === 'function',
       hasRendererCopySource: typeof window.DungeonDexDebtCollector?.debtCollectorRendererCopySource === 'function',
       hasRendererCopyModel: typeof window.DungeonDexDebtCollector?.debtCollectorClarityRendererCopyModel === 'function',
-      hasRepaymentContract: typeof window.DungeonDexDebtCollector?.debtCollectorRepaymentContract === 'function'
+      hasRepaymentContract: typeof window.DungeonDexDebtCollector?.debtCollectorRepaymentContract === 'function',
+      hasBorrowContract: typeof window.DungeonDexDebtCollector?.debtCollectorBorrowContract === 'function',
+      hasHighPressureState: typeof window.DungeonDexDebtCollector?.debtCollectorHighPressureState === 'function'
     }))()`));
     record('Debt display helpers exist', !!smoke?.summary && !!smoke?.pressure && typeof smoke?.statusLine === 'string' && debtHelperShape.hasSummary && debtHelperShape.hasPressure && debtHelperShape.hasStatusLine && debtHelperShape.hasFallback, JSON.stringify({ summary: smoke?.summary, pressure: smoke?.pressure, statusLine: smoke?.statusLine, debtHelperShape }));
+    record('Debt high-pressure borrow helpers exist', debtHelperShape.hasBorrowContract === true && debtHelperShape.hasHighPressureState === true, JSON.stringify(debtHelperShape));
 
     const debtClarityAudit = asObject(await evaluate(client, `(() => {
       const api = window.DungeonDexDebtCollector;
@@ -330,10 +333,10 @@ async function main() {
     record('Debt Collector public contract delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedContract) === JSON.stringify(debtClarityAudit?.canonicalLearnedContract) && JSON.stringify(debtClarityAudit?.lockedContract) === JSON.stringify(debtClarityAudit?.canonicalLockedContract), JSON.stringify({ debtLearned:debtClarityAudit?.learnedContract, canonicalLearned:debtClarityAudit?.canonicalLearnedContract }));
     record('Debt Collector public copy helper matches canonical Talent output', JSON.stringify(debtClarityAudit?.learnedCopy) === JSON.stringify(debtClarityAudit?.canonicalLearnedCopy) && JSON.stringify(debtClarityAudit?.lockedCopy) === JSON.stringify(debtClarityAudit?.canonicalLockedCopy), JSON.stringify({ debtLearned:debtClarityAudit?.learnedCopy, canonicalLearned:debtClarityAudit?.canonicalLearnedCopy }));
     record('Debt Collector renderer copy-model helpers exist', debtHelperShape.hasRendererCopySource === true && debtHelperShape.hasRendererCopyModel === true, JSON.stringify(debtHelperShape));
-    record('Debt Collector repayment activation contract is live and bounded', debtHelperShape.hasRepaymentContract === true && debtClarityAudit?.learnedRepaymentContract?.liveGameplayAction === true && debtClarityAudit?.learnedRepaymentContract?.repaymentActionLive === true && debtClarityAudit?.learnedRepaymentContract?.panelActionWired === true && debtClarityAudit?.learnedRepaymentContract?.enabled === true && debtClarityAudit?.learnedRepaymentContract?.maxRepayCopper === 875 && debtClarityAudit?.learnedRepaymentContract?.pressureReliefEnabled === true && debtClarityAudit?.learnedRepaymentContract?.pressureReliefAvailable === true && debtClarityAudit?.learnedRepaymentContract?.pressureReliefAmount === 1 && debtClarityAudit?.learnedRepaymentContract?.pressureReliefMax === 1 && debtClarityAudit?.learnedRepaymentContract?.appliesEffect === true && debtClarityAudit?.learnedRepaymentContract?.mutatesStateOnAction === true && debtClarityAudit?.learnedRepaymentContract?.mutatesSave === true && debtClarityAudit?.learnedRepaymentContract?.affectsDebtBalance === true && debtClarityAudit?.learnedRepaymentContract?.affectsWallet === true && debtClarityAudit?.learnedRepaymentContract?.affectsPressure === true && debtClarityAudit?.learnedRepaymentContract?.debtMath === true && debtClarityAudit?.learnedRepaymentContract?.repayment === true && debtClarityAudit?.learnedRepaymentContract?.economy === true && debtClarityAudit?.learnedRepaymentContract?.pressure === true && debtClarityAudit?.learnedRepaymentContract?.combat === false && debtClarityAudit?.learnedRepaymentContract?.rewards === false && debtClarityAudit?.learnedRepaymentContract?.progression === false && debtClarityAudit?.learnedRepaymentContract?.revisit === false && debtClarityAudit?.learnedRepaymentContract?.trophyEcho === false && debtClarityAudit?.learnedRepaymentContract?.talentPointEconomy === false && debtClarityAudit?.learnedRepaymentContract?.talentEarning === false && debtClarityAudit?.learnedRepaymentContract?.talentSpending === false && debtClarityAudit?.learnedRepaymentContract?.copyModelRendererWired === true && debtClarityAudit?.learnedRepaymentContract?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRepaymentContract));
+    record('Debt Collector repayment activation contract is live and bounded', debtHelperShape.hasRepaymentContract === true && debtClarityAudit?.learnedRepaymentContract?.liveGameplayAction === true && debtClarityAudit?.learnedRepaymentContract?.repaymentActionLive === true && debtClarityAudit?.learnedRepaymentContract?.panelActionWired === true && debtClarityAudit?.learnedRepaymentContract?.enabled === true && debtClarityAudit?.learnedRepaymentContract?.maxRepayCopper === 875 && debtClarityAudit?.learnedRepaymentContract?.highPressureThreshold === 3 && debtClarityAudit?.learnedRepaymentContract?.highPressureActive === true && debtClarityAudit?.learnedRepaymentContract?.borrowingBlockedByPressure === true && debtClarityAudit?.learnedRepaymentContract?.pressureReliefEnabled === true && debtClarityAudit?.learnedRepaymentContract?.pressureReliefAvailable === true && debtClarityAudit?.learnedRepaymentContract?.pressureReliefAmount === 1 && debtClarityAudit?.learnedRepaymentContract?.pressureReliefMax === 1 && debtClarityAudit?.learnedRepaymentContract?.appliesEffect === true && debtClarityAudit?.learnedRepaymentContract?.mutatesStateOnAction === true && debtClarityAudit?.learnedRepaymentContract?.mutatesSave === true && debtClarityAudit?.learnedRepaymentContract?.affectsDebtBalance === true && debtClarityAudit?.learnedRepaymentContract?.affectsWallet === true && debtClarityAudit?.learnedRepaymentContract?.affectsPressure === true && debtClarityAudit?.learnedRepaymentContract?.debtMath === true && debtClarityAudit?.learnedRepaymentContract?.repayment === true && debtClarityAudit?.learnedRepaymentContract?.economy === true && debtClarityAudit?.learnedRepaymentContract?.pressure === true && debtClarityAudit?.learnedRepaymentContract?.combat === false && debtClarityAudit?.learnedRepaymentContract?.rewards === false && debtClarityAudit?.learnedRepaymentContract?.progression === false && debtClarityAudit?.learnedRepaymentContract?.revisit === false && debtClarityAudit?.learnedRepaymentContract?.trophyEcho === false && debtClarityAudit?.learnedRepaymentContract?.talentPointEconomy === false && debtClarityAudit?.learnedRepaymentContract?.talentEarning === false && debtClarityAudit?.learnedRepaymentContract?.talentSpending === false && debtClarityAudit?.learnedRepaymentContract?.copyModelRendererWired === true && debtClarityAudit?.learnedRepaymentContract?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRepaymentContract));
     record('Debt repayment contract blocks only unaffordable repayment', debtClarityAudit?.lockedRepaymentContract?.enabled === true && debtClarityAudit?.lockedRepaymentContract?.copyModelRendererWired === false && debtClarityAudit?.lockedRepaymentContract?.pressureReliefAmount === 1 && debtClarityAudit?.blockedRepaymentContract?.enabled === false && debtClarityAudit?.blockedRepaymentContract?.blockedReason === 'no_coin' && debtClarityAudit?.blockedRepaymentContract?.maxRepayCopper === 0 && debtClarityAudit?.blockedRepaymentContract?.pressureReliefAvailable === false && debtClarityAudit?.blockedRepaymentContract?.pressureReliefAmount === 0, JSON.stringify({ locked:debtClarityAudit?.lockedRepaymentContract, blocked:debtClarityAudit?.blockedRepaymentContract }));
     record('Unlearned Debt renderer copy model returns default fragments', JSON.stringify(debtClarityAudit?.lockedRendererModel) === JSON.stringify(debtClarityAudit?.rendererSource), JSON.stringify(debtClarityAudit?.lockedRendererModel));
-    record('Learned Debt renderer copy model returns guarded preview fragments', debtClarityAudit?.learnedRendererModel?.title === 'Debt Collector' && debtClarityAudit?.learnedRendererModel?.summaryText === 'Active debt. Pressure is visible.' && debtClarityAudit?.learnedRendererModel?.statusText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.balanceText === 'Owed 15s' && debtClarityAudit?.learnedRendererModel?.pressureText === 'Pressure 3' && debtClarityAudit?.learnedRendererModel?.pressureDetail === 'Rising' && debtClarityAudit?.learnedRendererModel?.flavorText === 'Owed 15s. Rising' && debtClarityAudit?.learnedRendererModel?.termsText === 'Repay spends purse coin and eases pressure by 1 when pressure is active.' && debtClarityAudit?.learnedRendererModel?.statusMetaText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.lastVisitText === 'Test Visit' && debtClarityAudit?.learnedRendererModel?.notesText === '1 note' && debtClarityAudit?.learnedRendererModel?.clarityApplied === true && debtClarityAudit?.learnedRendererModel?.copyModelRendererWired === true && debtClarityAudit?.learnedRendererModel?.passiveApplied === false && debtClarityAudit?.learnedRendererModel?.previewOnly === true && debtClarityAudit?.learnedRendererModel?.guarded === true && debtClarityAudit?.learnedRendererModel?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRendererModel));
+    record('Learned Debt renderer copy model returns guarded preview fragments', debtClarityAudit?.learnedRendererModel?.title === 'Debt Collector' && debtClarityAudit?.learnedRendererModel?.summaryText === 'Active debt. Pressure is visible.' && debtClarityAudit?.learnedRendererModel?.statusText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.balanceText === 'Owed 15s' && debtClarityAudit?.learnedRendererModel?.pressureText === 'Pressure 3' && debtClarityAudit?.learnedRendererModel?.pressureDetail === 'Under Collection' && debtClarityAudit?.learnedRendererModel?.flavorText === 'Owed 15s. Under Collection' && debtClarityAudit?.learnedRendererModel?.termsText === 'Repay spends purse coin and eases pressure by 1 when pressure is active.' && debtClarityAudit?.learnedRendererModel?.highPressureThreshold === 3 && debtClarityAudit?.learnedRendererModel?.highPressureActive === true && debtClarityAudit?.learnedRendererModel?.borrowingBlockedByPressure === true && debtClarityAudit?.learnedRendererModel?.collectionText === 'Under Collection: borrowing is paused until pressure drops below 3.' && debtClarityAudit?.learnedRendererModel?.collectionActionText === 'Repay to ease pressure and restore normal terms.' && debtClarityAudit?.learnedRendererModel?.statusMetaText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.lastVisitText === 'Test Visit' && debtClarityAudit?.learnedRendererModel?.notesText === '1 note' && debtClarityAudit?.learnedRendererModel?.clarityApplied === true && debtClarityAudit?.learnedRendererModel?.copyModelRendererWired === true && debtClarityAudit?.learnedRendererModel?.passiveApplied === false && debtClarityAudit?.learnedRendererModel?.previewOnly === true && debtClarityAudit?.learnedRendererModel?.guarded === true && debtClarityAudit?.learnedRendererModel?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRendererModel));
     record('Debt renderer copy model avoids nested labels', !/Status:\s*Debt status:|Pressure:\s*Pressure/i.test(JSON.stringify(debtClarityAudit?.learnedRendererModel || {})), JSON.stringify(debtClarityAudit?.learnedRendererModel));
     record('Debt renderer copy model delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedRendererModel) === JSON.stringify(debtClarityAudit?.canonicalRendererModel), JSON.stringify({ debt:debtClarityAudit?.learnedRendererModel, canonical:debtClarityAudit?.canonicalRendererModel }));
     record('Debt renderer copy model stays read-only and value-stable', debtClarityAudit?.rendererLearnedBefore === debtClarityAudit?.rendererLearnedAfter && debtClarityAudit?.rendererLockedBefore === debtClarityAudit?.rendererLockedAfter && debtClarityAudit?.learnedRendererModel?.balanceCopper === 1500 && debtClarityAudit?.learnedRendererModel?.pressure === 3 && debtClarityAudit?.learnedRendererModel?.wallet === 875 && debtClarityAudit?.learnedRendererModel?.repaymentState === 'available', JSON.stringify(debtClarityAudit?.learnedRendererModel));
@@ -346,9 +349,11 @@ async function main() {
       render();
       const panel = document.getElementById('debtCollectorPanel');
       const repayButton = document.getElementById('repayDebtBtn');
+      const borrowButtons = Array.from(document.querySelectorAll('[data-debt-borrow]'));
       return JSON.stringify({
         html: panel?.innerHTML || '',
         text: panel?.innerText || '',
+        borrowButtons: borrowButtons.map(btn => ({ disabled: !!btn.disabled, blocked: btn.dataset.debtBorrowBlocked || '', amount: Number(btn.dataset.debtBorrow || 0) })),
         repayButtonMode: repayButton?.dataset?.debtRepaymentMode || '',
         repayButtonMax: Number(repayButton?.dataset?.debtMaxRepay || 0),
         repaymentContract: window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S),
@@ -357,14 +362,136 @@ async function main() {
         snapshot: JSON.stringify({ gold:S.player.gold, debt:{ ...S.player.debtCollector }, learnedIds:S.player.talentLearnedIds, unlockIds:S.player.talentUnlockIds })
       });
     })()`));
-    record('Learned Debt panel keeps passive renderer guarded while exposing live repayment', learnedPanelAudit?.html.includes('Active debt. Pressure is visible.') && learnedPanelAudit?.html.includes('Debt Active') && learnedPanelAudit?.html.includes('Owed 15s') && learnedPanelAudit?.html.includes('Pressure 3 • Rising') && learnedPanelAudit?.html.includes('Clarity: learned helper only') && learnedPanelAudit?.html.includes('Debt Collector Clarity is not active here') && learnedPanelAudit?.html.includes('Repay spends purse coin and eases pressure by 1 when pressure is active.') && learnedPanelAudit?.html.includes('data-debt-clarity-mode="copy-model"') && learnedPanelAudit?.html.includes('data-debt-repayment-mode="live-gameplay"') && learnedPanelAudit?.repayButtonMode === 'live-gameplay' && learnedPanelAudit?.repayButtonMax === 875 && learnedPanelAudit?.repaymentContract?.copyModelRendererWired === true && learnedPanelAudit?.repaymentContract?.liveRendererWired === false && learnedPanelAudit?.repaymentContract?.appliesEffect === true && learnedPanelAudit?.repaymentContract?.pressureReliefEnabled === true && learnedPanelAudit?.repaymentContract?.pressureReliefAmount === 1 && learnedPanelAudit?.html.includes('Status:</b> Debt Active') && learnedPanelAudit?.html.includes('Last Visit:</b> Test Visit') && learnedPanelAudit?.html.includes('Notes:</b> 1 note'), JSON.stringify(learnedPanelAudit));
+    record('Learned Debt panel keeps passive renderer guarded while exposing live repayment', learnedPanelAudit?.html.includes('Active debt. Pressure is visible.') && learnedPanelAudit?.html.includes('Debt Active') && learnedPanelAudit?.html.includes('Owed 15s') && learnedPanelAudit?.html.includes('Pressure 3 • Under Collection') && learnedPanelAudit?.html.includes('Under Collection: borrowing is paused until pressure drops below 3.') && learnedPanelAudit?.html.includes('Repay to ease pressure and restore normal terms.') && Array.isArray(learnedPanelAudit?.borrowButtons) && learnedPanelAudit.borrowButtons.length === 3 && learnedPanelAudit.borrowButtons.every(btn => btn.disabled === true && btn.blocked === 'under_collection') && learnedPanelAudit?.html.includes('Clarity: learned helper only') && learnedPanelAudit?.html.includes('Debt Collector Clarity is not active here') && learnedPanelAudit?.html.includes('Repay spends purse coin and eases pressure by 1 when pressure is active.') && learnedPanelAudit?.html.includes('data-debt-clarity-mode="copy-model"') && learnedPanelAudit?.html.includes('data-debt-repayment-mode="live-gameplay"') && learnedPanelAudit?.repayButtonMode === 'live-gameplay' && learnedPanelAudit?.repayButtonMax === 875 && learnedPanelAudit?.repaymentContract?.highPressureThreshold === 3 && learnedPanelAudit?.repaymentContract?.highPressureActive === true && learnedPanelAudit?.repaymentContract?.borrowingBlockedByPressure === true && learnedPanelAudit?.repaymentContract?.copyModelRendererWired === true && learnedPanelAudit?.repaymentContract?.liveRendererWired === false && learnedPanelAudit?.repaymentContract?.appliesEffect === true && learnedPanelAudit?.repaymentContract?.pressureReliefEnabled === true && learnedPanelAudit?.repaymentContract?.pressureReliefAmount === 1 && learnedPanelAudit?.html.includes('Status:</b> Debt Active') && learnedPanelAudit?.html.includes('Last Visit:</b> Test Visit') && learnedPanelAudit?.html.includes('Notes:</b> 1 note'), JSON.stringify(learnedPanelAudit));
     record('Learned Debt panel output avoids duplicate labels', !/Status:\s*Debt status:|Owed:\s*Amount owed:|Pressure:\s*Pressure\s*Pressure/i.test(learnedPanelAudit?.text || ''), JSON.stringify(learnedPanelAudit));
     record('Learned Debt panel leaves state unchanged after rendering', learnedPanelAudit?.wallet === 875 && learnedPanelAudit?.debt?.balanceCopper === 1500 && learnedPanelAudit?.debt?.pressure === 3 && learnedPanelAudit?.debt?.active === true && learnedPanelAudit?.snapshot === JSON.stringify({ gold:875, debt:{ active:true, balanceCopper:1500, pressure:3, lastVisitAt:'Test Visit', notes:['Test note'] }, learnedIds:{ debt_collector_clarity:true }, unlockIds:['debt_collector_clarity'] }), JSON.stringify(learnedPanelAudit));
     record('Debt Collector clarity contract stays non-dangerous and non-mutating', debtClarityAudit?.learnedContract?.combat === false && debtClarityAudit?.learnedContract?.economy === false && debtClarityAudit?.learnedContract?.rewards === false && debtClarityAudit?.learnedContract?.monsters === false && debtClarityAudit?.learnedContract?.gear === false && debtClarityAudit?.learnedContract?.progression === false && debtClarityAudit?.learnedContract?.scaling === false && debtClarityAudit?.learnedContract?.revisit === false && debtClarityAudit?.learnedContract?.eliteBoardMath === false && debtClarityAudit?.learnedContract?.debtMath === false && debtClarityAudit?.learnedContract?.talentUiActions === false && debtClarityAudit?.learnedContract?.mutatesSave === false, JSON.stringify(debtClarityAudit?.learnedContract));
     record('Debt Collector clarity helper is clone-safe and text-only', debtClarityAudit?.sameObject === false && debtClarityAudit?.before === debtClarityAudit?.after && debtClarityAudit?.learnedCopy?.passiveSurface === 'Debt Collector copy-model preview only' && debtClarityAudit?.learnedCopy?.passiveApplied === false && debtClarityAudit?.learnedCopy?.copyModelApplied === true && debtClarityAudit?.learnedCopy?.copyModelRendererWired === true && debtClarityAudit?.learnedCopy?.previewOnly === true && debtClarityAudit?.learnedCopy?.guarded === true && debtClarityAudit?.learnedCopy?.liveRendererWired === false && debtClarityAudit?.learnedCopy?.statusLabel === 'Debt status: Debt Active' && debtClarityAudit?.learnedCopy?.balanceLabel === 'Amount owed: Owed 15 coin' && debtClarityAudit?.learnedCopy?.pressureLabel === 'Pressure: Pressure 3' && debtClarityAudit?.learnedCopy?.termsLabel === 'Terms: Settle on return' && debtClarityAudit?.learnedCopy?.reminderLabel === 'Reminder: Keep coin ready.' && debtClarityAudit?.learnedCopy?.balanceCopper === 1500 && debtClarityAudit?.learnedCopy?.pressure === 3, JSON.stringify(debtClarityAudit?.learnedCopy));
     record('Debt Collector clarity helper leaves unlearned copy unchanged', JSON.stringify(debtClarityAudit?.lockedCopy) === debtClarityAudit?.before && debtClarityAudit?.lockedCopy?.passiveApplied !== true && debtClarityAudit?.lockedCopy?.passiveSurface === undefined, JSON.stringify(debtClarityAudit?.lockedCopy));
     record('Debt Collector clarity helper does not mutate input or player state', debtClarityAudit?.before === debtClarityAudit?.after && debtClarityAudit?.learnedStateBefore === debtClarityAudit?.learnedStateAfter && debtClarityAudit?.lockedStateBefore === debtClarityAudit?.lockedStateAfter && debtClarityAudit?.learnedCopy?.balanceCopper === 1500 && debtClarityAudit?.learnedCopy?.pressure === 3 && debtClarityAudit?.learnedCopy?.wallet === 875 && debtClarityAudit?.learnedCopy?.repaymentState === 'pending', JSON.stringify({ before: debtClarityAudit?.before, after: debtClarityAudit?.after, learnedStateBefore: debtClarityAudit?.learnedStateBefore, learnedStateAfter: debtClarityAudit?.learnedStateAfter }));
-    record('Debt Collector smoke fixture remains unchanged', !!smoke?.checks?.borrowOk && !!smoke?.checks?.persistOk && !!smoke?.checks?.partialOk && !!smoke?.checks?.clearOk && !!smoke?.checks?.pressureOk && !!smoke?.checks?.combatOk, JSON.stringify(smoke));
+    record('Debt Collector smoke fixture covers core and high-pressure debt behavior', !!smoke?.checks?.borrowOk && !!smoke?.checks?.persistOk && !!smoke?.checks?.partialOk && !!smoke?.checks?.clearOk && !!smoke?.checks?.belowThresholdOk && !!smoke?.checks?.atThresholdOk && !!smoke?.checks?.blockedBorrowOk && !!smoke?.checks?.repayUnderCollectionOk && !!smoke?.checks?.borrowAfterReliefOk && !!smoke?.checks?.pressureOk && !!smoke?.checks?.combatOk, JSON.stringify(smoke));
+
+    const highPressureAudit = asObject(await evaluate(client, `(() => {
+      const api = window.DungeonDexDebtCollector;
+      const clone = value => JSON.parse(JSON.stringify(value));
+      const scopedPlayer = {
+        stats: { power:9, guard:8, wit:7 },
+        talentLedger: { points:4, awardClaims:{ stable:true } },
+        talentEarning: { enabled:true, pointsAwarded:2 },
+        talentLearnedIds: { hunter_board_clarity:true },
+        talentUnlockIds: ['hunter_board_clarity'],
+        revisitState: { trophyEcho:{ memoryMarks:2, history:['keep'] } },
+        depth: 4,
+        maxDepth: 6,
+        district: 'lowfire',
+        districtCharters: { lowfire:1 },
+        route: 'main'
+      };
+      const makeState = (pressure, wallet = 100, balance = 500) => ({
+        player: {
+          ...clone(scopedPlayer),
+          gold: wallet,
+          debtCollector: { active:true, balanceCopper:balance, pressure, lastVisitAt:'', notes:[] }
+        },
+        run: { choices:['attack', 'guard'] },
+        rewards: { coin:1 },
+        pendingRewards: { gold:2 }
+      });
+      const moneySnapshot = state => JSON.stringify({ wallet:state.player.gold, debt:{ ...state.player.debtCollector } });
+      const scopeSnapshot = state => JSON.stringify({
+        talentLedger: state.player.talentLedger,
+        talentEarning: state.player.talentEarning,
+        learned: state.player.talentLearnedIds,
+        unlocks: state.player.talentUnlockIds,
+        revisit: state.player.revisitState,
+        stats: state.player.stats,
+        choices: state.run?.choices || [],
+        rewards: state.rewards || null,
+        pendingRewards: state.pendingRewards || null,
+        progression: {
+          depth: state.player.depth,
+          maxDepth: state.player.maxDepth,
+          district: state.player.district,
+          districtCharters: state.player.districtCharters,
+          route: state.player.route
+        }
+      });
+      const below = makeState(2);
+      const threshold = makeState(3);
+      const belowPressure = api.debtCollectorHighPressureState(below);
+      const belowBorrowContract = api.debtCollectorBorrowContract(below, 500);
+      const thresholdPressure = api.debtCollectorHighPressureState(threshold);
+      const thresholdBorrowContract = api.debtCollectorBorrowContract(threshold, 500);
+
+      const blockedMoneyBefore = moneySnapshot(threshold);
+      const blockedScopeBefore = scopeSnapshot(threshold);
+      const blockedResult = api.borrow(threshold, 500);
+      const blockedMoneyAfter = moneySnapshot(threshold);
+      const blockedScopeAfter = scopeSnapshot(threshold);
+
+      const failed = makeState(3, 0, 500);
+      const failedMoneyBefore = moneySnapshot(failed);
+      const failedScopeBefore = scopeSnapshot(failed);
+      const failedResult = api.repay(failed);
+      const failedMoneyAfter = moneySnapshot(failed);
+      const failedScopeAfter = scopeSnapshot(failed);
+      const failedPressureAfter = api.debtCollectorHighPressureState(failed);
+
+      const repay = makeState(3, 300, 500);
+      const repayScopeBefore = scopeSnapshot(repay);
+      const repayResult = api.repay(repay);
+      const repayAfter = { wallet:repay.player.gold, debt:{ ...repay.player.debtCollector } };
+      const repayScopeAfter = scopeSnapshot(repay);
+      const afterReliefPressure = api.debtCollectorHighPressureState(repay);
+      const afterReliefBorrowContract = api.debtCollectorBorrowContract(repay, 500);
+      const borrowAfterReliefResult = api.borrow(repay, 500);
+      const borrowAfterReliefScopeAfter = scopeSnapshot(repay);
+
+      const payoff = makeState(3, 1000, 500);
+      const payoffScopeBefore = scopeSnapshot(payoff);
+      const payoffResult = api.repay(payoff);
+      const payoffScopeAfter = scopeSnapshot(payoff);
+      const payoffPressureAfter = api.debtCollectorHighPressureState(payoff);
+
+      return JSON.stringify({
+        belowPressure,
+        belowBorrowContract,
+        thresholdPressure,
+        thresholdBorrowContract,
+        blockedResult,
+        blockedMoneyBefore,
+        blockedMoneyAfter,
+        blockedScopeBefore,
+        blockedScopeAfter,
+        failedResult,
+        failedMoneyBefore,
+        failedMoneyAfter,
+        failedScopeBefore,
+        failedScopeAfter,
+        failedPressureAfter,
+        repayResult,
+        repayAfter,
+        repayScopeBefore,
+        repayScopeAfter,
+        afterReliefPressure,
+        afterReliefBorrowContract,
+        borrowAfterReliefResult,
+        borrowAfterReliefAfter: { wallet:repay.player.gold, debt:{ ...repay.player.debtCollector } },
+        borrowAfterReliefScopeAfter,
+        payoffResult,
+        payoffAfter: { wallet:payoff.player.gold, debt:{ ...payoff.player.debtCollector } },
+        payoffScopeBefore,
+        payoffScopeAfter,
+        payoffPressureAfter
+      });
+    })()`));
+    record('Debt pressure below threshold keeps borrowing available', highPressureAudit?.belowPressure?.highPressureThreshold === 3 && highPressureAudit?.belowPressure?.highPressureActive === false && highPressureAudit?.belowPressure?.borrowingBlockedByPressure === false && highPressureAudit?.belowBorrowContract?.enabled === true && highPressureAudit?.belowBorrowContract?.borrowingBlockedByPressure === false, JSON.stringify(highPressureAudit?.belowBorrowContract));
+    record('Debt pressure threshold enters Under Collection', highPressureAudit?.thresholdPressure?.highPressureThreshold === 3 && highPressureAudit?.thresholdPressure?.highPressureActive === true && highPressureAudit?.thresholdPressure?.borrowingBlockedByPressure === true && highPressureAudit?.thresholdBorrowContract?.enabled === false && highPressureAudit?.thresholdBorrowContract?.blockedReason === 'under_collection' && highPressureAudit?.thresholdBorrowContract?.collectionText === 'Under Collection: borrowing is paused until pressure drops below 3.', JSON.stringify({ pressure:highPressureAudit?.thresholdPressure, borrow:highPressureAudit?.thresholdBorrowContract }));
+    record('Under Collection blocks borrowing before wallet or debt mutation', highPressureAudit?.blockedResult?.ok === false && highPressureAudit?.blockedResult?.reason === 'under collection' && highPressureAudit?.blockedResult?.blockedReason === 'under_collection' && highPressureAudit?.blockedResult?.borrowingBlockedByPressure === true && highPressureAudit?.blockedMoneyBefore === highPressureAudit?.blockedMoneyAfter, JSON.stringify({ result:highPressureAudit?.blockedResult, before:highPressureAudit?.blockedMoneyBefore, after:highPressureAudit?.blockedMoneyAfter }));
+    record('Failed repayment keeps Under Collection unchanged', highPressureAudit?.failedResult?.ok === false && highPressureAudit?.failedResult?.reason === 'no coin' && highPressureAudit?.failedMoneyBefore === highPressureAudit?.failedMoneyAfter && highPressureAudit?.failedPressureAfter?.highPressureActive === true && highPressureAudit?.failedPressureAfter?.borrowingBlockedByPressure === true, JSON.stringify({ result:highPressureAudit?.failedResult, before:highPressureAudit?.failedMoneyBefore, after:highPressureAudit?.failedMoneyAfter, pressure:highPressureAudit?.failedPressureAfter }));
+    record('Repayment works under collection and restores borrowing below threshold', highPressureAudit?.repayResult?.ok === true && highPressureAudit?.repayResult?.amount === 300 && highPressureAudit?.repayResult?.pressureRelief === 1 && highPressureAudit?.repayAfter?.wallet === 0 && highPressureAudit?.repayAfter?.debt?.balanceCopper === 200 && highPressureAudit?.repayAfter?.debt?.pressure === 2 && highPressureAudit?.afterReliefPressure?.highPressureActive === false && highPressureAudit?.afterReliefBorrowContract?.enabled === true && highPressureAudit?.borrowAfterReliefResult?.ok === true && highPressureAudit?.borrowAfterReliefAfter?.wallet === 500 && highPressureAudit?.borrowAfterReliefAfter?.debt?.balanceCopper === 700, JSON.stringify(highPressureAudit));
+    record('Full payoff clears Under Collection through debt clear path', highPressureAudit?.payoffResult?.ok === true && highPressureAudit?.payoffResult?.amount === 500 && highPressureAudit?.payoffAfter?.wallet === 500 && highPressureAudit?.payoffAfter?.debt?.balanceCopper === 0 && highPressureAudit?.payoffAfter?.debt?.active === false && highPressureAudit?.payoffAfter?.debt?.pressure === 0 && highPressureAudit?.payoffPressureAfter?.highPressureActive === false && highPressureAudit?.payoffPressureAfter?.borrowingBlockedByPressure === false, JSON.stringify({ result:highPressureAudit?.payoffResult, after:highPressureAudit?.payoffAfter, pressure:highPressureAudit?.payoffPressureAfter }));
+    record('Under Collection path does not touch Talent, Revisit, combat, rewards, or progression', highPressureAudit?.blockedScopeBefore === highPressureAudit?.blockedScopeAfter && highPressureAudit?.failedScopeBefore === highPressureAudit?.failedScopeAfter && highPressureAudit?.repayScopeBefore === highPressureAudit?.repayScopeAfter && highPressureAudit?.repayScopeBefore === highPressureAudit?.borrowAfterReliefScopeAfter && highPressureAudit?.payoffScopeBefore === highPressureAudit?.payoffScopeAfter, JSON.stringify(highPressureAudit));
 
     const uiResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;
@@ -396,6 +523,33 @@ async function main() {
     if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after persistence reload.');
     const persisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '' }))()`));
     record('Borrowed debt persists after reload', persisted.wallet === 500 && persisted.debt.balanceCopper === 500 && persisted.debt.active === true && persisted.panelText.includes('Debt Active') && !/Owed <span class="money/i.test(persisted.panelText || '') && /Owed 5s/.test(persisted.panelText || ''), JSON.stringify(persisted));
+
+    const highPressurePersistSetup = asObject(await evaluate(client, `(() => {
+      S.player.gold = 500;
+      S.player.debtCollector = { active:true, balanceCopper:500, pressure:3, lastVisitAt:'Persist Test', notes:['Pressure persisted'] };
+      S.screen = 'town';
+      if (typeof save === 'function') save(S);
+      render();
+      return JSON.stringify({
+        wallet:S.player.gold,
+        debt:{ ...S.player.debtCollector },
+        pressureState:window.DungeonDexDebtCollector.debtCollectorHighPressureState(S),
+        borrowContract:window.DungeonDexDebtCollector.debtCollectorBorrowContract(S, 500),
+        panelText:document.getElementById('debtCollectorPanel')?.innerText || ''
+      });
+    })()`));
+    record('Under Collection setup derives from pressure without new save field', highPressurePersistSetup.wallet === 500 && highPressurePersistSetup.debt?.balanceCopper === 500 && highPressurePersistSetup.debt?.pressure === 3 && !Object.prototype.hasOwnProperty.call(highPressurePersistSetup.debt || {}, 'highPressureActive') && highPressurePersistSetup.pressureState?.highPressureActive === true && highPressurePersistSetup.borrowContract?.enabled === false && /Under Collection: borrowing is paused until pressure drops below 3/.test(highPressurePersistSetup.panelText || ''), JSON.stringify(highPressurePersistSetup));
+
+    await client.send('Page.reload', { ignoreCache: true });
+    if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after high-pressure persistence reload.');
+    const highPressurePersisted = asObject(await evaluate(client, `(() => JSON.stringify({
+      wallet:S.player.gold,
+      debt:{ ...S.player.debtCollector },
+      pressureState:window.DungeonDexDebtCollector.debtCollectorHighPressureState(S),
+      borrowContract:window.DungeonDexDebtCollector.debtCollectorBorrowContract(S, 500),
+      panelText:document.getElementById('debtCollectorPanel')?.innerText || ''
+    }))()`));
+    record('Under Collection persists after reload by deriving from saved pressure', highPressurePersisted.wallet === 500 && highPressurePersisted.debt?.balanceCopper === 500 && highPressurePersisted.debt?.pressure === 3 && !Object.prototype.hasOwnProperty.call(highPressurePersisted.debt || {}, 'highPressureActive') && highPressurePersisted.pressureState?.highPressureThreshold === 3 && highPressurePersisted.pressureState?.highPressureActive === true && highPressurePersisted.pressureState?.borrowingBlockedByPressure === true && highPressurePersisted.borrowContract?.enabled === false && highPressurePersisted.borrowContract?.blockedReason === 'under_collection' && /Under Collection: borrowing is paused until pressure drops below 3/.test(highPressurePersisted.panelText || ''), JSON.stringify(highPressurePersisted));
 
     const repayResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 300;
@@ -434,7 +588,7 @@ async function main() {
       };
       return { partial, partialHadHandler: !!partialButton && typeof partialButton.onclick === 'function' };
     })()`));
-    record('Repay Debt spends available wallet partially and eases pressure by 1', repayResult.partialHadHandler && repayResult.partial.walletBefore === 300 && repayResult.partial.debtBefore?.balanceCopper === 500 && repayResult.partial.debtBefore?.pressure === 3 && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.pressure === 2 && repayResult.partial.debt.active === true && repayResult.partial.paidCopper === 300 && repayResult.partial.debtReducedCopper === 300 && repayResult.partial.pressureReduced === 1 && repayResult.partial.contractBefore?.maxRepayCopper === 300 && repayResult.partial.contractBefore?.pressureReliefEnabled === true && repayResult.partial.contractBefore?.pressureReliefAvailable === true && repayResult.partial.contractBefore?.pressureReliefAmount === 1 && repayResult.partial.contractBefore?.pressureReliefMax === 1 && repayResult.partial.contractAfterPartial?.enabled === false && repayResult.partial.contractAfterPartial?.blockedReason === 'no_coin' && repayResult.partial.contractAfterPartial?.balanceCopper === 200 && repayResult.partial.contractAfterPartial?.walletCopper === 0 && repayResult.partial.contractAfterPartial?.pressureReliefAvailable === false && repayResult.partial.contractAfterPartial?.pressureReliefAmount === 0 && /Owed 2s/.test(repayResult.partial.panelText || '') && /Pressure 2/.test(repayResult.partial.panelText || '') && /Repay spends purse coin and eases pressure by 1 when pressure is active/.test(repayResult.partial.panelText || '') && /data-debt-repayment-mode="live-gameplay"/.test(repayResult.partial.panel || ''), JSON.stringify(repayResult.partial));
+    record('Repay Debt spends available wallet partially and eases pressure by 1', repayResult.partialHadHandler && repayResult.partial.walletBefore === 300 && repayResult.partial.debtBefore?.balanceCopper === 500 && repayResult.partial.debtBefore?.pressure === 3 && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.pressure === 2 && repayResult.partial.debt.active === true && repayResult.partial.paidCopper === 300 && repayResult.partial.debtReducedCopper === 300 && repayResult.partial.pressureReduced === 1 && repayResult.partial.contractBefore?.maxRepayCopper === 300 && repayResult.partial.contractBefore?.highPressureThreshold === 3 && repayResult.partial.contractBefore?.highPressureActive === true && repayResult.partial.contractBefore?.borrowingBlockedByPressure === true && repayResult.partial.contractBefore?.pressureReliefEnabled === true && repayResult.partial.contractBefore?.pressureReliefAvailable === true && repayResult.partial.contractBefore?.pressureReliefAmount === 1 && repayResult.partial.contractBefore?.pressureReliefMax === 1 && repayResult.partial.contractAfterPartial?.enabled === false && repayResult.partial.contractAfterPartial?.blockedReason === 'no_coin' && repayResult.partial.contractAfterPartial?.balanceCopper === 200 && repayResult.partial.contractAfterPartial?.walletCopper === 0 && repayResult.partial.contractAfterPartial?.highPressureActive === false && repayResult.partial.contractAfterPartial?.borrowingBlockedByPressure === false && repayResult.partial.contractAfterPartial?.pressureReliefAvailable === false && repayResult.partial.contractAfterPartial?.pressureReliefAmount === 0 && /Owed 2s/.test(repayResult.partial.panelText || '') && /Pressure 2/.test(repayResult.partial.panelText || '') && !/Under Collection: borrowing is paused/.test(repayResult.partial.panelText || '') && /Repay spends purse coin and eases pressure by 1 when pressure is active/.test(repayResult.partial.panelText || '') && /data-debt-repayment-mode="live-gameplay"/.test(repayResult.partial.panel || ''), JSON.stringify(repayResult.partial));
     record('Debt repayment does not touch Talent, Revisit, combat, rewards, progression, or run choices', repayResult.partial?.talentSame === true && repayResult.partial?.revisitSame === true && repayResult.partial?.statsSame === true && repayResult.partial?.choicesSame === true && repayResult.partial?.rewardsSame === true && repayResult.partial?.progressionSame === true, JSON.stringify(repayResult.partial));
 
     const failedRepayResult = asObject(await evaluate(client, `(() => {
