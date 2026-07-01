@@ -16,7 +16,15 @@ window.ddGetMonsterCue = function(name){
     "The creature watches silently.",
     "Ash drifts from the enemy's armor.",
     "A hostile presence fills the chamber.",
-    "The monster prepares to strike."
+    "The monster prepares to strike.",
+    "The enemy's eyes gleam with malice.",
+    "A shadow moves across the floor.",
+    "The creature's breath is ragged and heavy.",
+    "The monster's claws scrape against the stone.",
+    "The enemy lets out a low growl.",
+    "The creature's gaze is fixed on you.",
+    "The monster's movements are deliberate and menacing.",
+    "A chill runs down your spine as the enemy approaches.",
   ];
   return cues[Math.floor(Math.random()*cues.length)];
 };
