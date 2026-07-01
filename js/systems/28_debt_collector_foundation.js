@@ -244,6 +244,7 @@
     const passiveContract = debtCollectorClarityPassiveContract(state);
     const liveRendererWired = passiveContract?.learned === true && passiveContract?.liveRendererWired === true;
     const clarityLearned = passiveContract?.learned === true;
+    const clarityCopyModelUsed = clarityLearned === true;
     const clarityStatusText = liveRendererWired
       ? 'Clarity: learned copy-only'
       : clarityLearned
@@ -255,16 +256,17 @@
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
     const canRepay = debt.balanceCopper > 0 && wallet > 0;
-    const titleText = liveRendererWired ? rendererCopy.title : summary.title;
-    const summaryText = liveRendererWired ? rendererCopy.summaryText : summary.summary;
-    const statusText = liveRendererWired ? rendererCopy.statusText : summary.statusLabel;
-    const balanceText = liveRendererWired ? rendererCopy.balanceText : summary.balanceLabel;
-    const pressureText = liveRendererWired ? rendererCopy.pressureText : pressure.label;
-    const pressureDetail = liveRendererWired ? rendererCopy.pressureDetail : pressure.detail;
-    const flavorText = liveRendererWired ? rendererCopy.flavorText : debtCollectorStatusLine(state);
-    const termsText = liveRendererWired ? rendererCopy.termsText : 'Repay spends purse coin. Pressure is visible only.';
-    const lastVisitText = liveRendererWired ? rendererCopy.lastVisitText : summary.lastVisitLabel;
-    const notesText = liveRendererWired ? rendererCopy.notesText : summary.notesLabel;
+    const copyModelSource = liveRendererWired || clarityCopyModelUsed ? rendererCopy : summary;
+    const titleText = copyModelSource.title || summary.title;
+    const summaryText = copyModelSource.summaryText || summary.summary;
+    const statusText = copyModelSource.statusText || summary.statusLabel;
+    const balanceText = copyModelSource.balanceText || summary.balanceLabel;
+    const pressureText = copyModelSource.pressureText || pressure.label;
+    const pressureDetail = copyModelSource.pressureDetail || pressure.detail;
+    const flavorText = copyModelSource.flavorText || debtCollectorStatusLine(state);
+    const termsText = copyModelSource.termsText || 'Repay spends purse coin. Pressure is visible only.';
+    const lastVisitText = copyModelSource.lastVisitText || summary.lastVisitLabel;
+    const notesText = copyModelSource.notesText || summary.notesLabel;
     const notes = debt.notes.length
       ? `<div class="small muted debt-collector-notes">${debt.notes.map(note => `<div class="debt-collector-note">${escapeHtml(note)}</div>`).join('')}</div>`
       : '';
@@ -274,7 +276,7 @@
         <h2>${escapeHtml(titleText)}</h2>
         <p>${escapeHtml(summaryText)}</p>
       </div>
-      <span class="pill debt-collector-status-pill ${statusClass}">${escapeHtml(statusText)}</span>
+      <span class="pill debt-collector-status-pill ${statusClass}" data-debt-clarity-mode="${clarityCopyModelUsed ? 'copy-model' : 'locked'}">${escapeHtml(statusText)}</span>
     </div>
     <p class="small muted debt-collector-flavor">${escapeHtml(flavorText)}</p>
     <div class="tag-row debt-collector-chips" aria-label="Debt Collector status">
