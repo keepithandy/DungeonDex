@@ -1550,11 +1550,11 @@
       copy.flavorText = copy.balanceText && copy.pressureText
         ? `${copy.balanceText}. ${copy.pressureDetail || 'Pressure is visible.'}`
         : 'Debt is active. Pressure is visible.';
-      copy.termsText = 'Repay spends purse coin. Pressure is visible only.';
+      copy.termsText = 'Repay spends purse coin and eases pressure by 1 when pressure is active.';
     } else {
       copy.summaryText = 'No active debt. Pressure is quiet.';
       copy.flavorText = 'No debt due. Pressure is quiet.';
-      copy.termsText = 'Repay spends purse coin. Pressure is visible only.';
+      copy.termsText = 'Repay spends purse coin and eases pressure by 1 when pressure is active.';
     }
     copy.passiveSurface = 'Debt Collector copy-model preview only';
     copy.clarityApplied = true;

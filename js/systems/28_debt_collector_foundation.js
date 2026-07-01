@@ -12,6 +12,7 @@
     { label: 'Borrow 10s', amount: coinValue(0, 10, 0) },
     { label: 'Borrow 25s', amount: coinValue(0, 25, 0) }
   ];
+  const PRESSURE_RELIEF_PER_REPAYMENT = 1;
 
   function coinValue(gold = 0, silver = 0, copper = 0){
     if (typeof coins === 'function') return coins(gold, silver, copper);
@@ -140,7 +141,7 @@
       pressureText: pressure.label,
       pressureDetail: pressure.detail,
       flavorText: debtCollectorStatusLine(state),
-      termsText: 'Repay spends purse coin. Pressure is visible only.',
+      termsText: 'Repay spends purse coin and eases pressure by 1 when pressure is active.',
       statusMetaText: summary.statusLabel,
       lastVisitText: summary.lastVisitLabel,
       notesText: summary.notesLabel,
@@ -167,6 +168,8 @@
     const maxRepayCopper = Math.max(0, Math.min(wallet, debt.balanceCopper));
     const copyModel = debtCollectorClarityRendererCopyModel(state);
     const enabled = debt.balanceCopper > 0 && wallet > 0 && maxRepayCopper > 0;
+    const pressureReliefAvailable = enabled && debt.pressure > 0;
+    const pressureReliefAmount = pressureReliefAvailable ? Math.min(PRESSURE_RELIEF_PER_REPAYMENT, debt.pressure) : 0;
     return {
       contractOwner: 'DungeonDexDebtCollector',
       contractVersion: 1,
@@ -180,14 +183,19 @@
       balanceCopper: debt.balanceCopper,
       walletCopper: wallet,
       maxRepayCopper,
+      pressureReliefEnabled: true,
+      pressureReliefAvailable,
+      pressureReliefAmount,
+      pressureReliefMax: PRESSURE_RELIEF_PER_REPAYMENT,
       appliesEffect: true,
       mutatesStateOnAction: true,
       mutatesSave: true,
       affectsDebtBalance: true,
       affectsWallet: true,
+      affectsPressure: true,
       debtMath: true,
       repayment: true,
-      pressure: false,
+      pressure: true,
       borrowing: false,
       economy: true,
       combat: false,
@@ -243,9 +251,15 @@
       if (typeof pushLog === 'function') pushLog(state, 'No coin available to repay the Debt Collector.');
       return { ok: false, reason: 'no coin' };
     }
+    const pressureBefore = Math.max(0, Math.floor(Number(debt.pressure) || 0));
     state.player.gold = Math.max(0, wallet - paid);
     debt.balanceCopper = Math.max(0, balance - paid);
     debt.lastVisitAt = nowStamp();
+    let pressureRelief = 0;
+    if (debt.balanceCopper > 0 && pressureBefore > 0) {
+      pressureRelief = Math.min(PRESSURE_RELIEF_PER_REPAYMENT, pressureBefore);
+      debt.pressure = Math.max(0, pressureBefore - pressureRelief);
+    }
     if (debt.balanceCopper <= 0) {
       debt.active = false;
       debt.pressure = 0;
@@ -253,10 +267,10 @@
       if (typeof pushLog === 'function') pushLog(state, `Debt Collector marker cleared with ${moneyHtml(paid)}.`);
     } else {
       debt.active = true;
-      addDebtNote(debt, `Repaid ${moneyPlain(paid)} toward the marker.`);
+      addDebtNote(debt, `Repaid ${moneyPlain(paid)} toward the marker.${pressureRelief > 0 ? ' Pressure eased by 1.' : ''}`);
       if (typeof pushLog === 'function') pushLog(state, `Debt Collector repayment: ${moneyHtml(paid)}.`);
     }
-    return { ok: true, amount: paid, balanceCopper: debt.balanceCopper };
+    return { ok: true, amount: paid, balanceCopper: debt.balanceCopper, pressureBefore, pressureAfter: debt.pressure, pressureRelief: Math.max(0, pressureBefore - debt.pressure) };
   }
 
   function recordDebtReturn(state){
@@ -293,8 +307,8 @@
         ? 'Clarity: learned helper only'
         : 'Clarity: locked';
     const clarityDetailText = liveRendererWired
-      ? 'Debt Collector Clarity is display text only; debt math, pressure, repayment, and economy stay unchanged.'
-      : 'Debt Collector Clarity is not active here; debt math, pressure, repayment, and economy stay unchanged.';
+      ? 'Debt Collector Clarity is display text only; it does not change repayment, pressure relief, debt math, or economy.'
+      : 'Debt Collector Clarity is not active here; repayment, pressure relief, debt math, and economy use Debt rules only.';
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const repaymentContract = debtCollectorRepaymentContract(state);
     const canRepay = repaymentContract.enabled === true;
@@ -306,7 +320,7 @@
     const pressureText = copyModelSource.pressureText || pressure.label;
     const pressureDetail = copyModelSource.pressureDetail || pressure.detail;
     const flavorText = copyModelSource.flavorText || debtCollectorStatusLine(state);
-    const termsText = copyModelSource.termsText || 'Repay spends purse coin. Pressure is visible only.';
+    const termsText = copyModelSource.termsText || 'Repay spends purse coin and eases pressure by 1 when pressure is active.';
     const lastVisitText = copyModelSource.lastVisitText || summary.lastVisitLabel;
     const notesText = copyModelSource.notesText || summary.notesLabel;
     const notes = debt.notes.length
@@ -403,8 +417,9 @@
       : JSON.parse(JSON.stringify(state));
     const persistOk = persisted.player.debtCollector.balanceCopper === state.player.debtCollector.balanceCopper && persisted.player.debtCollector.active === true;
     state.player.gold = coinValue(0, 3, 0);
+    state.player.debtCollector.pressure = 2;
     const partial = repayDebt(state);
-    const partialOk = partial.ok && state.player.gold === 0 && state.player.debtCollector.balanceCopper === coinValue(0, 2, 0) && state.player.debtCollector.active === true;
+    const partialOk = partial.ok && state.player.gold === 0 && state.player.debtCollector.balanceCopper === coinValue(0, 2, 0) && state.player.debtCollector.active === true && state.player.debtCollector.pressure === 1 && partial.pressureRelief === 1;
     state.player.gold = coinValue(0, 25, 0);
     const clear = repayDebt(state);
     const clearOk = clear.ok && state.player.debtCollector.balanceCopper === 0 && state.player.debtCollector.active === false && state.player.debtCollector.pressure === 0;
