@@ -26,7 +26,15 @@ window.ddGetMonsterCue = function(name){
     "The monster's movements are deliberate and menacing.",
     "A chill runs down your spine as the enemy approaches.",
   ];
-  return cues[Math.floor(Math.random()*cues.length)];
+  const namedCues = monsterName ? [
+    `the ${monsterName} studies your stance carefully.`,
+    `the ${monsterName} lets out a low growl.`,
+    `the ${monsterName} shifts its weight, preparing to strike.`,
+    `the ${monsterName} eyes you with a predatory gaze.`,
+    `the ${monsterName} moves with a fluid, dangerous grace.`,
+  ]  : [];
+  const pool = nameCues.length ? cues.concat(namedCues) : cues;
+  return pool[Math.floor(Math.random()*pool.length)];
 };
 
 (function(){
