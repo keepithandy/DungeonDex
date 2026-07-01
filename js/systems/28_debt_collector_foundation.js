@@ -244,7 +244,7 @@
     const passiveContract = debtCollectorClarityPassiveContract(state);
     const liveRendererWired = passiveContract?.learned === true && passiveContract?.liveRendererWired === true;
     const clarityLearned = passiveContract?.learned === true;
-    const clarityCopyModelUsed = clarityLearned === true;
+    const clarityCopyModelUsed = rendererCopy?.copyModelRendererWired === true;
     const clarityStatusText = liveRendererWired
       ? 'Clarity: learned copy-only'
       : clarityLearned

@@ -30,7 +30,7 @@ Allowed future learned-copy fields:
 
 - Text labels such as `statusLabel`, `balanceLabel`, `pressureLabel`, `termsLabel`, and `reminderLabel`.
 - Renderer copy model text such as `summaryText`, `statusText`, `balanceText`, `pressureText`, `pressureDetail`, `flavorText`, `termsText`, `statusMetaText`, `lastVisitText`, and `notesText`.
-- Copy-only metadata such as `passiveSurface`, `clarityApplied`, and `previewOnly`.
+- Copy-only metadata such as `passiveSurface`, `clarityApplied`, `copyModelRendererWired`, and `previewOnly`.
 
 Never-mutating fields:
 
@@ -52,6 +52,7 @@ Activation checklist for a future issue:
 6. Run Talent, Debt, and Revisit smokes before closing the activation issue.
 
 Current status: design-ready, not activation-ready. `liveRendererWired` must remain false unless a future activation issue explicitly changes it.
+`copyModelRendererWired` may be true for display-only copy-model wiring without implying live renderer activation.
 
 ## Issue 13: Revisit Trophy Echo readiness note
 

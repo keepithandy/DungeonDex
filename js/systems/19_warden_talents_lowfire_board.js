@@ -1532,6 +1532,7 @@
     copy.passiveSurface = 'Debt Collector copy-model preview only';
     copy.passiveApplied = false;
     copy.copyModelApplied = true;
+    copy.copyModelRendererWired = true;
     copy.previewOnly = true;
     copy.guarded = true;
     copy.liveRendererWired = false;
@@ -1557,6 +1558,7 @@
     }
     copy.passiveSurface = 'Debt Collector copy-model preview only';
     copy.clarityApplied = true;
+    copy.copyModelRendererWired = true;
     copy.passiveApplied = false;
     copy.previewOnly = true;
     copy.guarded = true;

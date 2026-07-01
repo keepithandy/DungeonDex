@@ -199,6 +199,7 @@ assert.equal(JSON.stringify(debtSource), debtSourceBefore, 'Debt copy helper mus
 assert.equal(debtCopy.passiveSurface, 'Debt Collector copy-model preview only');
 assert.equal(debtCopy.passiveApplied, false);
 assert.equal(debtCopy.copyModelApplied, true);
+assert.equal(debtCopy.copyModelRendererWired, true);
 assert.equal(debtCopy.previewOnly, true);
 assert.equal(debtCopy.liveRendererWired, false);
 assert.equal(debtCopy.balanceCopper, 1200);
