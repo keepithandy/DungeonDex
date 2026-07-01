@@ -105,6 +105,9 @@
     id: node.nodeKey,
     path: path.id,
     name: node.nodeTitle,
+    tier: node.tier || 0,
+    costPreview: node.costPreview || 0,
+    plannedCost: node.costPreview || 0,
     effect: node.passivePreviewDescription,
     summary: node.requirementPreview,
     note: 'Preview only.'
@@ -603,6 +606,301 @@
     return Object.keys(value).filter(key => value[key] === true && TALENT_BY_ID[key]);
   }
 
+  function talentRawNodeMeta(nodeKey){
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    for (const [branchId, branch] of Object.entries(TALENT_PASSIVE_PREVIEW_MAP)) {
+      const found = Array.isArray(branch.nodes)
+        ? branch.nodes.find(node => normaliseMilestoneId(node.nodeKey) === resolvedNodeKey)
+        : null;
+      if (found) {
+        return {
+          branchId,
+          branchName: branch.branchName || branchId,
+          branchSummary: branch.branchSummary || '',
+          node: found
+        };
+      }
+    }
+    return null;
+  }
+
+  function hasTalentNodeLearned(state, nodeKey){
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    const player = safeLedgerSource(state?.player);
+    const learnedMap = safeLedgerSource(ownValue(player, 'talentLearnedIds', {}));
+    const talentState = safeLedgerSource(ownValue(player, 'talents', {}));
+    const unlockedMap = safeLedgerSource(ownValue(talentState, 'unlocked', {}));
+    const spentMap = safeLedgerSource(ownValue(talentState, 'spent', {}));
+    const unlockIds = Array.isArray(player.talentUnlockIds) ? player.talentUnlockIds.map(id => normaliseMilestoneId(id)) : [];
+    const legacyIds = Array.isArray(talentState.unlockedIds) ? talentState.unlockedIds.map(id => normaliseMilestoneId(id)) : [];
+    return learnedMap[resolvedNodeKey] === true
+      || unlockedMap[resolvedNodeKey] === true
+      || spentMap[resolvedNodeKey] === true
+      || unlockIds.includes(resolvedNodeKey)
+      || legacyIds.includes(resolvedNodeKey);
+  }
+
+  function talentPassiveFrameworkProfile(nodeKey){
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    if (resolvedNodeKey === 'hunter_board_clarity') {
+      return {
+        classification: 'complete_copy_only',
+        contractHelperStatus: 'specific_contract',
+        rendererHelperStatus: 'live_copy_renderer',
+        hasRendererHelper: true,
+        copyOnly: true,
+        intentionallyDisabled: false,
+        spendPathAvailable: true,
+        safeFutureActivation: false,
+        blockedReason: '',
+        inactiveReason: '',
+        effectKey: 'hunter_board_clarity_display_copy',
+        affectedSurface: 'Elite Board display copy only',
+        passiveEnabledWhenLearned: true,
+        liveRendererWiredWhenLearned: true,
+        appliesCopyEffectWhenEnabled: true,
+        smokeCoverage: 'specific_runtime_and_browser_smoke',
+        futureBlockers: []
+      };
+    }
+    if (resolvedNodeKey === 'debt_collector_clarity') {
+      return {
+        classification: 'complete_inactive_guarded',
+        contractHelperStatus: 'specific_guarded_contract',
+        rendererHelperStatus: 'copy_model_only_not_live',
+        hasRendererHelper: true,
+        copyOnly: true,
+        intentionallyDisabled: true,
+        spendPathAvailable: false,
+        safeFutureActivation: true,
+        blockedReason: 'guarded_renderer_not_wired',
+        inactiveReason: 'Guarded: live Debt Collector renderer wiring is not authorized.',
+        effectKey: 'debt_collector_clarity_display_copy',
+        affectedSurface: 'Debt Collector copy-model preview only',
+        passiveEnabledWhenLearned: false,
+        liveRendererWiredWhenLearned: false,
+        appliesCopyEffectWhenEnabled: false,
+        smokeCoverage: 'specific_guard_smoke',
+        futureBlockers: [
+          'explicit activation issue',
+          'live renderer wiring',
+          'renderer integration smoke'
+        ]
+      };
+    }
+    return {
+      classification: 'placeholder',
+      contractHelperStatus: 'generic_inventory_contract',
+      rendererHelperStatus: 'none',
+      hasRendererHelper: false,
+      copyOnly: false,
+      intentionallyDisabled: true,
+      spendPathAvailable: false,
+      safeFutureActivation: false,
+      blockedReason: 'placeholder_no_contract_or_renderer',
+      inactiveReason: 'Placeholder passive. No spend path, renderer helper, or live effect is authorized.',
+      effectKey: '',
+      affectedSurface: 'none',
+      passiveEnabledWhenLearned: false,
+      liveRendererWiredWhenLearned: false,
+      appliesCopyEffectWhenEnabled: false,
+      smokeCoverage: 'inventory_status_smoke_only',
+      futureBlockers: [
+        'specific passive contract',
+        'activation issue',
+        'renderer or gameplay wiring',
+        'focused smoke coverage'
+      ]
+    };
+  }
+
+  function talentPassiveLifecycleState(contract){
+    if (!contract || contract.known === false) return 'unknown';
+    if (contract.appliesEffect === true) return 'applies_effect';
+    if (contract.passiveEnabled === true) return 'passive_enabled';
+    if (contract.passiveReady === true) return 'passive_ready';
+    if (contract.learned === true) return 'learned';
+    if (contract.learnable === true) return 'learnable';
+    if (contract.previewable === true) return 'preview';
+    return 'locked';
+  }
+
+  function talentPassiveContract(state, nodeKey, overrides = {}){
+    const resolvedNodeKey = normaliseMilestoneId(nodeKey);
+    const def = TALENT_BY_ID[resolvedNodeKey] || null;
+    if (!def) {
+      return Object.freeze({
+        known: false,
+        nodeKey: resolvedNodeKey,
+        displayName: '',
+        statusClassification: 'unknown_needs_review',
+        contractOwner: 'DungeonDexTalents',
+        contractVersion: 1,
+        learned: false,
+        passiveReady: false,
+        passiveEnabled: false,
+        appliesEffect: false,
+        appliesCopyEffect: false,
+        liveRendererWired: false,
+        mutatesSave: false,
+        inactiveReason: 'Unknown Talent passive node.'
+      });
+    }
+    const meta = talentRawNodeMeta(resolvedNodeKey) || {};
+    const profile = talentPassiveFrameworkProfile(resolvedNodeKey);
+    const learned = hasTalentNodeLearned(state, resolvedNodeKey);
+    const spendPreview = resolvedNodeKey === 'hunter_board_clarity' && typeof talentSpendPreview === 'function'
+      ? talentSpendPreview(state, resolvedNodeKey)
+      : null;
+    const learnable = profile.spendPathAvailable === true && learned === false && spendPreview?.eligible === true && spendPreview?.blockedReason === 'ready';
+    const passiveReady = overrides.passiveReady === false ? false : learned;
+    const passiveEnabled = overrides.passiveEnabled === true
+      ? learned
+      : profile.passiveEnabledWhenLearned === true && learned;
+    const liveRendererWired = overrides.liveRendererWired === true
+      ? learned
+      : profile.liveRendererWiredWhenLearned === true && learned;
+    const appliesCopyEffect = profile.appliesCopyEffectWhenEnabled === true && passiveEnabled === true && liveRendererWired === true;
+    const blockedReason = learned && passiveReady && !passiveEnabled && profile.blockedReason
+      ? profile.blockedReason
+      : !learned && learnable
+        ? 'ready_to_learn'
+        : !learned && resolvedNodeKey === 'hunter_board_clarity'
+          ? (spendPreview?.blockedReason || 'insufficient_points')
+          : profile.blockedReason;
+    const contract = {
+      contractOwner: 'DungeonDexTalents',
+      contractVersion: 1,
+      known: true,
+      nodeKey: resolvedNodeKey,
+      displayName: def.name || meta.node?.nodeTitle || resolvedNodeKey,
+      branchId: def.path || meta.branchId || '',
+      branchName: meta.branchName || TALENT_PATH_BY_ID[def.path]?.label || def.path || '',
+      branchSummary: meta.branchSummary || TALENT_PATH_BY_ID[def.path]?.summary || '',
+      tier: Math.max(0, Math.floor(N(def.tier || meta.node?.tier, 0, 0, 999999))),
+      cost: Math.max(0, Math.floor(N(def.plannedCost ?? def.costPreview ?? meta.node?.costPreview, 0, 0, 999999))),
+      statusClassification: profile.classification,
+      appearsInUi: true,
+      previewable: true,
+      learnable,
+      learnedOnly: learned === true && profile.spendPathAvailable !== true,
+      spendPathAvailable: profile.spendPathAvailable === true,
+      spendable: learnable,
+      persistsAfterSaveLoad: true,
+      hasContractHelper: true,
+      contractHelperStatus: profile.contractHelperStatus,
+      hasRendererHelper: profile.hasRendererHelper === true,
+      rendererHelperStatus: profile.rendererHelperStatus,
+      changesGameplay: false,
+      copyOnly: profile.copyOnly === true,
+      intentionallyDisabled: profile.intentionallyDisabled === true,
+      guarded: profile.intentionallyDisabled === true || profile.classification === 'placeholder',
+      safeFutureActivation: profile.safeFutureActivation === true,
+      blockedReason,
+      inactiveReason: passiveEnabled ? '' : profile.inactiveReason,
+      learned,
+      passiveReady,
+      passiveEnabled,
+      appliesEffect: overrides.appliesEffect === true,
+      appliesCopyEffect,
+      liveRendererWired,
+      mutatesSave: overrides.mutatesSave === true,
+      effectKey: profile.effectKey,
+      affectedSurface: profile.affectedSurface,
+      smokeCoverage: profile.smokeCoverage,
+      futureBlockers: Object.freeze(profile.futureBlockers.slice()),
+      sourceData: Object.freeze({
+        definition: 'TALENT_RULESET_PREVIEW',
+        statePath: 'player.talentLearnedIds',
+        spendSource: resolvedNodeKey === 'hunter_board_clarity' ? 'Boss Trophy Milestone point ledger' : 'none'
+      }),
+      combat: false,
+      economy: false,
+      rewards: false,
+      monsters: false,
+      gear: false,
+      progression: false,
+      dungeonProgression: false,
+      dungeonScaling: false,
+      scaling: false,
+      revisit: false,
+      debtCollector: resolvedNodeKey === 'debt_collector_clarity' ? false : false,
+      debtMath: false,
+      eliteBoardMath: false,
+      eliteBoardDifficultyRiskRewardMath: false,
+      talentUiActions: false
+    };
+    contract.lifecycleState = talentPassiveLifecycleState(contract);
+    return Object.freeze(contract);
+  }
+
+  function talentPassiveInventory(state){
+    const nodes = TALENT_DEFS.map(def => talentPassiveContract(state, def.id));
+    const counts = nodes.reduce((summary, entry) => {
+      summary.total += 1;
+      summary[entry.statusClassification] = (summary[entry.statusClassification] || 0) + 1;
+      if (entry.spendPathAvailable) summary.spendPathAvailable += 1;
+      if (entry.spendable) summary.spendable += 1;
+      if (entry.learned) summary.learned += 1;
+      if (entry.passiveReady) summary.passiveReady += 1;
+      if (entry.passiveEnabled) summary.passiveEnabled += 1;
+      if (entry.appliesEffect) summary.appliesEffect += 1;
+      if (entry.appliesCopyEffect) summary.appliesCopyEffect += 1;
+      if (entry.liveRendererWired) summary.liveRendererWired += 1;
+      if (entry.guarded) summary.guarded += 1;
+      return summary;
+    }, {
+      total: 0,
+      spendPathAvailable: 0,
+      spendable: 0,
+      learned: 0,
+      passiveReady: 0,
+      passiveEnabled: 0,
+      appliesEffect: 0,
+      appliesCopyEffect: 0,
+      liveRendererWired: 0,
+      guarded: 0
+    });
+    return Object.freeze({
+      version: 1,
+      lifecycle: Object.freeze({
+        passiveReady: 'learned and eligible for passive helper checks',
+        passiveEnabled: 'allowed to run on an approved copy surface',
+        appliesEffect: 'changes gameplay or state values',
+        appliesCopyEffect: 'changes display copy only',
+        liveRendererWired: 'a live renderer intentionally consumes the helper'
+      }),
+      nodes: Object.freeze(nodes),
+      summary: Object.freeze(counts)
+    });
+  }
+
+  function talentPassiveInventorySummary(state){
+    const inventory = talentPassiveInventory(state);
+    return Object.freeze({
+      version: inventory.version,
+      total: inventory.summary.total,
+      classifications: Object.freeze({
+        complete_active: inventory.summary.complete_active || 0,
+        complete_copy_only: inventory.summary.complete_copy_only || 0,
+        complete_inactive_guarded: inventory.summary.complete_inactive_guarded || 0,
+        partial_contract_only: inventory.summary.partial_contract_only || 0,
+        partial_renderer_only: inventory.summary.partial_renderer_only || 0,
+        placeholder: inventory.summary.placeholder || 0,
+        unknown_needs_review: inventory.summary.unknown_needs_review || 0
+      }),
+      spendPathAvailable: inventory.summary.spendPathAvailable,
+      spendable: inventory.summary.spendable,
+      learned: inventory.summary.learned,
+      passiveReady: inventory.summary.passiveReady,
+      passiveEnabled: inventory.summary.passiveEnabled,
+      appliesEffect: inventory.summary.appliesEffect,
+      appliesCopyEffect: inventory.summary.appliesCopyEffect,
+      liveRendererWired: inventory.summary.liveRendererWired,
+      guarded: inventory.summary.guarded
+    });
+  }
+
   function applyTalentNodeSpend(state, nodeKey, enabledOverride = false){
     const sourceId = TALENT_EARNING_SOURCE_CONTRACT.sourceId;
     const resolvedNodeKey = normaliseMilestoneId(nodeKey);
@@ -1009,14 +1307,9 @@
 
   // Ready means learned for read-only contract checks; enabled means the copy surface may use the passive contract; appliesEffect stays reserved for gameplay changes.
   function hunterBoardClarityPassiveContract(state){
-    const resolvedNodeKey = 'hunter_board_clarity';
-    const stateContract = talentNodeStateContract(resolvedNodeKey, state, {
-      passiveEnabled: true,
-      liveRendererWired: true
-    });
-    return {
-      contractOwner: 'DungeonDexTalents',
-      ...stateContract,
+    const contract = talentPassiveContract(state, 'hunter_board_clarity');
+    return Object.freeze({
+      ...contract,
       effectKey: 'hunter_board_clarity_display_copy',
       affectedSurface: 'Elite Board display copy only',
       combat: false,
@@ -1029,20 +1322,15 @@
       revisit: false,
       debtCollector: false,
       eliteBoardDifficultyRiskRewardMath: false
-    };
+    });
   }
 
   function debtCollectorClarityPassiveContract(state){
-    const resolvedNodeKey = 'debt_collector_clarity';
-    const stateContract = talentNodeStateContract(resolvedNodeKey, state, {
-      passiveEnabled: true,
-      liveRendererWired: true
-    });
-    return {
-      contractOwner: 'DungeonDexTalents',
-      ...stateContract,
+    const contract = talentPassiveContract(state, 'debt_collector_clarity');
+    return Object.freeze({
+      ...contract,
       effectKey: 'debt_collector_clarity_display_copy',
-      affectedSurface: 'Debt Collector display copy only',
+      affectedSurface: 'Debt Collector copy-model preview only',
       combat: false,
       economy: false,
       rewards: false,
@@ -1054,68 +1342,59 @@
       eliteBoardMath: false,
       debtMath: false,
       talentUiActions: false
-    };
+    });
   }
 
   function talentPassiveActivationReadiness(state){
-    const hunter = hunterBoardClarityPassiveContract(state);
-    const debt = debtCollectorClarityPassiveContract(state);
-    const passivesReady = [
-      {
-        id: hunter.nodeKey,
-        contractDefined: true,
+    const inventory = talentPassiveInventory(state);
+    const passivesReady = inventory.nodes.map(contract => {
+      const blockedSystems = contract.nodeKey === 'debt_collector_clarity'
+        ? ['talent earning', 'talent spending', 'talent unlocks', 'debt math', 'combat scaling', 'economy', 'gear', 'monsters']
+        : ['talent earning', 'talent spending', 'talent unlocks', 'combat scaling', 'economy', 'gear', 'monsters'];
+      return {
+        id: contract.nodeKey,
+        nodeKey: contract.nodeKey,
+        label: contract.displayName,
+        classification: contract.statusClassification,
+        contractDefined: contract.hasContractHelper === true,
         contractSmoked: true,
-        displayCopyDefined: true,
-        displayCopySurface: 'Elite Board summary only',
-        passiveReady: hunter.passiveReady,
-        passiveEnabled: hunter.passiveEnabled,
-        activationStatus: 'live (copy-only)',
+        displayCopyDefined: contract.hasRendererHelper === true,
+        displayCopySurface: contract.affectedSurface || 'none',
+        passiveReady: contract.passiveReady,
+        passiveEnabled: contract.passiveEnabled,
+        appliesEffect: contract.appliesEffect,
+        appliesCopyEffect: contract.appliesCopyEffect,
+        liveRendererWired: contract.liveRendererWired,
+        activationStatus: contract.passiveEnabled
+          ? 'copy-only surface enabled'
+          : contract.passiveReady
+            ? 'guarded helper ready'
+            : contract.statusClassification === 'placeholder'
+              ? 'placeholder guarded'
+              : 'locked',
+        inactiveReason: contract.statusClassification === 'placeholder'
+          ? 'Placeholder passive. No point path, renderer helper, or live effect is authorized.'
+          : contract.inactiveReason,
         saveMutation: false,
         gameplayEffect: false,
-        blockedSystems: [
-          'talent earning',
-          'talent spending',
-          'talent unlocks',
-          'combat scaling',
-          'economy',
-          'gear',
-          'monsters'
-        ]
-      },
-      {
-        id: debt.nodeKey,
-        contractDefined: true,
-        contractSmoked: true,
-        displayCopyDefined: true,
-        displayCopySurface: 'Debt Collector preview helper only',
-        passiveReady: debt.passiveReady,
-        passiveEnabled: debt.passiveEnabled,
-        activationStatus: 'preview-ready when learned; live renderer locked',
-        saveMutation: false,
-        gameplayEffect: false,
-        blockedSystems: [
-          'talent earning',
-          'talent spending',
-          'talent unlocks',
-          'debt math',
-          'combat scaling',
-          'economy',
-          'gear',
-          'monsters'
-        ]
-      }
-    ];
+        blockedSystems
+      };
+    });
+    const contractReady = passivesReady.filter(passive => passive.contractDefined).length;
+    const displayReady = passivesReady.filter(passive => passive.nodeKey === 'hunter_board_clarity' && passive.displayCopyDefined).length;
+    const guarded = passivesReady.filter(passive => passive.passiveEnabled !== true).length;
     return Object.freeze({
       passivesReady: Object.freeze(passivesReady.map(passive => Object.freeze({
         ...passive,
         blockedSystems: Object.freeze(passive.blockedSystems.slice())
       }))),
       readinessSummary: Object.freeze({
-        total: 2,
-        contractReady: 2,
-        displayReady: 1,
+        total: passivesReady.length,
+        contractReady,
+        displayReady,
         gameplayActive: 0,
-        nextCandidate: null
+        guarded,
+        nextCandidate: 'debt_collector_clarity'
       })
     });
   }
@@ -1138,43 +1417,55 @@
     ];
     const allowedSurface = 'display-copy only';
     const activationPolicyEnabled = false;
-    const definitions = [
-      {
-        nodeKey: 'hunter_board_clarity',
-        label: 'Board Clarity',
-        contract: hunterBoardClarityPassiveContract(state),
-        activationBlockedReason: 'Further activation is blocked; the existing Elite Board renderer remains copy-only.',
-        requiredFutureSteps: [
-          'Explicitly authorize any future copy-only activation change.',
-          'Add activation-gate smoke coverage for the authorized renderer path.'
-        ]
-      },
-      {
-        nodeKey: 'debt_collector_clarity',
-        label: 'Debt Collector Clarity',
-        contract: debtCollectorClarityPassiveContract(state),
-        activationBlockedReason: 'Activation is blocked by missing live Debt Collector renderer wiring; the renderer surface remains inactive.',
-        requiredFutureSteps: [
-          'Explicitly authorize live Debt Collector display-copy wiring.',
-          'Wire the copy helper into the live renderer without changing debt behavior.',
-          'Add renderer integration smoke coverage.'
-        ]
+    const definitions = talentPassiveInventory(state).nodes.map(contract => {
+      if (contract.nodeKey === 'hunter_board_clarity') {
+        return {
+          nodeKey: contract.nodeKey,
+          label: contract.displayName,
+          contract,
+          activationBlockedReason: 'Already limited to the approved Elite Board copy-only surface; further activation is blocked.',
+          requiredFutureSteps: [
+            'Explicitly authorize any future copy-only activation change.',
+            'Add activation-gate smoke coverage for the authorized renderer path.'
+          ]
+        };
       }
-    ];
+      if (contract.nodeKey === 'debt_collector_clarity') {
+        return {
+          nodeKey: contract.nodeKey,
+          label: contract.displayName,
+          contract,
+          activationBlockedReason: 'Guarded: live Debt Collector renderer wiring is not authorized.',
+          requiredFutureSteps: [
+            'Explicitly authorize live Debt Collector display-copy wiring.',
+            'Wire the copy helper into the live renderer without changing debt behavior.',
+            'Add renderer integration smoke coverage.'
+          ]
+        };
+      }
+      return {
+        nodeKey: contract.nodeKey,
+        label: contract.displayName,
+        contract,
+        activationBlockedReason: 'Placeholder passive: missing specific contract, renderer wiring, and focused activation smoke.',
+        requiredFutureSteps: contract.futureBlockers || []
+      };
+    });
     const passives = definitions.map(definition => {
       const readinessEntry = readinessByNode.get(definition.nodeKey);
       const safetyGatesSatisfied = !!readinessEntry
         && readinessEntry.contractDefined === true
-        && readinessEntry.displayCopyDefined === true
         && readinessEntry.contractSmoked === true
-        && definition.contract.liveRendererWired === true
         && allowedSurface === 'display-copy only'
         && blockedSystems.length === 11
         && readinessEntry.saveMutation === false
-        && readinessEntry.gameplayEffect === false;
+        && readinessEntry.gameplayEffect === false
+        && definition.contract.nodeKey === 'hunter_board_clarity'
+        && definition.contract.liveRendererWired === true;
       return Object.freeze({
         nodeKey: definition.nodeKey,
         label: definition.label,
+        classification: definition.contract.statusClassification,
         readinessKnown: !!readinessEntry,
         contractHelperPresent: readinessEntry?.contractDefined === true,
         displayCopyHelperPresent: readinessEntry?.displayCopyDefined === true,
@@ -1182,6 +1473,7 @@
         learned: definition.contract.learned === true,
         passiveReady: definition.contract.passiveReady === true,
         passiveEnabled: definition.contract.passiveEnabled === true,
+        appliesCopyEffect: definition.contract.appliesCopyEffect === true,
         liveRendererWired: definition.contract.liveRendererWired === true,
         canActivateNow: safetyGatesSatisfied && activationPolicyEnabled,
         activationBlockedReason: definition.activationBlockedReason,
@@ -1237,8 +1529,12 @@
     if (pressure) copy.pressureLabel = `Pressure: ${pressure}`;
     if (terms) copy.termsLabel = `Terms: ${terms}`;
     if (reminder) copy.reminderLabel = `Reminder: ${reminder}`;
-    copy.passiveSurface = 'Debt Collector live renderer copy only';
-    copy.passiveApplied = true;
+    copy.passiveSurface = 'Debt Collector copy-model preview only';
+    copy.passiveApplied = false;
+    copy.copyModelApplied = true;
+    copy.previewOnly = true;
+    copy.guarded = true;
+    copy.liveRendererWired = false;
     return copy;
   }
 
@@ -1259,9 +1555,12 @@
       copy.flavorText = 'No debt due. Pressure is quiet.';
       copy.termsText = 'Repay spends purse coin. Pressure is visible only.';
     }
-    copy.passiveSurface = 'Debt Collector live renderer copy only';
+    copy.passiveSurface = 'Debt Collector copy-model preview only';
     copy.clarityApplied = true;
+    copy.passiveApplied = false;
     copy.previewOnly = true;
+    copy.guarded = true;
+    copy.liveRendererWired = false;
     return copy;
   }
 
@@ -1501,22 +1800,45 @@
     return 'Active: Boss Trophy point source and the controlled Hunter Board Clarity spend path.';
   }
 
-  function talentPreviewNodeMarkup(node, branch){
+  function talentPreviewNodeMarkup(node, branch, state){
+    const contract = talentPassiveContract(state, node.nodeKey || node.key);
+    const stateLabel = contract.learned
+      ? contract.passiveEnabled
+        ? 'Learned'
+        : 'Guarded'
+      : contract.spendable
+        ? 'Ready'
+        : 'Locked';
+    const stateClass = contract.passiveEnabled || contract.spendable ? 'rarity-rare' : 'is-locked';
+    const note = contract.learned
+      ? contract.passiveEnabled
+        ? 'Learned - copy-only clarity active. No combat, reward, economy, or Revisit values change.'
+        : 'Learned - guarded helper only. No live effect.'
+      : contract.spendable
+        ? 'Learnable now - spends 1 Talent Point on display clarity only.'
+        : contract.statusClassification === 'placeholder'
+          ? 'Preview only. Future passive, no live effect.'
+          : 'Preview only. Inactive.';
+    const tags = contract.learned
+      ? contract.passiveEnabled
+        ? ['Copy-only', 'No combat', 'Renderer wired']
+        : ['Guarded', 'Helper only', 'No live effect']
+      : contract.spendable
+        ? ['Learnable', 'Copy-only', 'No combat']
+        : ['Preview', 'Planned', 'Inactive'];
     return `<article class="talent-preview-node is-locked">
       <div class="talent-path-head">
         <div>
           <span class="talent-path-label">${H(branch.title)}</span>
           <h3>${H(node.title)}</h3>
         </div>
-        <span class="talent-state-pill is-locked">Locked</span>
+        <span class="talent-state-pill ${H(stateClass)}">${H(stateLabel)}</span>
       </div>
       <p class="talent-path-effect">${H(node.passivePreviewDescription || node.plannedEffect)}</p>
       <p class="small muted talent-path-summary">${H(node.branchSummary || node.detail)}</p>
-      <p class="talent-path-note small muted">${H(node.requirementPreview || node.status)}</p>
+      <p class="talent-path-note small muted">${H(note || node.requirementPreview || node.status)}</p>
       <div class="talent-preview-tags">
-        <span class="pill">Preview</span>
-        <span class="pill">Planned</span>
-        <span class="pill">Inactive</span>
+        ${tags.map(tag => `<span class="pill">${H(tag)}</span>`).join('')}
       </div>
     </article>`;
   }
@@ -1684,7 +2006,7 @@
               <span>Inactive</span>
             </div>
             <div class="talent-preview-node-grid">
-              ${branch.nodes.map(node => talentPreviewNodeMarkup(node, branch)).join('')}
+              ${branch.nodes.map(node => talentPreviewNodeMarkup(node, branch, state)).join('')}
             </div>
           </section>`).join('')}
       </div>
@@ -2052,6 +2374,9 @@
     calculateTalentSpendDryRun,
     applyTalentNodeSpend,
     talentNodeStateContract,
+    talentPassiveContract,
+    passiveInventory: talentPassiveInventory,
+    passiveInventorySummary: talentPassiveInventorySummary,
     hunterBoardClarityPassiveContract,
     applyHunterBoardClarityCopy,
     debtCollectorClarityPassiveContract,
@@ -2091,7 +2416,7 @@
       const resolvedNodeKey = normaliseMilestoneId(nodeKey);
       if (resolvedNodeKey === 'hunter_board_clarity') return hunterBoardClarityPassiveContract(state);
       if (resolvedNodeKey === 'debt_collector_clarity') return debtCollectorClarityPassiveContract(state);
-      return null;
+      return TALENT_BY_ID[resolvedNodeKey] ? talentPassiveContract(state, resolvedNodeKey) : null;
     },
     summary: state => {
       return safeTalentSummary(state);

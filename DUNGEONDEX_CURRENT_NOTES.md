@@ -9,11 +9,31 @@
 ## Current Baseline
 - DungeonDex v1.23.1 - Trophy Echo Prototype Stabilization
 
+<<<<<<< HEAD
 ## v1.23.2 Progression Systems Clarity Pass
 - Display-only town/Talent/Debt wording clarifies active, learned, preview-only, locked, and next-target states without changing saves, math, rewards, economy, district IDs, depth ranges, unlock thresholds, or activation gates.
 - Talent copy now separates the live Boss Trophy point source and controlled Hunter Board Clarity spend path from the wider locked preview tree.
 - Town copy clarifies Trophy Echo as the only playable Revisit lane, Famous Gear Memory as planned-only, Debt Collector clarity as copy-only, and district/depth progression as a next-target status line.
 - `VERSION.md` remains at v1.23.1 until an explicit version bump is requested.
+=======
+## Issue #18 Stability Guardrail Audit
+- This is a documentation-only guardrail checkpoint before the next feature-style patch.
+- Protected systems for review: controlled `hunter_board_clarity` spending, read-only Talent preview/passive helpers, Debt Collector display-copy clarity, Revisit planning lock, service worker/cache label alignment, classic script-load order, and smoke-test coverage.
+- Do not use this audit to change gameplay behavior, save mutation, cache behavior, script ordering, combat, economy, rewards, Debt Collector math, Revisit activation, Talents, gear, monsters, dungeon entry, or scaling.
+- Recommended safety net before the next feature patch: run the Talent, Debt Collector, and Revisit smoke files listed in `docs/RELEASE_CHECKLIST.md`.
+
+## v1.21.2 Revisit Trophy Echo Readiness Packet
+- Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
+- It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
+- Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
+>>>>>>> origin/issue-18-stability-guardrail-audit
+
+## v1.23.2 Talent Passive Framework Completion
+- The Talent API now exposes a canonical passive inventory for all 13 known nodes, including classification, lifecycle, spend readiness, helper status, renderer wiring, copy-only status, and blocker metadata.
+- `hunter_board_clarity` remains the only controlled spend path and the only learned passive with live copy-only renderer wiring. It changes Elite Board display copy only.
+- `debt_collector_clarity` is learned-ready for contract checks but guarded: its copy model is preview-only, `passiveEnabled` is false, and `liveRendererWired` is false until an explicit activation issue authorizes live Debt renderer wiring.
+- Placeholder passives remain preview-only with generic inventory contracts and no renderer, gameplay, economy, reward, combat, Revisit, or progression effects.
+- `smoke_talent_passive_framework_v1232.mjs` locks the passive inventory shape, Hunter Board Clarity spend lifecycle, guarded Debt Collector clarity state, Talent award preview read-only behavior, duplicate award blocking, and passive activation gate metadata.
 
 ## v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo is now the first live Revisit lane.

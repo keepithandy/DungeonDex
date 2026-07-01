@@ -55,21 +55,24 @@
     const passives = Array.isArray(gate?.passives) ? gate.passives.map(summarizeGateEntry) : [];
     const debt = passives.find(entry => entry.nodeKey === 'debt_collector_clarity') || null;
     const hunter = passives.find(entry => entry.nodeKey === 'hunter_board_clarity') || null;
+    const placeholders = passives.filter(entry => entry.nodeKey && entry.nodeKey !== 'hunter_board_clarity' && entry.nodeKey !== 'debt_collector_clarity');
     return Object.freeze({
       build: BUILD,
-      ok: passives.length === 2
+      ok: passives.length >= 13
         && passives.every(entry => entry.nonMutating && entry.blockedSystemsComplete && entry.canActivateNow === false)
         && !!hunter
         && hunter.liveDisplayReady === true
         && !!debt
         && debt.helperReady === true
-        && debt.liveRendererWired === true
-        && debt.liveDisplayReady === true,
+        && debt.liveRendererWired === false
+        && debt.liveDisplayReady === false
+        && placeholders.every(entry => entry.liveRendererWired === false && entry.liveDisplayReady === false),
       dryRun: true,
       mutatesSave: false,
       appliesGameplayEffect: false,
       liveDisplayReadyCount: passives.filter(entry => entry.liveDisplayReady).length,
       debtCollectorRendererWired: debt ? debt.liveRendererWired : false,
+      guardedPassiveCount: passives.filter(entry => entry.liveRendererWired === false).length,
       entries: Object.freeze(passives)
     });
   }
@@ -87,6 +90,7 @@
         hotfixVerified: verification.ok === true,
         liveDisplayReadyCount: verification.liveDisplayReadyCount,
         debtCollectorRendererWired: verification.debtCollectorRendererWired,
+        guardedPassiveCount: verification.guardedPassiveCount,
         verification
       });
     };

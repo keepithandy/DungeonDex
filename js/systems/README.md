@@ -24,7 +24,7 @@ It preserves classic browser script load order instead of converting the game to
 - `16_relic_forge_crafting.js` — Relic Forge crafting actions and forge state helpers.
 - `17_relic_forge_clarity.js` — Relic Forge clarity copy and UI support.
 - `18_relic_forge_compact_text.js` — Compact Relic Forge text adjustments.
-- `19_warden_talents_lowfire_board.js` — Warden Talent foundation and Lowfire Board support.
+- `19_warden_talents_lowfire_board.js` — Warden Talent foundation, passive inventory/contracts, and Lowfire Board support.
 - `20_town_currency_clean_strip.js` — Compact town currency strip cleanup.
 - `21_build_label_guard.js` — Build label guard and cache query alignment.
 - `22_nav_centering.js` — Navigation centering cleanup.
@@ -34,11 +34,23 @@ It preserves classic browser script load order instead of converting the game to
 - `26_spark_writ_pill_cleanup.js` — Spark writ pill cleanup.
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
-- `30_passive_activation_gate_hotfix.js` — Passive activation gate verification hotfix.
+- `30_passive_activation_gate_hotfix.js` — Passive activation gate verification layer.
 - `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
 - `33_talent_hunter_board_clarity_spend.js` — Controlled one-node Hunter Board Clarity spend helper and readiness model.
 - `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.2 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.
+- `smoke_talent_passive_framework_v1232.mjs` — Focused Node smoke for passive inventory shape, lifecycle flags, guarded Debt Collector clarity, Hunter Board Clarity spend, award preview, and activation gate metadata.
+
+## Talent Passive Contract Vocabulary
+
+- `passiveReady` means the node is learned and eligible for passive helper checks.
+- `passiveEnabled` means an approved copy surface may consume the passive.
+- `appliesEffect` is reserved for gameplay or state changes.
+- `appliesCopyEffect` means display copy changes only.
+- `liveRendererWired` means a live renderer intentionally consumes the helper.
+- `hunter_board_clarity` is the only current controlled spend target and live copy-only passive.
+- `debt_collector_clarity` is guarded: contract and copy-model helpers exist, but the live Debt renderer is not wired.
+- Placeholder passives have generic inventory contracts only and remain preview-only until a future issue adds specific contracts, renderer or gameplay wiring, and smoke coverage.
 
 Notes:
 - `index.html` now loads these files directly in order.
