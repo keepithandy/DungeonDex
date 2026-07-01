@@ -48,8 +48,10 @@ It preserves classic browser script load order instead of converting the game to
 - `appliesEffect` is reserved for gameplay or state changes.
 - `appliesCopyEffect` means display copy changes only.
 - `liveRendererWired` means a live renderer intentionally consumes the helper.
+- `copyModelRendererWired` means the Debt Collector panel consumes display-only copy-model text without activating the Talent passive.
 - `hunter_board_clarity` is the only current controlled spend target and live copy-only passive.
 - `debt_collector_clarity` is guarded: contract and copy-model helpers exist, but the live Debt renderer is not wired.
+- Debt Collector repayment is a Debt-owned live action; it mutates only wallet and debt balance through the Debt Collector API and does not spend Talent points.
 - Placeholder passives have generic inventory contracts only and remain preview-only until a future issue adds specific contracts, renderer or gameplay wiring, and smoke coverage.
 
 Notes:

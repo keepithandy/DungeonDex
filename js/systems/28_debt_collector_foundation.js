@@ -161,6 +161,48 @@
       : source;
   }
 
+  function debtCollectorRepaymentContract(state){
+    const debt = debtState(state);
+    const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
+    const maxRepayCopper = Math.max(0, Math.min(wallet, debt.balanceCopper));
+    const copyModel = debtCollectorClarityRendererCopyModel(state);
+    const enabled = debt.balanceCopper > 0 && wallet > 0 && maxRepayCopper > 0;
+    return {
+      contractOwner: 'DungeonDexDebtCollector',
+      contractVersion: 1,
+      actionId: 'debt_collector_repayment',
+      actionLabel: 'Repay Debt',
+      liveGameplayAction: true,
+      repaymentActionLive: true,
+      panelActionWired: true,
+      enabled,
+      blockedReason: enabled ? '' : debt.balanceCopper <= 0 ? 'no_debt' : 'no_coin',
+      balanceCopper: debt.balanceCopper,
+      walletCopper: wallet,
+      maxRepayCopper,
+      appliesEffect: true,
+      mutatesStateOnAction: true,
+      mutatesSave: true,
+      affectsDebtBalance: true,
+      affectsWallet: true,
+      debtMath: true,
+      repayment: true,
+      pressure: false,
+      borrowing: false,
+      economy: true,
+      combat: false,
+      rewards: false,
+      progression: false,
+      revisit: false,
+      trophyEcho: false,
+      talentPointEconomy: false,
+      talentEarning: false,
+      talentSpending: false,
+      copyModelRendererWired: copyModel?.copyModelRendererWired === true,
+      liveRendererWired: false
+    };
+  }
+
   function debtCollectorFallbackState(){
     return {
       active: false,
@@ -254,8 +296,8 @@
       ? 'Debt Collector Clarity is display text only; debt math, pressure, repayment, and economy stay unchanged.'
       : 'Debt Collector Clarity is not active here; debt math, pressure, repayment, and economy stay unchanged.';
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
-    const wallet = Math.max(0, Math.floor(Number(state?.player?.gold) || 0));
-    const canRepay = debt.balanceCopper > 0 && wallet > 0;
+    const repaymentContract = debtCollectorRepaymentContract(state);
+    const canRepay = repaymentContract.enabled === true;
     const copyModelSource = liveRendererWired || clarityCopyModelUsed ? rendererCopy : summary;
     const titleText = copyModelSource.title || summary.title;
     const summaryText = copyModelSource.summaryText || summary.summary;
@@ -288,7 +330,7 @@
     <p class="small muted debt-collector-terms">${escapeHtml(clarityDetailText)}</p>
     <div class="debt-collector-actions" aria-label="Debt Collector loan actions">
       ${borrowButtons}
-      <button class="primary mini" id="repayDebtBtn" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
+      <button class="primary mini" id="repayDebtBtn" data-debt-action="repay" data-debt-repayment-mode="live-gameplay" data-debt-max-repay="${repaymentContract.maxRepayCopper}" ${canRepay ? '' : 'disabled'}>Repay Debt</button>
     </div>
     <p class="small muted debt-collector-terms">${escapeHtml(termsText)}</p>
     <div class="debt-collector-meta small">
@@ -428,6 +470,7 @@
     applyDebtCollectorClarityCopy,
     debtCollectorRendererCopySource,
     debtCollectorClarityRendererCopyModel,
+    debtCollectorRepaymentContract,
     debtCollectorFallbackState,
     warning: pressureWarning,
     smoke

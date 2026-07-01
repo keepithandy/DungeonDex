@@ -241,7 +241,8 @@ async function main() {
       hasPassiveContract: typeof window.DungeonDexDebtCollector?.debtCollectorClarityPassiveContract === 'function',
       hasPassiveCopy: typeof window.DungeonDexDebtCollector?.applyDebtCollectorClarityCopy === 'function',
       hasRendererCopySource: typeof window.DungeonDexDebtCollector?.debtCollectorRendererCopySource === 'function',
-      hasRendererCopyModel: typeof window.DungeonDexDebtCollector?.debtCollectorClarityRendererCopyModel === 'function'
+      hasRendererCopyModel: typeof window.DungeonDexDebtCollector?.debtCollectorClarityRendererCopyModel === 'function',
+      hasRepaymentContract: typeof window.DungeonDexDebtCollector?.debtCollectorRepaymentContract === 'function'
     }))()`));
     record('Debt display helpers exist', !!smoke?.summary && !!smoke?.pressure && typeof smoke?.statusLine === 'string' && debtHelperShape.hasSummary && debtHelperShape.hasPressure && debtHelperShape.hasStatusLine && debtHelperShape.hasFallback, JSON.stringify({ summary: smoke?.summary, pressure: smoke?.pressure, statusLine: smoke?.statusLine, debtHelperShape }));
 
@@ -289,6 +290,9 @@ async function main() {
       const learnedRendererModel = api?.debtCollectorClarityRendererCopyModel ? api.debtCollectorClarityRendererCopyModel(rendererLearnedState) : null;
       const lockedRendererModel = api?.debtCollectorClarityRendererCopyModel ? api.debtCollectorClarityRendererCopyModel(rendererLockedState) : null;
       const canonicalRendererModel = canonical?.debtCollectorClarityRendererCopyModel ? canonical.debtCollectorClarityRendererCopyModel(rendererLearnedState, rendererSource) : null;
+      const learnedRepaymentContract = api?.debtCollectorRepaymentContract ? api.debtCollectorRepaymentContract(rendererLearnedState) : null;
+      const lockedRepaymentContract = api?.debtCollectorRepaymentContract ? api.debtCollectorRepaymentContract(rendererLockedState) : null;
+      const blockedRepaymentContract = api?.debtCollectorRepaymentContract ? api.debtCollectorRepaymentContract({ player: { gold:0, debtCollector:{ active:true, balanceCopper:1500, pressure:3 } } }) : null;
       const livePanelBefore = document.getElementById('debtCollectorPanel')?.innerHTML || '';
       const livePanelAfter = document.getElementById('debtCollectorPanel')?.innerHTML || '';
       return {
@@ -304,6 +308,9 @@ async function main() {
         learnedRendererModel,
         lockedRendererModel,
         canonicalRendererModel,
+        learnedRepaymentContract,
+        lockedRepaymentContract,
+        blockedRepaymentContract,
         rendererLearnedBefore,
         rendererLearnedAfter: JSON.stringify(rendererLearnedState),
         rendererLockedBefore,
@@ -323,8 +330,10 @@ async function main() {
     record('Debt Collector public contract delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedContract) === JSON.stringify(debtClarityAudit?.canonicalLearnedContract) && JSON.stringify(debtClarityAudit?.lockedContract) === JSON.stringify(debtClarityAudit?.canonicalLockedContract), JSON.stringify({ debtLearned:debtClarityAudit?.learnedContract, canonicalLearned:debtClarityAudit?.canonicalLearnedContract }));
     record('Debt Collector public copy helper matches canonical Talent output', JSON.stringify(debtClarityAudit?.learnedCopy) === JSON.stringify(debtClarityAudit?.canonicalLearnedCopy) && JSON.stringify(debtClarityAudit?.lockedCopy) === JSON.stringify(debtClarityAudit?.canonicalLockedCopy), JSON.stringify({ debtLearned:debtClarityAudit?.learnedCopy, canonicalLearned:debtClarityAudit?.canonicalLearnedCopy }));
     record('Debt Collector renderer copy-model helpers exist', debtHelperShape.hasRendererCopySource === true && debtHelperShape.hasRendererCopyModel === true, JSON.stringify(debtHelperShape));
+    record('Debt Collector repayment activation contract is live and bounded', debtHelperShape.hasRepaymentContract === true && debtClarityAudit?.learnedRepaymentContract?.liveGameplayAction === true && debtClarityAudit?.learnedRepaymentContract?.repaymentActionLive === true && debtClarityAudit?.learnedRepaymentContract?.panelActionWired === true && debtClarityAudit?.learnedRepaymentContract?.enabled === true && debtClarityAudit?.learnedRepaymentContract?.maxRepayCopper === 875 && debtClarityAudit?.learnedRepaymentContract?.appliesEffect === true && debtClarityAudit?.learnedRepaymentContract?.mutatesStateOnAction === true && debtClarityAudit?.learnedRepaymentContract?.mutatesSave === true && debtClarityAudit?.learnedRepaymentContract?.affectsDebtBalance === true && debtClarityAudit?.learnedRepaymentContract?.affectsWallet === true && debtClarityAudit?.learnedRepaymentContract?.debtMath === true && debtClarityAudit?.learnedRepaymentContract?.repayment === true && debtClarityAudit?.learnedRepaymentContract?.economy === true && debtClarityAudit?.learnedRepaymentContract?.pressure === false && debtClarityAudit?.learnedRepaymentContract?.combat === false && debtClarityAudit?.learnedRepaymentContract?.rewards === false && debtClarityAudit?.learnedRepaymentContract?.progression === false && debtClarityAudit?.learnedRepaymentContract?.revisit === false && debtClarityAudit?.learnedRepaymentContract?.trophyEcho === false && debtClarityAudit?.learnedRepaymentContract?.talentPointEconomy === false && debtClarityAudit?.learnedRepaymentContract?.talentEarning === false && debtClarityAudit?.learnedRepaymentContract?.talentSpending === false && debtClarityAudit?.learnedRepaymentContract?.copyModelRendererWired === true && debtClarityAudit?.learnedRepaymentContract?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRepaymentContract));
+    record('Debt repayment contract blocks only unaffordable repayment', debtClarityAudit?.lockedRepaymentContract?.enabled === true && debtClarityAudit?.lockedRepaymentContract?.copyModelRendererWired === false && debtClarityAudit?.blockedRepaymentContract?.enabled === false && debtClarityAudit?.blockedRepaymentContract?.blockedReason === 'no_coin' && debtClarityAudit?.blockedRepaymentContract?.maxRepayCopper === 0, JSON.stringify({ locked:debtClarityAudit?.lockedRepaymentContract, blocked:debtClarityAudit?.blockedRepaymentContract }));
     record('Unlearned Debt renderer copy model returns default fragments', JSON.stringify(debtClarityAudit?.lockedRendererModel) === JSON.stringify(debtClarityAudit?.rendererSource), JSON.stringify(debtClarityAudit?.lockedRendererModel));
-    record('Learned Debt renderer copy model returns guarded preview fragments', debtClarityAudit?.learnedRendererModel?.title === 'Debt Collector' && debtClarityAudit?.learnedRendererModel?.summaryText === 'Active debt. Pressure is visible.' && debtClarityAudit?.learnedRendererModel?.statusText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.balanceText === 'Owed 15s' && debtClarityAudit?.learnedRendererModel?.pressureText === 'Pressure 3' && debtClarityAudit?.learnedRendererModel?.pressureDetail === 'Rising' && debtClarityAudit?.learnedRendererModel?.flavorText === 'Owed 15s. Rising' && debtClarityAudit?.learnedRendererModel?.termsText === 'Repay spends purse coin. Pressure is visible only.' && debtClarityAudit?.learnedRendererModel?.statusMetaText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.lastVisitText === 'Test Visit' && debtClarityAudit?.learnedRendererModel?.notesText === '1 note' && debtClarityAudit?.learnedRendererModel?.clarityApplied === true && debtClarityAudit?.learnedRendererModel?.passiveApplied === false && debtClarityAudit?.learnedRendererModel?.previewOnly === true && debtClarityAudit?.learnedRendererModel?.guarded === true && debtClarityAudit?.learnedRendererModel?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRendererModel));
+    record('Learned Debt renderer copy model returns guarded preview fragments', debtClarityAudit?.learnedRendererModel?.title === 'Debt Collector' && debtClarityAudit?.learnedRendererModel?.summaryText === 'Active debt. Pressure is visible.' && debtClarityAudit?.learnedRendererModel?.statusText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.balanceText === 'Owed 15s' && debtClarityAudit?.learnedRendererModel?.pressureText === 'Pressure 3' && debtClarityAudit?.learnedRendererModel?.pressureDetail === 'Rising' && debtClarityAudit?.learnedRendererModel?.flavorText === 'Owed 15s. Rising' && debtClarityAudit?.learnedRendererModel?.termsText === 'Repay spends purse coin. Pressure is visible only.' && debtClarityAudit?.learnedRendererModel?.statusMetaText === 'Debt Active' && debtClarityAudit?.learnedRendererModel?.lastVisitText === 'Test Visit' && debtClarityAudit?.learnedRendererModel?.notesText === '1 note' && debtClarityAudit?.learnedRendererModel?.clarityApplied === true && debtClarityAudit?.learnedRendererModel?.copyModelRendererWired === true && debtClarityAudit?.learnedRendererModel?.passiveApplied === false && debtClarityAudit?.learnedRendererModel?.previewOnly === true && debtClarityAudit?.learnedRendererModel?.guarded === true && debtClarityAudit?.learnedRendererModel?.liveRendererWired === false, JSON.stringify(debtClarityAudit?.learnedRendererModel));
     record('Debt renderer copy model avoids nested labels', !/Status:\s*Debt status:|Pressure:\s*Pressure/i.test(JSON.stringify(debtClarityAudit?.learnedRendererModel || {})), JSON.stringify(debtClarityAudit?.learnedRendererModel));
     record('Debt renderer copy model delegates to canonical Talent output', JSON.stringify(debtClarityAudit?.learnedRendererModel) === JSON.stringify(debtClarityAudit?.canonicalRendererModel), JSON.stringify({ debt:debtClarityAudit?.learnedRendererModel, canonical:debtClarityAudit?.canonicalRendererModel }));
     record('Debt renderer copy model stays read-only and value-stable', debtClarityAudit?.rendererLearnedBefore === debtClarityAudit?.rendererLearnedAfter && debtClarityAudit?.rendererLockedBefore === debtClarityAudit?.rendererLockedAfter && debtClarityAudit?.learnedRendererModel?.balanceCopper === 1500 && debtClarityAudit?.learnedRendererModel?.pressure === 3 && debtClarityAudit?.learnedRendererModel?.wallet === 875 && debtClarityAudit?.learnedRendererModel?.repaymentState === 'available', JSON.stringify(debtClarityAudit?.learnedRendererModel));
@@ -336,15 +345,19 @@ async function main() {
       S.player.talentUnlockIds = ['debt_collector_clarity'];
       render();
       const panel = document.getElementById('debtCollectorPanel');
+      const repayButton = document.getElementById('repayDebtBtn');
       return JSON.stringify({
         html: panel?.innerHTML || '',
         text: panel?.innerText || '',
+        repayButtonMode: repayButton?.dataset?.debtRepaymentMode || '',
+        repayButtonMax: Number(repayButton?.dataset?.debtMaxRepay || 0),
+        repaymentContract: window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S),
         wallet: S.player.gold,
         debt: { ...S.player.debtCollector },
         snapshot: JSON.stringify({ gold:S.player.gold, debt:{ ...S.player.debtCollector }, learnedIds:S.player.talentLearnedIds, unlockIds:S.player.talentUnlockIds })
       });
     })()`));
-    record('Learned Debt panel keeps live renderer guarded', learnedPanelAudit?.html.includes('Active debt. Pressure is visible.') && learnedPanelAudit?.html.includes('Debt Active') && learnedPanelAudit?.html.includes('Owed 15s') && learnedPanelAudit?.html.includes('Pressure 3 • Rising') && learnedPanelAudit?.html.includes('Clarity: learned helper only') && learnedPanelAudit?.html.includes('Debt Collector Clarity is not active here') && learnedPanelAudit?.html.includes('data-debt-clarity-mode="copy-model"') && learnedPanelAudit?.html.includes('copyModelRendererWired') && learnedPanelAudit?.html.includes('Status:</b> Debt Active') && learnedPanelAudit?.html.includes('Last Visit:</b> Test Visit') && learnedPanelAudit?.html.includes('Notes:</b> 1 note'), JSON.stringify(learnedPanelAudit));
+    record('Learned Debt panel keeps passive renderer guarded while exposing live repayment', learnedPanelAudit?.html.includes('Active debt. Pressure is visible.') && learnedPanelAudit?.html.includes('Debt Active') && learnedPanelAudit?.html.includes('Owed 15s') && learnedPanelAudit?.html.includes('Pressure 3 • Rising') && learnedPanelAudit?.html.includes('Clarity: learned helper only') && learnedPanelAudit?.html.includes('Debt Collector Clarity is not active here') && learnedPanelAudit?.html.includes('data-debt-clarity-mode="copy-model"') && learnedPanelAudit?.html.includes('data-debt-repayment-mode="live-gameplay"') && learnedPanelAudit?.repayButtonMode === 'live-gameplay' && learnedPanelAudit?.repayButtonMax === 875 && learnedPanelAudit?.repaymentContract?.copyModelRendererWired === true && learnedPanelAudit?.repaymentContract?.liveRendererWired === false && learnedPanelAudit?.repaymentContract?.appliesEffect === true && learnedPanelAudit?.html.includes('Status:</b> Debt Active') && learnedPanelAudit?.html.includes('Last Visit:</b> Test Visit') && learnedPanelAudit?.html.includes('Notes:</b> 1 note'), JSON.stringify(learnedPanelAudit));
     record('Learned Debt panel output avoids duplicate labels', !/Status:\s*Debt status:|Owed:\s*Amount owed:|Pressure:\s*Pressure\s*Pressure/i.test(learnedPanelAudit?.text || ''), JSON.stringify(learnedPanelAudit));
     record('Learned Debt panel leaves state unchanged after rendering', learnedPanelAudit?.wallet === 875 && learnedPanelAudit?.debt?.balanceCopper === 1500 && learnedPanelAudit?.debt?.pressure === 3 && learnedPanelAudit?.debt?.active === true && learnedPanelAudit?.snapshot === JSON.stringify({ gold:875, debt:{ active:true, balanceCopper:1500, pressure:3, lastVisitAt:'Test Visit', notes:['Test note'] }, learnedIds:{ debt_collector_clarity:true }, unlockIds:['debt_collector_clarity'] }), JSON.stringify(learnedPanelAudit));
     record('Debt Collector clarity contract stays non-dangerous and non-mutating', debtClarityAudit?.learnedContract?.combat === false && debtClarityAudit?.learnedContract?.economy === false && debtClarityAudit?.learnedContract?.rewards === false && debtClarityAudit?.learnedContract?.monsters === false && debtClarityAudit?.learnedContract?.gear === false && debtClarityAudit?.learnedContract?.progression === false && debtClarityAudit?.learnedContract?.scaling === false && debtClarityAudit?.learnedContract?.revisit === false && debtClarityAudit?.learnedContract?.eliteBoardMath === false && debtClarityAudit?.learnedContract?.debtMath === false && debtClarityAudit?.learnedContract?.talentUiActions === false && debtClarityAudit?.learnedContract?.mutatesSave === false, JSON.stringify(debtClarityAudit?.learnedContract));
@@ -386,16 +399,47 @@ async function main() {
       S.player.gold = 300;
       render();
       const partialButton = document.getElementById('repayDebtBtn');
+      const talentBefore = JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null });
+      const revisitBefore = JSON.stringify(S.player?.revisitState || null);
+      const statsBefore = JSON.stringify(S.player?.stats || {});
+      const choicesBefore = JSON.stringify(S.run?.choices || []);
+      const contractBefore = window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S);
       if (partialButton && typeof partialButton.onclick === 'function') partialButton.onclick();
-      const partial = { wallet:S.player.gold, debt:{ ...S.player.debtCollector } };
+      const contractAfterPartial = window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S);
+      const partial = {
+        wallet:S.player.gold,
+        debt:{ ...S.player.debtCollector },
+        panelText:document.getElementById('debtCollectorPanel')?.innerText || '',
+        panel:document.getElementById('debtCollectorPanel')?.innerHTML || '',
+        contractBefore,
+        contractAfterPartial,
+        talentSame:JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null }) === talentBefore,
+        revisitSame:JSON.stringify(S.player?.revisitState || null) === revisitBefore,
+        statsSame:JSON.stringify(S.player?.stats || {}) === statsBefore,
+        choicesSame:JSON.stringify(S.run?.choices || []) === choicesBefore
+      };
+      return { partial, partialHadHandler: !!partialButton && typeof partialButton.onclick === 'function' };
+    })()`));
+    record('Repay Debt spends available wallet partially', repayResult.partialHadHandler && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.active === true && repayResult.partial.contractBefore?.maxRepayCopper === 300 && repayResult.partial.contractAfterPartial?.enabled === false && repayResult.partial.contractAfterPartial?.blockedReason === 'no_coin' && repayResult.partial.contractAfterPartial?.balanceCopper === 200 && repayResult.partial.contractAfterPartial?.walletCopper === 0 && /Owed 2s/.test(repayResult.partial.panelText || '') && /data-debt-repayment-mode="live-gameplay"/.test(repayResult.partial.panel || ''), JSON.stringify(repayResult.partial));
+    record('Debt repayment does not touch Talent, Revisit, combat, or run choices', repayResult.partial?.talentSame === true && repayResult.partial?.revisitSame === true && repayResult.partial?.statsSame === true && repayResult.partial?.choicesSame === true, JSON.stringify(repayResult.partial));
+
+    await client.send('Page.reload', { ignoreCache: true });
+    if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after repayment reload.');
+    const partialPersisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '', contract:window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S) }))()`));
+    record('Partial repayment persists after reload', partialPersisted.wallet === 0 && partialPersisted.debt.balanceCopper === 200 && partialPersisted.debt.active === true && partialPersisted.contract?.enabled === false && partialPersisted.contract?.blockedReason === 'no_coin' && /Owed 2s/.test(partialPersisted.panelText || ''), JSON.stringify(partialPersisted));
+
+    const clearResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 1000;
       window.DungeonDexDebtCollector.repay(S);
       render();
-      const clear = { wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '' };
-      return { partial, clear, partialHadHandler: !!partialButton && typeof partialButton.onclick === 'function' };
+      return JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '', contract:window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S) });
     })()`));
-    record('Repay Debt spends available wallet partially', repayResult.partialHadHandler && repayResult.partial.wallet === 0 && repayResult.partial.debt.balanceCopper === 200 && repayResult.partial.debt.active === true, JSON.stringify(repayResult.partial));
-    record('Full payoff clears active debt and pressure', repayResult.clear.wallet === 800 && repayResult.clear.debt.balanceCopper === 0 && repayResult.clear.debt.active === false && repayResult.clear.debt.pressure === 0 && /No Debt/.test(repayResult.clear.panelText) && /Pressure 0/.test(repayResult.clear.panelText), JSON.stringify(repayResult.clear));
+    record('Full payoff clears active debt and pressure', clearResult.wallet === 800 && clearResult.debt.balanceCopper === 0 && clearResult.debt.active === false && clearResult.debt.pressure === 0 && clearResult.contract?.enabled === false && clearResult.contract?.blockedReason === 'no_debt' && /No Debt/.test(clearResult.panelText) && /Pressure 0/.test(clearResult.panelText), JSON.stringify(clearResult));
+
+    await client.send('Page.reload', { ignoreCache: true });
+    if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after payoff reload.');
+    const clearPersisted = asObject(await evaluate(client, `(() => JSON.stringify({ wallet:S.player.gold, debt:{ ...S.player.debtCollector }, panelText:document.getElementById('debtCollectorPanel')?.innerText || '', contract:window.DungeonDexDebtCollector.debtCollectorRepaymentContract(S) }))()`));
+    record('Cleared debt persists after reload', clearPersisted.wallet === 800 && clearPersisted.debt.balanceCopper === 0 && clearPersisted.debt.active === false && clearPersisted.debt.pressure === 0 && clearPersisted.contract?.blockedReason === 'no_debt' && /No Debt/.test(clearPersisted.panelText || ''), JSON.stringify(clearPersisted));
 
     const pressureResult = asObject(await evaluate(client, `(() => {
       S.player.gold = 0;

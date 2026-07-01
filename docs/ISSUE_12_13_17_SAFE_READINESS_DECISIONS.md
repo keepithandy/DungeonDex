@@ -53,6 +53,7 @@ Activation checklist for a future issue:
 
 Current status: design-ready, not activation-ready. `liveRendererWired` must remain false unless a future activation issue explicitly changes it.
 `copyModelRendererWired` may be true for display-only copy-model wiring without implying live renderer activation.
+Debt Collector repayment is tracked separately as a Debt-owned live action; it may mutate wallet and debt balance without activating the Talent clarity passive.
 
 ## Issue 13: Revisit Trophy Echo readiness note
 
