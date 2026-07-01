@@ -28,6 +28,13 @@
 - Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
 >>>>>>> origin/issue-18-stability-guardrail-audit
 
+## v1.23.2 Talent Passive Framework Completion
+- The Talent API now exposes a canonical passive inventory for all 13 known nodes, including classification, lifecycle, spend readiness, helper status, renderer wiring, copy-only status, and blocker metadata.
+- `hunter_board_clarity` remains the only controlled spend path and the only learned passive with live copy-only renderer wiring. It changes Elite Board display copy only.
+- `debt_collector_clarity` is learned-ready for contract checks but guarded: its copy model is preview-only, `passiveEnabled` is false, and `liveRendererWired` is false until an explicit activation issue authorizes live Debt renderer wiring.
+- Placeholder passives remain preview-only with generic inventory contracts and no renderer, gameplay, economy, reward, combat, Revisit, or progression effects.
+- `smoke_talent_passive_framework_v1232.mjs` locks the passive inventory shape, Hunter Board Clarity spend lifecycle, guarded Debt Collector clarity state, Talent award preview read-only behavior, duplicate award blocking, and passive activation gate metadata.
+
 ## v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo is now the first live Revisit lane.
 - It appears in town, locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history plus Memory Marks in save data.
