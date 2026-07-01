@@ -33,7 +33,7 @@ It preserves classic browser script load order instead of converting the game to
 - `25_town_wallet_chip_fix.js` — Town wallet chip layout fix.
 - `26_spark_writ_pill_cleanup.js` — Spark writ pill cleanup.
 - `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
-- `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
+- `28_debt_collector_foundation.js` — Debt Collector foundation UI, helpers, repayment pressure relief, and Under Collection borrowing block.
 - `30_passive_activation_gate_hotfix.js` — Passive activation gate verification layer.
 - `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
@@ -52,6 +52,7 @@ It preserves classic browser script load order instead of converting the game to
 - `hunter_board_clarity` is the only current controlled spend target and live copy-only passive.
 - `debt_collector_clarity` is guarded: contract and copy-model helpers exist, but the live Debt renderer is not wired.
 - Debt Collector repayment is a Debt-owned live action; it mutates only wallet, debt balance, and bounded pressure relief through the Debt Collector API and does not spend Talent points.
+- Debt Collector Under Collection is Debt-owned gameplay behavior. It is derived from existing saved pressure, uses threshold `pressure >= 3`, blocks borrowing while active, keeps repayment available, and does not store a new save field or set Talent `liveRendererWired` true.
 - Placeholder passives have generic inventory contracts only and remain preview-only until a future issue adds specific contracts, renderer or gameplay wiring, and smoke coverage.
 
 Notes:
