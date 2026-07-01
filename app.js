@@ -12,6 +12,7 @@ window.DD_MONSTER_ARCHETYPES = [
 ];
 
 window.ddGetMonsterCue = function(name){
+  const monsterName = String(name || "").trim();
   const cues = [
     "The creature watches silently.",
     "Ash drifts from the enemy's armor.",
@@ -33,7 +34,7 @@ window.ddGetMonsterCue = function(name){
     `the ${monsterName} eyes you with a predatory gaze.`,
     `the ${monsterName} moves with a fluid, dangerous grace.`,
   ]  : [];
-  const pool = nameCues.length ? cues.concat(namedCues) : cues;
+  const pool = namedCues.length ? cues.concat(namedCues) : cues;
   return pool[Math.floor(Math.random()*pool.length)];
 };
 
