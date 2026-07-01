@@ -8,28 +8,39 @@
 
 ## Current Baseline
 - DungeonDex v1.23.1 - Trophy Echo Prototype Stabilization
+- VERSION.md remains at v1.23.1 until an explicit version bump is requested.
 
-<<<<<<< HEAD
+## v1.23.1 Debt Collector Under Collection Hardening
+- Debt Collector Under Collection is a Debt-owned high-pressure state derived from existing `player.debtCollector.pressure`.
+- Threshold: `pressure >= 3` while active debt exists.
+- Under Collection blocks Debt Collector borrowing before wallet, debt balance, or pressure mutation.
+- Repayment remains available while Under Collection.
+- Successful partial repayment lowers pressure by the existing bounded relief amount of 1.
+- Failed repayment does not lower pressure or clear Under Collection.
+- Full payoff clears pressure through the existing clear-debt path.
+- Borrowing returns when pressure drops below 3.
+- No `highPressureActive`, `borrowingBlockedByPressure`, or Under Collection flag is stored in save data.
+- Talent passive `liveRendererWired` remains false. This is Debt Collector gameplay behavior, not Talent passive activation.
+
 ## v1.23.2 Progression Systems Clarity Pass
 - Display-only town/Talent/Debt wording clarifies active, learned, preview-only, locked, and next-target states without changing saves, math, rewards, economy, district IDs, depth ranges, unlock thresholds, or activation gates.
-- Talent copy now separates the live Boss Trophy point source and controlled Hunter Board Clarity spend path from the wider locked preview tree.
+- Talent copy separates the live Boss Trophy point source and controlled Hunter Board Clarity spend path from the wider locked preview tree.
 - Town copy clarifies Trophy Echo as the only playable Revisit lane, Famous Gear Memory as planned-only, Debt Collector clarity as copy-only, and district/depth progression as a next-target status line.
-- `VERSION.md` remains at v1.23.1 until an explicit version bump is requested.
-=======
+- This was retained from the resolved notes conflict as historical/planning context only; VERSION.md remains the version authority.
+
 ## Issue #18 Stability Guardrail Audit
-- This is a documentation-only guardrail checkpoint before the next feature-style patch.
+- Documentation-only guardrail checkpoint before feature-style patches.
 - Protected systems for review: controlled `hunter_board_clarity` spending, read-only Talent preview/passive helpers, Debt Collector display-copy clarity, Revisit planning lock, service worker/cache label alignment, classic script-load order, and smoke-test coverage.
 - Do not use this audit to change gameplay behavior, save mutation, cache behavior, script ordering, combat, economy, rewards, Debt Collector math, Revisit activation, Talents, gear, monsters, dungeon entry, or scaling.
-- Recommended safety net before the next feature patch: run the Talent, Debt Collector, and Revisit smoke files listed in `docs/RELEASE_CHECKLIST.md`.
+- Recommended safety net before feature patches: run the Talent, Debt Collector, and Revisit smoke files listed in `docs/RELEASE_CHECKLIST.md`.
 
 ## v1.21.2 Revisit Trophy Echo Readiness Packet
-- Trophy Echo is the first planned Revisit lane and remains a design/readiness packet only.
-- It may preview intended Revisit purpose, future lane ordering, and read-only planning language, but it cannot enter, start, complete, claim, reward, or mutate save state.
-- Famous Gear Memory remains the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remains the only active dungeon entry path.
->>>>>>> origin/issue-18-stability-guardrail-audit
+- Trophy Echo was originally planned as the first Revisit lane and was design/readiness-only at this historical point.
+- Famous Gear Memory remained the second planned lane as inert metadata only, and Enter Dungeon / Continue Run remained the only active dungeon entry path.
+- v1.23.1 later activated and stabilized Trophy Echo as the first live Revisit lane.
 
 ## v1.23.2 Talent Passive Framework Completion
-- The Talent API now exposes a canonical passive inventory for all 13 known nodes, including classification, lifecycle, spend readiness, helper status, renderer wiring, copy-only status, and blocker metadata.
+- The Talent API exposes a canonical passive inventory for all 13 known nodes, including classification, lifecycle, spend readiness, helper status, renderer wiring, copy-only status, and blocker metadata.
 - `hunter_board_clarity` remains the only controlled spend path and the only learned passive with live copy-only renderer wiring. It changes Elite Board display copy only.
 - `debt_collector_clarity` is learned-ready for contract checks but guarded: its copy model is preview-only, `passiveEnabled` is false, and `liveRendererWired` is false until an explicit activation issue authorizes live Debt renderer wiring.
 - Placeholder passives remain preview-only with generic inventory contracts and no renderer, gameplay, economy, reward, combat, Revisit, or progression effects.
@@ -49,7 +60,7 @@
 
 ## v1.23.1 Revisit Activation Contract
 - Trophy Echo is now the first live Revisit lane and uses boss trophy or boss record history as its qualifying source.
-- Live fields now include an active echo state, completion history, deterministic completion keys, a last-result summary, and a Revisit-only Memory Mark counter under `player.revisitState.trophyEcho`.
+- Live fields include an active echo state, completion history, deterministic completion keys, a last-result summary, and a Revisit-only Memory Mark counter under `player.revisitState.trophyEcho`.
 - Famous Gear Memory remains inactive, and other Revisit hooks remain planning-only.
 
 ## v1.22.0 Talent Loop Release-Stability Hardening
@@ -65,7 +76,7 @@
 ## v1.21.2 Hunter Board Clarity Post-Reload UI Contract Smoke
 - Current baseline: v1.21.2.
 - Adds the first complete controlled `hunter_board_clarity` Talent loop: Boss Trophy point source, spend preview, readiness, spend button, save/reload persistence, and duplicate blocking.
-- The Talent panel now explains available, earned, and spent points, the Boss Trophy Milestone source, the Hunter Board Clarity effect, and the learned/active display-only contract.
+- The Talent panel explains available, earned, and spent points, the Boss Trophy Milestone source, the Hunter Board Clarity effect, and the learned/active display-only contract.
 - No second Talent node, no Revisit activation, no combat change, no economy change, no Debt Collector change, and no broad Talent tree activation were added.
 
 ## v1.20.47 Hunter Board Clarity Spend Preview
@@ -91,7 +102,7 @@
 
 ## v1.20.43 Talent Award Claim Repair Contract Completion
 - Wired the claim repair contract into runtime loading and aligned build/cache labels to the release.
-- `player.talentLedger.awardClaims` now repairs to a normalized object map: missing or malformed containers become `{}`, valid boss trophy milestone records are retained, and invalid records are dropped.
+- `player.talentLedger.awardClaims` repairs to a normalized object map: missing or malformed containers become `{}`, valid boss trophy milestone records are retained, and invalid records are dropped.
 - No points are awarded, no live claim records are created from boss trophy evidence, and no spending or Talent unlock UI is introduced.
 
 ## v1.20.42 Talent Claim Tracking Save Shape Dry Run
