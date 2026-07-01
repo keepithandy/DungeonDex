@@ -3,11 +3,11 @@
 This folder is an exploratory split of the former monolithic `app.js` into major functional systems.
 It preserves classic browser script load order instead of converting the game to ES modules. While numeric naming suggests sequential loading, the actual order in `index.html` reflects dependency constraints and is the source of truth.
 
+- `app.js` — Runtime pointer plus small legacy/fallback helpers that have not been split yet. Keep new gameplay work in `js/systems/*.js` unless a targeted compatibility fix requires this file.
 - `00_core_constants_data.js` — Core constants, utility helpers, item/monster/district data.
 - `01_state_recovery.js` — Screen/run shell recovery and ID helpers.
 - `02_currency_pending_rewards.js` — Currency conversion, pending rewards, discovery banking, reward text helpers.
 - `03_town_contracts_market.js` — Gold sinks, elite contracts, district wares, selling helpers.
-- `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
 - `04_depth_progression_charters.js` — Depth labels, district progression, milestones, charters, pricing, encounter coin rewards.
 - `05_elite_modifiers.js` — Elite modifier registry, selection, rewards, and markup.
 - `06_scaling_generation_audits.js` — Rarity scaling, loot rules, base state, gear/monster generation, scaling audit.
@@ -55,6 +55,6 @@ It preserves classic browser script load order instead of converting the game to
 - Placeholder passives have generic inventory contracts only and remain preview-only until a future issue adds specific contracts, renderer or gameplay wiring, and smoke coverage.
 
 Notes:
-- `index.html` now loads these files directly in order.
-- `app.js` is replaced with a tiny pointer file so future work does not accidentally edit the old monolith.
+- `index.html` now loads these files directly in order and remains the source of truth for runtime order.
+- `app.js` should stay small. It currently retains build labels, compatibility helpers, and fallback effects that can be split later through targeted system passes.
 - This map is documentation only; future passes can split internals further once a target system is chosen.
