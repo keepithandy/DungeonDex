@@ -4,44 +4,80 @@
   // Read-only revisit helper surface remains in backend systems only.
   function earlierDungeonRevisitMarkup() {
     const api = window.DungeonDexEliteContracts || {};
-    const status = typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
-    if (!status) return '';
-    const active = status.activeEcho || null;
-    const lastResult = status.lastResult || null;
-    const bossName = cleanDisplayText(status.source?.bossName || active?.bossName || 'Unknown Boss', 'Unknown Boss');
-    const trophyName = cleanDisplayText(status.source?.trophyName || active?.trophyName || 'Boss Trophy', 'Boss Trophy');
-    const memoryMarks = Math.max(0, Math.floor(numberOr(status.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
-    const completedCount = Math.max(0, Math.floor(numberOr(status.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-    const historyCount = Math.max(0, Math.floor(numberOr(status.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-    const echoStateLabel = active ? 'Active' : status.locked ? 'Locked' : 'Playable';
-    const summaryLine = active
-      ? cleanDisplayText(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
-      : status.locked
+    const trophyStatus = typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
+    const famousStatus = typeof api.famousGearStatus === 'function' ? api.famousGearStatus(S) : null;
+    if (!trophyStatus || !famousStatus) return '';
+    const trophyActive = trophyStatus.activeEcho || null;
+    const trophyLastResult = trophyStatus.lastResult || null;
+    const famousActive = famousStatus.activeMemory || null;
+    const famousLastResult = famousStatus.lastResult || null;
+    const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
+    const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
+    const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
+    const famousMemoryTitle = cleanDisplayText(famousStatus.source?.memoryTitle || famousActive?.memoryTitle || `${itemName} Memory`, `${itemName} Memory`);
+    const memoryMarks = Math.max(0, Math.floor(numberOr(trophyStatus.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const completedCount = Math.max(0, Math.floor(numberOr(trophyStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const historyCount = Math.max(0, Math.floor(numberOr(trophyStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const famousHistoryCount = Math.max(0, Math.floor(numberOr(famousStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const famousCompletedCount = Math.max(0, Math.floor(numberOr(famousStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const echoStateLabel = trophyActive ? 'Active' : trophyStatus.locked ? 'Locked' : 'Playable';
+    const famousStateLabel = famousStatus.active ? 'Active' : famousStatus.completed ? 'Recovered' : famousStatus.locked ? 'Locked' : 'Playable';
+    const summaryLine = trophyActive
+      ? cleanDisplayText(trophyActive.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
+      : trophyStatus.locked
         ? 'Locked until you have at least one boss trophy or boss record.'
-        : `${bossName} is ready as the only playable Revisit lane.`;
-    const flavor = active
-      ? cleanDisplayText(active.reflection || '', '')
-      : status.locked
+        : `${bossName} is ready as a playable Revisit lane.`;
+    const famousSummaryLine = famousActive
+      ? cleanDisplayText(famousActive.summaryLine || `${itemName} settles into archive memory.`, `${itemName} settles into archive memory.`)
+      : famousStatus.completed
+        ? `${itemName} has already been recovered as archive memory.`
+        : famousStatus.locked
+          ? 'Locked until you have at least one retired gear record.'
+          : 'Retired gear can be revisited as safe archive memory.';
+    const flavor = trophyActive
+      ? cleanDisplayText(trophyActive.reflection || '', '')
+      : trophyStatus.locked
         ? 'The lane is cold. Bring back proof of a defeated boss and the echo can answer.'
         : `The ${trophyName} still remembers ${bossName}. Step into the reflection and settle the memory before the next descent.`;
-    const actionMarkup = active
+    const famousFlavor = famousActive
+      ? cleanDisplayText(famousActive.reflection || '', '')
+      : famousStatus.locked
+        ? 'Retired gear records stay archived until you have something to remember.'
+        : 'The archive keeps the record safe. Start the memory from town and read it back without returning the gear.';
+    const actionMarkup = trophyActive
       ? `<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>`
-      : status.locked
+      : trophyStatus.locked
         ? `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`
         : `<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>`;
-    const resultMarkup = lastResult
-      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(lastResult.summary || '', ''))}</div>`
+    const famousActionMarkup = famousActive
+      ? `<button class="primary" type="button" data-complete-famous-gear="1">Resolve Memory</button>`
+      : famousStatus.locked
+        ? `<button class="ghost" type="button" disabled aria-disabled="true">Memory Locked</button>`
+        : `<button class="primary" type="button" data-start-revisit="famous_gear_route">Start Famous Gear Memory</button>`;
+    const resultMarkup = trophyLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(trophyLastResult.summary || '', ''))}</div>`
       : '';
-    const revisitStatusText = active
-      ? 'Active: Trophy Echo is running in town. Locked: every other Revisit lane.'
-      : status.locked
-        ? 'Locked: Trophy Echo needs boss history. Preview: other Revisit lanes.'
-        : 'Playable: Trophy Echo only. Locked: Famous Gear Memory and other lanes.';
-    const revisitNextText = active
+    const famousResultMarkup = famousLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(famousLastResult.summary || '', ''))}</div>`
+      : '';
+    const playableLanes = [
+      trophyStatus.available ? 'Trophy Echo' : '',
+      famousStatus.available ? 'Famous Gear Memory' : ''
+    ].filter(Boolean);
+    const revisitStatusText = trophyActive
+      ? `Active: Trophy Echo is running in town. ${famousStatus.available ? 'Famous Gear Memory is also available.' : 'Famous Gear Memory remains locked.'}`
+      : famousActive
+        ? `Active: Famous Gear Memory is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}`
+        : playableLanes.length
+          ? `Playable: ${playableLanes.join(' and ')}.`
+          : 'Locked: Trophy Echo needs boss history and Famous Gear Memory needs retired gear history.';
+    const revisitNextText = trophyActive
       ? 'Next: resolve the active echo in town before starting another.'
-      : status.locked
-        ? 'Next: defeat a boss and keep the trophy record.'
-        : 'Next: start Trophy Echo from town; rewards stay Revisit-only.';
+      : famousActive
+        ? 'Next: resolve the active archive memory in town before starting another.'
+        : playableLanes.length
+          ? 'Next: choose a playable Revisit lane from town; rewards stay Revisit-only.'
+          : 'Next: defeat a boss or retire gear to open a Revisit lane.';
     return `
       <section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
         <div class="card-head">
@@ -50,10 +86,10 @@
             <p>Short memory lanes tied to DungeonDex history.</p>
           </div>
         </div>
-        <article class="quest-card revisit-echo-card ${status.locked ? 'locked' : 'ready'}">
+        <article class="quest-card revisit-echo-card ${trophyStatus.locked ? 'locked' : 'ready'}">
           <div class="quest-topline">
             <strong>Trophy Echo</strong>
-            <span class="small ${status.active ? '' : 'muted'}">${echoStateLabel}</span>
+            <span class="small ${trophyStatus.active ? '' : 'muted'}">${echoStateLabel}</span>
           </div>
           <p class="small">${escapeHtml(summaryLine)}</p>
           <p class="small muted">${escapeHtml(flavor)}</p>
@@ -61,18 +97,28 @@
           <div class="small muted">${escapeHtml(revisitStatusText)}</div>
           <div class="small muted">Memory Marks are Revisit-only records; combat, gear, debt, and Talent values stay unchanged.</div>
           <div class="small muted">${escapeHtml(revisitNextText)}</div>
-          ${active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(active.memoryTitle || bossName, bossName))}</div>` : ''}
+          ${trophyActive ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(trophyActive.memoryTitle || bossName, bossName))}</div>` : ''}
           <div class="inline-actions revisit-echo-actions">
             ${actionMarkup}
           </div>
           ${resultMarkup}
         </article>
-        <article class="quest-card revisit-lane-card locked">
+        <article class="quest-card revisit-lane-card ${famousStatus.locked ? 'locked' : famousStatus.active ? 'active' : famousStatus.completed ? 'completed' : 'ready'}">
           <div class="quest-topline">
             <strong>Famous Gear Memory</strong>
-            <span class="small muted">Planned</span>
+            <span class="small ${famousStatus.active ? '' : 'muted'}">${famousStateLabel}</span>
           </div>
-          <p class="small muted">Planned only. This lane remains inactive in this patch: no start, reward, claim, progression, or farming loop.</p>
+          <p class="small">${escapeHtml(famousSummaryLine)}</p>
+          <p class="small muted">${escapeHtml(famousFlavor)}</p>
+          <div class="small muted">Archive records ${famousHistoryCount} • Recovered memories ${famousCompletedCount}</div>
+          <div class="small muted">${famousStatus.active ? 'Active: resolve the archive memory in town.' : famousStatus.completed ? 'Recovered: the archive note stays readable after reload.' : famousStatus.locked ? 'Locked until you have a retired gear record.' : 'Playable: start the archive memory from town.'}</div>
+          <div class="small muted">Famous Gear Memory replays the record only; the item stays retired and no gear reward returns.</div>
+          <div class="small muted">${famousStatus.active ? 'Next: resolve the active archive memory before starting another.' : famousStatus.completed ? 'Next: start the memory again if you want to revisit the record.' : famousStatus.locked ? 'Next: retire gear to unlock the lane.' : 'Next: start Famous Gear Memory from town; rewards stay archive-only.'}</div>
+          ${famousActive ? `<div class="small muted">Active Memory: ${escapeHtml(famousMemoryTitle || itemName)}</div>` : ''}
+          <div class="inline-actions revisit-echo-actions">
+            ${famousActionMarkup}
+          </div>
+          ${famousResultMarkup}
         </article>
       </section>`;
   }

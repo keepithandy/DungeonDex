@@ -946,15 +946,21 @@
 
   function retiredRelicHelpText() {
     // TODO(v1.7): Let archive memory and famous gear point back toward revisited old zones without changing retirement rules.
-    return '<p class="small muted retired-relic-help">Retired gear is a read-only record. Famous Gear memory stays display-only.</p>';
+    return '<p class="small muted retired-relic-help">Retired gear is a read-only record. Famous Gear Memory can revisit that archive without returning the item as a reward.</p>';
   }
 
   function revisitArchiveEchoMarkup(state = S) {
     const revisit = state?.player?.revisitState || {};
-    if (revisit?.trophyEcho?.active) {
-      return '<div class="small muted">Trophy Echo is active in town. Famous Gear Memory remains inactive.</div>';
+    if (revisit?.famousGear?.active) {
+      return '<div class="small muted">Famous Gear Memory is active in town. Trophy Echo remains available as its own safe lane.</div>';
     }
-    return '<div class="small muted">Trophy Echo now lives in town as the first active Revisit lane. Famous Gear Memory remains inactive.</div>';
+    if (revisit?.famousGear?.lastResult) {
+      return '<div class="small muted">Famous Gear Memory is recovered in town. Its archive note stays readable after reload.</div>';
+    }
+    if (revisit?.trophyEcho?.active) {
+      return '<div class="small muted">Trophy Echo is active in town. Famous Gear Memory is available when retired gear exists.</div>';
+    }
+    return '<div class="small muted">Trophy Echo and Famous Gear Memory are the live Revisit lanes. The remaining lanes stay preview-only.</div>';
   }
 
   function retiredRelicCard(entry) {
@@ -1061,7 +1067,7 @@
       <h2>Archive Shelf</h2>
       ${retiredRelicHelpText()}
       ${revisitArchiveEchoMarkup(S)}
-      <p class="small muted">Retired gear records preserve manual retirement snapshots and display-only Famous Gear memory.</p>
+      <p class="small muted">Retired gear records preserve manual retirement snapshots and safe Famous Gear Memory echoes.</p>
       ${retiredRelics.length ? `${retiredSummaryHtml}<div class="retired-relic-grid">${retiredRelics.slice(0, 6).map(entry => retiredRelicCard(entry)).join('')}</div>` : retiredRelicEmptyState()}`;
   }
 

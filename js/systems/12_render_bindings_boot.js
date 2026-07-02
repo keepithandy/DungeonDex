@@ -228,6 +228,11 @@
       completeTrophyEchoRoute(S);
       render();
     }));
+    $$('[data-complete-famous-gear]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (typeof completeFamousGearRoute !== 'function') return;
+      completeFamousGearRoute(S);
+      render();
+    }));
     bindInventoryActions();
     bindCombatActions();
     if (el('refreshMerchantBtn')) el('refreshMerchantBtn').onclick = () => runGuardedAction(() => { rollMerchant(S); render(); });

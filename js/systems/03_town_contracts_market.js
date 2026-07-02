@@ -755,6 +755,55 @@
       lastResult: revisitState.trophyEcho?.lastResult || null
     };
   }
+
+  function famousGearRetiredRecords(state = S) {
+    const safePlayer = state?.player && typeof state.player === 'object' ? state.player : {};
+    return asArray(safePlayer.retiredRelics, []).filter(entry => entry && typeof entry === 'object');
+  }
+
+  function famousGearCompletionKey(source) {
+    const recordId = String(source?.recordId || source?.id || source?.itemId || '').trim();
+    return recordId ? `famous_gear:${recordId}` : '';
+  }
+
+  function createFamousGearReflection(source) {
+    const item = isPlainObject(source?.item) ? source.item : {};
+    const itemName = cleanDisplayText(source?.itemName || item.name || 'Famous Gear', 'Famous Gear');
+    const slot = cleanDisplayText(source?.slot || item.slot || 'gear', 'gear');
+    const rarity = cleanDisplayText(source?.rarity || item.rarity || 'common', 'common');
+    const archiveLabel = cleanDisplayText(source?.source || 'retired gear archive', 'retired gear archive');
+    const note = cleanDisplayText(source?.note || item.summary || '', '');
+    return {
+      memoryTitle: `${itemName} Memory`,
+      summaryLine: `${itemName} rests as a ${rarity} ${slot} record.`,
+      reflection: `${itemName} returns as a safe archive memory from the ${archiveLabel}. You review the record, keep the gear retired, and leave the reward path closed.${note ? ` Archive note: ${note}` : ''}`
+    };
+  }
+
+  function famousGearStatusModel(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    const retiredRecords = famousGearRetiredRecords(state);
+    const active = revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object'
+      ? revisitState.famousGear.active
+      : null;
+    const source = active
+      ? retiredRecords.find(entry => String(entry.recordId || entry.id || entry.item?.id || '') === String(active.recordId || active.itemId || '')) || active
+      : (retiredRecords[0] || null);
+    const completedCount = Object.keys(revisitState.famousGear?.completedKeys || {}).filter(key => /^famous_gear:[^:]+$/i.test(String(key || '').trim()) && revisitState.famousGear.completedKeys[key] === true).length;
+    return {
+      routeKey: 'famous_gear_route',
+      historyCount: retiredRecords.length,
+      completedCount,
+      locked: retiredRecords.length <= 0,
+      available: retiredRecords.length > 0,
+      active: !!active,
+      completed: !active && completedCount > 0,
+      source,
+      activeMemory: active,
+      lastResult: revisitState.famousGear?.lastResult || null
+    };
+  }
+
   function revisitCandidateHooks(state = S) {
     const safeState = state && typeof state === 'object' ? state : {};
     const safePlayer = safeState.player && typeof safeState.player === 'object' ? safeState.player : {};
@@ -764,12 +813,13 @@
     const trophies = ensureEliteTrophyState(safeState);
     const retired = asArray(safePlayer.retiredRelics, []).filter(entry => entry && typeof entry === 'object');
     const trophyEcho = trophyEchoStatusModel(safeState);
+    const famousGear = famousGearStatusModel(safeState);
     const trophyCount = trophyEcho.historyCount;
     const rivalCount = rivals.filter(r => r && !r.completed && r.revengeAvailable).length;
     const boardEcho = contracts.active ? (contracts.active.rivalContract ? 'Rival route active' : 'Board route open') : 'Board route quiet';
     const currentDistrict = typeof currentStagingDistrict === 'function' ? currentStagingDistrict(safeState) : null;
     const districtName = String(currentDistrict && currentDistrict.name ? currentDistrict.name : 'Lowfire District').trim() || 'Lowfire District';
-    const meta = trophyEcho.active ? 'Active' : trophyEcho.available ? 'Available' : (revisitState.unlocked ? 'Planned' : 'Future Route');
+    const meta = trophyEcho.active ? 'Active' : trophyEcho.available || famousGear.available ? 'Available' : (revisitState.unlocked ? 'Planned' : 'Future Route');
     const debtBalance = Math.max(0, Math.floor(numberOr(safePlayer?.debtCollector?.balanceCopper, 0, 0, Number.MAX_SAFE_INTEGER)));
     const entries = [
       {
@@ -1094,7 +1144,7 @@
   }
 
   function revisitGateProgressModel(routeKey, state = S) {
-    const meta = revisitUnlockGateMeta(routeKey);
+      const meta = revisitUnlockGateMeta(state, routeKey);
     const safeKey = String(routeKey || '');
     const signals = revisitGateProgressSignals(safeKey, state);
     const signalScore = signals.reduce((sum, signal) => {
@@ -1130,8 +1180,9 @@
     };
   }
 
-  function revisitUnlockGateMeta(routeKey = '') {
+  function revisitUnlockGateMeta(state = S, routeKey = '') {
     const key = String(routeKey || '');
+    const famousReady = famousGearRetiredRecords(state).length > 0;
     if (key === 'trophy_echo_route') {
       return {
         gateType: 'trophy',
@@ -1154,18 +1205,18 @@
       return {
         gateType: 'famousGear',
         gateLabel: 'Famous Gear',
-        reason: 'Locked: Famous Gear memory not ready',
-        requirement: 'Build stronger gear memory.',
-        progressLabel: 'No signal yet',
+        reason: famousReady ? 'Playable: Famous Gear archive memory is ready' : 'Locked: Famous Gear memory not ready',
+        requirement: famousReady ? 'Retired gear archive is ready.' : 'Build stronger gear memory.',
+        progressLabel: famousReady ? 'Archive signal noted' : 'No signal yet',
         diagnosticLabel: 'Gate Diagnostics',
         diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
-        accessLabel: 'Route access is unavailable.',
+        accessLabel: famousReady ? 'Route access is available.' : 'Route access is unavailable.',
         source: 'famous gear',
-        previewState: 'locked',
-        previewLabel: 'Still locked',
-        previewReason: 'Future archive memory may shape this path later.',
-        previewRequirement: 'Build stronger gear memory.',
-        previewSafety: 'Preview only - route access is unavailable.'
+        previewState: famousReady ? 'playable-now' : 'locked',
+        previewLabel: famousReady ? 'Available now' : 'Still locked',
+        previewReason: famousReady ? 'Retired gear archive can be revisited from town.' : 'Future archive memory may shape this path later.',
+        previewRequirement: famousReady ? 'Retired gear archive is ready.' : 'Build stronger gear memory.',
+        previewSafety: famousReady ? 'Route access is available.' : 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'rival_trace_route') {
@@ -1244,7 +1295,7 @@
     const routes = revisitRoutePreviews(revisitReadOnlyStateSnapshot(state));
     return asArray(routes, []).map(route => {
       const key = String(route?.key || 'unknown_route');
-      const meta = revisitUnlockGateMeta(key);
+      const meta = revisitUnlockGateMeta(state, key);
       const sourceHooks = asArray(route?.hooks, []).map(hook => String(hook || '').trim()).filter(Boolean);
       const readiness = String(route?.readiness || 'Faint Trace');
       const preview = revisitUnlockPreview(state).find(entry => entry.key === key) || null;
@@ -1302,13 +1353,13 @@
     const routeKey = String(route?.key || route || '');
     const routes = revisitRoutePreviews(revisitReadOnlyStateSnapshot(state));
     const preview = Array.isArray(routes) ? routes.find(entry => String(entry?.key || '') === routeKey) || null : null;
-    const gateMeta = revisitUnlockGateMeta(routeKey);
+    const gateMeta = revisitUnlockGateMeta(state, routeKey);
     const routeContent = revisitRouteContentDefinitions()?.[routeKey] || null;
     const hasRoute = !!preview;
     const locked = preview ? preview.locked !== false : true;
     const eligible = !!preview && !!gateMeta && !!routeContent;
     const enterable = preview?.entryAvailable === true;
-    const previewOnly = routeKey !== 'trophy_echo_route';
+    const previewOnly = !['trophy_echo_route', 'famous_gear_route'].includes(routeKey);
     return {
       routeKey: routeKey || 'unknown_route',
       eligible,
@@ -1320,7 +1371,21 @@
       previewOnly,
       routeTitle: String(preview?.title || routeContent?.title || gateMeta?.gateLabel || 'Route Preview').trim(),
       gateLabel: String(gateMeta?.gateLabel || routeContent?.title || 'Route Gate').trim(),
-      statusLabel: preview?.completionAvailable === true ? 'Echo Active' : enterable ? 'Entry Ready' : (hasRoute ? 'Entry Locked' : 'Gate Prepared'),
+      statusLabel: routeKey === 'famous_gear_route'
+        ? (preview?.status === 'Recovered'
+          ? 'Memory Recovered'
+          : preview?.completionAvailable === true
+            ? 'Memory Active'
+            : enterable
+              ? 'Archive Ready'
+              : hasRoute
+                ? 'Entry Locked'
+                : 'Gate Prepared')
+        : preview?.completionAvailable === true
+          ? 'Echo Active'
+          : enterable
+            ? 'Entry Ready'
+            : (hasRoute ? 'Entry Locked' : 'Gate Prepared'),
       sourceLabel: String(preview?.hookSource || routeContent?.hookSource || gateMeta?.source || '').trim(),
       previewState: String(preview?.status || gateMeta?.previewState || 'locked').trim(),
       routeFound: hasRoute,
@@ -1350,23 +1415,27 @@
   }
 
   function revisitUnlockPreview(state = S) {
+    const famousReady = famousGearRetiredRecords(state).length > 0;
     const routeDefs = [
       { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Future Unlock Preview', previewReason: 'Future boss history may reopen this path later.', previewRequirement: 'Build more boss history.' },
-      { key: 'famous_gear_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future archive memory may shape this path later.', previewRequirement: 'Build stronger gear memory.' },
+      { key: 'famous_gear_route', previewState: famousReady ? 'playable-now' : 'locked', previewLabel: famousReady ? 'Available now' : 'Still locked', previewReason: famousReady ? 'Retired gear archive can be revisited from town.' : 'Future archive memory may shape this path later.', previewRequirement: famousReady ? 'Retired gear archive is ready.' : 'Build stronger gear memory.' },
       { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future named rival elite memory may sharpen this trace later.', previewRequirement: 'Remember named rival elite history.' },
       { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future ledger pressure may mark this district later.', previewRequirement: 'Build more debt history.' },
       { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future board history may strengthen this echo later.', previewRequirement: 'Build more board history.' }
     ];
     return routeDefs.map(def => {
+      const previewSafety = def.previewState === 'playable-now'
+        ? 'Route access is available.'
+        : 'Preview only - route access is unavailable.';
       return {
         key: def.key,
         previewState: def.previewState,
         previewLabel: def.previewLabel,
         previewReason: def.previewReason,
         previewRequirement: def.previewRequirement,
-        previewSafety: 'Preview only - route access is unavailable.',
-        locked: true,
-        playable: false
+        previewSafety,
+        locked: def.previewState !== 'playable-now',
+        playable: def.previewState === 'playable-now'
       };
     });
   }
@@ -1376,8 +1445,8 @@
     return {
       total: previews.length,
       preview: previews.filter(entry => entry.previewState === 'preview').length,
-      locked: previews.length,
-      playable: 0
+      locked: previews.filter(entry => entry.previewState === 'locked').length,
+      playable: previews.filter(entry => entry.previewState === 'playable-now').length
     };
   }
 
@@ -1400,9 +1469,22 @@
         hookSource: 'famous_gear_memory',
         shortDescription: 'Retired gear remembers the route.',
         routeFlavorLine: 'Notable gear keeps the old turn.',
-        safetyStatusLine: 'Locked preview. No route access.',
-        lockedReadinessNote: 'Needs stronger gear memory.',
-        reason: 'Retired gear may remember old ground.'
+        safetyStatusLine: 'Playable. Start a safe archive memory from town.',
+        lockedReadinessNote: 'Retired gear archive is ready.',
+        reason: 'Retired gear may remember old ground.',
+        previewText: 'Retired gear can be revisited as a short archive memory in town.',
+        summary: 'Famous Gear Memory is a safe archive reflection tied to retired gear history, not a real item reward.',
+        detail: 'Playable memory lane tied to retired gear archive records. The lane replays the record, keeps the item retired, and never returns the gear as loot.',
+        flavorHooks: [
+          'A retired relic can remember the town that kept it.',
+          'Archive notes preserve the item without restoring it.',
+          'The memory should feel like a recovered record, not a reward loop.'
+        ],
+        echoExamples: [
+          'A famous sword remembers the day it was retired.',
+          'An archive record can replay the shape of the old gear without reviving it.',
+          'The item stays retired while the memory becomes readable.'
+        ]
       },
       rival_trace_route: {
         title: 'Rival Trace Route',
@@ -1468,6 +1550,7 @@
     if (!Array.isArray(hooks) || !hooks.length) return [];
     const sourceHooks = hooks.filter(hook => hook && typeof hook === 'object');
     const trophyEcho = trophyEchoStatusModel(state);
+    const famousGear = famousGearStatusModel(state);
     const routeDefs = [
       {
         key: 'trophy_echo_route',
@@ -1521,12 +1604,31 @@
         key: 'famous_gear_route',
         title: 'Famous Gear Memory Route',
         district: 'Archive memory districts',
-        reason: 'Retired gear may remember old ground.',
+        reason: famousGear.active
+          ? 'A retired gear record is already open as an archive memory.'
+          : famousGear.completed
+            ? 'A retired gear record was already recovered and remains readable.'
+            : famousGear.available
+              ? 'Retired gear can be revisited as a safe archive memory.'
+              : 'Retired gear memory waits for a record to answer.',
         hooks: ['famous_gear_memory'],
-        status: 'Future Route',
-        locked: true,
+        status: famousGear.active ? 'Active' : famousGear.completed ? 'Recovered' : famousGear.available ? 'Playable' : 'Locked',
+        locked: famousGear.locked,
         priority: 20,
-        hookSource: 'famous_gear_memory'
+        hookSource: 'famous_gear_memory',
+        playable: famousGear.available,
+        active: famousGear.active,
+        completed: famousGear.completed,
+        readOnly: false,
+        entryAvailable: famousGear.available && !famousGear.active,
+        startAvailable: famousGear.available && !famousGear.active,
+        enterAvailable: famousGear.available && !famousGear.active,
+        completionAvailable: famousGear.active,
+        completeAvailable: famousGear.active,
+        claimAvailable: false,
+        rewardAvailable: false,
+        resultAvailable: !!famousGear.lastResult,
+        mutatesSave: true
       },
       {
         key: 'rival_trace_route',
@@ -1604,11 +1706,19 @@
                 : trophyEcho.locked
                   ? 'Locked. Boss memory required.'
                   : 'Playable. Start a short memory reflection from town.')
-            : 'Locked preview. No route access.',
+            : route.key === 'famous_gear_route'
+              ? (famousGear.active
+                  ? 'Active archive memory in progress. Resolve it from town.'
+                  : famousGear.completed
+                    ? 'Recovered archive memory. Start again if you want to revisit the record.'
+                    : famousGear.available
+                      ? 'Playable. Start a safe archive memory from town.'
+                      : 'Locked. Archive memory required.')
+              : 'Locked preview. No route access.',
           lockedReadinessNote: route.key === 'trophy_echo_route'
             ? (trophyEcho.locked ? 'Needs more boss history.' : trophyEcho.active ? 'Active echo already underway.' : 'Boss history is ready.')
             : route.key === 'famous_gear_route'
-              ? 'Needs stronger gear memory.'
+              ? (famousGear.locked ? 'Needs retired gear archive history.' : famousGear.active ? 'Active archive memory already underway.' : famousGear.completed ? 'Archive memory recovered.' : 'Retired gear archive is ready.')
             : route.key === 'rival_trace_route'
                 ? 'Needs named rival elite memory.'
                 : route.key === 'debt_pressure_route'
@@ -1617,7 +1727,11 @@
                     ? 'Needs more board history.'
                     : 'Needs more dungeon history.',
           status: String(route.status || 'Locked').trim(),
-          locked: route.key === 'trophy_echo_route' ? trophyEcho.locked : true,
+          locked: route.key === 'trophy_echo_route'
+            ? trophyEcho.locked
+            : route.key === 'famous_gear_route'
+              ? famousGear.locked
+              : true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
           previewText: String(route.previewText || '').trim(),
           summary: String(route.summary || '').trim(),
@@ -1639,6 +1753,8 @@
           criteriaNote: criteriaStub.note,
           readiness: route.key === 'trophy_echo_route'
             ? (trophyEcho.active ? 'Active' : trophyEcho.locked ? 'Faint Trace' : 'Ready')
+            : route.key === 'famous_gear_route'
+              ? (famousGear.active ? 'Active' : famousGear.completed ? 'Recovered' : famousGear.locked ? 'Faint Trace' : 'Ready')
             : revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
         }, routeHooks.map(hook => hook.key));
       })
@@ -1662,6 +1778,7 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
     const trophyEcho = trophyEchoStatusModel(state);
+    const famousGear = famousGearStatusModel(state);
     const allowedFutureRouteStates = ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active'];
     const stableHookSources = {
       trophy_echo_route: 'Trophy Echo',
@@ -1682,24 +1799,30 @@
         planned: status === 'Planned' || status === 'Future Route',
         eligibilityState: key === 'trophy_echo_route'
           ? (route.active ? 'active' : route.locked ? 'locked' : 'playable-now')
-          : status === 'Planned' ? 'eligible-preview' : 'playable-later',
+          : key === 'famous_gear_route'
+            ? (route.active ? 'active' : route.completed ? 'playable-now' : route.locked ? 'locked' : 'playable-now')
+            : status === 'Planned' ? 'eligible-preview' : 'playable-later',
         optionalSideContent: true,
         primaryPathPreserved: true,
-        readOnly: key !== 'trophy_echo_route',
-        entryAvailable: key === 'trophy_echo_route' ? route.entryAvailable === true : false,
+        readOnly: key !== 'trophy_echo_route' && key !== 'famous_gear_route',
+        entryAvailable: key === 'trophy_echo_route' ? route.entryAvailable === true : key === 'famous_gear_route' ? route.entryAvailable === true : false,
         rewardAvailable: false,
-        completionAvailable: key === 'trophy_echo_route' ? route.completionAvailable === true : false,
+        completionAvailable: key === 'trophy_echo_route' ? route.completionAvailable === true : key === 'famous_gear_route' ? route.completionAvailable === true : false,
         sourceHistoryOnly: true
       };
     });
     return {
       contractId: 'revisit_route_activation_contract_v1',
-      status: trophyEcho.active ? 'Trophy Echo active' : trophyEcho.available ? 'Trophy Echo playable' : 'Trophy Echo locked',
-      locked: trophyEcho.locked,
+      status: routes.some(route => route.active)
+        ? `${String(routes.find(route => route.active)?.title || 'Revisit route') } active`
+        : routes.some(route => route.playable === true)
+          ? `${routes.filter(route => route.playable === true).map(route => String(route.title || 'Route')).join(' and ')} playable`
+          : 'Revisit lanes locked',
+      locked: !routes.some(route => route.playable === true || route.active === true),
       readOnly: false,
-      entryAvailable: trophyEcho.available && !trophyEcho.active,
+      entryAvailable: routes.some(route => route.entryAvailable === true),
       rewardAvailable: false,
-      completionAvailable: trophyEcho.active,
+      completionAvailable: routes.some(route => route.completionAvailable === true),
       primaryPath: 'Enter Dungeon / Continue Run',
       optionalSideContent: true,
       allowedFutureRouteStates,
@@ -1727,7 +1850,7 @@
       hasRewards: false,
       hasCompletion: plan?.completionAvailable === true,
       status: String(plan?.status || 'Planning only'),
-      note: 'Trophy Echo is the first live Revisit lane. The remaining lanes stay preview-only.',
+      note: 'Trophy Echo and Famous Gear Memory are the first live Revisit lanes. The remaining lanes stay preview-only.',
       routeStateCount: routeStates.length,
       eligibleRouteCount: eligibleRoutes.length
     };
@@ -1750,7 +1873,7 @@
       hasRewards: false,
       hasCompletion: routes.some(route => route && route.completionAvailable === true),
       stableHookLabels,
-      note: 'Trophy Echo can now be started and completed from town. The remaining lanes stay preview-only.'
+      note: 'Trophy Echo and Famous Gear Memory can now be started and completed from town. The remaining lanes stay preview-only.'
     };
   }
 
@@ -1769,7 +1892,7 @@
       previewOnly: false,
       hasLiveEntry: trophyEcho.available,
       hasRewards: false,
-      hasCompletion: trophyEcho.active,
+      hasCompletion: !!trophyEcho.lastResult,
       routeKey: 'trophy_echo_route',
       routeLabel: String(trophyRoute?.title || 'Trophy Echo Route'),
       reason: 'Derived from existing boss and trophy history only.',
@@ -1782,22 +1905,23 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
     const famousGearRoute = routes.find(route => String(route?.key || '') === 'famous_gear_route') || null;
+    const famousGear = famousGearStatusModel(state);
     return {
       laneKey: 'famous-gear-memory',
       laneLabel: 'Famous Gear Memory',
       sourceHook: 'Famous Gear Memory',
-      currentStatus: 'planned',
-      locked: true,
-      readOnly: true,
-      previewOnly: true,
-      hasLiveEntry: false,
+      currentStatus: famousGear.active ? 'active' : famousGear.completed ? 'recovered' : famousGear.available ? 'playable' : 'locked',
+      locked: famousGear.locked,
+      readOnly: false,
+      previewOnly: false,
+      hasLiveEntry: famousGear.available,
       hasRewards: false,
-      hasCompletion: false,
+      hasCompletion: famousGear.active || famousGear.completed,
       routeKey: 'famous_gear_route',
       routeLabel: String(famousGearRoute?.title || 'Famous Gear Memory Route'),
       reason: 'Derived from existing famous gear and archive memory only.',
-      note: 'Second planned revisit lane. Planning only.',
-      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+      note: 'Second live Revisit lane. Famous Gear Memory is a safe archive reflection tied to retired gear history, not a real item reward.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active']
     };
   }
 
@@ -1832,7 +1956,7 @@
     const routes = revisitRoutePreviews(state);
     const route = routes.find(r => String(r?.key || '') === safeKey);
     if (!route) return false;
-    if (safeKey !== 'trophy_echo_route') return false;
+    if (safeKey !== 'trophy_echo_route' && safeKey !== 'famous_gear_route') return false;
     return route.startAvailable === true;
   }
 
@@ -1840,14 +1964,18 @@
     if (!canStartRevisitRoute(state, routeKey)) return null;
     if (!state?.player) return null;
     const safeKey = String(routeKey || '').trim();
-    if (safeKey !== 'trophy_echo_route') return null;
     const revisitState = ensureRevisitStateShape(state);
-    if (revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object') return null;
-    const status = trophyEchoStatusModel(state);
+    if (safeKey === 'trophy_echo_route' && revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object') return null;
+    if (safeKey === 'famous_gear_route' && revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object') return null;
+    const status = safeKey === 'famous_gear_route' ? famousGearStatusModel(state) : trophyEchoStatusModel(state);
     const source = status.source;
     if (!source) return null;
-    const currentFloor = Math.max(0, Math.floor(numberOr(source.bestDepth, state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
-    const reflection = createTrophyEchoReflection(source);
+    const currentFloor = safeKey === 'famous_gear_route'
+      ? Math.max(0, Math.floor(numberOr(source.floor || source.itemLevel || source.item?.level || state?.player?.depth, 0, 0, 999999)))
+      : Math.max(0, Math.floor(numberOr(source.bestDepth, state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
+    const reflection = safeKey === 'famous_gear_route'
+      ? createFamousGearReflection(source)
+      : createTrophyEchoReflection(source);
     const startedAt = Date.now();
     revisitState.unlocked = true;
     revisitState.locked = false;
@@ -1857,6 +1985,35 @@
     revisitState.sideRoute = true;
     revisitState.cappedReward = true;
     revisitState.lastViewedAt = new Date(startedAt).toLocaleString();
+    if (safeKey === 'famous_gear_route') {
+      revisitState.famousGear.active = {
+        routeKey: safeKey,
+        completionKey: famousGearCompletionKey(source),
+        recordId: String(source.recordId || source.id || source.item?.id || '').trim(),
+        itemId: String(source.itemId || source.item?.id || source.id || '').trim(),
+        itemName: cleanDisplayText(source.itemName || source.item?.name || 'Famous Gear', 'Famous Gear'),
+        slot: cleanDisplayText(source.slot || source.item?.slot || 'gear', 'gear'),
+        memoryTitle: reflection.memoryTitle,
+        reflection: reflection.reflection,
+        summaryLine: reflection.summaryLine,
+        sourceLabel: cleanDisplayText(source.source || 'Retired Gear Archive', 'Retired Gear Archive'),
+        sourceFloor: currentFloor,
+        startedAt
+      };
+      revisitState.famousGear.lastResult = null;
+      pushLog(state, `Famous Gear Memory started: ${revisitState.famousGear.active.itemName}.`);
+      return {
+        routeKey: safeKey,
+        routeTitle: 'Famous Gear Memory Route',
+        startedAt,
+        sourceFloor: currentFloor,
+        sideRoute: true,
+        locked: false,
+        cappedReward: true,
+        recordId: revisitState.famousGear.active.recordId,
+        itemName: revisitState.famousGear.active.itemName
+      };
+    }
     revisitState.trophyEcho.active = {
       routeKey: safeKey,
       completionKey: trophyEchoCompletionKey(source),
@@ -1876,14 +2033,16 @@
     pushLog(state, `Trophy Echo started: ${revisitState.trophyEcho.active.bossName}.`);
     return {
       routeKey: safeKey,
-      routeTitle: 'Trophy Echo Route',
+      routeTitle: safeKey === 'famous_gear_route' ? 'Famous Gear Memory Route' : 'Trophy Echo Route',
       startedAt,
       sourceFloor: currentFloor,
       sideRoute: true,
       locked: false,
       cappedReward: true,
-      trophyId: revisitState.trophyEcho.active.trophyId,
-      bossName: revisitState.trophyEcho.active.bossName
+      trophyId: safeKey === 'famous_gear_route' ? '' : revisitState.trophyEcho.active.trophyId,
+      bossName: safeKey === 'famous_gear_route' ? '' : revisitState.trophyEcho.active.bossName,
+      recordId: safeKey === 'famous_gear_route' ? revisitState.famousGear.active.recordId : '',
+      itemName: safeKey === 'famous_gear_route' ? revisitState.famousGear.active.itemName : ''
     };
   }
 
@@ -1898,6 +2057,9 @@
     const activeEcho = revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object'
       ? revisitState.trophyEcho.active
       : null;
+    const activeMemory = revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object'
+      ? revisitState.famousGear.active
+      : null;
     return {
       routeKey: safeKey,
       routeTitle: String(route?.title || 'Return Route'),
@@ -1909,8 +2071,11 @@
       cappedReward: revisitState.cappedReward !== false,
       bossName: cleanDisplayText(activeEcho?.bossName || '', ''),
       trophyName: cleanDisplayText(activeEcho?.trophyName || '', ''),
-      memoryTitle: cleanDisplayText(activeEcho?.memoryTitle || '', ''),
-      reflection: cleanDisplayText(activeEcho?.reflection || '', '')
+      itemName: cleanDisplayText(activeMemory?.itemName || '', ''),
+      recordId: cleanDisplayText(activeMemory?.recordId || '', ''),
+      memoryTitle: cleanDisplayText(activeEcho?.memoryTitle || activeMemory?.memoryTitle || '', ''),
+      reflection: cleanDisplayText(activeEcho?.reflection || activeMemory?.reflection || '', ''),
+      summaryLine: cleanDisplayText(activeEcho?.summaryLine || activeMemory?.summaryLine || '', '')
     };
   }
 
@@ -1960,9 +2125,58 @@
     return result;
   }
 
+  function completeFamousGearRoute(state = S) {
+    if (!state?.player) return null;
+    const revisitState = ensureRevisitStateShape(state);
+    const active = revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object'
+      ? revisitState.famousGear.active
+      : null;
+    if (!active || String(revisitState.activeRouteKey || '').trim() !== 'famous_gear_route') return null;
+    const completionKey = String(active.completionKey || famousGearCompletionKey(active)).trim();
+    if (!completionKey || !/^famous_gear:[^:]+$/i.test(completionKey)) return null;
+    const firstCompletion = revisitState.famousGear.completedKeys[completionKey] !== true;
+    revisitState.famousGear.completedKeys[completionKey] = true;
+    const completedAt = Date.now();
+    const summary = firstCompletion
+      ? `${active.itemName} settles back into archive memory. Memory Recovered.`
+      : `${active.itemName} settles again, but its archive note was already recorded.`;
+    const result = {
+      completionKey,
+      recordId: String(active.recordId || '').trim(),
+      itemId: String(active.itemId || '').trim(),
+      itemName: cleanDisplayText(active.itemName || 'Famous Gear', 'Famous Gear'),
+      slot: cleanDisplayText(active.slot || 'gear', 'gear'),
+      memoryTitle: cleanDisplayText(active.memoryTitle || active.itemName || 'Famous Gear', 'Famous Gear'),
+      reflection: cleanDisplayText(active.reflection || '', ''),
+      summary,
+      sourceLabel: cleanDisplayText(active.sourceLabel || 'Retired Gear Archive', 'Retired Gear Archive'),
+      sourceFloor: Math.max(0, Math.floor(numberOr(active.sourceFloor, 0, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(active.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt
+    };
+    revisitState.famousGear.history.unshift(result);
+    revisitState.famousGear.history = revisitState.famousGear.history.slice(0, 20);
+    revisitState.famousGear.lastResult = result;
+    revisitState.famousGear.active = null;
+    revisitState.activeRouteKey = '';
+    revisitState.startedAt = 0;
+    revisitState.sourceFloor = 0;
+    revisitState.sideRoute = false;
+    revisitState.unlocked = true;
+    revisitState.locked = false;
+    revisitState.lastViewedAt = new Date(completedAt).toLocaleString();
+    pushLog(state, summary);
+    return result;
+  }
+
   function trophyEchoResultSummary(state = S) {
     const revisitState = ensureRevisitStateShape(state);
     return revisitState.trophyEcho?.lastResult || null;
+  }
+
+  function famousGearResultSummary(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    return revisitState.famousGear?.lastResult || null;
   }
 
   function ensureEliteContractState(state) {
@@ -2665,16 +2879,31 @@
       trophyEchoStatus(state = S) {
         return trophyEchoStatusModel(state);
       },
+      famousGearStatus(state = S) {
+        return famousGearStatusModel(state);
+      },
       startTrophyEcho(state = S) {
         return startRevisitRoute(state, 'trophy_echo_route');
+      },
+      startFamousGear(state = S) {
+        return startRevisitRoute(state, 'famous_gear_route');
       },
       completeTrophyEcho(state = S) {
         return completeTrophyEchoRoute(state);
       },
+      completeFamousGear(state = S) {
+        return completeFamousGearRoute(state);
+      },
       trophyEchoResultSummary(state = S) {
         return trophyEchoResultSummary(state);
       },
+      famousGearResultSummary(state = S) {
+        return famousGearResultSummary(state);
+      },
       activeTrophyEcho(state = S) {
+        return activeRevisitRouteSummary(state);
+      },
+      activeFamousGear(state = S) {
         return activeRevisitRouteSummary(state);
       },
       simulateDeathReset(state = S) {

@@ -91,12 +91,17 @@
         'player.revisitState.trophyEcho.history',
         'player.revisitState.trophyEcho.completedKeys',
         'player.revisitState.trophyEcho.lastResult',
-        'player.revisitState.trophyEcho.memoryMarks'
+        'player.revisitState.trophyEcho.memoryMarks',
+        'player.revisitState.famousGear.active',
+        'player.revisitState.famousGear.history',
+        'player.revisitState.famousGear.completedKeys',
+        'player.revisitState.famousGear.lastResult'
       ]),
       entryConditions: Object.freeze([
         'Require a valid boss trophy or boss record source before Trophy Echo can be started.',
+        'Require a retired gear record before Famous Gear Memory can be started.',
         'Require Enter Dungeon / Continue Run to remain the primary dungeon path.',
-        'Allow only Trophy Echo as the live Revisit lane in this patch.'
+        'Allow Trophy Echo and Famous Gear Memory as the live Revisit lanes in this patch.'
       ]),
       rewardCaps: Object.freeze([
         'Revisit-only Memory Marks stay separate from power systems.',
@@ -121,8 +126,8 @@
       ]),
       uiRequirements: Object.freeze([
         'Town Revisit copy must keep Trophy Echo distinct from the primary dungeon path.',
-        'Famous Gear Memory remains visibly inactive.',
-        'Start and Resolve buttons are limited to Trophy Echo only.'
+        'Famous Gear Memory must read as a safe archive memory, not a real item reward.',
+        'Start and Resolve buttons are limited to Trophy Echo and Famous Gear Memory.'
       ]),
       activationBlockers: Object.freeze(status.available ? [] : ['No qualifying boss trophy history yet.']),
       signalCurrent: safeNumber(plan && plan.signalCurrent, 0, 0, Number.MAX_SAFE_INTEGER),
@@ -132,7 +137,7 @@
       secondLane,
       notes: Object.freeze([
         'Trophy Echo is the first live Revisit lane.',
-        'Famous Gear Memory remains the second lane and stays inactive.',
+        'Famous Gear Memory is the second live Revisit lane.',
         'The prototype uses a short memory-reflection loop instead of new combat.'
       ])
     });
@@ -159,6 +164,14 @@
     const routeFlagsSafe = routeList.every(route => {
       if (!route) return false;
       if (String(route.key || '') === 'trophy_echo_route') return route.rewardAvailable !== true;
+      if (String(route.key || '') === 'famous_gear_route') {
+        return route.rewardAvailable !== true
+          && route.claimAvailable !== true
+          && route.mutatesSave === true
+          && (route.locked === true
+            ? route.playable !== true && route.active !== true
+            : route.playable === true && route.readOnly === false);
+      }
       return route.locked === true
         && route.playable !== true
         && route.active !== true
@@ -173,13 +186,15 @@
       forbiddenExportsRemoved: remaining.length === 0,
       remainingForbiddenExports: Object.freeze(remaining.slice()),
       detectedActionExports: Object.freeze(liveActionKeys.slice()),
-      liveEntry: trophyRoute?.entryAvailable === true,
+      liveEntry: trophyRoute?.entryAvailable === true || famousGearRoute?.entryAvailable === true,
       rewardAvailable: false,
-      completionAvailable: trophyRoute?.completionAvailable === true,
+      completionAvailable: trophyRoute?.completionAvailable === true || famousGearRoute?.completionAvailable === true,
       mutatesSave: true,
       trophyEchoPlayable: trophyRoute?.playable === true,
       trophyEchoActive: trophyRoute?.active === true,
-      famousGearInactive: famousGearRoute?.playable !== true && famousGearRoute?.entryAvailable !== true && famousGearRoute?.completionAvailable !== true,
+      famousGearPlayable: famousGearRoute?.playable === true,
+      famousGearActive: famousGearRoute?.active === true,
+      famousGearCompleted: famousGearRoute?.status === 'Recovered',
       routeFlagsSafe,
       apiSurfaceSafe: remaining.length === 0 && liveActionKeys.length === 0 && routeFlagsSafe,
       activationSummary,

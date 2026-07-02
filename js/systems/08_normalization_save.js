@@ -516,6 +516,12 @@
         memoryMarks: 0,
         completedKeys: {},
         lastResult: null
+      },
+      famousGear: {
+        active: null,
+        history: [],
+        completedKeys: {},
+        lastResult: null
       }
     };
   }
@@ -529,7 +535,7 @@
     if (!isPlainObject(value)) return map;
     Object.keys(value).forEach(key => {
       const cleanKey = String(key || '').trim().slice(0, 80);
-      if (!cleanKey || !/^trophy_echo:[^:]+$/i.test(cleanKey)) return;
+      if (!cleanKey || !/^(trophy_echo|famous_gear):[^:]+$/i.test(cleanKey)) return;
       map[cleanKey] = value[key] === true;
     });
     return map;
@@ -595,6 +601,62 @@
     };
   }
 
+  function normalizeFamousGearHistoryEntry(value) {
+    if (!isPlainObject(value)) return null;
+    const completionKey = normalizeRevisitText(value.completionKey || value.claimKey || '', '', 80);
+    const recordId = normalizeRevisitText(value.recordId || value.sourceRecordId || value.itemId || '', '', 80);
+    const itemName = normalizeRevisitText(value.itemName || value.gearName || 'Famous Gear', 'Famous Gear', 60);
+    const summary = normalizeRevisitText(value.summary || value.resultSummary || '', '', 180);
+    if (!completionKey || !recordId || !summary) return null;
+    return {
+      completionKey,
+      recordId,
+      itemId: normalizeRevisitText(value.itemId || '', '', 80),
+      itemName,
+      slot: normalizeRevisitText(value.slot || '', '', 40),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || itemName, itemName, 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summary,
+      sourceLabel: normalizeRevisitText(value.sourceLabel || '', '', 80),
+      sourceFloor: Math.max(0, Math.floor(numberOr(value.sourceFloor, 0, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt: Math.max(0, Math.floor(numberOr(value.completedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeFamousGearActive(value) {
+    if (!isPlainObject(value)) return null;
+    const recordId = normalizeRevisitText(value.recordId || value.sourceRecordId || value.itemId || '', '', 80);
+    const completionKey = normalizeRevisitText(value.completionKey || `famous_gear:${recordId}`, `famous_gear:${recordId}`, 80);
+    if (!recordId || !/^famous_gear:[^:]+$/i.test(completionKey)) return null;
+    return {
+      routeKey: normalizeRevisitText(value.routeKey || 'famous_gear_route', 'famous_gear_route', 40),
+      completionKey,
+      recordId,
+      itemId: normalizeRevisitText(value.itemId || '', '', 80),
+      itemName: normalizeRevisitText(value.itemName || value.memoryTitle || 'Famous Gear', 'Famous Gear', 60),
+      slot: normalizeRevisitText(value.slot || '', '', 40),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || value.itemName || 'Famous Gear', 'Famous Gear', 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summaryLine: normalizeRevisitText(value.summaryLine || '', '', 140),
+      sourceLabel: normalizeRevisitText(value.sourceLabel || '', '', 80),
+      sourceFloor: Math.max(0, Math.floor(numberOr(value.sourceFloor, 0, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeRevisitFamousGearState(value) {
+    const source = isPlainObject(value) ? value : {};
+    const history = asArray(source.history, []).map(normalizeFamousGearHistoryEntry).filter(Boolean).slice(0, 20);
+    const completedKeys = normalizeRevisitCompletedKeys(source.completedKeys);
+    return {
+      active: normalizeFamousGearActive(source.active),
+      history,
+      completedKeys,
+      lastResult: normalizeFamousGearHistoryEntry(source.lastResult)
+    };
+  }
+
   function normalizeRevisitState(value) {
     const base = createRevisitState();
     const source = isPlainObject(value) ? value : {};
@@ -608,6 +670,7 @@
     base.locked = source.locked !== false;
     base.cappedReward = source.cappedReward !== false;
     base.trophyEcho = normalizeRevisitTrophyEchoState(source.trophyEcho);
+    base.famousGear = normalizeRevisitFamousGearState(source.famousGear);
     return base;
   }
 
