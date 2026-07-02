@@ -233,6 +233,11 @@
       completeFamousGearRoute(S);
       render();
     }));
+    $$('[data-complete-rival-trace]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (typeof completeRivalTraceRoute !== 'function') return;
+      completeRivalTraceRoute(S);
+      render();
+    }));
     bindInventoryActions();
     bindCombatActions();
     if (el('refreshMerchantBtn')) el('refreshMerchantBtn').onclick = () => runGuardedAction(() => { rollMerchant(S); render(); });

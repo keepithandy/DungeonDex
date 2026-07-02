@@ -91,13 +91,16 @@ async function main(){
         checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
         firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
         secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
+        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
         trophyStatus: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
         trophyRoute,
         famousGearRoute,
+        rivalTraceRoute,
         famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
+        rivalTraceStatus: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
         famousStartBlocked: api.startFamousGear ? api.startFamousGear(S) : null,
         routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear]')).length,
+        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
         townButtons: Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
         text: document.getElementById('revisitFoundationSlot')?.innerText || '',
         debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
@@ -107,7 +110,7 @@ async function main(){
     record('Forbidden Revisit exports are absent', baselineAudit.forbiddenPresent.length === 0, JSON.stringify(baselineAudit.forbiddenPresent));
     record('Baseline Trophy Echo is locked without boss history', baselineAudit.trophyStatus?.locked === true && baselineAudit.trophyStatus?.available === false && baselineAudit.trophyStatus?.historyCount === 0 && baselineAudit.trophyRoute?.locked === true && baselineAudit.trophyRoute?.entryAvailable !== true, JSON.stringify({ trophyStatus:baselineAudit.trophyStatus, trophyRoute:baselineAudit.trophyRoute }));
     record('Baseline Famous Gear is locked and cannot start', baselineAudit.famousGearStatus?.locked === true && baselineAudit.famousGearStatus?.available === false && baselineAudit.famousGearRoute?.locked === true && baselineAudit.famousGearRoute?.entryAvailable !== true && baselineAudit.famousStartBlocked === null, JSON.stringify({ famousGearStatus:baselineAudit.famousGearStatus, famousGearRoute:baselineAudit.famousGearRoute, famousStartBlocked:baselineAudit.famousStartBlocked }));
-    record('Baseline town card shows locked Trophy Echo and Famous Gear', baselineAudit.routeButtons.includes('Echo Locked') && baselineAudit.routeButtons.includes('Memory Locked') && baselineAudit.routeControls === 0 && /Locked until you have at least one boss trophy or boss record/i.test(baselineAudit.text) && /Locked until you have a retired gear record/i.test(baselineAudit.text), JSON.stringify({ routeButtons:baselineAudit.routeButtons, routeControls:baselineAudit.routeControls, text:baselineAudit.text.slice(0, 500) }));
+    record('Baseline town card shows locked Trophy Echo, Famous Gear, and Rival Trace', baselineAudit.routeButtons.includes('Echo Locked') && baselineAudit.routeButtons.includes('Memory Locked') && baselineAudit.routeButtons.includes('Trace Locked') && baselineAudit.routeControls === 0 && /Locked until you have at least one boss trophy or boss record/i.test(baselineAudit.text) && /Locked until you have a retired gear record/i.test(baselineAudit.text) && /Locked until named rival history exists/i.test(baselineAudit.text), JSON.stringify({ routeButtons:baselineAudit.routeButtons, routeControls:baselineAudit.routeControls, text:baselineAudit.text.slice(0, 500) }));
     record('Baseline activation audit preserves primary dungeon path', baselineAudit.plan?.primaryPath === 'Enter Dungeon / Continue Run' && baselineAudit.summary?.hasLiveEntry === false && baselineAudit.report?.apiSurfaceSafe === true && baselineAudit.report?.trophyEchoPlayable === false && baselineAudit.report?.famousGearPlayable === false, JSON.stringify({ plan:baselineAudit.plan, summary:baselineAudit.summary, report:baselineAudit.report }));
     record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
 
@@ -118,27 +121,31 @@ async function main(){
       const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
       const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
       const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
+      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
       return {
         checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
         status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
         famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
+        rivalTraceStatus: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
         report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
         firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
         secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
+        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
         trophyRoute,
         famousGearRoute,
+        rivalTraceRoute,
         routes,
         routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear]')).length,
+        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
         text: document.getElementById('revisitFoundationSlot')?.innerText || '',
         debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
         talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
       };
     })()`);
-    const unrelatedRoutesInactive = Array.isArray(availableAudit.routes) && availableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
+    const unrelatedRoutesInactive = Array.isArray(availableAudit.routes) && availableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
     record('Trophy Echo becomes available with boss history', availableAudit.status?.available === true && availableAudit.status?.locked === false && availableAudit.status?.historyCount >= 1 && availableAudit.trophyRoute?.playable === true && availableAudit.trophyRoute?.entryAvailable === true && availableAudit.trophyRoute?.startAvailable === true, JSON.stringify({ status:availableAudit.status, trophyRoute:availableAudit.trophyRoute }));
-    record('Town card exposes Start Trophy Echo and keeps Famous Gear locked', availableAudit.routeButtons.includes('Start Trophy Echo') && availableAudit.routeControls >= 1 && /Memory Locked/i.test(availableAudit.text) && availableAudit.famousGearStatus?.locked === true && availableAudit.famousGearRoute?.playable !== true && availableAudit.famousGearRoute?.entryAvailable !== true && unrelatedRoutesInactive, JSON.stringify({ routeButtons:availableAudit.routeButtons, famousGearRoute:availableAudit.famousGearRoute, famousGearStatus:availableAudit.famousGearStatus, routes:availableAudit.routes }));
-    record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, report:availableAudit.report }));
+    record('Town card exposes Start Trophy Echo and keeps Famous Gear and Rival Trace locked', availableAudit.routeButtons.includes('Start Trophy Echo') && availableAudit.routeControls >= 1 && /Memory Locked/i.test(availableAudit.text) && /Trace Locked/i.test(availableAudit.text) && availableAudit.famousGearStatus?.locked === true && availableAudit.rivalTraceStatus?.locked === true && availableAudit.famousGearRoute?.playable !== true && availableAudit.famousGearRoute?.entryAvailable !== true && availableAudit.rivalTraceRoute?.playable !== true && availableAudit.rivalTraceRoute?.entryAvailable !== true && unrelatedRoutesInactive, JSON.stringify({ routeButtons:availableAudit.routeButtons, famousGearRoute:availableAudit.famousGearRoute, rivalTraceRoute:availableAudit.rivalTraceRoute, routes:availableAudit.routes }));
+    record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false && availableAudit.thirdLane?.locked === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, thirdLane:availableAudit.thirdLane, report:availableAudit.report }));
 
     const startedAudit = await evalByValue(client, `(() => {
       const api = window.DungeonDexEliteContracts || {};

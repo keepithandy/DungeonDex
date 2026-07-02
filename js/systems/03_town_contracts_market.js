@@ -675,6 +675,14 @@
     trophyEcho.completedKeys = trophyEcho.completedKeys && typeof trophyEcho.completedKeys === 'object' ? trophyEcho.completedKeys : {};
     trophyEcho.lastResult = trophyEcho.lastResult && typeof trophyEcho.lastResult === 'object' ? trophyEcho.lastResult : null;
     revisitState.trophyEcho = trophyEcho;
+    const rivalTrace = revisitState.rivalTrace && typeof revisitState.rivalTrace === 'object'
+      ? revisitState.rivalTrace
+      : {};
+    rivalTrace.active = rivalTrace.active && typeof rivalTrace.active === 'object' ? rivalTrace.active : null;
+    rivalTrace.history = asArray(rivalTrace.history, []).filter(entry => entry && typeof entry === 'object').slice(0, 20);
+    rivalTrace.completedKeys = rivalTrace.completedKeys && typeof rivalTrace.completedKeys === 'object' ? rivalTrace.completedKeys : {};
+    rivalTrace.lastResult = rivalTrace.lastResult && typeof rivalTrace.lastResult === 'object' ? rivalTrace.lastResult : null;
+    revisitState.rivalTrace = rivalTrace;
     state.player.revisitState = revisitState;
     return revisitState;
   }
@@ -801,6 +809,56 @@
       source,
       activeMemory: active,
       lastResult: revisitState.famousGear?.lastResult || null
+    };
+  }
+
+  function rivalTraceCompletionKey(source) {
+    const rivalId = String(source?.rivalId || source?.id || source?.eliteName || '').trim();
+    return rivalId ? `rival_trace:${rivalId}` : '';
+  }
+
+  function createRivalTraceReflection(source) {
+    const eliteName = cleanDisplayText(source?.eliteName || 'Rival Elite', 'Rival Elite');
+    const floorName = cleanDisplayText(source?.floorName || 'Elite Board', 'Elite Board');
+    const defeats = Math.max(0, Math.floor(numberOr(source?.defeats, 0, 0, 999999)));
+    const defeatLine = defeats > 0 ? `Remembered defeats: ${format(defeats)}.` : 'The rival trace is newly recorded.';
+    return {
+      memoryTitle: `${eliteName} Trace`,
+      summaryLine: `${eliteName} leaves a trace in the archive.`,
+      reflection: `${eliteName} is remembered as a safe archive trace from ${floorName}. You read the record, keep the rival sealed in memory, and leave combat, rewards, and board progression unchanged. ${defeatLine}`
+    };
+  }
+
+  function rivalTraceStatusModel(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    const contracts = ensureEliteContractState(state);
+    const rivals = ensureEliteRivalState(state);
+    const active = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
+      ? revisitState.rivalTrace.active
+      : null;
+    const source = active
+      ? rivals.find(entry => String(entry.id || '') === String(active.rivalId || '')) || active
+      : (contracts.active && contracts.active.rivalContract
+        ? {
+          id: String(contracts.active.rivalId || contracts.active.id || ''),
+          rivalId: String(contracts.active.rivalId || contracts.active.id || ''),
+          eliteName: cleanDisplayText(contracts.active.eliteName || 'Rival Elite', 'Rival Elite'),
+          floorName: cleanDisplayText(contracts.active.district || 'Elite Board', 'Elite Board'),
+          defeats: Math.max(1, Math.floor(numberOr(contracts.active.rivalDefeats, 1, 1, 999999)))
+        }
+        : (rivals[0] || null));
+    const completedCount = Object.keys(revisitState.rivalTrace?.completedKeys || {}).filter(key => /^rival_trace:[^:]+$/i.test(String(key || '').trim()) && revisitState.rivalTrace.completedKeys[key] === true).length;
+    return {
+      routeKey: 'rival_trace_route',
+      historyCount: rivals.length,
+      completedCount,
+      locked: rivals.length <= 0 && !contracts.active?.rivalContract,
+      available: rivals.length > 0 || !!contracts.active?.rivalContract,
+      active: !!active,
+      completed: !active && completedCount > 0,
+      source,
+      activeTrace: active,
+      lastResult: revisitState.rivalTrace?.lastResult || null
     };
   }
 
@@ -1220,21 +1278,22 @@
       };
     }
     if (key === 'rival_trace_route') {
+      const rivalReady = rivalTraceStatusModel(state).available;
       return {
         gateType: 'rival',
         gateLabel: 'Rival Trace',
-        reason: 'Locked: Rival Trace not ready',
+        reason: rivalReady ? 'Playable: Rival Trace memory is ready' : 'Locked: Rival Trace not ready',
         requirement: 'Remember named rival elite history.',
-        progressLabel: 'No signal yet',
+        progressLabel: rivalReady ? 'Rival signal noted' : 'No signal yet',
         diagnosticLabel: 'Gate Diagnostics',
         diagnosticDetail: 'Diagnostic only - future unlock rule inactive.',
-        accessLabel: 'Route access is unavailable.',
+        accessLabel: rivalReady ? 'Route access is available.' : 'Route access is unavailable.',
         source: 'named rival elite memory',
-        previewState: 'locked',
-        previewLabel: 'Still locked',
-        previewReason: 'Future named rival elite memory may sharpen this third planning lane later.',
+        previewState: rivalReady ? 'playable-now' : 'locked',
+        previewLabel: rivalReady ? 'Available now' : 'Still locked',
+        previewReason: rivalReady ? 'Named rival elite memory can be revisited from town.' : 'Future named rival elite memory may sharpen this third planning lane later.',
         previewRequirement: 'Remember named rival elite history.',
-        previewSafety: 'Preview only - route access is unavailable.'
+        previewSafety: rivalReady ? 'Route access is available.' : 'Preview only - route access is unavailable.'
       };
     }
     if (key === 'debt_pressure_route') {
@@ -1359,7 +1418,7 @@
     const locked = preview ? preview.locked !== false : true;
     const eligible = !!preview && !!gateMeta && !!routeContent;
     const enterable = preview?.entryAvailable === true;
-    const previewOnly = !['trophy_echo_route', 'famous_gear_route'].includes(routeKey);
+    const previewOnly = !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(routeKey);
     return {
       routeKey: routeKey || 'unknown_route',
       eligible,
@@ -1378,6 +1437,14 @@
             ? 'Memory Active'
             : enterable
               ? 'Archive Ready'
+              : hasRoute
+                ? 'Entry Locked'
+                : 'Gate Prepared')
+        : routeKey === 'rival_trace_route'
+          ? (preview?.completionAvailable === true
+            ? 'Trace Active'
+            : enterable
+              ? 'Trace Ready'
               : hasRoute
                 ? 'Entry Locked'
                 : 'Gate Prepared')
@@ -1419,7 +1486,7 @@
     const routeDefs = [
       { key: 'trophy_echo_route', previewState: 'preview', previewLabel: 'Future Unlock Preview', previewReason: 'Future boss history may reopen this path later.', previewRequirement: 'Build more boss history.' },
       { key: 'famous_gear_route', previewState: famousReady ? 'playable-now' : 'locked', previewLabel: famousReady ? 'Available now' : 'Still locked', previewReason: famousReady ? 'Retired gear archive can be revisited from town.' : 'Future archive memory may shape this path later.', previewRequirement: famousReady ? 'Retired gear archive is ready.' : 'Build stronger gear memory.' },
-      { key: 'rival_trace_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future named rival elite memory may sharpen this trace later.', previewRequirement: 'Remember named rival elite history.' },
+      { key: 'rival_trace_route', previewState: rivalTraceStatusModel(state).available ? 'playable-now' : 'locked', previewLabel: rivalTraceStatusModel(state).available ? 'Available now' : 'Still locked', previewReason: rivalTraceStatusModel(state).available ? 'Named rival elite memory can be revisited from town.' : 'Future named rival elite memory may sharpen this trace later.', previewRequirement: 'Remember named rival elite history.' },
       { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future ledger pressure may mark this district later.', previewRequirement: 'Build more debt history.' },
       { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future board history may strengthen this echo later.', previewRequirement: 'Build more board history.' }
     ];
@@ -1634,10 +1701,25 @@
         key: 'rival_trace_route',
         title: 'Rival Trace Route',
         district: 'Named rival memory districts',
-        reason: 'Remembered named rival elites may leave a trace.',
+        reason: rivalTraceStatusModel(state).available
+          ? 'A remembered named rival elite can answer as a safe trace.'
+          : 'Remembered named rival elites may leave a trace.',
         hooks: ['rival_trace', 'board_echo'],
-        status: 'Locked',
-        locked: true,
+        status: rivalTraceStatusModel(state).active ? 'Active' : rivalTraceStatusModel(state).completed ? 'Recovered' : rivalTraceStatusModel(state).available ? 'Playable' : 'Locked',
+        locked: !rivalTraceStatusModel(state).available && !rivalTraceStatusModel(state).active,
+        playable: rivalTraceStatusModel(state).available,
+        active: rivalTraceStatusModel(state).active,
+        completed: rivalTraceStatusModel(state).completed,
+        readOnly: false,
+        entryAvailable: rivalTraceStatusModel(state).available && !rivalTraceStatusModel(state).active,
+        startAvailable: rivalTraceStatusModel(state).available && !rivalTraceStatusModel(state).active,
+        enterAvailable: rivalTraceStatusModel(state).available && !rivalTraceStatusModel(state).active,
+        completionAvailable: rivalTraceStatusModel(state).active,
+        completeAvailable: rivalTraceStatusModel(state).active,
+        claimAvailable: false,
+        rewardAvailable: false,
+        resultAvailable: !!rivalTraceStatusModel(state).lastResult,
+        mutatesSave: true,
         priority: 30,
         hookSource: 'rival_trace / board_echo'
       },
@@ -1714,13 +1796,21 @@
                     : famousGear.available
                       ? 'Playable. Start a safe archive memory from town.'
                       : 'Locked. Archive memory required.')
+              : route.key === 'rival_trace_route'
+                ? (rivalTraceStatusModel(state).active
+                    ? 'Active rival trace in progress. Resolve it from town.'
+                    : rivalTraceStatusModel(state).completed
+                      ? 'Recovered rival trace. Start again if you want to revisit the record.'
+                      : rivalTraceStatusModel(state).available
+                        ? 'Playable. Start a safe rival trace from town.'
+                        : 'Locked. Rival memory required.')
               : 'Locked preview. No route access.',
           lockedReadinessNote: route.key === 'trophy_echo_route'
             ? (trophyEcho.locked ? 'Needs more boss history.' : trophyEcho.active ? 'Active echo already underway.' : 'Boss history is ready.')
             : route.key === 'famous_gear_route'
               ? (famousGear.locked ? 'Needs retired gear archive history.' : famousGear.active ? 'Active archive memory already underway.' : famousGear.completed ? 'Archive memory recovered.' : 'Retired gear archive is ready.')
             : route.key === 'rival_trace_route'
-                ? 'Needs named rival elite memory.'
+                ? (rivalTraceStatusModel(state).locked ? 'Needs named rival elite memory.' : rivalTraceStatusModel(state).active ? 'Active rival trace already underway.' : rivalTraceStatusModel(state).completed ? 'Rival trace recovered.' : 'Rival memory is ready.')
                 : route.key === 'debt_pressure_route'
                   ? 'Needs more debt history.'
                   : route.key === 'board_echo_route'
@@ -1731,6 +1821,8 @@
             ? trophyEcho.locked
             : route.key === 'famous_gear_route'
               ? famousGear.locked
+              : route.key === 'rival_trace_route'
+                ? rivalTraceStatusModel(state).locked
               : true,
           priority: Math.max(0, Math.floor(numberOr(route.priority, topHook.priority || 0, 0, Number.MAX_SAFE_INTEGER))),
           previewText: String(route.previewText || '').trim(),
@@ -1755,6 +1847,8 @@
             ? (trophyEcho.active ? 'Active' : trophyEcho.locked ? 'Faint Trace' : 'Ready')
             : route.key === 'famous_gear_route'
               ? (famousGear.active ? 'Active' : famousGear.completed ? 'Recovered' : famousGear.locked ? 'Faint Trace' : 'Ready')
+              : route.key === 'rival_trace_route'
+                ? (rivalTraceStatusModel(state).active ? 'Active' : rivalTraceStatusModel(state).completed ? 'Recovered' : rivalTraceStatusModel(state).locked ? 'Faint Trace' : 'Ready')
             : revisitRouteReadiness({ ...route, criteria: criteriaStub.criteria }, routeHooks)
         }, routeHooks.map(hook => hook.key));
       })
@@ -1801,13 +1895,15 @@
           ? (route.active ? 'active' : route.locked ? 'locked' : 'playable-now')
           : key === 'famous_gear_route'
             ? (route.active ? 'active' : route.completed ? 'playable-now' : route.locked ? 'locked' : 'playable-now')
+            : key === 'rival_trace_route'
+              ? (route.active ? 'active' : route.completed ? 'playable-now' : route.locked ? 'locked' : 'playable-now')
             : status === 'Planned' ? 'eligible-preview' : 'playable-later',
         optionalSideContent: true,
         primaryPathPreserved: true,
-        readOnly: key !== 'trophy_echo_route' && key !== 'famous_gear_route',
-        entryAvailable: key === 'trophy_echo_route' ? route.entryAvailable === true : key === 'famous_gear_route' ? route.entryAvailable === true : false,
+        readOnly: key !== 'trophy_echo_route' && key !== 'famous_gear_route' && key !== 'rival_trace_route',
+        entryAvailable: key === 'trophy_echo_route' ? route.entryAvailable === true : key === 'famous_gear_route' ? route.entryAvailable === true : key === 'rival_trace_route' ? route.entryAvailable === true : false,
         rewardAvailable: false,
-        completionAvailable: key === 'trophy_echo_route' ? route.completionAvailable === true : key === 'famous_gear_route' ? route.completionAvailable === true : false,
+        completionAvailable: key === 'trophy_echo_route' ? route.completionAvailable === true : key === 'famous_gear_route' ? route.completionAvailable === true : key === 'rival_trace_route' ? route.completionAvailable === true : false,
         sourceHistoryOnly: true
       };
     });
@@ -1850,7 +1946,7 @@
       hasRewards: false,
       hasCompletion: plan?.completionAvailable === true,
       status: String(plan?.status || 'Planning only'),
-      note: 'Trophy Echo and Famous Gear Memory are the first live Revisit lanes. The remaining lanes stay preview-only.',
+      note: 'Trophy Echo, Famous Gear Memory, and Rival Trace are the live Revisit lanes. The remaining lanes stay preview-only.',
       routeStateCount: routeStates.length,
       eligibleRouteCount: eligibleRoutes.length
     };
@@ -1873,7 +1969,7 @@
       hasRewards: false,
       hasCompletion: routes.some(route => route && route.completionAvailable === true),
       stableHookLabels,
-      note: 'Trophy Echo and Famous Gear Memory can now be started and completed from town. The remaining lanes stay preview-only.'
+      note: 'Trophy Echo, Famous Gear Memory, and Rival Trace can now be started and completed from town. The remaining lanes stay preview-only.'
     };
   }
 
@@ -1933,18 +2029,18 @@
       laneKey: 'rival-trace',
       laneLabel: 'Rival Trace',
       sourceHook: 'Rival Trace',
-      currentStatus: 'planned',
-      locked: true,
-      readOnly: true,
-      previewOnly: true,
-      hasLiveEntry: false,
+      currentStatus: rivalTraceStatusModel(state).active ? 'active' : rivalTraceStatusModel(state).completed ? 'traced' : rivalTraceStatusModel(state).available ? 'playable' : 'locked',
+      locked: rivalTraceStatusModel(state).locked,
+      readOnly: false,
+      previewOnly: false,
+      hasLiveEntry: rivalTraceStatusModel(state).available,
       hasRewards: false,
-      hasCompletion: false,
+      hasCompletion: !!rivalTraceStatusModel(state).lastResult || rivalTraceStatusModel(state).completed,
       routeKey: 'rival_trace_route',
       routeLabel: String(rivalTraceRoute?.title || 'Rival Trace Route'),
       reason: 'Based on remembered named rival elite history only.',
-      note: 'Third planned lane; memory/planning only. No hunt, board mission, route, reward, unlock, currency, progression, or combat mutation.',
-      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later']
+      note: 'Third live Revisit lane. Rival Trace is a safe archive memory tied to named rival elite history, not a reward, hunt, or combat path.',
+      allowedStates: ['locked', 'planned', 'eligible-preview', 'playable-later', 'playable-now', 'active']
     };
   }
 
@@ -1956,7 +2052,7 @@
     const routes = revisitRoutePreviews(state);
     const route = routes.find(r => String(r?.key || '') === safeKey);
     if (!route) return false;
-    if (safeKey !== 'trophy_echo_route' && safeKey !== 'famous_gear_route') return false;
+    if (safeKey !== 'trophy_echo_route' && safeKey !== 'famous_gear_route' && safeKey !== 'rival_trace_route') return false;
     return route.startAvailable === true;
   }
 
@@ -1967,15 +2063,20 @@
     const revisitState = ensureRevisitStateShape(state);
     if (safeKey === 'trophy_echo_route' && revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object') return null;
     if (safeKey === 'famous_gear_route' && revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object') return null;
-    const status = safeKey === 'famous_gear_route' ? famousGearStatusModel(state) : trophyEchoStatusModel(state);
+    if (safeKey === 'rival_trace_route' && revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object') return null;
+    const status = safeKey === 'famous_gear_route' ? famousGearStatusModel(state) : safeKey === 'rival_trace_route' ? rivalTraceStatusModel(state) : trophyEchoStatusModel(state);
     const source = status.source;
     if (!source) return null;
     const currentFloor = safeKey === 'famous_gear_route'
       ? Math.max(0, Math.floor(numberOr(source.floor || source.itemLevel || source.item?.level || state?.player?.depth, 0, 0, 999999)))
-      : Math.max(0, Math.floor(numberOr(source.bestDepth, state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
+      : safeKey === 'rival_trace_route'
+        ? Math.max(0, Math.floor(numberOr(source.defeats || source.rivalDefeats || 0, state?.player?.depth, 0, 0, 999999)))
+        : Math.max(0, Math.floor(numberOr(source.bestDepth, state?.player?.depth, state?.run?.floor || 0, 0, 999999)));
     const reflection = safeKey === 'famous_gear_route'
       ? createFamousGearReflection(source)
-      : createTrophyEchoReflection(source);
+      : safeKey === 'rival_trace_route'
+        ? createRivalTraceReflection(source)
+        : createTrophyEchoReflection(source);
     const startedAt = Date.now();
     revisitState.unlocked = true;
     revisitState.locked = false;
@@ -2014,6 +2115,33 @@
         itemName: revisitState.famousGear.active.itemName
       };
     }
+    if (safeKey === 'rival_trace_route') {
+      revisitState.rivalTrace.active = {
+        routeKey: safeKey,
+        completionKey: rivalTraceCompletionKey(source),
+        rivalId: String(source.rivalId || source.id || '').trim(),
+        eliteName: cleanDisplayText(source.eliteName || 'Rival Elite', 'Rival Elite'),
+        floorName: cleanDisplayText(source.floorName || 'Elite Board', 'Elite Board'),
+        memoryTitle: reflection.memoryTitle,
+        reflection: reflection.reflection,
+        summaryLine: reflection.summaryLine,
+        defeats: Math.max(0, Math.floor(numberOr(source.defeats, 0, 0, 999999))),
+        startedAt
+      };
+      revisitState.rivalTrace.lastResult = null;
+      pushLog(state, `Rival Trace started: ${revisitState.rivalTrace.active.eliteName}.`);
+      return {
+        routeKey: safeKey,
+        routeTitle: 'Rival Trace Route',
+        startedAt,
+        sourceFloor: currentFloor,
+        sideRoute: true,
+        locked: false,
+        cappedReward: true,
+        rivalId: revisitState.rivalTrace.active.rivalId,
+        eliteName: revisitState.rivalTrace.active.eliteName
+      };
+    }
     revisitState.trophyEcho.active = {
       routeKey: safeKey,
       completionKey: trophyEchoCompletionKey(source),
@@ -2042,7 +2170,9 @@
       trophyId: safeKey === 'famous_gear_route' ? '' : revisitState.trophyEcho.active.trophyId,
       bossName: safeKey === 'famous_gear_route' ? '' : revisitState.trophyEcho.active.bossName,
       recordId: safeKey === 'famous_gear_route' ? revisitState.famousGear.active.recordId : '',
-      itemName: safeKey === 'famous_gear_route' ? revisitState.famousGear.active.itemName : ''
+      itemName: safeKey === 'famous_gear_route' ? revisitState.famousGear.active.itemName : '',
+      rivalId: '',
+      eliteName: ''
     };
   }
 
@@ -2158,6 +2288,47 @@
     revisitState.famousGear.history = revisitState.famousGear.history.slice(0, 20);
     revisitState.famousGear.lastResult = result;
     revisitState.famousGear.active = null;
+    revisitState.activeRouteKey = '';
+    revisitState.startedAt = 0;
+    revisitState.sourceFloor = 0;
+    revisitState.sideRoute = false;
+    revisitState.unlocked = true;
+    revisitState.locked = false;
+    revisitState.lastViewedAt = new Date(completedAt).toLocaleString();
+    pushLog(state, summary);
+    return result;
+  }
+
+  function completeRivalTraceRoute(state = S) {
+    if (!state?.player) return null;
+    const revisitState = ensureRevisitStateShape(state);
+    const active = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
+      ? revisitState.rivalTrace.active
+      : null;
+    if (!active || String(revisitState.activeRouteKey || '').trim() !== 'rival_trace_route') return null;
+    const completionKey = String(active.completionKey || rivalTraceCompletionKey(active)).trim();
+    if (!completionKey || !/^rival_trace:[^:]+$/i.test(completionKey)) return null;
+    const firstCompletion = revisitState.rivalTrace.completedKeys[completionKey] !== true;
+    revisitState.rivalTrace.completedKeys[completionKey] = true;
+    const completedAt = Date.now();
+    const summary = firstCompletion
+      ? `${active.eliteName} settles into archive memory. Trace recorded.`
+      : `${active.eliteName} settles again, but its trace was already recorded.`;
+    const result = {
+      completionKey,
+      rivalId: String(active.rivalId || '').trim(),
+      eliteName: cleanDisplayText(active.eliteName || 'Rival Elite', 'Rival Elite'),
+      memoryTitle: cleanDisplayText(active.memoryTitle || active.eliteName || 'Rival Trace', 'Rival Trace'),
+      reflection: cleanDisplayText(active.reflection || '', ''),
+      summary,
+      floorName: cleanDisplayText(active.floorName || 'Elite Board', 'Elite Board'),
+      startedAt: Math.max(0, Math.floor(numberOr(active.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt
+    };
+    revisitState.rivalTrace.history.unshift(result);
+    revisitState.rivalTrace.history = revisitState.rivalTrace.history.slice(0, 20);
+    revisitState.rivalTrace.lastResult = result;
+    revisitState.rivalTrace.active = null;
     revisitState.activeRouteKey = '';
     revisitState.startedAt = 0;
     revisitState.sourceFloor = 0;
@@ -2893,6 +3064,15 @@
       },
       completeFamousGear(state = S) {
         return completeFamousGearRoute(state);
+      },
+      rivalTraceStatus(state = S) {
+        return rivalTraceStatusModel(state);
+      },
+      startRivalTrace(state = S) {
+        return startRevisitRoute(state, 'rival_trace_route');
+      },
+      completeRivalTrace(state = S) {
+        return completeRivalTraceRoute(state);
       },
       trophyEchoResultSummary(state = S) {
         return trophyEchoResultSummary(state);

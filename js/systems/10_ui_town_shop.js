@@ -11,17 +11,24 @@
     const trophyLastResult = trophyStatus.lastResult || null;
     const famousActive = famousStatus.activeMemory || null;
     const famousLastResult = famousStatus.lastResult || null;
+    const rivalStatus = typeof api.rivalTraceStatus === 'function' ? api.rivalTraceStatus(S) : null;
+    const rivalActive = rivalStatus?.activeTrace || null;
+    const rivalLastResult = rivalStatus?.lastResult || null;
     const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
     const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
     const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
     const famousMemoryTitle = cleanDisplayText(famousStatus.source?.memoryTitle || famousActive?.memoryTitle || `${itemName} Memory`, `${itemName} Memory`);
+    const rivalName = cleanDisplayText(rivalStatus?.source?.eliteName || rivalActive?.eliteName || 'Rival Elite', 'Rival Elite');
+    const rivalTraceTitle = cleanDisplayText(rivalStatus?.source?.memoryTitle || rivalActive?.memoryTitle || `${rivalName} Trace`, `${rivalName} Trace`);
     const memoryMarks = Math.max(0, Math.floor(numberOr(trophyStatus.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
     const completedCount = Math.max(0, Math.floor(numberOr(trophyStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
     const historyCount = Math.max(0, Math.floor(numberOr(trophyStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
     const famousHistoryCount = Math.max(0, Math.floor(numberOr(famousStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
     const famousCompletedCount = Math.max(0, Math.floor(numberOr(famousStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const rivalCompletedCount = Math.max(0, Math.floor(numberOr(rivalStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
     const echoStateLabel = trophyActive ? 'Active' : trophyStatus.locked ? 'Locked' : 'Playable';
     const famousStateLabel = famousStatus.active ? 'Active' : famousStatus.completed ? 'Recovered' : famousStatus.locked ? 'Locked' : 'Playable';
+    const rivalStateLabel = rivalStatus?.active ? 'Active' : rivalStatus?.completed ? 'Recovered' : rivalStatus?.locked ? 'Locked' : 'Playable';
     const summaryLine = trophyActive
       ? cleanDisplayText(trophyActive.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
       : trophyStatus.locked
@@ -60,6 +67,9 @@
     const famousResultMarkup = famousLastResult
       ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(famousLastResult.summary || '', ''))}</div>`
       : '';
+    const rivalResultMarkup = rivalLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(rivalLastResult.summary || '', ''))}</div>`
+      : '';
     const playableLanes = [
       trophyStatus.available ? 'Trophy Echo' : '',
       famousStatus.available ? 'Famous Gear Memory' : ''
@@ -68,9 +78,11 @@
       ? `Active: Trophy Echo is running in town. ${famousStatus.available ? 'Famous Gear Memory is also available.' : 'Famous Gear Memory remains locked.'}`
       : famousActive
         ? `Active: Famous Gear Memory is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}`
+        : rivalActive
+          ? `Active: Rival Trace is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}`
         : playableLanes.length
           ? `Playable: ${playableLanes.join(' and ')}.`
-          : 'Locked: Trophy Echo needs boss history and Famous Gear Memory needs retired gear history.';
+          : 'Locked: Trophy Echo needs boss history, Famous Gear Memory needs retired gear history, and Rival Trace needs named rival history.';
     const revisitNextText = trophyActive
       ? 'Next: resolve the active echo in town before starting another.'
       : famousActive
@@ -119,6 +131,23 @@
             ${famousActionMarkup}
           </div>
           ${famousResultMarkup}
+        </article>
+        <article class="quest-card revisit-lane-card ${rivalStatus?.locked ? 'locked' : rivalStatus?.active ? 'active' : rivalStatus?.completed ? 'completed' : 'ready'}">
+          <div class="quest-topline">
+            <strong>Rival Trace</strong>
+            <span class="small ${rivalStatus?.active ? '' : 'muted'}">${rivalStateLabel}</span>
+          </div>
+          <p class="small">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.summaryLine || `${rivalName} leaves a trace in the archive.`, `${rivalName} leaves a trace in the archive.`) : rivalStatus?.completed ? `${rivalName} has already been recovered as archive trace.` : rivalStatus?.locked ? 'Locked until named rival history exists.' : 'Named rival memory can be revisited as a safe archive trace.')}</p>
+          <p class="small muted">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.reflection || '', '') : rivalStatus?.locked ? 'The archive keeps the rival sealed in memory. No combat, reward, or board mission opens.' : 'The trace is safe to read from town; it does not return rewards or alter combat.' )}</p>
+          <div class="small muted">Named rival records ${rivalStatus?.historyCount || 0} • Traces recorded ${rivalCompletedCount}</div>
+          <div class="small muted">${rivalStatus?.active ? 'Active: resolve the rival trace in town.' : rivalStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : rivalStatus?.locked ? 'Locked until named rival memory exists.' : 'Playable: start Rival Trace from town.'}</div>
+          <div class="small muted">Rival Trace replays the record only; combat, debt, gear, and dungeon entry stay unchanged.</div>
+          <div class="small muted">${rivalStatus?.active ? 'Next: resolve the active rival trace before starting another.' : rivalStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : rivalStatus?.locked ? 'Next: remember a named rival elite to unlock the lane.' : 'Next: start Rival Trace from town; rewards stay archive-only.'}</div>
+          ${rivalActive ? `<div class="small muted">Active Memory: ${escapeHtml(rivalTraceTitle || rivalName)}</div>` : ''}
+          <div class="inline-actions revisit-echo-actions">
+            ${rivalStatus?.active ? `<button class="primary" type="button" data-complete-rival-trace="1">Resolve Trace</button>` : rivalStatus?.locked ? `<button class="ghost" type="button" disabled aria-disabled="true">Trace Locked</button>` : `<button class="primary" type="button" data-start-revisit="rival_trace_route">Start Rival Trace</button>`}
+          </div>
+          ${rivalResultMarkup}
         </article>
       </section>`;
   }
