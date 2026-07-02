@@ -12,8 +12,12 @@
     const famousActive = famousStatus.activeMemory || null;
     const famousLastResult = famousStatus.lastResult || null;
     const rivalStatus = typeof api.rivalTraceStatus === 'function' ? api.rivalTraceStatus(S) : null;
+    const revisitRoutes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
+    const rivalTraceRoute = Array.isArray(revisitRoutes) ? revisitRoutes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
     const rivalActive = rivalStatus?.activeTrace || null;
     const rivalLastResult = rivalStatus?.lastResult || null;
+    const rivalTraceState = S?.player?.revisitState?.rivalTrace || null;
+    const rivalRecords = Array.isArray(S?.player?.eliteContracts?.rivals) ? S.player.eliteContracts.rivals : [];
     const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
     const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
     const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
@@ -70,9 +74,18 @@
     const rivalResultMarkup = rivalLastResult
       ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(rivalLastResult.summary || '', ''))}</div>`
       : '';
+    const rivalPlayable = rivalTraceRoute?.playable === true
+      || rivalTraceRoute?.entryAvailable === true
+      || rivalTraceRoute?.startAvailable === true
+      || rivalStatus?.available === true
+      || rivalStatus?.active === true
+      || rivalStatus?.completed === true
+      || rivalRecords.some(entry => entry && entry.revengeAvailable !== false && entry.completed !== true)
+      || Array.isArray(rivalTraceState?.history) && rivalTraceState.history.length > 0;
     const playableLanes = [
       trophyStatus.available ? 'Trophy Echo' : '',
-      famousStatus.available ? 'Famous Gear Memory' : ''
+      famousStatus.available ? 'Famous Gear Memory' : '',
+      rivalPlayable ? 'Rival Trace' : ''
     ].filter(Boolean);
     const revisitStatusText = trophyActive
       ? `Active: Trophy Echo is running in town. ${famousStatus.available ? 'Famous Gear Memory is also available.' : 'Famous Gear Memory remains locked.'}`
@@ -132,20 +145,20 @@
           </div>
           ${famousResultMarkup}
         </article>
-        <article class="quest-card revisit-lane-card ${rivalStatus?.locked ? 'locked' : rivalStatus?.active ? 'active' : rivalStatus?.completed ? 'completed' : 'ready'}">
+        <article class="quest-card revisit-lane-card ${rivalStatus?.active ? 'active' : rivalStatus?.completed ? 'completed' : rivalPlayable ? 'ready' : 'locked'}">
           <div class="quest-topline">
             <strong>Rival Trace</strong>
             <span class="small ${rivalStatus?.active ? '' : 'muted'}">${rivalStateLabel}</span>
           </div>
-          <p class="small">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.summaryLine || `${rivalName} leaves a trace in the archive.`, `${rivalName} leaves a trace in the archive.`) : rivalStatus?.completed ? `${rivalName} has already been recovered as archive trace.` : rivalStatus?.locked ? 'Locked until named rival history exists.' : 'Named rival memory can be revisited as a safe archive trace.')}</p>
-          <p class="small muted">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.reflection || '', '') : rivalStatus?.locked ? 'The archive keeps the rival sealed in memory. No combat, reward, or board mission opens.' : 'The trace is safe to read from town; it does not return rewards or alter combat.' )}</p>
+          <p class="small">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.summaryLine || `${rivalName} leaves a trace in the archive.`, `${rivalName} leaves a trace in the archive.`) : rivalStatus?.completed ? `${rivalName} has already been recovered as archive trace.` : rivalPlayable ? 'Named rival memory can be revisited as a safe archive trace.' : 'Locked until named rival history exists.')}</p>
+          <p class="small muted">${escapeHtml(rivalStatus?.active ? cleanDisplayText(rivalActive?.reflection || '', '') : rivalPlayable ? 'The trace is safe to read from town; it does not return rewards or alter combat.' : 'The archive keeps the rival sealed in memory. No combat, reward, or board mission opens.' )}</p>
           <div class="small muted">Named rival records ${rivalStatus?.historyCount || 0} • Traces recorded ${rivalCompletedCount}</div>
-          <div class="small muted">${rivalStatus?.active ? 'Active: resolve the rival trace in town.' : rivalStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : rivalStatus?.locked ? 'Locked until named rival memory exists.' : 'Playable: start Rival Trace from town.'}</div>
+          <div class="small muted">${rivalStatus?.active ? 'Active: resolve the rival trace in town.' : rivalStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : rivalPlayable ? 'Playable: start Rival Trace from town.' : 'Locked until named rival memory exists.'}</div>
           <div class="small muted">Rival Trace replays the record only; combat, debt, gear, and dungeon entry stay unchanged.</div>
-          <div class="small muted">${rivalStatus?.active ? 'Next: resolve the active rival trace before starting another.' : rivalStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : rivalStatus?.locked ? 'Next: remember a named rival elite to unlock the lane.' : 'Next: start Rival Trace from town; rewards stay archive-only.'}</div>
+          <div class="small muted">${rivalStatus?.active ? 'Next: resolve the active rival trace before starting another.' : rivalStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : rivalPlayable ? 'Next: start Rival Trace from town; rewards stay archive-only.' : 'Next: remember a named rival elite to unlock the lane.'}</div>
           ${rivalActive ? `<div class="small muted">Active Memory: ${escapeHtml(rivalTraceTitle || rivalName)}</div>` : ''}
           <div class="inline-actions revisit-echo-actions">
-            ${rivalStatus?.active ? `<button class="primary" type="button" data-complete-rival-trace="1">Resolve Trace</button>` : rivalStatus?.locked ? `<button class="ghost" type="button" disabled aria-disabled="true">Trace Locked</button>` : `<button class="primary" type="button" data-start-revisit="rival_trace_route">Start Rival Trace</button>`}
+            ${rivalStatus?.active ? `<button class="primary" type="button" data-complete-rival-trace="1">Resolve Trace</button>` : rivalPlayable ? `<button class="primary" type="button" data-start-revisit="rival_trace_route">Start Rival Trace</button>` : `<button class="ghost" type="button" disabled aria-disabled="true">Trace Locked</button>`}
           </div>
           ${rivalResultMarkup}
         </article>

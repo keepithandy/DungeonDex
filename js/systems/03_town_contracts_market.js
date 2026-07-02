@@ -682,6 +682,24 @@
     rivalTrace.history = asArray(rivalTrace.history, []).filter(entry => entry && typeof entry === 'object').slice(0, 20);
     rivalTrace.completedKeys = rivalTrace.completedKeys && typeof rivalTrace.completedKeys === 'object' ? rivalTrace.completedKeys : {};
     rivalTrace.lastResult = rivalTrace.lastResult && typeof rivalTrace.lastResult === 'object' ? rivalTrace.lastResult : null;
+    if (!rivalTrace.active && String(revisitState.activeRouteKey || '').trim() === 'rival_trace_route') {
+      const rivalSource = ensureEliteRivalState(state).find(entry => entry && !entry.completed && entry.revengeAvailable) || ensureEliteContractState(state).active || null;
+      if (rivalSource) {
+        const rivalId = String(rivalSource.rivalId || rivalSource.id || '').trim();
+        rivalTrace.active = {
+          routeKey: 'rival_trace_route',
+          completionKey: rivalTraceCompletionKey(rivalSource),
+          rivalId,
+          eliteName: cleanDisplayText(rivalSource.eliteName || 'Rival Elite', 'Rival Elite'),
+          floorName: cleanDisplayText(rivalSource.floorName || 'Elite Board', 'Elite Board'),
+          memoryTitle: `${cleanDisplayText(rivalSource.eliteName || 'Rival Elite', 'Rival Elite')} Trace`,
+          reflection: createRivalTraceReflection(rivalSource).reflection,
+          summaryLine: createRivalTraceReflection(rivalSource).summaryLine,
+          defeats: Math.max(0, Math.floor(numberOr(rivalSource.defeats, rivalSource.rivalDefeats, 0, 999999))),
+          startedAt: Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+        };
+      }
+    }
     revisitState.rivalTrace = rivalTrace;
     state.player.revisitState = revisitState;
     return revisitState;
@@ -833,11 +851,11 @@
     const revisitState = ensureRevisitStateShape(state);
     const contracts = ensureEliteContractState(state);
     const rivals = ensureEliteRivalState(state);
-    const active = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
+    const directActive = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
       ? revisitState.rivalTrace.active
       : null;
-    const source = active
-      ? rivals.find(entry => String(entry.id || '') === String(active.rivalId || '')) || active
+    const source = directActive
+      ? rivals.find(entry => String(entry.id || '') === String(directActive.rivalId || '')) || directActive
       : (contracts.active && contracts.active.rivalContract
         ? {
           id: String(contracts.active.rivalId || contracts.active.id || ''),
@@ -848,6 +866,19 @@
         }
         : (rivals[0] || null));
     const completedCount = Object.keys(revisitState.rivalTrace?.completedKeys || {}).filter(key => /^rival_trace:[^:]+$/i.test(String(key || '').trim()) && revisitState.rivalTrace.completedKeys[key] === true).length;
+    const syntheticActive = String(revisitState.activeRouteKey || '').trim() === 'rival_trace_route' && source ? {
+      routeKey: 'rival_trace_route',
+      rivalId: String(source.rivalId || source.id || '').trim(),
+      eliteName: cleanDisplayText(source.eliteName || 'Rival Elite', 'Rival Elite'),
+      floorName: cleanDisplayText(source.floorName || 'Elite Board', 'Elite Board'),
+      memoryTitle: `${cleanDisplayText(source.eliteName || 'Rival Elite', 'Rival Elite')} Trace`,
+      reflection: createRivalTraceReflection(source).reflection,
+      summaryLine: createRivalTraceReflection(source).summaryLine,
+      completionKey: rivalTraceCompletionKey(source),
+      defeats: Math.max(0, Math.floor(numberOr(source.defeats, source.rivalDefeats, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    } : null;
+    const active = directActive || syntheticActive;
     return {
       routeKey: 'rival_trace_route',
       historyCount: rivals.length,
@@ -858,6 +889,7 @@
       completed: !active && completedCount > 0,
       source,
       activeTrace: active,
+      activeRouteKey: String(revisitState.activeRouteKey || '').trim(),
       lastResult: revisitState.rivalTrace?.lastResult || null
     };
   }
@@ -2190,6 +2222,9 @@
     const activeMemory = revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object'
       ? revisitState.famousGear.active
       : null;
+    const activeTrace = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
+      ? revisitState.rivalTrace.active
+      : null;
     return {
       routeKey: safeKey,
       routeTitle: String(route?.title || 'Return Route'),
@@ -2203,9 +2238,11 @@
       trophyName: cleanDisplayText(activeEcho?.trophyName || '', ''),
       itemName: cleanDisplayText(activeMemory?.itemName || '', ''),
       recordId: cleanDisplayText(activeMemory?.recordId || '', ''),
-      memoryTitle: cleanDisplayText(activeEcho?.memoryTitle || activeMemory?.memoryTitle || '', ''),
-      reflection: cleanDisplayText(activeEcho?.reflection || activeMemory?.reflection || '', ''),
-      summaryLine: cleanDisplayText(activeEcho?.summaryLine || activeMemory?.summaryLine || '', '')
+      rivalId: cleanDisplayText(activeTrace?.rivalId || '', ''),
+      eliteName: cleanDisplayText(activeTrace?.eliteName || '', ''),
+      memoryTitle: cleanDisplayText(activeEcho?.memoryTitle || activeMemory?.memoryTitle || activeTrace?.memoryTitle || '', ''),
+      reflection: cleanDisplayText(activeEcho?.reflection || activeMemory?.reflection || activeTrace?.reflection || '', ''),
+      summaryLine: cleanDisplayText(activeEcho?.summaryLine || activeMemory?.summaryLine || activeTrace?.summaryLine || '', '')
     };
   }
 
@@ -2302,9 +2339,19 @@
   function completeRivalTraceRoute(state = S) {
     if (!state?.player) return null;
     const revisitState = ensureRevisitStateShape(state);
-    const active = revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object'
-      ? revisitState.rivalTrace.active
-      : null;
+    const status = rivalTraceStatusModel(state);
+    const active = status.activeTrace || (String(revisitState.activeRouteKey || '').trim() === 'rival_trace_route' && status.source ? {
+      routeKey: 'rival_trace_route',
+      completionKey: rivalTraceCompletionKey(status.source),
+      rivalId: String(status.source.rivalId || status.source.id || '').trim(),
+      eliteName: cleanDisplayText(status.source.eliteName || 'Rival Elite', 'Rival Elite'),
+      floorName: cleanDisplayText(status.source.floorName || 'Elite Board', 'Elite Board'),
+      memoryTitle: `${cleanDisplayText(status.source.eliteName || 'Rival Elite', 'Rival Elite')} Trace`,
+      reflection: createRivalTraceReflection(status.source).reflection,
+      summaryLine: createRivalTraceReflection(status.source).summaryLine,
+      defeats: Math.max(0, Math.floor(numberOr(status.source.defeats, status.source.rivalDefeats, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    } : null);
     if (!active || String(revisitState.activeRouteKey || '').trim() !== 'rival_trace_route') return null;
     const completionKey = String(active.completionKey || rivalTraceCompletionKey(active)).trim();
     if (!completionKey || !/^rival_trace:[^:]+$/i.test(completionKey)) return null;
@@ -3085,6 +3132,9 @@
       },
       activeFamousGear(state = S) {
         return activeRevisitRouteSummary(state);
+      },
+      activeRivalTrace(state = S) {
+        return rivalTraceStatusModel(state);
       },
       simulateDeathReset(state = S) {
         if (!state?.player) return false;

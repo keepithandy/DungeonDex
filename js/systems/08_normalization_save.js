@@ -522,6 +522,12 @@
         history: [],
         completedKeys: {},
         lastResult: null
+      },
+      rivalTrace: {
+        active: null,
+        history: [],
+        completedKeys: {},
+        lastResult: null
       }
     };
   }
@@ -535,7 +541,7 @@
     if (!isPlainObject(value)) return map;
     Object.keys(value).forEach(key => {
       const cleanKey = String(key || '').trim().slice(0, 80);
-      if (!cleanKey || !/^(trophy_echo|famous_gear):[^:]+$/i.test(cleanKey)) return;
+      if (!cleanKey || !/^(trophy_echo|famous_gear|rival_trace):[^:]+$/i.test(cleanKey)) return;
       map[cleanKey] = value[key] === true;
     });
     return map;
@@ -657,6 +663,48 @@
     };
   }
 
+  function normalizeRevisitRivalTraceActive(value) {
+    return isPlainObject(value) ? {
+      routeKey: String(value.routeKey || 'rival_trace_route').trim() || 'rival_trace_route',
+      completionKey: String(value.completionKey || '').trim(),
+      rivalId: String(value.rivalId || value.id || '').trim(),
+      eliteName: cleanDisplayText(value.eliteName || 'Rival Elite', 'Rival Elite'),
+      floorName: cleanDisplayText(value.floorName || 'Elite Board', 'Elite Board'),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || '', '', 140),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summaryLine: normalizeRevisitText(value.summaryLine || '', '', 140),
+      defeats: Math.max(0, Math.floor(numberOr(value.defeats, 0, 0, 999999))),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    } : null;
+  }
+
+  function normalizeRevisitRivalTraceHistoryEntry(value) {
+    if (!isPlainObject(value)) return null;
+    return {
+      completionKey: String(value.completionKey || '').trim(),
+      rivalId: String(value.rivalId || '').trim(),
+      eliteName: cleanDisplayText(value.eliteName || 'Rival Elite', 'Rival Elite'),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || '', 'Rival Trace', 140),
+      reflection: normalizeRevisitText(value.reflection || '', '', 220),
+      summary: normalizeRevisitText(value.summary || '', '', 220),
+      floorName: cleanDisplayText(value.floorName || 'Elite Board', 'Elite Board'),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt: Math.max(0, Math.floor(numberOr(value.completedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeRevisitRivalTraceState(value) {
+    const source = isPlainObject(value) ? value : {};
+    const history = asArray(source.history, []).map(normalizeRevisitRivalTraceHistoryEntry).filter(Boolean).slice(0, 20);
+    const completedKeys = normalizeRevisitCompletedKeys(source.completedKeys);
+    return {
+      active: normalizeRevisitRivalTraceActive(source.active),
+      history,
+      completedKeys,
+      lastResult: normalizeRevisitRivalTraceHistoryEntry(source.lastResult)
+    };
+  }
+
   function normalizeRevisitState(value) {
     const base = createRevisitState();
     const source = isPlainObject(value) ? value : {};
@@ -671,6 +719,7 @@
     base.cappedReward = source.cappedReward !== false;
     base.trophyEcho = normalizeRevisitTrophyEchoState(source.trophyEcho);
     base.famousGear = normalizeRevisitFamousGearState(source.famousGear);
+    base.rivalTrace = normalizeRevisitRivalTraceState(source.rivalTrace);
     return base;
   }
 

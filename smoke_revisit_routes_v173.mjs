@@ -81,6 +81,7 @@ async function main(){
       const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
       const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
       const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
+      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
       const forbiddenPresent = forbidden.filter(name => Object.prototype.hasOwnProperty.call(api, name));
       return {
         forbiddenPresent,
@@ -304,6 +305,95 @@ async function main(){
     })()`);
     record('Duplicate Famous Gear resolve is blocked after completion', famousDuplicateCompleteAudit.result === null && famousDuplicateCompleteAudit.status?.active === false && famousDuplicateCompleteAudit.revisitState?.famousGear?.lastResult?.summary === famousCompletedAudit.revisitState?.famousGear?.lastResult?.summary, JSON.stringify(famousDuplicateCompleteAudit));
 
+    await evalScript(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      if (!api || typeof api.rememberRival !== 'function') return false;
+      if (!S.player) return false;
+      if (api.clearRivals) api.clearRivals(S);
+      const source = (api.ensure ? api.ensure(S).active : null) || (typeof ELITE_CONTRACTS !== 'undefined' && Array.isArray(ELITE_CONTRACTS) ? ELITE_CONTRACTS[0] : null);
+      if (!source) return false;
+      const fakeKiller = { contractTarget:true, contractId:source.id, name:source.eliteName || source.name || 'Rival Elite' };
+      return !!api.rememberRival(S, source, fakeKiller);
+    })()`);
+    await evalScript(client, `if (typeof render === 'function') render(); return true;`);
+    const rivalAvailableAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
+      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
+      return {
+        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
+        route: rivalTraceRoute,
+        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        routes
+      };
+    })()`);
+    const rivalRoutesInactive = Array.isArray(rivalAvailableAudit.routes) && rivalAvailableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
+    record('Rival Trace becomes available with named rival history', rivalAvailableAudit.status?.available === true && rivalAvailableAudit.status?.locked === false && rivalAvailableAudit.route?.playable === true && rivalAvailableAudit.route?.entryAvailable === true && rivalAvailableAudit.route?.startAvailable === true, JSON.stringify({ status:rivalAvailableAudit.status, route:rivalAvailableAudit.route }));
+    record('Town card exposes Start Rival Trace while other locked lanes stay locked', rivalAvailableAudit.routeButtons.includes('Start Rival Trace') && /Trace Locked/i.test(rivalAvailableAudit.text) === false && /Playable:/i.test(rivalAvailableAudit.text) && rivalRoutesInactive, JSON.stringify({ routeButtons:rivalAvailableAudit.routeButtons, route:rivalAvailableAudit.route, text:rivalAvailableAudit.text.slice(0, 500) }));
+
+    const rivalStartedAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.startRivalTrace ? api.startRivalTrace(S) : null;
+      if (typeof save === 'function') save(S);
+      if (typeof render === 'function') render();
+      return {
+        result,
+        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
+        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null,
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    record('Rival Trace can start and creates an active archive trace state', !!rivalStartedAudit.result && rivalStartedAudit.status?.active === true && rivalStartedAudit.active?.routeKey === 'rival_trace_route' && /Resolve Trace/i.test(rivalStartedAudit.routeButtons.join(' ')), JSON.stringify(rivalStartedAudit));
+    record('Active Rival Trace shows readable archive-trace flavor', /Active Memory:/i.test(rivalStartedAudit.text) && /Trace/i.test(rivalStartedAudit.text) && /Resolve Trace/i.test(rivalStartedAudit.text), JSON.stringify(rivalStartedAudit.text.slice(0, 500)));
+    const rivalReloadStartAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      return {
+        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
+        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null
+      };
+    })()`);
+    record('Active Rival Trace persists before reload', rivalReloadStartAudit.status?.active === true && rivalReloadStartAudit.active?.routeKey === 'rival_trace_route' && rivalReloadStartAudit.revisitState?.rivalTrace?.active?.routeKey === 'rival_trace_route', JSON.stringify(rivalReloadStartAudit));
+    await client.send('Page.reload', { ignoreCache:true });
+    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Rival Trace active reload.');
+    const rivalActiveReloadAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      return {
+        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
+        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null,
+        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
+        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
+      };
+    })()`);
+    record('Active Rival Trace persists after reload', rivalActiveReloadAudit.status?.active === true && rivalActiveReloadAudit.active?.routeKey === 'rival_trace_route' && rivalActiveReloadAudit.revisitState?.rivalTrace?.active?.routeKey === 'rival_trace_route' && rivalActiveReloadAudit.routeButtons.includes('Resolve Trace') && /Active/i.test(rivalActiveReloadAudit.text), JSON.stringify(rivalActiveReloadAudit));
+
+    const rivalCompletedAudit = await evalByValue(client, `(() => {
+      const api = window.DungeonDexEliteContracts || {};
+      const result = api.completeRivalTrace ? api.completeRivalTrace(S) : null;
+      if (typeof render === 'function') render();
+      return {
+        result,
+        active: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
+        summary: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
+        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        revisitState: S.player?.revisitState || null
+      };
+    })()`);
+    record('Rival Trace can complete and records archive history', !!rivalCompletedAudit.result && rivalCompletedAudit.active?.active === false && rivalCompletedAudit.active?.completed === true && Array.isArray(rivalCompletedAudit.revisitState?.rivalTrace?.history) && rivalCompletedAudit.revisitState.rivalTrace.history.length >= 1 && rivalCompletedAudit.revisitState.rivalTrace.completedKeys?.[rivalCompletedAudit.result?.completionKey || ''] === true, JSON.stringify(rivalCompletedAudit));
+    record('Completion shows a recovered trace summary and reopens Rival Trace', /Trace recorded/i.test(rivalCompletedAudit.text) && rivalCompletedAudit.routeButtons.includes('Start Rival Trace') && /Recovered/i.test(rivalCompletedAudit.text), JSON.stringify(rivalCompletedAudit.text.slice(0, 500)));
+
     await client.send('Page.reload', { ignoreCache:true });
     if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Famous Gear completion reload.');
     const reloadAudit = await evalByValue(client, `(() => {
@@ -326,7 +416,7 @@ async function main(){
         talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
       };
     })()`);
-    const reloadRoutesInactive = Array.isArray(reloadAudit.routes) && reloadAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
+    const reloadRoutesInactive = Array.isArray(reloadAudit.routes) && reloadAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
     record('Completion persists after save and reload', reloadAudit.status?.memoryMarks >= 1 && Array.isArray(reloadAudit.revisitState?.trophyEcho?.history) && reloadAudit.revisitState.trophyEcho.history.length >= 1 && reloadAudit.summary?.rewardMark >= 1 && reloadAudit.routeButtons.includes('Start Trophy Echo') && reloadAudit.famousGearStatus?.completed === true && reloadAudit.famousGearSummary?.summary === famousCompletedAudit.summary?.summary, JSON.stringify(reloadAudit));
     record('Reloaded state keeps Famous Gear recovered and Trophy Echo available', reloadAudit.famousGearStatus?.completed === true && reloadAudit.famousGearStatus?.active === false && /Recovered/i.test(reloadAudit.text) && reloadAudit.status?.available === true && reloadAudit.status?.active === false && reloadAudit.trophyRoute?.playable === true && reloadAudit.famousGearRoute?.status === 'Recovered' && reloadRoutesInactive, JSON.stringify(reloadAudit.text.slice(0, 500)));
     record('Famous Gear reload preserves history and does not alter Trophy Echo memory marks', Array.isArray(reloadAudit.revisitState?.famousGear?.history) && reloadAudit.revisitState.famousGear.history.length >= 1 && reloadAudit.revisitState.famousGear.lastResult?.summary === famousCompletedAudit.revisitState?.famousGear?.lastResult?.summary && reloadAudit.status?.memoryMarks === completedAudit.status?.memoryMarks, JSON.stringify({ famousGear:reloadAudit.revisitState?.famousGear, trophyStatus:reloadAudit.status }));
