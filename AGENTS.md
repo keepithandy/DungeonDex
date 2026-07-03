@@ -9,6 +9,8 @@ This file is the first-read operating contract for Codex, Claude, ChatGPT, and o
 ## Core Workflow Rules
 
 - Keep all changes small, focused, and versioned.
+- One issue should solve one engineering problem.
+- Finish existing systems before creating new systems.
 - Do not rewrite the project unless the user explicitly asks.
 - Preserve save data compatibility.
 - Prefer targeted fixes, contract helpers, and smoke coverage over large refactors.
@@ -29,11 +31,13 @@ Before planning or editing, read:
 5. `docs/PATCH_TEMPLATE.md` before writing a patch plan
 6. `docs/RELEASE_CHECKLIST.md` before version labels, release notes, cache labels, or public-facing package changes
 
+If a listed document is missing, continue safely and report that it was not present.
+
 ## Version Authority
 
 - Always check `VERSION.md` before changing any version number.
 - `VERSION.md` is the source of truth for the current public version, current development target, and hotfix naming.
-- Do not trust old release notes, old zip filenames, cached build labels, package names, old patch logs, or historical comments as the current version.
+- Do not trust old release notes, old zip filenames, cached build labels, package names, old patch logs, historical comments, or stale issue text as the current version.
 - Do not bump the version unless the user explicitly asks.
 - Before changing version labels, search for all version strings in:
   - `VERSION.md`
@@ -47,88 +51,144 @@ Before planning or editing, read:
   - smoke-test notes
   - current notes
 - Report every relevant version string found before editing.
-- Keep the visible player-facing label short, for example: `DungeonDex v1.21.1`.
+- Keep the visible player-facing label short, for example: `DungeonDex v1.23.1`.
 
-## Patch Types
+## Required Pre-Work Checklist
 
-Classify every task before editing.
+Before editing, identify and report or record:
 
-### Docs-only
+- current Git branch
+- current `VERSION.md` value
+- intended patch category
+- expected files to modify
+- protected systems for the task
+- smoke tests or checks required after changes
+- assumptions or uncertainties
 
-Allowed:
-- README
-- CHANGELOG
-- VERSION notes
-- current notes
-- docs files
+Stop and report uncertainty instead of guessing when the branch, version, scope, or protected systems cannot be determined.
 
-Rules:
-- Do not edit runtime JavaScript, CSS, service worker, or save logic unless explicitly requested.
+## Patch Categories
 
-### Smoke-only
+Classify every task before editing. Use exactly one primary category. Mention secondary effects only when they are unavoidable.
 
-Allowed:
-- smoke tests
-- test fixtures
-- test documentation
+### Audit
 
-Rules:
-- Do not change runtime behavior.
-- Do not modify player-facing behavior.
-- Use smoke coverage to lock expected behavior.
-
-### Contract/helper
-
-Allowed:
-- read-only helpers
-- copy model helpers
-- metadata helpers
-- contract functions
-- non-mutating preview logic
+Purpose:
+- inspect behavior, files, or repository state only
 
 Rules:
-- Helpers must not mutate game state unless explicitly requested.
-- Helpers must not wire into live gameplay unless activation is explicitly requested.
-- Prefer explicit return objects over hidden side effects.
+- do not edit runtime files
+- do not edit documentation unless the issue explicitly asks
+- do not change behavior
+- report findings only
 
-### Activation
+### Bug Fix
 
-Allowed only when the user explicitly requests activation.
+Purpose:
+- repair a confirmed defect
 
 Rules:
-- State what behavior is being activated.
-- State what behavior remains locked.
-- Add or update smoke coverage.
-- Preserve save compatibility.
-- Include rollback/risk notes.
+- apply the smallest safe fix
+- avoid unrelated cleanup
+- preserve compatibility
+- add or update regression coverage when practical
 
-### Release-label / cache-label
+### Clarity
 
-Allowed:
+Purpose:
+- improve wording, labels, UI copy, documentation, or readability
+
+Rules:
+- do not change gameplay
+- do not change balance
+- do not change progression
+- keep copy accurate to actual behavior
+
+### Smoke Hardening
+
+Purpose:
+- improve automated verification
+
+Rules:
+- runtime behavior should remain unchanged
+- increase regression protection
+- test fixtures must not become gameplay state
+- explain what behavior the smoke protects
+
+### Framework Completion
+
+Purpose:
+- finish an existing incomplete system or architecture path
+
+Rules:
+- complete the requested architecture path only
+- avoid feature creep
+- preserve public behavior unless the issue explicitly authorizes activation
+- add smoke coverage for newly reliable contracts
+
+### Content Expansion
+
+Purpose:
+- add monsters, relics, bosses, contracts, flavor, route content, or other player-facing data
+
+Rules:
+- prefer data-first additions
+- reuse existing systems
+- avoid engine rewrites
+- avoid balance jumps without explicit approval
+
+### Version Update
+
+Purpose:
+- update release labels after verification
+
+Rules:
+- update every required public/runtime/cache/version surface
+- never leave mixed versions
+- do not change gameplay behavior
+- verify labels after editing
+
+## Protected Systems
+
+Do not modify these systems unless the issue explicitly authorizes that area:
+
+- save compatibility
+- save normalization and repair
+- combat math
+- player damage
+- player HP
+- monster scaling
+- boss scaling
+- XP formulas
+- gold formulas
+- reward formulas
+- progression unlock rules
+- dungeon entry behavior
+- Talent earning
+- Talent spending costs
+- Talent learned-state schema
+- Revisit start, completion, reward, and history behavior
+- Debt Collector pressure, borrowing, repayment, and collection mechanics
+- service worker cache labels
 - version labels
-- public labels
-- service worker/cache labels
-- release notes
-- package notes
+- script-load order
+- public UI routes and screen IDs
 
-Rules:
-- Verify all public/runtime/cache labels match the requested version.
-- Do not change gameplay behavior.
+When a protected system is intentionally touched, state why it was in scope and what verification protects it.
 
 ## Permanent Gameplay Guardrails
 
-- `Enter Dungeon` / `Continue Run` remains the only active dungeon entry path unless the user explicitly requests a new playable entry system.
-- Revisit remains locked, read-only, and planning-only unless the user explicitly requests activation.
-- Do not add Revisit entry, start, begin, claim, complete, unlock, reward, progression, currency, combat, economy, or farming behavior unless explicitly requested.
-- Trophy Echo remains the first planned Revisit lane.
-- Famous Gear Memory remains the second planned Revisit lane.
-- Rival Trace remains named rival elite memory only.
+- `Enter Dungeon` / `Continue Run` remains the only primary dungeon entry path unless the user explicitly requests a new playable entry system.
+- Preserve existing live Revisit lanes exactly as implemented unless the issue explicitly targets Revisit.
+- Do not add or expand Revisit entry, start, begin, claim, complete, unlock, reward, progression, currency, combat, economy, or farming behavior unless explicitly requested.
+- Do not treat existing live Revisit behavior as nonexistent or planning-only.
+- Trophy Echo, Rival Trace, Famous Gear Memory, and future Revisit lanes may only change when a Revisit-scoped issue authorizes that work.
 - Preserve debt, gear, combat, monster, economy, Elite Board, contract, trophy, Famous Gear, Talent, and save-progression behavior unless the patch scope explicitly targets one of those systems.
 - No monster affixes, hidden statuses, or new combat complexity unless explicitly requested.
 
 ## Talent System Guardrails
 
-DungeonDex has an active Talent foundation. Do not treat the entire Talent system as nonexistent or fully inert.
+DungeonDex has an active Talent foundation. Do not treat the Talent system as nonexistent or fully inert.
 
 Known allowed Talent foundation may include:
 - Talent point earning where already implemented.
@@ -152,9 +212,26 @@ Rules:
 
 - Revisit helpers may exist internally.
 - Do not re-export Revisit helpers unless the issue explicitly asks for it.
-- Do not unlock Revisit behavior.
-- Do not add Revisit rewards, claim loops, progression, or farming.
+- Do not unlock additional Revisit lanes unless the issue explicitly asks for that lane activation.
+- Do not add Revisit rewards, claim loops, progression, or farming unless the issue explicitly asks.
 - Revisit planning copy may be edited only when the patch scope allows copy/docs changes.
+- When changing Revisit code, verify that existing playable lanes stay playable and locked future lanes stay locked.
+
+## Change Discipline
+
+- Prefer small focused commits.
+- Avoid unrelated cleanup.
+- Avoid large refactors.
+- Preserve compatibility.
+- Avoid duplicate helpers.
+- Avoid parallel implementations.
+- Prefer extending existing systems over replacing them.
+- Document assumptions.
+- Leave TODOs only when they identify a real future task.
+- Keep file edits minimal.
+- Preserve classic script-load ordering unless the issue explicitly targets script architecture.
+- Do not modernize architecture, convert modules, add build tooling, or refactor file structure unless explicitly requested.
+- Do not add dead UI buttons or labels that imply behavior not yet implemented.
 
 ## UI / Design Direction
 
@@ -165,23 +242,60 @@ Rules:
 - Ember, dungeon, town, wardens, trophies, loot, contracts, debt, elites, and descent identity.
 - Avoid clutter.
 - Prefer cleaner CSS/layout improvements before adding new UI systems.
-- Do not add dead UI buttons or labels that imply behavior not yet implemented.
+- Keep labels accurate to live behavior.
 
-## Code Rules
+## Verification Requirements
 
-- Check for broken references before finishing.
-- Avoid duplicate functions.
-- Avoid dead buttons.
-- Avoid UI labels that do not connect to real behavior.
-- Keep file edits minimal.
-- Explain exactly what changed.
-- Prefer contract/smoke coverage over repeated manual audit text when a behavior needs to stay locked.
-- Preserve classic script-load ordering unless the issue explicitly targets script architecture.
-- Do not modernize architecture, convert modules, add build tooling, or refactor file structure unless explicitly requested.
+Every implementation issue should finish with verification.
+
+Minimum expectations:
+- syntax checks for edited JavaScript, when JavaScript changed
+- relevant existing smoke tests
+- new or updated smoke coverage for newly introduced framework behavior, when practical
+- protected-system review
+- compatibility review
+- regression review
+
+Use applicable commands such as:
+- `node --check <file>`
+- targeted smoke file for the touched system
+- broader smoke file when the touched system crosses renderer, save, or town surfaces
+
+Documentation-only changes do not require gameplay smoke tests, but must still verify:
+- changed documentation is readable
+- version labels were not changed unless requested
+- no runtime files were edited
+- no new contradiction was introduced against current baseline notes
+
+Do not claim a check passed unless it was actually run.
+
+## Agent Decision Rules
+
+If uncertain:
+- inspect first
+- report findings
+- avoid assumptions
+
+If behavior is ambiguous:
+- preserve existing behavior
+
+If multiple implementations exist:
+- prefer the established implementation already loaded by `index.html`
+
+If compatibility is uncertain:
+- choose the safest compatible approach
+
+If a requested task expands beyond its scope:
+- complete the requested scoped work
+- recommend additional work separately
+
+If an issue is documentation-only:
+- do not opportunistically patch gameplay
+- report any gameplay risk as a suggested next issue instead
 
 ## Testing Before Final Response
 
-After any code change, report:
+After any repo change, report:
 
 1. Files edited.
 2. What changed.
