@@ -16,6 +16,17 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
+## v1.23.2 - Revisit v1 Completion Verification
+
+* Verified Revisit v1 around three live town lanes: Trophy Echo, Famous Gear Memory, and Rival Trace.
+* Trophy Echo remains tied to boss trophy or boss record history, starts from town, resolves from town, records history, and preserves Memory Marks through reload.
+* Famous Gear Memory remains tied to retired gear archive history, starts from town, resolves from town, records archive history, and does not return the retired item as loot.
+* Rival Trace is treated as the third live Revisit lane: named rival elite history can start a safe archive trace, resolve it from town, and record trace history without opening a new hunt, board mission, combat path, reward loop, or progression shortcut.
+* `smoke_revisit_routes_v173.mjs` is the primary verification target and covers availability, start, active reload persistence, completion history, duplicate blocking, locked future lanes, and adjacent-system neutrality.
+* No version bump, combat changes, gear stat changes, economy changes, Talent spend changes, Debt changes, or main dungeon progression changes were added.
+
+---
+
 ## v1.23.2 - Famous Gear Memory Revisit
 
 * Added a focused Famous Gear Memory state-shape patch so older saves and fixtures repair `player.revisitState.famousGear` before the town lane reads, starts, or resolves it.
@@ -67,7 +78,7 @@ This changelog records what changed and why.
 * Added the first controlled `hunter_board_clarity` Talent spend button.
 * The button is gated by the v1.20.50 readiness model and spends only through the existing controlled mutation helper.
 * Added smoke coverage for ready, blocked, reload, duplicate-blocking, and safety assertions.
-* No broad Talent UI, no second node, no Revisit activation, and no combat/economy/reward/Debt changes were added.
+* No broad Talent UI, no second node, no Revisit activation, combat changes, reward changes, Debt changes, or economy changes were added.
 
 ## v1.20.50 - Talent Spend UI Readiness Model
 

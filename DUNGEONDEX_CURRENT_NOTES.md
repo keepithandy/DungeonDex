@@ -7,21 +7,22 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.2 - Famous Gear Memory Revisit
+- DungeonDex v1.23.2 - Revisit v1 Completion Verification
 
-## v1.23.2 Famous Gear Memory Revisit
-- Famous Gear Memory is now the second live Revisit lane after Trophy Echo.
-- The lane starts and resolves from town using retired gear archive history.
-- Completion records archive history under `player.revisitState.famousGear` with deterministic completed keys and a last-result summary.
-- The item stays retired. This patch does not return gear rewards, open a combat path, change economy math, change Talent values, or alter main dungeon progression.
-- Added a focused state-shape patch in `js/systems/35_revisit_famous_gear_memory_state_patch.js` so older saves or fixtures that omit `player.revisitState.famousGear` repair before Famous Gear start/resolve actions use the lane.
-- Build labels, runtime pointer, service worker cache labels, README, CHANGELOG, and VERSION.md now target v1.23.2.
-- `smoke_revisit_routes_v173.mjs` is the primary smoke target for this patch.
+## v1.23.2 Revisit v1 Closeout
+- Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit lanes.
+- All three lanes start and resolve from town.
+- All three lanes record completion history under `player.revisitState` and persist through save/reload.
+- Trophy Echo remains tied to boss trophy or boss record history.
+- Famous Gear Memory remains tied to retired gear archive records and never returns the retired item as loot.
+- Rival Trace remains tied to named rival elite history and does not create a new hunt, combat path, board mission, reward loop, or progression shortcut.
+- Debt Pressure and Board Echo remain locked/planned.
+- `smoke_revisit_routes_v173.mjs` is the primary Revisit v1 verification smoke.
 
 ## Current Revisit Lane Status
 - Trophy Echo: live town memory lane tied to boss trophy or boss record history.
 - Famous Gear Memory: live town archive lane tied to retired gear records.
-- Rival Trace: live/scaffolded archive trace lane tied to named rival elite history.
+- Rival Trace: live town archive trace lane tied to named rival elite history.
 - Debt Pressure: locked/planned.
 - Board Echo: locked/planned.
 
@@ -32,12 +33,17 @@
 - Service worker/cache labels must stay aligned with the visible build label.
 
 ## Smoke Targets
-- Primary for this patch: `node smoke_revisit_routes_v173.mjs`
+- Primary Revisit v1 verification: `node smoke_revisit_routes_v173.mjs`
 - Useful adjacent checks:
   - `node smoke_talent_passive_framework_v1232.mjs`
   - `node smoke_debt_collector_v169.mjs`
 
 ## Recent Historical Notes
+
+### v1.23.2 Famous Gear Memory Revisit
+- Famous Gear Memory became the second live Revisit lane after Trophy Echo.
+- It appears in town, locks against missing retired gear history, opens from retired gear archive history, starts a safe archive memory, resolves in town, and records completion history.
+- The item stays retired. This patch does not return gear rewards, open a combat path, change economy math, change Talent values, or alter main dungeon progression.
 
 ### v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo became the first live Revisit lane.

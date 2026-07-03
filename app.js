@@ -27,7 +27,6 @@ window.ddGetMonsterCue = function(name){
     "The monster's movements are deliberate and menacing.",
     "A chill runs down your spine as the enemy approaches.",
   ];
-  const monsterName = String(name || '').trim();
   const namedCues = monsterName ? [
     `the ${monsterName} studies your stance carefully.`,
     `the ${monsterName} lets out a low growl.`,
