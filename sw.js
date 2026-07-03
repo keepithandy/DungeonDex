@@ -27,6 +27,7 @@ const ASSETS = [
   `./js/systems/14_devtools_scenarios.js?build=${BUILD_QS}`,
   `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`,
   `./js/systems/36_ui_revisit_archive_codex.js?build=${BUILD_QS}`,
+  `./js/systems/37_revisit_famous_gear_flavor_pack.js?build=${BUILD_QS}`,
   `./js/systems/16_relic_forge_crafting.js?build=${BUILD_QS}`,
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
