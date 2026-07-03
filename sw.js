@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.1-trophy-echo-prototype-stabilization';
+const CACHE_NAME = 'dungeondex-v1.23.2-famous-gear-memory-revisit';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.1-trophy-echo-prototype-stabilization';
+const BUILD_QS = '1.23.2-famous-gear-memory-revisit';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   `./js/systems/01_state_recovery.js?build=${BUILD_QS}`,
   `./js/systems/02_currency_pending_rewards.js?build=${BUILD_QS}`,
   `./js/systems/03_town_contracts_market.js?build=${BUILD_QS}`,
+  `./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=${BUILD_QS}`,
   `./js/systems/31_revisit_activation_surface_lockdown.js?build=${BUILD_QS}`,
   `./js/systems/04_depth_progression_charters.js?build=${BUILD_QS}`,
   `./js/systems/05_elite_modifiers.js?build=${BUILD_QS}`,
@@ -32,6 +33,7 @@ const ASSETS = [
   `./js/systems/32_talent_award_claim_repair_contract.js?build=${BUILD_QS}`,
   `./js/systems/33_talent_hunter_board_clarity_spend.js?build=${BUILD_QS}`,
   `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
+  `./js/systems/34_debt_collector_v1_completion.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
   `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,
   `./js/systems/22_nav_centering.js?build=${BUILD_QS}`,
