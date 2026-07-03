@@ -1,9 +1,9 @@
-// DungeonDex v1.23.1 runtime pointer.
+// DungeonDex v1.23.2 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.23.1';
-window.DUNGEONDEX_BUILD_QS = '1.23.1-trophy-echo-prototype-stabilization';
+window.DUNGEONDEX_BUILD = '1.23.2';
+window.DUNGEONDEX_BUILD_QS = '1.23.2-famous-gear-memory-revisit';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -26,6 +26,7 @@ window.ddGetMonsterCue = function(name){
     "The monster's movements are deliberate and menacing.",
     "A chill runs down your spine as the enemy approaches.",
   ];
+  const monsterName = String(name || '').trim();
   const namedCues = monsterName ? [
     `the ${monsterName} studies your stance carefully.`,
     `the ${monsterName} lets out a low growl.`,
@@ -33,7 +34,7 @@ window.ddGetMonsterCue = function(name){
     `the ${monsterName} eyes you with a predatory gaze.`,
     `the ${monsterName} moves with a fluid, dangerous grace.`,
   ]  : [];
-  const pool = nameCues.length ? cues.concat(namedCues) : cues;
+  const pool = namedCues.length ? cues.concat(namedCues) : cues;
   return pool[Math.floor(Math.random()*pool.length)];
 };
 
@@ -49,7 +50,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.1-trophy-echo-prototype-stabilization';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.2-famous-gear-memory-revisit';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
@@ -118,17 +119,6 @@ window.ddGetMonsterCue = function(name){
       var Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
       window.__ddAudioCtx142 = window.__ddAudioCtx142 || new Ctx();
-      var ctx = window.__ddAudioCtx142;
-      if (!ctx) return;
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.value = kind === "heavy" ? 92 : kind === "reward" ? 520 : 180;
-      gain.gain.value = 0.018;
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.04);
-    } catch(e) {}
+    } catch(err) {}
   };
 })();
