@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.23.2 Famous Gear Memory flavor pack.
+// v1.23.3 Famous Gear Memory flavor pack.
 // Text-only: expands archive-memory copy without changing combat, rewards,
 // economy, Talent, debt, gear stats, or dungeon progression.
 (function(){
@@ -97,7 +97,7 @@
     active.memoryTitle = flavor.memoryTitle;
     active.summaryLine = flavor.summaryLine;
     active.reflection = flavor.reflection;
-    active.flavorPack = 'v1.23.2-famous-gear-memory-flavor-pack';
+    active.flavorPack = 'v1.23.3-journal-v1-ledger';
     return true;
   }
   function hydrateLastResult(state){
@@ -106,7 +106,7 @@
     const flavor = safeFlavor(result);
     result.memoryTitle = flavor.memoryTitle;
     result.reflection = flavor.reflection;
-    result.flavorPack = 'v1.23.2-famous-gear-memory-flavor-pack';
+      result.flavorPack = 'v1.23.3-journal-v1-ledger';
     return true;
   }
   function patchApi(attempts = 0){

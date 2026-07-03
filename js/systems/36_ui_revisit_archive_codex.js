@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.23.2 Revisit Archive Codex.
+// v1.23.3 Revisit Archive Codex.
 // Adds a read-only archive ledger for completed/active Revisit memories.
 // Display-only: no combat, reward, debt, Talent, gear stat, or progression changes.
 (function(){

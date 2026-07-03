@@ -7,9 +7,9 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.2 - Revisit v1 Completion Verification
+- DungeonDex v1.23.3 - Journal v1 Memory Ledger
 
-## v1.23.2 Journal v1 Read-Only Ledger
+## v1.23.3 Journal v1 Memory Ledger
 - The Archive surface now includes a read-only Journal v1 summary band for Revisit, Debt, Talent, and boss progress records.
 - The Journal only reads existing state and shows safe copy when records are missing or malformed.
 - The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.

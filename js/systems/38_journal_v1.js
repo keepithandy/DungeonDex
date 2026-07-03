@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.23.2 Journal v1.
+// v1.23.3 Journal v1.
 // Read-only memory ledger for Revisit, Debt, Talent, and boss progress.
 (function(){
   if (window.DDJournalV1) return;

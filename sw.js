@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.2-famous-gear-memory-revisit';
+const CACHE_NAME = 'dungeondex-v1.23.3-journal-v1-ledger';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.2-famous-gear-memory-revisit';
+const BUILD_QS = '1.23.3-journal-v1-ledger';
 const ASSETS = [
   './',
   './index.html',

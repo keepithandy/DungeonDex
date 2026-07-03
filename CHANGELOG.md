@@ -8,13 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.2`
-* Current local package baseline: `v1.23.2`
-* Current development target: `v1.23.2`
+* Public/live itch version: `v1.23.3`
+* Current local package baseline: `v1.23.3`
+* Current development target: `v1.23.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.3 - Journal v1 Memory Ledger
+
+* Added the read-only Journal v1 ledger to the Archive surface.
+* The Journal summarizes Revisit completions, boss trophy records, retired gear memory, rival trace history, Debt status, Talent state, and boss progress using existing save data only.
+* The Journal does not add rewards, start/complete actions, spending, borrowing, repayment, combat changes, or progression hooks.
+* Added `smoke_journal_v1.mjs` to verify the read-only model/render contract and safe empty/populated states.
+* Bumped public/runtime/cache labels to `v1.23.3` with build query `1.23.3-journal-v1-ledger`.
+* Updated the service worker cache to match the current HTML script list.
+
+---
 
 ## v1.23.2 - Revisit v1 Completion Verification
 
