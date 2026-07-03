@@ -9,6 +9,12 @@
 ## Current Baseline
 - DungeonDex v1.23.2 - Revisit v1 Completion Verification
 
+## v1.23.2 Journal v1 Read-Only Ledger
+- The Archive surface now includes a read-only Journal v1 summary band for Revisit, Debt, Talent, and boss progress records.
+- The Journal only reads existing state and shows safe copy when records are missing or malformed.
+- The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.
+- `smoke_journal_v1.mjs` verifies the read-only summary model and archive-panel render contract.
+
 ## v1.23.2 Revisit v1 Closeout
 - Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit lanes.
 - All three lanes start and resolve from town.
