@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.2`
-* Current local package baseline: `v1.23.2`
-* Current development target: `v1.23.2`
+* Public/live itch version: `v1.23.3`
+* Current local package baseline: `v1.23.3`
+* Current development target: `v1.23.3`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.3 - Guild Journal / Memory Board
+
+* Added the read-only Guild Journal / Memory Board to the Archive surface.
+* The Journal summarizes boss trophies, Revisit history, famous gear memories, rival traces, Debt status, Talent memory, and boss-progress records using existing save data only.
+* The Journal does not add rewards, start/complete actions, spending, borrowing, repayment, or progression hooks.
+* Added `smoke_journal_v1233.mjs` to verify the read-only model/render contract and safe empty/populated states.
+* Bumped public/runtime/cache labels to `v1.23.3` with build query `1.23.3-guild-journal-memory-board`.
+
+---
 
 ## v1.23.2 - Revisit v1 Completion Verification
 

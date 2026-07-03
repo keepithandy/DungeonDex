@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.23.2 Famous Gear Memory state-shape hardening.
+// v1.23.3 Famous Gear Memory state-shape hardening.
 // Keeps the live archive lane safe when older saves or test fixtures omit
 // player.revisitState.famousGear. This is intentionally narrow: no rewards,
 // no combat changes, no economy changes.

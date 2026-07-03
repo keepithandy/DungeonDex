@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.2**
+Current baseline: **DungeonDex v1.23.3**
 
 ## Revisit Status
 
@@ -18,11 +18,11 @@ Debt Pressure and Board Echo remain locked/planned.
 
 ## Current Build
 
-**v1.23.2 - Revisit v1 Completion Verification**
+**v1.23.3 - Guild Journal / Memory Board**
 
-This closeout verifies the three live Revisit lanes: Trophy Echo, Famous Gear Memory, and Rival Trace. Each lane starts from town, resolves from town, records deterministic completion history, persists across reloads, and remains separate from combat, gear stats, economy, Talent values, Debt state, and main dungeon progression.
+This build adds the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, Talent, and boss-progress records using safe read-only state only.
 
-The build label, runtime pointer, service worker cache name, and version authority remain on v1.23.2.
+The build label, runtime pointer, service worker cache name, and version authority now target v1.23.3.
 
 ## Current Smoke Target
 

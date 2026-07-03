@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.2 - Revisit v1 Completion Verification
+- DungeonDex v1.23.3 - Guild Journal / Memory Board
+
+## v1.23.3 Guild Journal / Memory Board
+- The Archive surface now includes a read-only Guild Journal summary band for boss trophies, Revisit memories, Debt status, Talent memory, and boss progress.
+- The Journal only reads existing state and shows safe copy when records are missing or malformed.
+- The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.
+- `smoke_journal_v1233.mjs` verifies the read-only summary model and archive-panel render contract.
+
+## v1.23.2 Revisit v1 Completion Verification
 
 ## v1.23.2 Revisit v1 Closeout
 - Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit lanes.
