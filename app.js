@@ -53,6 +53,7 @@ window.ddGetMonsterCue = function(name){
     var qs = window.DUNGEONDEX_BUILD_QS || '1.23.2-famous-gear-memory-revisit';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
+    window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
     window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
     window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
