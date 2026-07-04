@@ -21,7 +21,7 @@ function cleanDisplayText(value, fallback = '') {
 
 function baseState() {
   return {
-    build: '1.23.4-boss-trophy-v1-completion',
+    build: '1.23.5-famous-gear-memory-v1-completion',
     screen: 'town',
     filters: { slot: 'all', rarity: 'all', search: '', sort: 'power' },
     player: {
@@ -106,7 +106,7 @@ function createContext() {
       clear() { store.clear(); }
     },
     STORAGE_KEY,
-    BUILD: '1.23.4-boss-trophy-v1-completion',
+    BUILD: '1.23.5-famous-gear-memory-v1-completion',
     COPPER_PER_GOLD: 10000,
     BOSS_INTERVAL: 5,
     DEPTH_CHAPTERS_PER_FLOOR: 3,
