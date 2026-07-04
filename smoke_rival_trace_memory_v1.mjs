@@ -43,7 +43,8 @@ const state = {
       rivalTrace: {
         history: [
           { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Trace recovered', completedAt: 20 },
-          { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Duplicate trace', completedAt: 15 }
+          { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Duplicate trace', completedAt: 15 },
+          'rival_trace:old_knife_bailiff'
         ],
         active: { rivalId: 'ash_crown', eliteName: 'Ash-Crowned Marauder', floorName: 'Ashgate Warrens', startedAt: 30 },
         completedKeys: {
@@ -82,7 +83,15 @@ assert.equal(summary.legacyIdsDetected, true);
 assert.equal(summary.totalRecorded, 3);
 assert.ok(summary.traceNames.includes('Glassfang Brute'));
 assert.ok(summary.traceNames.includes('Ash-Crowned Marauder'));
+assert.ok(summary.traceNames.some(name => /old knife bailiff/i.test(name)));
 assert.ok(summary.body.includes('3 rival traces remembered'));
+
+const reloaded = JSON.parse(JSON.stringify(state));
+const reloadedSummary = context.rivalTraceReadableSummary(reloaded);
+assert.deepEqual(reloadedSummary.traceNames, summary.traceNames);
+assert.equal(reloadedSummary.totalRecorded, summary.totalRecorded);
+assert.equal(reloadedSummary.duplicateRecordsCollapsed, true);
+assert.equal(reloadedSummary.legacyIdsDetected, true);
 
 const model = context.journalV1233SummaryModel(state);
 const rivalRow = model.sections.find(section => section.key === 'rival');
@@ -92,6 +101,10 @@ assert.ok(famousRow);
 assert.ok(rivalRow.body.includes('3 rival traces remembered'));
 assert.ok(rivalRow.meta.includes('duplicate-safe') || rivalRow.meta.includes('legacy trace detected'));
 assert.ok(famousRow.body.includes('1 famous gear memory recorded'));
+
+const reloadModel = context.journalV1233SummaryModel(reloaded);
+const reloadRivalRow = reloadModel.sections.find(section => section.key === 'rival');
+assert.ok(reloadRivalRow.body.includes('3 rival traces remembered'));
 
 context.DDJournalV1Render();
 assert.ok(String(context.document.getElementById('archivePanel').innerHTML).includes('Rival Traces'));
