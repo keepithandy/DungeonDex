@@ -656,11 +656,14 @@
 
   function normalizeRevisitFamousGearState(value) {
     const source = isPlainObject(value) ? value : {};
-    const history = asArray(source.history, []).map(normalizeFamousGearHistoryEntry).filter(Boolean).slice(0, 20);
+    const history = asArray(source.history, []).map(normalizeFamousGearHistoryEntry).filter(Boolean);
+    const dedupedHistory = typeof window !== 'undefined' && typeof window.dedupeFamousGearHistoryEntries === 'function'
+      ? window.dedupeFamousGearHistoryEntries(history)
+      : history;
     const completedKeys = normalizeRevisitCompletedKeys(source.completedKeys);
     return {
       active: normalizeFamousGearActive(source.active),
-      history,
+      history: dedupedHistory.slice(0, 20),
       completedKeys,
       lastResult: normalizeFamousGearHistoryEntry(source.lastResult)
     };

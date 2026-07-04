@@ -59,18 +59,36 @@
   }
 
   function normalizeHistoryEntry(value){
+    if (typeof value === 'string') {
+      const recordId = text(value, '');
+      if (!recordId) return null;
+      return {
+        completionKey: `famous_gear:${recordId}`,
+        recordId,
+        itemId: '',
+        itemName: 'Famous Gear',
+        slot: 'gear',
+        memoryTitle: 'Famous Gear Memory',
+        reflection: '',
+        summary: 'Recovered Famous Gear memory.',
+        sourceLabel: 'Retired Gear Archive',
+        sourceFloor: 0,
+        startedAt: 0,
+        completedAt: 0
+      };
+    }
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const recordId = text(value.recordId || value.sourceRecordId || value.itemId || '', '');
     const completionKey = text(value.completionKey || (recordId ? `famous_gear:${recordId}` : ''), '');
-    const summary = text(value.summary || value.resultSummary || '', '');
-    if (!recordId || !summary || !/^famous_gear:[^:]+$/i.test(completionKey)) return null;
+    const summary = text(value.summary || value.resultSummary || value.note || 'Recovered Famous Gear memory.', '');
+    if (!recordId || !/^famous_gear:[^:]+$/i.test(completionKey)) return null;
     return {
       completionKey,
       recordId,
       itemId: text(value.itemId || '', ''),
-      itemName: text(value.itemName || value.gearName || 'Famous Gear', 'Famous Gear'),
+      itemName: text(value.itemName || value.gearName || value.name || 'Famous Gear', 'Famous Gear'),
       slot: text(value.slot || 'gear', 'gear'),
-      memoryTitle: text(value.memoryTitle || value.itemName || 'Famous Gear', 'Famous Gear'),
+      memoryTitle: text(value.memoryTitle || value.itemName || value.gearName || 'Famous Gear', 'Famous Gear'),
       reflection: text(value.reflection || '', ''),
       summary,
       sourceLabel: text(value.sourceLabel || 'Retired Gear Archive', 'Retired Gear Archive'),
@@ -130,6 +148,36 @@
     };
   }
 
+  function dedupeHistoryEntries(entries){
+    const seen = new Map();
+    const order = [];
+    entries.forEach(entry => {
+      const key = text(entry?.completionKey || entry?.recordId || '', '');
+      if (!key) return;
+      const existing = seen.get(key);
+      if (!existing) {
+        seen.set(key, entry);
+        order.push(key);
+        return;
+      }
+      const merged = {
+        ...existing,
+        ...entry,
+        itemName: text(entry?.itemName || existing?.itemName || 'Famous Gear', 'Famous Gear'),
+        memoryTitle: text(entry?.memoryTitle || existing?.memoryTitle || entry?.itemName || existing?.itemName || 'Famous Gear', 'Famous Gear'),
+        summary: text(entry?.summary || existing?.summary || 'Recovered Famous Gear memory.', ''),
+        sourceLabel: text(entry?.sourceLabel || existing?.sourceLabel || 'Retired Gear Archive', 'Retired Gear Archive'),
+        reflection: text(entry?.reflection || existing?.reflection || '', ''),
+        sourceFloor: Math.max(entry?.sourceFloor || 0, existing?.sourceFloor || 0),
+        startedAt: Math.max(entry?.startedAt || 0, existing?.startedAt || 0),
+        completedAt: Math.max(entry?.completedAt || 0, existing?.completedAt || 0)
+      };
+      if ((entry?.completedAt || 0) >= (existing?.completedAt || 0)) merged.itemId = text(entry?.itemId || existing?.itemId || '', '');
+      seen.set(key, merged);
+    });
+    return order.map(key => seen.get(key)).filter(Boolean);
+  }
+
   window.ensureRevisitStateShape = function ensureRevisitStateShape(state){
     const revisitState = originalEnsure ? originalEnsure(state) : (state?.player?.revisitState || {});
     if (!state || typeof state !== 'object') return revisitState || {};
@@ -139,7 +187,7 @@
       : {};
     const famousGear = {
       active: normalizeActiveMemory(source.active),
-      history: asSafeArray(source.history).map(normalizeHistoryEntry).filter(Boolean).slice(0, 20),
+      history: dedupeHistoryEntries(asSafeArray(source.history).map(normalizeHistoryEntry).filter(Boolean)).slice(0, 20),
       completedKeys: repairCompletedKeys(source.completedKeys),
       lastResult: normalizeHistoryEntry(source.lastResult)
     };
@@ -149,4 +197,5 @@
     state.player.revisitState = revisitState;
     return revisitState;
   };
+  window.dedupeFamousGearHistoryEntries = dedupeHistoryEntries;
 })();

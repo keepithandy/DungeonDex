@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.4-boss-trophy-v1-completion';
+const CACHE_NAME = 'dungeondex-v1.23.5-famous-gear-memory-v1-completion';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.4-boss-trophy-v1-completion';
+const BUILD_QS = '1.23.5-famous-gear-memory-v1-completion';
 const ASSETS = [
   './',
   './index.html',

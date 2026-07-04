@@ -8,15 +8,15 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.4`
-* Current local package baseline: `v1.23.4`
-* Current development target: `v1.23.4`
+* Public/live itch version: `v1.23.5 Famous Gear Memory v1 Completion`
+* Current local package baseline: `v1.23.5 Famous Gear Memory v1 Completion`
+* Current development target: `v1.23.5 Famous Gear Memory v1 Completion`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
-## v1.23.4 - Boss Trophy v1 Completion
+## v1.23.5 - Famous Gear Memory v1 Completion
 
 * Completed Boss Trophy v1 as a player-facing progression memory system.
 * Boss Trophy state now normalizes modern records and legacy trophy IDs into a stable readable record shape without deleting valid trophy data.
@@ -24,7 +24,7 @@ This changelog records what changed and why.
 * Added a read-only Boss Trophy summary helper for counts, trophy names, source names, latest trophy, legacy detection, duplicate-collapse reporting, and safe empty-state copy.
 * The Guild Journal Boss Trophy section now consumes the completed readable summary helper while staying read-only.
 * Added `smoke_boss_trophy_v1.mjs` for Boss Trophy persistence, duplicate safety, legacy compatibility, Journal integration, and protected-system neutrality.
-* Bumped public/runtime/cache labels to `v1.23.4` with build query `1.23.4-boss-trophy-v1-completion`.
+* Bumped public/runtime/cache labels to `v1.23.5` with build query `1.23.5-famous-gear-memory-v1-completion`.
 
 ---
 

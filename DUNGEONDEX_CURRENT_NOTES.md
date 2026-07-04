@@ -7,9 +7,9 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.4 - Boss Trophy v1 Completion
+- DungeonDex v1.23.5 - Famous Gear Memory v1 Completion
 
-## v1.23.4 Boss Trophy v1 Completion
+## v1.23.5 Famous Gear Memory v1 Completion
 - Boss Trophy v1 now records earned boss trophies as durable, readable progression memory records.
 - Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
 - Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern state.

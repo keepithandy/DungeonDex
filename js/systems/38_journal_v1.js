@@ -88,10 +88,33 @@
     };
   }
   function famousModel(state){
+    const api = window.DungeonDexEliteContracts || null;
+    const summary = typeof api?.famousGearMemorySummary === 'function' ? api.famousGearMemorySummary(state) : null;
+    if (summary) {
+      return {
+        count: num(summary.totalRecorded, 0),
+        latest: summary.latestMemory ? text(summary.latestMemory.itemName || summary.latestMemory.recordId || 'Unknown gear') : '',
+        body: text(summary.body || '', ''),
+        meta: text(summary.meta || '', ''),
+        duplicateSafe: summary.duplicateSafe === true,
+        duplicatesCollapsed: summary.duplicateRecordsCollapsed === true,
+        legacyIdsDetected: summary.legacyIdsDetected === true,
+        emptyStateCopy: text(summary.emptyStateCopy || 'No famous gear memories recorded yet.', 'No famous gear memories recorded yet.')
+      };
+    }
     const famous = obj(state?.player?.revisitState?.famousGear);
     const history = list(famous.history).filter(entry => entry && typeof entry === 'object');
     const latest = history[0] || null;
-    return { count: history.length, latest: latest ? text(latest.itemName || latest.memoryTitle || latest.name || 'Unknown gear') : '' };
+    return {
+      count: history.length,
+      latest: latest ? text(latest.itemName || latest.memoryTitle || latest.name || 'Unknown gear') : '',
+      body: history.length > 0 ? `${history.length} famous gear memories recorded.` : 'No famous gear memories recorded yet.',
+      meta: history.length > 0 ? `Last remembered gear: ${text(latest.itemName || latest.memoryTitle || latest.name || 'Unknown gear')}` : 'No famous gear memories recorded yet.',
+      duplicateSafe: true,
+      duplicatesCollapsed: false,
+      legacyIdsDetected: false,
+      emptyStateCopy: 'No famous gear memories recorded yet.'
+    };
   }
   function rivalModel(state){
     const rival = obj(state?.player?.revisitState?.rivalTrace);
@@ -132,7 +155,7 @@
         { key: 'account', title: 'Account Memory', body: memoryTotal > 0 ? `Total remembered records: ${memoryTotal}.` : 'No records yet.', meta: revisit.last || debt.line },
         { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
-        { key: 'famous', title: 'Famous Gear', body: famous.count > 0 ? `${famous.count} retired gear record${famous.count === 1 ? '' : 's'} remembered.` : 'No famous gear has been retired into memory.', meta: famous.latest ? `Last remembered gear: ${famous.latest}` : 'No famous gear has been retired into memory.' },
+        { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
         { key: 'rival', title: 'Rival Traces', body: rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.', meta: rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.' },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
         { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }

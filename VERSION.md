@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.4
+v1.23.5 Famous Gear Memory v1 Completion
 
 ## Current Local Package Version
-v1.23.4
+v1.23.5 Famous Gear Memory v1 Completion
 
 ## Current Development Target
-v1.23.4
+v1.23.5 Famous Gear Memory v1 Completion
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.4**
+Current baseline: **DungeonDex v1.23.5**
 
 ## Revisit Status
 
@@ -18,11 +18,11 @@ Debt Pressure and Board Echo remain locked/planned.
 
 ## Current Build
 
-**v1.23.4 - Boss Trophy v1 Completion**
+**v1.23.5 - Famous Gear Memory v1 Completion**
 
 This build completes Boss Trophy v1 as a durable progression memory system. Boss Trophy records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy trophy state, and the Guild Journal shows the player-facing Boss Trophy summary.
 
-The build label, runtime pointer, service worker cache name, and version authority now target v1.23.4.
+The build label, runtime pointer, service worker cache name, and version authority now target v1.23.5.
 
 ## Current Smoke Target
 

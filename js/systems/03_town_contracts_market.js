@@ -806,6 +806,52 @@
     };
   }
 
+  function famousGearMemorySummary(state = S) {
+    const rawSource = state?.player?.revisitState?.famousGear && typeof state.player.revisitState.famousGear === 'object'
+      ? state.player.revisitState.famousGear
+      : {};
+    const rawHistory = Array.isArray(rawSource.history) ? rawSource.history.filter(Boolean) : [];
+    const revisitState = ensureRevisitStateShape(state);
+    const source = revisitState.famousGear && typeof revisitState.famousGear === 'object' ? revisitState.famousGear : {};
+    const history = Array.isArray(source.history) ? source.history.filter(entry => entry && typeof entry === 'object') : [];
+    const dedupedHistory = typeof window.dedupeFamousGearHistoryEntries === 'function'
+      ? window.dedupeFamousGearHistoryEntries(history)
+      : history;
+    const active = source.active && typeof source.active === 'object' ? source.active : null;
+    const lastResult = source.lastResult && typeof source.lastResult === 'object' ? source.lastResult : null;
+    const latest = dedupedHistory[0] || lastResult || active || null;
+    const legacyIdsDetected = rawHistory.some(entry => typeof entry === 'string' || !entry || !entry.completionKey || !entry.recordId)
+      || Object.keys(rawSource.completedKeys || {}).some(key => !/^famous_gear:[^:]+$/i.test(String(key || '').trim()));
+    const duplicateRecordsCollapsed = dedupedHistory.length < rawHistory.length || dedupedHistory.length < history.length;
+    const latestName = latest ? cleanDisplayText(latest.itemName || latest.memoryTitle || latest.name || 'Famous Gear', 'Famous Gear') : '';
+    const sourceLabel = latest ? cleanDisplayText(latest.sourceLabel || 'Retired Gear Archive', 'Retired Gear Archive') : '';
+    const summaryLine = latest ? cleanDisplayText(latest.summary || latest.summaryLine || latest.reflection || '', '') : '';
+    const body = dedupedHistory.length > 0
+      ? `${dedupedHistory.length} famous gear memory${dedupedHistory.length === 1 ? '' : 'ies'} recorded${duplicateRecordsCollapsed ? '; duplicates collapsed' : ''}.`
+      : 'No famous gear memories recorded yet.';
+    const meta = dedupedHistory.length > 0
+      ? `Last remembered gear: ${latestName}${sourceLabel ? ` • ${sourceLabel}` : ''}${summaryLine ? ` • ${summaryLine}` : ''}`
+      : 'No famous gear memories recorded yet.';
+    return {
+      totalRecorded: dedupedHistory.length,
+      readableNames: dedupedHistory.map(entry => cleanDisplayText(entry.itemName || entry.memoryTitle || entry.name || 'Famous Gear', 'Famous Gear')),
+      sourceNames: dedupedHistory.map(entry => cleanDisplayText(entry.sourceLabel || 'Retired Gear Archive', 'Retired Gear Archive')),
+      latestMemory: latest ? {
+        recordId: cleanDisplayText(latest.recordId || latest.itemId || 'unknown', 'unknown'),
+        itemName: latestName,
+        sourceLabel,
+        summary: summaryLine,
+        completedAt: Math.max(0, Math.floor(numberOr(latest.completedAt, latest.startedAt || 0, 0, Number.MAX_SAFE_INTEGER)))
+      } : null,
+      legacyIdsDetected,
+      duplicateRecordsCollapsed,
+      duplicateSafe: true,
+      body,
+      meta,
+      emptyStateCopy: 'No famous gear memories recorded yet.'
+    };
+  }
+
   function famousGearStatusModel(state = S) {
     const revisitState = ensureRevisitStateShape(state);
     const retiredRecords = famousGearRetiredRecords(state);
@@ -3099,6 +3145,9 @@
       },
       famousGearStatus(state = S) {
         return famousGearStatusModel(state);
+      },
+      famousGearMemorySummary(state = S) {
+        return famousGearMemorySummary(state);
       },
       startTrophyEcho(state = S) {
         return startRevisitRoute(state, 'trophy_echo_route');
