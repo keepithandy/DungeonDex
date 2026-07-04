@@ -146,7 +146,7 @@
       <div class="threshold-roadmap-card" aria-label="Current Roadmap">
         <div class="threshold-roadmap-head">
           <span class="threshold-label">Current Roadmap</span>
-          <p class="threshold-roadmap-copy">v1.23 closed the first memory arc. The next work should turn locked echoes into playable town choices.</p>
+          <p class="threshold-roadmap-copy">Memory lanes are live. Next up: turn the remaining locked echoes into playable town decisions.</p>
         </div>
         <div class="threshold-roadmap-list">
           <div class="threshold-roadmap-row">
@@ -155,11 +155,11 @@
           </div>
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">Next</span>
-            <span class="threshold-roadmap-value">Debt Pressure Revisit lane</span>
+            <span class="threshold-roadmap-value">Debt Pressure becomes a playable Revisit</span>
           </div>
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">After</span>
-            <span class="threshold-roadmap-value">Board Echo, Journal polish, clearer memory hooks</span>
+            <span class="threshold-roadmap-value">Board Echo, cleaner Journal hooks, memory polish</span>
           </div>
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">Future</span>
