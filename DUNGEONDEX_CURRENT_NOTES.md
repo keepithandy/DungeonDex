@@ -7,10 +7,26 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.5 - Famous Gear Memory v1 Completion
+- DungeonDex v1.23.6 - Rival Trace Memory v1 Completion
+
+## v1.23.6 Rival Trace Memory v1 Completion
+- Rival Trace now has a read-only Guild Journal summary helper.
+- Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys summarize into one readable display model.
+- Duplicate Rival Trace display records collapse by canonical trace identity.
+- The Guild Journal Rival Traces row consumes the readable summary and remains read-only.
+- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
+- The compact smoke suite passed 20/20 for this branch before final label alignment.
 
 ## v1.23.5 Famous Gear Memory v1 Completion
-- Boss Trophy v1 now records earned boss trophies as durable, readable progression memory records.
+- Famous Gear Memory v1 records retired gear archive memories as durable, readable progression memory records.
+- Legacy string entries and partial records normalize into one canonical duplicate-safe record list.
+- Duplicate records collapse by completion/record identity across repeated normalization, save/reload, and mixed legacy/modern state.
+- The read-only Famous Gear summary reports count, readable names, source labels, latest memory, legacy detection, duplicate-collapse status, duplicate safety, and empty-state copy.
+- The Guild Journal Famous Gear section consumes the readable summary and remains read-only.
+- `smoke_famous_gear_memory_v1.mjs` verifies duplicate collapse, reload persistence, summary output, and Journal rendering.
+
+## v1.23.4 Boss Trophy v1 Completion
+- Boss Trophy v1 records earned boss trophies as durable, readable progression memory records.
 - Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
 - Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern state.
 - The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
@@ -22,8 +38,6 @@
 - The Journal only reads existing state and shows safe copy when records are missing or malformed.
 - The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.
 - `smoke_journal_v1233.mjs` verifies the read-only summary model and archive-panel render contract.
-
-## v1.23.2 Revisit v1 Completion Verification
 
 ## v1.23.2 Revisit v1 Closeout
 - Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit lanes.
@@ -49,10 +63,13 @@
 - Service worker/cache labels must stay aligned with the visible build label.
 
 ## Smoke Targets
-- Boss Trophy v1 verification: `node smoke_boss_trophy_v1.mjs`
+- Compact smoke suite: `node smoke_compact_suite.mjs`
+- Rival Trace memory v1 verification: `node smoke_rival_trace_memory_v1.mjs`
 - Primary Revisit v1 verification: `node smoke_revisit_routes_v173.mjs`
 - Useful adjacent checks:
   - `node smoke_journal_v1233.mjs`
+  - `node smoke_famous_gear_memory_v1.mjs`
+  - `node smoke_boss_trophy_v1.mjs`
   - `node smoke_talent_passive_framework_v1232.mjs`
   - `node smoke_debt_collector_v169.mjs`
 
