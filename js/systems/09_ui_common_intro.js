@@ -258,3 +258,38 @@
           <span>${formatMoney(S.player.gold)} / Ember ${format(S.player.ember)}</span>
         </div>
       </div>`;
+  }
+
+  function renderIntroModal() {
+    const content = el('introModalContent');
+    if (!content) return;
+    // TODO(v1.7): Let earlier district revisits surface here without changing the current single-run entry flow.
+    content.innerHTML = introProgressMarkup();
+  }
+
+  function hideIntroModal() {
+    const modal = el('introModal');
+    if (!modal) return;
+    modal.hidden = true;
+  }
+
+  let introModalFallbackSeen = false;
+  function shouldShowIntroModal() {
+    try {
+      if (sessionStorage.getItem(INTRO_MODAL_SESSION_KEY)) return false;
+      sessionStorage.setItem(INTRO_MODAL_SESSION_KEY, '1');
+      return true;
+    } catch (err) {
+      if (introModalFallbackSeen) return false;
+      introModalFallbackSeen = true;
+      return true;
+    }
+  }
+
+  function showIntroModalOnce() {
+    const modal = el('introModal');
+    if (!modal || !shouldShowIntroModal()) return;
+    renderIntroModal();
+    modal.hidden = false;
+    bindIntroModalActions();
+  }
