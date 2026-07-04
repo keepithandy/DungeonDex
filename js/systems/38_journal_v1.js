@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.23.3 - Guild Journal / Memory Board read-only ledger.
+// DungeonDex v1.23.4 - Guild Journal / Memory Board read-only ledger.
 (function(){
   if (window.DDJournalV1) return;
   window.DDJournalV1 = true;
@@ -61,12 +61,30 @@
     };
   }
   function bossModel(state){
+    if (typeof bossTrophyReadableSummary === 'function') {
+      const summary = bossTrophyReadableSummary(state);
+      return {
+        count: num(summary.totalRecorded, 0),
+        latest: summary.latestTrophy ? text(summary.latestTrophy.trophyName || summary.latestTrophy.bossName || 'Boss Trophy') : '',
+        latestDetail: summary.latestTrophy ? text(summary.latestTrophy.bossName || '') : '',
+        body: text(summary.body || '', ''),
+        meta: text(summary.meta || '', ''),
+        duplicateSafe: summary.duplicateSafe === true,
+        duplicatesCollapsed: summary.duplicateRecordsCollapsed === true,
+        legacyIdsDetected: summary.legacyIdsDetected === true
+      };
+    }
     const records = list(state?.player?.bossTrophyRecords).filter(entry => entry && typeof entry === 'object');
     const latest = records.slice().sort((a, b) => num(b.earnedAt, 0) - num(a.earnedAt, 0))[0] || null;
     return {
       count: records.length,
       latest: latest ? text(latest.bossName || latest.trophyName || latest.id || 'Unknown boss') : '',
-      latestDetail: latest ? text(latest.summary || latest.recordId || '') : ''
+      latestDetail: latest ? text(latest.summary || latest.recordId || '') : '',
+      body: records.length > 0 ? `${records.length} boss trophies recorded.` : 'No boss trophies recorded yet.',
+      meta: latest ? `Last: ${text(latest.bossName || latest.trophyName || latest.id || 'Unknown boss')}${latest.summary || latest.recordId ? ` • ${text(latest.summary || latest.recordId || '')}` : ''}` : 'No boss trophies recorded yet.',
+      duplicateSafe: true,
+      duplicatesCollapsed: false,
+      legacyIdsDetected: false
     };
   }
   function famousModel(state){
@@ -112,7 +130,7 @@
       memoryTotal,
       sections: [
         { key: 'account', title: 'Account Memory', body: memoryTotal > 0 ? `Total remembered records: ${memoryTotal}.` : 'No records yet.', meta: revisit.last || debt.line },
-        { key: 'boss', title: 'Boss Trophies', body: boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.', meta: boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.' },
+        { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.count > 0 ? `${famous.count} retired gear record${famous.count === 1 ? '' : 's'} remembered.` : 'No famous gear has been retired into memory.', meta: famous.latest ? `Last remembered gear: ${famous.latest}` : 'No famous gear has been retired into memory.' },
         { key: 'rival', title: 'Rival Traces', body: rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.', meta: rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.' },

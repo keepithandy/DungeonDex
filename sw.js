@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.3-guild-journal-memory-board';
+const CACHE_NAME = 'dungeondex-v1.23.4-boss-trophy-v1-completion';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.3-guild-journal-memory-board';
+const BUILD_QS = '1.23.4-boss-trophy-v1-completion';
 const ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,7 @@ const ASSETS = [
   `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`,
   `./js/systems/36_ui_revisit_archive_codex.js?build=${BUILD_QS}`,
   `./js/systems/37_revisit_famous_gear_flavor_pack.js?build=${BUILD_QS}`,
+  `./js/systems/38_journal_v1.js?build=${BUILD_QS}`,
   `./js/systems/16_relic_forge_crafting.js?build=${BUILD_QS}`,
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,

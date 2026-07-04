@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.2-famous-gear-memory-revisit';
+const BUILD_QS = '1.23.4-boss-trophy-v1-completion';
 const CODEX_PATH = 'js/systems/36_ui_revisit_archive_codex.js';
 const SCRIPT_SRC = `./${CODEX_PATH}?build=${BUILD_QS}`;
 const ASSET_SRC = `./${CODEX_PATH}?build=${'${BUILD_QS}'}`;
@@ -33,8 +33,8 @@ async function main() {
 
   const scriptCount = countMatches(indexHtml, SCRIPT_SRC);
   const assetCount = countMatches(serviceWorker, ASSET_SRC);
-  const scriptAfterArchiveRenderer = indexOfRequired(indexHtml, './js/systems/15_devtools_balance_reports.js?build=1.23.2-famous-gear-memory-revisit') < indexOfRequired(indexHtml, SCRIPT_SRC);
-  const scriptBeforeCrafting = indexOfRequired(indexHtml, SCRIPT_SRC) < indexOfRequired(indexHtml, './js/systems/16_relic_forge_crafting.js?build=1.23.2-famous-gear-memory-revisit');
+  const scriptAfterArchiveRenderer = indexOfRequired(indexHtml, `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`) < indexOfRequired(indexHtml, SCRIPT_SRC);
+  const scriptBeforeCrafting = indexOfRequired(indexHtml, SCRIPT_SRC) < indexOfRequired(indexHtml, `./js/systems/16_relic_forge_crafting.js?build=${BUILD_QS}`);
 
   record('Archive Codex system 36 is loaded once by index.html', scriptCount === 1, `scriptCount=${scriptCount}`);
   record('Archive Codex loads after archive renderer helpers and before crafting systems', scriptAfterArchiveRenderer && scriptBeforeCrafting, JSON.stringify({ scriptAfterArchiveRenderer, scriptBeforeCrafting }));

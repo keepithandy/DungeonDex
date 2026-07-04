@@ -182,6 +182,9 @@
   }
 
   function normalizeBossTrophyRecords(source, unlockedIds = []) {
+    if (typeof bossTrophyStateModel === 'function') {
+      return bossTrophyStateModel({ player: { bossTrophyRecords: source, bossTrophies: unlockedIds } }).records;
+    }
     const records = [];
     const seen = new Set();
     asArray(source, []).forEach(raw => {
@@ -210,7 +213,7 @@
         source: String(raw.source || def?.source || 'Boss Floor'),
         image: String(raw.image || def?.image || 'assets/trophies/hollow_stair_skull_trophy.png'),
         icon: String(raw.icon || def?.icon || ''),
-        earnedAt: Math.max(0, Math.floor(numberOr(raw.earnedAt || raw.defeatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER)))
+        earnedAt: Math.max(0, Math.floor(numberOr(raw.earnedAt || raw.defeatedAt || raw.completedAt || raw.createdAt || raw.unlockedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
       });
     });
     unlockedIds.forEach(id => {
@@ -823,9 +826,17 @@
     });
     state.player.discoveredMonsters = asArray(savedPlayer.discoveredMonsters, []).map(String).slice(0, 200);
     state.player.discoveredGear = asArray(savedPlayer.discoveredGear, []).map(String).slice(0, 200);
+    const rawBossTrophyModel = typeof bossTrophyStateModel === 'function'
+      ? bossTrophyStateModel({ player: { bossTrophyRecords: savedPlayer.bossTrophyRecords, bossTrophies: savedPlayer.bossTrophies } })
+      : null;
     state.player.bossTrophies = Array.from(new Set(asArray(savedPlayer.bossTrophies, []).map(String).map(id => id.trim()).filter(Boolean))).slice(0, 80);
     state.player.bossTrophyRecords = normalizeBossTrophyRecords(savedPlayer.bossTrophyRecords, state.player.bossTrophies);
-    state.player.bossTrophies = Array.from(new Set(state.player.bossTrophies.concat(state.player.bossTrophyRecords.map(entry => String(entry.trophyId || entry.id || '').trim()).filter(Boolean)))).slice(0, 80);
+    if (typeof normalizeBossTrophyStateShape === 'function') {
+      normalizeBossTrophyStateShape(state);
+    } else {
+      state.player.bossTrophies = Array.from(new Set(state.player.bossTrophies.concat(state.player.bossTrophyRecords.map(entry => String(entry.trophyId || entry.id || '').trim()).filter(Boolean)))).slice(0, 80);
+    }
+    if (typeof rememberBossTrophyRepairFlags === 'function') rememberBossTrophyRepairFlags(state, rawBossTrophyModel);
     state.player.retiredRelics = normalizeRetiredRelicRecords(savedPlayer.retiredRelics);
     state.player.log = asArray(savedPlayer.log, base.player.log).map(String).slice(0, 60);
     state.player.loreSeen = asArray(savedPlayer.loreSeen, base.player.loreSeen).map(String).slice(0, 80);
@@ -899,6 +910,7 @@
     state.player.debtCollector = normalizeDebtCollectorState(state.player.debtCollector);
     state.player.revisitState = normalizeRevisitState(state.player.revisitState);
     state.player.retiredRelics = normalizeRetiredRelicRecords(state.player.retiredRelics);
+    if (typeof normalizeBossTrophyStateShape === 'function') normalizeBossTrophyStateShape(state);
     repairTalentState(state);
     normalizeTalentLedgerState(state);
     if (typeof window !== 'undefined' && typeof window.applyBossTrophyTalentAwardIfReady === 'function') {

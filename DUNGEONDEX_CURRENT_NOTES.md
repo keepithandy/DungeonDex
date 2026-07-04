@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.3 - Guild Journal / Memory Board
+- DungeonDex v1.23.4 - Boss Trophy v1 Completion
+
+## v1.23.4 Boss Trophy v1 Completion
+- Boss Trophy v1 now records earned boss trophies as durable, readable progression memory records.
+- Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
+- Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern state.
+- The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
+- The Guild Journal Boss Trophy section consumes the readable summary and remains read-only.
+- `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
 
 ## v1.23.3 Guild Journal / Memory Board
 - The Archive surface now includes a read-only Guild Journal summary band for boss trophies, Revisit memories, Debt status, Talent memory, and boss progress.
@@ -41,8 +49,10 @@
 - Service worker/cache labels must stay aligned with the visible build label.
 
 ## Smoke Targets
+- Boss Trophy v1 verification: `node smoke_boss_trophy_v1.mjs`
 - Primary Revisit v1 verification: `node smoke_revisit_routes_v173.mjs`
 - Useful adjacent checks:
+  - `node smoke_journal_v1233.mjs`
   - `node smoke_talent_passive_framework_v1232.mjs`
   - `node smoke_debt_collector_v169.mjs`
 

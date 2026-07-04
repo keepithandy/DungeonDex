@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.3**
+Current baseline: **DungeonDex v1.23.4**
 
 ## Revisit Status
 
@@ -18,21 +18,29 @@ Debt Pressure and Board Echo remain locked/planned.
 
 ## Current Build
 
-**v1.23.3 - Guild Journal / Memory Board**
+**v1.23.4 - Boss Trophy v1 Completion**
 
-This build adds the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, Talent, and boss-progress records using safe read-only state only.
+This build completes Boss Trophy v1 as a durable progression memory system. Boss Trophy records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy trophy state, and the Guild Journal shows the player-facing Boss Trophy summary.
 
-The build label, runtime pointer, service worker cache name, and version authority now target v1.23.3.
+The build label, runtime pointer, service worker cache name, and version authority now target v1.23.4.
 
 ## Current Smoke Target
 
-Run the Revisit smoke after this patch:
+Run the Boss Trophy and adjacent regression smokes after this patch:
 
 ```bash
+node smoke_boss_trophy_v1.mjs
+node smoke_journal_v1233.mjs
 node smoke_revisit_routes_v173.mjs
 ```
 
-That smoke covers Trophy Echo, Famous Gear Memory, Rival Trace, reload persistence, duplicate blocking, and neutrality around adjacent systems.
+Those smokes cover Boss Trophy persistence, duplicate safety, Journal integration, Revisit lanes, reload persistence, duplicate blocking, and neutrality around adjacent systems.
+
+## Previous Build
+
+**v1.23.3 - Guild Journal / Memory Board**
+
+This build added the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, Talent, and boss-progress records using safe read-only state only.
 
 ## Previous Build
 

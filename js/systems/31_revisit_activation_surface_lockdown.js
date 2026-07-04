@@ -1,11 +1,11 @@
 'use strict';
 
-// DungeonDex v1.23.3 - Revisit Activation Surface Lockdown.
+// DungeonDex v1.23.4 - Revisit Activation Surface Lockdown.
 (function(){
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.23.3-guild-journal-memory-board';
+  const BUILD = '1.23.4-boss-trophy-v1-completion';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const forbiddenExportNames = Object.freeze([
     'can' + 'Start' + 'Revisit' + 'Route',
