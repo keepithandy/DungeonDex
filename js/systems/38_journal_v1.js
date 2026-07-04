@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.23.4 - Guild Journal / Memory Board read-only ledger.
+// DungeonDex v1.23.6 - Guild Journal / Memory Board read-only ledger.
 (function(){
   if (window.DDJournalV1) return;
   window.DDJournalV1 = true;
@@ -17,6 +17,14 @@
   function num(value, fallback = 0){
     const n = Number(value);
     return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : Math.max(0, Math.floor(fallback));
+  }
+  function firstNum(values, fallback = 0){
+    const source = Array.isArray(values) ? values : [];
+    for (const value of source) {
+      const n = Number(value);
+      if (Number.isFinite(n)) return Math.max(0, Math.floor(n));
+    }
+    return num(fallback, 0);
   }
   function money(value){
     return typeof formatMoney === 'function' ? formatMoney(value) : `${num(value)}c`;
@@ -116,11 +124,107 @@
       emptyStateCopy: 'No famous gear memories recorded yet.'
     };
   }
+  function rivalTraceSlug(value){
+    return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  }
+  function rivalTraceRawObject(raw){
+    if (raw && typeof raw === 'object') return raw;
+    const rawText = text(raw, '');
+    if (!rawText) return {};
+    const cleanName = rawText.replace(/^rival_trace:/i, '').replace(/[_-]+/g, ' ').trim() || 'Rival Elite';
+    return { completionKey: rawText, eliteName: cleanName, memoryTitle: `${cleanName} Trace`, legacy: true };
+  }
+  function rivalTraceKey(raw, sourceLabel, index){
+    const source = rivalTraceRawObject(raw);
+    const key = text(source.completionKey || source.rivalId || source.id || source.recordId || source.eliteName || source.memoryTitle || '', '');
+    if (key) return key.indexOf('rival_trace:') === 0 ? key : `rival_trace:${rivalTraceSlug(key) || key}`;
+    return `rival_trace:${sourceLabel}:${index}`;
+  }
+  function rivalTraceRecord(raw, sourceLabel, index, legacy = false){
+    const source = rivalTraceRawObject(raw);
+    const legacyRecord = legacy || source.legacy === true || typeof raw === 'string';
+    const eliteName = text(source.eliteName || source.name || source.memoryTitle || 'Rival Elite', 'Rival Elite');
+    const memoryTitle = text(source.memoryTitle || `${eliteName} Trace`, `${eliteName} Trace`);
+    return {
+      key: rivalTraceKey(source, sourceLabel, index),
+      rivalId: text(source.rivalId || source.id || source.recordId || '', ''),
+      eliteName,
+      memoryTitle,
+      floorName: text(source.floorName || source.district || source.source || 'Elite Board', 'Elite Board'),
+      summary: text(source.summary || source.summaryLine || source.reflection || '', ''),
+      source: text(sourceLabel, 'Rival Trace'),
+      completed: !!(source.completed || source.result || sourceLabel === 'history' || legacyRecord),
+      legacy: legacyRecord,
+      updatedAt: firstNum([source.completedAt, source.endedAt, source.startedAt, source.updatedAt, source.createdAt, source.earnedAt], 0)
+    };
+  }
+  function rivalTraceReadableSummary(state){
+    const safeState = obj(state);
+    const trace = obj(safeState?.player?.revisitState?.rivalTrace);
+    const contracts = obj(safeState?.player?.eliteContracts);
+    const records = [];
+    const rawHistory = list(trace.history).filter(Boolean);
+    rawHistory.forEach((entry, index) => records.push(rivalTraceRecord(entry, 'history', index)));
+    if (trace.active && typeof trace.active === 'object') records.push(rivalTraceRecord(trace.active, 'active', records.length));
+    list(contracts.rivals).filter(entry => entry && typeof entry === 'object').forEach((entry, index) => records.push(rivalTraceRecord(entry, 'elite-rival-record', index)));
+    const completedKeys = Object.keys(obj(trace.completedKeys)).filter(key => trace.completedKeys[key] === true && /^rival_trace:[^:]+/i.test(String(key || '').trim()));
+    completedKeys.forEach((key, index) => {
+      records.push(rivalTraceRecord({ completionKey: key, memoryTitle: key.replace(/^rival_trace:/i, '').replace(/[_-]+/g, ' '), completed: true }, 'legacy-completed-key', index, true));
+    });
+    const byKey = new Map();
+    let duplicatesCollapsed = false;
+    records.forEach(record => {
+      const key = record.key;
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, record);
+        return;
+      }
+      duplicatesCollapsed = true;
+      existing.rivalId = existing.rivalId || record.rivalId;
+      existing.eliteName = existing.eliteName === 'Rival Elite' ? record.eliteName : existing.eliteName;
+      existing.memoryTitle = existing.memoryTitle || record.memoryTitle;
+      existing.floorName = existing.floorName === 'Elite Board' ? record.floorName : existing.floorName;
+      existing.summary = existing.summary || record.summary;
+      existing.completed = existing.completed || record.completed;
+      existing.legacy = existing.legacy || record.legacy;
+      existing.updatedAt = Math.max(num(existing.updatedAt, 0), num(record.updatedAt, 0));
+    });
+    const collapsed = Array.from(byKey.values())
+      .sort((left, right) => num(right.updatedAt, 0) - num(left.updatedAt, 0) || String(left.key || '').localeCompare(String(right.key || '')))
+      .slice(0, 12);
+    const latest = collapsed[0] || null;
+    const total = collapsed.length;
+    const names = collapsed.map(record => record.eliteName || record.memoryTitle).filter(Boolean);
+    const legacyIdsDetected = collapsed.some(record => record.legacy) || rawHistory.some(entry => typeof entry === 'string') || completedKeys.length > rawHistory.length;
+    return {
+      totalRecorded: total,
+      traceNames: names,
+      latestTrace: latest,
+      body: total > 0
+        ? `${total} rival trace${total === 1 ? '' : 's'} remembered: ${names.slice(0, 3).join(', ')}${names.length > 3 ? ', and more' : ''}.`
+        : 'No rival has left a name worth carving.',
+      meta: latest
+        ? `Last rival: ${latest.eliteName}${latest.floorName ? ` • ${latest.floorName}` : ''}${duplicatesCollapsed ? ' • duplicate-safe' : ''}${legacyIdsDetected ? ' • legacy trace detected' : ''}`
+        : 'No rival trace records yet.',
+      duplicateSafe: true,
+      duplicateRecordsCollapsed: duplicatesCollapsed,
+      legacyIdsDetected,
+      records: collapsed
+    };
+  }
   function rivalModel(state){
-    const rival = obj(state?.player?.revisitState?.rivalTrace);
-    const history = list(rival.history).filter(entry => entry && typeof entry === 'object');
-    const latest = history[0] || null;
-    return { count: history.length, latest: latest ? text(latest.eliteName || latest.memoryTitle || 'Unknown rival') : '' };
+    const summary = rivalTraceReadableSummary(state);
+    const latest = summary.latestTrace || null;
+    return {
+      count: num(summary.totalRecorded, 0),
+      latest: latest ? text(latest.eliteName || latest.memoryTitle || 'Unknown rival') : '',
+      body: text(summary.body || '', ''),
+      meta: text(summary.meta || '', ''),
+      duplicateSafe: summary.duplicateSafe === true,
+      duplicatesCollapsed: summary.duplicateRecordsCollapsed === true,
+      legacyIdsDetected: summary.legacyIdsDetected === true
+    };
   }
   function talentModel(state){
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents || null;
@@ -156,7 +260,7 @@
         { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
-        { key: 'rival', title: 'Rival Traces', body: rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.', meta: rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.' },
+        { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
         { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }
       ]
@@ -193,6 +297,7 @@
       return result;
     };
   }
+  window.rivalTraceReadableSummary = rivalTraceReadableSummary;
   window.journalV1233SummaryModel = journalV1233SummaryModel;
   window.renderGuildJournalPanel = renderGuildJournalPanel;
   window.guildJournalMemoryRows = state => journalV1233SummaryModel(state).sections.slice();
