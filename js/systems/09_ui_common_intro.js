@@ -146,24 +146,24 @@
       <div class="threshold-roadmap-card" aria-label="Current Roadmap">
         <div class="threshold-roadmap-head">
           <span class="threshold-label">Current Roadmap</span>
-          <p class="threshold-roadmap-copy">v1.4 stabilized the dungeon. v1.5 starts deeper progression.</p>
+          <p class="threshold-roadmap-copy">v1.23 closed the first memory arc. The next work should turn locked echoes into playable town choices.</p>
         </div>
         <div class="threshold-roadmap-list">
           <div class="threshold-roadmap-row">
-            <span class="threshold-roadmap-key">Now</span>
-            <span class="threshold-roadmap-value">Scaling, board hunts, rivals, trophies</span>
+            <span class="threshold-roadmap-key">Live</span>
+            <span class="threshold-roadmap-value">Trophy Echo, Famous Gear Memory, Rival Trace</span>
           </div>
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">Next</span>
-            <span class="threshold-roadmap-value">Talent System Foundation</span>
+            <span class="threshold-roadmap-value">Debt Pressure Revisit lane</span>
           </div>
           <div class="threshold-roadmap-row">
-            <span class="threshold-roadmap-key">Later</span>
-            <span class="threshold-roadmap-value">Boss trophies, retired gear, famous items</span>
+            <span class="threshold-roadmap-key">After</span>
+            <span class="threshold-roadmap-value">Board Echo, Journal polish, clearer memory hooks</span>
           </div>
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">Future</span>
-            <span class="threshold-roadmap-value">District identity, Debt Collector, Dungeon Court</span>
+            <span class="threshold-roadmap-value">Dungeon Court, district identity, deeper rewards</span>
           </div>
         </div>
       </div>`;
@@ -258,38 +258,3 @@
           <span>${formatMoney(S.player.gold)} / Ember ${format(S.player.ember)}</span>
         </div>
       </div>`;
-  }
-
-  function renderIntroModal() {
-    const content = el('introModalContent');
-    if (!content) return;
-    // TODO(v1.7): Let earlier district revisits surface here without changing the current single-run entry flow.
-    content.innerHTML = introProgressMarkup();
-  }
-
-  function hideIntroModal() {
-    const modal = el('introModal');
-    if (!modal) return;
-    modal.hidden = true;
-  }
-
-  let introModalFallbackSeen = false;
-  function shouldShowIntroModal() {
-    try {
-      if (sessionStorage.getItem(INTRO_MODAL_SESSION_KEY)) return false;
-      sessionStorage.setItem(INTRO_MODAL_SESSION_KEY, '1');
-      return true;
-    } catch (err) {
-      if (introModalFallbackSeen) return false;
-      introModalFallbackSeen = true;
-      return true;
-    }
-  }
-
-  function showIntroModalOnce() {
-    const modal = el('introModal');
-    if (!modal || !shouldShowIntroModal()) return;
-    renderIntroModal();
-    modal.hidden = false;
-    bindIntroModalActions();
-  }
