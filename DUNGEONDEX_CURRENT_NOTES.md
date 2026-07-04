@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.6 - Rival Trace Memory v1 Completion
+- DungeonDex v1.23.7 - Rival Trace Result Detail Polish
+
+## v1.23.7 Rival Trace Result Detail Polish
+- Rival Trace now exposes a clearer read-only Guild Journal completed-result detail line.
+- Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys still summarize into one readable display model.
+- Duplicate Rival Trace display records still collapse by canonical trace identity.
+- The Guild Journal Rival Traces row now includes rival name, route/status, completed state, memory key/id, flavor summary, and last completed label in read-only copy.
+- `smoke_rival_trace_memory_v1.mjs` now verifies the completed-result detail appears after a Rival Trace completion, along with the existing empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
+- The compact smoke suite remains the branch verification target.
 
 ## v1.23.6 Rival Trace Memory v1 Completion
 - Rival Trace now has a read-only Guild Journal summary helper.

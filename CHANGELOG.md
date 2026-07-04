@@ -8,13 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.6 Rival Trace Memory v1 Completion`
-* Current local package baseline: `v1.23.6 Rival Trace Memory v1 Completion`
-* Current development target: `v1.23.6 Rival Trace Memory v1 Completion`
+* Public/live itch version: `v1.23.7 Rival Trace Result Detail Polish`
+* Current local package baseline: `v1.23.7 Rival Trace Result Detail Polish`
+* Current development target: `v1.23.7 Rival Trace Result Detail Polish`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.7 - Rival Trace Result Detail Polish
+
+* Added clearer read-only Rival Trace completed-result detail in the Guild Journal.
+* Rival Trace result detail now surfaces rival name, route/status, completed state, memory key/id, short flavor summary, and last completed label when available.
+* The Guild Journal Rival Traces row now includes the completed-result detail while staying read-only.
+* Extended `smoke_rival_trace_memory_v1.mjs` to prove the completed-result detail appears after Rival Trace completion.
+* Bumped public/runtime/cache labels to `v1.23.7` with build query `1.23.7-rival-trace-result-detail-polish`.
+* No combat, HP, XP, monster scaling, boss scaling, rewards, currency, item drops, item stats, Talent, Debt, Famous Gear behavior, route mechanics, or dungeon-entry behavior changed.
+
+---
 
 ## v1.23.6 - Rival Trace Memory v1 Completion
 

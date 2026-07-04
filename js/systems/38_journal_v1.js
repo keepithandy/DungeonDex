@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.23.6 - Guild Journal / Memory Board read-only ledger.
+// DungeonDex v1.23.7 - Guild Journal / Memory Board read-only ledger.
 (function(){
   if (window.DDJournalV1) return;
   window.DDJournalV1 = true;
@@ -145,6 +145,8 @@
     const legacyRecord = legacy || source.legacy === true || typeof raw === 'string';
     const eliteName = text(source.eliteName || source.name || source.memoryTitle || 'Rival Elite', 'Rival Elite');
     const memoryTitle = text(source.memoryTitle || `${eliteName} Trace`, `${eliteName} Trace`);
+    const routeStatus = text(source.routeStatus || source.status || source.state || source.resultStatus || '', '');
+    const completedLabel = source.completedLabel || source.lastCompletedLabel || source.completedAtLabel || '';
     return {
       key: rivalTraceKey(source, sourceLabel, index),
       rivalId: text(source.rivalId || source.id || source.recordId || '', ''),
@@ -152,11 +154,29 @@
       memoryTitle,
       floorName: text(source.floorName || source.district || source.source || 'Elite Board', 'Elite Board'),
       summary: text(source.summary || source.summaryLine || source.reflection || '', ''),
+      routeStatus,
+      completedLabel: text(completedLabel || (legacyRecord ? 'Completed' : ''), legacyRecord ? 'Completed' : ''),
+      memoryKey: text(source.memoryKey || source.completionKey || source.key || '', ''),
       source: text(sourceLabel, 'Rival Trace'),
       completed: !!(source.completed || source.result || sourceLabel === 'history' || legacyRecord),
       legacy: legacyRecord,
       updatedAt: firstNum([source.completedAt, source.endedAt, source.startedAt, source.updatedAt, source.createdAt, source.earnedAt], 0)
     };
+  }
+  function rivalTraceResultDetail(record){
+    const parts = [];
+    const rivalName = text(record?.eliteName || record?.memoryTitle || '', '');
+    const routeStatus = text(record?.routeStatus || '', '');
+    const memoryKey = text(record?.memoryKey || record?.key || '', '');
+    const flavor = text(record?.summary || '', '');
+    const completedLabel = text(record?.completedLabel || '', '');
+    if (rivalName) parts.push(`Rival: ${rivalName}`);
+    if (routeStatus) parts.push(`Route: ${routeStatus}`);
+    parts.push(`State: ${record?.completed ? 'Completed' : 'Pending'}`);
+    if (memoryKey) parts.push(`Memory Key: ${memoryKey}`);
+    if (flavor) parts.push(`Flavor: ${flavor}`);
+    if (completedLabel) parts.push(`Last Completed: ${completedLabel}`);
+    return parts.join(' • ');
   }
   function rivalTraceReadableSummary(state){
     const safeState = obj(state);
@@ -194,18 +214,21 @@
       .sort((left, right) => num(right.updatedAt, 0) - num(left.updatedAt, 0) || String(left.key || '').localeCompare(String(right.key || '')))
       .slice(0, 12);
     const latest = collapsed[0] || null;
+    const latestCompleted = collapsed.find(record => record.completed) || latest;
     const total = collapsed.length;
     const names = collapsed.map(record => record.eliteName || record.memoryTitle).filter(Boolean);
     const legacyIdsDetected = collapsed.some(record => record.legacy) || rawHistory.some(entry => typeof entry === 'string') || completedKeys.length > rawHistory.length;
     return {
       totalRecorded: total,
       traceNames: names,
-      latestTrace: latest,
+      latestTrace: latestCompleted,
+      latestCompletedTrace: latestCompleted,
+      latestResultDetail: latestCompleted ? rivalTraceResultDetail(latestCompleted) : '',
       body: total > 0
         ? `${total} rival trace${total === 1 ? '' : 's'} remembered: ${names.slice(0, 3).join(', ')}${names.length > 3 ? ', and more' : ''}.`
         : 'No rival has left a name worth carving.',
-      meta: latest
-        ? `Last rival: ${latest.eliteName}${latest.floorName ? ` • ${latest.floorName}` : ''}${duplicatesCollapsed ? ' • duplicate-safe' : ''}${legacyIdsDetected ? ' • legacy trace detected' : ''}`
+      meta: latestCompleted
+        ? `Last rival: ${latestCompleted.eliteName}${latestCompleted.floorName ? ` • ${latestCompleted.floorName}` : ''}${duplicatesCollapsed ? ' • duplicate-safe' : ''}${legacyIdsDetected ? ' • legacy trace detected' : ''}`
         : 'No rival trace records yet.',
       duplicateSafe: true,
       duplicateRecordsCollapsed: duplicatesCollapsed,
@@ -216,11 +239,15 @@
   function rivalModel(state){
     const summary = rivalTraceReadableSummary(state);
     const latest = summary.latestTrace || null;
+    const detail = text(summary.latestResultDetail || (latest ? rivalTraceResultDetail(latest) : ''), '');
+    const detailLine = detail ? `Completed result: ${detail}` : '';
     return {
       count: num(summary.totalRecorded, 0),
       latest: latest ? text(latest.eliteName || latest.memoryTitle || 'Unknown rival') : '',
+      latestDetail: detail,
+      completed: latest ? latest.completed === true : false,
       body: text(summary.body || '', ''),
-      meta: text(summary.meta || '', ''),
+      meta: text([summary.meta || '', detailLine].filter(Boolean).join(' • '), ''),
       duplicateSafe: summary.duplicateSafe === true,
       duplicatesCollapsed: summary.duplicateRecordsCollapsed === true,
       legacyIdsDetected: summary.legacyIdsDetected === true
@@ -260,7 +287,7 @@
         { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
-        { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') },
+        { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
         { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }
       ]

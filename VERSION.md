@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.6 Rival Trace Memory v1 Completion
+v1.23.7 Rival Trace Result Detail Polish
 
 ## Current Local Package Version
-v1.23.6 Rival Trace Memory v1 Completion
+v1.23.7 Rival Trace Result Detail Polish
 
 ## Current Development Target
-v1.23.6 Rival Trace Memory v1 Completion
+v1.23.7 Rival Trace Result Detail Polish
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

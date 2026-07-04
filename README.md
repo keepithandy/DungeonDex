@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.6**
+Current baseline: **DungeonDex v1.23.7**
 
 ## Revisit Status
 
@@ -18,11 +18,11 @@ Debt Pressure and Board Echo remain locked/planned.
 
 ## Current Build
 
-**v1.23.6 - Rival Trace Memory v1 Completion**
+**v1.23.7 - Rival Trace Result Detail Polish**
 
-This build completes Rival Trace memory presentation inside the Guild Journal. Rival Trace records now summarize into readable duplicate-safe copy, legacy `rival_trace:*` completed keys and string history entries are detected safely, JSON save/reload roundtrip preserves the summary contract, and Famous Gear Journal compatibility stays intact.
+This build sharpens the Rival Trace completed-result surface inside the Guild Journal. Rival Trace records now expose clearer read-only result detail for the latest memory, including rival name, route/status, completed state, memory key/id, flavor summary, and last completed label, while keeping duplicate-safe summary behavior intact.
 
-The build label, runtime pointer, service worker cache name, and version authority now target v1.23.6.
+The build label, runtime pointer, service worker cache name, and version authority now target v1.23.7.
 
 ## Current Smoke Target
 

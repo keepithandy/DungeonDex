@@ -42,16 +42,16 @@ const state = {
     revisitState: {
       rivalTrace: {
         history: [
-          { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Trace recovered', completedAt: 20 },
+          { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Trace recovered', routeStatus: 'Archive trace', completedLabel: 'Lowfire District cleared', memoryKey: 'rival_trace:glassfang', completedAt: 20 },
           { rivalId: 'glassfang', eliteName: 'Glassfang Brute', floorName: 'Lowfire District', summary: 'Duplicate trace', completedAt: 15 },
           'rival_trace:old_knife_bailiff'
         ],
-        active: { rivalId: 'ash_crown', eliteName: 'Ash-Crowned Marauder', floorName: 'Ashgate Warrens', startedAt: 30 },
+        active: { rivalId: 'ash_crown', eliteName: 'Ash-Crowned Marauder', floorName: 'Ashgate Warrens', routeStatus: 'Active trace', summary: 'The rival is still at large', startedAt: 30 },
         completedKeys: {
           'rival_trace:glassfang': true,
           'rival_trace:old_knife_bailiff': true
         },
-        lastResult: { summary: 'Rival trace complete' },
+        lastResult: { summary: 'Rival trace complete', completedLabel: 'Lowfire District cleared', memoryKey: 'rival_trace:glassfang' },
         completed: true
       }
     },
@@ -81,6 +81,11 @@ assert.equal(summary.duplicateSafe, true);
 assert.equal(summary.duplicateRecordsCollapsed, true);
 assert.equal(summary.legacyIdsDetected, true);
 assert.equal(summary.totalRecorded, 3);
+assert.ok(summary.latestResultDetail.includes('Rival: Glassfang Brute'));
+assert.ok(summary.latestResultDetail.includes('Route: Archive trace'));
+assert.ok(summary.latestResultDetail.includes('State: Completed'));
+assert.ok(summary.latestResultDetail.includes('Memory Key: rival_trace:glassfang'));
+assert.ok(summary.latestResultDetail.includes('Last Completed: Lowfire District cleared'));
 assert.ok(summary.traceNames.includes('Glassfang Brute'));
 assert.ok(summary.traceNames.includes('Ash-Crowned Marauder'));
 assert.ok(summary.traceNames.some(name => /old knife bailiff/i.test(name)));
@@ -100,6 +105,8 @@ assert.ok(rivalRow);
 assert.ok(famousRow);
 assert.ok(rivalRow.body.includes('3 rival traces remembered'));
 assert.ok(rivalRow.meta.includes('duplicate-safe') || rivalRow.meta.includes('legacy trace detected'));
+assert.ok(rivalRow.meta.includes('Completed result:'));
+assert.ok(rivalRow.meta.includes('Memory Key: rival_trace:glassfang'));
 assert.ok(famousRow.body.includes('1 famous gear memory recorded'));
 
 const reloadModel = context.journalV1233SummaryModel(reloaded);

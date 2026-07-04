@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.6-rival-trace-memory-v1-completion';
+const CACHE_NAME = 'dungeondex-v1.23.7-rival-trace-result-detail-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.6-rival-trace-memory-v1-completion';
+const BUILD_QS = '1.23.7-rival-trace-result-detail-polish';
 const ASSETS = [
   './',
   './index.html',
