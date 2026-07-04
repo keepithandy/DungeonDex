@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.5**
+Current baseline: **DungeonDex v1.23.6**
 
 ## Revisit Status
 
@@ -18,23 +18,39 @@ Debt Pressure and Board Echo remain locked/planned.
 
 ## Current Build
 
-**v1.23.5 - Famous Gear Memory v1 Completion**
+**v1.23.6 - Rival Trace Memory v1 Completion**
 
-This build completes Boss Trophy v1 as a durable progression memory system. Boss Trophy records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy trophy state, and the Guild Journal shows the player-facing Boss Trophy summary.
+This build completes Rival Trace memory presentation inside the Guild Journal. Rival Trace records now summarize into readable duplicate-safe copy, legacy `rival_trace:*` completed keys and string history entries are detected safely, JSON save/reload roundtrip preserves the summary contract, and Famous Gear Journal compatibility stays intact.
 
-The build label, runtime pointer, service worker cache name, and version authority now target v1.23.5.
+The build label, runtime pointer, service worker cache name, and version authority now target v1.23.6.
 
 ## Current Smoke Target
 
-Run the Boss Trophy and adjacent regression smokes after this patch:
+Run the compact smoke suite after this patch:
 
 ```bash
-node smoke_boss_trophy_v1.mjs
-node smoke_journal_v1233.mjs
-node smoke_revisit_routes_v173.mjs
+node smoke_compact_suite.mjs
 ```
 
-Those smokes cover Boss Trophy persistence, duplicate safety, Journal integration, Revisit lanes, reload persistence, duplicate blocking, and neutrality around adjacent systems.
+Focused Rival Trace checks are available with:
+
+```bash
+node smoke_rival_trace_memory_v1.mjs
+```
+
+Those smokes cover Rival Trace readable summary output, duplicate collapse, legacy key detection, JSON reload stability, Journal integration, and neutrality around adjacent systems.
+
+## Previous Build
+
+**v1.23.5 - Famous Gear Memory v1 Completion**
+
+This build completed Famous Gear Memory v1 as a durable progression memory system. Famous Gear records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy memory state, and the Guild Journal shows the player-facing Famous Gear summary.
+
+## Previous Build
+
+**v1.23.4 - Boss Trophy v1 Completion**
+
+This build completed Boss Trophy v1 as a durable progression memory system. Boss Trophy records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy trophy state, and the Guild Journal shows the player-facing Boss Trophy summary.
 
 ## Previous Build
 

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.5-famous-gear-memory-v1-completion';
+const BUILD_QS = '1.23.6-rival-trace-memory-v1-completion';
 const FLAVOR_PATH = 'js/systems/37_revisit_famous_gear_flavor_pack.js';
 const SCRIPT_SRC = `./${FLAVOR_PATH}?build=${BUILD_QS}`;
 const ASSET_SRC = `./${FLAVOR_PATH}?build=${'${BUILD_QS}'}`;
