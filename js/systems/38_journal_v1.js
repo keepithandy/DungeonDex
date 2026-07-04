@@ -127,25 +127,35 @@
   function rivalTraceSlug(value){
     return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   }
+  function rivalTraceRawObject(raw){
+    if (raw && typeof raw === 'object') return raw;
+    const rawText = text(raw, '');
+    if (!rawText) return {};
+    const cleanName = rawText.replace(/^rival_trace:/i, '').replace(/[_-]+/g, ' ').trim() || 'Rival Elite';
+    return { completionKey: rawText, eliteName: cleanName, memoryTitle: `${cleanName} Trace`, legacy: true };
+  }
   function rivalTraceKey(raw, sourceLabel, index){
-    const key = text(raw?.completionKey || raw?.rivalId || raw?.id || raw?.recordId || raw?.eliteName || raw?.memoryTitle || '', '');
+    const source = rivalTraceRawObject(raw);
+    const key = text(source.completionKey || source.rivalId || source.id || source.recordId || source.eliteName || source.memoryTitle || '', '');
     if (key) return key.indexOf('rival_trace:') === 0 ? key : `rival_trace:${rivalTraceSlug(key) || key}`;
     return `rival_trace:${sourceLabel}:${index}`;
   }
   function rivalTraceRecord(raw, sourceLabel, index, legacy = false){
-    const eliteName = text(raw?.eliteName || raw?.name || raw?.memoryTitle || 'Rival Elite', 'Rival Elite');
-    const memoryTitle = text(raw?.memoryTitle || `${eliteName} Trace`, `${eliteName} Trace`);
+    const source = rivalTraceRawObject(raw);
+    const legacyRecord = legacy || source.legacy === true || typeof raw === 'string';
+    const eliteName = text(source.eliteName || source.name || source.memoryTitle || 'Rival Elite', 'Rival Elite');
+    const memoryTitle = text(source.memoryTitle || `${eliteName} Trace`, `${eliteName} Trace`);
     return {
-      key: rivalTraceKey(raw, sourceLabel, index),
-      rivalId: text(raw?.rivalId || raw?.id || raw?.recordId || '', ''),
+      key: rivalTraceKey(source, sourceLabel, index),
+      rivalId: text(source.rivalId || source.id || source.recordId || '', ''),
       eliteName,
       memoryTitle,
-      floorName: text(raw?.floorName || raw?.district || raw?.source || 'Elite Board', 'Elite Board'),
-      summary: text(raw?.summary || raw?.summaryLine || raw?.reflection || '', ''),
+      floorName: text(source.floorName || source.district || source.source || 'Elite Board', 'Elite Board'),
+      summary: text(source.summary || source.summaryLine || source.reflection || '', ''),
       source: text(sourceLabel, 'Rival Trace'),
-      completed: !!(raw?.completed || raw?.result || sourceLabel === 'history' || legacy),
-      legacy,
-      updatedAt: firstNum([raw?.completedAt, raw?.endedAt, raw?.startedAt, raw?.updatedAt, raw?.createdAt, raw?.earnedAt], 0)
+      completed: !!(source.completed || source.result || sourceLabel === 'history' || legacyRecord),
+      legacy: legacyRecord,
+      updatedAt: firstNum([source.completedAt, source.endedAt, source.startedAt, source.updatedAt, source.createdAt, source.earnedAt], 0)
     };
   }
   function rivalTraceReadableSummary(state){
@@ -153,8 +163,8 @@
     const trace = obj(safeState?.player?.revisitState?.rivalTrace);
     const contracts = obj(safeState?.player?.eliteContracts);
     const records = [];
-    const history = list(trace.history).filter(entry => entry && typeof entry === 'object');
-    history.forEach((entry, index) => records.push(rivalTraceRecord(entry, 'history', index)));
+    const rawHistory = list(trace.history).filter(Boolean);
+    rawHistory.forEach((entry, index) => records.push(rivalTraceRecord(entry, 'history', index)));
     if (trace.active && typeof trace.active === 'object') records.push(rivalTraceRecord(trace.active, 'active', records.length));
     list(contracts.rivals).filter(entry => entry && typeof entry === 'object').forEach((entry, index) => records.push(rivalTraceRecord(entry, 'elite-rival-record', index)));
     const completedKeys = Object.keys(obj(trace.completedKeys)).filter(key => trace.completedKeys[key] === true && /^rival_trace:[^:]+/i.test(String(key || '').trim()));
@@ -186,7 +196,7 @@
     const latest = collapsed[0] || null;
     const total = collapsed.length;
     const names = collapsed.map(record => record.eliteName || record.memoryTitle).filter(Boolean);
-    const legacyIdsDetected = collapsed.some(record => record.legacy) || completedKeys.length > history.length;
+    const legacyIdsDetected = collapsed.some(record => record.legacy) || rawHistory.some(entry => typeof entry === 'string') || completedKeys.length > rawHistory.length;
     return {
       totalRecorded: total,
       traceNames: names,
