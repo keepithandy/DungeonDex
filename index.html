@@ -45,6 +45,89 @@
       --rarity-glow: rgba(168,240,179,0.06);
       --rarity-sheen: rgba(168,240,179,0.11);
     }
+
+    /* Intro roadmap polish: make the launch card readable instead of oversized and cramped. */
+    .threshold-roadmap-card {
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255,196,99,0.07), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,0.032), rgba(0,0,0,0.24));
+    }
+
+    .threshold-roadmap-head {
+      gap: 6px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,214,151,0.10);
+    }
+
+    .threshold-roadmap-card .threshold-label {
+      font-family: var(--font);
+      font-size: 0.66rem;
+      line-height: 1.1;
+      letter-spacing: 0.16em;
+    }
+
+    .threshold-roadmap-copy {
+      max-width: 36rem;
+      color: rgba(240,234,222,0.72);
+      font-family: var(--font);
+      font-size: clamp(0.78rem, 2.45vw, 0.92rem);
+      line-height: 1.45;
+    }
+
+    .threshold-roadmap-list {
+      gap: 8px;
+    }
+
+    .threshold-roadmap-row {
+      grid-template-columns: minmax(6.6rem, 7.2rem) minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      min-height: 46px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border-color: rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(255,255,255,0.022), rgba(0,0,0,0.24));
+    }
+
+    .threshold-roadmap-key {
+      color: #f6d9a1;
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .threshold-roadmap-value {
+      min-width: 0;
+      color: rgba(248,246,238,0.88);
+      font-family: var(--font);
+      font-size: clamp(0.82rem, 2.7vw, 0.96rem);
+      font-weight: 700;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 430px) {
+      .threshold-roadmap-card {
+        padding: 12px;
+      }
+
+      .threshold-roadmap-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        align-items: start;
+        min-height: 0;
+      }
+
+      .threshold-roadmap-key {
+        letter-spacing: 0.16em;
+      }
+    }
   </style>
 </head>
 <body>
