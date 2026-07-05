@@ -120,6 +120,21 @@
       #talentPanel .talent-path-effect,#talentPanel .talent-path-summary,#talentPanel .talent-path-note{font-size:10.5px!important;line-height:1.22!important}
       #talentPanel .talent-preview-tags{margin-top:5px!important}
 
+      /* Gear tab: only show Talent UI when it has a playable spend action. */
+      #screen-gear #talentPanel:not(:has(.talent-spend-ready-card button:not([disabled]))){display:none!important}
+      #screen-gear #talentPanel .talent-head p,
+      #screen-gear #talentPanel .talent-passive-note,
+      #screen-gear #talentPanel .talent-preview-banner,
+      #screen-gear #talentPanel .talent-ledger-card:not(.talent-spend-ready-card),
+      #screen-gear #talentPanel .talent-rules-card,
+      #screen-gear #talentPanel .talent-point-line,
+      #screen-gear #talentPanel .talent-preview-grid,
+      #screen-gear #talentPanel .talent-footer,
+      #screen-gear #talentPanel .talent-summary-row:not(.talent-ledger-chips),
+      #screen-gear #talentPanel .talent-milestone-line:not([aria-label="Spend readiness status"]){display:none!important}
+      #screen-gear #talentPanel .talent-legend{margin:0 0 7px!important}
+      #screen-gear #talentPanel .talent-spend-ready-card{margin-bottom:0!important}
+
       /* Gear and archive scanability */
       #screen-gear .inventory-upgrade-card{border-color:rgba(122,232,178,.20)!important;background:linear-gradient(180deg,rgba(122,232,178,.040),rgba(255,255,255,.014))!important}
       #screen-gear .inventory-upgrade-card .gear-status-badge.better{border-color:rgba(122,232,178,.28)!important;background:rgba(122,232,178,.08)!important;color:#baf6d8!important}
