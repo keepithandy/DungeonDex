@@ -22,6 +22,11 @@
     state.screen = screen;
     document.querySelectorAll('.screen').forEach(node => node.classList.toggle('active', node.id === `screen-${screen}`));
     document.querySelectorAll('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === screen));
+    const shell = document.querySelector('.app-shell');
+    if (shell) {
+      shell.classList.toggle('run-focus', screen === 'run');
+      shell.classList.toggle('combat-active', screen === 'run' && state.run && state.run.active);
+    }
   }
 
   function ensureVisibleScreen(){
@@ -35,16 +40,40 @@
     }
   }
 
-  function recoverAfterStart(){
-    window.setTimeout(() => {
-      const state = getState();
-      if (!state) return;
-      if (state.run && state.run.active) state.screen = 'run';
-      safeCall(() => typeof hideIntroModal === 'function' && hideIntroModal());
-      safeCall(() => typeof render === 'function' && render());
+  function activeScreenHasVisibleContent(){
+    const active = document.querySelector('.screen.active');
+    if (!active) return false;
+    return (active.textContent || '').replace(/\s+/g, ' ').trim().length > 0;
+  }
+
+  function forceRunRenderIfNeeded(){
+    const state = getState();
+    if (!state || !state.run || !state.run.active) return;
+    setScreen('run');
+    safeCall(() => typeof renderRun === 'function' && renderRun());
+    safeCall(() => typeof renderStickyBar === 'function' && renderStickyBar());
+    safeCall(() => typeof bindCombatActions === 'function' && bindCombatActions());
+  }
+
+  function recoverVisibleGame(){
+    const state = getState();
+    if (!state) return;
+    if (state.run && state.run.active) state.screen = 'run';
+    safeCall(() => typeof hideIntroModal === 'function' && hideIntroModal());
+    safeCall(() => typeof render === 'function' && render());
+    ensureVisibleScreen();
+    forceRunRenderIfNeeded();
+    if (!activeScreenHasVisibleContent()) {
+      forceRunRenderIfNeeded();
       ensureVisibleScreen();
-      safeCall(() => typeof bindDynamic === 'function' && bindDynamic());
-    }, 0);
+    }
+    safeCall(() => typeof bindDynamic === 'function' && bindDynamic());
+  }
+
+  function recoverAfterStart(){
+    window.setTimeout(recoverVisibleGame, 0);
+    window.setTimeout(recoverVisibleGame, 80);
+    window.setTimeout(recoverVisibleGame, 240);
   }
 
   function installIntroRecovery(){
@@ -73,6 +102,7 @@
   function install(){
     ensureVisibleScreen();
     installIntroRecovery();
+    forceRunRenderIfNeeded();
   }
 
   const oldBindIntro = window.bindIntroModalActions || globalThis.bindIntroModalActions;
@@ -92,6 +122,7 @@
     const wrappedRender = function(){
       const result = oldRender.apply(this, arguments);
       ensureVisibleScreen();
+      forceRunRenderIfNeeded();
       installIntroRecovery();
       return result;
     };
