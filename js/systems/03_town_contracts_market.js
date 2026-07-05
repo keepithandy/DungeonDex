@@ -2130,6 +2130,68 @@
     };
   }
 
+  function calculateBoardEchoStartDryRun(state = S) {
+    const contract = boardEchoActivationContract(state);
+    const requiredStateFields = Array.isArray(contract.requiredStateFields)
+      ? contract.requiredStateFields.slice()
+      : [
+          'player.revisitState.boardEcho.active',
+          'player.revisitState.boardEcho.history',
+          'player.revisitState.boardEcho.completedKeys',
+          'player.revisitState.boardEcho.lastResult'
+        ];
+    const missingPrerequisites = Array.isArray(contract.prerequisites)
+      ? contract.prerequisites.slice()
+      : [];
+    return {
+      key: contract.key || 'boardEcho',
+      routeKey: contract.routeKey || 'board_echo_route',
+      title: contract.title || 'Board Echo',
+      dryRunVersion: 1,
+      dryRunOnly: true,
+      readOnly: true,
+      enabled: false,
+      playable: false,
+      canStart: false,
+      wouldStart: false,
+      wouldMutateState: false,
+      mutatesSave: false,
+      safeToCommitStart: false,
+      duplicateStartBlocked: true,
+      blockedReason: contract.reasonText || 'Board Echo is planned/locked and cannot be started yet.',
+      status: contract.status || 'planned',
+      bucket: contract.bucket || 'unfinished',
+      activationContractSummary: {
+        key: contract.key || 'boardEcho',
+        routeKey: contract.routeKey || 'board_echo_route',
+        enabled: contract.enabled === true,
+        playable: contract.playable === true,
+        canStart: contract.canStart === true,
+        safeToShowStartAction: contract.safeToShowStartAction === true,
+        status: contract.status || 'planned',
+        bucket: contract.bucket || 'unfinished',
+        readOnly: contract.readOnly === true,
+        mutatesSave: contract.mutatesSave === true
+      },
+      requiredStateFields,
+      wouldCreateStateShape: {
+        'player.revisitState.boardEcho': {
+          active: {
+            routeKey: 'board_echo_route',
+            sourceRecordId: 'future_elite_board_record_id',
+            memoryTitle: 'Board Echo',
+            startedAt: 'future_timestamp'
+          },
+          history: [],
+          completedKeys: {},
+          lastResult: null
+        }
+      },
+      missingPrerequisites,
+      nextStepText: 'Future patch should add a hidden Board Echo start fixture and prove duplicate-safe active/history behavior before activation.'
+    };
+  }
+
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
@@ -3278,6 +3340,9 @@
       },
       boardEchoActivationContract(state = S) {
         return boardEchoActivationContract(state);
+      },
+      calculateBoardEchoStartDryRun(state = S) {
+        return calculateBoardEchoStartDryRun(state);
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);
