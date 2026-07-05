@@ -22,7 +22,11 @@
     $$('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === S.screen));
   }
 
+  let dungeonDexBootReady = false;
+  let dungeonDexBootStarted = false;
+
   function render() {
+    if (!dungeonDexBootReady) return;
     try {
       syncScreenState();
       renderStatBoxes();
@@ -347,6 +351,9 @@
   }
 
   function bootDungeonDex() {
+    if (dungeonDexBootStarted) return;
+    dungeonDexBootStarted = true;
+    dungeonDexBootReady = true;
     bindStatic();
     render();
     showIntroModalOnce();
@@ -376,7 +383,11 @@
     };
   }
 
-  window.setTimeout(bootDungeonDex, 0);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootDungeonDex, { once:true });
+  } else {
+    bootDungeonDex();
+  }
 
 
 // v1.4.2 Sootveil Mythic Set Pass
