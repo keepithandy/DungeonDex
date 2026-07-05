@@ -79,6 +79,17 @@
       }
     }
 
+    /* Temporary Revisit preview hide: keep only playable, active, or completed lanes visible. */
+    .revisit-foundation-panel .revisit-unfinished-lanes-card,
+    .revisit-foundation-panel .revisit-echo-card.locked,
+    .revisit-foundation-panel .revisit-lane-card.locked {
+      display: none !important;
+    }
+
+    .revisit-foundation-panel:not(:has(.revisit-echo-card.ready, .revisit-lane-card.ready, .revisit-lane-card.active, .revisit-lane-card.completed)) {
+      display: none !important;
+    }
+
     /* v1.6.21 uncommon rarity hotfix: restore the pre-theme green uncommon read. */
     .rarity-uncommon {
       color: #a8f0b3;
