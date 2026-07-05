@@ -346,6 +346,12 @@
     window.DungeonDexCheckpointAudit = runCheckpointCharterAudit;
   }
 
+  function bootDungeonDex() {
+    bindStatic();
+    render();
+    showIntroModalOnce();
+  }
+
   function bindStatic() {
     $$('.tab').forEach(btn => btn.addEventListener('click', () => switchScreen(btn.dataset.screen)));
     const startRunBtn = el('startRunBtn');
@@ -370,9 +376,7 @@
     };
   }
 
-  bindStatic();
-  render();
-  showIntroModalOnce();
+  window.setTimeout(bootDungeonDex, 0);
 
 
 // v1.4.2 Sootveil Mythic Set Pass
