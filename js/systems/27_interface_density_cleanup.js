@@ -120,23 +120,9 @@
       #talentPanel .talent-path-effect,#talentPanel .talent-path-summary,#talentPanel .talent-path-note{font-size:10.5px!important;line-height:1.22!important}
       #talentPanel .talent-preview-tags{margin-top:5px!important}
 
-      /* Gear tab: collapse non-playable Talent and any empty renderer shells. */
+      /* Gear tab: only hide the non-playable Talent panel. Do not touch Gear panels. */
       #screen-gear #talentPanel[hidden],
-      #screen-gear #talentPanel[data-dd-playable="0"],
-      #screen-gear .panel[data-dd-empty="1"],
-      #screen-gear .panel:empty{display:none!important}
-      #screen-gear #talentPanel .talent-head p,
-      #screen-gear #talentPanel .talent-passive-note,
-      #screen-gear #talentPanel .talent-preview-banner,
-      #screen-gear #talentPanel .talent-ledger-card:not(.talent-spend-ready-card),
-      #screen-gear #talentPanel .talent-rules-card,
-      #screen-gear #talentPanel .talent-point-line,
-      #screen-gear #talentPanel .talent-preview-grid,
-      #screen-gear #talentPanel .talent-footer,
-      #screen-gear #talentPanel .talent-summary-row:not(.talent-ledger-chips),
-      #screen-gear #talentPanel .talent-milestone-line:not([aria-label="Spend readiness status"]){display:none!important}
-      #screen-gear #talentPanel .talent-legend{margin:0 0 7px!important}
-      #screen-gear #talentPanel .talent-spend-ready-card{margin-bottom:0!important}
+      #screen-gear #talentPanel[data-dd-playable="0"]{display:none!important}
 
       /* Gear and archive scanability */
       #screen-gear .inventory-upgrade-card{border-color:rgba(122,232,178,.20)!important;background:linear-gradient(180deg,rgba(122,232,178,.040),rgba(255,255,255,.014))!important}
@@ -267,29 +253,13 @@
       && !!panel.querySelector('[data-talent-spend-hunter-board]:not([disabled])');
   }
 
-  function setPanelCollapsed(panel, collapsed){
-    if (!panel) return;
-    panel.hidden = collapsed === true;
-    panel.dataset.ddEmpty = collapsed === true ? '1' : '0';
-    panel.style.display = collapsed === true ? 'none' : '';
-  }
-
-  function collapseGearPanels(){
+  function hideNonPlayableGearTalentPanel(){
     const talent = document.getElementById('talentPanel');
-    if (talent) {
-      const playableTalent = hasPlayableTalentAction(talent);
-      talent.dataset.ddPlayable = playableTalent ? '1' : '0';
-      talent.hidden = !playableTalent;
-      talent.style.display = playableTalent ? '' : 'none';
-    }
-
-    ['gearPlayerPanel', 'equipmentPanel', 'filtersPanel', 'inventoryPanel'].forEach(id => {
-      const panel = document.getElementById(id);
-      if (!panel) return;
-      const hasText = (panel.textContent || '').trim().length > 0;
-      const hasControls = !!panel.querySelector('button,select,input,[data-equip],[data-sell],[data-retire]');
-      setPanelCollapsed(panel, !hasText && !hasControls);
-    });
+    if (!talent) return;
+    const playableTalent = hasPlayableTalentAction(talent);
+    talent.dataset.ddPlayable = playableTalent ? '1' : '0';
+    talent.hidden = !playableTalent;
+    talent.style.display = playableTalent ? '' : 'none';
   }
 
   function run(){
@@ -298,7 +268,7 @@
     syncBuildHealth();
     polishCopy();
     improveSparkWritButtons();
-    collapseGearPanels();
+    hideNonPlayableGearTalentPanel();
   }
 
   function wrap(name){
