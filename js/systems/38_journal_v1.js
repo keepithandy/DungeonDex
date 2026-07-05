@@ -52,20 +52,24 @@
     const revisit = obj(state?.player?.revisitState);
     const trophy = obj(revisit.trophyEcho);
     const famous = obj(revisit.famousGear);
+    const board = obj(revisit.boardEcho);
     const rival = obj(revisit.rivalTrace);
     const trophyCount = list(trophy.history).length;
     const famousCount = list(famous.history).length;
+    const boardCount = list(board.history).length;
     const rivalCount = list(rival.history).length;
-    const total = trophyCount + famousCount + rivalCount;
+    const total = trophyCount + famousCount + boardCount + rivalCount;
     return {
       total,
       trophyCount,
       famousCount,
+      boardCount,
       rivalCount,
       trophyStatus: trophy.active ? 'Active' : trophy.locked ? 'Locked' : trophy.completed ? 'Recovered' : trophy.available ? 'Playable' : 'Quiet',
       famousStatus: famous.active ? 'Active' : famous.locked ? 'Locked' : famous.completed ? 'Recovered' : famous.available ? 'Playable' : 'Quiet',
+      boardStatus: board.active ? 'Active' : board.locked ? 'Locked' : board.completed ? 'Recovered' : board.available ? 'Playable' : 'Quiet',
       rivalStatus: rival.active ? 'Active' : rival.locked ? 'Locked' : rival.completed ? 'Recovered' : rival.available ? 'Playable' : 'Quiet',
-      last: summaryLine([text(trophy.lastResult?.summary), text(famous.lastResult?.summary), text(rival.lastResult?.summary)], '')
+      last: summaryLine([text(trophy.lastResult?.summary), text(famous.lastResult?.summary), text(board.lastResult?.summary), text(rival.lastResult?.summary)], '')
     };
   }
   function bossModel(state){
@@ -260,7 +264,7 @@
     const board = unfinished.find(lane => lane.key === 'board_echo_route') || null;
     const debt = unfinished.find(lane => lane.key === 'debt_pressure_route') || null;
     const boardText = board
-      ? `${board.title || 'Board Echo'} ${board.shortLabel || 'Locked'}. This lane is not playable yet. ${board.detailText || 'Read-only lane copy only.'} ${board.nextStepText || 'Future patch should keep it read-only for now.'}`
+      ? `${board.title || 'Board Echo'} ${board.shortLabel || 'Locked'}. ${board.active ? 'This lane is active now.' : board.historyStateAvailable ? 'This lane has a recorded completion.' : board.isPlayable ? 'This lane is playable now.' : 'This lane is not playable yet.'} ${board.detailText || 'Read-only lane copy only.'} ${board.nextStepText || 'Future patch should keep it read-only for now.'}`
       : 'Board Echo is not recorded yet.';
     const debtText = debt
       ? `${debt.title || 'Debt Pressure'} ${debt.shortLabel || 'Locked'}. This lane is not playable yet. ${debt.detailText || 'Read-only lane copy only.'} ${debt.nextStepText || 'Future patch should keep it read-only for now.'}`
@@ -314,7 +318,7 @@
       sections: [
         { key: 'account', title: 'Account Memory', body: memoryTotal > 0 ? `Total remembered records: ${memoryTotal}.` : 'No records yet.', meta: revisit.last || debt.line },
         { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
-        { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
+        { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Board Echo ${revisit.boardStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
         { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
         { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: [laneClarity.boardText, laneClarity.debtText].filter(Boolean).join(' • ') || laneClarity.boardText || laneClarity.debtText },

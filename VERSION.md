@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.7 Rival Trace Result Detail Polish
+v1.23.8 Board Echo Minimal Playable Activation
 
 ## Current Local Package Version
-v1.23.7 Rival Trace Result Detail Polish
+v1.23.8 Board Echo Minimal Playable Activation
 
 ## Current Development Target
-v1.23.7 Rival Trace Result Detail Polish
+v1.23.8 Board Echo Minimal Playable Activation
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

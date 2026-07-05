@@ -893,6 +893,18 @@
     };
   }
 
+  function createBoardEchoReflection(source) {
+    const sourceLabel = cleanDisplayText(source?.sourceLabel || 'Elite Board', 'Elite Board');
+    const sourceRecordId = cleanDisplayText(source?.id || source?.recordId || source?.contractId || '', '');
+    const signalLine = sourceRecordId ? `Source record: ${sourceRecordId}.` : 'The board record is remembered without a separate record id.';
+    return {
+      memoryTitle: 'Board Echo',
+      sourceLabel,
+      summaryLine: `Contract marks echo back from ${sourceLabel}.`,
+      reflection: `Board Echo replays an old contract mark as a safe town memory from ${sourceLabel}. You read the trace, keep the board history sealed, and leave rewards, combat, and dungeon entry untouched. ${signalLine}`
+    };
+  }
+
   function rivalTraceStatusModel(state = S) {
     const revisitState = ensureRevisitStateShape(state);
     const contracts = ensureEliteContractState(state);
@@ -937,6 +949,42 @@
       activeTrace: active,
       activeRouteKey: String(revisitState.activeRouteKey || '').trim(),
       lastResult: revisitState.rivalTrace?.lastResult || null
+    };
+  }
+
+  function boardEchoStatusModel(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    const contracts = ensureEliteContractState(state);
+    const sourceRecords = [];
+    if (isPlainObject(contracts.active) && String(contracts.active.id || '').trim()) sourceRecords.push(contracts.active);
+    if (Array.isArray(contracts.completed)) {
+      contracts.completed.forEach(id => {
+        if (String(id || '').trim()) sourceRecords.push({ id, completed: true });
+      });
+    }
+    if (Array.isArray(contracts.rivals?.rivals)) {
+      contracts.rivals.rivals.forEach(entry => {
+        if (entry && typeof entry === 'object') sourceRecords.push(entry);
+      });
+    }
+    const source = sourceRecords[0] || null;
+    const active = revisitState.boardEcho?.active && typeof revisitState.boardEcho.active === 'object'
+      ? revisitState.boardEcho.active
+      : (String(revisitState.activeRouteKey || '').trim() === 'board_echo_route' && source ? {
+        routeKey: 'board_echo_route',
+        sourceRecordId: String(source.id || source.recordId || source.contractId || '').trim(),
+        memoryTitle: 'Board Echo',
+        sourceLabel: 'Elite Board',
+        startedAt: Math.max(0, Math.floor(numberOr(revisitState.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+      } : null);
+    const completed = Array.isArray(revisitState.boardEcho?.history) && revisitState.boardEcho.history.length > 0;
+    return {
+      locked: !source && !active && !completed,
+      available: !!source || !!active || !!completed,
+      active: !!active,
+      completed,
+      source,
+      activeTrace: active
     };
   }
 
@@ -1566,7 +1614,7 @@
       { key: 'famous_gear_route', previewState: famousReady ? 'playable-now' : 'locked', previewLabel: famousReady ? 'Available now' : 'Still locked', previewReason: famousReady ? 'Retired gear archive can be revisited from town.' : 'Future archive memory may shape this path later.', previewRequirement: famousReady ? 'Retired gear archive is ready.' : 'Build stronger gear memory.' },
       { key: 'rival_trace_route', previewState: rivalTraceStatusModel(state).available ? 'playable-now' : 'locked', previewLabel: rivalTraceStatusModel(state).available ? 'Available now' : 'Still locked', previewReason: rivalTraceStatusModel(state).available ? 'Named rival elite memory can be revisited from town.' : 'Future named rival elite memory may sharpen this trace later.', previewRequirement: 'Remember named rival elite history.' },
       { key: 'debt_pressure_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future ledger pressure may mark this district later.', previewRequirement: 'Build more debt history.' },
-      { key: 'board_echo_route', previewState: 'locked', previewLabel: 'Still locked', previewReason: 'Future board history may strengthen this echo later.', previewRequirement: 'Build more board history.' }
+      { key: 'board_echo_route', previewState: boardEchoStatusModel(state).available ? 'playable-now' : 'locked', previewLabel: boardEchoStatusModel(state).available ? 'Available now' : 'Still locked', previewReason: boardEchoStatusModel(state).available ? 'Board history can be revisited from town.' : 'Future board history may strengthen this echo later.', previewRequirement: boardEchoStatusModel(state).available ? 'Board history is ready.' : 'Build more board history.' }
     ];
     return routeDefs.map(def => {
       const previewSafety = def.previewState === 'playable-now'
@@ -1657,9 +1705,9 @@
         hookSource: 'board_echo',
         shortDescription: 'Old board contracts echo as a route.',
         routeFlavorLine: 'Paid marks can still linger.',
-        safetyStatusLine: 'Locked preview. No route access.',
-        lockedReadinessNote: 'Needs more board history.',
-        reason: 'Contract history may reopen old roads.'
+        safetyStatusLine: boardEchoStatusModel(state).available ? 'Playable now. Board history can be revisited from town.' : 'Locked preview. No route access.',
+        lockedReadinessNote: boardEchoStatusModel(state).available ? 'Board history is ready.' : 'Needs more board history.',
+        reason: boardEchoStatusModel(state).available ? 'Board history can reopen old roads.' : 'Contract history may reopen old roads.'
       }
     };
   }
@@ -1816,12 +1864,25 @@
         key: 'board_echo_route',
         title: 'Board Echo Route',
         district: 'Contract history districts',
-        reason: 'Contract history may reopen old roads.',
+        reason: boardEchoStatusModel(state).available ? 'Board history can reopen old roads.' : 'Contract history may reopen old roads.',
         hooks: ['board_echo'],
-        status: 'Planned',
-        locked: true,
+        status: boardEchoStatusModel(state).available ? 'Playable' : 'Planned',
+        locked: !boardEchoStatusModel(state).available,
+        playable: boardEchoStatusModel(state).available,
+        active: boardEchoStatusModel(state).active,
+        completed: boardEchoStatusModel(state).completed,
         priority: 50,
-        hookSource: 'board_echo'
+        hookSource: 'board_echo',
+        readOnly: false,
+        entryAvailable: boardEchoStatusModel(state).available && !boardEchoStatusModel(state).active,
+        startAvailable: boardEchoStatusModel(state).available && !boardEchoStatusModel(state).active,
+        enterAvailable: boardEchoStatusModel(state).available && !boardEchoStatusModel(state).active,
+        completionAvailable: boardEchoStatusModel(state).active,
+        completeAvailable: boardEchoStatusModel(state).active,
+        claimAvailable: false,
+        rewardAvailable: false,
+        resultAvailable: !!boardEchoStatusModel(state).lastResult,
+        mutatesSave: true
       }
     ];
     const byKey = new Map(sourceHooks.map(hook => [hook.key, hook]));
@@ -2062,29 +2123,33 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const lane = revisitLaneStatusClarity(safeState).find(entry => entry && entry.key === 'board_echo_route') || null;
     const route = revisitRoutePreviews(safeState).find(entry => entry && entry.key === 'board_echo_route') || null;
-    const reasonText = 'Board Echo has a preview surface and activation contract only. It remains planned/locked until a future patch adds start, active, completion, and history behavior with smoke coverage.';
+    const status = boardEchoStatusModel(state);
+    const playable = status.available === true;
+    const reasonText = playable
+      ? 'Board Echo is playable now from its existing board history route.'
+      : 'Board Echo has a preview surface and activation contract only. It remains planned/locked until a future patch adds start, active, completion, and history behavior with smoke coverage.';
     return {
       key: 'boardEcho',
       routeKey: 'board_echo_route',
       title: 'Board Echo',
       contractVersion: 1,
       contractType: 'read-only activation contract',
-      enabled: false,
-      playable: false,
-      canStart: false,
-      safeToShowStartAction: false,
+      enabled: playable,
+      playable,
+      canStart: playable,
+      safeToShowStartAction: playable,
       status: lane?.shortLabel === 'Planned' ? 'planned' : 'locked',
       bucket: 'unfinished',
-      previewOnly: true,
+      previewOnly: !playable,
       readOnly: true,
-      mutatesSave: false,
+      mutatesSave: playable,
       actionAvailable: false,
-      activeStateAvailable: false,
-      completedStateAvailable: false,
-      historyStateAvailable: false,
+      activeStateAvailable: playable,
+      completedStateAvailable: playable,
+      historyStateAvailable: playable,
       reasonText,
       lockReasonText: String(lane?.detailText || route?.reason || 'Future board history may strengthen this echo later.').trim(),
-      nextStepText: 'Next patch must prove Board Echo start dry-run behavior before any Start Board Echo action can be shown.',
+      nextStepText: playable ? 'Start Board Echo is available from the Town Revisit card.' : 'Next patch must prove Board Echo start dry-run behavior before any Start Board Echo action can be shown.',
       prerequisites: [
         'Define eligible Elite Board history source records.',
         'Define duplicate-safe Board Echo memory identity.',
@@ -2115,15 +2180,25 @@
         'Completion must write a completed key and last result.',
         'Completion must not grant rewards or mutate unrelated systems.'
       ],
-      requiredSmokeChecks: [
-        'Board Echo contract helper exists and is read-only.',
-        'Board Echo remains unfinished and not playable before activation.',
-        'No Start Board Echo text or data-start-revisit action appears before activation.',
-        'No active/completed/history Board Echo state is created by preview reads.',
-        'Trophy Echo, Famous Gear Memory, and Rival Trace remain playable/stable.',
-        'Debt Pressure remains preview/locked.',
-        'Debt Collector and Talent behavior remain stable.'
-      ],
+      requiredSmokeChecks: playable
+        ? [
+          'Board Echo contract helper exists and becomes playable only from its existing route preview/status.',
+          'Start Board Echo creates active state from the dry-run helper shape.',
+          'Completion writes Board Echo history and last result.',
+          'Preview and completion states persist across save/reload.',
+          'Trophy Echo and Rival Trace remain playable/stable.',
+          'Debt Pressure remains preview/locked.',
+          'Debt Collector and Talent behavior remain stable.'
+        ]
+        : [
+          'Board Echo contract helper exists and is read-only.',
+          'Board Echo remains unfinished and not playable before activation.',
+          'No Start Board Echo text or data-start-revisit action appears before activation.',
+          'No active/completed/history Board Echo state is created by preview reads.',
+          'Trophy Echo, Famous Gear Memory, and Rival Trace remain playable/stable.',
+          'Debt Pressure remains preview/locked.',
+          'Debt Collector and Talent behavior remain stable.'
+        ],
       currentRouteStatus: String(route?.status || '').trim(),
       currentLaneBucket: String(lane?.bucket || 'planned').trim(),
       currentLaneLabel: String(lane?.shortLabel || 'Planned').trim()
@@ -2150,10 +2225,10 @@
       dryRunVersion: 1,
       dryRunOnly: true,
       readOnly: true,
-      enabled: false,
-      playable: false,
-      canStart: false,
-      wouldStart: false,
+      enabled: contract.playable === true,
+      playable: contract.playable === true,
+      canStart: contract.canStart === true,
+      wouldStart: contract.playable === true,
       wouldMutateState: false,
       mutatesSave: false,
       safeToCommitStart: false,
@@ -2188,7 +2263,9 @@
         }
       },
       missingPrerequisites,
-      nextStepText: 'Future patch should add a hidden Board Echo start fixture and prove duplicate-safe active/history behavior before activation.'
+      nextStepText: contract.playable === true
+        ? 'Board Echo can start from town using the existing dry-run helper shape.'
+        : 'Future patch should add a hidden Board Echo start fixture and prove duplicate-safe active/history behavior before activation.'
     };
   }
 
@@ -2399,7 +2476,7 @@
     const routes = revisitRoutePreviews(state);
     const route = routes.find(r => String(r?.key || '') === safeKey);
     if (!route) return false;
-    if (safeKey !== 'trophy_echo_route' && safeKey !== 'famous_gear_route' && safeKey !== 'rival_trace_route') return false;
+    if (safeKey !== 'trophy_echo_route' && safeKey !== 'famous_gear_route' && safeKey !== 'rival_trace_route' && safeKey !== 'board_echo_route') return false;
     return route.startAvailable === true;
   }
 
@@ -2411,7 +2488,8 @@
     if (safeKey === 'trophy_echo_route' && revisitState.trophyEcho?.active && typeof revisitState.trophyEcho.active === 'object') return null;
     if (safeKey === 'famous_gear_route' && revisitState.famousGear?.active && typeof revisitState.famousGear.active === 'object') return null;
     if (safeKey === 'rival_trace_route' && revisitState.rivalTrace?.active && typeof revisitState.rivalTrace.active === 'object') return null;
-    const status = safeKey === 'famous_gear_route' ? famousGearStatusModel(state) : safeKey === 'rival_trace_route' ? rivalTraceStatusModel(state) : trophyEchoStatusModel(state);
+    if (safeKey === 'board_echo_route' && revisitState.boardEcho?.active && typeof revisitState.boardEcho.active === 'object') return null;
+    const status = safeKey === 'famous_gear_route' ? famousGearStatusModel(state) : safeKey === 'rival_trace_route' ? rivalTraceStatusModel(state) : safeKey === 'board_echo_route' ? boardEchoStatusModel(state) : trophyEchoStatusModel(state);
     const source = status.source;
     if (!source) return null;
     const currentFloor = safeKey === 'famous_gear_route'
@@ -2423,7 +2501,9 @@
       ? createFamousGearReflection(source)
       : safeKey === 'rival_trace_route'
         ? createRivalTraceReflection(source)
-        : createTrophyEchoReflection(source);
+        : safeKey === 'board_echo_route'
+          ? createBoardEchoReflection(source)
+          : createTrophyEchoReflection(source);
     const startedAt = Date.now();
     revisitState.unlocked = true;
     revisitState.locked = false;
@@ -2487,6 +2567,30 @@
         cappedReward: true,
         rivalId: revisitState.rivalTrace.active.rivalId,
         eliteName: revisitState.rivalTrace.active.eliteName
+      };
+    }
+    if (safeKey === 'board_echo_route') {
+      revisitState.boardEcho.active = {
+        routeKey: safeKey,
+        sourceRecordId: String(source.id || source.recordId || source.contractId || '').trim(),
+        memoryTitle: reflection.memoryTitle,
+        sourceLabel: cleanDisplayText(reflection.sourceLabel || source.source || 'Elite Board', 'Elite Board'),
+        reflection: reflection.reflection,
+        summaryLine: reflection.summaryLine,
+        startedAt
+      };
+      revisitState.boardEcho.lastResult = null;
+      pushLog(state, `Board Echo started: ${revisitState.boardEcho.active.memoryTitle}.`);
+      return {
+        routeKey: safeKey,
+        routeTitle: 'Board Echo Route',
+        startedAt,
+        sourceFloor: currentFloor,
+        sideRoute: true,
+        locked: false,
+        cappedReward: true,
+        sourceRecordId: revisitState.boardEcho.active.sourceRecordId,
+        memoryTitle: revisitState.boardEcho.active.memoryTitle
       };
     }
     revisitState.trophyEcho.active = {
@@ -2702,6 +2806,46 @@
     return result;
   }
 
+  function completeBoardEchoRoute(state = S) {
+    if (!state?.player) return null;
+    const revisitState = ensureRevisitStateShape(state);
+    const active = revisitState.boardEcho?.active && typeof revisitState.boardEcho.active === 'object'
+      ? revisitState.boardEcho.active
+      : null;
+    if (!active || String(revisitState.activeRouteKey || '').trim() !== 'board_echo_route') return null;
+    const completionKey = String(active.completionKey || active.sourceRecordId || '').trim() || `board_echo:${String(active.sourceRecordId || 'unknown').trim()}`;
+    const firstCompletion = revisitState.boardEcho.completedKeys[completionKey] !== true;
+    revisitState.boardEcho.completedKeys[completionKey] = true;
+    const completedAt = Date.now();
+    const summary = firstCompletion
+      ? `Board Echo settles into archive memory. ${active.memoryTitle || 'Board Echo'} recorded.`
+      : `Board Echo settles again, but this mark was already recorded.`;
+    const result = {
+      completionKey,
+      routeKey: 'board_echo_route',
+      sourceRecordId: String(active.sourceRecordId || '').trim(),
+      memoryTitle: cleanDisplayText(active.memoryTitle || 'Board Echo', 'Board Echo'),
+      sourceLabel: cleanDisplayText(active.sourceLabel || 'Elite Board', 'Elite Board'),
+      reflection: cleanDisplayText(active.reflection || '', ''),
+      summary,
+      startedAt: Math.max(0, Math.floor(numberOr(active.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt
+    };
+    revisitState.boardEcho.history.unshift(result);
+    revisitState.boardEcho.history = revisitState.boardEcho.history.slice(0, 20);
+    revisitState.boardEcho.lastResult = result;
+    revisitState.boardEcho.active = null;
+    revisitState.activeRouteKey = '';
+    revisitState.startedAt = 0;
+    revisitState.sourceFloor = 0;
+    revisitState.sideRoute = false;
+    revisitState.unlocked = true;
+    revisitState.locked = false;
+    revisitState.lastViewedAt = new Date(completedAt).toLocaleString();
+    pushLog(state, summary);
+    return result;
+  }
+
   function trophyEchoResultSummary(state = S) {
     const revisitState = ensureRevisitStateShape(state);
     return revisitState.trophyEcho?.lastResult || null;
@@ -2710,6 +2854,11 @@
   function famousGearResultSummary(state = S) {
     const revisitState = ensureRevisitStateShape(state);
     return revisitState.famousGear?.lastResult || null;
+  }
+
+  function boardEchoResultSummary(state = S) {
+    const revisitState = ensureRevisitStateShape(state);
+    return revisitState.boardEcho?.lastResult || null;
   }
 
   function ensureEliteContractState(state) {
@@ -3367,6 +3516,9 @@
       calculateBoardEchoStartDryRun(state = S) {
         return calculateBoardEchoStartDryRun(state);
       },
+      boardEchoStatus(state = S) {
+        return boardEchoStatusModel(state);
+      },
       createBoardEchoStartFixture(state = S, options = {}) {
         return createBoardEchoStartFixture(state, options);
       },
@@ -3454,11 +3606,17 @@
       completeRivalTrace(state = S) {
         return completeRivalTraceRoute(state);
       },
+      completeBoardEcho(state = S) {
+        return completeBoardEchoRoute(state);
+      },
       trophyEchoResultSummary(state = S) {
         return trophyEchoResultSummary(state);
       },
       famousGearResultSummary(state = S) {
         return famousGearResultSummary(state);
+      },
+      boardEchoResultSummary(state = S) {
+        return boardEchoResultSummary(state);
       },
       activeTrophyEcho(state = S) {
         return activeRevisitRouteSummary(state);
