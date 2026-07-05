@@ -22,21 +22,28 @@
     $$('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === S.screen));
   }
 
-  function render() {
+  function renderStep(label, fn) {
     try {
-      syncScreenState();
-      renderStatBoxes();
-      renderTown();
-      renderRun();
-      renderGear();
-      renderDex();
-      renderArchive();
-      renderStickyBar();
-      syncScreenState();
+      if (typeof fn === 'function') fn();
+      return true;
     } catch (err) {
-      console.warn('DungeonDex render error (partial):', err);
+      console.warn(`DungeonDex ${label} render error:`, err);
+      return false;
     }
-    updateSaveStatus(save(S));
+  }
+
+  function render() {
+    renderStep('screen sync', syncScreenState);
+    renderStep('stats', renderStatBoxes);
+    if (S?.run?.active) renderStep('run', renderRun);
+    renderStep('town', renderTown);
+    if (!S?.run?.active) renderStep('run', renderRun);
+    renderStep('gear', renderGear);
+    renderStep('dex', renderDex);
+    renderStep('archive', renderArchive);
+    renderStep('sticky bar', renderStickyBar);
+    renderStep('screen sync final', syncScreenState);
+    try { updateSaveStatus(save(S)); } catch (err) { console.warn('DungeonDex save status error:', err); }
     try { bindDynamic(); } catch(err) { console.warn('DungeonDex bindDynamic error:', err); }
   }
 
@@ -196,8 +203,9 @@
     if (el('introModalEnterDungeonBtn')) {
       el('introModalEnterDungeonBtn').onclick = () => runGuardedAction(() => {
         hideIntroModal();
-        startRun(S);
-        render();
+        const started = startRun(S);
+        if (started || S.run?.active) switchScreen('run');
+        else render();
       });
     }
     if (el('introModalContinueRunBtn')) {
@@ -210,7 +218,8 @@
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
       hideIntroModal();
       startCharterRun(S, btn.dataset.charterStart);
-      render();
+      if (S.run?.active) switchScreen('run');
+      else render();
     }));
   }
 
@@ -258,8 +267,8 @@
     if (el('rarityFilter')) el('rarityFilter').onchange = (e) => { S.filters.rarity = e.target.value; render(); };
     if (el('sortFilter')) el('sortFilter').onchange = (e) => { S.filters.sort = e.target.value; render(); };
     if (el('searchFilter')) el('searchFilter').oninput = (e) => { S.filters.search = e.target.value; refreshInventoryOnly(); };
-    $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startCharterRun(S, btn.dataset.charterStart); render(); }));
-    if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { startRun(S); render(); });
+    $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startCharterRun(S, btn.dataset.charterStart); if (S.run?.active) switchScreen('run'); else render(); }));
+    if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { const started = startRun(S); if (started || S.run?.active) switchScreen('run'); else render(); });
     if (el('clearCacheReloadBtn')) el('clearCacheReloadBtn').onclick = clearCacheAndReload;
   }
 
@@ -355,8 +364,9 @@
         else render();
         return;
       }
-      startRun(S);
-      render();
+      const started = startRun(S);
+      if (started || S.run?.active) switchScreen('run');
+      else render();
     });
     const restBtn = el('restBtn');
     if (restBtn) restBtn.onclick = () => runGuardedAction(() => { restPlayer(S); render(); });
