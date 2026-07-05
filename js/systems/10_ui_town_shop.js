@@ -18,14 +18,15 @@
     const rivalLastResult = rivalStatus?.lastResult || null;
     const rivalTraceState = S?.player?.revisitState?.rivalTrace || null;
     const rivalRecords = Array.isArray(S?.player?.eliteContracts?.rivals) ? S.player.eliteContracts.rivals : [];
-    const laneClarity = typeof api.revisitLaneStatusClarity === 'function' ? api.revisitLaneStatusClarity(S) : [];
-    const unfinishedLanes = Array.isArray(laneClarity) ? laneClarity.filter(lane => lane && lane.bucket !== 'finished') : [];
+    const unfinishedLanes = typeof api.revisitUnfinishedLaneTownRows === 'function'
+      ? api.revisitUnfinishedLaneTownRows(S)
+      : [];
     const unfinishedLaneRows = unfinishedLanes.length
       ? unfinishedLanes.map(lane => `
           <article class="journal-row revisit-unfinished-row revisit-unfinished-${escapeHtml(String(lane.key || '').replace(/[^a-z0-9_-]/gi, ''))}">
             <strong>${escapeHtml(cleanDisplayText(lane.title || 'Unlisted Route', 'Unlisted Route'))}</strong>
-            <p>${escapeHtml(cleanDisplayText(`${lane.shortLabel || 'Locked'}: ${lane.detailText || 'This lane is not playable yet.'}`, 'This lane is not playable yet.'))}</p>
-            <p class="small muted">${escapeHtml(cleanDisplayText(`${lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.'}`, 'Future patch should keep this lane read-only until its contract is ready.'))}</p>
+            <p>${escapeHtml(cleanDisplayText(lane.bodyText || 'This unfinished lane is not playable yet. No player action is available yet.', 'This unfinished lane is not playable yet. No player action is available yet.'))}</p>
+            <p class="small muted">${escapeHtml(cleanDisplayText(lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.', 'Future patch should keep this lane read-only until its contract is ready.'))}</p>
           </article>
         `).join('')
       : `<p class="small muted">No unfinished Revisit lanes recorded.</p>`;

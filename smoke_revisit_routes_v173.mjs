@@ -95,6 +95,7 @@ async function main(){
         summary: api.revisitRouteActivationSummary ? api.revisitRouteActivationSummary(S) : null,
         mirror: api.revisitRoutePreviewStateSummary ? api.revisitRoutePreviewStateSummary(S) : null,
         laneClarity: api.revisitLaneStatusClarity ? api.revisitLaneStatusClarity(S) : null,
+        unfinishedTownRows: api.revisitUnfinishedLaneTownRows ? api.revisitUnfinishedLaneTownRows(S) : null,
         checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
         firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
         secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
@@ -108,9 +109,15 @@ async function main(){
         famousStartBlocked: api.startFamousGear ? api.startFamousGear(S) : null,
         routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
         routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
+        unfinishedControls: Array.from(document.querySelectorAll('.revisit-unfinished-lanes-card button, .revisit-unfinished-lanes-card [data-start-revisit], .revisit-unfinished-lanes-card [data-complete-trophy-echo], .revisit-unfinished-lanes-card [data-complete-famous-gear], .revisit-unfinished-lanes-card [data-complete-rival-trace]')).length,
+        unfinishedGridText: document.querySelector('.revisit-unfinished-grid')?.innerText || '',
         journalModel: typeof window.DDJournalV1SummaryModel === 'function' ? window.DDJournalV1SummaryModel(S) : null,
         townButtons: Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
         text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        unfinishedLaneState: {
+          boardEcho: S.player?.revisitState?.boardEcho || null,
+          debtPressure: S.player?.revisitState?.debtPressure || null
+        },
         debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
         talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
       };
@@ -122,12 +129,18 @@ async function main(){
     record('Baseline activation audit preserves primary dungeon path', baselineAudit.plan?.primaryPath === 'Enter Dungeon / Continue Run' && baselineAudit.summary?.hasLiveEntry === false && baselineAudit.report?.apiSurfaceSafe === true && baselineAudit.report?.trophyEchoPlayable === false && baselineAudit.report?.famousGearPlayable === false, JSON.stringify({ plan:baselineAudit.plan, summary:baselineAudit.summary, report:baselineAudit.report }));
     record('Revisit activation summary distinguishes finished and unfinished lanes', baselineAudit.summary?.currentLockedCount >= 0 && baselineAudit.summary?.currentPlayableCount >= 0 && baselineAudit.summary?.currentPreviewOnly === false && baselineAudit.summary?.allowedStates?.includes('planned') && baselineAudit.summary?.allowedStates?.includes('playable-now') && baselineAudit.summary?.allowedStates?.includes('active'), JSON.stringify(baselineAudit.summary));
     record('Unfinished lane clarity helper reports Board Echo and Debt Pressure as read-only', Array.isArray(baselineAudit.laneClarity) && baselineAudit.laneClarity.some(lane => lane.key === 'board_echo_route' && lane.bucket === 'planned' && lane.isPlanned === true && lane.isLocked === true && lane.isPlayable === false && lane.shortLabel === 'Planned') && baselineAudit.laneClarity.some(lane => lane.key === 'debt_pressure_route' && lane.bucket === 'locked' && lane.isLocked === true && lane.isPlayable === false && lane.shortLabel === 'Locked') && baselineAudit.laneClarity.every(lane => ['playable','finished','preview','planned','locked','unknown'].includes(lane.bucket)), JSON.stringify(baselineAudit.laneClarity));
+    record('Unfinished town row helper exposes only Board Echo and Debt Pressure as inert rows', Array.isArray(baselineAudit.unfinishedTownRows) && baselineAudit.unfinishedTownRows.length === 2 && baselineAudit.unfinishedTownRows[0]?.key === 'board_echo_route' && baselineAudit.unfinishedTownRows[1]?.key === 'debt_pressure_route' && baselineAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.isLocked === true && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false && /not playable yet/i.test(row?.bodyText || '') && /No player action is available yet/i.test(row?.bodyText || '') && /Planned|Locked/i.test(row?.statusLabel || '')), JSON.stringify(baselineAudit.unfinishedTownRows));
     record('Guild Journal shows Board Echo and Debt Pressure preview copy with no start actions', !!baselineAudit.journalModel && Array.isArray(baselineAudit.journalModel.sections) && (() => {
       const section = baselineAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
       const text = `${section?.body || ''} ${section?.meta || ''}`;
       return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && /not playable yet/i.test(text) && /future ledger pressure/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(baselineAudit.journalModel?.debtPreviewText || ''));
     })());
     record('Town Revisit surface shows unfinished lanes separately from live lanes', /Unfinished Lanes/i.test(baselineAudit.text) && /Board Echo/i.test(baselineAudit.text) && /Debt Pressure/i.test(baselineAudit.text) && /not playable yet/i.test(baselineAudit.text) && /Trophy Echo/i.test(baselineAudit.text) && /Famous Gear Memory/i.test(baselineAudit.text) && /Rival Trace/i.test(baselineAudit.text) && !/Start Board Echo/i.test(baselineAudit.text) && !/Start Debt Pressure/i.test(baselineAudit.text), baselineAudit.text.slice(0, 700));
+    record('Town unfinished card has no controls and excludes finished lane rows', baselineAudit.unfinishedControls === 0 && /Board Echo/i.test(baselineAudit.unfinishedGridText) && /Debt Pressure/i.test(baselineAudit.unfinishedGridText) && /not playable yet/i.test(baselineAudit.unfinishedGridText) && /No player action is available yet/i.test(baselineAudit.unfinishedGridText) && !/Trophy Echo/i.test(baselineAudit.unfinishedGridText) && !/Famous Gear Memory/i.test(baselineAudit.unfinishedGridText) && !/Rival Trace/i.test(baselineAudit.unfinishedGridText) && !/Start Board Echo/i.test(baselineAudit.unfinishedGridText) && !/Start Debt Pressure/i.test(baselineAudit.unfinishedGridText), JSON.stringify({ unfinishedControls:baselineAudit.unfinishedControls, unfinishedGridText:baselineAudit.unfinishedGridText }));
+    record('Board Echo and Debt Pressure do not create active, completed, or history state', (() => {
+      const emptyLane = lane => !lane || (!lane.active && !lane.completed && (!Array.isArray(lane.history) || lane.history.length === 0) && (!lane.completedKeys || Object.keys(lane.completedKeys).length === 0));
+      return emptyLane(baselineAudit.unfinishedLaneState?.boardEcho) && emptyLane(baselineAudit.unfinishedLaneState?.debtPressure);
+    })(), JSON.stringify(baselineAudit.unfinishedLaneState));
     record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
 
     await evalScript(client, `window.DungeonDexScenarioDevTools.clearBossTrophies(); window.DungeonDexScenarioDevTools.clearRetiredRelics(); window.DungeonDexScenarioDevTools.clearGearMemoryForTest(); return true;`);
@@ -148,14 +161,21 @@ async function main(){
         firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
         secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
         thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
+        unfinishedTownRows: api.revisitUnfinishedLaneTownRows ? api.revisitUnfinishedLaneTownRows(S) : null,
         trophyRoute,
         famousGearRoute,
         rivalTraceRoute,
         routes,
         routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
         routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
+        unfinishedControls: Array.from(document.querySelectorAll('.revisit-unfinished-lanes-card button, .revisit-unfinished-lanes-card [data-start-revisit], .revisit-unfinished-lanes-card [data-complete-trophy-echo], .revisit-unfinished-lanes-card [data-complete-famous-gear], .revisit-unfinished-lanes-card [data-complete-rival-trace]')).length,
+        unfinishedGridText: document.querySelector('.revisit-unfinished-grid')?.innerText || '',
         journalModel: typeof window.DDJournalV1SummaryModel === 'function' ? window.DDJournalV1SummaryModel(S) : null,
         text: document.getElementById('revisitFoundationSlot')?.innerText || '',
+        unfinishedLaneState: {
+          boardEcho: S.player?.revisitState?.boardEcho || null,
+          debtPressure: S.player?.revisitState?.debtPressure || null
+        },
         debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
         talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
       };
@@ -169,6 +189,11 @@ async function main(){
       return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(availableAudit.journalModel?.debtPreviewText || ''));
     })());
     record('Town Revisit surface keeps unfinished lanes separate after activation checks', /Unfinished Lanes/i.test(availableAudit.text) && /Board Echo/i.test(availableAudit.text) && /Debt Pressure/i.test(availableAudit.text) && /not playable yet/i.test(availableAudit.text) && /Trophy Echo/i.test(availableAudit.text) && /Famous Gear Memory/i.test(availableAudit.text) && /Rival Trace/i.test(availableAudit.text) && !/Start Board Echo/i.test(availableAudit.text) && !/Start Debt Pressure/i.test(availableAudit.text), availableAudit.text.slice(0, 700));
+    record('Unfinished town rows stay inert after Trophy Echo availability changes', Array.isArray(availableAudit.unfinishedTownRows) && availableAudit.unfinishedTownRows.length === 2 && availableAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false) && availableAudit.unfinishedControls === 0 && /Board Echo/i.test(availableAudit.unfinishedGridText) && /Debt Pressure/i.test(availableAudit.unfinishedGridText) && !/Trophy Echo/i.test(availableAudit.unfinishedGridText) && !/Start Board Echo/i.test(availableAudit.unfinishedGridText) && !/Start Debt Pressure/i.test(availableAudit.unfinishedGridText), JSON.stringify({ rows:availableAudit.unfinishedTownRows, controls:availableAudit.unfinishedControls, grid:availableAudit.unfinishedGridText }));
+    record('Board Echo and Debt Pressure still have no active, completed, or history state after activation checks', (() => {
+      const emptyLane = lane => !lane || (!lane.active && !lane.completed && (!Array.isArray(lane.history) || lane.history.length === 0) && (!lane.completedKeys || Object.keys(lane.completedKeys).length === 0));
+      return emptyLane(availableAudit.unfinishedLaneState?.boardEcho) && emptyLane(availableAudit.unfinishedLaneState?.debtPressure);
+    })(), JSON.stringify(availableAudit.unfinishedLaneState));
     record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false && availableAudit.thirdLane?.locked === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, thirdLane:availableAudit.thirdLane, report:availableAudit.report }));
 
     const startedAudit = await evalByValue(client, `(() => {

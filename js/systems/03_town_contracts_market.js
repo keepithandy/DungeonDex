@@ -2026,6 +2026,38 @@
     });
   }
 
+  function revisitUnfinishedLaneTownRows(state = S) {
+    const laneOrder = ['board_echo_route', 'debt_pressure_route'];
+    const laneClarity = revisitLaneStatusClarity(revisitReadOnlyStateSnapshot(state));
+    const byKey = new Map(laneClarity.map(lane => [String(lane?.key || '').trim(), lane]).filter(entry => entry[0]));
+    return laneOrder.map(key => {
+      const lane = byKey.get(key) || {};
+      const title = key === 'board_echo_route' ? 'Board Echo' : 'Debt Pressure';
+      const statusLabel = key === 'board_echo_route' ? 'Planned / Locked' : 'Locked / Planned';
+      const detail = String(lane.detailText || (key === 'board_echo_route'
+        ? 'Future board history may strengthen this echo later.'
+        : 'Future ledger pressure may mark this district later.')).trim();
+      const next = String(lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.').trim();
+      return {
+        key,
+        title: String(lane.title || title).replace(/\s+Route$/i, '').trim() || title,
+        statusLabel,
+        bucket: String(lane.bucket || (key === 'board_echo_route' ? 'planned' : 'locked')).trim(),
+        isUnfinished: true,
+        isPlayable: false,
+        isLocked: true,
+        isPlanned: key === 'board_echo_route' || lane.isPlanned === true,
+        actionAvailable: false,
+        startAvailable: false,
+        activeStateAvailable: false,
+        completedStateAvailable: false,
+        historyStateAvailable: false,
+        bodyText: `${statusLabel}: unfinished Revisit lane. This lane is not playable yet. No player action is available yet. ${detail}`,
+        nextStepText: `${next} Board Echo and Debt Pressure remain separate from finished lanes.`
+      };
+    });
+  }
+
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
@@ -3168,6 +3200,9 @@
       },
       revisitLaneStatusClarity(state = S) {
         return revisitLaneStatusClarity(state);
+      },
+      revisitUnfinishedLaneTownRows(state = S) {
+        return revisitUnfinishedLaneTownRows(state);
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);
