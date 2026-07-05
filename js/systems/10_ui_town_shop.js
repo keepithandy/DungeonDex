@@ -18,6 +18,17 @@
     const rivalLastResult = rivalStatus?.lastResult || null;
     const rivalTraceState = S?.player?.revisitState?.rivalTrace || null;
     const rivalRecords = Array.isArray(S?.player?.eliteContracts?.rivals) ? S.player.eliteContracts.rivals : [];
+    const laneClarity = typeof api.revisitLaneStatusClarity === 'function' ? api.revisitLaneStatusClarity(S) : [];
+    const unfinishedLanes = Array.isArray(laneClarity) ? laneClarity.filter(lane => lane && lane.bucket !== 'finished') : [];
+    const unfinishedLaneRows = unfinishedLanes.length
+      ? unfinishedLanes.map(lane => `
+          <article class="journal-row revisit-unfinished-row revisit-unfinished-${escapeHtml(String(lane.key || '').replace(/[^a-z0-9_-]/gi, ''))}">
+            <strong>${escapeHtml(cleanDisplayText(lane.title || 'Unlisted Route', 'Unlisted Route'))}</strong>
+            <p>${escapeHtml(cleanDisplayText(`${lane.shortLabel || 'Locked'}: ${lane.detailText || 'This lane is not playable yet.'}`, 'This lane is not playable yet.'))}</p>
+            <p class="small muted">${escapeHtml(cleanDisplayText(`${lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.'}`, 'Future patch should keep this lane read-only until its contract is ready.'))}</p>
+          </article>
+        `).join('')
+      : `<p class="small muted">No unfinished Revisit lanes recorded.</p>`;
     const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
     const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
     const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
@@ -161,6 +172,17 @@
             ${rivalStatus?.active ? `<button class="primary" type="button" data-complete-rival-trace="1">Resolve Trace</button>` : rivalPlayable ? `<button class="primary" type="button" data-start-revisit="rival_trace_route">Start Rival Trace</button>` : `<button class="ghost" type="button" disabled aria-disabled="true">Trace Locked</button>`}
           </div>
           ${rivalResultMarkup}
+        </article>
+        <article class="quest-card revisit-lane-card revisit-unfinished-lanes-card ${unfinishedLanes.length ? 'locked' : 'muted'}">
+          <div class="quest-topline">
+            <strong>Unfinished Lanes</strong>
+            <span class="small muted">Read-only preview</span>
+          </div>
+          <p class="small">Board Echo and Debt Pressure are future Revisit lanes. They are planned or locked, not playable yet, and do not change debt mechanics.</p>
+          <p class="small muted">Finished lanes stay separate: Trophy Echo, Famous Gear Memory, and Rival Trace remain the only live Revisit lanes.</p>
+          <div class="journal-grid revisit-unfinished-grid">
+            ${unfinishedLaneRows}
+          </div>
         </article>
       </section>`;
   }

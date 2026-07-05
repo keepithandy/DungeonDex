@@ -127,6 +127,7 @@ async function main(){
       const text = `${section?.body || ''} ${section?.meta || ''}`;
       return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && /not playable yet/i.test(text) && /future ledger pressure/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(baselineAudit.journalModel?.debtPreviewText || ''));
     })());
+    record('Town Revisit surface shows unfinished lanes separately from live lanes', /Unfinished Lanes/i.test(baselineAudit.text) && /Board Echo/i.test(baselineAudit.text) && /Debt Pressure/i.test(baselineAudit.text) && /not playable yet/i.test(baselineAudit.text) && /Trophy Echo/i.test(baselineAudit.text) && /Famous Gear Memory/i.test(baselineAudit.text) && /Rival Trace/i.test(baselineAudit.text) && !/Start Board Echo/i.test(baselineAudit.text) && !/Start Debt Pressure/i.test(baselineAudit.text), baselineAudit.text.slice(0, 700));
     record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
 
     await evalScript(client, `window.DungeonDexScenarioDevTools.clearBossTrophies(); window.DungeonDexScenarioDevTools.clearRetiredRelics(); window.DungeonDexScenarioDevTools.clearGearMemoryForTest(); return true;`);
@@ -167,6 +168,7 @@ async function main(){
       const text = `${section?.body || ''} ${section?.meta || ''}`;
       return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(availableAudit.journalModel?.debtPreviewText || ''));
     })());
+    record('Town Revisit surface keeps unfinished lanes separate after activation checks', /Unfinished Lanes/i.test(availableAudit.text) && /Board Echo/i.test(availableAudit.text) && /Debt Pressure/i.test(availableAudit.text) && /not playable yet/i.test(availableAudit.text) && /Trophy Echo/i.test(availableAudit.text) && /Famous Gear Memory/i.test(availableAudit.text) && /Rival Trace/i.test(availableAudit.text) && !/Start Board Echo/i.test(availableAudit.text) && !/Start Debt Pressure/i.test(availableAudit.text), availableAudit.text.slice(0, 700));
     record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false && availableAudit.thirdLane?.locked === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, thirdLane:availableAudit.thirdLane, report:availableAudit.report }));
 
     const startedAudit = await evalByValue(client, `(() => {
