@@ -1936,13 +1936,19 @@
 
   function revisitRouteSummary(state = S) {
     const routes = revisitRoutePreviews(state);
+    const finishedRoutes = routes.filter(route => route.completed === true || route.active === true || route.playable === true);
+    const unfinishedRoutes = routes.filter(route => route.completed !== true && route.active !== true && route.playable !== true);
     return {
       total: routes.length,
+      finished: finishedRoutes.length,
+      unfinished: unfinishedRoutes.length,
       planned: routes.filter(route => route.status === 'Planned').length,
       active: routes.filter(route => route.active === true).length,
       playable: routes.filter(route => route.playable === true).length,
       future: routes.filter(route => route.status === 'Future Route').length,
-      locked: routes.filter(route => route.locked).length
+      locked: routes.filter(route => route.locked).length,
+      finishedRoutes,
+      unfinishedRoutes
     };
   }
 
