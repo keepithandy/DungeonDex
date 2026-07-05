@@ -260,10 +260,10 @@
     const board = unfinished.find(lane => lane.key === 'board_echo_route') || null;
     const debt = unfinished.find(lane => lane.key === 'debt_pressure_route') || null;
     const boardText = board
-      ? `${board.title || 'Board Echo'} ${board.shortLabel || 'Locked'}. ${board.detailText || 'This lane is not playable yet.'} ${board.nextStepText || 'Future patch should keep it read-only for now.'}`
+      ? `${board.title || 'Board Echo'} ${board.shortLabel || 'Locked'}. This lane is not playable yet. ${board.detailText || 'Read-only lane copy only.'} ${board.nextStepText || 'Future patch should keep it read-only for now.'}`
       : 'Board Echo is not recorded yet.';
     const debtText = debt
-      ? `${debt.title || 'Debt Pressure'} ${debt.shortLabel || 'Locked'}. ${debt.detailText || 'This lane is not playable yet.'}`
+      ? `${debt.title || 'Debt Pressure'} ${debt.shortLabel || 'Locked'}. This lane is not playable yet. ${debt.detailText || 'Read-only lane copy only.'} ${debt.nextStepText || 'Future patch should keep it read-only for now.'}`
       : 'Debt Pressure is not recorded yet.';
     const statusText = unfinished.length
       ? [boardText, debtText].filter(Boolean).join(' • ')
@@ -315,7 +315,7 @@
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
         { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
-        { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: laneClarity.board?.status === 'locked' || laneClarity.board?.status === 'Planned' || laneClarity.board?.bucket === 'planned' ? laneClarity.boardText : laneClarity.debtText },
+        { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: [laneClarity.boardText, laneClarity.debtText].filter(Boolean).join(' • ') || laneClarity.boardText || laneClarity.debtText },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
         { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }
       ]
