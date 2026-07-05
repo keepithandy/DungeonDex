@@ -27,6 +27,58 @@
       box-shadow: 0 0 14px rgba(255,162,70,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
+    /* Town header mobile lock: controls stay before district content. */
+    #screen-town > .stack-8 > .section-header.panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      grid-template-areas:
+        "district actions"
+        "charter charter";
+      align-items: start;
+    }
+
+    #screen-town > .stack-8 > .section-header.panel > div:first-child {
+      grid-area: district;
+      min-width: 0;
+    }
+
+    #screen-town > .stack-8 > .section-header.panel > .inline-actions {
+      grid-area: actions;
+      justify-self: end;
+      align-self: start;
+      flex-wrap: nowrap;
+      width: auto;
+    }
+
+    #screen-town > .stack-8 > .section-header.panel > .district-charter-slot {
+      grid-area: charter;
+      min-width: 0;
+    }
+
+    @media (max-width: 700px) {
+      #screen-town > .stack-8 > .section-header.panel {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "actions"
+          "district"
+          "charter";
+      }
+
+      #screen-town > .stack-8 > .section-header.panel > .inline-actions {
+        justify-self: stretch;
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      #screen-town > .stack-8 > .section-header.panel > .inline-actions > button {
+        flex: 1 1 132px;
+      }
+
+      #screen-town > .stack-8 > .section-header.panel > .inline-actions > #restCostPill {
+        flex: 0 1 92px;
+      }
+    }
+
     /* v1.6.21 uncommon rarity hotfix: restore the pre-theme green uncommon read. */
     .rarity-uncommon {
       color: #a8f0b3;
