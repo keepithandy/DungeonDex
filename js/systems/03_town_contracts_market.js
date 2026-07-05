@@ -2058,6 +2058,78 @@
     });
   }
 
+  function boardEchoActivationContract(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const lane = revisitLaneStatusClarity(safeState).find(entry => entry && entry.key === 'board_echo_route') || null;
+    const route = revisitRoutePreviews(safeState).find(entry => entry && entry.key === 'board_echo_route') || null;
+    const reasonText = 'Board Echo has a preview surface and activation contract only. It remains planned/locked until a future patch adds start, active, completion, and history behavior with smoke coverage.';
+    return {
+      key: 'boardEcho',
+      routeKey: 'board_echo_route',
+      title: 'Board Echo',
+      contractVersion: 1,
+      contractType: 'read-only activation contract',
+      enabled: false,
+      playable: false,
+      canStart: false,
+      safeToShowStartAction: false,
+      status: lane?.shortLabel === 'Planned' ? 'planned' : 'locked',
+      bucket: 'unfinished',
+      previewOnly: true,
+      readOnly: true,
+      mutatesSave: false,
+      actionAvailable: false,
+      activeStateAvailable: false,
+      completedStateAvailable: false,
+      historyStateAvailable: false,
+      reasonText,
+      lockReasonText: String(lane?.detailText || route?.reason || 'Future board history may strengthen this echo later.').trim(),
+      nextStepText: 'Next patch must prove Board Echo start dry-run behavior before any Start Board Echo action can be shown.',
+      prerequisites: [
+        'Define eligible Elite Board history source records.',
+        'Define duplicate-safe Board Echo memory identity.',
+        'Define active Board Echo town state without combat, rewards, or board mission changes.',
+        'Define completion result copy and history persistence.',
+        'Add smoke proving no Debt Pressure, Debt Collector, Talent, combat, economy, or live Revisit lane drift.'
+      ],
+      requiredStateFields: [
+        'player.revisitState.boardEcho.active',
+        'player.revisitState.boardEcho.history',
+        'player.revisitState.boardEcho.completedKeys',
+        'player.revisitState.boardEcho.lastResult'
+      ],
+      requiredStartBehavior: [
+        'Start Board Echo may appear only after this contract reports safeToShowStartAction true.',
+        'Start must create one active Board Echo memory from eligible board history.',
+        'Start must block duplicate active memories.',
+        'Start must not create rewards, combat, debt, Talent, or economy effects.'
+      ],
+      requiredActiveBehavior: [
+        'Active state must remain town-only.',
+        'Active state must persist through reload.',
+        'Active state must not alter finished Revisit lanes.'
+      ],
+      requiredCompletionBehavior: [
+        'Completion must clear active state.',
+        'Completion must write one duplicate-safe history entry.',
+        'Completion must write a completed key and last result.',
+        'Completion must not grant rewards or mutate unrelated systems.'
+      ],
+      requiredSmokeChecks: [
+        'Board Echo contract helper exists and is read-only.',
+        'Board Echo remains unfinished and not playable before activation.',
+        'No Start Board Echo text or data-start-revisit action appears before activation.',
+        'No active/completed/history Board Echo state is created by preview reads.',
+        'Trophy Echo, Famous Gear Memory, and Rival Trace remain playable/stable.',
+        'Debt Pressure remains preview/locked.',
+        'Debt Collector and Talent behavior remain stable.'
+      ],
+      currentRouteStatus: String(route?.status || '').trim(),
+      currentLaneBucket: String(lane?.bucket || 'planned').trim(),
+      currentLaneLabel: String(lane?.shortLabel || 'Planned').trim()
+    };
+  }
+
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
@@ -3203,6 +3275,9 @@
       },
       revisitUnfinishedLaneTownRows(state = S) {
         return revisitUnfinishedLaneTownRows(state);
+      },
+      boardEchoActivationContract(state = S) {
+        return boardEchoActivationContract(state);
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);
