@@ -275,6 +275,7 @@
       debt,
       boardText,
       debtText,
+      debtPreviewText: debt ? `${debt.title || 'Debt Pressure'} preview is read-only and not playable yet.` : '',
       statusText,
       lanes
     };
@@ -309,6 +310,7 @@
         ? 'The town keeps record of your scars, debts, trophies, and names best forgotten.'
         : 'The ledger is quiet. Make something worth remembering.',
       memoryTotal,
+      debtPreviewText: laneClarity.debtPreviewText,
       sections: [
         { key: 'account', title: 'Account Memory', body: memoryTotal > 0 ? `Total remembered records: ${memoryTotal}.` : 'No records yet.', meta: revisit.last || debt.line },
         { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },

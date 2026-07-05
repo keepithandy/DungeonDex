@@ -125,7 +125,7 @@ async function main(){
     record('Guild Journal shows Board Echo and Debt Pressure preview copy with no start actions', !!baselineAudit.journalModel && Array.isArray(baselineAudit.journalModel.sections) && (() => {
       const section = baselineAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
       const text = `${section?.body || ''} ${section?.meta || ''}`;
-      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && /not playable yet/i.test(text) && /future ledger pressure/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text);
+      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && /not playable yet/i.test(text) && /future ledger pressure/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(baselineAudit.journalModel?.debtPreviewText || ''));
     })());
     record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
 
@@ -165,7 +165,7 @@ async function main(){
     record('Board Echo and Debt Pressure remain non-playable in the journal surface after route activation checks', !!availableAudit.journalModel && Array.isArray(availableAudit.journalModel.sections) && (() => {
       const section = availableAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
       const text = `${section?.body || ''} ${section?.meta || ''}`;
-      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text);
+      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(availableAudit.journalModel?.debtPreviewText || ''));
     })());
     record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false && availableAudit.thirdLane?.locked === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, thirdLane:availableAudit.thirdLane, report:availableAudit.report }));
 
