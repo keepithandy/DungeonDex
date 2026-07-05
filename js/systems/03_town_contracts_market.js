@@ -1952,6 +1952,80 @@
     };
   }
 
+  function revisitLaneStatusClarity(state = S) {
+    const safeState = revisitReadOnlyStateSnapshot(state);
+    const routes = revisitRoutePreviews(safeState);
+    const previewEntries = revisitUnlockPreview(safeState);
+    const routeContent = revisitRouteContentDefinitions();
+    const routeByKey = new Map(routes.map(route => [String(route?.key || '').trim(), route]).filter(entry => entry[0]));
+    const previewByKey = new Map(previewEntries.map(entry => [String(entry?.key || '').trim(), entry]).filter(entry => entry[0]));
+    const knownKeys = ['trophy_echo_route', 'famous_gear_route', 'rival_trace_route', 'debt_pressure_route', 'board_echo_route'];
+    return knownKeys.map(key => {
+      const route = routeByKey.get(key) || null;
+      const preview = previewByKey.get(key) || null;
+      const source = route || preview || null;
+      const content = isPlainObject(routeContent) ? routeContent[key] : null;
+      const status = String(route?.status || preview?.previewState || 'unknown').trim();
+      const plannedFromContent = key === 'board_echo_route' || (content && String(content.status || '').trim() === 'Planned');
+      const bucket = key === 'board_echo_route'
+        ? 'planned'
+        : route
+          ? (route.completed === true ? 'finished' : route.playable === true || route.active === true ? 'playable' : route.status === 'Planned' || plannedFromContent ? 'planned' : route.locked === true ? 'locked' : 'unknown')
+          : preview
+            ? (preview.previewState === 'playable-now' ? 'playable' : preview.previewState === 'planned' ? 'planned' : preview.previewState === 'preview' ? 'preview' : preview.previewState === 'locked' ? (plannedFromContent ? 'planned' : 'locked') : 'unknown')
+            : plannedFromContent
+              ? 'planned'
+              : 'unknown';
+      const isPlayable = route ? route.playable === true || route.active === true : preview ? preview.previewState === 'playable-now' : false;
+      const isFinished = route ? route.completed === true : false;
+      const isPreview = route ? route.status === 'Planned' || route.status === 'Future Route' : preview ? preview.previewState === 'preview' : false;
+      const isPlanned = key === 'board_echo_route'
+        ? true
+        : route
+          ? route.status === 'Planned' || plannedFromContent
+          : preview
+            ? preview.previewState === 'planned'
+            : plannedFromContent;
+      const isLocked = key === 'board_echo_route'
+        ? true
+        : route
+          ? (route.status === 'Planned' ? false : route.locked === true)
+          : preview
+            ? preview.previewState === 'locked' && !plannedFromContent
+            : !isPlanned;
+      const shortLabel = isFinished ? 'Completed' : isPlayable ? 'Playable' : isPlanned ? 'Planned' : isPreview ? 'Preview' : isLocked ? 'Locked' : 'Unknown';
+      const detailText = route
+        ? String(route.reason || route.summary || route.previewText || route.detail || 'Route status is read-only.').trim()
+        : preview
+          ? String(preview.previewReason || preview.previewSafety || preview.previewLabel || 'Route status is read-only.').trim()
+          : 'Route status is not yet defined.';
+      const nextStepText = isPlayable
+        ? 'This lane can already be used from town.'
+        : isFinished
+          ? 'Preserve the finished lane and keep future lanes read-only.'
+          : key === 'debt_pressure_route'
+            ? 'Future patch should add read-only copy before any activation.'
+            : key === 'board_echo_route'
+              ? 'Future patch should add preview copy or smoke coverage before activation.'
+              : 'Future patch should keep this lane read-only until its contract is ready.';
+      return {
+        key,
+        title: String(route?.title || content?.title || preview?.previewLabel || preview?.title || (key === 'board_echo_route' ? 'Board Echo Route' : key === 'debt_pressure_route' ? 'Debt Pressure Route' : 'Unlisted Route')).trim(),
+        status,
+        bucket,
+        isPlayable,
+        isFinished,
+        isPreview,
+        isPlanned,
+        isLocked,
+        shortLabel,
+        detailText,
+        nextStepText,
+        sourceLabel: String(source?.hookSource || source?.source || content?.hookSource || 'unknown').trim()
+      };
+    });
+  }
+
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
@@ -3091,6 +3165,9 @@
       },
       revisitRouteSummary(state = S) {
         return revisitRouteSummary(state);
+      },
+      revisitLaneStatusClarity(state = S) {
+        return revisitLaneStatusClarity(state);
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);

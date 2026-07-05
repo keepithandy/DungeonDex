@@ -253,6 +253,24 @@
       legacyIdsDetected: summary.legacyIdsDetected === true
     };
   }
+  function revisitLaneClarityModel(state){
+    const api = window.DungeonDexEliteContracts || null;
+    const lanes = typeof api?.revisitLaneStatusClarity === 'function' ? api.revisitLaneStatusClarity(state) : [];
+    const unfinished = lanes.filter(lane => lane && lane.bucket !== 'finished');
+    const board = unfinished.find(lane => lane.key === 'board_echo_route') || null;
+    const debt = unfinished.find(lane => lane.key === 'debt_pressure_route') || null;
+    const statusText = unfinished.length
+      ? unfinished.map(lane => `${lane.title || lane.key}: ${lane.shortLabel}`).join(' • ')
+      : 'No unfinished lanes recorded.';
+    return {
+      count: lanes.length,
+      unfinishedCount: unfinished.length,
+      board,
+      debt,
+      statusText,
+      lanes
+    };
+  }
   function talentModel(state){
     const api = window.DungeonDexTalents || window.DungeonDexWardenTalents || null;
     const summary = typeof api?.summary === 'function' ? api.summary(state) : null;
@@ -273,6 +291,7 @@
     const revisit = revisitModel(safeState);
     const famous = famousModel(safeState);
     const rival = rivalModel(safeState);
+    const laneClarity = revisitLaneClarityModel(safeState);
     const debt = debtStatus(safeState);
     const talent = talentModel(safeState);
     const memoryTotal = boss.count + revisit.total + famous.count + rival.count + (debt.balance > 0 ? 1 : 0) + talent.learnedCount;
@@ -288,6 +307,7 @@
         { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
         { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
         { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
+        { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: laneClarity.board?.nextStepText || laneClarity.debt?.nextStepText || 'Future lanes remain read-only.' },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
         { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }
       ]
