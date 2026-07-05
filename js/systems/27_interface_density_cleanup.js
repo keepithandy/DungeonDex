@@ -120,10 +120,6 @@
       #talentPanel .talent-path-effect,#talentPanel .talent-path-summary,#talentPanel .talent-path-note{font-size:10.5px!important;line-height:1.22!important}
       #talentPanel .talent-preview-tags{margin-top:5px!important}
 
-      /* Gear tab: only hide the non-playable Talent panel. Do not touch Gear panels. */
-      #screen-gear #talentPanel[hidden],
-      #screen-gear #talentPanel[data-dd-playable="0"]{display:none!important}
-
       /* Gear and archive scanability */
       #screen-gear .inventory-upgrade-card{border-color:rgba(122,232,178,.20)!important;background:linear-gradient(180deg,rgba(122,232,178,.040),rgba(255,255,255,.014))!important}
       #screen-gear .inventory-upgrade-card .gear-status-badge.better{border-color:rgba(122,232,178,.28)!important;background:rgba(122,232,178,.08)!important;color:#baf6d8!important}
@@ -241,34 +237,12 @@
     if (claim && claim.textContent.trim() === 'Claim Spark Writ') claim.textContent = 'Claim Writ';
   }
 
-  function hasPlayableTalentAction(panel){
-    if (!panel || typeof window === 'undefined') return false;
-    const api = window.DungeonDexTalents || window.DungeonDexWardenTalents;
-    const model = typeof api?.hunterBoardClaritySpendUiReadinessModel === 'function'
-      ? api.hunterBoardClaritySpendUiReadinessModel(window.S)
-      : null;
-    return model?.enabled === true
-      && model?.clickHandlerEnabled === true
-      && model?.renderButtonNow === true
-      && !!panel.querySelector('[data-talent-spend-hunter-board]:not([disabled])');
-  }
-
-  function hideNonPlayableGearTalentPanel(){
-    const talent = document.getElementById('talentPanel');
-    if (!talent) return;
-    const playableTalent = hasPlayableTalentAction(talent);
-    talent.dataset.ddPlayable = playableTalent ? '1' : '0';
-    talent.hidden = !playableTalent;
-    talent.style.display = playableTalent ? '' : 'none';
-  }
-
   function run(){
     injectCss();
     syncBuild();
     syncBuildHealth();
     polishCopy();
     improveSparkWritButtons();
-    hideNonPlayableGearTalentPanel();
   }
 
   function wrap(name){
