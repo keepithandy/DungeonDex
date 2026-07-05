@@ -90,9 +90,13 @@ async function main(){
       const forbiddenPresent = forbidden.filter(name => Object.prototype.hasOwnProperty.call(api, name));
       const boardEchoDryRunBefore = JSON.stringify(S.player?.revisitState || null);
       const boardEchoDryRun = api.calculateBoardEchoStartDryRun ? api.calculateBoardEchoStartDryRun(S) : null;
+      const boardEchoFixtureBefore = JSON.stringify(S.player?.revisitState || null);
+      const boardEchoFixture = api.createBoardEchoStartFixture ? api.createBoardEchoStartFixture(S) : null;
+      const boardEchoFixtureAfter = JSON.stringify(S.player?.revisitState || null);
       const boardEchoDryRunAfter = JSON.stringify(S.player?.revisitState || null);
       return {
         forbiddenPresent,
+        publicBoardEchoExports: ['startBoardEcho', 'completeBoardEcho'].filter(name => Object.prototype.hasOwnProperty.call(api, name)),
         report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
         plan: api.revisitRouteActivationPlan ? api.revisitRouteActivationPlan(S) : null,
         summary: api.revisitRouteActivationSummary ? api.revisitRouteActivationSummary(S) : null,
@@ -103,6 +107,11 @@ async function main(){
         boardEchoDryRun,
         boardEchoDryRunMutationSafe: boardEchoDryRunBefore === boardEchoDryRunAfter,
         boardEchoDryRunStateAfter: S.player?.revisitState?.boardEcho || null,
+        boardEchoFixture,
+        boardEchoFixtureBefore,
+        boardEchoFixtureAfter,
+        boardEchoFixtureMutationSafe: boardEchoFixtureBefore === boardEchoFixtureAfter,
+        boardEchoFixtureInputStateAfter: S.player?.revisitState?.boardEcho || null,
         checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
         firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
         secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
@@ -115,6 +124,7 @@ async function main(){
         rivalTraceStatus: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
         famousStartBlocked: api.startFamousGear ? api.startFamousGear(S) : null,
         routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
+        boardEchoStartHooks: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit="board_echo_route"], #revisitFoundationSlot [data-start-revisit]')).map(node => node.getAttribute('data-start-revisit')),
         routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
         unfinishedControls: Array.from(document.querySelectorAll('.revisit-unfinished-lanes-card button, .revisit-unfinished-lanes-card [data-start-revisit], .revisit-unfinished-lanes-card [data-complete-trophy-echo], .revisit-unfinished-lanes-card [data-complete-famous-gear], .revisit-unfinished-lanes-card [data-complete-rival-trace]')).length,
         unfinishedGridText: document.querySelector('.revisit-unfinished-grid')?.innerText || '',
@@ -141,6 +151,10 @@ async function main(){
     record('Board Echo activation contract defines future prerequisites and state shape', Array.isArray(baselineAudit.boardEchoContract?.prerequisites) && baselineAudit.boardEchoContract.prerequisites.length >= 3 && Array.isArray(baselineAudit.boardEchoContract?.requiredStateFields) && ['player.revisitState.boardEcho.active','player.revisitState.boardEcho.history','player.revisitState.boardEcho.completedKeys','player.revisitState.boardEcho.lastResult'].every(field => baselineAudit.boardEchoContract.requiredStateFields.includes(field)) && Array.isArray(baselineAudit.boardEchoContract?.requiredStartBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredActiveBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredCompletionBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredSmokeChecks) && baselineAudit.boardEchoContract.requiredSmokeChecks.some(text => /No Start Board Echo/i.test(text)) && /Start Board Echo/i.test(baselineAudit.boardEchoContract.nextStepText || ''), JSON.stringify(baselineAudit.boardEchoContract));
     record('Board Echo start dry run exists and agrees with activation contract', baselineAudit.boardEchoDryRun?.key === 'boardEcho' && baselineAudit.boardEchoDryRun?.routeKey === 'board_echo_route' && baselineAudit.boardEchoDryRun?.dryRunVersion === 1 && baselineAudit.boardEchoDryRun?.enabled === false && baselineAudit.boardEchoDryRun?.playable === false && baselineAudit.boardEchoDryRun?.canStart === false && baselineAudit.boardEchoDryRun?.wouldStart === false && baselineAudit.boardEchoDryRun?.wouldMutateState === false && baselineAudit.boardEchoDryRun?.safeToCommitStart === false && baselineAudit.boardEchoDryRun?.activationContractSummary?.canStart === baselineAudit.boardEchoContract?.canStart && baselineAudit.boardEchoDryRun?.activationContractSummary?.safeToShowStartAction === baselineAudit.boardEchoContract?.safeToShowStartAction, JSON.stringify({ dryRun:baselineAudit.boardEchoDryRun, contract:baselineAudit.boardEchoContract }));
     record('Board Echo start dry run describes future state shape without creating it', Array.isArray(baselineAudit.boardEchoDryRun?.requiredStateFields) && ['player.revisitState.boardEcho.active','player.revisitState.boardEcho.history','player.revisitState.boardEcho.completedKeys','player.revisitState.boardEcho.lastResult'].every(field => baselineAudit.boardEchoDryRun.requiredStateFields.includes(field)) && baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.active?.routeKey === 'board_echo_route' && Array.isArray(baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.history) && baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.completedKeys && baselineAudit.boardEchoDryRunMutationSafe === true && baselineAudit.boardEchoDryRunStateAfter === null, JSON.stringify({ dryRun:baselineAudit.boardEchoDryRun, mutationSafe:baselineAudit.boardEchoDryRunMutationSafe, stateAfter:baselineAudit.boardEchoDryRunStateAfter }));
+    record('Board Echo fixture helper exists and clones fixture state', baselineAudit.boardEchoFixture && baselineAudit.boardEchoFixture !== baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.active?.routeKey === 'board_echo_route' && Array.isArray(baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.history) && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.history.length === 0 && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.completedKeys && Object.keys(baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.completedKeys).length === 0 && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.lastResult === null, JSON.stringify(baselineAudit.boardEchoFixture));
+    record('Board Echo fixture helper leaves original state untouched', baselineAudit.boardEchoFixtureMutationSafe === true && baselineAudit.boardEchoFixtureInputStateAfter === null && baselineAudit.boardEchoFixtureBefore === baselineAudit.boardEchoFixtureAfter, JSON.stringify({ before:baselineAudit.boardEchoFixtureBefore, after:baselineAudit.boardEchoFixtureAfter, stateAfter:baselineAudit.boardEchoFixtureInputStateAfter }));
+    record('Board Echo fixture helper is distinct from dry run helper', baselineAudit.boardEchoFixture && baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture !== baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.active?.routeKey === baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.active?.routeKey, JSON.stringify({ fixture:baselineAudit.boardEchoFixture, dryRun:baselineAudit.boardEchoDryRun }));
+    record('No public Board Echo start path exists', baselineAudit.publicBoardEchoExports.length === 0 && baselineAudit.boardEchoStartHooks.length === 0 && !baselineAudit.routeButtons.some(text => /Start Board Echo/i.test(text)) && !/Start Board Echo/i.test(baselineAudit.text), JSON.stringify({ exports:baselineAudit.publicBoardEchoExports, hooks:baselineAudit.boardEchoStartHooks, buttons:baselineAudit.routeButtons, text:baselineAudit.text.slice(0, 500) }));
     record('Guild Journal shows Board Echo and Debt Pressure preview copy with no start actions', !!baselineAudit.journalModel && Array.isArray(baselineAudit.journalModel.sections) && (() => {
       const section = baselineAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
       const text = `${section?.body || ''} ${section?.meta || ''}`;

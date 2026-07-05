@@ -2192,6 +2192,29 @@
     };
   }
 
+  function createBoardEchoStartFixture(state = S, options = {}) {
+    const dryRun = calculateBoardEchoStartDryRun(state);
+    const clonedState = typeof structuredClone === 'function'
+      ? structuredClone(state)
+      : JSON.parse(JSON.stringify(state || {}));
+    if (!clonedState.player) clonedState.player = {};
+    const revisitState = isPlainObject(clonedState.player.revisitState) ? clonedState.player.revisitState : {};
+    const fixture = {
+      active: {
+        routeKey: dryRun.routeKey || 'board_echo_route',
+        sourceRecordId: String(options.sourceRecordId || 'future_elite_board_record_id').trim() || 'future_elite_board_record_id',
+        memoryTitle: dryRun.title || 'Board Echo',
+        startedAt: String(options.startedAt || 'future_timestamp')
+      },
+      history: [],
+      completedKeys: {},
+      lastResult: null
+    };
+    revisitState.boardEcho = fixture;
+    clonedState.player.revisitState = revisitState;
+    return clonedState;
+  }
+
   function revisitRouteActivationPlan(state = S) {
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
@@ -3343,6 +3366,9 @@
       },
       calculateBoardEchoStartDryRun(state = S) {
         return calculateBoardEchoStartDryRun(state);
+      },
+      createBoardEchoStartFixture(state = S, options = {}) {
+        return createBoardEchoStartFixture(state, options);
       },
       revisitRouteActivationPlan(state = S) {
         return revisitRouteActivationPlan(state);
