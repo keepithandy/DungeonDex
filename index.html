@@ -90,6 +90,12 @@
       display: none !important;
     }
 
+    /* Temporary town board cleanup: hide empty planning boards. */
+    #questPanel .elite-contract-empty,
+    #questPanel .elite-contract-board:has(.elite-contract-empty) {
+      display: none !important;
+    }
+
     /* v1.6.21 uncommon rarity hotfix: restore the pre-theme green uncommon read. */
     .rarity-uncommon {
       color: #a8f0b3;
