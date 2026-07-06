@@ -4,6 +4,52 @@
 
 Current baseline: **DungeonDex v1.23.7**
 
+## Player Promise
+
+DungeonDex is about surviving the Hollow Stair and letting the Guild Journal remember what mattered: trophies, retired gear, rivals, debt pressure, Talent choices, and safe echoes of past progress.
+
+The project favors:
+
+- readable mobile-first play;
+- clear HP-driven encounters;
+- records and memories that build from real save history;
+- small focused systems over broad rewrites;
+- safe smoke-backed patches before bigger content expansion.
+
+DungeonDex is not trying to become an action game, a hidden-stat spreadsheet, a broad live-service framework, or a reward-farming exploit loop.
+
+## What DungeonDex Is
+
+DungeonDex is built around a simple loop:
+
+1. Prepare in town.
+2. Enter the Hollow Stair.
+3. Fight readable HP-driven encounters.
+4. Loot gear.
+5. Retire notable gear into the archive.
+6. Revisit safe memory lanes from town.
+7. Keep pushing deeper.
+
+## Current Playable / Live Systems
+
+- **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
+- **Guild Journal:** Read-only memory board for existing records and progression memory.
+- **Trophy Echo:** Live Revisit lane tied to boss trophy or boss record history.
+- **Famous Gear Memory:** Live Revisit lane tied to retired gear archive history.
+- **Rival Trace:** Live Revisit lane tied to named rival elite history.
+- **Talent foundation:** Controlled earning/spending path with Hunter Board Clarity as the safe copy-only Talent behavior.
+- **Debt Collector foundation:** Borrowing, repayment, pressure, and collection status foundation with conservative guardrails.
+
+## Planned / Locked Systems
+
+These systems may appear in docs or locked/planned copy, but they should not be treated as fully playable until their focused issues land:
+
+- **Board Echo v1:** Next safe Revisit memory-lane candidate.
+- **Debt Pressure v1:** Debt readability and recovery lane.
+- **Public copy smoke coverage:** Stable smoke checks for important player-facing labels.
+- **Revisit flavor pass:** Copy polish for live lanes without changing mechanics.
+- **Asset hygiene:** Source/license inventory for icons, fonts, screenshots, and other public-facing assets.
+
 ## Revisit Status
 
 Trophy Echo is the first live Revisit lane. It stays small and deterministic: if the player has boss trophy history, town can surface a short memory-reflection loop tied to that boss record.
@@ -15,6 +61,22 @@ Rival Trace is the third live Revisit lane. It uses named rival elite history to
 The Revisit prototype starts and resolves entirely from town. It records completion history, preserves it across reloads, and keeps the main dungeon path separate from memory lanes.
 
 Debt Pressure and Board Echo remain locked/planned.
+
+## Open Issue Roadmap
+
+The current open issue set is split into four safe lanes:
+
+1. **Playable/system completion** — Board Echo v1 and Debt Pressure v1.
+2. **Identity layer** — premise, glossary, lore, factions, player-facing copy, README, and title/loading direction.
+3. **Visual/public readiness** — visual rules, title/logo direction, screenshot plan, and asset inventory.
+4. **Smoke hardening** — stable public-label coverage once copy targets settle.
+
+See:
+
+- `docs/OPEN_ISSUE_SWEEP.md`
+- `docs/PLAYABLE_SYSTEMS_QUEUE.md`
+- `docs/IP_LAYER_GUIDE.md`
+- `docs/ASSET_INVENTORY.md`
 
 ## Current Build
 
@@ -39,6 +101,12 @@ node smoke_rival_trace_memory_v1.mjs
 ```
 
 Those smokes cover Rival Trace readable summary output, duplicate collapse, legacy key detection, JSON reload stability, Journal integration, and neutrality around adjacent systems.
+
+For the current open-issue sweep, documentation-only validation should also include:
+
+```bash
+git diff --check
+```
 
 ## Previous Build
 
@@ -121,15 +189,3 @@ This patch fully de-exports dormant Revisit start/active-summary surfaces from t
 This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup.
 
 Latest confirmed commit is the repository HEAD for the current baseline.
-
-## What DungeonDex Is
-
-DungeonDex is built around a simple loop:
-
-1. Prepare in town.
-2. Enter the Hollow Stair.
-3. Fight readable HP-driven encounters.
-4. Loot gear.
-5. Retire notable gear into the archive.
-6. Revisit safe memory lanes from town.
-7. Keep pushing deeper.
