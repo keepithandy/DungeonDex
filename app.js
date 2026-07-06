@@ -59,6 +59,7 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
     window.setTimeout(function(){ loadModule('./js/systems/30_passive_activation_gate_hotfix.js?build=' + qs, 'DDPassiveActivationGateHotfix', 'Passive activation gate hotfix'); }, 360);
     window.setTimeout(function(){ loadModule('./js/systems/31_revisit_activation_surface_lockdown.js?build=' + qs, 'DDRevisitActivationSurfaceLockdown', 'Revisit activation surface lockdown'); }, 420);
+    window.setTimeout(function(){ loadModule('./js/systems/41_debt_pressure_v1.js?build=' + qs, 'DDDebtPressureV1', 'Debt Pressure v1'); }, 580);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
   else loadExtensions();
