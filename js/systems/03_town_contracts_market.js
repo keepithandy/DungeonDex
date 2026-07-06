@@ -167,7 +167,9 @@
     let target = current + rand(3, 8);
     const bossInterval = Math.max(1, Math.floor(numberOr(BOSS_INTERVAL, 5, 1, 999)));
     target = Math.min(target, current + 12);
-    while (target % bossInterval === 0) target += 1;
+    if (bossInterval > 1) {
+      while (target % bossInterval === 0) target += 1;
+    }
     return Math.max(current + 1, target);
   }
 
@@ -320,7 +322,7 @@
 
   function activeEliteContractRisk(state) {
     const active = state?.player?.eliteContracts?.active;
-    if (active && active.eliteName) return { ...ELITE_CONTRACT_RISK_DEFAULTS };
+    if (!active || !active.eliteName) return { ...ELITE_CONTRACT_RISK_DEFAULTS };
     const contract = activeEliteContractDef(state);
     return contract ? eliteContractRisk(contract) : { ...ELITE_CONTRACT_RISK_DEFAULTS };
   }
@@ -3452,6 +3454,12 @@
     sink.junkSaleBonusCharges = Math.max(0, Math.floor(numberOr(sink.junkSaleBonusCharges, 0, 0, 3)) - 1);
   }
 
+  function validateEliteContractsEnv() {
+    const required = ['coins','numberOr','asArray','isPlainObject','clamp','rand','format','stripHtml','pushLog','pushCombat','addPlayerGold','BOSS_INTERVAL','DEPTH_CHAPTERS_PER_THREAT_STEP','DISTRICT_DATA'];
+    const missing = required.filter(name => typeof globalThis[name] === 'undefined');
+    return missing;
+  }
+
   if (typeof window !== 'undefined') {
     window.DungeonDexEliteContracts = {
       ensure: ensureEliteContractState,
@@ -3465,6 +3473,7 @@
       awardTrophy: awardEliteTrophy,
       trophyBonus: getEliteTrophyPayoutBonus,
       trophySummary: eliteTrophySummary,
+      validateEnv: validateEliteContractsEnv,
       activeSummaryText(state = S) {
         const active = activeEliteContractHunt(state);
         if (!active) return '';
