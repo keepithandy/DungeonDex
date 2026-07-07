@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.7 Rival Trace Result Detail Polish`
-* Current local package baseline: `v1.23.7 Rival Trace Result Detail Polish`
-* Current development target: `v1.23.7 Rival Trace Result Detail Polish`
+* Public/live itch version: `v1.23.8 Board Echo Minimal Playable Activation`
+* Current local package baseline: `v1.23.8 Board Echo Minimal Playable Activation`
+* Current development target: `v1.23.8 Board Echo Minimal Playable Activation`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.

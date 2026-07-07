@@ -23,6 +23,29 @@ function earlierDungeonRevisitMarkup() {
 		[];
 	const unfinishedLaneRows = unfinishedLanes.length ?
 		unfinishedLanes.map(lane => `
+  // Read-only revisit helper surface remains in backend systems only.
+  function earlierDungeonRevisitMarkup() {
+    const api = window.DungeonDexEliteContracts || {};
+    const trophyStatus = typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
+    const famousStatus = typeof api.famousGearStatus === 'function' ? api.famousGearStatus(S) : null;
+    if (!trophyStatus || !famousStatus) return '';
+    const trophyActive = trophyStatus.activeEcho || null;
+    const trophyLastResult = trophyStatus.lastResult || null;
+    const famousActive = famousStatus.activeMemory || null;
+    const famousLastResult = famousStatus.lastResult || null;
+    const rivalStatus = typeof api.rivalTraceStatus === 'function' ? api.rivalTraceStatus(S) : null;
+    const boardStatus = typeof api.boardEchoStatus === 'function' ? api.boardEchoStatus(S) : null;
+    const revisitRoutes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
+    const rivalTraceRoute = Array.isArray(revisitRoutes) ? revisitRoutes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
+    const rivalActive = rivalStatus?.activeTrace || null;
+    const rivalLastResult = rivalStatus?.lastResult || null;
+    const rivalTraceState = S?.player?.revisitState?.rivalTrace || null;
+    const rivalRecords = Array.isArray(S?.player?.eliteContracts?.rivals) ? S.player.eliteContracts.rivals : [];
+    const unfinishedLanes = typeof api.revisitUnfinishedLaneTownRows === 'function'
+      ? api.revisitUnfinishedLaneTownRows(S)
+      : [];
+    const unfinishedLaneRows = unfinishedLanes.length
+      ? unfinishedLanes.map(lane => `
           <article class="journal-row revisit-unfinished-row revisit-unfinished-${escapeHtml(String(lane.key || '').replace(/[^a-z0-9_-]/gi, ''))}">
             <strong>${escapeHtml(cleanDisplayText(lane.title || 'Unlisted Route', 'Unlisted Route'))}</strong>
             <p>${escapeHtml(cleanDisplayText(lane.bodyText || 'This unfinished lane is not playable yet. No player action is available yet.', 'This unfinished lane is not playable yet. No player action is available yet.'))}</p>
@@ -116,6 +139,95 @@ function earlierDungeonRevisitMarkup() {
 		'Next: choose a playable Revisit lane from town; rewards stay Revisit-only.' :
 		'Next: defeat a boss or retire gear to open a Revisit lane.';
 	return `
+        `).join('')
+      : `<p class="small muted">No unfinished Revisit lanes recorded.</p>`;
+    const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
+    const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
+    const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
+    const famousMemoryTitle = cleanDisplayText(famousStatus.source?.memoryTitle || famousActive?.memoryTitle || `${itemName} Memory`, `${itemName} Memory`);
+    const rivalName = cleanDisplayText(rivalStatus?.source?.eliteName || rivalActive?.eliteName || 'Rival Elite', 'Rival Elite');
+    const rivalTraceTitle = cleanDisplayText(rivalStatus?.source?.memoryTitle || rivalActive?.memoryTitle || `${rivalName} Trace`, `${rivalName} Trace`);
+    const memoryMarks = Math.max(0, Math.floor(numberOr(trophyStatus.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const completedCount = Math.max(0, Math.floor(numberOr(trophyStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const historyCount = Math.max(0, Math.floor(numberOr(trophyStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const famousHistoryCount = Math.max(0, Math.floor(numberOr(famousStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const famousCompletedCount = Math.max(0, Math.floor(numberOr(famousStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const rivalCompletedCount = Math.max(0, Math.floor(numberOr(rivalStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const echoStateLabel = trophyActive ? 'Active' : trophyStatus.locked ? 'Locked' : 'Playable';
+    const famousStateLabel = famousStatus.active ? 'Active' : famousStatus.completed ? 'Recovered' : famousStatus.locked ? 'Locked' : 'Playable';
+    const rivalStateLabel = rivalStatus?.active ? 'Active' : rivalStatus?.completed ? 'Recovered' : rivalStatus?.locked ? 'Locked' : 'Playable';
+    const summaryLine = trophyActive
+      ? cleanDisplayText(trophyActive.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
+      : trophyStatus.locked
+        ? 'Locked until you have at least one boss trophy or boss record.'
+        : `${bossName} is ready as a playable Revisit lane.`;
+    const famousSummaryLine = famousActive
+      ? cleanDisplayText(famousActive.summaryLine || `${itemName} settles into archive memory.`, `${itemName} settles into archive memory.`)
+      : famousStatus.completed
+        ? `${itemName} has already been recovered as archive memory.`
+        : famousStatus.locked
+          ? 'Locked until you have at least one retired gear record.'
+          : 'Retired gear can be revisited as safe archive memory.';
+    const flavor = trophyActive
+      ? cleanDisplayText(trophyActive.reflection || '', '')
+      : trophyStatus.locked
+        ? 'The lane is cold. Bring back proof of a defeated boss and the echo can answer.'
+        : `The ${trophyName} still remembers ${bossName}. Step into the reflection and settle the memory before the next descent.`;
+    const famousFlavor = famousActive
+      ? cleanDisplayText(famousActive.reflection || '', '')
+      : famousStatus.locked
+        ? 'Retired gear records stay archived until you have something to remember.'
+        : 'The archive keeps the record safe. Start the memory from town and read it back without returning the gear.';
+    const actionMarkup = trophyActive
+      ? `<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>`
+      : trophyStatus.locked
+        ? `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`
+        : `<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>`;
+    const famousActionMarkup = famousActive
+      ? `<button class="primary" type="button" data-complete-famous-gear="1">Resolve Memory</button>`
+      : famousStatus.locked
+        ? `<button class="ghost" type="button" disabled aria-disabled="true">Memory Locked</button>`
+        : `<button class="primary" type="button" data-start-revisit="famous_gear_route">Start Famous Gear Memory</button>`;
+    const resultMarkup = trophyLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(trophyLastResult.summary || '', ''))}</div>`
+      : '';
+    const famousResultMarkup = famousLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(famousLastResult.summary || '', ''))}</div>`
+      : '';
+    const rivalResultMarkup = rivalLastResult
+      ? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(rivalLastResult.summary || '', ''))}</div>`
+      : '';
+    const rivalPlayable = rivalTraceRoute?.playable === true
+      || rivalTraceRoute?.entryAvailable === true
+      || rivalTraceRoute?.startAvailable === true
+      || rivalStatus?.available === true
+      || rivalStatus?.active === true
+      || rivalStatus?.completed === true
+      || rivalRecords.some(entry => entry && entry.revengeAvailable !== false && entry.completed !== true)
+      || Array.isArray(rivalTraceState?.history) && rivalTraceState.history.length > 0;
+    const boardPlayable = boardStatus?.available === true || boardStatus?.active === true || boardStatus?.completed === true;
+    const playableLanes = [
+      trophyStatus.available ? 'Trophy Echo' : '',
+      famousStatus.available ? 'Famous Gear Memory' : '',
+      rivalPlayable ? 'Rival Trace' : ''
+    ].filter(Boolean);
+    const revisitStatusText = trophyActive
+      ? `Active: Trophy Echo is running in town. ${famousStatus.available ? 'Famous Gear Memory is also available.' : 'Famous Gear Memory remains locked.'}`
+      : famousActive
+        ? `Active: Famous Gear Memory is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}`
+        : rivalActive
+          ? `Active: Rival Trace is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}`
+        : playableLanes.length
+          ? `Playable: ${playableLanes.join(' and ')}.`
+          : 'Locked: Trophy Echo needs boss history, Famous Gear Memory needs retired gear history, and Rival Trace needs named rival history.';
+    const revisitNextText = trophyActive
+      ? 'Next: resolve the active echo in town before starting another.'
+      : famousActive
+        ? 'Next: resolve the active archive memory in town before starting another.'
+        : playableLanes.length
+          ? 'Next: choose a playable Revisit lane from town; rewards stay Revisit-only.'
+          : 'Next: defeat a boss or retire gear to open a Revisit lane.';
+    return `
       <section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
         <div class="card-head">
           <div>
@@ -174,13 +286,29 @@ function earlierDungeonRevisitMarkup() {
           </div>
           ${rivalResultMarkup}
         </article>
+        <article class="quest-card revisit-lane-card ${boardStatus?.active ? 'active' : boardStatus?.completed ? 'completed' : boardPlayable ? 'ready' : 'locked'}">
+          <div class="quest-topline">
+            <strong>Board Echo</strong>
+            <span class="small ${boardStatus?.active ? '' : 'muted'}">${boardStatus?.active ? 'Active' : boardStatus?.completed ? 'Recovered' : boardPlayable ? 'Playable' : 'Locked'}</span>
+          </div>
+          <p class="small">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.summaryLine || 'Board Echo is active in town.', 'Board Echo is active in town.') : boardStatus?.completed ? 'Board Echo has already been recorded as archive memory.' : boardPlayable ? 'Board history can be revisited as a safe town memory.' : 'Locked until board history exists.')}</p>
+          <p class="small muted">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.reflection || '', '') : boardPlayable ? 'The board trace is safe to read from town; it does not add rewards, combat, debt, or dungeon-entry changes.' : 'The archive keeps the board sealed in memory. No combat, reward, or board mission opens.')}</p>
+          <div class="small muted">Board records ${Math.max(0, Math.floor(numberOr(boardStatus?.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)))} • Completed echoes ${Math.max(0, Math.floor(numberOr(boardStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)))}</div>
+          <div class="small muted">${boardStatus?.active ? 'Active: resolve Board Echo in town.' : boardStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : boardPlayable ? 'Playable: start Board Echo from town.' : 'Locked until board history exists.'}</div>
+          <div class="small muted">Board Echo replays the record only; rewards, combat, and dungeon entry stay unchanged.</div>
+          <div class="small muted">${boardStatus?.active ? 'Next: resolve the active board echo before starting another.' : boardStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : boardPlayable ? 'Next: start Board Echo from town; rewards stay archive-only.' : 'Next: build board history to unlock the lane.'}</div>
+          ${boardStatus?.active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(boardStatus?.activeTrace?.memoryTitle || 'Board Echo', 'Board Echo'))}</div>` : ''}
+          <div class="inline-actions revisit-echo-actions">
+            ${boardStatus?.active ? `<button class="primary" type="button" data-complete-board-echo="1">Resolve Echo</button>` : boardPlayable ? `<button class="primary" type="button" data-start-revisit="board_echo_route">Start Board Echo</button>` : `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`}
+          </div>
+        </article>
         <article class="quest-card revisit-lane-card revisit-unfinished-lanes-card ${unfinishedLanes.length ? 'locked' : 'muted'}">
           <div class="quest-topline">
             <strong>Unfinished Lanes</strong>
             <span class="small muted">Read-only preview</span>
           </div>
-          <p class="small">Board Echo and Debt Pressure are future Revisit lanes. They are planned or locked, not playable yet, and do not change debt mechanics.</p>
-          <p class="small muted">Finished lanes stay separate: Trophy Echo, Famous Gear Memory, and Rival Trace remain the only live Revisit lanes.</p>
+          <p class="small">Board Echo is a compact Revisit lane when its board history route is playable. It stays separate from debt mechanics and rewards.</p>
+          <p class="small muted">Trophy Echo, Famous Gear Memory, Rival Trace, and Board Echo remain distinct memory lanes; Debt Pressure stays locked.</p>
           <div class="journal-grid revisit-unfinished-grid">
             ${unfinishedLaneRows}
           </div>

@@ -526,6 +526,12 @@
         completedKeys: {},
         lastResult: null
       },
+      boardEcho: {
+        active: null,
+        history: [],
+        completedKeys: {},
+        lastResult: null
+      },
       rivalTrace: {
         active: null,
         history: [],
@@ -711,6 +717,45 @@
     };
   }
 
+  function normalizeRevisitBoardEchoActive(value) {
+    return isPlainObject(value) ? {
+      routeKey: String(value.routeKey || 'board_echo_route').trim() || 'board_echo_route',
+      sourceRecordId: String(value.sourceRecordId || value.recordId || value.contractId || '').trim(),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || 'Board Echo', 'Board Echo', 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 180),
+      summaryLine: normalizeRevisitText(value.summaryLine || value.summary || '', '', 180),
+      sourceLabel: normalizeRevisitText(value.sourceLabel || 'Elite Board', 'Elite Board', 60),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    } : null;
+  }
+
+  function normalizeRevisitBoardEchoHistoryEntry(value) {
+    if (!isPlainObject(value)) return null;
+    return {
+      routeKey: String(value.routeKey || 'board_echo_route').trim() || 'board_echo_route',
+      sourceRecordId: String(value.sourceRecordId || value.recordId || '').trim(),
+      memoryTitle: normalizeRevisitText(value.memoryTitle || 'Board Echo', 'Board Echo', 60),
+      reflection: normalizeRevisitText(value.reflection || '', '', 180),
+      summary: normalizeRevisitText(value.summary || value.summaryLine || '', '', 180),
+      sourceLabel: normalizeRevisitText(value.sourceLabel || 'Elite Board', 'Elite Board', 60),
+      completedLabel: normalizeRevisitText(value.completedLabel || value.lastCompletedLabel || '', '', 60),
+      startedAt: Math.max(0, Math.floor(numberOr(value.startedAt, 0, 0, Number.MAX_SAFE_INTEGER))),
+      completedAt: Math.max(0, Math.floor(numberOr(value.completedAt, 0, 0, Number.MAX_SAFE_INTEGER)))
+    };
+  }
+
+  function normalizeRevisitBoardEchoState(value) {
+    const source = isPlainObject(value) ? value : {};
+    const history = asArray(source.history, []).map(normalizeRevisitBoardEchoHistoryEntry).filter(Boolean).slice(0, 20);
+    const completedKeys = normalizeRevisitCompletedKeys(source.completedKeys);
+    return {
+      active: normalizeRevisitBoardEchoActive(source.active),
+      history,
+      completedKeys,
+      lastResult: normalizeRevisitBoardEchoHistoryEntry(source.lastResult)
+    };
+  }
+
   function normalizeRevisitState(value) {
     const base = createRevisitState();
     const source = isPlainObject(value) ? value : {};
@@ -725,6 +770,7 @@
     base.cappedReward = source.cappedReward !== false;
     base.trophyEcho = normalizeRevisitTrophyEchoState(source.trophyEcho);
     base.famousGear = normalizeRevisitFamousGearState(source.famousGear);
+    base.boardEcho = normalizeRevisitBoardEchoState(source.boardEcho);
     base.rivalTrace = normalizeRevisitRivalTraceState(source.rivalTrace);
     return base;
   }

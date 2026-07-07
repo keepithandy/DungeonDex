@@ -7,7 +7,7 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.7 - Rival Trace Result Detail Polish
+- DungeonDex v1.23.8 - Board Echo Minimal Playable Activation
 
 ## v1.23.7 Rival Trace Result Detail Polish
 - Rival Trace now exposes a clearer read-only Guild Journal completed-result detail line.

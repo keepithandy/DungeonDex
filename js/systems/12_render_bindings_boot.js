@@ -233,6 +233,11 @@
       completeFamousGearRoute(S);
       render();
     }));
+    $$('[data-complete-board-echo]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (typeof completeBoardEchoRoute !== 'function') return;
+      completeBoardEchoRoute(S);
+      render();
+    }));
     $$('[data-complete-rival-trace]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
       if (typeof completeRivalTraceRoute !== 'function') return;
       completeRivalTraceRoute(S);

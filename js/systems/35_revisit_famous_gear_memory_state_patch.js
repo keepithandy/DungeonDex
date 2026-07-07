@@ -1,9 +1,9 @@
 'use strict';
 
-// v1.23.3 Famous Gear Memory state-shape hardening.
-// Keeps the live archive lane safe when older saves or test fixtures omit
-// player.revisitState.famousGear. This is intentionally narrow: no rewards,
-// no combat changes, no economy changes.
+// v1.23.8 Famous Gear Memory and Board Echo state-shape hardening.
+// Keeps the live archive lane and the Board Echo lane safe when older saves
+// or test fixtures omit revisit state branches. This is intentionally narrow:
+// no rewards, no combat changes, no economy changes.
 (function(){
   if (window.DDFamousGearMemoryStatePatch) return;
   window.DDFamousGearMemoryStatePatch = true;
@@ -191,9 +191,19 @@
       completedKeys: repairCompletedKeys(source.completedKeys),
       lastResult: normalizeHistoryEntry(source.lastResult)
     };
+    const boardEchoSource = revisitState.boardEcho && typeof revisitState.boardEcho === 'object'
+      ? revisitState.boardEcho
+      : {};
+    const boardEcho = {
+      active: normalizeHistoryEntry(boardEchoSource.active),
+      history: dedupeHistoryEntries(asSafeArray(boardEchoSource.history).map(normalizeHistoryEntry).filter(Boolean)).slice(0, 20),
+      completedKeys: repairCompletedKeys(boardEchoSource.completedKeys),
+      lastResult: normalizeHistoryEntry(boardEchoSource.lastResult)
+    };
     const synthetic = syntheticActiveFromRouteKey(state, revisitState, famousGear);
     if (synthetic) famousGear.active = synthetic;
     revisitState.famousGear = famousGear;
+    revisitState.boardEcho = boardEcho;
     state.player.revisitState = revisitState;
     return revisitState;
   };
