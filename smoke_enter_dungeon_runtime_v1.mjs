@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const CHROME_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
+const VERBOSE = process.env.DUNGEONDEX_SMOKE_VERBOSE === '1' || process.argv.includes('--verbose') || process.argv.includes('-v');
 
 const results = [];
 const consoleIssues = [];
@@ -22,7 +23,20 @@ function sleep(ms) {
 
 function record(name, ok, detail = '') {
   results.push({ name, ok: !!ok, detail });
-  console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`);
+  if (!ok || VERBOSE) console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`);
+}
+
+function printSummary() {
+  const passed = results.filter(result => result.ok).length;
+  const failed = results.length - passed;
+  console.log(`Enter Dungeon runtime smoke: ${passed}/${results.length} passing${failed ? `, ${failed} failing` : ''}`);
+  if (failed) {
+    console.log('Failed assertions:');
+    results.filter(result => !result.ok).forEach(result => {
+      console.log(`- ${result.name}${result.detail ? `: ${result.detail}` : ''}`);
+    });
+  }
+  return failed;
 }
 
 async function pickPort() {
@@ -263,9 +277,10 @@ async function main() {
     record('Run panels render after Enter Dungeon', [after.runStatusText, after.combatPanelText, after.combatLogText].every(text => String(text || '').trim().length > 0), JSON.stringify(after));
     record('No uncaught click-time console/runtime errors', runtimeExceptions.length === 0 && consoleIssues.length === 0 && networkFailures.length === 0, JSON.stringify({ runtimeExceptions, consoleIssues, networkFailures }));
 
-    const failed = results.filter(result => !result.ok);
-    console.log(JSON.stringify({ pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results }, null, 2));
-    if (failed.length) process.exitCode = 1;
+    const diagnostics = { pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results };
+    const failed = printSummary();
+    if (failed || VERBOSE) console.log(JSON.stringify(diagnostics, null, 2));
+    if (failed) process.exitCode = 1;
   } finally {
     try { if (client) client.close(); } catch {}
     try { chrome.kill(); } catch {}
@@ -275,6 +290,8 @@ async function main() {
 }
 
 main().catch(err => {
+  console.error('Enter Dungeon runtime smoke failed during setup or execution:');
   console.error(err?.stack || String(err));
+  if (!results.length) console.log('Enter Dungeon runtime smoke: 0/0 passing, 1 failing');
   process.exitCode = 1;
 });
