@@ -9,6 +9,14 @@
 ## Current Baseline
 - DungeonDex v1.23.8 - Board Echo Minimal Playable Activation
 
+## Open Issue Sweep Notes
+- The current open issue set is grouped into playable/system completion, identity/documentation, visual/asset readiness, and smoke hardening tracks.
+- `docs/OPEN_ISSUE_SWEEP.md` maps issues #36 through #51 to concrete repo surfaces and next actions.
+- `docs/PLAYABLE_SYSTEMS_QUEUE.md` defines safe focused boundaries for Board Echo v1 and Debt Pressure v1.
+- `docs/IP_LAYER_GUIDE.md` defines the current premise, glossary, visual identity direction, lore bible, factions/roles, copy rules, README direction, title/logo usage, screenshot plan, Revisit flavor direction, smoke copy targets, public roadmap categories, and loading/title copy.
+- `docs/ASSET_INVENTORY.md` creates the first asset provenance scaffold.
+- This sweep is documentation-focused. It does not change runtime behavior, save shape, combat, debt math, Talent math, Revisit route activation, rewards, service worker cache labels, or version labels.
+
 ## v1.23.7 Rival Trace Result Detail Polish
 - Rival Trace now exposes a clearer read-only Guild Journal completed-result detail line.
 - Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys still summarize into one readable display model.
