@@ -1541,7 +1541,7 @@
     const routes = revisitRoutePreviews(revisitReadOnlyStateSnapshot(state));
     const preview = Array.isArray(routes) ? routes.find(entry => String(entry?.key || '') === routeKey) || null : null;
     const gateMeta = revisitUnlockGateMeta(state, routeKey);
-    const routeContent = revisitRouteContentDefinitions()?.[routeKey] || null;
+    const routeContent = revisitRouteContentDefinitions(state)?.[routeKey] || null;
     const hasRoute = !!preview;
     const locked = preview ? preview.locked !== false : true;
     const eligible = !!preview && !!gateMeta && !!routeContent;
@@ -1645,7 +1645,7 @@
     };
   }
 
-  function revisitRouteContentDefinitions() {
+  function revisitRouteContentDefinitions(state) {
     return {
       trophy_echo_route: {
         title: 'Trophy Echo Route',
@@ -1714,8 +1714,8 @@
     };
   }
 
-  function hydrateRevisitRoutePreview(route = {}, fallbackHookLabels = []) {
-    const definitions = revisitRouteContentDefinitions();
+  function hydrateRevisitRoutePreview(state, route = {}, fallbackHookLabels = []) {
+    const definitions = revisitRouteContentDefinitions(state);
     const def = definitions[String(route?.key || '').trim()] || {};
     const hookLabels = Array.isArray(route?.hooks) ? route.hooks.filter(Boolean) : [];
     const sourceLabels = Array.isArray(fallbackHookLabels) ? fallbackHookLabels.filter(Boolean) : [];
@@ -1894,7 +1894,7 @@
         if (!routeHooks.length) return null;
         const topHook = routeHooks[0];
         const criteriaStub = revisitRouteUnlockCriteriaStub(route.key, routeHooks.map(hook => hook.key));
-        return hydrateRevisitRoutePreview({
+        return hydrateRevisitRoutePreview(state, {
           key: String(route.key || '').trim(),
           title: String(route.title || '').trim(),
           district: String(route.district || '').trim(),
@@ -2019,7 +2019,7 @@
     const safeState = revisitReadOnlyStateSnapshot(state);
     const routes = revisitRoutePreviews(safeState);
     const previewEntries = revisitUnlockPreview(safeState);
-    const routeContent = revisitRouteContentDefinitions();
+    const routeContent = revisitRouteContentDefinitions(state);
     const routeByKey = new Map(routes.map(route => [String(route?.key || '').trim(), route]).filter(entry => entry[0]));
     const previewByKey = new Map(previewEntries.map(entry => [String(entry?.key || '').trim(), entry]).filter(entry => entry[0]));
     const knownKeys = ['trophy_echo_route', 'famous_gear_route', 'rival_trace_route', 'debt_pressure_route', 'board_echo_route'];
@@ -3561,8 +3561,8 @@
       explainRevisitRouteGate(state = S, routeKey = '') {
         return explainRevisitRouteGate(state, routeKey);
       },
-      revisitRouteContentDefinitions() {
-        return revisitRouteContentDefinitions();
+      revisitRouteContentDefinitions(state) {
+        return revisitRouteContentDefinitions(state);
       },
       revisitUnlockGates(state = S) {
         return revisitUnlockGates(state);
