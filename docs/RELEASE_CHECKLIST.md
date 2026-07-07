@@ -22,11 +22,10 @@ node --check sw.js
 node --check js/systems/21_build_label_guard.js
 node --check js/systems/30_passive_activation_gate_hotfix.js
 node --check js/systems/31_revisit_activation_surface_lockdown.js
-node --check js/systems/33_talent_hunter_board_clarity_spend.js
-node --check smoke_talent_v150b.mjs
+node --check smoke_merchant_gear_upgrades_v1238.mjs
 node --check smoke_debt_collector_v169.mjs
 node --check smoke_revisit_routes_v173.mjs
-node .\smoke_talent_v150b.mjs
+node .\smoke_merchant_gear_upgrades_v1238.mjs
 node .\smoke_debt_collector_v169.mjs
 node .\smoke_revisit_routes_v173.mjs
 ```
@@ -35,8 +34,8 @@ For documentation-only audits, this command list is the expected safety net for 
 
 ## Protected Stability Surfaces
 
-- Controlled Talent spending: `hunter_board_clarity` is the only known controlled Talent spend target unless a focused Talent issue explicitly expands it. Any second node, broad spend UI, respec, refund, unlock tree, or passive stat/economy/reward effect needs its own explicit issue.
-- Read-only/passive helpers: Talent previews, award previews, passive contracts, readiness reports, and activation-gate dry runs must not mutate save state unless the issue explicitly names a controlled mutation helper.
+- Merchant gear upgrades: keep upgrades limited to equipped weapon and armor pieces, fixed costs, and a `+3` cap unless a focused issue explicitly expands that surface.
+- Old Talent compatibility: legacy `talentLedger`, earning, learned-node, preview, and passive helper paths must not restore gameplay effects or become the active progression UI without an explicit issue.
 - Debt Collector clarity prep: display-copy helpers may clarify wording only. They must not change debt math, pressure, repayment, wallet, economy, combat, rewards, save shape, or Revisit state unless a focused debt issue explicitly targets that behavior.
 - Revisit lanes: Trophy Echo, Famous Gear Memory, and Rival Trace are the current live memory lanes. Board Echo and Debt Pressure remain locked/planned until focused issues activate them. Live lanes must remain town/archive memory loops, not reward, combat, farming, or progression loops.
 - Service worker/cache labels: `CACHE_NAME`, build query strings, visible title labels, and `VERSION.md` must stay aligned during versioned release patches. Documentation-only audits should not change service worker behavior or cache labels.
@@ -48,8 +47,8 @@ For documentation-only audits, this command list is the expected safety net for 
 - Preview-only systems must stay preview-only unless the issue explicitly activates them.
 - Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit memory lanes.
 - Board Echo and Debt Pressure remain locked/planned unless their focused issues are being implemented.
-- The broad Talent tree UI remains locked and preview-limited.
-- Do not add new Talent nodes, respec, passive stat effects, reward multipliers, combat effects, economy effects, or Revisit effects unless the issue explicitly says so.
+- The Talent tree is deprecated compatibility-only. Merchant gear upgrades are the active progression surface.
+- Do not reactivate Talent nodes, respec, passive stat effects, reward multipliers, combat effects, economy effects, or Revisit effects unless the issue explicitly says so.
 - Service worker and cache label changes should only happen during versioned release patches.
 
 ## Final Pass

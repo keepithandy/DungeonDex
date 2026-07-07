@@ -61,22 +61,19 @@ Planned lane direction:
 
 Rival Trace means named rival elite memory only. It does not create a hunt, board mission, route, reward, unlock, currency, or progression mutation.
 
-### Talent System
+### Merchant Gear Upgrades
 
-Talent is an active but tightly controlled foundation.
+Merchant Gear Upgrades are the active long-term gear progression path.
 
 Current contract:
 
-- normalized save shape with repaired ledger and claim containers
-- controlled Boss Trophy Milestone point award source where already implemented
-- controlled spend entrypoint for `hunter_board_clarity`
-- learned node marking for the controlled Hunter Board Clarity path
-- passive readiness gating through explicit contract helpers
-- copy-only passive surfaces for Hunter Board and Debt Collector clarity where already wired
-- no broad Talent tree activation
-- no additional live Talent spend nodes unless explicitly scoped
-- no respec/refund system
-- no combat/economy/stat mutation
+- the Lowfire Market upgrades equipped weapon and armor pieces only
+- each eligible item stores `upgradeLevel` from `0` to `3`
+- upgrade costs are fixed at `50c`, `125c`, and `250c`
+- weapon upgrades add flat Power
+- armor upgrades add flat Guard and HP
+- upgrade state persists through save/reload and repairs malformed levels safely
+- old Talent save fields remain compatibility-only and do not apply gameplay effects
 
 ### Debt Collector
 
@@ -109,7 +106,7 @@ Use these files to lock existing behavior:
 
 ```text
 smoke_compact_suite.mjs
-smoke_talent_v150b.mjs
+smoke_merchant_gear_upgrades_v1238.mjs
 smoke_debt_collector_v169.mjs
 smoke_revisit_routes_v173.mjs
 smoke_journal_v1233.mjs

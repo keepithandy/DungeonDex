@@ -327,6 +327,54 @@ function townProgressionStatusLine(state, stagedStartDepth) {
 	return `Secured depth D${formatSafe(safeDepth)}. Next target: ${bossText}; ${charterText}.`;
 }
 
+function merchantGearUpgradeCard(model) {
+	const stateText = !model.item
+		? `Equip a ${model.label.toLowerCase()} to unlock upgrades.`
+		: model.capped
+			? 'Maxed'
+			: model.affordable
+				? `Upgrade for ${formatMoney(model.cost)}`
+				: `Need ${formatMoney(model.missingCopper)} more copper`;
+	const action = model.item && !model.capped && model.affordable
+		? `<button class="primary mini" data-merchant-upgrade="${escapeHtml(model.slot)}">Upgrade</button>`
+		: `<span class="small muted">${escapeHtml(stateText)}</span>`;
+	return `<article class="shop-item merchant-upgrade-card">
+      <div class="split">
+        <div>
+          <div class="item-name">${escapeHtml(model.label)}</div>
+          <div class="item-meta">${escapeHtml(model.itemName)} • +${escapeHtml(String(model.level))} / +${escapeHtml(String(model.cap))}</div>
+        </div>
+        <span class="pill">${model.capped ? 'Maxed' : `+${escapeHtml(String(model.level))}`}</span>
+      </div>
+      ${model.item ? `
+        <div class="tag-row">
+          <span class="pill">Current ${escapeHtml(model.currentStat)}</span>
+          ${model.capped ? '<span class="pill rarity-uncommon">No further upgrades</span>' : `<span class="pill">Next ${escapeHtml(model.nextStat)}</span>`}
+          ${model.capped ? '' : `<span class="pill">${escapeHtml(formatMoney(model.cost))}</span>`}
+        </div>
+      ` : `
+        <p class="small muted">No equipped ${escapeHtml(model.label.toLowerCase())} is ready for the merchant.</p>
+      `}
+      <div class="item-actions">${action}</div>
+    </article>`;
+}
+
+function merchantGearUpgradePanelMarkup(state) {
+	const models = typeof merchantGearUpgradeSummary === 'function'
+		? merchantGearUpgradeSummary(state)
+		: [];
+	return `<div class="district-market lowfire-upgrades">
+      <div class="split market-subhead">
+        <div>
+          <strong>Merchant Gear Upgrades</strong>
+          <p class="small">Spend copper to permanently improve equipped gear.</p>
+        </div>
+        <span class="pill">${models.filter(model => model.item).length}/${models.length}</span>
+      </div>
+      <div class="list district-ware-list">${models.map(merchantGearUpgradeCard).join('')}</div>
+    </div>`;
+}
+
 function renderTown() {
 	const stagingDistrict = currentStagingDistrict(S);
 	const districtDisplay = currentDistrictDisplay(S);
@@ -374,6 +422,8 @@ function renderTown() {
 	if (merchantPanel) merchantPanel.innerHTML = `
       <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Gear and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
       ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
+      ${merchantGearUpgradePanelMarkup(S)}
+      <div class="sep"></div>
       <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
       <div class="sep"></div>
       <div class="district-market lowfire-wares">

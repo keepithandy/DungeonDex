@@ -37,7 +37,6 @@
     const balance = num(debt.balanceCopper, 0);
     const pressure = balance > 0 ? num(debt.pressure, 0) : 0;
     const high = pressure >= 3;
-    const learned = !!obj(state?.player?.talentLearnedIds).debt_collector_clarity;
     const mode = balance <= 0 ? 'Clear' : high ? 'Under Collection' : pressure > 0 ? 'Pressure Rising' : 'Borrowed';
     return {
       mode,
@@ -45,7 +44,7 @@
       pressure,
       status: balance <= 0 ? 'No Debt' : 'Debt Active',
       line: balance <= 0 ? 'The ledger is quiet.' : high ? 'The collector is watching closely.' : pressure > 0 ? 'Pressure is building.' : 'Borrowing is available under normal terms.',
-      extra: learned ? 'Debt Collector Clarity is learned as a guarded preview.' : 'Debt Collector Clarity remains preview-only.'
+      extra: 'Debt Collector terms remain unchanged.'
     };
   }
   function revisitModel(state){
@@ -284,18 +283,19 @@
       lanes
     };
   }
-  function talentModel(state){
-    const api = window.DungeonDexTalents || window.DungeonDexWardenTalents || null;
-    const summary = typeof api?.summary === 'function' ? api.summary(state) : null;
-    const learnedIds = list(state?.player?.talentUnlockIds);
-    const learnedMap = obj(state?.player?.talentLearnedIds);
-    const learnedCount = Array.isArray(summary?.unlockedIds) ? summary.unlockedIds.length : learnedIds.length;
+  function merchantUpgradeModel(state){
+    const upgrades = typeof merchantGearUpgradeSummary === 'function' ? merchantGearUpgradeSummary(state) : [];
+    const active = upgrades.filter(entry => entry && entry.item);
+    const totalLevels = active.reduce((sum, entry) => sum + num(entry.level, 0), 0);
     return {
-      points: num(summary?.pointsAvailable, num(state?.player?.talentPoints, 0)),
-      learnedCount,
-      hunter: !!learnedMap.hunter_board_clarity || learnedIds.includes('hunter_board_clarity'),
-      debt: !!learnedMap.debt_collector_clarity || learnedIds.includes('debt_collector_clarity'),
-      previewOnly: !!summary?.previewOnly
+      active,
+      totalLevels,
+      body: active.length
+        ? active.map(entry => `${text(entry.label || 'Gear')} +${num(entry.level, 0)}/${num(entry.cap, 3)}`).join(' • ')
+        : 'No merchant gear upgrades are active yet.',
+      meta: active.length
+        ? active.map(entry => `${text(entry.itemName || entry.label || 'Gear')} (${text(entry.currentStat || 'No stat')})`).join(' • ')
+        : 'Spend copper at the Lowfire Market to improve equipped gear.'
     };
   }
   function journalV1233SummaryModel(state){
@@ -306,8 +306,8 @@
     const rival = rivalModel(safeState);
     const laneClarity = revisitLaneClarityModel(safeState);
     const debt = debtStatus(safeState);
-    const talent = talentModel(safeState);
-    const memoryTotal = boss.count + revisit.total + famous.count + rival.count + (debt.balance > 0 ? 1 : 0) + talent.learnedCount;
+    const upgrades = merchantUpgradeModel(safeState);
+    const memoryTotal = boss.count + revisit.total + famous.count + rival.count + (debt.balance > 0 ? 1 : 0) + upgrades.totalLevels;
     return {
       title: 'Guild Journal',
       flavor: memoryTotal > 0
@@ -323,7 +323,7 @@
         { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
         { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: [laneClarity.boardText, laneClarity.debtText].filter(Boolean).join(' • ') || laneClarity.boardText || laneClarity.debtText },
         { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
-        { key: 'talent', title: 'Talent Memory', body: `Available Talent points: ${talent.points}. Learned nodes: ${talent.learnedCount}. Hunter Board Clarity ${talent.hunter ? 'learned' : 'locked'}.`, meta: talent.debt ? 'Debt Collector Clarity is present as a guarded preview.' : 'Debt Collector Clarity remains locked or preview-only.' }
+        { key: 'upgrades', title: 'Merchant Upgrades', body: upgrades.body, meta: upgrades.meta }
       ]
     };
   }

@@ -85,6 +85,9 @@
     if (item.setId && !getMythicSetDefinition(item.setId)) delete item.setId;
     if (item.setId || item.mythicSetId || item.setSlot != null || LEGACY_MYTHIC_SET_SLOTS.includes(rawSlot)) item.setSlot = legacySetSlot || mythicSetSlotFromSlot(baseSlot) || '';
     item.tags = asArray(item.tags, []).map(String);
+    item.upgradeLevel = typeof normalizeMerchantGearUpgradeLevel === 'function'
+      ? normalizeMerchantGearUpgradeLevel(item.upgradeLevel)
+      : Math.max(0, Math.min(3, Math.floor(numberOr(item.upgradeLevel, 0, 0, 3))));
     const gearMemory = normalizeGearMemory(item.gearMemory, item);
     if (gearMemory) item.gearMemory = gearMemory;
     else delete item.gearMemory;
@@ -335,10 +338,10 @@
     const earning = createTalentEarningState();
     if (!state?.player) return earning;
     const saved = isPlainObject(state.player.talentEarning) ? state.player.talentEarning : {};
-    earning.enabled = true;
-    earning.sourceId = 'boss_depth_milestone';
+    earning.enabled = false;
+    earning.sourceId = 'deprecated_talent_system';
     earning.milestonesReached = isPlainObject(saved.milestonesReached) ? saved.milestonesReached : {};
-    earning.pointsAwarded = Math.max(0, Math.floor(numberOr(saved.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
+    earning.pointsAwarded = 0;
     state.player.talentEarning = earning;
     return earning;
   }
@@ -353,10 +356,7 @@
     state.player.talentPoints = 0;
     state.player.talentUnlockIds = normalizeTalentLearnedIdList(state.player.talentUnlockIds);
     state.player.talentLearnedIds = normalizeTalentLearnedIds(state.player.talentLearnedIds);
-    const earning = normalizeTalentEarningState(state);
-    if (earning && earning.enabled === true && typeof window !== 'undefined' && window.DungeonDexTalents && typeof window.DungeonDexTalents.applyPendingTalentMilestoneAwards === 'function') {
-      window.DungeonDexTalents.applyPendingTalentMilestoneAwards(state);
-    }
+    normalizeTalentEarningState(state);
     return talentState;
   }
 
@@ -393,22 +393,15 @@
   function normalizeTalentLedgerState(state) {
     if (!state?.player) return normalizeTalentLedger();
     const ledger = normalizeTalentLedger(state.player.talentLedger);
-    const earning = isPlainObject(state.player.talentEarning) ? state.player.talentEarning : {};
-    const earned = Math.max(0, Math.floor(numberOr(earning.pointsAwarded, 0, 0, Number.MAX_SAFE_INTEGER)));
-    const learnedMap = normalizeTalentLearnedIds(state.player.talentLearnedIds);
-    const learnedCount = Object.keys(learnedMap).length;
     const repairedClaims = typeof window !== 'undefined' && typeof window.normalizeTalentAwardClaims === 'function'
       ? window.normalizeTalentAwardClaims(state.player.talentLedger?.awardClaims)
       : {};
-    const liveClaimPoints = Object.keys(repairedClaims).length;
-    const totalPoints = earned + liveClaimPoints;
-    const available = Math.max(0, totalPoints - learnedCount);
-    ledger.lifetimePoints = totalPoints;
-    ledger.availablePoints = available;
-    ledger.spentPoints = Math.max(0, totalPoints - available);
+    ledger.lifetimePoints = 0;
+    ledger.availablePoints = 0;
+    ledger.spentPoints = 0;
     ledger.previewOnly = true;
     ledger.unlocked = false;
-    ledger.earnedSources = [{ sourceId: 'boss_depth_milestone', points: totalPoints }];
+    ledger.earnedSources = [];
     ledger.awardClaims = repairedClaims;
     state.player.talentLedger = ledger;
     return ledger;
@@ -842,10 +835,6 @@
     state.player.deepStairCharters = normalizeCharterDepthList(savedPlayer.deepStairCharters);
     repairTalentState(state);
     normalizeTalentLedgerState(state);
-    if (typeof window !== 'undefined' && typeof window.applyBossTrophyTalentAwardIfReady === 'function') {
-      window.applyBossTrophyTalentAwardIfReady(state);
-      normalizeTalentLedgerState(state);
-    }
     if (state.player.permanentStartFloor >= 40) state.player.goldSink.boughtStart40Charter = true;
     ensurePermanentCharters(state);
     state.player.stats = { ...base.player.stats, ...(isPlainObject(savedPlayer.stats) ? savedPlayer.stats : {}) };

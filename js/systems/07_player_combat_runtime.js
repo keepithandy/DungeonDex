@@ -1,6 +1,78 @@
 'use strict';
 
 // Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge
+  const MERCHANT_GEAR_UPGRADE_COSTS = Object.freeze([50, 125, 250]);
+  const MERCHANT_GEAR_UPGRADE_CAP = MERCHANT_GEAR_UPGRADE_COSTS.length;
+
+  function normalizeMerchantGearUpgradeLevel(value) {
+    return Math.max(0, Math.min(MERCHANT_GEAR_UPGRADE_CAP, Math.floor(numberOr(value, 0, 0, MERCHANT_GEAR_UPGRADE_CAP))));
+  }
+
+  function merchantGearUpgradeSlotKey(slot) {
+    const baseSlot = baseSlotForSlot(slot || '', '');
+    return baseSlot === 'weapon' || baseSlot === 'armor' ? baseSlot : '';
+  }
+
+  function merchantGearUpgradeBonuses(item, levelOverride = null) {
+    const level = levelOverride == null
+      ? normalizeMerchantGearUpgradeLevel(item?.upgradeLevel)
+      : normalizeMerchantGearUpgradeLevel(levelOverride);
+    const slot = merchantGearUpgradeSlotKey(item?.slot || '');
+    const bonuses = { power: 0, guard: 0, wit: 0, speed: 0, luck: 0, hp: 0 };
+    if (slot === 'weapon') bonuses.power = level * 2;
+    if (slot === 'armor') {
+      bonuses.guard = level * 2;
+      bonuses.hp = level * 8;
+    }
+    return bonuses;
+  }
+
+  function merchantGearUpgradeCost(level) {
+    return MERCHANT_GEAR_UPGRADE_COSTS[normalizeMerchantGearUpgradeLevel(level)] || 0;
+  }
+
+  function merchantGearUpgradeStatSummary(item, levelOverride = null) {
+    if (!item || typeof item !== 'object') return 'No gear equipped';
+    const slot = merchantGearUpgradeSlotKey(item.slot);
+    const bonuses = merchantGearUpgradeBonuses(item, levelOverride);
+    const baseStats = isPlainObject(item.stats) ? item.stats : {};
+    const power = Math.floor(numberOr(baseStats.power, 0, 0, 999999)) + bonuses.power;
+    const guard = Math.floor(numberOr(baseStats.guard, 0, 0, 999999)) + bonuses.guard;
+    const hp = Math.floor(numberOr(baseStats.hp, 0, 0, 999999)) + bonuses.hp;
+    if (slot === 'armor') return `Guard ${format(guard)} • HP ${format(hp)}`;
+    return `Power ${format(power)}`;
+  }
+
+  function merchantGearUpgradeModel(state, slot) {
+    const safeSlot = merchantGearUpgradeSlotKey(slot);
+    const equipment = state?.player?.equipment && typeof state.player.equipment === 'object' ? state.player.equipment : null;
+    const item = equipment ? equipment[safeSlot] : null;
+    const level = normalizeMerchantGearUpgradeLevel(item?.upgradeLevel);
+    const capped = !item || level >= MERCHANT_GEAR_UPGRADE_CAP;
+    const cost = capped ? 0 : merchantGearUpgradeCost(level);
+    const gold = Math.max(0, Math.floor(numberOr(state?.player?.gold, 0, 0, Number.MAX_SAFE_INTEGER)));
+    const affordable = !!item && !capped && gold >= cost;
+    const missingCopper = affordable || !item || capped ? 0 : Math.max(0, cost - gold);
+    return {
+      slot: safeSlot,
+      label: safeSlot === 'armor' ? 'Armor' : 'Weapon',
+      item,
+      itemName: cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'),
+      level,
+      cap: MERCHANT_GEAR_UPGRADE_CAP,
+      cost,
+      capped,
+      affordable,
+      missingCopper,
+      currentStat: item ? merchantGearUpgradeStatSummary(item, level) : '',
+      nextStat: item && !capped ? merchantGearUpgradeStatSummary(item, level + 1) : ''
+    };
+  }
+
+  function merchantGearUpgradeSummary(state) {
+    return ['weapon', 'armor'].map(slot => merchantGearUpgradeModel(state, slot));
+  }
+
   function calcDerived(state) {
     if (!isPlainObject(state?.player)) return { ...DEFAULT_PLAYER_STATS, hpBonus: 0 };
     if (!isPlainObject(state.player.stats)) state.player.stats = { ...DEFAULT_PLAYER_STATS };
@@ -17,6 +89,8 @@
       if (seen.has(key)) return;
       seen.add(key);
       Object.keys(equip).forEach(k => equip[k] += item.stats[k] || 0);
+      const upgradeBonuses = merchantGearUpgradeBonuses(item);
+      Object.keys(equip).forEach(k => equip[k] += upgradeBonuses[k] || 0);
     });
     const ashboundCount = getEquippedSetCount(state, 'ashbound_warden');
     const bellforgeCount = getEquippedSetCount(state, 'veyruhn_bellforge');
@@ -1595,6 +1669,56 @@
     state.merchantStock.splice(idx, 1);
     grantDebtbrandMerchantBoost(state);
     pushLog(state, `Bought ${item.name}.`);
+  }
+
+  function buyMerchantGearUpgrade(state, slot) {
+    const model = merchantGearUpgradeModel(state, slot);
+    if (!model.item) {
+      pushLog(state, `Equip a ${model.slot || 'gear'} piece before asking the merchant for upgrades.`);
+      return { ok: false, reason: 'missing_item', slot: model.slot };
+    }
+    if (model.capped) {
+      pushLog(state, `${model.itemName} is already maxed.`);
+      return { ok: false, reason: 'maxed', slot: model.slot, level: model.level };
+    }
+    if (!model.affordable) {
+      pushLog(state, `Need ${formatMoney(model.missingCopper)} more copper to upgrade ${model.itemName}.`);
+      return { ok: false, reason: 'not_enough_copper', slot: model.slot, missingCopper: model.missingCopper, cost: model.cost };
+    }
+
+    const beforeLevel = model.level;
+    const afterLevel = beforeLevel + 1;
+    state.player.gold = Math.max(0, state.player.gold - model.cost);
+    model.item.upgradeLevel = afterLevel;
+    calcDerived(state);
+    pushLog(state, `Upgraded ${model.itemName} to +${afterLevel} for ${formatMoney(model.cost)}.`);
+    return {
+      ok: true,
+      slot: model.slot,
+      itemId: model.item.id || '',
+      itemName: model.itemName,
+      cost: model.cost,
+      beforeLevel,
+      afterLevel,
+      goldAfter: state.player.gold
+    };
+  }
+
+  if (typeof window !== 'undefined') {
+    window.DungeonDexMerchantGearUpgrades = {
+      costs: MERCHANT_GEAR_UPGRADE_COSTS.slice(),
+      cap: MERCHANT_GEAR_UPGRADE_CAP,
+      normalizeLevel: normalizeMerchantGearUpgradeLevel,
+      bonusesForItem: merchantGearUpgradeBonuses,
+      statSummary: merchantGearUpgradeStatSummary,
+      model: merchantGearUpgradeModel,
+      summary: merchantGearUpgradeSummary,
+      purchase: buyMerchantGearUpgrade
+    };
+    window.normalizeMerchantGearUpgradeLevel = normalizeMerchantGearUpgradeLevel;
+    window.merchantGearUpgradeModel = merchantGearUpgradeModel;
+    window.merchantGearUpgradeSummary = merchantGearUpgradeSummary;
+    window.buyMerchantGearUpgrade = buyMerchantGearUpgrade;
   }
 
   function rollMerchant(state, first = false) {

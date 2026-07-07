@@ -216,6 +216,7 @@
 
   function bindDynamic() {
     $$('[data-buy]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantItem(S, btn.dataset.buy); render(); }));
+    $$('[data-merchant-upgrade]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantGearUpgrade(S, btn.dataset.merchantUpgrade); render(); }));
     $$('[data-buy-district]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyDistrictWare(S, btn.dataset.buyDistrict); render(); }));
     $$('[data-start-contract]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startEliteContract(S, btn.dataset.startContract); render(); }));
     $$('[data-start-revisit]').forEach(btn => btn.onclick = () => runGuardedAction(() => {

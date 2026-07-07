@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8-board-echo-minimal-playable-activation';
+const BUILD_QS = '1.23.8-merchant-gear-upgrades-replace-talent-system';
 
 function extractMatches(source, regex) {
   const out = [];

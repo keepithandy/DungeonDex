@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8 Board Echo Minimal Playable Activation
+v1.23.8 Merchant Gear Upgrades Replace Talent System
 
 ## Current Local Package Version
-v1.23.8 Board Echo Minimal Playable Activation
+v1.23.8 Merchant Gear Upgrades Replace Talent System
 
 ## Current Development Target
-v1.23.8 Board Echo Minimal Playable Activation
+v1.23.8 Merchant Gear Upgrades Replace Talent System
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

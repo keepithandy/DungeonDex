@@ -6,7 +6,7 @@ Current baseline: **DungeonDex v1.23.8**
 
 ## Player Promise
 
-DungeonDex is about surviving the Hollow Stair and letting the Guild Journal remember what mattered: trophies, retired gear, rivals, debt pressure, Talent choices, and safe echoes of past progress.
+DungeonDex is about surviving the Hollow Stair and letting the Guild Journal remember what mattered: trophies, retired gear, rivals, debt pressure, merchant gear upgrades, and safe echoes of past progress.
 
 The project favors:
 
@@ -37,7 +37,7 @@ DungeonDex is built around a simple loop:
 - **Trophy Echo:** Live Revisit lane tied to boss trophy or boss record history.
 - **Famous Gear Memory:** Live Revisit lane tied to retired gear archive history.
 - **Rival Trace:** Live Revisit lane tied to named rival elite history.
-- **Talent foundation:** Controlled earning/spending path with Hunter Board Clarity as the safe copy-only Talent behavior.
+- **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
 - **Debt Collector foundation:** Borrowing, repayment, pressure, and collection status foundation with conservative guardrails.
 
 ## Planned / Locked Systems
@@ -80,9 +80,11 @@ See:
 
 ## Current Build
 
-**v1.23.8 - Board Echo Minimal Playable Activation**
+**v1.23.8 - Merchant Gear Upgrades Replace Talent System**
 
-This build sharpens the Rival Trace completed-result surface inside the Guild Journal. Rival Trace records now expose clearer read-only result detail for the latest memory, including rival name, route/status, completed state, memory key/id, flavor summary, and last completed label, while keeping duplicate-safe summary behavior intact.
+This build replaces the active Talent tree with Merchant Gear Upgrades. The Lowfire Market now lets the player spend copper to permanently improve equipped weapon and armor pieces up to +3, with item-level persistence, exact upgrade costs, and live stat application.
+
+Old Talent ledger/learned data remains inert compatibility state only. The Gear surface and Guild Journal now point at merchant upgrades instead of Talent preview copy.
 
 The build label, runtime pointer, service worker cache name, and version authority now target v1.23.8.
 
@@ -94,13 +96,13 @@ Run the compact smoke suite after this patch:
 node smoke_compact_suite.mjs
 ```
 
-Focused Rival Trace checks are available with:
+Focused merchant-upgrade checks are available with:
 
 ```bash
-node smoke_rival_trace_memory_v1.mjs
+node smoke_merchant_gear_upgrades_v1238.mjs
 ```
 
-Those smokes cover Rival Trace readable summary output, duplicate collapse, legacy key detection, JSON reload stability, Journal integration, and neutrality around adjacent systems.
+That smoke covers merchant panel rendering, upgrade purchase rules, save/reload persistence, cap enforcement, malformed upgrade repair, Talent compatibility neutrality, and Journal integration.
 
 For the current open-issue sweep, documentation-only validation should also include:
 

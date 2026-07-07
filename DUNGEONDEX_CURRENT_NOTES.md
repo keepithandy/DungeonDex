@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8 - Board Echo Minimal Playable Activation
+- DungeonDex v1.23.8 - Merchant Gear Upgrades Replace Talent System
+
+## v1.23.8 Merchant Gear Upgrades Replace Talent System
+- The active player-facing Talent Tree Preview has been replaced by Merchant Gear Upgrades.
+- The Lowfire Market now sells permanent upgrades for equipped weapon and armor pieces.
+- Each eligible item stores `upgradeLevel` from `0` to `3` and persists it through save/reload.
+- Upgrade costs are fixed at `50c`, `125c`, and `250c`.
+- Weapon upgrades add flat Power. Armor upgrades add flat Guard and HP.
+- Old `talentLedger`, `talentEarning`, `talentLearnedIds`, and related Talent save data remain compatibility-safe but no longer grant gameplay effects.
+- `smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the new progression path.
 
 ## Open Issue Sweep Notes
 - The current open issue set is grouped into playable/system completion, identity/documentation, visual/asset readiness, and smoke hardening tracks.
@@ -15,7 +24,7 @@
 - `docs/PLAYABLE_SYSTEMS_QUEUE.md` defines safe focused boundaries for Board Echo v1 and Debt Pressure v1.
 - `docs/IP_LAYER_GUIDE.md` defines the current premise, glossary, visual identity direction, lore bible, factions/roles, copy rules, README direction, title/logo usage, screenshot plan, Revisit flavor direction, smoke copy targets, public roadmap categories, and loading/title copy.
 - `docs/ASSET_INVENTORY.md` creates the first asset provenance scaffold.
-- This sweep is documentation-focused. It does not change runtime behavior, save shape, combat, debt math, Talent math, Revisit route activation, rewards, service worker cache labels, or version labels.
+- The sweep docs remain reference material only. The current runtime baseline is the merchant-upgrade patch described above.
 
 ## v1.23.7 Rival Trace Result Detail Polish
 - Rival Trace now exposes a clearer read-only Guild Journal completed-result detail line.
@@ -74,19 +83,19 @@
 
 ## Protected Systems
 - Enter Dungeon / Continue Run remains the primary dungeon path.
-- Talent spend remains controlled around `hunter_board_clarity` unless a separate issue expands it.
+- Merchant gear upgrades are limited to equipped weapon and armor pieces with fixed costs and a `+3` cap.
 - Gear stat math, monster scaling, economy rewards, and dungeon progression should stay outside Revisit memory patches unless explicitly scoped.
 - Service worker/cache labels must stay aligned with the visible build label.
 
 ## Smoke Targets
 - Compact smoke suite: `node smoke_compact_suite.mjs`
+- Merchant gear upgrades verification: `node smoke_merchant_gear_upgrades_v1238.mjs`
 - Rival Trace memory v1 verification: `node smoke_rival_trace_memory_v1.mjs`
 - Primary Revisit v1 verification: `node smoke_revisit_routes_v173.mjs`
 - Useful adjacent checks:
   - `node smoke_journal_v1233.mjs`
   - `node smoke_famous_gear_memory_v1.mjs`
   - `node smoke_boss_trophy_v1.mjs`
-  - `node smoke_talent_passive_framework_v1232.mjs`
   - `node smoke_debt_collector_v169.mjs`
 
 ## Recent Historical Notes

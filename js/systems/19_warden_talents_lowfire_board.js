@@ -1848,172 +1848,43 @@
   function renderTalentPanel(state){
     const panel = talentPanel();
     if (!panel || !state?.player) return;
-    ensureTalents(state);
-    const ledger = talentPointLedger(state);
-    const ledgerSummary = talentPointLedgerSummary(state);
-    const rulesSummary = talentRulesetSummary(state);
-    const preview = talentTreePreview(state);
-    const summary = talentTreePreviewSummary(state);
-    const readiness = typeof window.DungeonDexTalents?.hunterBoardClaritySpendUiReadinessModel === 'function'
-      ? window.DungeonDexTalents.hunterBoardClaritySpendUiReadinessModel(state)
-      : null;
-    const spendButtonVisible = !!readiness && readiness.supported === true;
-    const spendButtonEnabled = !!readiness && readiness.enabled === true && readiness.blockedReason === 'ready' && readiness.renderButtonNow === false;
-    const spendActionLabel = readiness?.actionLabel || 'Spend 1 Talent Point';
-    const spendStatusText = talentSpendUiStatusText(readiness);
-    const spendStatusDisabled = readiness?.disabledLabel || 'Spend unavailable';
-    const spendLearnedText = talentSpendUiLearnedText(readiness);
-    const spendEffectText = talentSpendUiEffectText(readiness);
-    const spendSourceText = talentSpendUiSourceText();
-    const talentNextText = talentNextProgressionText(readiness, ledgerSummary);
-    const talentActiveText = talentActiveStatusText(readiness);
-    const spendButtonBusy = readiness?.enabled === true && readiness?.blockedReason === 'ready' && readiness?.renderButtonNow === false ? false : false;
+    const upgrades = typeof merchantGearUpgradeSummary === 'function' ? merchantGearUpgradeSummary(state) : [];
     panel.innerHTML = `
       <div class="card-head talent-head">
         <div>
-          <h2>Talent Tree Preview</h2>
-          <p>Locked preview only. Hunter Board Clarity is the only spendable path right now. The wider tree stays preview-only.</p>
-          <div class="talent-passive-note small">Display-only copy clarity only. No stat, reward, combat, economy, or Revisit effects.</div>
+          <h2>Gear Upgrades</h2>
+          <p>Merchant upgrades are the active long-term gear progression path.</p>
+          <div class="talent-passive-note small">Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces.</div>
         </div>
-        <span class="pill rarity-rare">Locked</span>
+        <span class="pill rarity-rare">Town</span>
       </div>
-      <div class="talent-legend small">
-        <span><b>Talent Points:</b> ${H(String(ledger.availablePoints || 0))} available / ${H(String(ledger.lifetimePoints || 0))} earned</span>
-        <span><b>Spent:</b> ${H(String(ledger.spentPoints || 0))}</span>
-        <span><b>${H(spendSourceText)}</b></span>
+      <div class="talent-summary-row small muted" aria-label="Gear upgrade status">
+        <span>Weapon and armor upgrades cap at +3.</span>
+        <span>Costs: 50c, 125c, 250c.</span>
+        <span>Talent data remains deprecated compatibility only.</span>
       </div>
-      <div class="talent-preview-banner small">
-        <strong>Locked preview</strong>
-        <span>Wider tree planning only. No broad purchases, unlocks, or bonuses.</span>
-      </div>
-      <div class="talent-summary-row small muted" aria-label="Talent system status">
-        <span>${H(talentActiveText)}</span>
-        <span>${H(readiness?.learned === true ? 'Learned: Hunter Board Clarity' : 'Learned: none yet')}</span>
-        <span>Preview: wider tree and future passives</span>
-        <span>Locked: all other nodes, bonuses, and respec</span>
-        <span>${H(talentNextText)}</span>
-      </div>
-      <section class="talent-ledger-card">
-        <div class="split talent-ledger-head">
-          <div>
-            <strong>Talent Ledger</strong>
-            <p class="small muted">Ledger preview only. Only Hunter Board Clarity can spend now; the rest of the tree stays locked.</p>
-          </div>
-          <span class="pill">Preview</span>
-        </div>
-        <div class="talent-summary-row small muted talent-ledger-chips">
-          <span>Locked</span>
-          <span>0 available</span>
-          <span>Spending inactive</span>
-          <span>No active points</span>
-        </div>
-        <div class="talent-milestone-line small" aria-label="Talent ledger status">
-          <span>Preview only</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Unlocked: ${ledgerSummary.unlocked ? 'yes' : 'no'}</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Lifetime: ${ledgerSummary.lifetimePoints}</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Available: ${ledgerSummary.availablePoints}</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Spent: ${ledgerSummary.spentPoints}</span>
-        </div>
-      </section>
-      <section class="talent-ledger-card talent-rules-card">
-        <div class="split talent-ledger-head">
-          <div>
-            <strong>Ruleset Foundation</strong>
-            <p class="small muted">Read-only future rules. Gameplay remains off.</p>
-          </div>
-          <span class="pill">Locked</span>
-        </div>
-        <div class="talent-summary-row small muted talent-ledger-chips">
-          <span>Source: ${H(rulesSummary.pointSourceLabels[0] || 'Milestones')}</span>
-          <span>Cap ${F(rulesSummary.earlyCap)} planned / ${F(rulesSummary.activeCap)} active</span>
-          <span>${F(rulesSummary.branchCount)} branches</span>
-          <span>${F(rulesSummary.tierCount)} tiers</span>
-          <span>${F(rulesSummary.nodeCount)} nodes</span>
-        </div>
-        <div class="talent-milestone-line small" aria-label="Talent ruleset status">
-          <span>Earning disabled</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Spending disabled</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Unlocks disabled</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>Passives disabled</span>
-        </div>
-      </section>
-      <div class="talent-point-line small" aria-label="Talent preview totals">
-        <span><b>Branches:</b> ${F(summary.totalBranches)}</span>
-        <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Nodes:</b> ${F(summary.totalNodes)}</span>
-        <span class="talent-separator" aria-hidden="true">&bull;</span>
-        <span><b>Status:</b> Locked / preview only; Hunter Board Clarity is the only spendable path</span>
-      </div>
-      <div class="talent-milestone-line small" aria-label="Talent preview status">
-        <span><b>Locked nodes:</b> ${F(summary.lockedNodes)}</span>
-        <span>Active nodes: ${F(summary.activeNodes)}</span>
-      </div>
-      <div class="talent-summary-row small muted">
-        <span>Preview only.</span>
-        <span>Inactive.</span>
-        <span>No gameplay effects.</span>
-      </div>
-      <section class="talent-ledger-card talent-spend-ready-card">
-        <div class="split talent-ledger-head">
-          <div>
-            <strong>Spend Readiness</strong>
-            <p class="small muted">${H(spendStatusText)}</p>
-          </div>
-          <span class="pill ${spendButtonEnabled ? 'rarity-rare' : 'rarity-common'}">${spendButtonEnabled ? 'Ready' : 'Blocked'}</span>
-        </div>
-        <div class="talent-summary-row small muted talent-ledger-chips">
-          <span>${H(spendStatusDisabled)}</span>
-          <span>${H(spendActionLabel)}</span>
-          <span>${spendButtonVisible ? 'Hunter Board only' : 'Inactive'}</span>
-          <span>${H(talentNextText)}</span>
-        </div>
-        <div class="talent-milestone-line small" aria-label="Spend readiness status">
-          <span>${H(spendStatusText)}</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>${H(spendLearnedText)}</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>${H(spendEffectText)}</span>
-        </div>
-        ${spendButtonVisible ? `
-          <div class="talent-spend-actions">
-            <button class="primary mini" data-talent-spend-hunter-board="hunter_board_clarity" data-talent-spend-busy="${spendButtonBusy ? '1' : '0'}" ${spendButtonEnabled ? '' : 'disabled'}>${H(spendActionLabel)}</button>
-          </div>
-        ` : ''}
-        <div class="talent-milestone-line small" aria-label="Talent node explanation">
-          <span><b>Hunter Board Clarity:</b> Elite Board contract wording only, not a stat bonus.</span>
-          <span class="talent-separator" aria-hidden="true">&bull;</span>
-          <span>No reward, risk, economy, combat, or Revisit values change.</span>
-        </div>
-      </section>
       <div class="talent-preview-grid">
-        ${preview.branches.map(branch => `
+        ${upgrades.map(model => `
           <section class="talent-preview-branch">
             <div class="split talent-preview-branch-head">
               <div>
-                <strong>${H(branch.title)}</strong>
-                <p class="small muted">${H(branch.detail)}</p>
+                <strong>${H(model.label)}</strong>
+                <p class="small muted">${H(model.itemName)}</p>
               </div>
-              <span class="pill">Locked</span>
+              <span class="pill">+${H(String(model.level))} / +${H(String(model.cap))}</span>
             </div>
-            <div class="talent-meter-row">
-              <span>Nodes ${F(branch.nodeCount)}</span>
-              <span>Preview</span>
-              <span>Inactive</span>
-            </div>
-            <div class="talent-preview-node-grid">
-              ${branch.nodes.map(node => talentPreviewNodeMarkup(node, branch, state)).join('')}
-            </div>
+            ${model.item ? `
+              <div class="talent-meter-row">
+                <span>Current ${H(model.currentStat)}</span>
+                <span>${model.capped ? 'Maxed' : `Next ${H(model.nextStat)}`}</span>
+              </div>
+            ` : `
+              <p class="small muted">Equip this slot to unlock upgrades at the market.</p>
+            `}
           </section>`).join('')}
       </div>
       <div class="talent-footer">
-        <span class="small muted">${H(summary.previewOnly ? 'Preview only. No points or bonuses.' : '')}</span>
+        <span class="small muted">The Talent tree is deprecated. The market now handles permanent gear progression.</span>
       </div>`;
   }
 
@@ -2345,7 +2216,7 @@
   const oldGear = typeof renderGear === 'function' ? renderGear : null;
   if (oldGear) renderGear = function(){ oldGear(); injectCss(); if (typeof S !== 'undefined') renderTalentPanel(S); };
   const oldBind = typeof bindDynamic === 'function' ? bindDynamic : null;
-  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); document.querySelectorAll('[data-talent-spend-hunter-board]').forEach(btn => btn.onclick = () => guard(() => { if (btn.dataset.talentSpendBusy === '1') { render(); return; } btn.dataset.talentSpendBusy = '1'; btn.disabled = true; const api = window.DungeonDexTalents || window.DungeonDexWardenTalents; const model = api && typeof api.hunterBoardClaritySpendUiReadinessModel === 'function' ? api.hunterBoardClaritySpendUiReadinessModel(S) : null; if (!model || model.enabled !== true || model.blockedReason !== 'ready') { btn.dataset.talentSpendBusy = '0'; render(); return; } const result = typeof api.applyHunterBoardClaritySpend === 'function' ? api.applyHunterBoardClaritySpend(S) : null; if (result?.ok === true) { if (typeof save === 'function') save(S); } btn.dataset.talentSpendBusy = '0'; render(); })); };
+  if (oldBind) bindDynamic = function(){ oldBind(); injectCss(); const r = document.getElementById('refreshLowfireBoardBtn'); if (r) r.onclick = () => guard(() => { refreshBoard(S); render(); }); document.querySelectorAll('[data-start-rival]').forEach(btn => btn.onclick = () => guard(() => { if (typeof startEliteRivalContract === 'function') startEliteRivalContract(S, btn.dataset.startRival); render(); })); };
 
   const api = {
     build: SCRIPT_BUILD,

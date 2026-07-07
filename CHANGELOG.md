@@ -8,13 +8,27 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8 Board Echo Minimal Playable Activation`
-* Current local package baseline: `v1.23.8 Board Echo Minimal Playable Activation`
-* Current development target: `v1.23.8 Board Echo Minimal Playable Activation`
+* Public/live itch version: `v1.23.8 Merchant Gear Upgrades Replace Talent System`
+* Current local package baseline: `v1.23.8 Merchant Gear Upgrades Replace Talent System`
+* Current development target: `v1.23.8 Merchant Gear Upgrades Replace Talent System`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8 - Merchant Gear Upgrades Replace Talent System
+
+* Replaced the active player-facing Talent tree with Merchant Gear Upgrades in the Lowfire Market.
+* Equipped weapon and armor items now carry persistent `upgradeLevel` values from `+0` to `+3`.
+* Merchant upgrade costs are fixed at `50c`, `125c`, and `250c`.
+* Weapon upgrades add flat Power; armor upgrades add flat Guard and HP.
+* Old Talent ledger, earning, learned-node, and preview data remain compatibility-safe but no longer drive gameplay or the active progression UI.
+* The Gear surface and Guild Journal now summarize merchant upgrades instead of Talent preview state.
+* Added `smoke_merchant_gear_upgrades_v1238.mjs` and updated compact smoke coverage for the new progression path.
+* Bumped public/runtime/cache labels to `v1.23.8` with build query `1.23.8-merchant-gear-upgrades-replace-talent-system`.
+* No monster scaling, boss scaling, debt behavior, reward tables, Revisit lane activation, or dungeon-entry rules changed.
+
+---
 
 ## v1.23.7 - Rival Trace Result Detail Polish
 

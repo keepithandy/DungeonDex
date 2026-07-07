@@ -8,7 +8,7 @@
 
   const BUILD = '1.23.8';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.23.8-board-echo-minimal-playable-activation';
+  const BUILD_QS = '1.23.8-merchant-gear-upgrades-replace-talent-system';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

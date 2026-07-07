@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8-board-echo-minimal-playable-activation';
+const CACHE_NAME = 'dungeondex-v1.23.8-merchant-gear-upgrades-replace-talent-system';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8-board-echo-minimal-playable-activation';
+const BUILD_QS = '1.23.8-merchant-gear-upgrades-replace-talent-system';
 const ASSETS = [
   './',
   './index.html',
