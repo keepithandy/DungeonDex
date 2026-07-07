@@ -95,6 +95,8 @@ See:
 - `docs/PLAYABLE_SYSTEMS_QUEUE.md`
 - `docs/IP_LAYER_GUIDE.md`
 - `docs/ASSET_INVENTORY.md`
+- `docs/PACKAGE_STRUCTURE.md`
+- `docs/status/CURRENT_NOTES.md`
 
 ## Current Build
 
@@ -127,6 +129,12 @@ For the current open-issue sweep, documentation-only validation should also incl
 ```bash
 git diff --check
 ```
+
+## Package Structure
+
+The root folder should stay limited to browser/runtime entry files, version/history files, and the stable compact smoke runner. Status notes now live in `docs/status/`, and package-layout rules live in `docs/PACKAGE_STRUCTURE.md`.
+
+Individual smoke scripts currently remain at the root because several scripts load runtime files relative to their own location. Move them into `tests/smoke/` only as a separate path-aware migration that updates the compact runner, README commands, status notes, and any script-local file loading.
 
 ## Previous Build
 
