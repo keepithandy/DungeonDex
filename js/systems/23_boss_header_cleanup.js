@@ -2,15 +2,15 @@
 
 // DungeonDex v1.4.9a — Boss header cleanup.
 // Keeps the boss floor / district boss title, removes excess monster callout copy from boss encounters.
-(function(){
-  if (window.DDBossHeaderCleanup) return;
-  window.DDBossHeaderCleanup = true;
+(function() {
+	if (window.DDBossHeaderCleanup) return;
+	window.DDBossHeaderCleanup = true;
 
-  function inject(){
-    if (document.getElementById('ddBossHeaderCleanupCss')) return;
-    var style = document.createElement('style');
-    style.id = 'ddBossHeaderCleanupCss';
-    style.textContent = `
+	function inject() {
+		if (document.getElementById('ddBossHeaderCleanupCss')) return;
+		var style = document.createElement('style');
+		style.id = 'ddBossHeaderCleanupCss';
+		style.textContent = `
       .combat-device-boss .combat-enemy-header {
         padding: 8px 10px !important;
         text-align: center !important;
@@ -29,12 +29,12 @@
         white-space: normal !important;
       }
     `;
-    document.head.appendChild(style);
-  }
+		document.head.appendChild(style);
+	}
 
-  inject();
-  window.addEventListener('DOMContentLoaded', inject);
-  window.addEventListener('load', inject);
-  window.setTimeout(inject, 100);
-  window.setTimeout(inject, 500);
+	inject();
+	window.addEventListener('DOMContentLoaded', inject);
+	window.addEventListener('load', inject);
+	window.setTimeout(inject, 100);
+	window.setTimeout(inject, 500);
 })();
