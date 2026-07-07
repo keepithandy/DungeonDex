@@ -4,6 +4,24 @@
 
 Current baseline: **DungeonDex v1.23.8**
 
+## Try It First
+
+Open `index.html` directly in a browser to review the current playable build.
+
+For the safest current validation pass, run:
+
+```bash
+node smoke_compact_suite.mjs
+```
+
+Focused merchant-upgrade checks are available with:
+
+```bash
+node smoke_merchant_gear_upgrades_v1238.mjs
+```
+
+Current status: active flagship browser RPG. The live build includes the core dungeon loop, merchant gear upgrades, Guild Journal memory surfaces, and safe Revisit lanes. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
+
 ## Player Promise
 
 DungeonDex is about surviving the Hollow Stair and letting the Guild Journal remember what mattered: trophies, retired gear, rivals, debt pressure, merchant gear upgrades, and safe echoes of past progress.
@@ -157,37 +175,3 @@ This patch enabled the first controlled Boss Trophy Milestone Talent point award
 ## Previous Build
 
 **v1.20.41 - Talent Award Claim Tracking Plan**
-
-This patch defines the planned claim path, deterministic key format, record shape, and duplicate-prevention rules for future Boss Trophy Milestone awards. It does not add save fields, award points, enable spending, or add Talent unlock UI.
-
-## Previous Build
-
-**v1.20.40 - Talent Point Award Contract Dry Run**
-
-This patch adds a read-only Boss Trophy Milestone award eligibility preview. It does not award points, add claim tracking, enable spending, or add Talent unlock UI.
-
-## Previous Build
-
-**v1.20.39 - Talent Point Source Decision**
-
-This patch selects Boss Trophy Milestone as the first Talent point source and keeps point earning, spending, unlocks, and gameplay behavior disabled.
-
-## Previous Build
-
-**v1.20.36 - Live Debt Clarity Renderer Wiring**
-
-This patch wires the existing Debt Collector clarity copy model into the live Debt panel for learned state only. The live panel remains text-only, nonredundant, and gameplay-neutral.
-
-## Previous Build
-
-**v1.20.33 - Revisit Activation Surface Lockdown**
-
-This patch fully de-exports dormant Revisit start/active-summary surfaces from the public Elite Contracts API and adds a read-only lockdown report. Revisit remains planning-only; Enter Dungeon / Continue Run remains the only active dungeon entry path.
-
-## Previous Build
-
-**v1.20.8 - Owed Money Text Fix**
-
-This patch fixes the Debt Collector Owed line so text-rendered debt summaries show clean coin notation like `Owed 5s` instead of raw money span markup.
-
-Latest confirmed commit is the repository HEAD for the current baseline.
