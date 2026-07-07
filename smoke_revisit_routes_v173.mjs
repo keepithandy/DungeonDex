@@ -323,7 +323,7 @@ async function main(){
       };
     })()`);
     record('Famous Gear can start and creates an active archive memory state', !!famousStartedAudit.result && famousStartedAudit.status?.active === true && famousStartedAudit.active?.routeKey === 'famous_gear_route' && famousStartedAudit.revisitState?.famousGear?.active?.routeKey === 'famous_gear_route', JSON.stringify(famousStartedAudit));
-    record('Active Famous Gear shows readable archive-memory flavor', famousStartedAudit.status?.activeMemory?.summaryLine && /record/i.test(famousStartedAudit.status.activeMemory.summaryLine) && famousStartedAudit.status?.activeMemory?.reflection && /retired/i.test(famousStartedAudit.status.activeMemory.reflection), JSON.stringify(famousStartedAudit.status?.activeMemory || famousStartedAudit.active));
+    record('Active Famous Gear shows readable archive-memory flavor', famousStartedAudit.status?.activeMemory?.summaryLine && /record/i.test(famousStartedAudit.status.activeMemory.summaryLine) && famousStartedAudit.status?.activeMemory?.reflection && /archive|record|town/i.test(famousStartedAudit.status.activeMemory.reflection) && famousStartedAudit.status.activeMemory.reflection.includes(famousStartedAudit.status.activeMemory.itemName), JSON.stringify(famousStartedAudit.status?.activeMemory || famousStartedAudit.active));
     const famousDuplicateStartAudit = await evalByValue(client, `(() => {
       const api = window.DungeonDexEliteContracts || {};
       const result = api.startFamousGear ? api.startFamousGear(S) : null;
