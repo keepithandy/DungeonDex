@@ -12,6 +12,8 @@ function earlierDungeonRevisitMarkup() {
 	const famousActive = famousStatus.activeMemory || null;
 	const famousLastResult = famousStatus.lastResult || null;
 	const rivalStatus = typeof api.rivalTraceStatus === 'function' ? api.rivalTraceStatus(S) : null;
+	const boardStatus = typeof api.boardEchoStatus === 'function' ? api.boardEchoStatus(S) : null;
+	const boardContract = typeof api.boardEchoActivationContract === 'function' ? api.boardEchoActivationContract(S) : null;
 	const revisitRoutes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
 	const rivalTraceRoute = Array.isArray(revisitRoutes) ? revisitRoutes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
 	const rivalActive = rivalStatus?.activeTrace || null;
@@ -94,7 +96,18 @@ function earlierDungeonRevisitMarkup() {
       || rivalStatus?.completed === true
       || rivalRecords.some(entry => entry && entry.revengeAvailable !== false && entry.completed !== true)
       || Array.isArray(rivalTraceState?.history) && rivalTraceState.history.length > 0;
-    const boardPlayable = boardStatus?.available === true || boardStatus?.active === true || boardStatus?.completed === true;
+    const boardSurfaceReady = boardStatus?.active === true || boardStatus?.completed === true || boardContract?.safeToShowStartAction === true;
+    const boardPlayable = boardSurfaceReady && boardContract?.safeToShowStartAction === true && (boardStatus?.available === true || boardStatus?.active === true || boardStatus?.completed === true);
+    const hasVisibleRevisitLane = trophyStatus.available === true
+      || trophyStatus.active === true
+      || famousStatus.available === true
+      || famousStatus.active === true
+      || famousStatus.completed === true
+      || rivalPlayable
+      || rivalStatus?.active === true
+      || rivalStatus?.completed === true
+      || boardSurfaceReady;
+    if (!hasVisibleRevisitLane) return '';
     const playableLanes = [
       trophyStatus.available ? 'Trophy Echo' : '',
       famousStatus.available ? 'Famous Gear Memory' : '',
@@ -116,6 +129,23 @@ function earlierDungeonRevisitMarkup() {
         : playableLanes.length
           ? 'Next: choose a playable Revisit lane from town; rewards stay Revisit-only.'
           : 'Next: defeat a boss or retire gear to open a Revisit lane.';
+    const boardCardMarkup = boardSurfaceReady ? `
+        <article class="quest-card revisit-lane-card ${boardStatus?.active ? 'active' : boardStatus?.completed ? 'completed' : boardPlayable ? 'ready' : 'locked'}">
+          <div class="quest-topline">
+            <strong>Board Echo</strong>
+            <span class="small ${boardStatus?.active ? '' : 'muted'}">${boardStatus?.active ? 'Active' : boardStatus?.completed ? 'Recovered' : boardPlayable ? 'Playable' : 'Locked'}</span>
+          </div>
+          <p class="small">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.summaryLine || 'Board Echo is active in town.', 'Board Echo is active in town.') : boardStatus?.completed ? 'Board Echo has already been recorded as archive memory.' : boardPlayable ? 'Board history can be revisited as a safe town memory.' : 'Locked until board history exists.')}</p>
+          <p class="small muted">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.reflection || '', '') : boardPlayable ? 'The board trace is safe to read from town; it does not add rewards, combat, debt, or dungeon-entry changes.' : 'The archive keeps the board sealed in memory. No combat, reward, or board mission opens.')}</p>
+          <div class="small muted">Board records ${Math.max(0, Math.floor(numberOr(boardStatus?.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)))} • Completed echoes ${Math.max(0, Math.floor(numberOr(boardStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)))}</div>
+          <div class="small muted">${boardStatus?.active ? 'Active: resolve Board Echo in town.' : boardStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : boardPlayable ? 'Playable: start Board Echo from town.' : 'Locked until board history exists.'}</div>
+          <div class="small muted">Board Echo replays the record only; rewards, combat, and dungeon entry stay unchanged.</div>
+          <div class="small muted">${boardStatus?.active ? 'Next: resolve the active board echo before starting another.' : boardStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : boardPlayable ? 'Next: start Board Echo from town; rewards stay archive-only.' : 'Next: build board history to unlock the lane.'}</div>
+          ${boardStatus?.active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(boardStatus?.activeTrace?.memoryTitle || 'Board Echo', 'Board Echo'))}</div>` : ''}
+          <div class="inline-actions revisit-echo-actions">
+            ${boardStatus?.active ? `<button class="primary" type="button" data-complete-board-echo="1">Resolve Echo</button>` : boardPlayable ? `<button class="primary" type="button" data-start-revisit="board_echo_route">Start Board Echo</button>` : `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`}
+          </div>
+        </article>` : '';
     return `
       <section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
         <div class="card-head">
@@ -175,22 +205,7 @@ function earlierDungeonRevisitMarkup() {
           </div>
           ${rivalResultMarkup}
         </article>
-        <article class="quest-card revisit-lane-card ${boardStatus?.active ? 'active' : boardStatus?.completed ? 'completed' : boardPlayable ? 'ready' : 'locked'}">
-          <div class="quest-topline">
-            <strong>Board Echo</strong>
-            <span class="small ${boardStatus?.active ? '' : 'muted'}">${boardStatus?.active ? 'Active' : boardStatus?.completed ? 'Recovered' : boardPlayable ? 'Playable' : 'Locked'}</span>
-          </div>
-          <p class="small">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.summaryLine || 'Board Echo is active in town.', 'Board Echo is active in town.') : boardStatus?.completed ? 'Board Echo has already been recorded as archive memory.' : boardPlayable ? 'Board history can be revisited as a safe town memory.' : 'Locked until board history exists.')}</p>
-          <p class="small muted">${escapeHtml(boardStatus?.active ? cleanDisplayText(boardStatus?.activeTrace?.reflection || '', '') : boardPlayable ? 'The board trace is safe to read from town; it does not add rewards, combat, debt, or dungeon-entry changes.' : 'The archive keeps the board sealed in memory. No combat, reward, or board mission opens.')}</p>
-          <div class="small muted">Board records ${Math.max(0, Math.floor(numberOr(boardStatus?.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)))} • Completed echoes ${Math.max(0, Math.floor(numberOr(boardStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)))}</div>
-          <div class="small muted">${boardStatus?.active ? 'Active: resolve Board Echo in town.' : boardStatus?.completed ? 'Recovered: the archive note stays readable after reload.' : boardPlayable ? 'Playable: start Board Echo from town.' : 'Locked until board history exists.'}</div>
-          <div class="small muted">Board Echo replays the record only; rewards, combat, and dungeon entry stay unchanged.</div>
-          <div class="small muted">${boardStatus?.active ? 'Next: resolve the active board echo before starting another.' : boardStatus?.completed ? 'Next: start the memory again if you want to revisit the record.' : boardPlayable ? 'Next: start Board Echo from town; rewards stay archive-only.' : 'Next: build board history to unlock the lane.'}</div>
-          ${boardStatus?.active ? `<div class="small muted">Active Memory: ${escapeHtml(cleanDisplayText(boardStatus?.activeTrace?.memoryTitle || 'Board Echo', 'Board Echo'))}</div>` : ''}
-          <div class="inline-actions revisit-echo-actions">
-            ${boardStatus?.active ? `<button class="primary" type="button" data-complete-board-echo="1">Resolve Echo</button>` : boardPlayable ? `<button class="primary" type="button" data-start-revisit="board_echo_route">Start Board Echo</button>` : `<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>`}
-          </div>
-        </article>
+        ${boardCardMarkup}
         <article class="quest-card revisit-lane-card revisit-unfinished-lanes-card ${unfinishedLanes.length ? 'locked' : 'muted'}">
           <div class="quest-topline">
             <strong>Unfinished Lanes</strong>

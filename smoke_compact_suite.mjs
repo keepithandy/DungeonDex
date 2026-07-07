@@ -25,6 +25,7 @@ const COMMANDS = [
   { tag: 'syntax', name: 'revisit smoke syntax', cmd: ['node', '--check', 'smoke_revisit_routes_v173.mjs'] },
   { tag: 'syntax', name: 'debt smoke syntax', cmd: ['node', '--check', 'smoke_debt_collector_v169.mjs'] },
   { tag: 'syntax', name: 'app wiring smoke syntax', cmd: ['node', '--check', 'smoke_app_wiring_cache_manifest_v1.mjs'] },
+  { tag: 'syntax', name: 'enter dungeon smoke syntax', cmd: ['node', '--check', 'smoke_enter_dungeon_runtime_v1.mjs'] },
   { tag: 'syntax', name: 'talent passive smoke syntax', cmd: ['node', '--check', 'smoke_talent_passive_framework_v1232.mjs'] },
   { tag: 'syntax', name: 'talent browser smoke syntax', cmd: ['node', '--check', 'smoke_talent_v150b.mjs'] },
   { tag: 'journal', name: 'journal v1', cmd: ['node', 'smoke_journal_v1233.mjs'] },
@@ -36,6 +37,7 @@ const COMMANDS = [
   { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'smoke_revisit_famous_gear_flavor_v175.mjs' },
   { tag: 'debt', name: 'debt collector', cmd: ['node', 'smoke_debt_collector_v169.mjs'] },
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'smoke_app_wiring_cache_manifest_v1.mjs'] },
+  { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'smoke_enter_dungeon_runtime_v1.mjs'] },
   { tag: 'talent', name: 'talent passive framework', cmd: ['node', 'smoke_talent_passive_framework_v1232.mjs'] },
   { tag: 'talent', name: 'talent browser full smoke', cmd: ['node', 'smoke_talent_v150b.mjs'] }
 ];
