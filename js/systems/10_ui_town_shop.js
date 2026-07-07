@@ -22,126 +22,15 @@ function earlierDungeonRevisitMarkup() {
 		api.revisitUnfinishedLaneTownRows(S) :
 		[];
 	const unfinishedLaneRows = unfinishedLanes.length ?
-		unfinishedLanes.map(lane => `
-  // Read-only revisit helper surface remains in backend systems only.
-  function earlierDungeonRevisitMarkup() {
-    const api = window.DungeonDexEliteContracts || {};
-    const trophyStatus = typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
-    const famousStatus = typeof api.famousGearStatus === 'function' ? api.famousGearStatus(S) : null;
-    if (!trophyStatus || !famousStatus) return '';
-    const trophyActive = trophyStatus.activeEcho || null;
-    const trophyLastResult = trophyStatus.lastResult || null;
-    const famousActive = famousStatus.activeMemory || null;
-    const famousLastResult = famousStatus.lastResult || null;
-    const rivalStatus = typeof api.rivalTraceStatus === 'function' ? api.rivalTraceStatus(S) : null;
-    const boardStatus = typeof api.boardEchoStatus === 'function' ? api.boardEchoStatus(S) : null;
-    const revisitRoutes = typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(S) : [];
-    const rivalTraceRoute = Array.isArray(revisitRoutes) ? revisitRoutes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
-    const rivalActive = rivalStatus?.activeTrace || null;
-    const rivalLastResult = rivalStatus?.lastResult || null;
-    const rivalTraceState = S?.player?.revisitState?.rivalTrace || null;
-    const rivalRecords = Array.isArray(S?.player?.eliteContracts?.rivals) ? S.player.eliteContracts.rivals : [];
-    const unfinishedLanes = typeof api.revisitUnfinishedLaneTownRows === 'function'
-      ? api.revisitUnfinishedLaneTownRows(S)
-      : [];
-    const unfinishedLaneRows = unfinishedLanes.length
-      ? unfinishedLanes.map(lane => `
-          <article class="journal-row revisit-unfinished-row revisit-unfinished-${escapeHtml(String(lane.key || '').replace(/[^a-z0-9_-]/gi, ''))}">
-            <strong>${escapeHtml(cleanDisplayText(lane.title || 'Unlisted Route', 'Unlisted Route'))}</strong>
-            <p>${escapeHtml(cleanDisplayText(lane.bodyText || 'This unfinished lane is not playable yet. No player action is available yet.', 'This unfinished lane is not playable yet. No player action is available yet.'))}</p>
-            <p class="small muted">${escapeHtml(cleanDisplayText(lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.', 'Future patch should keep this lane read-only until its contract is ready.'))}</p>
-          </article>
-        `).join('') :
-		`<p class="small muted">No unfinished Revisit lanes recorded.</p>`;
+		unfinishedLanes.map(lane => [
+			'<article class="journal-row revisit-unfinished-row revisit-unfinished-' + escapeHtml(String(lane.key || '').replace(/[^a-z0-9_-]/gi, '')) + '">',
+			'<strong>' + escapeHtml(cleanDisplayText(lane.title || 'Unlisted Route', 'Unlisted Route')) + '</strong>',
+			'<p>' + escapeHtml(cleanDisplayText(lane.bodyText || 'This unfinished lane is not playable yet. No player action is available yet.', 'This unfinished lane is not playable yet. No player action is available yet.')) + '</p>',
+			'<p class="small muted">' + escapeHtml(cleanDisplayText(lane.nextStepText || 'Future patch should keep this lane read-only until its contract is ready.', 'Future patch should keep this lane read-only until its contract is ready.')) + '</p>',
+			'</article>'
+		].join('')).join('')
+	: '<p class="small muted">No unfinished Revisit lanes recorded.</p>';
 	const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
-	const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
-	const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
-	const famousMemoryTitle = cleanDisplayText(famousStatus.source?.memoryTitle || famousActive?.memoryTitle || `${itemName} Memory`, `${itemName} Memory`);
-	const rivalName = cleanDisplayText(rivalStatus?.source?.eliteName || rivalActive?.eliteName || 'Rival Elite', 'Rival Elite');
-	const rivalTraceTitle = cleanDisplayText(rivalStatus?.source?.memoryTitle || rivalActive?.memoryTitle || `${rivalName} Trace`, `${rivalName} Trace`);
-	const memoryMarks = Math.max(0, Math.floor(numberOr(trophyStatus.memoryMarks, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const completedCount = Math.max(0, Math.floor(numberOr(trophyStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const historyCount = Math.max(0, Math.floor(numberOr(trophyStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const famousHistoryCount = Math.max(0, Math.floor(numberOr(famousStatus.historyCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const famousCompletedCount = Math.max(0, Math.floor(numberOr(famousStatus.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const rivalCompletedCount = Math.max(0, Math.floor(numberOr(rivalStatus?.completedCount, 0, 0, Number.MAX_SAFE_INTEGER)));
-	const echoStateLabel = trophyActive ? 'Active' : trophyStatus.locked ? 'Locked' : 'Playable';
-	const famousStateLabel = famousStatus.active ? 'Active' : famousStatus.completed ? 'Recovered' : famousStatus.locked ? 'Locked' : 'Playable';
-	const rivalStateLabel = rivalStatus?.active ? 'Active' : rivalStatus?.completed ? 'Recovered' : rivalStatus?.locked ? 'Locked' : 'Playable';
-	const summaryLine = trophyActive ?
-		cleanDisplayText(trophyActive.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`) :
-		trophyStatus.locked ?
-		'Locked until you have at least one boss trophy or boss record.' :
-		`${bossName} is ready as a playable Revisit lane.`;
-	const famousSummaryLine = famousActive ?
-		cleanDisplayText(famousActive.summaryLine || `${itemName} settles into archive memory.`, `${itemName} settles into archive memory.`) :
-		famousStatus.completed ?
-		`${itemName} has already been recovered as archive memory.` :
-		famousStatus.locked ?
-		'Locked until you have at least one retired gear record.' :
-		'Retired gear can be revisited as safe archive memory.';
-	const flavor = trophyActive ?
-		cleanDisplayText(trophyActive.reflection || '', '') :
-		trophyStatus.locked ?
-		'The lane is cold. Bring back proof of a defeated boss and the echo can answer.' :
-		`The ${trophyName} still remembers ${bossName}. Step into the reflection and settle the memory before the next descent.`;
-	const famousFlavor = famousActive ?
-		cleanDisplayText(famousActive.reflection || '', '') :
-		famousStatus.locked ?
-		'Retired gear records stay archived until you have something to remember.' :
-		'The archive keeps the record safe. Start the memory from town and read it back without returning the gear.';
-	const actionMarkup = trophyActive ?
-		`<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>` :
-		trophyStatus.locked ?
-		`<button class="ghost" type="button" disabled aria-disabled="true">Echo Locked</button>` :
-		`<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>`;
-	const famousActionMarkup = famousActive ?
-		`<button class="primary" type="button" data-complete-famous-gear="1">Resolve Memory</button>` :
-		famousStatus.locked ?
-		`<button class="ghost" type="button" disabled aria-disabled="true">Memory Locked</button>` :
-		`<button class="primary" type="button" data-start-revisit="famous_gear_route">Start Famous Gear Memory</button>`;
-	const resultMarkup = trophyLastResult ?
-		`<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(trophyLastResult.summary || '', ''))}</div>` :
-		'';
-	const famousResultMarkup = famousLastResult ?
-		`<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(famousLastResult.summary || '', ''))}</div>` :
-		'';
-	const rivalResultMarkup = rivalLastResult ?
-		`<div class="small revisit-echo-result"><strong>Last Result:</strong> ${escapeHtml(cleanDisplayText(rivalLastResult.summary || '', ''))}</div>` :
-		'';
-	const rivalPlayable = rivalTraceRoute?.playable === true ||
-		rivalTraceRoute?.entryAvailable === true ||
-		rivalTraceRoute?.startAvailable === true ||
-		rivalStatus?.available === true ||
-		rivalStatus?.active === true ||
-		rivalStatus?.completed === true ||
-		rivalRecords.some(entry => entry && entry.revengeAvailable !== false && entry.completed !== true) ||
-		Array.isArray(rivalTraceState?.history) && rivalTraceState.history.length > 0;
-	const playableLanes = [
-		trophyStatus.available ? 'Trophy Echo' : '',
-		famousStatus.available ? 'Famous Gear Memory' : '',
-		rivalPlayable ? 'Rival Trace' : ''
-	].filter(Boolean);
-	const revisitStatusText = trophyActive ?
-		`Active: Trophy Echo is running in town. ${famousStatus.available ? 'Famous Gear Memory is also available.' : 'Famous Gear Memory remains locked.'}` :
-		famousActive ?
-		`Active: Famous Gear Memory is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}` :
-		rivalActive ?
-		`Active: Rival Trace is running in town. ${trophyStatus.available ? 'Trophy Echo is also available.' : 'Trophy Echo remains locked.'}` :
-		playableLanes.length ?
-		`Playable: ${playableLanes.join(' and ')}.` :
-		'Locked: Trophy Echo needs boss history, Famous Gear Memory needs retired gear history, and Rival Trace needs named rival history.';
-	const revisitNextText = trophyActive ?
-		'Next: resolve the active echo in town before starting another.' :
-		famousActive ?
-		'Next: resolve the active archive memory in town before starting another.' :
-		playableLanes.length ?
-		'Next: choose a playable Revisit lane from town; rewards stay Revisit-only.' :
-		'Next: defeat a boss or retire gear to open a Revisit lane.';
-	return `
-        `).join('')
-      : `<p class="small muted">No unfinished Revisit lanes recorded.</p>`;
-    const bossName = cleanDisplayText(trophyStatus.source?.bossName || trophyActive?.bossName || 'Unknown Boss', 'Unknown Boss');
     const trophyName = cleanDisplayText(trophyStatus.source?.trophyName || trophyActive?.trophyName || 'Boss Trophy', 'Boss Trophy');
     const itemName = cleanDisplayText(famousStatus.source?.itemName || famousActive?.itemName || 'Famous Gear', 'Famous Gear');
     const famousMemoryTitle = cleanDisplayText(famousStatus.source?.memoryTitle || famousActive?.memoryTitle || `${itemName} Memory`, `${itemName} Memory`);
