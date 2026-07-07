@@ -158,6 +158,10 @@
   function renderDebtCollectorV1Status(state){
     const slot = document.getElementById(PANEL_ID);
     if (!slot || !state) return;
+    const api = debtApi();
+    if (api && typeof api.renderDebtCollectorPanel === 'function' && !slot.querySelector('[data-debt-borrow], #repayDebtBtn')) {
+      api.renderDebtCollectorPanel();
+    }
     injectCss();
     const existing = slot.querySelector('[data-debt-v1-status]');
     if (existing) existing.remove();
@@ -179,8 +183,12 @@
     const oldRenderTown = typeof renderTown === 'function' ? renderTown : null;
     if (!oldRenderTown || oldRenderTown.__debtCollectorV1Completion) return;
     const wrapped = function(){
-      const result = oldRenderTown.apply(this, arguments);
-      try { renderDebtCollectorV1Status(typeof S !== 'undefined' ? S : null); } catch (_) {}
+      let result;
+      try {
+        result = oldRenderTown.apply(this, arguments);
+      } finally {
+        try { renderDebtCollectorV1Status(typeof S !== 'undefined' ? S : null); } catch (_) {}
+      }
       return result;
     };
     wrapped.__debtCollectorV1Completion = true;
@@ -225,5 +233,6 @@
   wrapRenderTown();
   patchApi();
   injectCss();
-  if (typeof S !== 'undefined') renderDebtCollectorV1Status(S);
+  if (typeof render === 'function') render();
+  else if (typeof S !== 'undefined') renderDebtCollectorV1Status(S);
 })();

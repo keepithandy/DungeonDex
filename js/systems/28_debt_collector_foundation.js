@@ -597,8 +597,12 @@
   const oldRenderTown = typeof renderTown === 'function' ? renderTown : null;
   if (oldRenderTown && !oldRenderTown.__debtCollectorFoundation) {
     const wrapped = function(){
-      const result = oldRenderTown.apply(this, arguments);
-      renderDebtCollectorPanel();
+      let result;
+      try {
+        result = oldRenderTown.apply(this, arguments);
+      } finally {
+        renderDebtCollectorPanel();
+      }
       return result;
     };
     wrapped.__debtCollectorFoundation = true;
@@ -643,6 +647,8 @@
     debtCollectorBorrowContract,
     debtCollectorHighPressureState,
     debtCollectorFallbackState,
+    renderDebtCollectorPanel,
+    bindDebtCollectorActions,
     warning: pressureWarning,
     smoke
   };
