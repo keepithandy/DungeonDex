@@ -2001,19 +2001,20 @@ async function main() {
     const retireAccept = await clickRetireFlow(true, famousMark.itemId || '');
     record('Retire confirmation accept archives and removes exactly one item', !!retireAccept.ok && retireAccept.after.retired === retireAccept.before.retired + 1 && retireAccept.after.inventory === retireAccept.before.inventory - 1 && retireAccept.archived && retireAccept.archived.name && retireAccept.archived.rarity && retireAccept.archived.slot, JSON.stringify(retireAccept));
     record('Retired item archive snapshot preserves Famous Gear memory', Array.isArray(retireAccept.archived?.memoryTags) && retireAccept.archived.memoryTags.includes('Boss-Worn'), JSON.stringify(retireAccept.archived || null));
+    const retiredItemProbe = retireAccept?.item || {};
     const postRetireGearText = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return document.getElementById('inventoryPanel')?.innerText || ''; })()`);
-    record('Retired item removed from inventory card list', !postRetireGearText.includes(retireAccept.item.name), postRetireGearText.slice(0, 500));
+    record('Retired item removed from inventory card list', !!retireAccept.ok && !!retiredItemProbe.name && !postRetireGearText.includes(retiredItemProbe.name), postRetireGearText.slice(0, 500));
     await evalByValue(client, `(() => { S.screen = 'dex'; if (typeof render === 'function') render(); return true; })()`);
     const archiveTextAfterRetire = await evalByValue(client, `(() => document.getElementById('gearDex')?.innerText || document.getElementById('monsterDex')?.innerText || '')()`);
     const archiveLower = String(archiveTextAfterRetire || '').toLowerCase();
-    record('Retired item appears in Trophy Hall archive', archiveLower.includes(String(retireAccept.item.name || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.rarity || '').toLowerCase()) && archiveLower.includes(String(retireAccept.item.slot || '').toLowerCase()) && archiveLower.includes('famous gear record'), archiveTextAfterRetire.slice(0, 500));
+    record('Retired item appears in Trophy Hall archive', !!retireAccept.ok && archiveLower.includes(String(retiredItemProbe.name || '').toLowerCase()) && archiveLower.includes(String(retiredItemProbe.rarity || '').toLowerCase()) && archiveLower.includes(String(retiredItemProbe.slot || '').toLowerCase()) && archiveLower.includes('famous gear record'), archiveTextAfterRetire.slice(0, 500));
     record('Retired item archive displays Famous Gear memory label', archiveTextAfterRetire.includes('Famous Gear Record') && archiveTextAfterRetire.includes('Boss-Worn'), archiveTextAfterRetire.slice(0, 700));
     await client.send('Page.reload', { ignoreCache: true });
     await waitForCondition(client, `!!window.DungeonDexScenarioDevTools && !!window.DungeonDexTalents && typeof render === 'function' && typeof S !== 'undefined' && !!S && !!S.player && document.body && document.readyState !== 'loading'`, 15000);
     const retiredAfterReload = await getRetiredRelicState();
-    record('Retired item archive record persists after reload', Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retireAccept.item.name && r.rarity === retireAccept.item.rarity && r.slot === retireAccept.item.slot), JSON.stringify(retiredAfterReload.records[0] || null));
-    record('Retired Famous Gear memory persists after reload', Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retireAccept.item.name && Array.isArray(r.memoryTags) && r.memoryTags.includes('Boss-Worn')), JSON.stringify(retiredAfterReload.records[0] || null));
-    const gearAfterReload = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return Array.isArray(S.player?.inventory) ? S.player.inventory.some(item => item && item.id === ${JSON.stringify(retireAccept.item.id)}) : false; })()`);
+    record('Retired item archive record persists after reload', !!retireAccept.ok && Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retiredItemProbe.name && r.rarity === retiredItemProbe.rarity && r.slot === retiredItemProbe.slot), JSON.stringify(retiredAfterReload.records[0] || null));
+    record('Retired Famous Gear memory persists after reload', !!retireAccept.ok && Array.isArray(retiredAfterReload.records) && retiredAfterReload.records.some(r => r.name === retiredItemProbe.name && Array.isArray(r.memoryTags) && r.memoryTags.includes('Boss-Worn')), JSON.stringify(retiredAfterReload.records[0] || null));
+    const gearAfterReload = await evalByValue(client, `(() => { S.screen = 'gear'; if (typeof render === 'function') render(); return Array.isArray(S.player?.inventory) ? S.player.inventory.some(item => item && item.id === ${JSON.stringify(retiredItemProbe.id || '')}) : false; })()`);
     record('Retired item does not return to inventory after reload', gearAfterReload === false, JSON.stringify({ gearAfterReload }));
 
     // Mobile overflow sweep on gear and archive screens.
