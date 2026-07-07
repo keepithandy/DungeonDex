@@ -46,6 +46,7 @@ const ASSETS = [
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/30_passive_activation_gate_hotfix.js?build=${BUILD_QS}`,
+  `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
