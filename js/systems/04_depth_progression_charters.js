@@ -100,6 +100,8 @@
   }
 
   function dungeonDistrictIdentityForDepth(depth) {
+    const numericDepth = Math.floor(Number(depth));
+    const fallbackInput = !Number.isFinite(numericDepth) || numericDepth < 1;
     const district = districtByDepth(depth);
     const key = String(district?.id || 'lowfire').toLowerCase();
     const fallback = {
@@ -192,7 +194,7 @@
         safeFallback: false
       }
     };
-    return identities[key] || {
+    const identity = identities[key] || {
       ...fallback,
       key,
       name: district?.name || fallback.name,
@@ -200,6 +202,7 @@
       shortFlavor: district?.mood || district?.line || fallback.shortFlavor,
       bossApproachLine: 'Boss approach: the Stair tightens.'
     };
+    return fallbackInput ? { ...identity, safeFallback: true } : identity;
   }
 
   function dungeonDistrictSummary(depth){
