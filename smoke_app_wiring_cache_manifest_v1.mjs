@@ -21,10 +21,16 @@ function normalizeAsset(asset) {
 }
 
 async function main() {
-  const [appJs, swJs] = await Promise.all([
+  const [indexHtml, appJs, swJs] = await Promise.all([
+    readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'app.js'), 'utf8'),
     readFile(path.join(ROOT, 'sw.js'), 'utf8')
   ]);
+
+  const directScripts = extractMatches(
+    indexHtml,
+    /<script\s+src=["']([^"']+?\.js)(?:\?build=([^"']+))?["']/g
+  ).map(match => normalizeAsset(`${match[1]}?build=${match[2] || BUILD_QS}`));
 
   const dynamicLoads = extractMatches(
     appJs,
@@ -34,12 +40,19 @@ async function main() {
   const cacheAssets = new Set(
     extractMatches(swJs, /`([^`]+)`/g)
       .map(match => match[1])
-      .filter(asset => asset.includes('/js/systems/'))
       .map(normalizeAsset)
   );
 
   const uniqueLoads = [...new Set(dynamicLoads)];
+  const uniqueDirectScripts = [...new Set(directScripts)];
+  const missingDirect = uniqueDirectScripts.filter(asset => !cacheAssets.has(asset));
   const missing = uniqueLoads.filter(asset => !cacheAssets.has(asset));
+
+  if (missingDirect.length) {
+    console.error('Missing service-worker cache entries for direct index.html scripts:');
+    missingDirect.forEach(asset => console.error(`- ${asset}`));
+    process.exit(1);
+  }
 
   if (missing.length) {
     console.error('Missing service-worker cache entries for dynamic runtime assets:');
@@ -47,7 +60,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`PASS dynamic runtime assets are present in sw.js cache manifest (${uniqueLoads.length} checked)`);
+  console.log(`PASS index.html scripts and dynamic runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueLoads.length} checked)`);
 }
 
 main().catch(err => {
