@@ -8,13 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8 Merchant Gear Upgrades`
-* Current local package baseline: `v1.23.8 Merchant Gear Upgrades`
-* Current development target: `v1.23.8 Merchant Gear Upgrades`
+* Public/live itch version: `v1.23.8.01 Gear Section Polish`
+* Current local package baseline: `v1.23.8.01 Gear Section Polish`
+* Current development target: `v1.23.8.01 Gear Section Polish`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.01 - Gear Section Polish
+
+* Fixed escaped `formatMoney()` markup leaking into the Merchant Gear Upgrades panels.
+* Added a read-only click-to-inspect gear detail modal for visible equipped and inventory gear cards.
+* Added modal styling for a compact dark overlay with rarity, slot, level, upgrade, stat, sell-value, and summary details.
+* Added a Gear-tab money text cleanup extension so upgrade cards display `50c` instead of raw `<span>` markup.
+* Bumped runtime/cache/version authority labels to `v1.23.8.01`.
+* No purchase costs, stat math, inventory mutation, equip behavior, selling behavior, monster scaling, rewards, debt behavior, Revisit behavior, or dungeon-entry rules changed.
+
+---
 
 ## v1.23.8 - Merchant Gear Upgrades
 
@@ -78,57 +89,3 @@ This changelog records what changed and why.
 ## v1.23.3 - Guild Journal / Memory Board
 
 * Added the read-only Guild Journal / Memory Board to the Archive surface.
-* The Journal summarizes boss trophies, Revisit history, famous gear memories, rival traces, Debt status, merchant-upgrade records, and boss-progress records using existing save data only.
-* The Journal does not add rewards, start/complete actions, spending, borrowing, repayment, or progression hooks.
-* Added `smoke_journal_v1233.mjs` to verify the read-only model/render contract and safe empty/populated states.
-* Bumped public/runtime/cache labels to `v1.23.3` with build query `1.23.3-guild-journal-memory-board`.
-
----
-
-## v1.23.2 - Revisit v1 Completion Verification
-
-* Verified Revisit v1 around three live town lanes: Trophy Echo, Famous Gear Memory, and Rival Trace.
-* Trophy Echo remains tied to boss trophy or boss record history, starts from town, resolves from town, records history, and preserves Memory Marks through reload.
-* Famous Gear Memory remains tied to retired gear archive history, starts from town, resolves from town, records archive history, and does not return the retired item as loot.
-* Rival Trace is treated as the third live Revisit lane: named rival elite history can start a safe archive trace, resolve it from town, and record trace history without opening a new hunt, board mission, combat path, reward loop, or progression shortcut.
-* `smoke_revisit_routes_v173.mjs` is the primary verification target and covers availability, start, active reload persistence, completion history, duplicate blocking, locked future lanes, and adjacent-system neutrality.
-* No version bump, combat changes, gear stat changes, economy changes, Debt changes, or main dungeon progression changes were added.
-
----
-
-## v1.23.2 - Famous Gear Memory Revisit
-
-* Added a focused Famous Gear Memory state-shape patch so older saves and fixtures repair `player.revisitState.famousGear` before the town lane reads, starts, or resolves it.
-* Famous Gear Memory now has the needed live-state safety shape for `active`, `history`, `completedKeys`, and `lastResult`, including recovery for an active route key with missing active memory data.
-* Kept the lane archive-only: the retired item stays retired, and the loop does not change combat, gear stats, economy, or main dungeon progression.
-* Bumped public/runtime/cache labels to `v1.23.2` with build query `1.23.2-famous-gear-memory-revisit`.
-* Added the Famous Gear Memory state patch to the HTML load order and service worker cache list.
-* Added the current Debt Collector completion script to the service worker cache list so cached builds match the current HTML script list.
-* Fixed the runtime monster cue helper so it uses the passed monster name instead of stale variable references.
-* Existing Revisit smoke coverage checks Famous Gear availability, start, active reload persistence, completion history, duplicate blocking, and ledger neutrality.
-
----
-
-## v1.23.1 - Trophy Echo Prototype Stabilization
-
-* Hardened Trophy Echo save normalization, active-state validation, and duplicate-blocking checks without expanding the lane.
-* Clarified the Revisit town copy so the playable Trophy Echo lane stays distinct from the still-inactive planned lanes.
-* Tightened revisit smoke coverage for duplicate start/resolve blocking, reload persistence, and the existing Memory Mark contract.
-
----
-
-## v1.23.1 - Trophy Echo Prototype Stabilization
-
-* Activated Trophy Echo as the first live Revisit lane in town.
-* Trophy Echo now locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history in save data.
-* Added a Revisit-only `Memory Mark` result that persists through save and reload without touching combat, gear stats, monster scaling, or broad progression activation.
-* Famous Gear Memory remains inactive/planned, and the primary dungeon path remains Enter Dungeon / Continue Run.
-
----
-
-## v1.22.0 - Trophy Echo Content Seed
-
-* Trophy Echo now has a small content seed for future replay-memory flavor.
-* Added short player-facing echo hooks around boss trophies, prior victories, and archive memory.
-* Kept Revisit locked, preview-only, and non-playable, with no route entry, claim, completion, reward, or save mutation.
-* Preserved Debt Collector behavior, combat behavior, economy behavior, and the existing build-label contract.
