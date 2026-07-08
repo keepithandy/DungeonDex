@@ -6,6 +6,8 @@
   if (window.DDGearUpgradeMoneyTextCleanup) return;
   window.DDGearUpgradeMoneyTextCleanup = true;
 
+  let cleanupQueued = false;
+
   function cleanMoneyText(raw){
     return String(raw || '')
       .replace(/<[^>]*>/g, '')
@@ -25,6 +27,15 @@
     document.querySelectorAll('.merchant-upgrade-card .pill, .merchant-upgrade-card p, .gear-upgrade-summary-card .pill, .gear-upgrade-summary-card p').forEach(cleanNodeText);
   }
 
+  function queueClean(){
+    if (cleanupQueued) return;
+    cleanupQueued = true;
+    window.requestAnimationFrame(function(){
+      cleanupQueued = false;
+      cleanUpgradeMoneyText();
+    });
+  }
+
   function wrapRender(name){
     const fn = window[name] || (typeof globalThis !== 'undefined' ? globalThis[name] : null);
     if (typeof fn !== 'function' || fn.__gearUpgradeMoneyTextCleanup) return false;
@@ -39,10 +50,20 @@
     return true;
   }
 
+  function installObserver(){
+    if (!window.MutationObserver || window.__ddGearUpgradeMoneyTextObserver) return;
+    const observer = new MutationObserver(function(mutations){
+      if (mutations.some(mutation => mutation.addedNodes && mutation.addedNodes.length)) queueClean();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.__ddGearUpgradeMoneyTextObserver = observer;
+  }
+
   function install(){
     wrapRender('renderTown');
     wrapRender('renderGear');
     wrapRender('renderGearUpgradeSummaryPanel');
+    installObserver();
     cleanUpgradeMoneyText();
   }
 
