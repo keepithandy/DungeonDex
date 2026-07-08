@@ -42,6 +42,7 @@ const ASSETS = [
   `./js/systems/25_town_wallet_chip_fix.js?build=${BUILD_QS}`,
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
+  `./js/systems/39_gear_upgrade_summary_panel.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
