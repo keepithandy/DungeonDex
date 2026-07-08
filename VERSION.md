@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8 Merchant Gear Upgrades
+v1.23.8.01 Gear Section Polish
 
 ## Current Local Package Version
-v1.23.8 Merchant Gear Upgrades
+v1.23.8.01 Gear Section Polish
 
 ## Current Development Target
-v1.23.8 Merchant Gear Upgrades
+v1.23.8.01 Gear Section Polish
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
