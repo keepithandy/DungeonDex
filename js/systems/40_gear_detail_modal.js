@@ -288,7 +288,7 @@
       .gear-compare-cards span{display:block;margin-bottom:3px;color:rgba(245,222,180,.62);font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
       .gear-compare-cards b{display:block;color:rgba(248,242,226,.92);font-size:.78rem;line-height:1.15;overflow-wrap:anywhere}
       .gear-compare-grid{display:grid;grid-template-columns:minmax(0,1.2fr) repeat(3,minmax(0,.8fr));gap:1px;overflow:hidden;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.07)}
-      .gear-compare-head,.gear-compare-row{display:contents}
+      .gear-compare-row{display:contents}
       .gear-compare-head,.gear-compare-row>span,.gear-compare-row>b{padding:7px 8px;background:rgba(8,8,8,.44);font-size:.72rem;line-height:1.15;text-align:right}
       .gear-compare-head{color:rgba(245,222,180,.7);font-size:.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
       .gear-compare-stat{text-align:left!important;color:rgba(255,238,210,.78)}
