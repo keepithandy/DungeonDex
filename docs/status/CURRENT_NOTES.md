@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8 - Merchant Gear Upgrades
+- DungeonDex v1.23.8.01 - Gear Section Polish
+
+## v1.23.8.01 Gear Section Polish
+- Merchant Gear Upgrade money text no longer leaks raw `<span>` markup in the town or Gear-tab upgrade panels.
+- Gear cards now support a read-only click-to-inspect detail modal.
+- The modal summarizes visible equipped/inventory gear with source, slot, level, rarity, upgrade level, score, sell value, stats, summary, set, maker/theme, and memory labels when available.
+- Gear inspection is display-only. It does not equip, sell, retire, buy upgrades, change costs, mutate state, or change save data.
+- Runtime/cache/version authority labels are now `v1.23.8.01`.
 
 ## v1.23.8 Merchant Gear Upgrades
 - Merchant Gear Upgrades are the active simple progression system.
@@ -58,53 +65,7 @@
 - The Guild Journal Boss Trophy section consumes the readable summary and remains read-only.
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
 
-## v1.23.3 Guild Journal / Memory Board
-- The Archive surface includes a read-only Guild Journal summary band for boss trophies, Revisit memories, Debt status, merchant upgrades, and boss progress.
-- The Journal only reads existing state and shows safe copy when records are missing or malformed.
-- The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.
-- `smoke_journal_v1233.mjs` verifies the read-only summary model and archive-panel render contract.
-
-## v1.23.2 Revisit v1 Closeout
-- Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit lanes.
-- All three lanes start and resolve from town.
-- All three lanes record completion history under `player.revisitState` and persist through save/reload.
-- Trophy Echo remains tied to boss trophy or boss record history.
-- Famous Gear Memory remains tied to retired gear archive records and never returns the retired item as loot.
-- Rival Trace remains tied to named rival elite history and does not create a new hunt, combat path, board mission, reward loop, or progression shortcut.
-- Debt Pressure and Board Echo remain locked/planned.
-- `smoke_revisit_routes_v173.mjs` is the primary Revisit v1 verification smoke.
-
 ## Current Revisit Lane Status
 - Trophy Echo: live town memory lane tied to boss trophy or boss record history.
 - Famous Gear Memory: live town archive lane tied to retired gear records.
-- Rival Trace: live town archive trace lane tied to named rival elite history.
-- Debt Pressure: locked/planned.
-- Board Echo: locked/planned.
-
-## Protected Systems
-- Enter Dungeon / Continue Run remains the primary dungeon path.
-- Merchant gear upgrades are limited to equipped weapon and armor pieces with fixed costs and a `+3` cap.
-- Gear stat math, monster scaling, economy rewards, and dungeon progression should stay outside Revisit memory patches unless explicitly scoped.
-- Service worker/cache labels must stay aligned with the visible build label.
-
-## Smoke Targets
-- Compact smoke suite: `node smoke_compact_suite.mjs`
-- Merchant gear upgrades verification: `node smoke_merchant_gear_upgrades_v1238.mjs`
-- Rival Trace memory v1 verification: `node smoke_rival_trace_memory_v1.mjs`
-- Primary Revisit v1 verification: `node smoke_revisit_routes_v173.mjs`
-- Useful adjacent checks:
-  - `node smoke_journal_v1233.mjs`
-  - `node smoke_famous_gear_memory_v1.mjs`
-  - `node smoke_boss_trophy_v1.mjs`
-  - `node smoke_debt_collector_v169.mjs`
-
-## Recent Historical Notes
-
-### v1.23.2 Famous Gear Memory Revisit
-- Famous Gear Memory became the second live Revisit lane after Trophy Echo.
-- It appears in town, locks against missing retired gear history, opens from retired gear archive history, starts a safe archive memory, resolves in town, and records completion history.
-- The item stays retired. This patch does not return gear rewards, open a combat path, change economy math, or alter main dungeon progression.
-
-### v1.23.1 Trophy Echo Prototype Stabilization
-- Trophy Echo became the first live Revisit lane.
-- It appears in town, locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history plus Memory Marks in save data.
+- Rival Trace: live town archive trace tied to named rival elite history.
