@@ -100,13 +100,13 @@ See:
 
 ## Current Build
 
-**v1.23.8 - Merchant Gear Upgrades Replace Talent System**
+**v1.23.8 - Merchant Gear Upgrades**
 
-This build replaces the active Talent tree with Merchant Gear Upgrades. The Lowfire Market now lets the player spend copper to permanently improve equipped weapon and armor pieces up to +3, with item-level persistence, exact upgrade costs, and live stat application.
+This build makes Merchant Gear Upgrades the active simple progression system. The Lowfire Market lets the player spend copper to permanently improve equipped weapon and armor pieces up to +3, with item-level persistence, exact upgrade costs, and live stat application.
 
-Old Talent ledger/learned data remains inert compatibility state only. The Gear surface and Guild Journal now point at merchant upgrades instead of Talent preview copy.
+Legacy progression save data remains inert compatibility state only. The active Gear surface, Lowfire Market, and Guild Journal now point at merchant upgrades.
 
-The build label, runtime pointer, service worker cache name, and version authority now target v1.23.8.
+The build label, runtime pointer, service worker cache name, and version authority target v1.23.8.
 
 ## Current Smoke Target
 
@@ -122,7 +122,7 @@ Focused merchant-upgrade checks are available with:
 node smoke_merchant_gear_upgrades_v1238.mjs
 ```
 
-That smoke covers merchant panel rendering, upgrade purchase rules, save/reload persistence, cap enforcement, malformed upgrade repair, Talent compatibility neutrality, and Journal integration.
+That smoke covers merchant panel wiring, replacement cleanup, upgrade purchase hooks, service-worker cache wiring, and Journal integration.
 
 For the current open-issue sweep, documentation-only validation should also include:
 
@@ -152,13 +152,13 @@ This build completed Boss Trophy v1 as a durable progression memory system. Boss
 
 **v1.23.3 - Guild Journal / Memory Board**
 
-This build added the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, Talent, and boss-progress records using safe read-only state only.
+This build added the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, merchant-upgrade, and boss-progress records using safe read-only state only.
 
 ## Previous Build
 
 **v1.23.2 - Famous Gear Memory Revisit**
 
-This patch hardened the Famous Gear Memory lane so older saves and fixtures always repair `player.revisitState.famousGear` before town start/resolve actions use it. The lane stays archive-only: retired gear remains retired, and the memory does not alter combat, gear stats, economy, Talent values, or main dungeon progression.
+This patch hardened the Famous Gear Memory lane so older saves and fixtures always repair `player.revisitState.famousGear` before town start/resolve actions use it. The lane stays archive-only: retired gear remains retired, and the memory does not alter combat, gear stats, economy, legacy progression fields, or main dungeon progression.
 
 ## Previous Build
 
@@ -166,20 +166,4 @@ This patch hardened the Famous Gear Memory lane so older saves and fixtures alwa
 
 This patch hardened the first playable Revisit loop. Trophy Echo locks against missing boss history, opens from real boss records, starts an active memory, resolves in town, records completion history, and persists Memory Marks across reloads.
 
-No dungeon combat path, debt math, gear stats, monster scaling, or broader Talent activation was added.
-
-## Previous Build
-
-**v1.20.47 - Hunter Board Clarity Spend Preview**
-
-This patch added a read-only preview of the first safe Talent spend target, `hunter_board_clarity`. It did not spend points, learn nodes, mutate save state, enable spending, or add Talent unlock UI.
-
-## Previous Build
-
-**v1.20.46 - First Controlled Boss Trophy Talent Award**
-
-This patch enabled the first controlled Boss Trophy Milestone Talent point award path behind the live gate. The award is atomic: one point, one claim record, and duplicate claims block repeat awards.
-
-## Previous Build
-
-**v1.20.41 - Talent Award Claim Tracking Plan**
+No dungeon combat path, debt math, gear stats, monster scaling, or broader progression activation was added.
