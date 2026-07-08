@@ -63,7 +63,7 @@ def main() -> int:
 
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in files:
-            archive.write(path, Path("DungeonDex") / path.relative_to(root))
+            archive.write(path, path.relative_to(root))
 
     print(f"Wrote {output_path}")
     print(f"Included {len(files)} files")
