@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.8**
+Current baseline: **DungeonDex v1.23.8.01**
 
 ## Try It First
 
@@ -20,7 +20,7 @@ Focused merchant-upgrade checks are available with:
 node smoke_merchant_gear_upgrades_v1238.mjs
 ```
 
-Current status: active flagship browser RPG. The live build includes the core dungeon loop, merchant gear upgrades, Guild Journal memory surfaces, and safe Revisit lanes. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
+Current status: active flagship browser RPG. The live build includes the core dungeon loop, merchant gear upgrades, Guild Journal memory surfaces, safe Revisit lanes, a Gear-tab upgrade summary, and a click-to-inspect gear detail modal. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
 
 ## Player Promise
 
@@ -56,6 +56,7 @@ DungeonDex is built around a simple loop:
 - **Famous Gear Memory:** Live Revisit lane tied to retired gear archive history.
 - **Rival Trace:** Live Revisit lane tied to named rival elite history.
 - **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
+- **Gear detail modal:** Click a visible equipped or inventory gear card for a simple read-only rundown.
 - **Debt Collector foundation:** Borrowing, repayment, pressure, and collection status foundation with conservative guardrails.
 
 ## Planned / Locked Systems
@@ -77,93 +78,3 @@ Famous Gear Memory is the second live Revisit lane. It uses retired gear archive
 Rival Trace is the third live Revisit lane. It uses named rival elite history to start a safe archive trace from town, resolve it, and record trace history without opening a new hunt, board mission, combat path, or reward loop.
 
 The Revisit prototype starts and resolves entirely from town. It records completion history, preserves it across reloads, and keeps the main dungeon path separate from memory lanes.
-
-Debt Pressure and Board Echo remain locked/planned.
-
-## Open Issue Roadmap
-
-The current open issue set is split into four safe lanes:
-
-1. **Playable/system completion** — Board Echo v1 and Debt Pressure v1.
-2. **Identity layer** — premise, glossary, lore, factions, player-facing copy, README, and title/loading direction.
-3. **Visual/public readiness** — visual rules, title/logo direction, screenshot plan, and asset inventory.
-4. **Smoke hardening** — stable public-label coverage once copy targets settle.
-
-See:
-
-- `docs/OPEN_ISSUE_SWEEP.md`
-- `docs/PLAYABLE_SYSTEMS_QUEUE.md`
-- `docs/IP_LAYER_GUIDE.md`
-- `docs/ASSET_INVENTORY.md`
-- `docs/PACKAGE_STRUCTURE.md`
-- `docs/status/CURRENT_NOTES.md`
-
-## Current Build
-
-**v1.23.8 - Merchant Gear Upgrades**
-
-This build makes Merchant Gear Upgrades the active simple progression system. The Lowfire Market lets the player spend copper to permanently improve equipped weapon and armor pieces up to +3, with item-level persistence, exact upgrade costs, and live stat application.
-
-Legacy progression save data remains inert compatibility state only. The active Gear surface, Lowfire Market, and Guild Journal now point at merchant upgrades.
-
-The build label, runtime pointer, service worker cache name, and version authority target v1.23.8.
-
-## Current Smoke Target
-
-Run the compact smoke suite after this patch:
-
-```bash
-node smoke_compact_suite.mjs
-```
-
-Focused merchant-upgrade checks are available with:
-
-```bash
-node smoke_merchant_gear_upgrades_v1238.mjs
-```
-
-That smoke covers merchant panel wiring, replacement cleanup, upgrade purchase hooks, service-worker cache wiring, and Journal integration.
-
-For the current open-issue sweep, documentation-only validation should also include:
-
-```bash
-git diff --check
-```
-
-## Package Structure
-
-The root folder should stay limited to browser/runtime entry files, version/history files, and the stable compact smoke runner. Status notes now live in `docs/status/`, and package-layout rules live in `docs/PACKAGE_STRUCTURE.md`.
-
-Individual smoke scripts currently remain at the root because several scripts load runtime files relative to their own location. Move them into `tests/smoke/` only as a separate path-aware migration that updates the compact runner, README commands, status notes, and any script-local file loading.
-
-## Previous Build
-
-**v1.23.5 - Famous Gear Memory v1 Completion**
-
-This build completed Famous Gear Memory v1 as a durable progression memory system. Famous Gear records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy memory state, and the Guild Journal shows the player-facing Famous Gear summary.
-
-## Previous Build
-
-**v1.23.4 - Boss Trophy v1 Completion**
-
-This build completed Boss Trophy v1 as a durable progression memory system. Boss Trophy records normalize into a readable canonical shape, duplicate records collapse safely, save/reload preserves modern and legacy trophy state, and the Guild Journal shows the player-facing Boss Trophy summary.
-
-## Previous Build
-
-**v1.23.3 - Guild Journal / Memory Board**
-
-This build added the read-only Guild Journal memory board in the Archive surface. It summarizes existing Revisit, Debt, merchant-upgrade, and boss-progress records using safe read-only state only.
-
-## Previous Build
-
-**v1.23.2 - Famous Gear Memory Revisit**
-
-This patch hardened the Famous Gear Memory lane so older saves and fixtures always repair `player.revisitState.famousGear` before town start/resolve actions use it. The lane stays archive-only: retired gear remains retired, and the memory does not alter combat, gear stats, economy, legacy progression fields, or main dungeon progression.
-
-## Previous Build
-
-**v1.23.1 - Trophy Echo Prototype Stabilization**
-
-This patch hardened the first playable Revisit loop. Trophy Echo locks against missing boss history, opens from real boss records, starts an active memory, resolves in town, records completion history, and persists Memory Marks across reloads.
-
-No dungeon combat path, debt math, gear stats, monster scaling, or broader progression activation was added.
