@@ -141,7 +141,7 @@
     const statMarkup = stats.length
       ? stats.map(([key, value]) => `<span class="gear-detail-stat"><b>${esc(statLabel(key))}</b>${esc(formatNumber(value))}</span>`).join('')
       : `<span class="gear-detail-stat"><b>Power</b>${esc(formatNumber(power))}</span>`;
-    return `<div class="gear-detail-backdrop" data-gear-detail-close="1">
+    return `<div class="gear-detail-backdrop">
       <section class="gear-detail-window" role="dialog" aria-modal="true" aria-label="Gear details">
         <button class="ghost mini gear-detail-close" type="button" data-gear-detail-close="1">Close</button>
         <div class="gear-detail-kicker">${esc(entry.source)} • ${esc(slot)} • ${esc(level)}</div>
@@ -206,7 +206,7 @@
 
   document.addEventListener('click', function(event){
     const closeTarget = event.target.closest?.('[data-gear-detail-close]');
-    if (closeTarget) {
+    if (closeTarget || event.target.classList?.contains('gear-detail-backdrop')) {
       closeGearDetail();
       return;
     }
