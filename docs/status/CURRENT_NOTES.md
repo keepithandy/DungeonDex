@@ -7,16 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8 - Merchant Gear Upgrades Replace Talent System
+- DungeonDex v1.23.8 - Merchant Gear Upgrades
 
-## v1.23.8 Merchant Gear Upgrades Replace Talent System
-- The active player-facing Talent Tree Preview has been replaced by Merchant Gear Upgrades.
-- The Lowfire Market now sells permanent upgrades for equipped weapon and armor pieces.
+## v1.23.8 Merchant Gear Upgrades
+- Merchant Gear Upgrades are the active simple progression system.
+- The Lowfire Market sells permanent upgrades for equipped weapon and armor pieces.
 - Each eligible item stores `upgradeLevel` from `0` to `3` and persists it through save/reload.
 - Upgrade costs are fixed at `50c`, `125c`, and `250c`.
 - Weapon upgrades add flat Power. Armor upgrades add flat Guard and HP.
-- Old `talentLedger`, `talentEarning`, `talentLearnedIds`, and related Talent save data remain compatibility-safe but no longer grant gameplay effects.
-- `smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the new progression path.
+- Legacy progression save data remains compatibility-safe but no longer grants gameplay effects or active progression UI.
+- `smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
 - The current open issue set is grouped into playable/system completion, identity/documentation, visual/asset readiness, and smoke hardening tracks.
@@ -59,7 +59,7 @@
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
 
 ## v1.23.3 Guild Journal / Memory Board
-- The Archive surface now includes a read-only Guild Journal summary band for boss trophies, Revisit memories, Debt status, Talent memory, and boss progress.
+- The Archive surface includes a read-only Guild Journal summary band for boss trophies, Revisit memories, Debt status, merchant upgrades, and boss progress.
 - The Journal only reads existing state and shows safe copy when records are missing or malformed.
 - The Journal does not add buttons, rewards, spending, borrowing, repayment, or Revisit activation.
 - `smoke_journal_v1233.mjs` verifies the read-only summary model and archive-panel render contract.
@@ -103,14 +103,8 @@
 ### v1.23.2 Famous Gear Memory Revisit
 - Famous Gear Memory became the second live Revisit lane after Trophy Echo.
 - It appears in town, locks against missing retired gear history, opens from retired gear archive history, starts a safe archive memory, resolves in town, and records completion history.
-- The item stays retired. This patch does not return gear rewards, open a combat path, change economy math, change Talent values, or alter main dungeon progression.
+- The item stays retired. This patch does not return gear rewards, open a combat path, change economy math, or alter main dungeon progression.
 
 ### v1.23.1 Trophy Echo Prototype Stabilization
 - Trophy Echo became the first live Revisit lane.
 - It appears in town, locks against missing boss history, opens from boss trophy history, starts a short active memory, resolves in town, and records completion history plus Memory Marks in save data.
-
-### v1.23.2 Talent Passive Framework Completion
-- The Talent API exposes a canonical passive inventory for known nodes.
-- `hunter_board_clarity` remains the controlled spend path and live copy-only renderer effect.
-- `debt_collector_clarity` remains guarded until a separate issue authorizes live panel activation.
-- Placeholder passives remain preview-only with no combat, economy, reward, Revisit, or progression effects.
