@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.23.9 Gear Upgrade Summary panel.
+// DungeonDex v1.23.8.01 Gear Upgrade Summary panel.
 // Read-only Gear-tab summary for Merchant Gear Upgrades; purchasing stays in town.
 (function(){
   if (window.DDGearUpgradeSummaryPanel) return;
@@ -18,10 +18,11 @@
     return String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
   }
 
-  function money(value){
+  function moneyPlain(value){
+    const amount = Math.max(0, Math.floor(Number(value) || 0));
     return typeof formatMoney === 'function'
-      ? formatMoney(Math.max(0, Math.floor(Number(value) || 0)))
-      : `${Math.max(0, Math.floor(Number(value) || 0))}c`;
+      ? safeText(formatMoney(amount), `${amount}c`)
+      : `${amount}c`;
   }
 
   function upgradeModels(state){
@@ -40,13 +41,15 @@
     const capped = model?.capped === true || level >= cap;
     const hasItem = !!model?.item;
     const canBuy = hasItem && !capped && model?.affordable === true;
+    const costText = moneyPlain(model?.cost);
+    const missingText = moneyPlain(model?.missingCopper);
     const statusText = !hasItem
       ? `Equip a ${label.toLowerCase()} first.`
       : capped
         ? 'Maxed'
         : canBuy
-          ? `Ready in town for ${safeText(money(model?.cost), 'coin')}`
-          : `Need ${safeText(money(model?.missingCopper), 'more coin')}`;
+          ? `Ready in town for ${costText}`
+          : `Need ${missingText}`;
     const currentStat = safeText(model?.currentStat, `+${level}`);
     const nextStat = safeText(model?.nextStat, capped ? `+${level}` : `+${level + 1}`);
     return `<article class="shop-item merchant-upgrade-card gear-upgrade-summary-card">
@@ -60,7 +63,7 @@
       <div class="tag-row">
         <span class="pill">Current ${esc(currentStat)}</span>
         ${hasItem && !capped ? `<span class="pill">Next ${esc(nextStat)}</span>` : ''}
-        ${hasItem && !capped ? `<span class="pill">${esc(money(model?.cost))}</span>` : ''}
+        ${hasItem && !capped ? `<span class="pill">${esc(costText)}</span>` : ''}
       </div>
       <p class="small muted">${esc(statusText)} Upgrades are bought from the Lowfire Market.</p>
     </article>`;
