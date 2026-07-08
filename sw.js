@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8-merchant-gear-upgrades-replace-talent-system';
+const CACHE_NAME = 'dungeondex-v1.23.8.01-gear-section-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8-merchant-gear-upgrades-replace-talent-system';
+const BUILD_QS = '1.23.8.01-gear-section-polish';
 const ASSETS = [
   './',
   './index.html',
@@ -43,7 +43,9 @@ const ASSETS = [
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/39_gear_upgrade_summary_panel.js?build=${BUILD_QS}`,
+  `./js/systems/40_gear_detail_modal.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
+  `./js/systems/42_gear_upgrade_money_text_cleanup.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
