@@ -32,9 +32,6 @@ const ASSETS = [
   `./js/systems/16_relic_forge_crafting.js?build=${BUILD_QS}`,
   `./js/systems/17_relic_forge_clarity.js?build=${BUILD_QS}`,
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
-  `./js/systems/19_warden_talents_lowfire_board.js?build=${BUILD_QS}`,
-  `./js/systems/32_talent_award_claim_repair_contract.js?build=${BUILD_QS}`,
-  `./js/systems/33_talent_hunter_board_clarity_spend.js?build=${BUILD_QS}`,
   `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
   `./js/systems/34_debt_collector_v1_completion.js?build=${BUILD_QS}`,
   `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
@@ -45,7 +42,6 @@ const ASSETS = [
   `./js/systems/25_town_wallet_chip_fix.js?build=${BUILD_QS}`,
   `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
-  `./js/systems/30_passive_activation_gate_hotfix.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
