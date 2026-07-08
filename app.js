@@ -58,6 +58,7 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
     window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
     window.setTimeout(function(){ loadModule('./js/systems/31_revisit_activation_surface_lockdown.js?build=' + qs, 'DDRevisitActivationSurfaceLockdown', 'Revisit activation surface lockdown'); }, 420);
+    window.setTimeout(function(){ loadModule('./js/systems/39_gear_upgrade_summary_panel.js?build=' + qs, 'DDGearUpgradeSummaryPanel', 'Gear upgrade summary panel'); }, 500);
     window.setTimeout(function(){ loadModule('./js/systems/41_debt_pressure_v1.js?build=' + qs, 'DDDebtPressureV1', 'Debt Pressure v1'); }, 580);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
