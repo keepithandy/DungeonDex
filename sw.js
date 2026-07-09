@@ -46,6 +46,7 @@ const ASSETS = [
   `./js/systems/40_gear_detail_modal.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   `./js/systems/42_gear_upgrade_money_text_cleanup.js?build=${BUILD_QS}`,
+  `./js/systems/43_devkit_reset_hold.js?build=${BUILD_QS}`,
   './assets/trophies/hollow_stair_skull_trophy.png'
 ];
 const FRESH_FIRST_DESTINATIONS = new Set(['script','style','worker','manifest']);
