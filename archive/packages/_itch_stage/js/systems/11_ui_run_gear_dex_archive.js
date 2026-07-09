@@ -585,6 +585,14 @@
     return badges.join('');
   }
 
+  function gearDisplayName(item, showZero = false) {
+    if (typeof formatGearDisplayName === 'function') return formatGearDisplayName(item, { showZero });
+    const name = cleanGearText(item && item.name, '');
+    if (!name) return '';
+    const level = Math.max(0, Math.floor(Number(item && item.upgradeLevel) || 0));
+    return level > 0 || showZero ? `${name} +${level}` : name;
+  }
+
   function equippedSlotCard(slot) {
     const equipment = isPlainObject(S.player?.equipment) ? S.player.equipment : {};
     const item = isPlainObject(equipment[slot]) ? equipment[slot] : null;
@@ -595,7 +603,7 @@
       </article>`;
     }
     const rarityKey = itemRarityKey(item);
-    const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
+    const itemName = gearDisplayName(item);
     const typeLabel = slotDisplayName(item.slot || slot);
     const slotTypeLabel = gearSlotTypeText(slotLabel, typeLabel);
     const levelLabel = getItemLevelLabel(item);
@@ -736,7 +744,7 @@
     const rarityKey = itemRarityKey(item);
     const slotLabel = slotDisplayName(item.slot);
     const slotTypeLabel = gearSlotTypeText(slotLabel, slotDisplayName(item.slot));
-    const itemName = cleanGearText(item.name, `${slotLabel} Gear`);
+    const itemName = gearDisplayName(item);
     const maker = cleanGearText(item.maker);
     const summary = cleanGearText(item.summary);
     const delta = gearUpgradeDelta(item, S);

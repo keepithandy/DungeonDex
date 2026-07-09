@@ -43,29 +43,33 @@
     const canBuy = hasItem && !capped && model?.affordable === true;
     const costText = moneyPlain(model?.cost);
     const missingText = moneyPlain(model?.missingCopper);
+    const tierText = safeText(model?.tierText, `+${level} / +${cap}`);
+    const levelText = safeText(model?.levelText, `+${level}`);
+    const perTierText = safeText(model?.perTierText, label === 'Armor' ? '+2 Guard and +8 HP per tier' : '+2 Power per tier');
+    const currentBonusText = safeText(model?.currentBonusText, model?.currentStat || levelText);
+    const nextBonusText = safeText(model?.nextBonusText, model?.nextStat || `+${level + 1}`);
     const statusText = !hasItem
       ? `Equip a ${label.toLowerCase()} first.`
       : capped
-        ? 'Maxed'
+        ? 'Maxed at +3.'
         : canBuy
-          ? `Ready in town for ${costText}`
+          ? `Next cost ${costText}.`
           : `Need ${missingText}`;
-    const currentStat = safeText(model?.currentStat, `+${level}`);
-    const nextStat = safeText(model?.nextStat, capped ? `+${level}` : `+${level + 1}`);
     return `<article class="shop-item merchant-upgrade-card gear-upgrade-summary-card">
       <div class="split">
         <div>
           <div class="item-name">${esc(label)}</div>
-          <div class="item-meta">${esc(itemName)} • +${esc(String(level))} / +${esc(String(cap))}</div>
+          <div class="item-meta">${esc(itemName)} • ${esc(tierText)}</div>
         </div>
-        <span class="pill ${capped ? 'rarity-uncommon' : ''}">${esc(capped ? 'Maxed' : `+${level}`)}</span>
+        <span class="pill ${capped ? 'rarity-uncommon' : ''}">${esc(capped ? 'Maxed' : levelText)}</span>
       </div>
       <div class="tag-row">
-        <span class="pill">Current ${esc(currentStat)}</span>
-        ${hasItem && !capped ? `<span class="pill">Next ${esc(nextStat)}</span>` : ''}
-        ${hasItem && !capped ? `<span class="pill">${esc(costText)}</span>` : ''}
+        <span class="pill">${esc(perTierText)}</span>
+        <span class="pill">Current bonus ${esc(currentBonusText)}</span>
+        ${hasItem && !capped ? `<span class="pill">Next cost ${esc(costText)}</span>` : ''}
+        ${hasItem && capped ? '<span class="pill rarity-uncommon">Maxed at +3</span>' : ''}
       </div>
-      <p class="small muted">${esc(statusText)} Upgrades are bought from the Lowfire Market.</p>
+      <p class="small muted">${esc(`${label} ${levelText} gives ${currentBonusText}. ${perTierText}. ${!hasItem ? statusText : capped ? 'Maxed at +3.' : `Next tier gives ${nextBonusText}. ${statusText}`}`)} Upgrades are bought from the Lowfire Market.</p>
     </article>`;
   }
 
@@ -81,7 +85,7 @@
     panel.innerHTML = `<div class="split market-subhead gear-upgrade-summary-head">
       <div>
         <h2>Gear Upgrades</h2>
-        <p class="small muted">Permanent weapon and armor improvements from the Lowfire Market.</p>
+        <p class="small muted">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.</p>
       </div>
       <span class="pill">${esc(String(maxedCount))} maxed • ${esc(String(readyCount))} ready</span>
     </div>

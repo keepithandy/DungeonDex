@@ -1,0 +1,520 @@
+/* DungeonDex v1.24.0 Lore Layer - IP Interface Patch
+ * Transforms generic panels into lore-framed surfaces:
+ * Guild Ledgers, Town Notices, Dungeon Writs, Monster Archives,
+ * Merchant Ledgers, Forge Counters, and Guild Journals.
+ *
+ * Structure:
+ * - Navigation & Headers
+ * - Ledger Card styling
+ * - Notice Board styling
+ * - Contract Card styling (Dungeon Writ, Debt Card)
+ * - Merchant Card styling (Ledger, Forge, Upgrades)
+ * - Archive Card styling (Records, Logs)
+ * - Journal Card styling
+ * - Responsive & utility tweaks
+ *
+ * All existing IDs, data-attributes, JS hooks, and gameplay mechanics
+ * remain untouched. Only HTML structure and CSS classes are layered.
+ */
+
+/* ========================================
+   GUILD HEADER
+   ======================================== */
+
+.ddx-guild-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 25, 15, 0.92),
+    rgba(20, 18, 24, 0.95)
+  );
+  border-bottom: 1px solid rgba(255, 217, 136, 0.15);
+}
+
+.ddx-header-title-slot {
+  flex: 1;
+  min-width: 0;
+}
+
+.ddx-header-title-slot h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f6d9a1;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.ddx-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.ddx-action-row button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   NAVIGATION BAR
+   ======================================== */
+
+.ddx-nav-guild-bar {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  background: rgba(8, 8, 12, 0.6);
+  border-bottom: 1px solid rgba(255, 217, 136, 0.12);
+}
+
+.ddx-nav-guild-bar .tab {
+  flex: 1;
+  border-radius: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgba(240, 234, 222, 0.72);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  padding: 10px 12px;
+}
+
+.ddx-nav-guild-bar .tab:hover {
+  background: rgba(255, 217, 136, 0.08);
+  color: rgba(240, 234, 222, 0.92);
+}
+
+.ddx-nav-guild-bar .tab.active {
+  background: rgba(255, 217, 136, 0.06);
+  border-bottom-color: #ffd980;
+  color: #f6d9a1;
+  box-shadow: none;
+}
+
+/* ========================================
+   LEDGER CARDS
+   (Guild Record, Armor Record, Archive Summary, Settings)
+   ======================================== */
+
+.ddx-ledger-card {
+  position: relative;
+  border-color: rgba(255, 217, 136, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 217, 136, 0.04),
+    rgba(0, 0, 0, 0.1)
+  );
+}
+
+.ddx-ledger-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 217, 136, 0.08);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ddx-record-title {
+  display: grid;
+  gap: 8px;
+}
+
+.ddx-record-name {
+  display: block;
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #f6d9a1;
+}
+
+.ddx-record-meta {
+  display: block;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.3;
+  color: rgba(240, 234, 222, 0.72);
+}
+
+.ddx-record-body {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 217, 136, 0.08);
+}
+
+/* ========================================
+   NOTICE BOARD
+   (Town Contracts, Quest Board)
+   ======================================== */
+
+.ddx-notice-board {
+  border-color: rgba(255, 217, 136, 0.20);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 217, 136, 0.06),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-quest-board {
+  /* Inherits from .ddx-notice-board */
+}
+
+.ddx-notice-board h3,
+.ddx-notice-board .quest-card strong {
+  color: #f6d9a1;
+  font-weight: 700;
+}
+
+.ddx-notice-board .quest-card {
+  border-color: rgba(255, 217, 136, 0.15);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* ========================================
+   CONTRACT CARDS
+   (Dungeon Writ, Debt Card, Revisit Contracts)
+   ======================================== */
+
+.ddx-contract-card {
+  border-color: rgba(255, 217, 136, 0.20);
+  background: linear-gradient(
+    135deg,
+    rgba(197, 139, 255, 0.06),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-dungeon-writ {
+  /* Dungeon entry writ styling */
+  border-color: rgba(255, 178, 96, 0.22);
+}
+
+.ddx-debt-card {
+  /* Debt pressure contract styling */
+  border-color: rgba(255, 136, 100, 0.22);
+}
+
+.ddx-contract-card h3,
+.ddx-contract-card strong {
+  color: #ffc480;
+}
+
+.ddx-danger-note {
+  color: rgba(255, 120, 120, 0.88);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+/* ========================================
+   MERCHANT CARDS
+   (Merchant Ledger, Forge Counter, Upgrade Receipt, Equipment)
+   ======================================== */
+
+.ddx-merchant-card {
+  border-color: rgba(167, 255, 210, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(167, 255, 210, 0.04),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-merchant-ledger {
+  /* Merchant shop ledger */
+  border-color: rgba(167, 255, 210, 0.18);
+}
+
+.ddx-forge-counter {
+  /* Forge/crafting counter */
+  border-color: rgba(255, 196, 99, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 196, 99, 0.04),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-gear-summary {
+  /* Upgrade receipt */
+  border-color: rgba(255, 217, 136, 0.18);
+}
+
+.ddx-equipment-ledger {
+  /* Equipment loadout */
+  border-color: rgba(167, 255, 210, 0.18);
+}
+
+.ddx-merchant-card h3,
+.ddx-merchant-card strong {
+  color: #a8f0b3;
+}
+
+.ddx-forge-counter h3,
+.ddx-forge-counter strong {
+  color: #ffc480;
+}
+
+.ddx-reward-note {
+  color: rgba(168, 240, 179, 0.88);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+/* ========================================
+   ARCHIVE CARDS
+   (Combat Record, Monster Archive, Gear Archive, Filter Record)
+   ======================================== */
+
+.ddx-archive-card {
+  border-color: rgba(102, 200, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 200, 255, 0.04),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-combat-record {
+  /* Combat log as archival record */
+  border-color: rgba(255, 178, 96, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 178, 96, 0.04),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-monster-archive {
+  /* Monster bestiary/trophy records */
+  border-color: rgba(255, 120, 120, 0.16);
+}
+
+.ddx-gear-trophy-archive {
+  /* Gear trophy/retirement records */
+  border-color: rgba(167, 255, 210, 0.16);
+}
+
+.ddx-filter-record {
+  /* Inventory filter record */
+  border-color: rgba(102, 200, 255, 0.16);
+}
+
+.ddx-archive-card h3,
+.ddx-archive-card strong {
+  color: #66c8ff;
+}
+
+.ddx-monster-archive h3,
+.ddx-monster-archive strong {
+  color: #ff7878;
+}
+
+.ddx-gear-trophy-archive h3,
+.ddx-gear-trophy-archive strong {
+  color: #a8f0b3;
+}
+
+/* ========================================
+   JOURNAL CARDS
+   (Guild Journal, Revisit Memory Records)
+   ======================================== */
+
+.ddx-journal-card {
+  border-color: rgba(200, 160, 255, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(200, 160, 255, 0.04),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.ddx-guild-journal {
+  /* Guild journal entries */
+  border-color: rgba(200, 160, 255, 0.18);
+}
+
+.ddx-journal-card h3,
+.ddx-journal-card strong {
+  color: #d9a8ff;
+}
+
+.ddx-muted-lore {
+  color: rgba(240, 234, 222, 0.56);
+  font-size: 0.74rem;
+  font-style: italic;
+}
+
+.ddx-locked-lore {
+  color: rgba(255, 136, 100, 0.72);
+  opacity: 0.76;
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 136, 100, 0.4);
+}
+
+/* ========================================
+   UTILITIES & DETAIL ELEMENTS
+   ======================================== */
+
+.ddx-wallet-slot {
+  margin-top: 6px;
+  padding: 4px 0;
+  font-size: 0.82rem;
+}
+
+.ddx-revisit-slot {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: rgba(200, 160, 255, 0.72);
+}
+
+.ddx-charter-display {
+  margin-top: 6px;
+}
+
+.ddx-cost-indicator {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 217, 136, 0.25);
+  background: rgba(255, 217, 136, 0.08);
+  color: rgba(255, 217, 136, 0.88);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.ddx-merchant-pair {
+  /* Two-column merchant + forge pair - already uses .grid-2 */
+}
+
+/* ========================================
+   VIEWPORT & LAYOUT
+   ======================================== */
+
+.ddx-main-viewport {
+  /* Main content viewport - inherits from .screens */
+}
+
+.ddx-view-stack {
+  /* Vertical stack of regions - already uses .stack-8 */
+}
+
+.ddx-region {
+  /* Individual screen region - inherits from .screen */
+  /* Smooth transitions when switching screens */
+  transition: opacity 0.3s ease;
+}
+
+.ddx-region.active {
+  opacity: 1;
+}
+
+.ddx-region:not(.active) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ddx-action-strip {
+  /* Sticky footer action strip */
+  border-top: 1px solid rgba(255, 217, 136, 0.12);
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 700px) {
+  .ddx-guild-header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .ddx-header-title-slot h1 {
+    font-size: 0.95rem;
+  }
+
+  .ddx-action-row {
+    width: 100%;
+  }
+
+  .ddx-action-row button {
+    flex: 1 1 auto;
+    min-width: 70px;
+  }
+
+  .ddx-nav-guild-bar {
+    gap: 0;
+  }
+
+  .ddx-nav-guild-bar .tab {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .ddx-record-title {
+    gap: 6px;
+  }
+
+  .ddx-record-name {
+    font-size: 0.88rem;
+  }
+
+  .ddx-record-meta {
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ddx-guild-header {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .ddx-header-title-slot h1 {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+  }
+
+  .ddx-nav-guild-bar .tab {
+    padding: 6px 8px;
+    font-size: 0.70rem;
+  }
+
+  .ddx-cost-indicator {
+    padding: 3px 8px;
+    font-size: 0.65rem;
+  }
+
+  .ddx-action-row button {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ========================================
+   NO DISRUPTION TO EXISTING SYSTEMS
+   ======================================== */
+
+/* All gameplay, combat math, rewards, save data, and dungeon
+   entry behavior remain unchanged. The .ddx-* classes are
+   purely semantic layout and theming layers over existing
+   .panel, .tab, button, and system-generated HTML.
+   
+   No existing IDs, data-attributes, or JavaScript hooks
+   have been renamed or removed.
+*/

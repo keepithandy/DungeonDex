@@ -331,9 +331,9 @@ function merchantGearUpgradeCard(model) {
 	const stateText = !model.item
 		? `Equip a ${model.label.toLowerCase()} to unlock upgrades.`
 		: model.capped
-			? 'Maxed'
+			? 'Maxed at +3'
 			: model.affordable
-				? `Upgrade for ${formatMoney(model.cost)}`
+				? `Next cost ${formatMoney(model.cost)}`
 				: `Need ${formatMoney(model.missingCopper)} more copper`;
 	const action = model.item && !model.capped && model.affordable
 		? `<button class="primary mini" data-merchant-upgrade="${escapeHtml(model.slot)}">Upgrade</button>`
@@ -342,16 +342,17 @@ function merchantGearUpgradeCard(model) {
       <div class="split">
         <div>
           <div class="item-name">${escapeHtml(model.label)}</div>
-          <div class="item-meta">${escapeHtml(model.itemName)} • +${escapeHtml(String(model.level))} / +${escapeHtml(String(model.cap))}</div>
+          <div class="item-meta">${escapeHtml(model.itemName)} • ${escapeHtml(model.tierText || `+${String(model.level)} / +${String(model.cap)}`)}</div>
         </div>
-        <span class="pill">${model.capped ? 'Maxed' : `+${escapeHtml(String(model.level))}`}</span>
+        <span class="pill">${model.capped ? 'Maxed' : escapeHtml(model.levelText || `+${String(model.level)}`)}</span>
       </div>
       ${model.item ? `
         <div class="tag-row">
-          <span class="pill">Current ${escapeHtml(model.currentStat)}</span>
-          ${model.capped ? '<span class="pill rarity-uncommon">No further upgrades</span>' : `<span class="pill">Next ${escapeHtml(model.nextStat)}</span>`}
-          ${model.capped ? '' : `<span class="pill">${escapeHtml(formatMoney(model.cost))}</span>`}
+          <span class="pill">${escapeHtml(model.perTierText || '')}</span>
+          <span class="pill">Current bonus ${escapeHtml(model.currentBonusText || model.currentStat)}</span>
+          ${model.capped ? '<span class="pill rarity-uncommon">Maxed at +3</span>' : `<span class="pill">Next cost ${escapeHtml(formatMoney(model.cost))}</span>`}
         </div>
+        <p class="small">${escapeHtml(model.label)} ${escapeHtml(model.tierText || '')} gives ${escapeHtml(model.currentBonusText || model.currentStat)}.${model.capped ? ' Maxed at +3.' : ` Next tier gives ${escapeHtml(model.nextBonusText || model.nextStat)}.`}</p>
       ` : `
         <p class="small muted">No equipped ${escapeHtml(model.label.toLowerCase())} is ready for the merchant.</p>
       `}
@@ -367,7 +368,7 @@ function merchantGearUpgradePanelMarkup(state) {
       <div class="split market-subhead">
         <div>
           <strong>Merchant Gear Upgrades</strong>
-          <p class="small">Spend copper to permanently improve equipped gear.</p>
+          <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.</p>
         </div>
         <span class="pill">${models.filter(model => model.item).length}/${models.length}</span>
       </div>

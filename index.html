@@ -8,13 +8,92 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.23.8.04</title>
-  <link rel="stylesheet" href="./styles.css?build=1.23.8.04-gear-replacement-ownership-clarity" />
+  <title>DungeonDex v1.24.0</title>
+  <link rel="stylesheet" href="./styles.css?build=1.24.0-lore-layer-interface-shell" />
+  <link rel="stylesheet" href="./styles_lore_layer.css?build=1.24.0-lore-layer-interface-shell" />
   <style>
-    /* v1.23.8.04 gear replacement and ownership clarity. */
+    /* v1.23.8 Merchant Gear Upgrades Replace Talent System update. */
     .panel {
       box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.035);
     }
+
+    /* ========================================
+       LORE-LAYER UI CLASS DEFINITIONS
+       DungeonDex IP Interface Shell
+       ======================================== */
+
+    /* Shell & Layout Containers */
+    .ddx-shell { /* Main application container wrapper */ }
+    .ddx-main-viewport { /* Main content viewport for screen regions */ }
+    .ddx-view-stack { /* Vertical stack of content regions within a screen */ }
+    .ddx-region { /* Individual screen region (town, run, gear, dex, archive) */ }
+    .ddx-region-town { /* Town screen region */ }
+    .ddx-region-run { /* Run/Dungeon screen region */ }
+    .ddx-region-gear { /* Gear Hall screen region */ }
+    .ddx-region-dex { /* Archive/Trophy Hall screen region */ }
+    .ddx-region-archive { /* Guild Journal screen region */ }
+
+    /* Navigation & Headers */
+    .ddx-guild-header { /* Top header with build/title */ }
+    .ddx-header-title-slot { /* Title area inside header */ }
+    .ddx-nav-guild-bar { /* Guild navigation bar (5-tab nav) */ }
+    .ddx-lore-kicker { /* Lore-framed section kicker/label */ }
+
+    /* Card Type Base Classes (apply to .panel) */
+    .ddx-ledger-card { /* Guild records, status, summaries */ }
+    .ddx-notice-board { /* Town contracts, posted notices */ }
+    .ddx-contract-card { /* Dungeon writ, debt pressure, revisit contracts */ }
+    .ddx-merchant-card { /* Merchant ledger, forge, gear upgrades */ }
+    .ddx-archive-card { /* Combat record, monster/gear archive, filters */ }
+    .ddx-journal-card { /* Guild journal, revisit memory records */ }
+
+    /* Specialized Card Subclasses */
+    .ddx-guild-ledger { /* Guild status, adventurer record, current standing */ }
+    .ddx-debt-card { /* Debt pressure display */ }
+    .ddx-merchant-ledger { /* Merchant shop ledger */ }
+    .ddx-forge-counter { /* Forge/crafting counter */ }
+    .ddx-dungeon-writ { /* Dungeon entry & depth status */ }
+    .ddx-combat-arena { /* Combat arena/stage */ }
+    .ddx-combat-record { /* Combat log as record */ }
+    .ddx-gear-player-ledger { /* Player gear status ledger */ }
+    .ddx-gear-summary { /* Upgrade receipt/summary */ }
+    .ddx-equipment-ledger { /* Equipment loadout ledger */ }
+    .ddx-filter-record { /* Inventory filter record */ }
+    .ddx-gear-archive { /* Relic archive/inventory */ }
+    .ddx-archive-summary { /* Trophy hall summary */ }
+    .ddx-monster-archive { /* Monster/bestiary archive */ }
+    .ddx-gear-trophy-archive { /* Gear trophy records */ }
+    .ddx-quest-board { /* Quest/contract board */ }
+    .ddx-guild-journal { /* Guild journal entries */ }
+    .ddx-settings-ledger { /* Settings/archive ledger */ }
+
+    /* Grouping & Pairs */
+    .ddx-merchant-pair { /* Two-column merchant/forge pair */ }
+
+    /* Record Semantic Classes */
+    .ddx-record-title { /* Title section of a record card */ }
+    .ddx-record-name { /* Name/primary heading within a record */ }
+    .ddx-record-meta { /* Metadata/flavor text in a record */ }
+    .ddx-record-body { /* Body content of a record */ }
+
+    /* Specific UI Elements */
+    .ddx-action-row { /* Horizontal row of action buttons */ }
+    .ddx-action-strip { /* Footer action strip (sticky) */ }
+    .ddx-wallet-slot { /* Currency/wallet display slot */ }
+    .ddx-revisit-slot { /* Revisit foundation display slot */ }
+    .ddx-charter-display { /* Charter/depth progression display */ }
+    .ddx-cost-indicator { /* Rest cost, resource cost chips */ }
+
+    /* Semantic Modifiers */
+    .ddx-muted-lore { /* Muted/flavor text styling */ }
+    .ddx-locked-lore { /* Locked/unavailable styling */ }
+    .ddx-danger-note { /* Warning/danger styling */ }
+    .ddx-reward-note { /* Reward/success styling */ }
+
+    /* All .ddx-* classes above are layout/semantic wrappers.
+       Existing .panel, .tab, .button, and system-generated classes
+       continue to control visual appearance and behavior.
+       No disruption to existing JS selectors, IDs, or data-attributes. */
 
     .section-header.panel,
     .tabs.panel,
@@ -216,90 +295,90 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar" aria-labelledby="buildTag">
-      <div>
-        <h1 id="buildTag">DungeonDex v1.23.8.04</h1>
+  <div class="app-shell ddx-shell">
+    <header class="topbar ddx-guild-header" aria-labelledby="buildTag" role="banner">
+      <div class="ddx-header-title-slot">
+        <h1 id="buildTag" class="ddx-lore-kicker">DungeonDex v1.23.8</h1>
       </div>
-      <div class="top-actions" aria-label="Save controls">
+      <div class="top-actions ddx-action-row" aria-label="Save controls">
         <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
         <button class="ghost mini" id="saveBtn" type="button">Save</button>
         <button class="ghost mini" id="resetBtn" type="button">Reset</button>
       </div>
     </header>
 
-    <nav class="tabs panel" aria-label="Primary screens">
+    <nav class="tabs panel ddx-nav-guild-bar" aria-label="Guild Navigation Routes">
       <button class="tab active" data-screen="town" id="tab-town" type="button" aria-controls="screen-town">Town</button>
       <button class="tab" data-screen="run" id="tab-run" type="button" aria-controls="screen-run">Run</button>
       <button class="tab" data-screen="gear" id="tab-gear" type="button" aria-controls="screen-gear">Gear</button>
-      <button class="tab" data-screen="dex" id="tab-dex" type="button" aria-controls="screen-dex">Trophy Hall</button>
-      <button class="tab" data-screen="archive" id="tab-archive" type="button" aria-controls="screen-archive">Archive</button>
+      <button class="tab" data-screen="dex" id="tab-dex" type="button" aria-controls="screen-dex">Archive</button>
+      <button class="tab" data-screen="archive" id="tab-archive" type="button" aria-controls="screen-archive">Journal</button>
     </nav>
 
-    <main class="screens" aria-label="DungeonDex screens">
-      <section class="screen active" id="screen-town" aria-labelledby="tab-town">
-        <div class="stack-8">
-          <div class="panel section-header">
-            <div>
-              <h2 id="districtName">Lowfire District</h2>
-              <p id="districtLine">Lowfire holds the line. The Hollow Stair waits below.</p>
-              <div class="district-wallet-slot" id="districtWalletSlot"></div>
-              <div class="district-wallet-slot" id="revisitFoundationSlot"></div>
+    <main class="screens ddx-main-viewport" aria-label="DungeonDex screens" role="main">
+      <section class="screen active ddx-region ddx-region-town" id="screen-town" aria-labelledby="tab-town" role="region" aria-label="Town">
+        <div class="stack-8 ddx-view-stack">
+          <header class="panel section-header ddx-ledger-card ddx-guild-ledger" role="banner" aria-label="Guild Ledger">
+            <div class="ddx-record-title">
+              <h2 id="districtName" class="ddx-record-name">Lowfire District</h2>
+              <p id="districtLine" class="ddx-record-meta">Lowfire holds the line. The Hollow Stair waits below.</p>
+              <div class="district-wallet-slot ddx-wallet-slot" id="districtWalletSlot"></div>
+              <div class="district-wallet-slot ddx-revisit-slot" id="revisitFoundationSlot"></div>
             </div>
-            <div class="inline-actions" aria-label="Town actions">
+            <div class="inline-actions ddx-action-row" aria-label="Town actions">
               <button class="primary" id="startRunBtn" type="button">Enter Dungeon</button>
               <button class="ghost" id="restBtn" type="button">Rest</button>
-              <span class="rest-cost-chip" id="restCostPill" title="Rest cost">Cost --</span>
+              <span class="rest-cost-chip ddx-cost-indicator" id="restCostPill" title="Rest cost">Cost --</span>
             </div>
-            <div class="district-charter-slot" id="districtCharterSlot"></div>
+            <div class="district-charter-slot ddx-charter-display" id="districtCharterSlot"></div>
+          </header>
+
+          <section class="panel ddx-contract-card ddx-debt-card" id="debtCollectorPanel" aria-label="Debt Pressure" role="region"></section>
+
+          <div class="grid-2 ddx-merchant-pair">
+            <section class="panel ddx-merchant-card ddx-merchant-ledger" id="merchantPanel" aria-label="Merchant Ledger" role="region"></section>
+            <section class="panel ddx-merchant-card ddx-forge-counter" id="forgePanel" aria-label="Forge Counter" role="region"></section>
           </div>
 
-          <section class="panel" id="debtCollectorPanel" aria-label="Debt Collector panel"></section>
-
-          <div class="grid-2">
-            <section class="panel" id="merchantPanel" aria-label="Merchant panel"></section>
-            <section class="panel" id="forgePanel" aria-label="Forge panel"></section>
-          </div>
-
-          <section class="panel" id="questPanel" aria-label="Quest panel"></section>
+          <section class="panel ddx-notice-board ddx-quest-board" id="questPanel" aria-label="Town Notice Board" role="region"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-run" aria-labelledby="tab-run">
-        <div class="stack-8">
-          <section class="panel" id="runStatus" aria-label="Run status panel"></section>
-          <section class="panel combat-panel" id="combatPanel" aria-label="Combat panel"></section>
-          <section class="panel" id="combatLog" aria-label="Combat log"></section>
+      <section class="screen ddx-region ddx-region-run" id="screen-run" aria-labelledby="tab-run" role="region" aria-label="Dungeon Expedition">
+        <div class="stack-8 ddx-view-stack">
+          <section class="panel ddx-contract-card ddx-dungeon-writ" id="runStatus" aria-label="Dungeon Writ" role="region"></section>
+          <section class="panel combat-panel ddx-combat-arena" id="combatPanel" aria-label="Combat Arena" role="region"></section>
+          <section class="panel ddx-archive-card ddx-combat-record" id="combatLog" aria-label="Combat Record" role="region"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-gear" aria-labelledby="tab-gear">
-        <div class="stack-8">
-          <section class="panel gear-player-panel" id="gearPlayerPanel" aria-label="Gear player panel"></section>
-          <section class="panel gear-upgrade-summary-panel" id="gearUpgradeSummaryPanel" aria-label="Gear upgrade summary panel"></section>
-          <section class="panel" id="equipmentPanel" aria-label="Equipment panel"></section>
-          <section class="panel" id="filtersPanel" aria-label="Inventory filters panel"></section>
-          <section class="panel" id="inventoryPanel" aria-label="Inventory panel"></section>
+      <section class="screen ddx-region ddx-region-gear" id="screen-gear" aria-labelledby="tab-gear" role="region" aria-label="Relic Hall">
+        <div class="stack-8 ddx-view-stack">
+          <section class="panel gear-player-panel ddx-ledger-card ddx-gear-player-ledger" id="gearPlayerPanel" aria-label="Gear Hall Status" role="region"></section>
+          <section class="panel gear-upgrade-summary-panel ddx-merchant-card ddx-gear-summary" id="gearUpgradeSummaryPanel" aria-label="Upgrade Receipt" role="region"></section>
+          <section class="panel ddx-merchant-card ddx-equipment-ledger" id="equipmentPanel" aria-label="Equipment Ledger" role="region"></section>
+          <section class="panel ddx-archive-card ddx-filter-record" id="filtersPanel" aria-label="Archive Filters" role="region"></section>
+          <section class="panel ddx-archive-card ddx-gear-archive" id="inventoryPanel" aria-label="Relic Archive" role="region"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-dex" aria-labelledby="tab-dex">
-        <div class="stack-8">
-          <section class="panel" id="dexSummary" aria-label="Trophy Hall summary"></section>
-          <section class="panel" id="monsterDex" aria-label="Monster trophy records"></section>
-          <section class="panel" id="gearDex" aria-label="Gear trophy records"></section>
+      <section class="screen ddx-region ddx-region-dex" id="screen-dex" aria-labelledby="tab-dex" role="region" aria-label="Archive & Trophies">
+        <div class="stack-8 ddx-view-stack">
+          <section class="panel ddx-ledger-card ddx-archive-summary" id="dexSummary" aria-label="Archive Summary" role="region"></section>
+          <section class="panel ddx-archive-card ddx-monster-archive" id="monsterDex" aria-label="Monster Archive" role="region"></section>
+          <section class="panel ddx-archive-card ddx-gear-trophy-archive" id="gearDex" aria-label="Gear Trophy Records" role="region"></section>
         </div>
       </section>
 
-      <section class="screen" id="screen-archive" aria-labelledby="tab-archive">
-        <div class="stack-8">
-          <section class="panel" id="archivePanel" aria-label="Archive panel"></section>
-          <section class="panel" id="settingsPanel" aria-label="Settings panel"></section>
+      <section class="screen ddx-region ddx-region-archive" id="screen-archive" aria-labelledby="tab-archive" role="region" aria-label="Guild Journal">
+        <div class="stack-8 ddx-view-stack">
+          <section class="panel ddx-journal-card ddx-guild-journal" id="archivePanel" aria-label="Guild Journal" role="region"></section>
+          <section class="panel ddx-ledger-card ddx-settings-ledger" id="settingsPanel" aria-label="Archive Settings" role="region"></section>
         </div>
       </section>
     </main>
 
-    <footer class="sticky-actions panel" id="stickyBar" aria-label="Context actions"></footer>
+    <footer class="sticky-actions panel ddx-action-strip" id="stickyBar" aria-label="Action Strip" role="contentinfo"></footer>
   </div>
 
   <!-- Inert renderer-prep templates. These do not render until a future renderer explicitly clones them. -->
@@ -334,10 +413,10 @@
   </template>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.23.8.04';
-    window.DUNGEONDEX_BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
+    window.DUNGEONDEX_BUILD = '1.24.0';
+    window.DUNGEONDEX_BUILD_QS = '1.24.0-lore-layer-interface-shell';
     (function(){
-      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.23.8.04-gear-replacement-ownership-clarity';
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.23.8-merchant-gear-upgrades-replace-talent-system';
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
         if (tag) tag.textContent = 'DungeonDex v' + window.DUNGEONDEX_BUILD;
@@ -368,7 +447,7 @@
   <script>
     (function(){
       if (!('serviceWorker' in navigator)) return;
-      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.23.8.04-gear-replacement-ownership-clarity';
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.23.8-merchant-gear-upgrades-replace-talent-system';
       var host = window.location.hostname;
       var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
       if (isLocalDev) {
@@ -382,41 +461,41 @@
     })();
   </script>
 
-  <script src="./app.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/00_core_constants_data.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/01_state_recovery.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/02_currency_pending_rewards.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/03_town_contracts_market.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/04_depth_progression_charters.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/05_elite_modifiers.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/06_scaling_generation_audits.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/07_player_combat_runtime.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/08_normalization_save.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/09_ui_common_intro.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/10_ui_town_shop.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/12_render_bindings_boot.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/13_devtools_overlay.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/14_devtools_scenarios.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/15_devtools_balance_reports.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/36_ui_revisit_archive_codex.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/38_journal_v1.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/16_relic_forge_crafting.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/17_relic_forge_clarity.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/18_relic_forge_compact_text.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/28_debt_collector_foundation.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/34_debt_collector_v1_completion.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/20_town_currency_clean_strip.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/21_build_label_guard.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/22_nav_centering.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/23_boss_header_cleanup.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/24_lowfire_spark_board.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/25_town_wallet_chip_fix.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/26_spark_writ_pill_cleanup.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
-  <script src="./js/systems/27_interface_density_cleanup.js?build=1.23.8.04-gear-replacement-ownership-clarity"></script>
+  <script src="./app.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/00_core_constants_data.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/01_state_recovery.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/02_currency_pending_rewards.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/03_town_contracts_market.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/04_depth_progression_charters.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/05_elite_modifiers.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/06_scaling_generation_audits.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/07_player_combat_runtime.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/08_normalization_save.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/09_ui_common_intro.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/10_ui_town_shop.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/12_render_bindings_boot.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/13_devtools_overlay.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/14_devtools_scenarios.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/15_devtools_balance_reports.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/36_ui_revisit_archive_codex.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/38_journal_v1.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/16_relic_forge_crafting.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/17_relic_forge_clarity.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/18_relic_forge_compact_text.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/28_debt_collector_foundation.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/34_debt_collector_v1_completion.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/20_town_currency_clean_strip.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/21_build_label_guard.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/22_nav_centering.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/23_boss_header_cleanup.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/24_lowfire_spark_board.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/25_town_wallet_chip_fix.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/26_spark_writ_pill_cleanup.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
+  <script src="./js/systems/27_interface_density_cleanup.js?build=1.23.8-merchant-gear-upgrades-replace-talent-system"></script>
 </body>
 </html>

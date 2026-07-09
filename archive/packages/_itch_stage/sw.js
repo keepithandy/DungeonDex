@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.01-gear-section-polish';
+const CACHE_NAME = 'dungeondex-v1.23.8.04-gear-replacement-ownership-clarity';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.01-gear-section-polish';
+const BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
 const ASSETS = [
   './',
   './index.html',
@@ -23,6 +23,9 @@ const ASSETS = [
   `./js/systems/11_ui_run_gear_dex_archive.js?build=${BUILD_QS}`,
   `./js/systems/29_monster_backdrops_canvas.js?build=${BUILD_QS}`,
   `./js/systems/12_render_bindings_boot.js?build=${BUILD_QS}`,
+  `./js/systems/13_devtools_overlay.js?build=${BUILD_QS}`,
+  `./js/systems/14_devtools_scenarios.js?build=${BUILD_QS}`,
+  `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`,
   `./js/systems/36_ui_revisit_archive_codex.js?build=${BUILD_QS}`,
   `./js/systems/37_revisit_famous_gear_flavor_pack.js?build=${BUILD_QS}`,
   `./js/systems/38_journal_v1.js?build=${BUILD_QS}`,
@@ -72,5 +75,3 @@ self.addEventListener('fetch', event => {
   }
   event.respondWith(caches.match(event.request).then(hit => hit || network()));
 });
-
-
