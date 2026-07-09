@@ -7,12 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.03 - Gear Upgrade Identity and Loot Comparison Clarity
+- DungeonDex v1.23.8.04 - Gear Replacement Warning and Upgrade Ownership Clarity
 
-## v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
-- Upgraded equipped weapon and armor pieces now render with visible tier suffixes in gear-facing surfaces.
-- Loot comparison and gear detail copy now make upgrade bonuses explicit without changing any combat math or replacement behavior.
-- Runtime/cache/version authority labels are now `v1.23.8.03`.
+## v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
+- The gear detail compare note now explains that an upgraded equipped item keeps its tier if replaced.
+- The note also clarifies that new gear equips at its own upgrade tier instead of inheriting the old item’s tier.
+- Runtime/cache/version authority labels are now `v1.23.8.04`.
 
 ## v1.23.8.01 Gear Section Polish
 - Merchant Gear Upgrade money text no longer leaks raw `<span>` markup in the town or Gear-tab upgrade panels.

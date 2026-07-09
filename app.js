@@ -1,9 +1,9 @@
-// DungeonDex v1.23.8.03 runtime pointer.
+// DungeonDex v1.23.8.04 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 
-window.DUNGEONDEX_BUILD = '1.23.8.03';
-window.DUNGEONDEX_BUILD_QS = '1.23.8.03-gear-identity-compare-clarity';
+window.DUNGEONDEX_BUILD = '1.23.8.04';
+window.DUNGEONDEX_BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -50,7 +50,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.8.03-gear-identity-compare-clarity';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.8.04-gear-replacement-ownership-clarity';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);

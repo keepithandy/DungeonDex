@@ -173,6 +173,15 @@
     return `+${formatNumber(level * 2)} Power from upgrades`;
   }
 
+  function compareOwnershipText(equippedItem){
+    const equippedLevel = upgradeLevel(equippedItem);
+    if (!equippedItem || equippedLevel <= 0) return '';
+    const equippedName = typeof formatGearDisplayName === 'function'
+      ? formatGearDisplayName(equippedItem)
+      : text(equippedItem.name, 'Equipped gear');
+    return `${equippedName} keeps its upgrade tier if replaced. New gear equips at its own upgrade tier.`;
+  }
+
   function signedDiff(value){
     const diff = Math.floor(number(value));
     if (diff > 0) return `+${formatNumber(diff)}`;
@@ -214,6 +223,8 @@
     const status = equippedItem
       ? (sameGear(selected, equippedItem) ? `This is already the equipped piece for this slot. Equipped: ${compareBonusText(equippedItem)}.` : `Selected gear is compared against the current equipped piece in the same slot. Equipped: ${compareBonusText(equippedItem)}.`)
       : 'No equipped piece is in this slot yet, so the selected gear is compared against an empty slot.';
+    const ownership = compareOwnershipText(equippedItem);
+    const noteText = ownership ? `${status} ${ownership}` : status;
     return `<div class="gear-detail-compare-panel" data-gear-detail-compare-panel="1" hidden>
       <div class="gear-compare-title">Equipped vs Selected</div>
       <div class="gear-compare-cards">
@@ -227,7 +238,7 @@
         <div class="gear-compare-head">Δ</div>
         ${compareRowsMarkup(selected, equippedItem)}
       </div>
-      <p class="gear-compare-note small muted">${esc(status)} This panel is read-only and does not equip, sell, upgrade, or retire anything.</p>
+      <p class="gear-compare-note small muted">${esc(noteText)} This panel is read-only and does not equip, sell, upgrade, or retire anything.</p>
     </div>`;
   }
 

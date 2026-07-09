@@ -24,7 +24,7 @@ function cleanDisplayText(value, fallback = '') {
 
 function createState() {
   return {
-    build: '1.23.8.03-gear-identity-compare-clarity',
+    build: '1.23.8.04-gear-replacement-ownership-clarity',
     screen: 'town',
     filters: { slot: 'all', rarity: 'all', search: '', sort: 'power' },
     player: {
@@ -152,7 +152,7 @@ function createContext() {
       clear() { store.clear(); }
     },
     STORAGE_KEY,
-    BUILD: '1.23.8.03-gear-identity-compare-clarity',
+    BUILD: '1.23.8.04-gear-replacement-ownership-clarity',
     COPPER_PER_GOLD: 10000,
     COMBAT_LOG_STORE_LIMIT: 20,
     CORE_COMBAT_ACTIONS: ['attack', 'guard', 'skill', 'extract'],
@@ -243,5 +243,7 @@ assert.ok(modalHtml.includes('Equipped'));
 assert.ok(modalHtml.includes('Warden Blade +2'));
 assert.ok(modalHtml.includes('Equipped: +4 Power from upgrades'));
 assert.ok(modalHtml.includes('Selected gear is compared against the current equipped piece in the same slot.'));
+assert.ok(modalHtml.includes('Warden Blade +2 keeps its upgrade tier if replaced.'));
+assert.ok(modalHtml.includes('New gear equips at its own upgrade tier.'));
 
 console.log('PASS: Gear identity and comparison smoke');

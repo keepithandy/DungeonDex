@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
+v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
 
 ## Current Local Package Version
-v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
+v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
 
 ## Current Development Target
-v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
+v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

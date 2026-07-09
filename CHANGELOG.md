@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
-* Current local package baseline: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
-* Current development target: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
+* Public/live itch version: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
+* Current local package baseline: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
+* Current development target: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.04 - Gear Replacement Warning and Upgrade Ownership Clarity
+
+* Added a short ownership warning to the existing gear detail compare note so upgraded equipped gear clearly keeps its own tier if replaced.
+* Clarified that new gear equips at its own upgrade tier and does not inherit the equipped item’s upgrade level.
+* Kept replacement behavior, upgrade math, costs, caps, save fields, and all combat/progression rules unchanged.
+
+---
 
 ## v1.23.8.03 - Gear Upgrade Identity and Loot Comparison Clarity
 
