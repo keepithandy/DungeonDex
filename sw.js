@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.02-release-hygiene';
+const CACHE_NAME = 'dungeondex-v1.23.8.03-gear-identity-compare-clarity';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.02-release-hygiene';
+const BUILD_QS = '1.23.8.03-gear-identity-compare-clarity';
 const ASSETS = [
   './',
   './index.html',

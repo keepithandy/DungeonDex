@@ -164,6 +164,15 @@
     return values;
   }
 
+  function compareBonusText(item){
+    const level = upgradeLevel(item);
+    const slot = text(item?.slot || '', '').toLowerCase();
+    if (slot === 'armor') {
+      return `+${formatNumber(level * 2)} Guard and +${formatNumber(level * 8)} HP from upgrades`;
+    }
+    return `+${formatNumber(level * 2)} Power from upgrades`;
+  }
+
   function signedDiff(value){
     const diff = Math.floor(number(value));
     if (diff > 0) return `+${formatNumber(diff)}`;
@@ -200,10 +209,10 @@
     const selected = entry.item;
     const equipped = equippedEntryFor(entry);
     const equippedItem = equipped?.item || null;
-    const selectedName = text(selected?.name, 'Selected gear');
-    const equippedName = equippedItem ? text(equippedItem.name, 'Equipped gear') : `Empty ${itemSlot(selected, entry.slot)} slot`;
+    const selectedName = text(typeof formatGearDisplayName === 'function' ? formatGearDisplayName(selected) : selected?.name, 'Selected gear');
+    const equippedName = equippedItem ? text(typeof formatGearDisplayName === 'function' ? formatGearDisplayName(equippedItem) : equippedItem.name, 'Equipped gear') : `Empty ${itemSlot(selected, entry.slot)} slot`;
     const status = equippedItem
-      ? (sameGear(selected, equippedItem) ? 'This is already the equipped piece for this slot.' : 'Selected gear is compared against the current equipped piece in the same slot.')
+      ? (sameGear(selected, equippedItem) ? `This is already the equipped piece for this slot. Equipped: ${compareBonusText(equippedItem)}.` : `Selected gear is compared against the current equipped piece in the same slot. Equipped: ${compareBonusText(equippedItem)}.`)
       : 'No equipped piece is in this slot yet, so the selected gear is compared against an empty slot.';
     return `<div class="gear-detail-compare-panel" data-gear-detail-compare-panel="1" hidden>
       <div class="gear-compare-title">Equipped vs Selected</div>

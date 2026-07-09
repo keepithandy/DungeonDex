@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
-* Current local package baseline: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
-* Current development target: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
+* Public/live itch version: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
+* Current local package baseline: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
+* Current development target: `v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.03 - Gear Upgrade Identity and Loot Comparison Clarity
+
+* Added shared display-only gear-name formatting so upgraded equipped weapon and armor pieces show their upgrade tier in gear-facing surfaces.
+* Clarified loot comparison and gear detail copy so equipped upgrade bonuses are shown as part of the comparison/readout.
+* Kept Merchant Gear Upgrade math, prices, caps, save fields, and replacement behavior unchanged.
+* Extended focused smoke coverage for gear identity and loot comparison clarity while keeping the compact suite green.
+
+---
 
 ## v1.23.8.02 - Merchant Gear Upgrade Clarity and Smoke Hardening
 

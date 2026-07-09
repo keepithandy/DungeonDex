@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8.02-release-hygiene';
+const BUILD_QS = '1.23.8.03-gear-identity-compare-clarity';
 
 function extractMatches(source, regex) {
   const out = [];

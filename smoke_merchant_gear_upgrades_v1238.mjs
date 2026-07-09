@@ -24,7 +24,7 @@ function cleanDisplayText(value, fallback = '') {
 
 function createGearState() {
   return {
-    build: '1.23.8.02-release-hygiene',
+    build: '1.23.8.03-gear-identity-compare-clarity',
     screen: 'town',
     filters: { slot: 'all', rarity: 'all', search: '', sort: 'power' },
     player: {
@@ -176,7 +176,7 @@ function createContext() {
       clear() { store.clear(); }
     },
     STORAGE_KEY,
-    BUILD: '1.23.8.02-release-hygiene',
+    BUILD: '1.23.8.03-gear-identity-compare-clarity',
     COPPER_PER_GOLD: 10000,
     BOSS_INTERVAL: 5,
     DEPTH_CHAPTERS_PER_THREAT_STEP: 15,
@@ -315,8 +315,8 @@ const townLeveledState = createGearState();
 townLeveledState.player.equipment.weapon.upgradeLevel = 1;
 townLeveledState.player.equipment.armor.upgradeLevel = 2;
 const townLeveledHtml = context.merchantGearUpgradePanelMarkup(townLeveledState);
-assert.ok(townLeveledHtml.includes('Warden Blade • +1 / +3'));
-assert.ok(townLeveledHtml.includes('Ashcoat • +2 / +3'));
+assert.ok(townLeveledHtml.includes('Warden Blade +1 • +1 / +3'));
+assert.ok(townLeveledHtml.includes('Ashcoat +2 • +2 / +3'));
 assert.ok(townLeveledHtml.includes('Current bonus +2 Power'));
 assert.ok(townLeveledHtml.includes('Current bonus +4 Guard and +16 HP'));
 assert.ok(townLeveledHtml.includes('Next cost 125c'));
@@ -359,8 +359,8 @@ assert.equal(derivedAfterArmor.guard, 13);
 assert.equal(state.player.maxHp, 138);
 
 const journalBeforeSave = merchantSection(state, context);
-assert.ok(journalBeforeSave.body.includes('Warden Blade +1 / +3 gives +2 Power'));
-assert.ok(journalBeforeSave.body.includes('Ashcoat +1 / +3 gives +2 Guard and +8 HP'));
+assert.ok(journalBeforeSave.body.includes('Warden Blade +1 +1 / +3 gives +2 Power'));
+assert.ok(journalBeforeSave.body.includes('Ashcoat +1 +1 / +3 gives +2 Guard and +8 HP'));
 assert.ok(journalBeforeSave.body.includes('Next cost 125c'));
 assert.ok(journalBeforeSave.meta.includes('Weapon upgrades are +2 Power per tier.'));
 assert.ok(journalBeforeSave.meta.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
@@ -398,8 +398,8 @@ assert.equal(reloadedSummary[1].currentBonusText, '+2 Guard and +8 HP');
 assert.equal(reloadedSummary[0].currentStat, 'Power 14');
 assert.equal(reloadedSummary[1].currentStat, 'Guard 7 • HP 28');
 const journalAfterLoad = merchantSection(reloaded, context);
-assert.ok(journalAfterLoad.body.includes('Warden Blade +1 / +3 gives +2 Power'));
-assert.ok(journalAfterLoad.body.includes('Ashcoat +1 / +3 gives +2 Guard and +8 HP'));
+assert.ok(journalAfterLoad.body.includes('Warden Blade +1 +1 / +3 gives +2 Power'));
+assert.ok(journalAfterLoad.body.includes('Ashcoat +1 +1 / +3 gives +2 Guard and +8 HP'));
 
 context.S = reloaded;
 context.renderGearUpgradeSummaryPanel();
@@ -426,6 +426,6 @@ context.S = reloaded;
 context.DDJournalV1Render();
 assert.ok(String(archivePanel.innerHTML).includes('Guild Journal'));
 assert.ok(String(archivePanel.innerHTML).includes('Merchant Upgrades'));
-assert.ok(String(archivePanel.innerHTML).includes('Warden Blade +1 / +3 gives +2 Power'));
+assert.ok(String(archivePanel.innerHTML).includes('Warden Blade +1 +1 / +3 gives +2 Power'));
 
 console.log('PASS: Merchant Gear Upgrades smoke');

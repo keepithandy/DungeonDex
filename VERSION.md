@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
+v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
 
 ## Current Local Package Version
-v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
+v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
 
 ## Current Development Target
-v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
+v1.23.8.03 Gear Upgrade Identity and Loot Comparison Clarity
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

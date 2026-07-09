@@ -79,7 +79,7 @@
       slot: safeSlot,
       label: safeSlot === 'armor' ? 'Armor' : 'Weapon',
       item,
-      itemName: cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'),
+      itemName: formatGearDisplayName(item) || cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'),
       level,
       levelText: merchantGearUpgradeLevelText(level),
       tierText: merchantGearUpgradeTierText(level, MERCHANT_GEAR_UPGRADE_CAP),
@@ -98,6 +98,15 @@
 
   function merchantGearUpgradeSummary(state) {
     return ['weapon', 'armor'].map(slot => merchantGearUpgradeModel(state, slot));
+  }
+
+  function formatGearDisplayName(item, options = {}) {
+    if (!item || typeof item !== 'object') return '';
+    const name = cleanDisplayText(item.name || '', '');
+    if (!name) return '';
+    const level = normalizeMerchantGearUpgradeLevel(item.upgradeLevel);
+    const showZero = options && options.showZero === true;
+    return level > 0 || showZero ? `${name} +${level}` : name;
   }
 
   function calcDerived(state) {
@@ -1742,6 +1751,7 @@
       bonusText: merchantGearUpgradeBonusText,
       bonusesForItem: merchantGearUpgradeBonuses,
       statSummary: merchantGearUpgradeStatSummary,
+      formatDisplayName: formatGearDisplayName,
       model: merchantGearUpgradeModel,
       summary: merchantGearUpgradeSummary,
       purchase: buyMerchantGearUpgrade
@@ -1749,6 +1759,7 @@
     window.normalizeMerchantGearUpgradeLevel = normalizeMerchantGearUpgradeLevel;
     window.merchantGearUpgradeModel = merchantGearUpgradeModel;
     window.merchantGearUpgradeSummary = merchantGearUpgradeSummary;
+    window.formatGearDisplayName = formatGearDisplayName;
     window.buyMerchantGearUpgrade = buyMerchantGearUpgrade;
   }
 
