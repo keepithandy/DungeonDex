@@ -21,6 +21,23 @@
     if (window.S && typeof window.S === 'object') window.S.build = BUILD_QS;
   }
 
+  function hideEmberfallNotes(){
+    const panel = document.getElementById('archivePanel');
+    if (!panel) return;
+    const headings = Array.from(panel.querySelectorAll('h3')).filter(node => String(node.textContent || '').trim() === 'Emberfall Notes');
+    headings.forEach(heading => {
+      const list = heading.nextElementSibling && heading.nextElementSibling.classList && heading.nextElementSibling.classList.contains('archive-log-list')
+        ? heading.nextElementSibling
+        : null;
+      const separator = heading.previousElementSibling && heading.previousElementSibling.classList && heading.previousElementSibling.classList.contains('sep')
+        ? heading.previousElementSibling
+        : null;
+      if (list) list.remove();
+      if (separator) separator.remove();
+      heading.remove();
+    });
+  }
+
   function healthCheck(){
     const tag = document.getElementById('buildTag');
     const visible = tag ? String(tag.textContent || '').trim() : '';
@@ -30,20 +47,29 @@
       expectedLabel: LABEL,
       visibleLabel: visible,
       cacheQuery,
-      cacheHealth: visible === LABEL && cacheQuery === BUILD_QS ? 'current' : 'mismatch'
+      cacheHealth: visible === LABEL && cacheQuery === BUILD_QS ? 'current' : 'mismatch',
+      emberfallNotes: document.querySelector('#archivePanel h3') && Array.from(document.querySelectorAll('#archivePanel h3')).some(node => String(node.textContent || '').trim() === 'Emberfall Notes') ? 'visible' : 'hidden'
     };
   }
 
   function installObserver(){
     const tag = document.getElementById('buildTag');
-    if (!tag || tag.__ddBuildLabelObserved) return;
-    tag.__ddBuildLabelObserved = true;
-    const observer = new MutationObserver(syncBuildLabel);
-    observer.observe(tag, { childList:true, characterData:true, subtree:true });
+    if (tag && !tag.__ddBuildLabelObserved) {
+      tag.__ddBuildLabelObserved = true;
+      const observer = new MutationObserver(syncBuildLabel);
+      observer.observe(tag, { childList:true, characterData:true, subtree:true });
+    }
+
+    if (document.body && !document.body.__ddEmberfallNotesObserved) {
+      document.body.__ddEmberfallNotesObserved = true;
+      const observer = new MutationObserver(hideEmberfallNotes);
+      observer.observe(document.body, { childList:true, subtree:true });
+    }
   }
 
   function install(){
     syncBuildLabel();
+    hideEmberfallNotes();
     window.DUNGEONDEX_BUILD_HEALTH = healthCheck;
     installObserver();
   }
