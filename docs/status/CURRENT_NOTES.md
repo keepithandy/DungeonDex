@@ -7,7 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.01 - Gear Section Polish
+- DungeonDex v1.23.8.02 - Merchant Gear Upgrade Clarity and Smoke Hardening
+
+## v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
+- Merchant Gear Upgrades now use clearer player-facing copy in Town, the Gear summary panel, and the Guild Journal merchant-upgrade summary.
+- Focused merchant smokes now verify clarity text, persistence across save/reload, insufficient-funds blocking, and direct Town merchant renderer HTML output.
+- Runtime/cache/version authority labels are now `v1.23.8.02`.
 
 ## v1.23.8.01 Gear Section Polish
 - Merchant Gear Upgrade money text no longer leaks raw `<span>` markup in the town or Gear-tab upgrade panels.

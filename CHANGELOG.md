@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.01 Gear Section Polish`
-* Current local package baseline: `v1.23.8.01 Gear Section Polish`
-* Current development target: `v1.23.8.01 Gear Section Polish`
+* Public/live itch version: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
+* Current local package baseline: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
+* Current development target: `v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.02 - Merchant Gear Upgrade Clarity and Smoke Hardening
+
+* Aligned visible runtime labels, build query strings, and service-worker cache labels to `v1.23.8.02`.
+* Clarified Merchant Gear Upgrade player-facing copy for equipped weapon and armor tiers, current bonuses, and next-cost/maxed states.
+* Extended merchant-upgrade smoke coverage to verify persisted clarity text and direct Town merchant renderer HTML output.
+* Updated the itch package helper and release-facing docs to match the active `docs/status/CURRENT_NOTES.md` notes path and current package baseline.
+* No upgrade costs, upgrade effects, upgrade caps, save fields, combat math, HP logic, reward tables, debt behavior, Revisit activation, or dungeon-entry rules changed.
+
+---
 
 ## v1.23.8.01 - Gear Section Polish
 

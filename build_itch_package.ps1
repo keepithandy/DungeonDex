@@ -1,10 +1,10 @@
 # DungeonDex Itch Package Builder
 # Run this from your local DungeonDex repo folder.
-# Output: dist\DungeonDex_v1.23.8.01_ItchReady.zip
+# Output: dist\DungeonDex_v1.23.8.02_ItchReady.zip
 
 $ErrorActionPreference = "Stop"
 
-$Version = "v1.23.8.01"
+$Version = "v1.23.8.02"
 $BuildName = "DungeonDex_$Version`_ItchReady"
 
 $Root = Get-Location
@@ -57,6 +57,7 @@ $ExcludeFilePatterns = @(
     "*.log",
     "*.tmp",
     "*.bak",
+    "*.md",
     "*.ps1",
     "package.json",
     "package-lock.json",
@@ -64,7 +65,7 @@ $ExcludeFilePatterns = @(
     "yarn.lock",
     "jsconfig.json",
     "AGENTS.md",
-    "DUNGEONDEX_CURRENT_NOTES.md",
+    "docs/status/CURRENT_NOTES.md",
     "PATCH*.md",
     "ITCH_PACKAGE_MANIFEST*.md",
     "DEVLOG*.md"
@@ -154,10 +155,10 @@ if (Test-Path $IndexPath) {
     $index = Get-Content $IndexPath -Raw
 
     # Update visible/runtime build labels in packaged index.
-    $index = $index -replace "DungeonDex v1\.23\.8", "DungeonDex v1.23.8.01"
-    $index = $index -replace "1\.23\.8-merchant-gear-upgrades-replace-talent-system", "1.23.8.01-gear-section-polish"
-    $index = $index -replace "window\.DUNGEONDEX_BUILD = '1\.23\.8';", "window.DUNGEONDEX_BUILD = '1.23.8.01';"
-    $index = $index -replace "window\.DUNGEONDEX_BUILD_QS = '1\.23\.8\.01-gear-section-polish';", "window.DUNGEONDEX_BUILD_QS = '1.23.8.01-gear-section-polish';"
+    $index = $index -replace "DungeonDex v1\.23\.8(?:\.01|\.02)?", "DungeonDex v1.23.8.02"
+    $index = $index -replace "1\.23\.8(?:\.01)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish)", "1.23.8.02-release-hygiene"
+    $index = $index -replace "window\.DUNGEONDEX_BUILD = '1\.23\.8(?:\.01|\.02)?';", "window.DUNGEONDEX_BUILD = '1.23.8.02';"
+    $index = $index -replace "window\.DUNGEONDEX_BUILD_QS = '1\.23\.8(?:\.01)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish)';", "window.DUNGEONDEX_BUILD_QS = '1.23.8.02-release-hygiene';"
 
     # Remove public package references to devtool scripts.
     $index = $index -replace "(?m)^\s*<script src=""\.\/js\/systems\/13_devtools_overlay\.js\?build=[^""]+""></script>\s*\r?\n?", ""
@@ -172,9 +173,9 @@ $AppPath = Join-Path $StageDir "app.js"
 if (Test-Path $AppPath) {
     $app = Get-Content $AppPath -Raw
 
-    $app = $app -replace "1\.23\.8-merchant-gear-upgrades-replace-talent-system", "1.23.8.01-gear-section-polish"
-    $app = $app -replace "window\.DUNGEONDEX_BUILD = '1\.23\.8';", "window.DUNGEONDEX_BUILD = '1.23.8.01';"
-    $app = $app -replace "window\.DUNGEONDEX_BUILD_QS = '1\.23\.8\.01-gear-section-polish';", "window.DUNGEONDEX_BUILD_QS = '1.23.8.01-gear-section-polish';"
+    $app = $app -replace "1\.23\.8(?:\.01)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish)", "1.23.8.02-release-hygiene"
+    $app = $app -replace "window\.DUNGEONDEX_BUILD = '1\.23\.8(?:\.01)?';", "window.DUNGEONDEX_BUILD = '1.23.8.02';"
+    $app = $app -replace "window\.DUNGEONDEX_BUILD_QS = '1\.23\.8(?:\.01)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish)';", "window.DUNGEONDEX_BUILD_QS = '1.23.8.02-release-hygiene';"
 
     # Remove dynamic devtool loads from public build.
     $app = $app -replace "(?m)^\s*loadModule\('\.\/js\/systems\/14_devtools_scenarios\.js\?build=' \+ qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'\);\s*\r?\n?", ""
@@ -188,12 +189,12 @@ $SwPath = Join-Path $StageDir "sw.js"
 if (Test-Path $SwPath) {
     $sw = Get-Content $SwPath -Raw
 
-    $sw = $sw -replace "dungeondex-v1\.23\.8-merchant-gear-upgrades-replace-talent-system", "dungeondex-v1.23.8.01-gear-section-polish"
-    $sw = $sw -replace "1\.23\.8-merchant-gear-upgrades-replace-talent-system", "1.23.8.01-gear-section-polish"
+    $sw = $sw -replace "dungeondex-v1\.23\.8(?:\.01|\.02)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish|release-hygiene)", "dungeondex-v1.23.8.02-release-hygiene"
+    $sw = $sw -replace "1\.23\.8(?:\.01|\.02)?-(?:merchant-gear-upgrades-replace-talent-system|gear-section-polish|release-hygiene)", "1.23.8.02-release-hygiene"
 
-    $sw = $sw -replace "(?m)^\s*`\.\/js\/systems\/13_devtools_overlay\.js\?build=\$\{BUILD_QS\}`,?\s*\r?\n?", ""
-    $sw = $sw -replace "(?m)^\s*`\.\/js\/systems\/14_devtools_scenarios\.js\?build=\$\{BUILD_QS\}`,?\s*\r?\n?", ""
-    $sw = $sw -replace "(?m)^\s*`\.\/js\/systems\/15_devtools_balance_reports\.js\?build=\$\{BUILD_QS\}`,?\s*\r?\n?", ""
+    $sw = $sw -replace "(?m)^.*13_devtools_overlay\.js.*\r?\n?", ""
+    $sw = $sw -replace "(?m)^.*14_devtools_scenarios\.js.*\r?\n?", ""
+    $sw = $sw -replace "(?m)^.*15_devtools_balance_reports\.js.*\r?\n?", ""
 
     Set-Content -Path $SwPath -Value $sw -Encoding UTF8
 }

@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.01 Gear Section Polish
+v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
 
 ## Current Local Package Version
-v1.23.8.01 Gear Section Polish
+v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
 
 ## Current Development Target
-v1.23.8.01 Gear Section Polish
+v1.23.8.02 Merchant Gear Upgrade Clarity and Smoke Hardening
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.01-gear-section-polish';
+const CACHE_NAME = 'dungeondex-v1.23.8.02-release-hygiene';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.01-gear-section-polish';
+const BUILD_QS = '1.23.8.02-release-hygiene';
 const ASSETS = [
   './',
   './index.html',
