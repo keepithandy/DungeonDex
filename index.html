@@ -23,72 +23,72 @@
        ======================================== */
 
     /* Shell & Layout Containers */
-    .ddx-shell { /* Main application container wrapper */ }
-    .ddx-main-viewport { /* Main content viewport for screen regions */ }
-    .ddx-view-stack { /* Vertical stack of content regions within a screen */ }
-    .ddx-region { /* Individual screen region (town, run, gear, dex, archive) */ }
-    .ddx-region-town { /* Town screen region */ }
-    .ddx-region-run { /* Run/Dungeon screen region */ }
-    .ddx-region-gear { /* Gear Hall screen region */ }
-    .ddx-region-dex { /* Archive/Trophy Hall screen region */ }
-    .ddx-region-archive { /* Guild Journal screen region */ }
+    .ddx-shell { display:block; /* Main application container wrapper */ }
+    .ddx-main-viewport { display:block; /* Main content viewport for screen regions */ }
+    .ddx-view-stack { display:block; /* Vertical stack of content regions within a screen */ }
+    .ddx-region { display:block; /* Individual screen region (town, run, gear, dex, archive) */ }
+    .ddx-region-town { display:block; /* Town screen region */ }
+    .ddx-region-run { display:block; /* Run/Dungeon screen region */ }
+    .ddx-region-gear { display:block; /* Gear Hall screen region */ }
+    .ddx-region-dex { display:block; /* Archive/Trophy Hall screen region */ }
+    .ddx-region-archive { display:block; /* Guild Journal screen region */ }
 
     /* Navigation & Headers */
-    .ddx-guild-header { /* Top header with build/title */ }
-    .ddx-header-title-slot { /* Title area inside header */ }
-    .ddx-nav-guild-bar { /* Guild navigation bar (5-tab nav) */ }
-    .ddx-lore-kicker { /* Lore-framed section kicker/label */ }
+    .ddx-guild-header { display:flex; /* Top header with build/title */ }
+    .ddx-header-title-slot { display:block; /* Title area inside header */ }
+    .ddx-nav-guild-bar { display:flex; /* Guild navigation bar (5-tab nav) */ }
+    .ddx-lore-kicker { display:inline-block; /* Lore-framed section kicker/label */ }
 
     /* Card Type Base Classes (apply to .panel) */
-    .ddx-ledger-card { /* Guild records, status, summaries */ }
-    .ddx-notice-board { /* Town contracts, posted notices */ }
-    .ddx-contract-card { /* Dungeon writ, debt pressure, revisit contracts */ }
-    .ddx-merchant-card { /* Merchant ledger, forge, gear upgrades */ }
-    .ddx-archive-card { /* Combat record, monster/gear archive, filters */ }
-    .ddx-journal-card { /* Guild journal, revisit memory records */ }
+    .ddx-ledger-card { display:block; /* Guild records, status, summaries */ }
+    .ddx-notice-board { display:block; /* Town contracts, posted notices */ }
+    .ddx-contract-card { display:block; /* Dungeon writ, debt pressure, revisit contracts */ }
+    .ddx-merchant-card { display:block; /* Merchant ledger, forge, gear upgrades */ }
+    .ddx-archive-card { display:block; /* Combat record, monster/gear archive, filters */ }
+    .ddx-journal-card { display:block; /* Guild journal, revisit memory records */ }
 
     /* Specialized Card Subclasses */
-    .ddx-guild-ledger { /* Guild status, adventurer record, current standing */ }
-    .ddx-debt-card { /* Debt pressure display */ }
-    .ddx-merchant-ledger { /* Merchant shop ledger */ }
-    .ddx-forge-counter { /* Forge/crafting counter */ }
-    .ddx-dungeon-writ { /* Dungeon entry & depth status */ }
-    .ddx-combat-arena { /* Combat arena/stage */ }
-    .ddx-combat-record { /* Combat log as record */ }
-    .ddx-gear-player-ledger { /* Player gear status ledger */ }
-    .ddx-gear-summary { /* Upgrade receipt/summary */ }
-    .ddx-equipment-ledger { /* Equipment loadout ledger */ }
-    .ddx-filter-record { /* Inventory filter record */ }
-    .ddx-gear-archive { /* Relic archive/inventory */ }
-    .ddx-archive-summary { /* Trophy hall summary */ }
-    .ddx-monster-archive { /* Monster/bestiary archive */ }
-    .ddx-gear-trophy-archive { /* Gear trophy records */ }
-    .ddx-quest-board { /* Quest/contract board */ }
-    .ddx-guild-journal { /* Guild journal entries */ }
-    .ddx-settings-ledger { /* Settings/archive ledger */ }
+    .ddx-guild-ledger { display:block; /* Guild status, adventurer record, current standing */ }
+    .ddx-debt-card { display:block; /* Debt pressure display */ }
+    .ddx-merchant-ledger { display:block; /* Merchant shop ledger */ }
+    .ddx-forge-counter { display:block; /* Forge/crafting counter */ }
+    .ddx-dungeon-writ { display:block; /* Dungeon entry & depth status */ }
+    .ddx-combat-arena { display:block; /* Combat arena/stage */ }
+    .ddx-combat-record { display:block; /* Combat log as record */ }
+    .ddx-gear-player-ledger { display:block; /* Player gear status ledger */ }
+    .ddx-gear-summary { display:block; /* Upgrade receipt/summary */ }
+    .ddx-equipment-ledger { display:block; /* Equipment loadout ledger */ }
+    .ddx-filter-record { display:block; /* Inventory filter record */ }
+    .ddx-gear-archive { display:block; /* Relic archive/inventory */ }
+    .ddx-archive-summary { display:block; /* Trophy hall summary */ }
+    .ddx-monster-archive { display:block; /* Monster/bestiary archive */ }
+    .ddx-gear-trophy-archive { display:block; /* Gear trophy records */ }
+    .ddx-quest-board { display:block; /* Quest/contract board */ }
+    .ddx-guild-journal { display:block; /* Guild journal entries */ }
+    .ddx-settings-ledger { display:block; /* Settings/archive ledger */ }
 
     /* Grouping & Pairs */
-    .ddx-merchant-pair { /* Two-column merchant/forge pair */ }
+    .ddx-merchant-pair { display:flex; /* Two-column merchant/forge pair */ }
 
     /* Record Semantic Classes */
-    .ddx-record-title { /* Title section of a record card */ }
-    .ddx-record-name { /* Name/primary heading within a record */ }
-    .ddx-record-meta { /* Metadata/flavor text in a record */ }
-    .ddx-record-body { /* Body content of a record */ }
+    .ddx-record-title { display:block; /* Title section of a record card */ }
+    .ddx-record-name { display:block; /* Name/primary heading within a record */ }
+    .ddx-record-meta { display:block; /* Metadata/flavor text in a record */ }
+    .ddx-record-body { display:block; /* Body content of a record */ }
 
     /* Specific UI Elements */
-    .ddx-action-row { /* Horizontal row of action buttons */ }
-    .ddx-action-strip { /* Footer action strip (sticky) */ }
-    .ddx-wallet-slot { /* Currency/wallet display slot */ }
-    .ddx-revisit-slot { /* Revisit foundation display slot */ }
-    .ddx-charter-display { /* Charter/depth progression display */ }
-    .ddx-cost-indicator { /* Rest cost, resource cost chips */ }
+    .ddx-action-row { display:flex; /* Horizontal row of action buttons */ }
+    .ddx-action-strip { display:flex; /* Footer action strip (sticky) */ }
+    .ddx-wallet-slot { display:inline-block; /* Currency/wallet display slot */ }
+    .ddx-revisit-slot { display:inline-block; /* Revisit foundation display slot */ }
+    .ddx-charter-display { display:block; /* Charter/depth progression display */ }
+    .ddx-cost-indicator { display:inline-block; /* Rest cost, resource cost chips */ }
 
     /* Semantic Modifiers */
-    .ddx-muted-lore { /* Muted/flavor text styling */ }
-    .ddx-locked-lore { /* Locked/unavailable styling */ }
-    .ddx-danger-note { /* Warning/danger styling */ }
-    .ddx-reward-note { /* Reward/success styling */ }
+    .ddx-muted-lore { color:rgba(255,255,255,0.55); /* Muted/flavor text styling */ }
+    .ddx-locked-lore { opacity:0.6; /* Locked/unavailable styling */ }
+    .ddx-danger-note { color:#ff6b6b; /* Warning/danger styling */ }
+    .ddx-reward-note { color:#6bff9e; /* Reward/success styling */ }
 
     /* All .ddx-* classes above are layout/semantic wrappers.
        Existing .panel, .tab, .button, and system-generated classes
