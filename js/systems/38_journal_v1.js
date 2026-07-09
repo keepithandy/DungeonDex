@@ -308,30 +308,29 @@
     const debt = debtStatus(safeState);
     const upgrades = merchantUpgradeModel(safeState);
     const memoryTotal = boss.count + revisit.total + famous.count + rival.count + (debt.balance > 0 ? 1 : 0) + upgrades.totalLevels;
+    const sections = [];
+    if (boss.count > 0) sections.push({ key: 'boss', title: 'Boss Trophies', body: boss.body || `${boss.count} boss trophies recorded.`, meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : '') });
+    if (revisit.total > 0) sections.push({ key: 'revisit', title: 'Revisit Memories', body: `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Board Echo ${revisit.boardStatus} • Rival Trace ${revisit.rivalStatus}.`, meta: revisit.last || '' });
+    if (famous.count > 0) sections.push({ key: 'famous', title: 'Famous Gear', body: famous.body || `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.`, meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : '') });
+    if (rival.count > 0) sections.push({ key: 'rival', title: 'Rival Traces', body: rival.body || `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.`, meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : '') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') });
+    if (debt.balance > 0) sections.push({ key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra });
+    if (upgrades.totalLevels > 0) sections.push({ key: 'upgrades', title: 'Merchant Upgrades', body: upgrades.body, meta: upgrades.meta });
     return {
       title: 'Guild Journal',
-      flavor: memoryTotal > 0
-        ? 'The town keeps record of your scars, debts, trophies, and names best forgotten.'
-        : 'The ledger is quiet. Make something worth remembering.',
+      flavor: sections.length > 0
+        ? 'Only active records and earned memories are shown here.'
+        : '',
       memoryTotal,
       debtPreviewText: laneClarity.debtPreviewText,
-      sections: [
-        { key: 'account', title: 'Account Memory', body: memoryTotal > 0 ? `Total remembered records: ${memoryTotal}.` : 'No records yet.', meta: revisit.last || debt.line },
-        { key: 'boss', title: 'Boss Trophies', body: boss.body || (boss.count > 0 ? `${boss.count} boss trophies recorded.` : 'No boss trophies recorded yet.'), meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : 'No boss trophies recorded yet.') },
-        { key: 'revisit', title: 'Revisit Memories', body: revisit.total > 0 ? `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Board Echo ${revisit.boardStatus} • Rival Trace ${revisit.rivalStatus}.` : 'No Revisit history yet.', meta: revisit.last || 'No Revisit history yet.' },
-        { key: 'famous', title: 'Famous Gear', body: famous.body || (famous.count > 0 ? `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.` : famous.emptyStateCopy), meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : famous.emptyStateCopy) },
-        { key: 'rival', title: 'Rival Traces', body: rival.body || (rival.count > 0 ? `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.` : 'No rival has left a name worth carving.'), meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : 'No rival has left a name worth carving.') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') },
-        { key: 'lanes', title: 'Unfinished Lanes', body: laneClarity.statusText, meta: [laneClarity.boardText, laneClarity.debtText].filter(Boolean).join(' • ') || laneClarity.boardText || laneClarity.debtText },
-        { key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra },
-        { key: 'upgrades', title: 'Merchant Upgrades', body: upgrades.body, meta: upgrades.meta }
-      ]
+      sections
     };
   }
   function row(section){
-    return `<article class="journal-row"><strong>${esc(section.title)}</strong><p>${esc(section.body)}</p><p class="small muted">${esc(section.meta || '')}</p></article>`;
+    return `<article class="journal-row"><strong>${esc(section.title)}</strong><p>${esc(section.body)}</p>${section.meta ? `<p class="small muted">${esc(section.meta)}</p>` : ''}</article>`;
   }
   function renderGuildJournalPanel(state){
     const model = journalV1233SummaryModel(state);
+    if (!model.sections.length) return '';
     return `<section class="journal-board" id="guildJournalPanel" aria-label="Guild Journal">
       <div class="card-head">
         <div><h2>${esc(model.title)}</h2><p>${esc(model.flavor)}</p></div>
@@ -347,6 +346,11 @@
     if (!panel) return;
     const html = renderGuildJournalPanel(window.S || {});
     const existing = panel.querySelector('#guildJournalPanel');
+    if (!html) {
+      if (existing && typeof existing.remove === 'function') existing.remove();
+      else if (existing) existing.outerHTML = '';
+      return;
+    }
     if (existing) existing.outerHTML = html;
     else panel.insertAdjacentHTML('beforeend', html);
   }
