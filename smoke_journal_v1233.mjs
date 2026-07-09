@@ -22,7 +22,7 @@ const state = {
 function makeContext(){
   const panel = {
     innerHTML: '',
-    querySelector: selector => selector === '#guildJournalPanel' && panel.innerHTML.includes('guildJournalPanel') ? { outerHTML: panel.innerHTML } : null,
+    querySelector: selector => selector === '#guildJournalPanel' && panel.innerHTML.includes('guildJournalPanel') ? { outerHTML: panel.innerHTML, remove: () => { panel.innerHTML = ''; } } : null,
     insertAdjacentHTML: (_pos, html) => { panel.innerHTML += html; }
   };
   return {
@@ -76,15 +76,22 @@ const before = JSON.stringify(state);
 const emptyModel = context.journalV1233SummaryModel({});
 const richModel = context.journalV1233SummaryModel(state);
 assert.equal(JSON.stringify(state), before);
-assert.ok(emptyModel.sections.length >= 6);
+assert.equal(emptyModel.sections.length, 0);
+assert.equal(context.renderGuildJournalPanel({}), '');
 assert.ok(richModel.sections.some(section => section.title === 'Boss Trophies'));
 assert.ok(richModel.sections.some(section => section.title === 'Revisit Memories'));
 assert.ok(richModel.sections.some(section => section.title === 'Debt Status'));
 assert.ok(richModel.sections.some(section => section.title === 'Merchant Upgrades'));
+assert.ok(!richModel.sections.some(section => section.title === 'Account Memory'));
+assert.ok(!richModel.sections.some(section => section.title === 'Unfinished Lanes'));
 
 context.DDJournalV1Render();
-assert.ok(String(context.document.getElementById('archivePanel').innerHTML).includes('Guild Journal'));
-assert.ok(String(context.document.getElementById('archivePanel').innerHTML).includes('Merchant Upgrades'));
-assert.ok(!String(context.document.getElementById('archivePanel').innerHTML).match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
+const html = String(context.document.getElementById('archivePanel').innerHTML);
+assert.ok(html.includes('Guild Journal'));
+assert.ok(html.includes('Merchant Upgrades'));
+assert.ok(!html.includes('Account Memory'));
+assert.ok(!html.includes('Unfinished Lanes'));
+assert.ok(!html.includes('No records yet'));
+assert.ok(!html.match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
 
 console.log('PASS: Journal v1 smoke');
