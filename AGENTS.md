@@ -6,11 +6,21 @@ DungeonDex is a mobile-first dark fantasy browser roguelite / idle dungeon crawl
 
 This file is the first-read operating contract for Codex, Claude, ChatGPT, and other repo agents.
 
+## Active Core Loop
+
+Preserve the live player loop unless the issue explicitly targets one of its steps:
+
+```text
+Town -> Dungeon -> Loot -> Return -> Gear Upgrades -> Archive/Journal -> Repeat
+```
+
 ## Core Workflow Rules
 
 - Keep all changes small, focused, and versioned.
 - One issue should solve one engineering problem.
 - Finish existing systems before creating new systems.
+- Inspect the existing implementation before proposing replacement, activation, or cleanup work.
+- Extend or clarify established systems before considering a rewrite.
 - Do not rewrite the project unless the user explicitly asks.
 - Preserve save data compatibility.
 - Prefer targeted fixes, contract helpers, and smoke coverage over large refactors.
@@ -19,6 +29,7 @@ This file is the first-read operating contract for Codex, Claude, ChatGPT, and o
 - Do not introduce external dependencies unless explicitly approved.
 - Do not expose API keys, secrets, private tokens, or credentials.
 - Do not include `node_modules` or unrelated lockfile noise unless required by the explicit task.
+- Do not ship stale devtool artifacts, stale cache/build labels, or unrelated package leftovers in public output bundles.
 
 ## Required Agent Reading Order
 
@@ -26,7 +37,7 @@ Before planning or editing, read:
 
 1. `AGENTS.md`
 2. `VERSION.md`
-3. `DUNGEONDEX_CURRENT_NOTES.md`
+3. `docs/status/CURRENT_NOTES.md`
 4. `docs/CURRENT_ARCHITECTURE.md` if present
 5. `docs/PATCH_TEMPLATE.md` before writing a patch plan
 6. `docs/RELEASE_CHECKLIST.md` before version labels, release notes, cache labels, or public-facing package changes
@@ -154,6 +165,7 @@ Do not modify these systems unless the issue explicitly authorizes that area:
 
 - save compatibility
 - save normalization and repair
+- Merchant Gear Upgrade costs, caps, save fields, and stat-effect contract
 - combat math
 - player damage
 - player HP
@@ -179,6 +191,8 @@ When a protected system is intentionally touched, state why it was in scope and 
 ## Permanent Gameplay Guardrails
 
 - `Enter Dungeon` / `Continue Run` remains the only primary dungeon entry path unless the user explicitly requests a new playable entry system.
+- Gear Upgrades are part of the active post-run loop and must be audited in their existing implementation before being changed.
+- Archive / Journal remain part of the live loop after gear upgrades and must not be treated as optional planning-only surfaces.
 - Preserve existing live Revisit lanes exactly as implemented unless the issue explicitly targets Revisit.
 - Do not add or expand Revisit entry, start, begin, claim, complete, unlock, reward, progression, currency, combat, economy, or farming behavior unless explicitly requested.
 - Do not treat existing live Revisit behavior as nonexistent or planning-only.
@@ -232,6 +246,13 @@ Rules:
 - Preserve classic script-load ordering unless the issue explicitly targets script architecture.
 - Do not modernize architecture, convert modules, add build tooling, or refactor file structure unless explicitly requested.
 - Do not add dead UI buttons or labels that imply behavior not yet implemented.
+- If an existing system already works in some form, audit and continue it safely instead of rebuilding it from scratch.
+
+## Preferred Agent Roles
+
+- Patch Warden: enforce narrow diffs, active-surface guardrails, and inspect-before-replace discipline.
+- Smoke Captain: map the touched behavior to the compact smoke suite and any focused smoke checks, then report what was actually run.
+- Lore Consistency: review player-facing copy, Archive / Journal wording, and DungeonDex tone so documentation and UI language stay aligned with the live baseline.
 
 ## UI / Design Direction
 
@@ -250,7 +271,7 @@ Every implementation issue should finish with verification.
 
 Minimum expectations:
 - syntax checks for edited JavaScript, when JavaScript changed
-- relevant existing smoke tests
+- relevant existing smoke tests for behavior-facing changes
 - new or updated smoke coverage for newly introduced framework behavior, when practical
 - protected-system review
 - compatibility review
@@ -260,12 +281,17 @@ Use applicable commands such as:
 - `node --check <file>`
 - targeted smoke file for the touched system
 - broader smoke file when the touched system crosses renderer, save, or town surfaces
+- `node smoke_compact_suite.mjs` when a change crosses multiple live systems or the right focused boundary is unclear
 
 Documentation-only changes do not require gameplay smoke tests, but must still verify:
 - changed documentation is readable
 - version labels were not changed unless requested
 - no runtime files were edited
 - no new contradiction was introduced against current baseline notes
+
+Release/package-facing work must additionally verify:
+- version labels, build query strings, and service-worker cache labels stay aligned
+- public package output does not include stale devtool/cache references or unrelated temp artifacts
 
 Do not claim a check passed unless it was actually run.
 

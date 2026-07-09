@@ -13,7 +13,7 @@ This template should be copied into a Codex prompt, GitHub issue, or patch-plann
 Always begin a Codex task with this instruction:
 
 ```text
-Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and DUNGEONDEX_CURRENT_NOTES.md before planning edits. If docs/CURRENT_ARCHITECTURE.md, docs/PATCH_TEMPLATE.md, or docs/RELEASE_CHECKLIST.md are relevant to this task, read them before editing.
+Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and docs/status/CURRENT_NOTES.md before planning edits. If docs/CURRENT_ARCHITECTURE.md, docs/PATCH_TEMPLATE.md, or docs/RELEASE_CHECKLIST.md are relevant to this task, read them before editing.
 ```
 
 ## Packet Header
@@ -30,7 +30,7 @@ Expected commit: [yes/no]
 ## Full Codex Packet Template
 
 ```text
-Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and DUNGEONDEX_CURRENT_NOTES.md before planning edits. If docs/CURRENT_ARCHITECTURE.md, docs/PATCH_TEMPLATE.md, or docs/RELEASE_CHECKLIST.md are relevant to this task, read them before editing.
+Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and docs/status/CURRENT_NOTES.md before planning edits. If docs/CURRENT_ARCHITECTURE.md, docs/PATCH_TEMPLATE.md, or docs/RELEASE_CHECKLIST.md are relevant to this task, read them before editing.
 
 Repo: DungeonDex
 Branch: main
@@ -51,7 +51,7 @@ Add smoke coverage for Debt Collector clarity remaining locked without activatin
 [Summarize the relevant current project state. Include known version, recent patch context, locked systems, or prior helper behavior if relevant.]
 
 Example:
-DungeonDex already has an active Talent foundation. Hunter Board Clarity exists as copy-only behavior. Debt Collector clarity is prepared but must not be live-renderer activated. Revisit remains locked and planning-only.
+DungeonDex already has live Merchant Gear Upgrades, live Trophy Echo / Famous Gear Memory / Rival Trace lanes, and a read-only Archive / Journal layer. Board Echo and Debt Pressure remain locked/planned, and old Talent save fields remain compatibility-only.
 
 ## Allowed Scope
 
@@ -102,7 +102,7 @@ Before editing, inspect:
 - Current branch and repo status if available
 - `AGENTS.md`
 - `VERSION.md`
-- `DUNGEONDEX_CURRENT_NOTES.md`
+- `docs/status/CURRENT_NOTES.md`
 - Any files directly named in Allowed Scope
 - Any existing helper, smoke, renderer, or copy function related to this task
 
@@ -193,7 +193,7 @@ Suggested commit message:
 Use this for small patches.
 
 ```text
-Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and DUNGEONDEX_CURRENT_NOTES.md before planning edits.
+Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and docs/status/CURRENT_NOTES.md before planning edits.
 
 Repo: DungeonDex
 Branch: main
@@ -229,7 +229,7 @@ Final report must include:
 Use this when asking Codex to inspect the repo without editing.
 
 ```text
-Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and DUNGEONDEX_CURRENT_NOTES.md.
+Read AGENTS.md first and follow it as the repo operating contract. Then read VERSION.md and docs/status/CURRENT_NOTES.md.
 
 Review only. Do not edit files and do not commit.
 

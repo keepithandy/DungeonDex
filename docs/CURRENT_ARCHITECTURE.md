@@ -19,7 +19,7 @@ The project is intentionally conservative:
 The active dungeon path is:
 
 ```text
-Town -> Enter Dungeon / Continue Run -> Combat / Run Progress -> Extract or Death -> Town
+Town -> Enter Dungeon / Continue Run -> Combat / Run Progress -> Loot -> Return -> Gear Upgrades -> Archive / Journal -> Repeat
 ```
 
 Enter Dungeon / Continue Run is the only active dungeon entry path unless the user explicitly requests another live path.
@@ -123,7 +123,7 @@ When the patch explicitly requires a version bump, check:
 VERSION.md
 README.md
 CHANGELOG.md
-DUNGEONDEX_CURRENT_NOTES.md
+docs/status/CURRENT_NOTES.md
 app.js
 index.html
 sw.js

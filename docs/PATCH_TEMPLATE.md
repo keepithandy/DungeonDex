@@ -15,7 +15,7 @@ Use this template for every focused DungeonDex patch. Keep the patch narrow, tes
 Write one plain-language sentence describing the exact outcome.
 
 Example:
-> Add smoke coverage proving Talent earning remains disabled while preserving the existing locked preview UI.
+> Add smoke coverage proving Merchant Gear Upgrades still buy correctly and persist after save/reload.
 
 ## Allowed Scope
 List the files or systems that may change.
@@ -24,7 +24,7 @@ List the files or systems that may change.
 Allowed files:
 - VERSION.md
 - CHANGELOG.md
-- DUNGEONDEX_CURRENT_NOTES.md
+- docs/status/CURRENT_NOTES.md
 - smoke_talent_v150b.mjs
 ```
 
@@ -43,7 +43,7 @@ Do not change:
 Before editing, read:
 1. AGENTS.md
 2. VERSION.md
-3. DUNGEONDEX_CURRENT_NOTES.md
+3. docs/status/CURRENT_NOTES.md
 4. docs/CURRENT_ARCHITECTURE.md
 5. The target files listed in Allowed Scope
 

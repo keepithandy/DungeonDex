@@ -6,7 +6,7 @@ Use this short checklist before committing a DungeonDex patch.
 
 - `VERSION.md` is the public build authority.
 - `CHANGELOG.md` is the permanent release history.
-- `DUNGEONDEX_CURRENT_NOTES.md` is the current working summary.
+- `docs/status/CURRENT_NOTES.md` is the current working summary.
 - Runtime labels, cache labels, and internal module labels must not replace those files as the source of truth.
 - Keep visible version labels short and aligned with the authority files.
 
@@ -39,6 +39,7 @@ For documentation-only audits, this command list is the expected safety net for 
 - Debt Collector clarity prep: display-copy helpers may clarify wording only. They must not change debt math, pressure, repayment, wallet, economy, combat, rewards, save shape, or Revisit state unless a focused debt issue explicitly targets that behavior.
 - Revisit lanes: Trophy Echo, Famous Gear Memory, and Rival Trace are the current live memory lanes. Board Echo and Debt Pressure remain locked/planned until focused issues activate them. Live lanes must remain town/archive memory loops, not reward, combat, farming, or progression loops.
 - Service worker/cache labels: `CACHE_NAME`, build query strings, visible title labels, and `VERSION.md` must stay aligned during versioned release patches. Documentation-only audits should not change service worker behavior or cache labels.
+- Public package output: itch-ready or release packages must not ship stale devtool/cache references, old build labels, temp files, or unrelated repo artifacts.
 - Classic script-load ordering: `index.html` is the source of truth for dependency order. Keep the numeric file map in `js/systems/README.md` descriptive; do not reorder runtime scripts as cleanup.
 - Smoke-test safety net: Talent, Debt Collector, Revisit, Journal, and compact smoke files define the current protected behavior boundaries. Update smoke coverage only when the issue scope explicitly calls for it.
 
