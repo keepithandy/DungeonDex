@@ -364,6 +364,11 @@
    ======================================== */
 
 .app-shell {
+  width: min(100%, 860px);
+  max-width: 860px;
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: clamp(6px, 2.2vw, 10px);
   padding-bottom: calc(76px + var(--safe-bottom));
   scroll-padding-bottom: calc(90px + var(--safe-bottom));
 }
@@ -400,10 +405,146 @@
 }
 
 /* ========================================
+   FULL MOBILE-FRIENDLY HARDENING
+   ======================================== */
+
+.screens,
+.screen,
+.stack-8,
+.panel,
+.stat-box,
+.resource-box,
+.loot-card,
+.equip-slot,
+.monster-card,
+.log-line,
+.quest-card,
+.shop-item,
+.archive-line,
+.item-row,
+.split,
+.card-head,
+.tag-row,
+.item-actions,
+.inline-actions,
+.top-actions {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.panel {
+  padding: clamp(9px, 2.75vw, 12px);
+  border-radius: clamp(14px, 4vw, 18px);
+}
+
+.panel *,
+.tab,
+button,
+.pill,
+.item-name,
+.item-meta,
+.ddx-record-name,
+.ddx-record-meta {
+  min-width: 0;
+}
+
+p,
+small,
+strong,
+span,
+button,
+.pill,
+.item-name,
+.item-meta,
+.muted,
+.mono,
+.ddx-record-name,
+.ddx-record-meta {
+  overflow-wrap: anywhere;
+}
+
+button,
+.tab,
+.ghost,
+.primary,
+.mini {
+  max-width: 100%;
+}
+
+.grid-2,
+.filter-grid,
+.compact-grid,
+.combat-hud,
+.hud-grid,
+.intro-grid {
+  min-width: 0;
+}
+
+.item-row,
+.split,
+.card-head,
+.title-row,
+.inline-actions,
+.top-actions,
+.item-actions,
+.tag-row,
+.sticky-meta,
+.inventory-head,
+.inventory-actions,
+.merchant-head,
+.charter-actions,
+.intro-actions {
+  flex-wrap: wrap;
+}
+
+#screen-town > .stack-8 > .section-header.panel {
+  gap: 8px;
+}
+
+#screen-town > .stack-8 > .section-header.panel > .inline-actions {
+  min-width: 0;
+}
+
+#screen-town > .stack-8 > .section-header.panel > .district-charter-slot {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.district-wallet-slot,
+.revisit-foundation-panel,
+.deep-charter-card,
+.depth-progress-card,
+.district-market,
+.market-subhead,
+.district-ware-list,
+.run-command-strip,
+.log-wrap,
+.inventory-actions,
+.shop-item,
+.loot-card,
+.equip-slot,
+.monster-card,
+.quest-card,
+.archive-line {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.revisit-foundation-panel,
+.deep-charter-card,
+.depth-progress-card {
+  overflow: hidden;
+}
+
+/* ========================================
    RESPONSIVE ADJUSTMENTS
    ======================================== */
 
 @media (max-width: 700px) {
+  .app-shell {
+    padding-top: calc(6px + var(--safe-top));
+  }
+
   .ddx-guild-header {
     gap: 10px;
     padding: 10px 12px;
@@ -440,6 +581,7 @@
 
 @media (max-width: 560px) {
   .app-shell {
+    padding-inline: 7px;
     padding-bottom: calc(74px + var(--safe-bottom));
     scroll-padding-bottom: calc(88px + var(--safe-bottom));
   }
@@ -453,11 +595,13 @@
     align-items: center;
     gap: 8px;
     padding: 8px 10px;
+    border-radius: 14px;
   }
 
   .ddx-header-title-slot h1 {
     font-size: 0.82rem;
     letter-spacing: 0.03em;
+    line-height: 1.1;
   }
 
   .top-actions.ddx-action-row {
@@ -478,17 +622,94 @@
   .top-actions .save-status {
     display: none;
   }
+
+  .stack-8 {
+    gap: 7px;
+  }
+
+  .grid-2,
+  .ddx-merchant-pair,
+  .filter-grid,
+  .hero-main {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid,
+  .intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .section-header,
+  .topbar {
+    gap: 8px;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "actions"
+      "district"
+      "charter" !important;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions > button {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 9px;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions > #restCostPill {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 34px;
+  }
+
+  .inventory-actions,
+  .item-actions,
+  .intro-actions,
+  .charter-actions {
+    width: 100%;
+  }
+
+  .item-actions .mini,
+  .inventory-actions .mini,
+  .intro-actions button,
+  .charter-actions button {
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  .log-wrap {
+    max-height: min(220px, 32dvh);
+  }
 }
 
 @media (max-width: 480px) {
+  .app-shell {
+    padding-inline: 6px;
+    padding-top: calc(5px + var(--safe-top));
+  }
+
   .ddx-guild-header {
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 7px;
+    padding: 7px 9px;
   }
 
   .ddx-header-title-slot h1 {
-    font-size: 0.80rem;
-    letter-spacing: 0.02em;
+    font-size: 0.78rem;
+    letter-spacing: 0.01em;
+  }
+
+  .panel {
+    padding: 9px;
   }
 
   .ddx-nav-guild-bar {
@@ -501,6 +722,7 @@
     border-radius: 10px;
     padding: 5px 2px;
     font-size: 0.66rem;
+    letter-spacing: 0;
   }
 
   .ddx-cost-indicator {
@@ -511,6 +733,85 @@
   .ddx-action-row button {
     padding: 8px 6px;
     font-size: 0.75rem;
+  }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid {
+    gap: 6px;
+  }
+
+  .stat-box,
+  .resource-box,
+  .loot-card,
+  .equip-slot,
+  .monster-card,
+  .log-line,
+  .quest-card,
+  .shop-item,
+  .archive-line {
+    padding: 8px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    padding-inline: 5px;
+  }
+
+  .ddx-header-title-slot h1 {
+    font-size: 0.72rem;
+  }
+
+  .top-actions.ddx-action-row button {
+    min-height: 30px;
+    padding: 4px 6px;
+    font-size: 0.64rem;
+  }
+
+  .ddx-nav-guild-bar {
+    gap: 3px;
+    padding: 5px 5px calc(5px + var(--safe-bottom));
+  }
+
+  .ddx-nav-guild-bar .tab {
+    min-height: 40px;
+    font-size: 0.60rem;
+    padding-inline: 1px;
+  }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid,
+  .intro-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .item-actions .mini,
+  .inventory-actions .mini,
+  .intro-actions button,
+  .charter-actions button {
+    flex-basis: 100%;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .app-shell {
+    padding-top: calc(4px + var(--safe-top));
+    padding-bottom: calc(58px + var(--safe-bottom));
+  }
+
+  .ddx-guild-header {
+    padding-block: 6px;
+  }
+
+  .ddx-nav-guild-bar .tab {
+    min-height: 36px;
+  }
+
+  .tabs.ddx-nav-guild-bar {
+    padding-block: 4px;
   }
 }
 
