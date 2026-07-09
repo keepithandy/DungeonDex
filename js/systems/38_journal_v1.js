@@ -291,10 +291,10 @@
       active,
       totalLevels,
       body: active.length
-        ? active.map(entry => `${text(entry.label || 'Gear')} +${num(entry.level, 0)}/${num(entry.cap, 3)}`).join(' • ')
+        ? active.map(entry => `${text(entry.itemName || entry.label || 'Gear')} ${text(entry.tierText || `${entry.level || 0}`)} gives ${text(entry.currentBonusText || entry.currentStat || 'no bonus')}${entry.capped ? ' • Maxed at +3' : ` • Next cost ${money(entry.cost)}`}`).join(' • ')
         : 'No merchant gear upgrades are active yet.',
       meta: active.length
-        ? active.map(entry => `${text(entry.itemName || entry.label || 'Gear')} (${text(entry.currentStat || 'No stat')})`).join(' • ')
+        ? 'Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.'
         : 'Spend copper at the Lowfire Market to improve equipped gear.'
     };
   }

@@ -7,7 +7,8 @@ const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const SYSTEM_FILES = [
   'js/systems/07_player_combat_runtime.js',
   'js/systems/08_normalization_save.js',
-  'js/systems/38_journal_v1.js'
+  'js/systems/38_journal_v1.js',
+  'js/systems/39_gear_upgrade_summary_panel.js'
 ];
 
 function numberOr(value, fallback = 0, min = -Infinity, max = Infinity) {
@@ -140,6 +141,9 @@ function createBaseState() {
 
 function createContext() {
   const store = new Map();
+  const gearUpgradeSummaryPanel = {
+    innerHTML: ''
+  };
   const archivePanel = {
     innerHTML: '',
     querySelector(selector) {
@@ -158,7 +162,9 @@ function createContext() {
     clearTimeout() {},
     addEventListener() {},
     document: {
+      readyState: 'complete',
       getElementById(id) {
+        if (id === 'gearUpgradeSummaryPanel') return gearUpgradeSummaryPanel;
         return id === 'archivePanel' ? archivePanel : null;
       }
     },
@@ -241,11 +247,12 @@ function createContext() {
     normalizeBossTrophyStateShape() {},
     rememberBossTrophyRepairFlags() {},
     normalizeTalentAwardClaims() { return {}; },
-    applyBossTrophyTalentAwardIfReady() {}
+    applyBossTrophyTalentAwardIfReady() {},
+    renderGear() {}
   };
   context.window = context;
   context.globalThis = context;
-  return { context: vm.createContext(context), store, archivePanel };
+  return { context: vm.createContext(context), store, archivePanel, gearUpgradeSummaryPanel };
 }
 
 function loadRuntime(context) {
@@ -259,7 +266,7 @@ function merchantSection(state, context) {
   return model.sections.find(section => section.key === 'upgrades');
 }
 
-const { context, store, archivePanel } = createContext();
+const { context, store, archivePanel, gearUpgradeSummaryPanel } = createContext();
 loadRuntime(context);
 
 assert.equal(typeof context.merchantGearUpgradeSummary, 'function');
@@ -268,17 +275,24 @@ assert.equal(typeof context.normalizeSaveShape, 'function');
 assert.equal(typeof context.save, 'function');
 assert.equal(typeof context.load, 'function');
 assert.equal(typeof context.journalV1233SummaryModel, 'function');
+assert.equal(typeof context.renderGearUpgradeSummaryPanel, 'function');
 
 const state = createGearState();
 const initialSummary = context.merchantGearUpgradeSummary(state);
 assert.equal(initialSummary.length, 2);
 assert.equal(initialSummary[0].label, 'Weapon');
 assert.equal(initialSummary[0].itemName, 'Warden Blade');
+assert.equal(initialSummary[0].perTierText, '+2 Power per tier');
+assert.equal(initialSummary[0].tierText, '+0 / +3');
+assert.equal(initialSummary[0].currentBonusText, '+0 Power');
 assert.equal(initialSummary[0].cost, 50);
 assert.equal(initialSummary[0].currentStat, 'Power 12');
 assert.equal(initialSummary[0].nextStat, 'Power 14');
 assert.equal(initialSummary[1].label, 'Armor');
 assert.equal(initialSummary[1].itemName, 'Ashcoat');
+assert.equal(initialSummary[1].perTierText, '+2 Guard and +8 HP per tier');
+assert.equal(initialSummary[1].tierText, '+0 / +3');
+assert.equal(initialSummary[1].currentBonusText, '+0 Guard and +0 HP');
 assert.equal(initialSummary[1].cost, 50);
 assert.equal(initialSummary[1].currentStat, 'Guard 5 • HP 20');
 assert.equal(initialSummary[1].nextStat, 'Guard 7 • HP 28');
@@ -292,6 +306,9 @@ assert.equal(state.player.gold, 950);
 assert.equal(state.player.equipment.weapon.upgradeLevel, 1);
 const afterWeaponSummary = context.merchantGearUpgradeSummary(state);
 assert.equal(afterWeaponSummary[0].cost, 125);
+assert.equal(afterWeaponSummary[0].tierText, '+1 / +3');
+assert.equal(afterWeaponSummary[0].currentBonusText, '+2 Power');
+assert.equal(afterWeaponSummary[0].nextBonusText, '+4 Power');
 assert.equal(afterWeaponSummary[0].currentStat, 'Power 14');
 assert.equal(afterWeaponSummary[0].nextStat, 'Power 16');
 assert.equal(context.calcDerived(state).power, 22);
@@ -305,6 +322,9 @@ assert.equal(state.player.gold, 900);
 assert.equal(state.player.equipment.armor.upgradeLevel, 1);
 const afterArmorSummary = context.merchantGearUpgradeSummary(state);
 assert.equal(afterArmorSummary[1].cost, 125);
+assert.equal(afterArmorSummary[1].tierText, '+1 / +3');
+assert.equal(afterArmorSummary[1].currentBonusText, '+2 Guard and +8 HP');
+assert.equal(afterArmorSummary[1].nextBonusText, '+4 Guard and +16 HP');
 assert.equal(afterArmorSummary[1].currentStat, 'Guard 7 • HP 28');
 assert.equal(afterArmorSummary[1].nextStat, 'Guard 9 • HP 36');
 const derivedAfterArmor = context.calcDerived(state);
@@ -312,10 +332,11 @@ assert.equal(derivedAfterArmor.guard, 13);
 assert.equal(state.player.maxHp, 138);
 
 const journalBeforeSave = merchantSection(state, context);
-assert.ok(journalBeforeSave.body.includes('Weapon +1/3'));
-assert.ok(journalBeforeSave.body.includes('Armor +1/3'));
-assert.ok(journalBeforeSave.meta.includes('Warden Blade (Power 14)'));
-assert.ok(journalBeforeSave.meta.includes('Ashcoat (Guard 7 • HP 28)'));
+assert.ok(journalBeforeSave.body.includes('Warden Blade +1 / +3 gives +2 Power'));
+assert.ok(journalBeforeSave.body.includes('Ashcoat +1 / +3 gives +2 Guard and +8 HP'));
+assert.ok(journalBeforeSave.body.includes('Next cost 125c'));
+assert.ok(journalBeforeSave.meta.includes('Weapon upgrades are +2 Power per tier.'));
+assert.ok(journalBeforeSave.meta.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
 
 const poorState = createGearState();
 poorState.player.gold = 49;
@@ -345,16 +366,35 @@ const reloaded = context.load();
 assert.equal(reloaded.player.equipment.weapon.upgradeLevel, 1);
 assert.equal(reloaded.player.equipment.armor.upgradeLevel, 1);
 const reloadedSummary = context.merchantGearUpgradeSummary(reloaded);
+assert.equal(reloadedSummary[0].currentBonusText, '+2 Power');
+assert.equal(reloadedSummary[1].currentBonusText, '+2 Guard and +8 HP');
 assert.equal(reloadedSummary[0].currentStat, 'Power 14');
 assert.equal(reloadedSummary[1].currentStat, 'Guard 7 • HP 28');
 const journalAfterLoad = merchantSection(reloaded, context);
-assert.ok(journalAfterLoad.body.includes('Weapon +1/3'));
-assert.ok(journalAfterLoad.body.includes('Armor +1/3'));
+assert.ok(journalAfterLoad.body.includes('Warden Blade +1 / +3 gives +2 Power'));
+assert.ok(journalAfterLoad.body.includes('Ashcoat +1 / +3 gives +2 Guard and +8 HP'));
+
+context.S = reloaded;
+context.renderGearUpgradeSummaryPanel();
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Weapon upgrades are +2 Power per tier.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Warden Blade'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Ashcoat'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Weapon +1 gives +2 Power.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Armor +1 gives +2 Guard and +8 HP.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Next cost 125c'));
+
+const maxedState = createGearState();
+maxedState.player.equipment.weapon.upgradeLevel = 3;
+maxedState.player.equipment.armor.upgradeLevel = 3;
+context.S = maxedState;
+context.renderGearUpgradeSummaryPanel();
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Maxed at +3'));
 
 context.S = reloaded;
 context.DDJournalV1Render();
 assert.ok(String(archivePanel.innerHTML).includes('Guild Journal'));
 assert.ok(String(archivePanel.innerHTML).includes('Merchant Upgrades'));
-assert.ok(String(archivePanel.innerHTML).includes('Weapon +1/3'));
+assert.ok(String(archivePanel.innerHTML).includes('Warden Blade +1 / +3 gives +2 Power'));
 
 console.log('PASS: Merchant Gear Upgrades smoke');

@@ -31,6 +31,28 @@
     return MERCHANT_GEAR_UPGRADE_COSTS[normalizeMerchantGearUpgradeLevel(level)] || 0;
   }
 
+  function merchantGearUpgradeLevelText(level) {
+    return `+${format(normalizeMerchantGearUpgradeLevel(level))}`;
+  }
+
+  function merchantGearUpgradeTierText(level, cap = MERCHANT_GEAR_UPGRADE_CAP) {
+    return `${merchantGearUpgradeLevelText(level)} / +${format(Math.max(0, Math.floor(numberOr(cap, MERCHANT_GEAR_UPGRADE_CAP, 0, MERCHANT_GEAR_UPGRADE_CAP))))}`;
+  }
+
+  function merchantGearUpgradePerTierText(slot) {
+    return merchantGearUpgradeSlotKey(slot) === 'armor'
+      ? '+2 Guard and +8 HP per tier'
+      : '+2 Power per tier';
+  }
+
+  function merchantGearUpgradeBonusText(slot, level) {
+    const safeLevel = normalizeMerchantGearUpgradeLevel(level);
+    if (merchantGearUpgradeSlotKey(slot) === 'armor') {
+      return `+${format(safeLevel * 2)} Guard and +${format(safeLevel * 8)} HP`;
+    }
+    return `+${format(safeLevel * 2)} Power`;
+  }
+
   function merchantGearUpgradeStatSummary(item, levelOverride = null) {
     if (!item || typeof item !== 'object') return 'No gear equipped';
     const slot = merchantGearUpgradeSlotKey(item.slot);
@@ -59,11 +81,16 @@
       item,
       itemName: cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'),
       level,
+      levelText: merchantGearUpgradeLevelText(level),
+      tierText: merchantGearUpgradeTierText(level, MERCHANT_GEAR_UPGRADE_CAP),
       cap: MERCHANT_GEAR_UPGRADE_CAP,
       cost,
       capped,
       affordable,
       missingCopper,
+      perTierText: merchantGearUpgradePerTierText(safeSlot),
+      currentBonusText: merchantGearUpgradeBonusText(safeSlot, level),
+      nextBonusText: !capped ? merchantGearUpgradeBonusText(safeSlot, level + 1) : '',
       currentStat: item ? merchantGearUpgradeStatSummary(item, level) : '',
       nextStat: item && !capped ? merchantGearUpgradeStatSummary(item, level + 1) : ''
     };
@@ -1709,6 +1736,10 @@
       costs: MERCHANT_GEAR_UPGRADE_COSTS.slice(),
       cap: MERCHANT_GEAR_UPGRADE_CAP,
       normalizeLevel: normalizeMerchantGearUpgradeLevel,
+      levelText: merchantGearUpgradeLevelText,
+      tierText: merchantGearUpgradeTierText,
+      perTierText: merchantGearUpgradePerTierText,
+      bonusText: merchantGearUpgradeBonusText,
       bonusesForItem: merchantGearUpgradeBonuses,
       statSummary: merchantGearUpgradeStatSummary,
       model: merchantGearUpgradeModel,
