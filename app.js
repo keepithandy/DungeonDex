@@ -68,6 +68,7 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/40_gear_detail_modal.js?build=' + qs, 'DDGearDetailModal', 'Gear detail modal'); }, 540);
     window.setTimeout(function(){ loadModule('./js/systems/41_debt_pressure_v1.js?build=' + qs, 'DDDebtPressureV1', 'Debt Pressure v1'); }, 580);
     window.setTimeout(function(){ loadModule('./js/systems/42_gear_upgrade_money_text_cleanup.js?build=' + qs, 'DDGearUpgradeMoneyTextCleanup', 'Gear upgrade money text cleanup'); }, 620);
+    window.setTimeout(function(){ loadModule('./js/systems/43_devkit_reset_hold.js?build=' + qs, 'DDDevKitResetHold', 'DevKit reset hold'); }, 660);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
   else loadExtensions();
