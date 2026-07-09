@@ -94,7 +94,7 @@ function createContext() {
       innerHTML: '',
       querySelector(selector) {
         return selector === '#guildJournalPanel' && this.innerHTML.includes('guildJournalPanel')
-          ? { outerHTML: this.innerHTML }
+          ? { outerHTML: this.innerHTML, remove: () => { this.innerHTML = ''; } }
           : null;
       },
       insertAdjacentHTML(_pos, html) { this.innerHTML += html; }
@@ -225,7 +225,7 @@ assert.equal(cleanSummary.totalRecorded, 0);
 assert.equal(cleanSummary.emptyCopy, 'No boss trophies recorded yet.');
 assert.equal(cleanSummary.duplicateSafe, true);
 const emptyJournal = context.journalV1233SummaryModel(clean);
-assert.ok(emptyJournal.sections.find(section => section.key === 'boss').body.includes('No boss trophies recorded yet'));
+assert.equal(emptyJournal.sections.length, 0);
 
 const state = baseState();
 state.player.gold = 4321;
@@ -307,6 +307,7 @@ assert.ok(bossSection.meta.includes('Boss Floor 5'));
 const panel = context.renderGuildJournalPanel(reloaded);
 assert.ok(panel.includes('Guild Journal'));
 assert.ok(panel.includes('Lowfire Fang'));
+assert.ok(!panel.includes('No boss trophies recorded yet'));
 assert.ok(!panel.match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
 
 console.log('PASS: Boss Trophy v1 smoke');
