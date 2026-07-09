@@ -7,6 +7,7 @@ const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const SYSTEM_FILES = [
   'js/systems/07_player_combat_runtime.js',
   'js/systems/08_normalization_save.js',
+  'js/systems/10_ui_town_shop.js',
   'js/systems/38_journal_v1.js',
   'js/systems/39_gear_upgrade_summary_panel.js'
 ];
@@ -275,6 +276,8 @@ assert.equal(typeof context.normalizeSaveShape, 'function');
 assert.equal(typeof context.save, 'function');
 assert.equal(typeof context.load, 'function');
 assert.equal(typeof context.journalV1233SummaryModel, 'function');
+assert.equal(typeof context.merchantGearUpgradeCard, 'function');
+assert.equal(typeof context.merchantGearUpgradePanelMarkup, 'function');
 assert.equal(typeof context.renderGearUpgradeSummaryPanel, 'function');
 
 const state = createGearState();
@@ -296,6 +299,30 @@ assert.equal(initialSummary[1].currentBonusText, '+0 Guard and +0 HP');
 assert.equal(initialSummary[1].cost, 50);
 assert.equal(initialSummary[1].currentStat, 'Guard 5 • HP 20');
 assert.equal(initialSummary[1].nextStat, 'Guard 7 • HP 28');
+const townFreshHtml = context.merchantGearUpgradePanelMarkup(state);
+assert.ok(townFreshHtml.includes('Weapon upgrades are +2 Power per tier.'));
+assert.ok(townFreshHtml.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
+assert.ok(townFreshHtml.includes('Warden Blade'));
+assert.ok(townFreshHtml.includes('Ashcoat'));
+assert.ok(townFreshHtml.includes('+0 / +3'));
+assert.ok(townFreshHtml.includes('Current bonus +0 Power'));
+assert.ok(townFreshHtml.includes('Current bonus +0 Guard and +0 HP'));
+assert.ok(townFreshHtml.includes('Next cost 50c'));
+assert.ok(townFreshHtml.includes('data-merchant-upgrade="weapon"'));
+assert.ok(townFreshHtml.includes('data-merchant-upgrade="armor"'));
+
+const townLeveledState = createGearState();
+townLeveledState.player.equipment.weapon.upgradeLevel = 1;
+townLeveledState.player.equipment.armor.upgradeLevel = 2;
+const townLeveledHtml = context.merchantGearUpgradePanelMarkup(townLeveledState);
+assert.ok(townLeveledHtml.includes('Warden Blade • +1 / +3'));
+assert.ok(townLeveledHtml.includes('Ashcoat • +2 / +3'));
+assert.ok(townLeveledHtml.includes('Current bonus +2 Power'));
+assert.ok(townLeveledHtml.includes('Current bonus +4 Guard and +16 HP'));
+assert.ok(townLeveledHtml.includes('Next cost 125c'));
+assert.ok(townLeveledHtml.includes('Next cost 250c'));
+assert.ok(townLeveledHtml.includes('Weapon +1 / +3 gives +2 Power.'));
+assert.ok(townLeveledHtml.includes('Armor +2 / +3 gives +4 Guard and +16 HP.'));
 
 const weaponBuy = context.buyMerchantGearUpgrade(state, 'weapon');
 assert.equal(weaponBuy.ok, true);
@@ -387,6 +414,10 @@ assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Next cost 125c'));
 const maxedState = createGearState();
 maxedState.player.equipment.weapon.upgradeLevel = 3;
 maxedState.player.equipment.armor.upgradeLevel = 3;
+const townMaxedHtml = context.merchantGearUpgradePanelMarkup(maxedState);
+assert.ok(townMaxedHtml.includes('Maxed at +3'));
+assert.ok(!townMaxedHtml.includes('data-merchant-upgrade="weapon"'));
+assert.ok(!townMaxedHtml.includes('data-merchant-upgrade="armor"'));
 context.S = maxedState;
 context.renderGearUpgradeSummaryPanel();
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Maxed at +3'));
