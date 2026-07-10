@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.25.0 Visual Identity + Side Rail Release
+v1.25.1 Mobile Side Rail Toggle
 
 ## Current Local Package Version
-v1.25.0 Visual Identity + Side Rail Release
+v1.25.1 Mobile Side Rail Toggle
 
 ## Current Development Target
-v1.25.0 Visual Identity + Side Rail Release
+v1.25.1 Mobile Side Rail Toggle
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
