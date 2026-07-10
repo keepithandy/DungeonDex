@@ -7,7 +7,12 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.08 - Town Mobile Screenshot Harness
+- DungeonDex v1.23.8.09 - Build Label Alignment
+
+## v1.23.8.09 Build Label Alignment
+- Visible browser/build labels now agree with the runtime, cache, and version authority.
+- App wiring smoke now rejects mixed visible-build and cache-query labels.
+- No gameplay mechanics changed.
 
 ## v1.23.8.08 Town Mobile Screenshot Harness
 - Added a narrow local screenshot helper that captures Town at 390px, 430px, and 768px widths for repeatable visual inspection.

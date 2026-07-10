@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.08 Town Mobile Screenshot Harness`
-* Current local package baseline: `v1.23.8.08 Town Mobile Screenshot Harness`
-* Current development target: `v1.23.8.08 Town Mobile Screenshot Harness`
+* Public/live itch version: `v1.23.8.09 Build Label Alignment`
+* Current local package baseline: `v1.23.8.09 Build Label Alignment`
+* Current development target: `v1.23.8.09 Build Label Alignment`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.09 - Build Label Alignment
+
+* Aligned the visible browser title and build-label guard with the current runtime/cache version.
+* Added smoke coverage that rejects mixed visible-build and cache-query labels.
+* No gameplay, save, progression, economy, combat, Relic, Talent, Debt, or Revisit behavior changed.
+
+---
 
 ## v1.23.8.08 - Town Mobile Screenshot Harness
 

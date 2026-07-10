@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.08 Town Mobile Screenshot Harness
+v1.23.8.09 Build Label Alignment
 
 ## Current Local Package Version
-v1.23.8.08 Town Mobile Screenshot Harness
+v1.23.8.09 Build Label Alignment
 
 ## Current Development Target
-v1.23.8.08 Town Mobile Screenshot Harness
+v1.23.8.09 Build Label Alignment
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.08-town-mobile-screenshot-harness';
+const CACHE_NAME = 'dungeondex-v1.23.8.09-build-label-alignment';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.08-town-mobile-screenshot-harness';
+const BUILD_QS = '1.23.8.09-build-label-alignment';
 const ASSETS = [
   './',
   './index.html',
