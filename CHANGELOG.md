@@ -8,13 +8,25 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.09 Build Label Alignment`
-* Current local package baseline: `v1.23.8.09 Build Label Alignment`
-* Current development target: `v1.23.8.09 Build Label Alignment`
+* Public/live itch version: `v1.25.0 Visual Identity + Side Rail Release`
+* Current local package baseline: `v1.25.0 Visual Identity + Side Rail Release`
+* Current development target: `v1.25.0 Visual Identity + Side Rail Release`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.25.0 - Visual Identity + Side Rail Release
+
+* Added the first custom DungeonDex crest asset and decorative Hollow Stair gate visual to the live identity layer.
+* Polished the Hollow Stair gate art for stronger arch, stair, and ember readability.
+* Renamed player-facing Relic Forge copy to Lowfire Forge while preserving legacy filenames, globals, and save fields.
+* Replaced the fixed bottom navigation with a left-side rail that expands on hover/focus and opens with a tap toggle on touch/mobile devices.
+* Aligned visible runtime labels, build query strings, service-worker cache labels, and docs to `v1.25.0`.
+* Added the crest and Hollow Stair SVG assets to the service-worker precache list.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit, Echo, or Relic collection behavior changed.
+
+---
 
 ## v1.23.8.09 - Build Label Alignment
 
@@ -146,7 +158,7 @@ This changelog records what changed and why.
 * Completed Boss Trophy v1 as a player-facing progression memory system.
 * Boss Trophy state now normalizes modern records and legacy trophy IDs into a stable readable record shape without deleting valid trophy data.
 * Duplicate Boss Trophy records collapse by canonical trophy identity across repeated award calls, repair passes, save/reload, and mixed legacy/modern trophy state.
-* Added a read-only Boss Trophy summary helper for counts, trophy names, source names, latest trophy, legacy detection, duplicate-collapse reporting, and safe empty-state copy.
+* Added a read-only Boss Trophy summary helper for counts, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse reporting, and safe empty-state copy.
 * The Guild Journal Boss Trophy section now consumes the completed readable summary helper while staying read-only.
 * Added `smoke_boss_trophy_v1.mjs` for Boss Trophy persistence, duplicate safety, legacy compatibility, Journal integration, and protected-system neutrality.
 
