@@ -587,7 +587,7 @@ button,
   }
 
   .app-shell.combat-active {
-    padding-bottom: calc(118px + var(--safe-bottom));
+    padding-bottom: calc(8px + var(--safe-bottom));
   }
 
   .ddx-guild-header {
@@ -832,7 +832,7 @@ button,
 }
 
 /* ========================================
-   COMBAT DENSITY AND ACTION DOCK
+   COMBAT DENSITY AND MOBILE FLOW
    ======================================== */
 
 @media (max-width: 700px) {
@@ -871,8 +871,8 @@ button,
 @media (max-width: 560px) {
   .app-shell.combat-active {
     max-width: 430px;
-    padding: calc(4px + var(--safe-top)) 5px calc(76px + var(--safe-bottom)) !important;
-    scroll-padding-bottom: calc(98px + var(--safe-bottom)) !important;
+    padding: calc(4px + var(--safe-top)) 5px calc(8px + var(--safe-bottom)) !important;
+    scroll-padding-bottom: calc(12px + var(--safe-bottom)) !important;
   }
 
   .app-shell.combat-active #screen-run .stack-8 {
@@ -1013,6 +1013,22 @@ button,
     text-align: center;
   }
 
+  .app-shell.combat-active .combat-device-actions {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    z-index: auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    padding: 5px 0 3px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
   .app-shell.combat-active .run-log-head {
     margin-bottom: 3px !important;
   }
@@ -1049,12 +1065,6 @@ button,
   }
 }
 
-@media (max-width: 360px) {
-  .app-shell.combat-active {
-    padding-bottom: calc(118px + var(--safe-bottom)) !important;
-  }
-
-}
 
 /* ========================================
    NO DISRUPTION TO EXISTING SYSTEMS
