@@ -8,13 +8,20 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
-* Current local package baseline: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
-* Current development target: `v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity`
+* Public/live itch version: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
+* Current local package baseline: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
+* Current development target: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.05 - Release Audit + Gameplay Foundation Cleanup
+
+* Aligned public version labels, cache-busting labels, and runtime title labels to `v1.23.8.05`.
+* Kept combat math, loot, economy, save compatibility, progression rules, dungeon entry, and Revisit behavior unchanged.
+
+---
 
 ## v1.23.8.04 - Gear Replacement Warning and Upgrade Ownership Clarity
 

@@ -66,11 +66,11 @@ function Resolve-PythonCommand {
         $found = Get-Command $cmd -ErrorAction SilentlyContinue
         if ($found) {
             if ($arg) { return @($cmd, $arg) }
-            return @($cmd)
+            return @($cmd, $null)
         }
     }
 
-    return @()
+    return @($null, $null)
 }
 
 function Copy-RequiredFile {

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
+const BUILD_QS = '1.23.8.05-release-audit-gameplay-foundation-cleanup';
 const CODEX_PATH = 'js/systems/36_ui_revisit_archive_codex.js';
 const SCRIPT_SRC = `./${CODEX_PATH}?build=${BUILD_QS}`;
 const ASSET_SRC = `./${CODEX_PATH}?build=${'${BUILD_QS}'}`;

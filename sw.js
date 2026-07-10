@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.04-gear-replacement-ownership-clarity';
+const CACHE_NAME = 'dungeondex-v1.23.8.05-release-audit-gameplay-foundation-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
+const BUILD_QS = '1.23.8.05-release-audit-gameplay-foundation-cleanup';
 const ASSETS = [
   './',
   './index.html',

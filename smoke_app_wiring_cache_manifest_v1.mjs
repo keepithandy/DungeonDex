@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8.04-gear-replacement-ownership-clarity';
+const BUILD_QS = '1.23.8.05-release-audit-gameplay-foundation-cleanup';
 
 function extractMatches(source, regex) {
   const out = [];
