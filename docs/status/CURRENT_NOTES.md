@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.25.1 - Mobile Side Rail Toggle
+- DungeonDex v1.25.2 - Revisit No-op Stability + Version Alignment
+
+## v1.25.2 Revisit No-op Stability + Version Alignment
+- Disabled the unstable post-render Revisit relocation helper after mobile/Textastic lag and unresponsive button reports.
+- Bumped the service-worker cache/build query to `1.25.2-revisit-noop-stability` so stale relocation assets are purged.
+- Aligned runtime pointer, build-label guard, service-worker cache labels, README, changelog, current notes, agent instructions, and release templates to the stability baseline.
+- The live town renderer remains the source owner of the Revisit panel until a future source-render placement patch moves it beside Elite Contracts safely.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit start/resolve/reward/history behavior, Echo activation, gear mechanics, or Relic collection behavior changed.
 
 ## v1.25.1 Mobile Side Rail Toggle
 - Mobile/touch side rail now uses a tiny `←` drawer button instead of the larger hamburger/close control.
@@ -106,7 +113,7 @@
 ## v1.23.4 Boss Trophy v1 Completion
 - Boss Trophy v1 records earned boss trophies as durable, readable progression memory records.
 - Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
-- Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern state.
+- Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern trophy state.
 - The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
 - The Guild Journal Boss Trophy section consumes the completed readable summary and remains read-only.
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
