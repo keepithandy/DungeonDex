@@ -246,9 +246,18 @@ async function main() {
     const before = await evaluate(client, `(() => ({
       activeScreen: document.querySelector('.screen.active')?.id || '',
       townText: document.getElementById('screen-town')?.innerText || '',
-      buttonText: document.getElementById('startRunBtn')?.innerText || ''
+      buttonText: document.getElementById('startRunBtn')?.innerText || '',
+      townHubTitle: document.querySelector('#screen-town .town-hub-titlebar #districtName')?.innerText || '',
+      townSectionCount: document.querySelectorAll('#screen-town .town-section-shell').length,
+      boardShell: !!document.querySelector('#questPanel.town-board-shell'),
+      marketShell: !!document.querySelector('#merchantPanel.town-market-shell'),
+      forgeShell: !!document.querySelector('#forgePanel.town-forge-shell'),
+      revisitStartButtons: Array.from(document.querySelectorAll('[data-start-revisit]')).map(btn => btn.getAttribute('data-start-revisit') || '')
     }))()`);
     record('Town loads before Enter Dungeon', before.activeScreen === 'screen-town' && /Enter Dungeon|Continue Run/.test(before.buttonText), JSON.stringify(before));
+    record('Town shell sections render', before.townSectionCount >= 3 && before.boardShell && before.marketShell && before.forgeShell, JSON.stringify(before));
+    record('Town hub title remains visible', /Lowfire District/.test(before.townHubTitle), JSON.stringify(before));
+    record('No Board Echo start action is exposed in town', !before.revisitStartButtons.includes('board_echo_route'), JSON.stringify(before.revisitStartButtons));
 
     const clickResult = await evaluate(client, `(() => {
       const btn = document.getElementById('startRunBtn');

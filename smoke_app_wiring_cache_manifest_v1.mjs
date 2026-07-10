@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8.05-release-audit-gameplay-foundation-cleanup';
+const BUILD_QS = '1.23.8.06-town-shell-identity-pass';
 
 function extractMatches(source, regex) {
   const out = [];

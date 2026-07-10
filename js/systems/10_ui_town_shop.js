@@ -385,9 +385,12 @@ function renderTown() {
 	const questPanel = el('questPanel');
 	const merchantPanel = el('merchantPanel');
 	const forgePanel = el('forgePanel');
+	if (questPanel) questPanel.classList.add('town-section-shell', 'town-board-shell');
+	if (merchantPanel) merchantPanel.classList.add('town-section-shell', 'town-market-shell');
+	if (forgePanel) forgePanel.classList.add('town-section-shell', 'town-forge-shell');
 	const districtPanel = el('districtName')?.closest('.panel');
 	if (districtPanel) {
-		districtPanel.className = `panel section-header district-banner town-district-hub district-charter-hub ${districtToneClass(stagingDistrict)}`;
+		districtPanel.className = `panel section-header district-banner town-district-hub town-hub-card town-hub-titlebar district-charter-hub ${districtToneClass(stagingDistrict)}`;
 	}
 	if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
 	if (el('districtLine')) el('districtLine').innerHTML = `<span class="district-subtitle">${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}</span><br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br><span class="district-next-descent">Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.</span><br><span class="district-next-descent">${escapeHtml(progressionStatusLine)}</span>`;
@@ -404,41 +407,66 @@ function renderTown() {
 	}
 	if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
 	if (questPanel) questPanel.innerHTML = `
-      <div class="card-head"><div><h2>Lowfire Board</h2><p>Paid marks and objectives.</p></div></div>
-      <div class="warden-ledger">
-        <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short orders paid after runs.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
-      </div>
-      <div class="list warden-objective-list">
-        ${S.player.quests.map(q => `
-          <div class="quest-card warden-objective-card">
-            <div class="split"><strong>${q.title}</strong><span class="small muted">${q.progress}/${q.goal}</span></div>
-            <p class="small">${q.reward}${q.claimed ? ' - claimed' : ''}</p>
-            <div class="xpbar"><div class="xpfill" style="width:${(q.progress/q.goal)*100}%"></div></div>
-          </div>`).join('')}
-      </div>
-      ${eliteContractBoardMarkup(S)}`;
+      <div class="town-section-shell town-board-shell">
+        <div class="town-section-head">
+          <div>
+            <span class="eyebrow town-section-kicker">Town Square</span>
+            <h2>Lowfire Board</h2>
+            <p>Paid marks, objectives, and the current pressure line.</p>
+          </div>
+        </div>
+        <div class="warden-ledger town-board-ledger">
+          <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">Short orders paid after runs.</p></div><span class="pill">${S.player.quests.filter(q => q.claimed).length}/${S.player.quests.length}</span></div>
+        </div>
+        <div class="list warden-objective-list">
+          ${S.player.quests.map(q => `
+            <div class="quest-card warden-objective-card">
+              <div class="split"><strong>${q.title}</strong><span class="small muted">${q.progress}/${q.goal}</span></div>
+              <p class="small">${q.reward}${q.claimed ? ' - claimed' : ''}</p>
+              <div class="xpbar"><div class="xpfill" style="width:${(q.progress/q.goal)*100}%"></div></div>
+            </div>`).join('')}
+        </div>
+        ${eliteContractBoardMarkup(S)}
+      </div>`;
 
 	const districtWares = unlockedDistrictWares(S);
 	const activeSinkPills = activeGoldSinkPills(S);
 	if (merchantPanel) merchantPanel.innerHTML = `
-      <div class="split merchant-head"><div><h2>Lowfire Market</h2><p>Gear and descent support.</p></div><button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button></div>
-      ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
-      ${merchantGearUpgradePanelMarkup(S)}
-      <div class="sep"></div>
-      <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
-      <div class="sep"></div>
-      <div class="district-market lowfire-wares">
-        <div class="split market-subhead"><div><strong>District Wares</strong><p class="small">Support unlocked by your deepest secured floor.</p></div><span class="pill">${districtWares.length}/${DISTRICT_MARKET_WARES.length}</span></div>
-        <div class="list district-ware-list">${districtWares.map(ware => districtWareCard(ware)).join('')}</div>
+      <div class="town-section-shell town-market-shell">
+        <div class="town-section-head town-market-head">
+          <div>
+            <span class="eyebrow town-section-kicker">Merchant Stall</span>
+            <h2>Lowfire Market</h2>
+            <p>Gear, district wares, and descent support.</p>
+          </div>
+          <button class="ghost mini refresh-compact" id="refreshMerchantBtn"><span>Refresh Stock</span><strong>${formatMoney(S.town.merchantRefreshCost)}</strong></button>
+        </div>
+        ${activeSinkPills.length ? `<div class="tag-row market-pills">${activeSinkPills.map(label => `<span class="pill rarity-uncommon">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
+        ${merchantGearUpgradePanelMarkup(S)}
+        <div class="sep"></div>
+        <div class="list market-stock-list">${S.merchantStock.map(item => shopCard(item)).join('')}</div>
+        <div class="sep"></div>
+        <div class="district-market lowfire-wares">
+          <div class="split market-subhead"><div><strong>District Wares</strong><p class="small">Support unlocked by your deepest secured floor.</p></div><span class="pill">${districtWares.length}/${DISTRICT_MARKET_WARES.length}</span></div>
+          <div class="list district-ware-list">${districtWares.map(ware => districtWareCard(ware)).join('')}</div>
+        </div>
       </div>`;
 
 	if (forgePanel) forgePanel.innerHTML = `
-      <div class="card-head"><div><h2>Relic Forge</h2><p>Craft and salvage relic gear.</p></div></div>
-      <div class="tag-row"><span class="pill">Forge spark: ${S.player.forgeSpark}</span><span class="pill">Shards: ${S.player.shards}</span></div>
-      <div class="sep"></div>
-      <button class="primary" id="forgeBtn">Forge Relic (1 spark + 40 shards)</button>
-      <div class="sep"></div>
-      <p class="small">Every crafted relic rolls at least rare quality.</p>`;
+      <div class="town-section-shell town-forge-shell">
+        <div class="town-section-head">
+          <div>
+            <span class="eyebrow town-section-kicker">Forge Counter</span>
+            <h2>Relic Forge</h2>
+            <p>Craft and salvage relic gear.</p>
+          </div>
+        </div>
+        <div class="tag-row"><span class="pill">Forge spark: ${S.player.forgeSpark}</span><span class="pill">Shards: ${S.player.shards}</span></div>
+        <div class="sep"></div>
+        <button class="primary" id="forgeBtn">Forge Relic (1 spark + 40 shards)</button>
+        <div class="sep"></div>
+        <p class="small">Every crafted relic rolls at least rare quality.</p>
+      </div>`;
 }
 
 function districtWareCard(ware) {

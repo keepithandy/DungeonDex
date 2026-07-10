@@ -39,6 +39,15 @@
     </div>`;
   }
 
+  function renderTownShellIdentity(){
+    const questPanel = typeof el === 'function' ? el('questPanel') : document.getElementById('questPanel');
+    const merchantPanel = typeof el === 'function' ? el('merchantPanel') : document.getElementById('merchantPanel');
+    const forgePanel = typeof el === 'function' ? el('forgePanel') : document.getElementById('forgePanel');
+    if (questPanel) questPanel.classList.add('town-section-shell', 'town-board-shell');
+    if (merchantPanel) merchantPanel.classList.add('town-section-shell', 'town-market-shell');
+    if (forgePanel) forgePanel.classList.add('town-section-shell', 'town-forge-shell');
+  }
+
   function injectCss(){
     if (document.getElementById('ddTownWalletChipFixCss')) return;
     const style = document.createElement('style');
@@ -56,6 +65,7 @@
 
   function install(){
     injectCss();
+    renderTownShellIdentity();
     renderTownWallet();
   }
 

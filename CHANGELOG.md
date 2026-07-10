@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
-* Current local package baseline: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
-* Current development target: `v1.23.8.05 Release Audit + Gameplay Foundation Cleanup`
+* Public/live itch version: `v1.23.8.06 Town Shell Identity Pass`
+* Current local package baseline: `v1.23.8.06 Town Shell Identity Pass`
+* Current development target: `v1.23.8.06 Town Shell Identity Pass`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.06 - Town Shell Identity Pass
+
+* Improved the Town shell with clearer semantic grouping for the district header, market, forge, contract board, gear hub, archive, and journal surfaces.
+* Added small hub-oriented copy and layout hooks to strengthen Town readability without changing any gameplay actions or rules.
+* Updated public version labels, build labels, and cache-busting labels to `v1.23.8.06`.
+
+---
 
 ## v1.23.8.05 - Release Audit + Gameplay Foundation Cleanup
 

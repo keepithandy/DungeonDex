@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.05 Release Audit + Gameplay Foundation Cleanup
+v1.23.8.06 Town Shell Identity Pass
 
 ## Current Local Package Version
-v1.23.8.05 Release Audit + Gameplay Foundation Cleanup
+v1.23.8.06 Town Shell Identity Pass
 
 ## Current Development Target
-v1.23.8.05 Release Audit + Gameplay Foundation Cleanup
+v1.23.8.06 Town Shell Identity Pass
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

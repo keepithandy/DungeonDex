@@ -7,11 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.05 - Release Audit + Gameplay Foundation Cleanup
+- DungeonDex v1.23.8.06 - Town Shell Identity Pass
+
+## v1.23.8.06 Town Shell Identity Pass
+- Town now presents a clearer hub shell with stronger sections, hierarchy, and world identity.
+- Runtime/cache/version authority labels are now `v1.23.8.06`.
+- No gameplay mechanics changed.
 
 ## v1.23.8.05 Release Audit + Gameplay Foundation Cleanup
-- Runtime/cache/version authority labels are now `v1.23.8.05`.
-- No gameplay mechanics changed.
+- Runtime/cache/version authority labels were previously `v1.23.8.05`.
 
 ## v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
 - The gear detail compare note now explains that an upgraded equipped item keeps its tier if replaced.

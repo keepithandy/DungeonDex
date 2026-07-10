@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.23.8.05**
+Current baseline: **DungeonDex v1.23.8.06**
 
 ## Try It First
 

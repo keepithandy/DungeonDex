@@ -24,7 +24,7 @@ function cleanDisplayText(value, fallback = '') {
 
 function createGearState() {
   return {
-    build: '1.23.8.04-gear-replacement-ownership-clarity',
+    build: '1.23.8.06-town-shell-identity-pass',
     screen: 'town',
     filters: { slot: 'all', rarity: 'all', search: '', sort: 'power' },
     player: {
@@ -176,7 +176,7 @@ function createContext() {
       clear() { store.clear(); }
     },
     STORAGE_KEY,
-    BUILD: '1.23.8.04-gear-replacement-ownership-clarity',
+    BUILD: '1.23.8.06-town-shell-identity-pass',
     COPPER_PER_GOLD: 10000,
     BOSS_INTERVAL: 5,
     DEPTH_CHAPTERS_PER_THREAT_STEP: 15,
