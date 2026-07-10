@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.06 Town Shell Identity Pass
+v1.23.8.07 Town Readability + Mobile Hierarchy Lock
 
 ## Current Local Package Version
-v1.23.8.06 Town Shell Identity Pass
+v1.23.8.07 Town Readability + Mobile Hierarchy Lock
 
 ## Current Development Target
-v1.23.8.06 Town Shell Identity Pass
+v1.23.8.07 Town Readability + Mobile Hierarchy Lock
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.

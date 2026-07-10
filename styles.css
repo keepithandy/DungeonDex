@@ -82,15 +82,22 @@ p { color: var(--soft); line-height: 1.35; }
   display: grid;
   gap: 10px;
 }
+.town-board-shell,
+.town-market-shell,
+.town-forge-shell {
+  align-content: start;
+}
 .town-section-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255,213,148,0.10);
 }
 .town-section-head h2 {
   font-size: 1.02rem;
-  letter-spacing: 0;
+  letter-spacing: 0.01em;
 }
 .town-section-head p {
   margin-top: 3px;
@@ -101,6 +108,7 @@ p { color: var(--soft); line-height: 1.35; }
 .town-section-kicker {
   margin-bottom: 3px;
   color: #f6d9a1;
+  font-weight: 800;
 }
 .town-hub-card {
   position: relative;
@@ -264,6 +272,17 @@ p { color: var(--soft); line-height: 1.35; }
 .town-market-head .refresh-compact {
   align-self: flex-start;
   min-width: 148px;
+}
+@media (max-width: 560px) {
+  .town-section-shell { gap: 9px; }
+  .town-section-head { gap: 8px; padding-bottom: 8px; }
+  .town-section-head h2 { font-size: 1rem; }
+  .town-section-head p { font-size: 0.78rem; line-height: 1.38; }
+  .town-section-kicker { font-size: 0.64rem; margin-bottom: 2px; }
+  .town-market-head { flex-direction: column; }
+  .town-market-head .refresh-compact { width: 100%; min-width: 0; }
+  .town-market-head .refresh-compact strong { margin-left: auto; }
+  .town-board-ledger { padding: 9px; }
 }
 
 

@@ -252,10 +252,25 @@ async function main() {
       boardShell: !!document.querySelector('#questPanel.town-board-shell'),
       marketShell: !!document.querySelector('#merchantPanel.town-market-shell'),
       forgeShell: !!document.querySelector('#forgePanel.town-forge-shell'),
+      townSectionText: {
+        board: document.getElementById('questPanel')?.innerText || '',
+        market: document.getElementById('merchantPanel')?.innerText || '',
+        forge: document.getElementById('forgePanel')?.innerText || ''
+      },
+      townActions: {
+        enterDungeon: !!document.getElementById('startRunBtn'),
+        refreshMarket: !!document.getElementById('refreshMerchantBtn'),
+        forgeRelic: !!document.getElementById('forgeBtn'),
+        gearTab: !!document.getElementById('tab-gear'),
+        archiveTab: !!document.getElementById('tab-dex'),
+        journalTab: !!document.getElementById('tab-archive')
+      },
       revisitStartButtons: Array.from(document.querySelectorAll('[data-start-revisit]')).map(btn => btn.getAttribute('data-start-revisit') || '')
     }))()`);
     record('Town loads before Enter Dungeon', before.activeScreen === 'screen-town' && /Enter Dungeon|Continue Run/.test(before.buttonText), JSON.stringify(before));
-    record('Town shell sections render', before.townSectionCount >= 3 && before.boardShell && before.marketShell && before.forgeShell, JSON.stringify(before));
+    record('Town shell identity survives the full wrapper chain', before.townSectionCount >= 3 && before.boardShell && before.marketShell && before.forgeShell, JSON.stringify(before));
+    record('Town sections retain readable final labels', /Lowfire Board/.test(before.townSectionText.board) && /Lowfire Market/.test(before.townSectionText.market) && /Lowfire Relic Forge|Relic Forge/.test(before.townSectionText.forge), JSON.stringify({ board: /Lowfire Board/.test(before.townSectionText.board), market: /Lowfire Market/.test(before.townSectionText.market), forge: /Lowfire Relic Forge|Relic Forge/.test(before.townSectionText.forge) }));
+    record('Town actions preserve dungeon, market, gear, archive, and journal access', Object.values(before.townActions).every(Boolean), JSON.stringify(before.townActions));
     record('Town hub title remains visible', /Lowfire District/.test(before.townHubTitle), JSON.stringify(before));
     record('No Board Echo start action is exposed in town', !before.revisitStartButtons.includes('board_echo_route'), JSON.stringify(before.revisitStartButtons));
 

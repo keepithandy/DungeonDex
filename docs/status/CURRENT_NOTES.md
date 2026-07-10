@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.06 - Town Shell Identity Pass
+- DungeonDex v1.23.8.07 - Town Readability + Mobile Hierarchy Lock
+
+## v1.23.8.07 Town Readability + Mobile Hierarchy Lock
+- Town shell spacing, readable headings, and mobile action grouping now reinforce the existing hub hierarchy.
+- Town runtime smoke now protects the final wrapper-chain shell classes, major section headings, and live Town access points.
+- Runtime/cache/version authority labels are now `v1.23.8.07`.
+- No gameplay mechanics changed.
 
 ## v1.23.8.06 Town Shell Identity Pass
 - Town now presents a clearer hub shell with stronger sections, hierarchy, and world identity.

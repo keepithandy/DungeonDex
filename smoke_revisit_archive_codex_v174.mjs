@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const BUILD_QS = '1.23.8.06-town-shell-identity-pass';
+const BUILD_QS = '1.23.8.07-town-readability-mobile-hierarchy-lock';
 const CODEX_PATH = 'js/systems/36_ui_revisit_archive_codex.js';
 const SCRIPT_SRC = `./${CODEX_PATH}?build=${BUILD_QS}`;
 const ASSET_SRC = `./${CODEX_PATH}?build=${'${BUILD_QS}'}`;

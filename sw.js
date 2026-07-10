@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.23.8.06-town-shell-identity-pass';
+const CACHE_NAME = 'dungeondex-v1.23.8.07-town-readability-mobile-hierarchy-lock';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.23.8.06-town-shell-identity-pass';
+const BUILD_QS = '1.23.8.07-town-readability-mobile-hierarchy-lock';
 const ASSETS = [
   './',
   './index.html',

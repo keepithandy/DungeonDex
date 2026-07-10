@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.06 Town Shell Identity Pass`
-* Current local package baseline: `v1.23.8.06 Town Shell Identity Pass`
-* Current development target: `v1.23.8.06 Town Shell Identity Pass`
+* Public/live itch version: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
+* Current local package baseline: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
+* Current development target: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.07 - Town Readability + Mobile Hierarchy Lock
+
+* Refined Town section spacing, heading hierarchy, and mobile action grouping around the existing hub shell.
+* Extended the Town runtime smoke to verify shell identity survives the full Town wrapper chain, readable section labels remain present, and core Town navigation/actions remain available.
+* Updated public version labels, build labels, and cache-busting labels to `v1.23.8.07`.
+
+---
 
 ## v1.23.8.06 - Town Shell Identity Pass
 
