@@ -1,0 +1,231 @@
+/* DungeonDex visual weight layer.
+   CSS-only hierarchy pass: panels, cards, nav, and action rows gain stronger depth
+   without changing runtime selectors, game state, combat, economy, or save behavior. */
+
+:root {
+  --ddx-depth-shadow: 0 18px 38px rgba(0,0,0,0.42);
+  --ddx-card-shadow: 0 12px 24px rgba(0,0,0,0.28);
+  --ddx-inner-glow: inset 0 1px 0 rgba(255,255,255,0.045);
+  --ddx-line-strong: rgba(255,213,148,0.19);
+  --ddx-line-soft: rgba(255,255,255,0.075);
+  --ddx-panel-wash: linear-gradient(180deg, rgba(30,22,15,0.96), rgba(9,8,10,0.96));
+  --ddx-card-wash: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,166,76,0.12), transparent 30%),
+    radial-gradient(circle at 82% 0%, rgba(197,139,255,0.09), transparent 24%),
+    linear-gradient(180deg, rgba(255,213,148,0.035), transparent 34%);
+}
+
+.ddx-shell {
+  position: relative;
+}
+
+.ddx-guild-header,
+.ddx-nav-guild-bar,
+.panel,
+.sticky-actions.panel {
+  box-shadow: var(--ddx-depth-shadow), var(--ddx-inner-glow);
+}
+
+.panel {
+  position: relative;
+  border-color: var(--ddx-line-strong);
+  background: var(--ddx-panel-wash);
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,213,148,0.065), transparent 38%, rgba(197,139,255,0.035));
+  opacity: 0.78;
+}
+
+.panel > * {
+  position: relative;
+}
+
+.ddx-guild-header {
+  padding: 9px 10px;
+  border: 1px solid rgba(255,213,148,0.12);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(17,12,8,0.94), rgba(8,7,8,0.96));
+}
+
+.ddx-lore-kicker,
+.ddx-record-name,
+.panel h2,
+.panel h3 {
+  text-shadow: 0 1px 0 rgba(0,0,0,0.55), 0 0 18px rgba(255,173,83,0.10);
+}
+
+.ddx-record-meta,
+.panel p,
+.muted {
+  color: rgba(244,236,223,0.77);
+}
+
+.ddx-main-viewport {
+  display: block;
+}
+
+.ddx-view-stack {
+  gap: 11px;
+}
+
+.ddx-guild-ledger,
+.ddx-dungeon-writ,
+.ddx-gear-player-ledger,
+.ddx-archive-summary,
+.ddx-guild-journal {
+  border-color: rgba(255,213,148,0.24);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255,168,72,0.13), transparent 28%),
+    radial-gradient(circle at 100% 10%, rgba(197,139,255,0.07), transparent 25%),
+    linear-gradient(180deg, rgba(34,24,15,0.97), rgba(10,9,11,0.96));
+}
+
+.ddx-contract-card,
+.ddx-merchant-card,
+.ddx-archive-card,
+.ddx-notice-board,
+.ddx-journal-card {
+  box-shadow: var(--ddx-card-shadow), var(--ddx-inner-glow);
+}
+
+.stat-box,
+.resource-box,
+.loot-card,
+.equip-slot,
+.monster-card,
+.log-line,
+.quest-card,
+.shop-item,
+.archive-line,
+.merchant-upgrade-card,
+.district-ware,
+.revisit-lane-card,
+.revisit-echo-card,
+.elite-contract-card,
+.elite-contract-empty,
+.town-board-ledger {
+  border-color: var(--ddx-line-soft);
+  background: var(--ddx-card-wash);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.stat-box strong,
+.resource-box strong,
+.item-name,
+.threshold-roadmap-value,
+.money {
+  color: rgba(255,248,232,0.96);
+}
+
+.pill,
+.rest-cost-chip,
+.save-status {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045), 0 6px 14px rgba(0,0,0,0.16);
+}
+
+.ddx-action-row,
+.item-actions,
+.intro-actions,
+.inline-actions,
+.top-actions {
+  gap: 8px;
+}
+
+button,
+.tab,
+.ghost,
+.mini,
+.primary {
+  border-width: 1px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045), 0 8px 18px rgba(0,0,0,0.20);
+}
+
+.primary,
+.tab.active {
+  background: linear-gradient(135deg, rgba(255,178,78,0.32), rgba(145,84,34,0.22));
+  border-color: rgba(255,213,148,0.42);
+  box-shadow: 0 0 18px rgba(255,162,70,0.13), inset 0 1px 0 rgba(255,255,255,0.07), 0 10px 22px rgba(0,0,0,0.26);
+}
+
+.ghost,
+.tab:not(.active),
+.mini:not(.primary) {
+  background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+}
+
+.tabs.panel {
+  border-top-color: rgba(255,213,148,0.18);
+  background:
+    linear-gradient(180deg, rgba(28,20,14,0.95), rgba(7,5,4,0.99));
+  box-shadow: 0 -18px 36px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.045);
+}
+
+.sticky-actions.panel:not(:empty) {
+  border-color: rgba(255,213,148,0.22);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,168,72,0.10), transparent 28%),
+    linear-gradient(180deg, rgba(28,19,13,0.98), rgba(7,5,4,0.99));
+}
+
+.combat-panel {
+  border-color: rgba(255,138,124,0.20);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,138,124,0.09), transparent 26%),
+    linear-gradient(180deg, rgba(27,18,14,0.97), rgba(8,8,10,0.97));
+}
+
+.monster-card {
+  border-color: rgba(255,138,124,0.16);
+}
+
+@media (min-width: 760px) {
+  .ddx-shell {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .ddx-view-stack {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ddx-shell {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .panel {
+    padding: 11px;
+  }
+
+  .grid-2,
+  .ddx-merchant-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .ddx-guild-header {
+    gap: 9px;
+  }
+
+  .ddx-action-row button,
+  .inline-actions button,
+  .item-actions button {
+    min-height: 46px;
+  }
+}
