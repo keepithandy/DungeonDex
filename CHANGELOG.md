@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.25.0 Visual Identity + Side Rail Release`
-* Current local package baseline: `v1.25.0 Visual Identity + Side Rail Release`
-* Current development target: `v1.25.0 Visual Identity + Side Rail Release`
+* Public/live itch version: `v1.25.1 Mobile Side Rail Toggle`
+* Current local package baseline: `v1.25.1 Mobile Side Rail Toggle`
+* Current development target: `v1.25.1 Mobile Side Rail Toggle`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.25.1 - Mobile Side Rail Toggle
+
+* Replaced the mobile/touch side-rail hamburger/close control with a tiny `←` drawer button.
+* Tightened the closed mobile rail to a narrow 28px strip and hides route tabs until the drawer is opened.
+* Preserved desktop hover/focus side-rail behavior.
+* Aligned runtime pointer, build-label guard, service-worker cache labels, README, changelog, current notes, and version authority to `v1.25.1`.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit, Echo, or Relic collection behavior changed.
+
+---
 
 ## v1.25.0 - Visual Identity + Side Rail Release
 
