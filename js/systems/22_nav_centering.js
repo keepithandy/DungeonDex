@@ -1,4 +1,4 @@
-// Center bottom nav on wide screens and keep it clear of Textastic's app chrome.
+// Convert the guild nav into a side rail and keep it clear of Textastic's app chrome.
 (function(){
   if (window.DDNavCentering) return;
   window.DDNavCentering = true;
@@ -31,15 +31,79 @@
       || hasTextasticOverride()
       || (isIosLike() && isLocalPreview());
   }
+  function isTouchNav(){
+    try {
+      return window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    } catch (_) {
+      return Number(navigator.maxTouchPoints || 0) > 0;
+    }
+  }
   function applyHostClass(){
     document.documentElement.classList.toggle('ddx-textastic-host', shouldOffsetForHost());
+    document.documentElement.classList.toggle('ddx-touch-nav', isTouchNav());
   }
   function addNavCenteringCss(){
     if (document.getElementById('ddNavCenteringCss')) return;
     var style = document.createElement('style');
     style.id = 'ddNavCenteringCss';
-    style.textContent = '.tabs.panel,nav.tabs{left:50%!important;right:auto!important;width:min(860px,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;transform:translateX(-50%)!important;margin-left:0!important;margin-right:0!important}.app-shell.run-focus .tabs{left:50%!important;right:auto!important;transform:translateX(-50%)!important}:root.ddx-textastic-host .tabs.panel,:root.ddx-textastic-host nav.tabs{bottom:calc(80px + var(--safe-bottom,0px))!important}:root.ddx-textastic-host .app-shell{padding-bottom:calc(198px + var(--safe-bottom,0px));scroll-padding-bottom:calc(230px + var(--safe-bottom,0px))}@media(max-width:520px){.tabs.panel,nav.tabs{width:100vw!important;max-width:100vw!important;left:50%!important;transform:translateX(-50%)!important}}';
+    style.textContent = ':root{--ddx-nav-rail-width:46px;--ddx-nav-panel-width:164px;--ddx-nav-top:50%;--ddx-nav-y:-50%}.tabs.panel,nav.tabs{position:fixed!important;left:0!important;right:auto!important;top:var(--ddx-nav-top)!important;bottom:auto!important;width:var(--ddx-nav-panel-width)!important;max-width:min(76vw,var(--ddx-nav-panel-width))!important;max-height:min(420px,calc(100vh - 116px))!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:6px!important;padding:8px 8px 8px 6px!important;margin:0!important;border-radius:0 18px 18px 0!important;overflow:visible!important;transform:translate(calc(-100% + var(--ddx-nav-rail-width)),var(--ddx-nav-y))!important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;z-index:120!important;backdrop-filter:blur(14px)!important;box-shadow:12px 0 26px rgba(0,0,0,.18),inset 1px 0 0 rgba(255,220,150,.05)!important}.tabs.panel:hover,nav.tabs:hover,.tabs.panel:focus-within,nav.tabs:focus-within,.tabs.panel.ddx-nav-open,nav.tabs.ddx-nav-open{transform:translate(0,var(--ddx-nav-y))!important;box-shadow:18px 0 34px rgba(0,0,0,.34),inset 1px 0 0 rgba(255,220,150,.08)!important}.tabs.panel .tab,nav.tabs .tab{width:100%!important;min-height:36px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:8px 10px!important;white-space:nowrap!important;overflow:hidden!important;text-align:left!important}.tabs.panel:not(:hover):not(:focus-within):not(.ddx-nav-open) .tab,nav.tabs:not(:hover):not(:focus-within):not(.ddx-nav-open) .tab{font-size:0!important;justify-content:center!important;padding:8px 4px!important}.tabs.panel:not(:hover):not(:focus-within):not(.ddx-nav-open) .tab::before,nav.tabs:not(:hover):not(:focus-within):not(.ddx-nav-open) .tab::before{content:attr(data-nav-short);font-size:12px;font-weight:900;letter-spacing:.08em;text-indent:0}.ddx-nav-toggle{display:flex;align-items:center;justify-content:center;width:34px;height:34px;min-height:34px;border-radius:12px;border:1px solid rgba(255,211,145,.26);background:rgba(255,180,80,.10);color:#f7d9a5;font:900 14px/1 var(--font,system-ui);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer}.tabs.panel.ddx-nav-open .ddx-nav-toggle,nav.tabs.ddx-nav-open .ddx-nav-toggle{background:rgba(255,180,80,.18);border-color:rgba(255,211,145,.38)}@media(hover:hover) and (pointer:fine){.ddx-nav-toggle{display:none}}@media(hover:none),(pointer:coarse){:root{--ddx-nav-top:calc(76px + var(--safe-top,0px));--ddx-nav-y:0}.tabs.panel,nav.tabs{max-height:calc(100vh - 118px - var(--safe-bottom,0px))!important;transform:translateX(calc(-100% + var(--ddx-nav-rail-width)))!important}.tabs.panel.ddx-nav-open,nav.tabs.ddx-nav-open{transform:translateX(0)!important}.tabs.panel:hover,nav.tabs:hover{transform:translateX(calc(-100% + var(--ddx-nav-rail-width)))!important}.tabs.panel.ddx-nav-open:hover,nav.tabs.ddx-nav-open:hover{transform:translateX(0)!important}}@media(max-width:520px){:root{--ddx-nav-rail-width:42px;--ddx-nav-panel-width:158px}.tabs.panel,nav.tabs{padding:7px 7px 7px 5px!important;border-radius:0 16px 16px 0!important}.tabs.panel .tab,nav.tabs .tab{min-height:34px!important;padding:8px 9px!important}.ddx-nav-toggle{width:32px;height:32px;min-height:32px}}@media(max-height:560px){.tabs.panel,nav.tabs{gap:4px!important;max-height:calc(100vh - 34px)!important}.tabs.panel .tab,nav.tabs .tab{min-height:31px!important;padding-top:6px!important;padding-bottom:6px!important}}';
     document.head.appendChild(style);
+  }
+  function navShortLabel(tab, index){
+    var labels = ['T','R','G','A','J'];
+    var text = String(tab.textContent || '').trim();
+    return text ? text.charAt(0).toUpperCase() : (labels[index] || '?');
+  }
+  function setNavOpen(nav, open){
+    if (!nav) return;
+    nav.classList.toggle('ddx-nav-open', !!open);
+    var toggle = nav.querySelector('.ddx-nav-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      toggle.textContent = open ? '×' : '☰';
+    }
+  }
+  function installSideNav(){
+    var nav = document.querySelector('nav.tabs, .tabs.panel');
+    if (!nav) return;
+    nav.classList.add('ddx-side-nav');
+    nav.setAttribute('aria-label', 'Guild Navigation Sidebar');
+    Array.prototype.forEach.call(nav.querySelectorAll('.tab'), function(tab, index){
+      if (!tab.getAttribute('data-nav-short')) tab.setAttribute('data-nav-short', navShortLabel(tab, index));
+    });
+    if (!nav.querySelector('.ddx-nav-toggle')) {
+      var toggle = document.createElement('button');
+      toggle.className = 'ddx-nav-toggle';
+      toggle.type = 'button';
+      toggle.textContent = '☰';
+      toggle.setAttribute('aria-label', 'Open navigation');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.addEventListener('click', function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        setNavOpen(nav, !nav.classList.contains('ddx-nav-open'));
+      });
+      nav.insertBefore(toggle, nav.firstChild);
+    }
+    Array.prototype.forEach.call(nav.querySelectorAll('.tab'), function(tab){
+      if (tab.__ddxSideNavBound) return;
+      tab.__ddxSideNavBound = true;
+      tab.addEventListener('click', function(){
+        if (isTouchNav()) window.setTimeout(function(){ setNavOpen(nav, false); }, 80);
+      });
+    });
+    if (!nav.__ddxSideNavOutsideBound) {
+      nav.__ddxSideNavOutsideBound = true;
+      document.addEventListener('click', function(event){
+        if (!isTouchNav() || !nav.classList.contains('ddx-nav-open')) return;
+        if (nav.contains(event.target)) return;
+        setNavOpen(nav, false);
+      }, true);
+      document.addEventListener('keydown', function(event){
+        if (event.key === 'Escape') setNavOpen(nav, false);
+      });
+    }
   }
   function addHeaderCrestCss(){
     if (document.getElementById('ddHeaderCrestCss')) return;
@@ -100,24 +164,24 @@
     addTownGateCss();
     installTownGateArt();
   }
-  applyHostClass();
-  addNavCenteringCss();
+  function applySideNav(){
+    applyHostClass();
+    addNavCenteringCss();
+    installSideNav();
+  }
+  applySideNav();
   applyHeaderCrest();
   applyTownGateArt();
-  window.addEventListener('DOMContentLoaded', applyHostClass);
-  window.addEventListener('DOMContentLoaded', addNavCenteringCss);
+  window.addEventListener('DOMContentLoaded', applySideNav);
   window.addEventListener('DOMContentLoaded', applyHeaderCrest);
   window.addEventListener('DOMContentLoaded', applyTownGateArt);
-  window.addEventListener('load', applyHostClass);
-  window.addEventListener('load', addNavCenteringCss);
+  window.addEventListener('load', applySideNav);
   window.addEventListener('load', applyHeaderCrest);
   window.addEventListener('load', applyTownGateArt);
-  window.setTimeout(applyHostClass, 100);
-  window.setTimeout(addNavCenteringCss, 100);
+  window.setTimeout(applySideNav, 100);
   window.setTimeout(applyHeaderCrest, 100);
   window.setTimeout(applyTownGateArt, 100);
-  window.setTimeout(applyHostClass, 500);
-  window.setTimeout(addNavCenteringCss, 500);
+  window.setTimeout(applySideNav, 500);
   window.setTimeout(applyHeaderCrest, 500);
   window.setTimeout(applyTownGateArt, 500);
 })();
