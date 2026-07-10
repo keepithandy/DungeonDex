@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.25.1-revisit-lowfire-board-slot';
+const CACHE_NAME = 'dungeondex-v1.25.1-revisit-noop-stability';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.25.1-revisit-lowfire-board-slot';
+const BUILD_QS = '1.25.1-revisit-noop-stability';
 const ASSETS = [
   './',
   './index.html',
