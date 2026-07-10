@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.4.8c - Relic Forge compact text pass.
+// DungeonDex v1.4.8c - Lowfire Forge compact text pass.
 (function(){
   if (window.DDRelicForgeCompactText) return;
   window.DDRelicForgeCompactText = true;

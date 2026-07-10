@@ -21,9 +21,9 @@ It preserves classic browser script load order instead of converting the game to
 - `13_devtools_overlay.js` — Hidden internal DevTools overlay for save inspection, run controls, test loot, snapshots, and error logs.
 - `14_devtools_scenarios.js` — DevTools scenario presets and focused state setup helpers.
 - `15_devtools_balance_reports.js` — DevTools balance reports and simulation helpers.
-- `16_relic_forge_crafting.js` — Relic Forge crafting actions and forge state helpers.
-- `17_relic_forge_clarity.js` — Relic Forge clarity copy and UI support.
-- `18_relic_forge_compact_text.js` — Compact Relic Forge text adjustments.
+- `16_relic_forge_crafting.js` — Lowfire Forge crafting actions and forge state helpers; filename/global names are legacy compatibility only.
+- `17_relic_forge_clarity.js` — Lowfire Forge clarity copy and UI support; filename/global names are legacy compatibility only.
+- `18_relic_forge_compact_text.js` — Compact Lowfire Forge text adjustments; filename/global names are legacy compatibility only.
 - `19_warden_talents_lowfire_board.js` — Warden Talent foundation, passive inventory/contracts, and Lowfire Board support.
 - `20_town_currency_clean_strip.js` — Compact town currency strip cleanup.
 - `21_build_label_guard.js` — Build label guard and cache query alignment.
@@ -58,3 +58,4 @@ Notes:
 - `index.html` now loads these files directly in order and remains the source of truth for runtime order.
 - `app.js` should stay small. It currently retains build labels, compatibility helpers, and fallback effects that can be split later through targeted system passes.
 - This map is documentation only; future passes can split internals further once a target system is chosen.
+- Player-facing forge copy now calls the active gear crafting/tempering system `Lowfire Forge`; legacy `relic_*` file names, globals, and save fields remain stable for compatibility.
