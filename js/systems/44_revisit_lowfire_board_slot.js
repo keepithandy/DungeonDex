@@ -1,16 +1,23 @@
 'use strict';
 
-// v1.25.1 Revisit Lowfire Board Slot
+// v1.25.1 Revisit Lowfire Elite Board Anchor
 // Presentation-only relocation: keep Revisit lane behavior unchanged while placing
-// the rendered Revisit panel beside the Elite Contracts board after each town render.
+// the rendered Revisit panel inside the Elite Board body beside the contract cards.
 (function(){
 	const SLOT_ID = 'lowfireRevisitBoardSlot';
-	const PAIR_ID = 'lowfireBoardRevisitPair';
+	const BODY_ID = 'lowfireEliteRevisitBody';
+	const CONTRACTS_COLUMN_ID = 'lowfireEliteContractsColumn';
 	const STYLE_ID = 'lowfireRevisitBoardPairStyle';
+	const PLACEHOLDER_ID = 'lowfireRevisitPlaceholder';
 	let renderTownPatched = false;
 
 	function townBoardShell() {
 		return document.querySelector('#questPanel .town-board-shell');
+	}
+
+	function directChildWithClass(parent, className) {
+		if (!parent) return null;
+		return Array.prototype.find.call(parent.children || [], child => child.classList && child.classList.contains(className)) || null;
 	}
 
 	function ensurePairStyle() {
@@ -18,22 +25,33 @@
 		const style = document.createElement('style');
 		style.id = STYLE_ID;
 		style.textContent = [
-			'.lowfire-board-revisit-pair {',
+			'.lowfire-elite-revisit-body {',
 			'  display: grid;',
-			'  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);',
+			'  grid-template-columns: minmax(0, 1.12fr) minmax(250px, 0.88fr);',
 			'  gap: 10px;',
 			'  align-items: start;',
 			'}',
-			'.lowfire-board-revisit-pair > .elite-contract-board,',
-			'.lowfire-board-revisit-pair > .lowfire-revisit-board-slot {',
+			'.lowfire-elite-contracts-column,',
+			'.lowfire-revisit-board-slot {',
 			'  min-width: 0;',
+			'  display: grid;',
+			'  gap: 8px;',
+			'  align-content: start;',
 			'}',
-			'.lowfire-board-revisit-pair .revisit-foundation-panel {',
-			'  height: 100%;',
+			'.lowfire-revisit-board-slot .revisit-foundation-panel,',
+			'.lowfire-revisit-board-slot .lowfire-revisit-placeholder {',
 			'  margin: 0;',
+			'  height: auto;',
 			'}',
+			'.lowfire-revisit-placeholder {',
+			'  display: grid;',
+			'  gap: 8px;',
+			'  border-style: dashed;',
+			'}',
+			'.lowfire-revisit-placeholder .pill { justify-self: start; }',
 			'@media (max-width: 760px) {',
-			'  .lowfire-board-revisit-pair { grid-template-columns: 1fr; }',
+			'  .lowfire-elite-revisit-body { grid-template-columns: 1fr; }',
+			'  .lowfire-revisit-board-slot { order: -1; }',
 			'}'
 		].join('\n');
 		document.head.appendChild(style);
@@ -49,41 +67,81 @@
 		return slot;
 	}
 
-	function ensureBoardPair(shell, eliteBoard, slot) {
-		let pair = document.getElementById(PAIR_ID);
-		if (!pair) {
-			pair = document.createElement('div');
-			pair.id = PAIR_ID;
-			pair.className = 'lowfire-board-revisit-pair';
+	function ensureContractBody(eliteBoard, slot) {
+		let body = document.getElementById(BODY_ID);
+		if (!body) {
+			body = document.createElement('div');
+			body.id = BODY_ID;
+			body.className = 'lowfire-elite-revisit-body';
 		}
 
-		if (pair.parentElement !== shell) {
-			shell.insertBefore(pair, eliteBoard);
+		let contractsColumn = document.getElementById(CONTRACTS_COLUMN_ID);
+		if (!contractsColumn) {
+			contractsColumn = document.createElement('div');
+			contractsColumn.id = CONTRACTS_COLUMN_ID;
+			contractsColumn.className = 'lowfire-elite-contracts-column';
 		}
 
-		if (eliteBoard.parentElement !== pair) {
-			pair.appendChild(eliteBoard);
-		}
-		if (slot.parentElement !== pair) {
-			pair.appendChild(slot);
+		const head = directChildWithClass(eliteBoard, 'elite-contract-head');
+		if (body.parentElement !== eliteBoard) {
+			eliteBoard.insertBefore(body, head ? head.nextSibling : eliteBoard.firstChild);
 		}
 
-		return pair;
+		Array.prototype.slice.call(eliteBoard.children || []).forEach(child => {
+			if (child === head || child === body) return;
+			contractsColumn.appendChild(child);
+		});
+
+		if (contractsColumn.parentElement !== body) {
+			body.insertBefore(contractsColumn, body.firstChild);
+		}
+		if (slot.parentElement !== body) {
+			body.appendChild(slot);
+		}
+		return body;
+	}
+
+	function placeholderMarkup() {
+		return [
+			'<section class="panel lowfire-revisit-placeholder" id="' + PLACEHOLDER_ID + '" aria-label="Revisit lanes">',
+			'  <div class="card-head">',
+			'    <div>',
+			'      <h2>Revisit</h2>',
+			'      <p>Memory lanes will appear here beside Elite Contracts.</p>',
+			'    </div>',
+			'  </div>',
+			'  <span class="pill">No lane ready</span>',
+			'  <p class="small muted">Defeat bosses, retire gear, or build named rival history to surface safe Revisit lanes here.</p>',
+			'</section>'
+		].join('');
+	}
+
+	function renderPlaceholderIfNeeded(slot, panel) {
+		if (panel) {
+			const existing = document.getElementById(PLACEHOLDER_ID);
+			if (existing) existing.remove();
+			return;
+		}
+		if (!document.getElementById(PLACEHOLDER_ID)) {
+			slot.innerHTML = placeholderMarkup();
+		}
 	}
 
 	function moveRevisitPanelIntoLowfireBoard() {
-		const panel = document.getElementById('revisitPanel');
 		const shell = townBoardShell();
-		if (!panel || !shell) return false;
+		if (!shell) return false;
 
 		const eliteBoard = shell.querySelector('.elite-contract-board');
 		if (!eliteBoard) return false;
 
 		ensurePairStyle();
 		const slot = ensureBoardSlot();
-		ensureBoardPair(shell, eliteBoard, slot);
+		ensureContractBody(eliteBoard, slot);
 
-		if (panel.parentElement !== slot) {
+		const panel = document.getElementById('revisitPanel');
+		renderPlaceholderIfNeeded(slot, panel);
+
+		if (panel && panel.parentElement !== slot) {
 			slot.appendChild(panel);
 		}
 		return true;
