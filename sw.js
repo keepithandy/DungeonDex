@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.25.1-mobile-side-rail-toggle';
+const CACHE_NAME = 'dungeondex-v1.25.1-revisit-lowfire-board-slot';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.25.1-mobile-side-rail-toggle';
+const BUILD_QS = '1.25.1-revisit-lowfire-board-slot';
 const ASSETS = [
   './',
   './index.html',
@@ -49,6 +49,7 @@ const ASSETS = [
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   `./js/systems/42_gear_upgrade_money_text_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/43_devkit_reset_hold.js?build=${BUILD_QS}`,
+  `./js/systems/44_revisit_lowfire_board_slot.js?build=${BUILD_QS}`,
   './assets/img/ui/dungeondex-crest.svg',
   './assets/img/ui/hollow-stair-gate.svg',
   './assets/trophies/hollow_stair_skull_trophy.png'
