@@ -340,6 +340,71 @@ async function main() {
       );
     }
 
+    const feedProbe = await evaluate(client, `(() => {
+      S.run.combatLog = [
+        'Mireborn Herald hits for 18. The submerged blade drives through the Warden guard and shakes the old stone corridor.',
+        'You strike for 8. The return blow scatters brine across the floor before the creature steadies itself again.',
+        'Mireborn Herald hits for 23. Cold water floods the cracked flagstones as the enemy presses its attack.'
+      ];
+      render();
+      const panel = document.getElementById('combatLog');
+      const list = panel?.querySelector('.run-log-list');
+      if (!panel || !list) return null;
+      const panelRect = panel.getBoundingClientRect();
+      const listRect = list.getBoundingClientRect();
+      const before = list.scrollTop;
+      list.scrollTop = list.scrollHeight;
+      return {
+        panelOverflow: getComputedStyle(panel).overflowY,
+        listOverflow: getComputedStyle(list).overflowY,
+        listScrolls: list.scrollHeight > list.clientHeight && list.scrollTop > before,
+        listContained: listRect.top >= panelRect.top - 1 && listRect.bottom <= panelRect.bottom + 1,
+        lineCount: list.querySelectorAll('.combat-feed-line').length
+      };
+    })()`);
+    record(
+      'Combat Feed has one contained scroll area without panel clipping',
+      feedProbe?.panelOverflow === 'visible'
+        && feedProbe?.listOverflow === 'auto'
+        && feedProbe?.listScrolls === true
+        && feedProbe?.listContained === true
+        && feedProbe?.lineCount === 3,
+      JSON.stringify(feedProbe)
+    );
+
+    const sellAllProbe = await evaluate(client, `(() => {
+      const originalConfirm = window.confirm;
+      const confirmations = [];
+      try {
+        S.player.inventory = [
+          { id:'smoke-sellable', name:'Smoke Helm', slot:'helm', rarity:'common', level:1, rating:1, value:10, stats:{ guard:1 }, tags:[] },
+          { id:'smoke-protected', name:'Protected Helm', slot:'helm', rarity:'common', level:1, rating:1, value:10, protected:true, stats:{ guard:1 }, tags:['protected'] }
+        ];
+        window.confirm = message => { confirmations.push(String(message)); return true; };
+        document.getElementById('tab-gear')?.click();
+        const button = document.getElementById('sellAllGearBtn');
+        if (!button) return { buttonFound:false, confirmations };
+        button.click();
+        return {
+          buttonFound: true,
+          confirmations,
+          sold: !S.player.inventory.some(item => item.id === 'smoke-sellable'),
+          protectedKept: S.player.inventory.some(item => item.id === 'smoke-protected')
+        };
+      } finally {
+        window.confirm = originalConfirm;
+      }
+    })()`);
+    record(
+      'Sell All asks once and preserves protected gear',
+      sellAllProbe?.buttonFound === true
+        && sellAllProbe?.confirmations?.length === 1
+        && /cannot be undone/i.test(sellAllProbe.confirmations[0] || '')
+        && sellAllProbe?.sold === true
+        && sellAllProbe?.protectedKept === true,
+      JSON.stringify(sellAllProbe)
+    );
+
     record('No uncaught click-time console/runtime errors', runtimeExceptions.length === 0 && consoleIssues.length === 0 && networkFailures.length === 0, JSON.stringify({ runtimeExceptions, consoleIssues, networkFailures }));
 
     const diagnostics = { pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results };

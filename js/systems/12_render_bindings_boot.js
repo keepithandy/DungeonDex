@@ -137,10 +137,8 @@
     if (sellAllBtn) sellAllBtn.onclick = () => runGuardedAction(() => {
       const count = S.player.inventory.filter(item => canSellAllGearItem(S, item)).length;
       if (!count) return;
-      const firstConfirm = window.confirm(`Sell ALL ${count} unequipped sellable gear items? Equipped, protected, favorite, locked, and special items will stay.`);
-      if (!firstConfirm) return;
-      const secondConfirm = window.confirm('Final warning: press Yes again to permanently sell this gear.');
-      if (!secondConfirm) return;
+      const confirmed = window.confirm(`Sell ALL ${count} unequipped sellable gear items? This cannot be undone. Equipped, protected, favorite, locked, and special items will stay.`);
+      if (!confirmed) return;
       const result = sellAllGear(S);
       if (result.paid) showGoldPopup(result.paid);
       render();

@@ -1136,3 +1136,22 @@ button,
   line-height: 1 !important;
   white-space: nowrap;
 }
+
+/* Combat Feed scroll contract: the list owns scrolling, never its panel. */
+.app-shell.combat-active #combatLog {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.app-shell.combat-active .run-log-list {
+  box-sizing: border-box;
+  min-height: clamp(84px, 14dvh, 108px);
+  max-height: clamp(108px, 18dvh, 150px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scroll-padding-bottom: 6px;
+  scrollbar-gutter: stable;
+}

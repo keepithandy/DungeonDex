@@ -705,7 +705,7 @@
     const allSellCount = inventory.filter(item => canSellAllGearItem(S, item)).length;
     const retireCount = inventory.filter(item => canRetireInventoryItem(S, item)).length;
     const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
-    const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after two confirmations" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
+    const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after one confirmation" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
     const retireAllBtn = `<button class="ghost mini tiny-sell-all" id="retireArchiveBtn" title="Manual retirement happens one item at a time from inventory cards." disabled>Retire ${format(retireCount)}</button>`;
     inventoryPanel.innerHTML = `
       <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Equip, sell, retire, or filter.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}${retireAllBtn}</div></div>
