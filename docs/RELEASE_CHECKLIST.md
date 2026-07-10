@@ -32,6 +32,16 @@ node .\smoke_revisit_routes_v173.mjs
 
 For documentation-only audits, this command list is the expected safety net for the next feature patch; do not change runtime behavior just to satisfy the checklist.
 
+## Stability Hotfix / Cache Recovery Checks
+
+Use this when a patch follows a lag report, broken mobile interaction, stale service-worker behavior, or rollback/no-op patch:
+
+- Prefer restoring responsiveness before continuing feature placement work.
+- If disabling unstable glue code, keep the disabled file as an explicit no-op marker instead of deleting a loaded script path unless script-order cleanup is the issue.
+- If a service-worker cache key changes, align `CACHE_NAME`, `BUILD_QS`, `VERSION.md`, `CHANGELOG.md`, `docs/status/CURRENT_NOTES.md`, `app.js`, and `js/systems/21_build_label_guard.js`.
+- Do not use post-render `MutationObserver` relocation loops for source-render placement problems.
+- If `index.html` still contains stale static labels or stale query strings, either align them in the same version pass or call out the remaining conflict before merge.
+
 ## Protected Stability Surfaces
 
 - Merchant gear upgrades: keep upgrades limited to equipped weapon and armor pieces, fixed costs, and a `+3` cap unless a focused issue explicitly expands that surface.
@@ -50,7 +60,7 @@ For documentation-only audits, this command list is the expected safety net for 
 - Board Echo and Debt Pressure remain locked/planned unless their focused issues are being implemented.
 - The Talent tree is deprecated compatibility-only. Merchant gear upgrades are the active progression surface.
 - Do not reactivate Talent nodes, respec, passive stat effects, reward multipliers, combat effects, economy effects, or Revisit effects unless the issue explicitly says so.
-- Service worker and cache label changes should only happen during versioned release patches.
+- Service worker and cache label changes should only happen during versioned release or stability patches.
 
 ## Final Pass
 
