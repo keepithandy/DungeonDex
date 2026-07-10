@@ -1,15 +1,15 @@
-// DungeonDex v1.23.8.07 runtime pointer.
+// DungeonDex v1.23.8.08 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.23.8.07: Town Readability + Mobile Hierarchy Lock
+// v1.23.8.08: Town Mobile Screenshot Harness
 // - HTML structure now uses semantic lore-based wrappers (Guild Ledger, Town Notice, Dungeon Writ, etc.)
 // - Added .ddx-* CSS class layer for IP-framed interface theming
 // - All gameplay, combat math, rewards, and save data unchanged
 // - No JS hooks renamed; all existing selectors preserved
 
 window.DUNGEONDEX_BUILD = '1.23.8.07';
-window.DUNGEONDEX_BUILD_QS = '1.23.8.07-town-readability-mobile-hierarchy-lock';
+window.DUNGEONDEX_BUILD_QS = '1.23.8.08-town-mobile-screenshot-harness';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -56,7 +56,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.8.07-town-readability-mobile-hierarchy-lock';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.8.08-town-mobile-screenshot-harness';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);

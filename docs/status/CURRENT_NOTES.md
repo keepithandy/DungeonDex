@@ -7,7 +7,13 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.07 - Town Readability + Mobile Hierarchy Lock
+- DungeonDex v1.23.8.08 - Town Mobile Screenshot Harness
+
+## v1.23.8.08 Town Mobile Screenshot Harness
+- Added a narrow local screenshot helper that captures Town at 390px, 430px, and 768px widths for repeatable visual inspection.
+- The helper reuses the existing Chrome/CDP smoke path, writes local PNGs under `archive/screenshots/town-mobile/`, and exits cleanly with browser guidance when no Chromium executable is available.
+- Runtime/cache/version authority labels are now `v1.23.8.08`.
+- No gameplay mechanics changed.
 
 ## v1.23.8.07 Town Readability + Mobile Hierarchy Lock
 - Town shell spacing, readable headings, and mobile action grouping now reinforce the existing hub hierarchy.

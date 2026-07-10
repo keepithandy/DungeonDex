@@ -8,13 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
-* Current local package baseline: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
-* Current development target: `v1.23.8.07 Town Readability + Mobile Hierarchy Lock`
+* Public/live itch version: `v1.23.8.08 Town Mobile Screenshot Harness`
+* Current local package baseline: `v1.23.8.08 Town Mobile Screenshot Harness`
+* Current development target: `v1.23.8.08 Town Mobile Screenshot Harness`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.23.8.08 - Town Mobile Screenshot Harness
+
+* Added a narrow local screenshot helper that opens Town at 390px, 430px, and 768px widths for repeatable visual inspection.
+* The helper reuses the existing Chrome/CDP smoke path, writes local PNGs under `archive/screenshots/town-mobile/`, and exits cleanly with browser guidance when no Chromium executable is available.
+* Updated public version labels, build labels, and cache-busting labels to `v1.23.8.08`.
+
+---
 
 ## v1.23.8.07 - Town Readability + Mobile Hierarchy Lock
 

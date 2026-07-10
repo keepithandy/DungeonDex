@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.07 Town Readability + Mobile Hierarchy Lock
+v1.23.8.08 Town Mobile Screenshot Harness
 
 ## Current Local Package Version
-v1.23.8.07 Town Readability + Mobile Hierarchy Lock
+v1.23.8.08 Town Mobile Screenshot Harness
 
 ## Current Development Target
-v1.23.8.07 Town Readability + Mobile Hierarchy Lock
+v1.23.8.08 Town Mobile Screenshot Harness
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
