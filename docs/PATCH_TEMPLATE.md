@@ -6,7 +6,7 @@ Use this template for every focused DungeonDex patch. Keep the patch narrow, tes
 - Target version:
 - Patch name:
 - Primary system:
-- Patch type: code / smoke / docs / UI / release / audit
+- Patch type: code / smoke / docs / UI / release / audit / stability hotfix
 - Starting branch:
 - Starting commit:
 - Baseline status: clean / dirty
@@ -39,6 +39,20 @@ Do not change:
 - Enter Dungeon / Continue Run as the only active dungeon entry path
 ```
 
+## Stability Hotfix Rules
+Use this section when a patch follows a regression, lag report, cache problem, or broken mobile interaction.
+
+```text
+Stability goal:
+- Restore responsiveness / cache correctness / label alignment before continuing feature work.
+
+Required constraints:
+- Prefer disabling unstable glue code over expanding it.
+- Do not add post-render DOM movers to solve source-render placement issues.
+- If cache labels change, align VERSION.md, CHANGELOG.md, CURRENT_NOTES, app.js, sw.js, and build-label guard.
+- If the patch intentionally leaves a feature in its old location, document that as a temporary stability tradeoff.
+```
+
 ## Required Reads
 Before editing, read:
 1. AGENTS.md
@@ -62,6 +76,8 @@ Use the commands that apply to the patch.
 git status --short
 git diff --check
 node --check app.js
+node --check sw.js
+node --check js/systems/21_build_label_guard.js
 node smoke_talent_v150b.mjs
 node smoke_debt_collector_v169.mjs
 node smoke_revisit_routes_v173.mjs

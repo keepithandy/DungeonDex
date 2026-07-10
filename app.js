@@ -1,14 +1,15 @@
-// DungeonDex v1.25.1 runtime pointer.
+// DungeonDex v1.25.2 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.25.1: Mobile Side Rail Toggle
-// - Mobile/touch side rail now exposes a tiny <- drawer button instead of relying on hover behavior.
-// - Desktop hover/focus side rail behavior remains unchanged.
+// v1.25.2: Revisit No-op Stability + Version Alignment
+// - Disabled the unstable Revisit DOM relocation helper after mobile/Textastic lag reports.
+// - Bumped the service-worker cache to force stale relocation assets out of the app cache.
+// - Aligned runtime/cache/version authority labels for the stability baseline.
 // - Gameplay, save data, and system activation remain unchanged.
 
-window.DUNGEONDEX_BUILD = '1.25.1';
-window.DUNGEONDEX_BUILD_QS = '1.25.1-mobile-side-rail-toggle';
+window.DUNGEONDEX_BUILD = '1.25.2';
+window.DUNGEONDEX_BUILD_QS = '1.25.2-revisit-noop-stability';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -55,7 +56,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.25.1-mobile-side-rail-toggle';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.25.2-revisit-noop-stability';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);

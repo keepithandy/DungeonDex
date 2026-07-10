@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.25.1 Mobile Side Rail Toggle`
-* Current local package baseline: `v1.25.1 Mobile Side Rail Toggle`
-* Current development target: `v1.25.1 Mobile Side Rail Toggle`
+* Public/live itch version: `v1.25.2 Revisit No-op Stability + Version Alignment`
+* Current local package baseline: `v1.25.2 Revisit No-op Stability + Version Alignment`
+* Current development target: `v1.25.2 Revisit No-op Stability + Version Alignment`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.25.2 - Revisit No-op Stability + Version Alignment
+
+* Disabled the unstable post-render Revisit relocation helper after mobile/Textastic lag and unresponsive button reports.
+* Bumped the service-worker cache/build query to `1.25.2-revisit-noop-stability` so stale relocation assets are purged.
+* Aligned runtime pointer, build-label guard, service-worker cache labels, README, changelog, current notes, agent instructions, and release templates to the new stability baseline.
+* Left the source town renderer as the owner of the live Revisit panel until a future source-render placement patch is implemented.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit start/resolve/reward/history behavior, Echo activation, gear mechanics, or Relic collection behavior changed.
+
+---
 
 ## v1.25.1 - Mobile Side Rail Toggle
 
@@ -79,7 +89,9 @@ This changelog records what changed and why.
 
 ## v1.23.8.04 - Gear Replacement Warning and Upgrade Ownership Clarity
 
-* Added a short ownership warning to the existing gear detail compare note so upgraded equipped gear clearly keeps its own tier if replaced.
+* The gear detail compare note now explains that an upgraded equipped item keeps its tier if replaced.
+* The note also clarifies that new gear equips at its own upgrade tier instead of inheriting the old item’s tier.
+* Runtime/cache/version authority labels were previously `v1.23.8.04`.
 * Clarified that new gear equips at its own upgrade tier and does not inherit the equipped item’s upgrade level.
 * Kept replacement behavior, upgrade math, costs, caps, save fields, and all combat/progression rules unchanged.
 
