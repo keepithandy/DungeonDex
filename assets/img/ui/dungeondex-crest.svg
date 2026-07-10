@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="DungeonDex crest">
+  <defs>
+    <radialGradient id="ember" cx="50%" cy="24%" r="70%">
+      <stop offset="0" stop-color="#ffd795" stop-opacity="0.95"/>
+      <stop offset="0.42" stop-color="#e28b38" stop-opacity="0.76"/>
+      <stop offset="1" stop-color="#24130c" stop-opacity="0.92"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="18" y1="8" x2="78" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#332315"/>
+      <stop offset="0.52" stop-color="#151016"/>
+      <stop offset="1" stop-color="#07080d"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="16" y1="10" x2="80" y2="86" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffe1a3"/>
+      <stop offset="0.48" stop-color="#c77a2f"/>
+      <stop offset="1" stop-color="#6b3a1d"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.2" flood-color="#f0a24d" flood-opacity="0.42"/>
+    </filter>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#08070a"/>
+  <circle cx="48" cy="48" r="43" fill="none" stroke="#d08c45" stroke-opacity="0.22" stroke-width="2"/>
+
+  <path d="M48 8 78 19v23c0 21-12 36-30 46C30 78 18 63 18 42V19L48 8Z" fill="url(#shield)" stroke="url(#edge)" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M27 27h42v34H27z" fill="#110d10" stroke="#f0a24d" stroke-opacity="0.5" stroke-width="2" rx="3"/>
+  <path d="M32 32h32v25H32z" fill="#20140f" stroke="#74421f" stroke-width="1.5"/>
+
+  <path d="M37 61V45c0-7 5-13 11-13s11 6 11 13v16H37Z" fill="#07070b" stroke="#f5bd6b" stroke-width="2"/>
+  <path d="M43 61V47c0-4 2-7 5-7s5 3 5 7v14" fill="none" stroke="#c8843c" stroke-opacity="0.5" stroke-width="1.4"/>
+
+  <path d="M48 17 55 30H41l7-13Z" fill="url(#ember)" stroke="#ffe1a3" stroke-opacity="0.65" stroke-width="1.5" filter="url(#glow)"/>
+  <path d="M28 68c11 7 29 7 40 0" fill="none" stroke="#f0a24d" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M24 22 48 13 72 22" fill="none" stroke="#fff2c8" stroke-opacity="0.24" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
