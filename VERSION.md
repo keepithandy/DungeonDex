@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.25.1 Mobile Side Rail Toggle
+v1.25.2 Revisit No-op Stability + Version Alignment
 
 ## Current Local Package Version
-v1.25.1 Mobile Side Rail Toggle
+v1.25.2 Revisit No-op Stability + Version Alignment
 
 ## Current Development Target
-v1.25.1 Mobile Side Rail Toggle
+v1.25.2 Revisit No-op Stability + Version Alignment
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
