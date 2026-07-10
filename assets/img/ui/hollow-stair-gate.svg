@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" role="img" aria-label="Hollow Stair gate">
+  <defs>
+    <linearGradient id="stone" x1="16" y1="8" x2="136" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#322418"/>
+      <stop offset="0.5" stop-color="#151116"/>
+      <stop offset="1" stop-color="#07080d"/>
+    </linearGradient>
+    <radialGradient id="ember" cx="50%" cy="48%" r="62%">
+      <stop offset="0" stop-color="#ffd99a" stop-opacity="0.92"/>
+      <stop offset="0.44" stop-color="#e28b38" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#060507" stop-opacity="0.08"/>
+    </radialGradient>
+    <filter id="gateGlow" x="-20%" y="-25%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#f0a24d" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="160" height="112" rx="18" fill="#070609"/>
+  <path d="M10 95c21-12 44-17 70-17s49 5 70 17v13H10V95Z" fill="#0d0b0e"/>
+  <path d="M31 95V47c0-23 19-40 49-40s49 17 49 40v48" fill="url(#stone)" stroke="#d08c45" stroke-opacity="0.45" stroke-width="3"/>
+  <path d="M45 94V50c0-17 14-29 35-29s35 12 35 29v44" fill="#08070b" stroke="#f0a24d" stroke-opacity="0.5" stroke-width="2" filter="url(#gateGlow)"/>
+  <path d="M52 92V53c0-13 11-23 28-23s28 10 28 23v39" fill="url(#ember)" opacity="0.82"/>
+
+  <path d="M63 95h34l-4 7H67l-4-7Z" fill="#29160f" stroke="#f0a24d" stroke-opacity="0.35"/>
+  <path d="M58 84h44M62 74h36M66 64h28M70 54h20" fill="none" stroke="#ffd795" stroke-opacity="0.28" stroke-width="2" stroke-linecap="round"/>
+  <path d="M29 48h102M35 36h90M46 24h68" fill="none" stroke="#fff2c8" stroke-opacity="0.13" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M31 95c29 9 69 9 98 0" fill="none" stroke="#f0a24d" stroke-opacity="0.32" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="48" cy="64" r="2" fill="#f0a24d" opacity="0.58"/>
+  <circle cx="112" cy="64" r="2" fill="#f0a24d" opacity="0.58"/>
+</svg>
