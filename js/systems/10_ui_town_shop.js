@@ -401,9 +401,15 @@ function renderTown() {
 	if (restCostNode) {
 		const cost = restCost(S);
 		const affordable = S.player.gold >= cost;
-		restCostNode.innerHTML = `Cost ${formatMoney(cost)}`;
+		const cleanCost = cleanDisplayText(formatMoney(cost));
+		restCostNode.innerHTML = formatMoney(cost);
 		restCostNode.classList.toggle('rest-cost-low', !affordable);
-		restCostNode.title = affordable ? 'Cost to rest and restore HP' : `Need ${cleanDisplayText(formatMoney(cost))} to rest`;
+		restCostNode.title = affordable ? `Rest and restore HP for ${cleanCost}` : `Need ${cleanCost} to rest`;
+		const restAction = el('restBtn');
+		if (restAction) {
+			restAction.classList.toggle('rest-action-unaffordable', !affordable);
+			restAction.setAttribute('aria-label', affordable ? `Rest for ${cleanCost}` : `Rest unavailable. Need ${cleanCost}`);
+		}
 	}
 	if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
 	if (questPanel) questPanel.innerHTML = `
