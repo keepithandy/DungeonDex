@@ -10028,3 +10028,55 @@ button.dd-devtools-btn-danger {
     min-width: 0;
   }
 }
+
+
+/* Town mobile control regression guard.
+   Earlier compact-market rules use an ID selector, so this final narrow-screen
+   pass deliberately owns the Town action layout instead of letting an old
+   70–82px width win over the current section-header design. */
+@media (max-width: 560px) {
+  .town-district-hub .inline-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr) max-content;
+    align-items: stretch;
+  }
+
+  .town-district-hub .inline-actions .rest-cost-chip {
+    grid-column: auto;
+    justify-self: stretch;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 43px;
+    padding: 5px 8px;
+    white-space: nowrap;
+  }
+
+  .town-market-head #refreshMerchantBtn.refresh-compact {
+    align-self: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 44px;
+    padding: 8px 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .town-market-head #refreshMerchantBtn.refresh-compact span {
+    flex: 1 1 auto;
+  }
+
+  .town-market-head #refreshMerchantBtn.refresh-compact strong {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 370px) {
+  .town-district-hub .inline-actions {
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+
+  .town-district-hub .inline-actions #startRunBtn {
+    grid-column: 1 / -1;
+  }
+}
