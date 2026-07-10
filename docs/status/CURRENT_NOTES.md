@@ -11,9 +11,9 @@
 
 ## v1.25.2 Revisit No-op Stability + Version Alignment
 - Disabled the unstable post-render Revisit relocation helper after mobile/Textastic lag and unresponsive button reports.
-- Bumped the service-worker cache/build query to `1.25.2-revisit-noop-stability` so stale relocation assets are purged.
-- Aligned runtime pointer, build-label guard, service-worker cache labels, README, changelog, current notes, agent instructions, and release templates to the stability baseline.
-- The live town renderer remains the source owner of the Revisit panel until a future source-render placement patch moves it beside Elite Contracts safely.
+- Bumped the service-worker cache/build query first to `1.25.2-revisit-noop-stability` so stale relocation assets were purged.
+- Follow-up cache recovery now uses `1.25.2-revisit-source-slot` for the Revisit source-slot bridge.
+- `app.js` also forces a fresh source-slot load of `js/systems/44_revisit_lowfire_board_slot.js` so a stale local `index.html` query is less likely to keep serving the disabled no-op helper.
 - No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit start/resolve/reward/history behavior, Echo activation, gear mechanics, or Relic collection behavior changed.
 
 ## v1.25.1 Mobile Side Rail Toggle
@@ -99,7 +99,7 @@
 - Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys summarize into one readable display model.
 - Duplicate Rival Trace display records collapse by canonical trace identity.
 - The Guild Journal Rival Traces row consumes the readable summary and remains read-only.
-- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
+- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, and Journal rendering, and Famous Gear compatibility.
 - The compact smoke suite passed 20/20 for this branch before final label alignment.
 
 ## v1.23.5 Famous Gear Memory v1 Completion
@@ -117,8 +117,3 @@
 - The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
 - The Guild Journal Boss Trophy section consumes the completed readable summary and remains read-only.
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
-
-## Current Revisit Lane Status
-- Trophy Echo: live town memory lane tied to boss trophy or boss record history.
-- Famous Gear Memory: live town archive lane tied to retired gear records.
-- Rival Trace: live town archive trace tied to named rival elite history.
