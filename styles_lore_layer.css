@@ -667,10 +667,26 @@ button,
     padding: 8px 9px;
   }
 
-  #screen-town > .stack-8 > .section-header.panel > .inline-actions > #restCostPill {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-height: 34px;
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions > #restBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel #restBtn > #restCostPill {
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0 0 0 7px;
+    border: 0;
+    border-left: 1px solid rgba(255,213,148,0.18);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 0.68rem;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .inventory-actions,
