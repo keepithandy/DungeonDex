@@ -2,14 +2,14 @@
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.25.2: Revisit No-op Stability + Version Alignment
-// - Disabled the unstable Revisit DOM relocation helper after mobile/Textastic lag reports.
-// - Bumped the service-worker cache to force stale relocation assets out of the app cache.
-// - Aligned runtime/cache/version authority labels for the stability baseline.
+// v1.25.2: Revisit Source-slot Cache Recovery
+// - Keeps the v1.25.2 stability baseline.
+// - Bumps runtime cache query from the no-op Revisit helper to the source-slot helper.
+// - Forces the Revisit source-slot bridge to load with the new cache key even if index.html still has a stale no-op query.
 // - Gameplay, save data, and system activation remain unchanged.
 
 window.DUNGEONDEX_BUILD = '1.25.2';
-window.DUNGEONDEX_BUILD_QS = '1.25.2-revisit-noop-stability';
+window.DUNGEONDEX_BUILD_QS = '1.25.2-revisit-source-slot';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -56,9 +56,10 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.25.2-revisit-noop-stability';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.25.2-revisit-source-slot';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
+    window.setTimeout(function(){ loadModule('./js/systems/44_revisit_lowfire_board_slot.js?build=' + qs, '__dungeondexRevisitLowfireBoardSourceSlot', 'Revisit source-slot bridge'); }, 40);
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
     window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
