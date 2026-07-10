@@ -70,19 +70,54 @@
     addHeaderCrestCss();
     installHeaderCrest();
   }
+  function addTownGateCss(){
+    if (document.getElementById('ddTownGateCss')) return;
+    var style = document.createElement('style');
+    style.id = 'ddTownGateCss';
+    style.textContent = '.ddx-record-title.town-gate-lockup{position:relative;min-height:74px;padding-right:112px}.town-gate-art{position:absolute;top:0;right:0;width:96px;height:74px;object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 12px rgba(255,170,72,.18));opacity:.92}.town-gate-art[hidden]{display:none!important}@media(max-width:700px){.ddx-record-title.town-gate-lockup{min-height:64px;padding-right:88px}.town-gate-art{width:78px;height:62px}}@media(max-width:430px){.ddx-record-title.town-gate-lockup{min-height:0;padding-right:0}.town-gate-art{display:none!important}}';
+    document.head.appendChild(style);
+  }
+  function installTownGateArt(){
+    var slot = document.querySelector('#screen-town .ddx-record-title');
+    var line = document.getElementById('districtLine');
+    if (!slot || !line || slot.querySelector('.town-gate-art')) return;
+    slot.classList.add('town-gate-lockup');
+    var gate = document.createElement('img');
+    gate.className = 'town-gate-art';
+    gate.src = './assets/img/ui/hollow-stair-gate.svg';
+    gate.alt = '';
+    gate.setAttribute('aria-hidden', 'true');
+    gate.decoding = 'async';
+    gate.loading = 'lazy';
+    gate.addEventListener('error', function(){
+      gate.hidden = true;
+      gate.dataset.assetStatus = 'missing';
+      slot.classList.remove('town-gate-lockup');
+    }, { once: true });
+    line.insertAdjacentElement('afterend', gate);
+  }
+  function applyTownGateArt(){
+    addTownGateCss();
+    installTownGateArt();
+  }
   applyHostClass();
   addNavCenteringCss();
   applyHeaderCrest();
+  applyTownGateArt();
   window.addEventListener('DOMContentLoaded', applyHostClass);
   window.addEventListener('DOMContentLoaded', addNavCenteringCss);
   window.addEventListener('DOMContentLoaded', applyHeaderCrest);
+  window.addEventListener('DOMContentLoaded', applyTownGateArt);
   window.addEventListener('load', applyHostClass);
   window.addEventListener('load', addNavCenteringCss);
   window.addEventListener('load', applyHeaderCrest);
+  window.addEventListener('load', applyTownGateArt);
   window.setTimeout(applyHostClass, 100);
   window.setTimeout(addNavCenteringCss, 100);
   window.setTimeout(applyHeaderCrest, 100);
+  window.setTimeout(applyTownGateArt, 100);
   window.setTimeout(applyHostClass, 500);
   window.setTimeout(addNavCenteringCss, 500);
   window.setTimeout(applyHeaderCrest, 500);
+  window.setTimeout(applyTownGateArt, 500);
 })();
