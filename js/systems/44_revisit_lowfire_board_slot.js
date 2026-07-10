@@ -2,29 +2,73 @@
 
 // v1.25.1 Revisit Lowfire Board Slot
 // Presentation-only relocation: keep Revisit lane behavior unchanged while placing
-// the rendered Revisit panel inside the Lowfire Board section after each town render.
+// the rendered Revisit panel beside the Elite Contracts board after each town render.
 (function(){
 	const SLOT_ID = 'lowfireRevisitBoardSlot';
+	const PAIR_ID = 'lowfireBoardRevisitPair';
+	const STYLE_ID = 'lowfireRevisitBoardPairStyle';
 	let renderTownPatched = false;
 
 	function townBoardShell() {
 		return document.querySelector('#questPanel .town-board-shell');
 	}
 
-	function ensureBoardSlot(shell) {
+	function ensurePairStyle() {
+		if (document.getElementById(STYLE_ID)) return;
+		const style = document.createElement('style');
+		style.id = STYLE_ID;
+		style.textContent = [
+			'.lowfire-board-revisit-pair {',
+			'  display: grid;',
+			'  grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);',
+			'  gap: 10px;',
+			'  align-items: start;',
+			'}',
+			'.lowfire-board-revisit-pair > .elite-contract-board,',
+			'.lowfire-board-revisit-pair > .lowfire-revisit-board-slot {',
+			'  min-width: 0;',
+			'}',
+			'.lowfire-board-revisit-pair .revisit-foundation-panel {',
+			'  height: 100%;',
+			'  margin: 0;',
+			'}',
+			'@media (max-width: 760px) {',
+			'  .lowfire-board-revisit-pair { grid-template-columns: 1fr; }',
+			'}'
+		].join('\n');
+		document.head.appendChild(style);
+	}
+
+	function ensureBoardSlot() {
 		let slot = document.getElementById(SLOT_ID);
 		if (!slot) {
 			slot = document.createElement('div');
 			slot.id = SLOT_ID;
 			slot.className = 'lowfire-revisit-board-slot';
 		}
+		return slot;
+	}
 
-		if (slot.parentElement !== shell) {
-			const objectiveLedger = shell.querySelector('.warden-ledger.town-board-ledger');
-			shell.insertBefore(slot, objectiveLedger || shell.children[1] || null);
+	function ensureBoardPair(shell, eliteBoard, slot) {
+		let pair = document.getElementById(PAIR_ID);
+		if (!pair) {
+			pair = document.createElement('div');
+			pair.id = PAIR_ID;
+			pair.className = 'lowfire-board-revisit-pair';
 		}
 
-		return slot;
+		if (pair.parentElement !== shell) {
+			shell.insertBefore(pair, eliteBoard);
+		}
+
+		if (eliteBoard.parentElement !== pair) {
+			pair.appendChild(eliteBoard);
+		}
+		if (slot.parentElement !== pair) {
+			pair.appendChild(slot);
+		}
+
+		return pair;
 	}
 
 	function moveRevisitPanelIntoLowfireBoard() {
@@ -32,7 +76,13 @@
 		const shell = townBoardShell();
 		if (!panel || !shell) return false;
 
-		const slot = ensureBoardSlot(shell);
+		const eliteBoard = shell.querySelector('.elite-contract-board');
+		if (!eliteBoard) return false;
+
+		ensurePairStyle();
+		const slot = ensureBoardSlot();
+		ensureBoardPair(shell, eliteBoard, slot);
+
 		if (panel.parentElement !== slot) {
 			slot.appendChild(panel);
 		}
