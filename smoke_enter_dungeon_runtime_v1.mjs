@@ -299,6 +299,47 @@ async function main() {
     record('App does not blank after Enter Dungeon', after.bodyTextLength > 20 && after.saveButtonExists === true && after.tabCount >= 5, JSON.stringify(after));
     record('Run screen appears after Enter Dungeon', after.activeScreen === 'screen-run' && after.runActive === true, JSON.stringify(after));
     record('Run panels render after Enter Dungeon', [after.runStatusText, after.combatPanelText, after.combatLogText].every(text => String(text || '').trim().length > 0), JSON.stringify(after));
+
+    for (const width of [320, 390, 868]) {
+      await client.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      await sleep(100);
+      const combatBar = await evaluate(client, `(() => {
+        const stats = Array.from(document.querySelectorAll('.combat-hud.run-stat-grid .stat-box'));
+        const labels = stats.map(box => box.querySelector('.small'));
+        const actions = Array.from(document.querySelectorAll('.combat-device-actions button'));
+        const statRects = stats.map(node => node.getBoundingClientRect());
+        const actionRects = actions.map(node => node.getBoundingClientRect());
+        const sameRow = rects => rects.length === 4 && rects.every(rect => Math.abs(rect.top - rects[0].top) < 1);
+        const equalWidth = rects => rects.length === 4 && rects.every(rect => Math.abs(rect.width - rects[0].width) < 1);
+        return {
+          statCount: stats.length,
+          actionCount: actions.length,
+          labels: labels.map(node => node?.textContent?.trim() || ''),
+          labelsVisible: labels.every(node => node && getComputedStyle(node).display !== 'none'),
+          statSameRow: sameRow(statRects),
+          actionSameRow: sameRow(actionRects),
+          statEqualWidth: equalWidth(statRects),
+          actionEqualWidth: equalWidth(actionRects),
+          actionOrder: actions.map(node => node.textContent.trim()),
+          fitsViewport: [...statRects, ...actionRects].every(rect => rect.left >= -1 && rect.right <= innerWidth + 1)
+        };
+      })()`);
+      record(
+        `Combat bar keeps the four-column reference layout at ${width}px`,
+        combatBar?.statCount === 4
+          && combatBar?.actionCount === 4
+          && combatBar?.labelsVisible === true
+          && combatBar?.statSameRow === true
+          && combatBar?.actionSameRow === true
+          && combatBar?.statEqualWidth === true
+          && combatBar?.actionEqualWidth === true
+          && combatBar?.fitsViewport === true
+          && JSON.stringify(combatBar?.labels) === JSON.stringify(['PWR', 'GRD', 'SPD', 'LCK'])
+          && JSON.stringify(combatBar?.actionOrder) === JSON.stringify(['Attack', 'Ashburst', 'Guard', 'Extract']),
+        JSON.stringify(combatBar)
+      );
+    }
+
     record('No uncaught click-time console/runtime errors', runtimeExceptions.length === 0 && consoleIssues.length === 0 && networkFailures.length === 0, JSON.stringify({ runtimeExceptions, consoleIssues, networkFailures }));
 
     const diagnostics = { pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results };
