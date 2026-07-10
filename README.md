@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.25.0**
+Current baseline: **DungeonDex v1.25.1**
 
 ## Try It First
 
@@ -20,7 +20,7 @@ Focused merchant-upgrade checks are available with:
 node smoke_merchant_gear_upgrades_v1238.mjs
 ```
 
-Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and mobile tap use, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, safe Revisit lanes, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
+Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, safe Revisit lanes, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
 
 ## Player Promise
 
@@ -51,7 +51,7 @@ DungeonDex is built around a simple loop:
 ## Current Playable / Live Systems
 
 - **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
-- **Side rail navigation:** Desktop hover/focus reveal and mobile/touch tap drawer for core routes.
+- **Side rail navigation:** Desktop hover/focus reveal and a tiny mobile/touch `←` drawer button for core routes.
 - **Lowfire Forge:** Gear crafting, salvage, and tempering system formerly labeled Relic Forge; legacy internal names remain compatibility-safe while Relic stays open-ended for future planning.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
