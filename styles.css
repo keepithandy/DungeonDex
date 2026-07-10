@@ -10036,18 +10036,39 @@ button.dd-devtools-btn-danger {
    70–82px width win over the current section-header design. */
 @media (max-width: 560px) {
   .town-district-hub .inline-actions {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr) max-content;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
     align-items: stretch;
   }
 
-  .town-district-hub .inline-actions .rest-cost-chip {
-    grid-column: auto;
-    justify-self: stretch;
-    align-self: stretch;
+  .town-district-hub #restBtn.rest-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .town-district-hub #restBtn .rest-cost-chip {
     min-width: 0;
-    min-height: 43px;
-    padding: 5px 8px;
+    min-height: 0;
+    padding: 0 0 0 7px;
+    border: 0;
+    border-left: 1px solid rgba(255,213,148,0.18);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 0.68rem;
+    line-height: 1;
     white-space: nowrap;
+  }
+
+  .town-district-hub #restBtn .rest-cost-chip.rest-cost-low {
+    border-left-color: rgba(255,141,141,0.32);
+    background: transparent;
+    color: rgba(255,190,180,0.94);
+  }
+
+  .town-district-hub #restBtn.rest-action-unaffordable {
+    border-color: rgba(255,141,141,0.24);
   }
 
   .town-market-head #refreshMerchantBtn.refresh-compact {
@@ -10073,10 +10094,10 @@ button.dd-devtools-btn-danger {
 
 @media (max-width: 370px) {
   .town-district-hub .inline-actions {
-    grid-template-columns: minmax(0, 1fr) max-content;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .town-district-hub .inline-actions #startRunBtn {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }
