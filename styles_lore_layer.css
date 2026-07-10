@@ -3,16 +3,6 @@
  * Guild Ledgers, Town Notices, Dungeon Writs, Monster Archives,
  * Merchant Ledgers, Forge Counters, and Guild Journals.
  *
- * Structure:
- * - Navigation & Headers
- * - Ledger Card styling
- * - Notice Board styling
- * - Contract Card styling (Dungeon Writ, Debt Card)
- * - Merchant Card styling (Ledger, Forge, Upgrades)
- * - Archive Card styling (Records, Logs)
- * - Journal Card styling
- * - Responsive & utility tweaks
- *
  * All existing IDs, data-attributes, JS hooks, and gameplay mechanics
  * remain untouched. Only HTML structure and CSS classes are layered.
  */
@@ -27,11 +17,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 12px 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(30, 25, 15, 0.92),
-    rgba(20, 18, 24, 0.95)
-  );
+  background: linear-gradient(135deg, rgba(30, 25, 15, 0.92), rgba(20, 18, 24, 0.95));
   border-bottom: 1px solid rgba(255, 217, 136, 0.15);
 }
 
@@ -66,25 +52,32 @@
    ======================================== */
 
 .ddx-nav-guild-bar {
-  display: flex;
-  gap: 0;
-  padding: 0;
-  background: rgba(8, 8, 12, 0.6);
-  border-bottom: 1px solid rgba(255, 217, 136, 0.12);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px 8px calc(6px + var(--safe-bottom));
+  background: linear-gradient(180deg, rgba(16, 12, 10, 0.88), rgba(7, 5, 4, 0.98));
+  border-top: 1px solid rgba(255, 217, 136, 0.12);
+  border-bottom: 0;
 }
 
 .ddx-nav-guild-bar .tab {
-  flex: 1;
-  border-radius: 0;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
+  min-width: 0;
+  min-height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 217, 136, 0.10);
+  border-bottom: 1px solid rgba(255, 217, 136, 0.10);
+  background: rgba(255, 255, 255, 0.025);
   color: rgba(240, 234, 222, 0.72);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  transition: all 0.2s ease;
-  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 6px 4px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .ddx-nav-guild-bar .tab:hover {
@@ -94,24 +87,19 @@
 
 .ddx-nav-guild-bar .tab.active {
   background: rgba(255, 217, 136, 0.06);
-  border-bottom-color: #ffd980;
+  border-color: rgba(255, 217, 136, 0.28);
   color: #f6d9a1;
   box-shadow: none;
 }
 
 /* ========================================
    LEDGER CARDS
-   (Guild Record, Armor Record, Archive Summary, Settings)
    ======================================== */
 
 .ddx-ledger-card {
   position: relative;
   border-color: rgba(255, 217, 136, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 217, 136, 0.04),
-    rgba(0, 0, 0, 0.1)
-  );
+  background: linear-gradient(135deg, rgba(255, 217, 136, 0.04), rgba(0, 0, 0, 0.1));
 }
 
 .ddx-ledger-card::before {
@@ -155,20 +143,11 @@
 
 /* ========================================
    NOTICE BOARD
-   (Town Contracts, Quest Board)
    ======================================== */
 
 .ddx-notice-board {
   border-color: rgba(255, 217, 136, 0.20);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 217, 136, 0.06),
-    rgba(0, 0, 0, 0.08)
-  );
-}
-
-.ddx-quest-board {
-  /* Inherits from .ddx-notice-board */
+  background: linear-gradient(180deg, rgba(255, 217, 136, 0.06), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-notice-board h3,
@@ -184,25 +163,18 @@
 
 /* ========================================
    CONTRACT CARDS
-   (Dungeon Writ, Debt Card, Revisit Contracts)
    ======================================== */
 
 .ddx-contract-card {
   border-color: rgba(255, 217, 136, 0.20);
-  background: linear-gradient(
-    135deg,
-    rgba(197, 139, 255, 0.06),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(197, 139, 255, 0.06), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-dungeon-writ {
-  /* Dungeon entry writ styling */
   border-color: rgba(255, 178, 96, 0.22);
 }
 
 .ddx-debt-card {
-  /* Debt pressure contract styling */
   border-color: rgba(255, 136, 100, 0.22);
 }
 
@@ -219,40 +191,27 @@
 
 /* ========================================
    MERCHANT CARDS
-   (Merchant Ledger, Forge Counter, Upgrade Receipt, Equipment)
    ======================================== */
 
 .ddx-merchant-card {
   border-color: rgba(167, 255, 210, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(167, 255, 210, 0.04),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(167, 255, 210, 0.04), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-merchant-ledger {
-  /* Merchant shop ledger */
   border-color: rgba(167, 255, 210, 0.18);
 }
 
 .ddx-forge-counter {
-  /* Forge/crafting counter */
   border-color: rgba(255, 196, 99, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 196, 99, 0.04),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(255, 196, 99, 0.04), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-gear-summary {
-  /* Upgrade receipt */
   border-color: rgba(255, 217, 136, 0.18);
 }
 
 .ddx-equipment-ledger {
-  /* Equipment loadout */
   border-color: rgba(167, 255, 210, 0.18);
 }
 
@@ -274,40 +233,27 @@
 
 /* ========================================
    ARCHIVE CARDS
-   (Combat Record, Monster Archive, Gear Archive, Filter Record)
    ======================================== */
 
 .ddx-archive-card {
   border-color: rgba(102, 200, 255, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(102, 200, 255, 0.04),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(102, 200, 255, 0.04), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-combat-record {
-  /* Combat log as archival record */
   border-color: rgba(255, 178, 96, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 178, 96, 0.04),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(255, 178, 96, 0.04), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-monster-archive {
-  /* Monster bestiary/trophy records */
   border-color: rgba(255, 120, 120, 0.16);
 }
 
 .ddx-gear-trophy-archive {
-  /* Gear trophy/retirement records */
   border-color: rgba(167, 255, 210, 0.16);
 }
 
 .ddx-filter-record {
-  /* Inventory filter record */
   border-color: rgba(102, 200, 255, 0.16);
 }
 
@@ -328,20 +274,14 @@
 
 /* ========================================
    JOURNAL CARDS
-   (Guild Journal, Revisit Memory Records)
    ======================================== */
 
 .ddx-journal-card {
   border-color: rgba(200, 160, 255, 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(200, 160, 255, 0.04),
-    rgba(0, 0, 0, 0.08)
-  );
+  background: linear-gradient(135deg, rgba(200, 160, 255, 0.04), rgba(0, 0, 0, 0.08));
 }
 
 .ddx-guild-journal {
-  /* Guild journal entries */
   border-color: rgba(200, 160, 255, 0.18);
 }
 
@@ -396,25 +336,13 @@
   white-space: nowrap;
 }
 
-.ddx-merchant-pair {
-  /* Two-column merchant + forge pair - already uses .grid-2 */
-}
-
-/* ========================================
-   VIEWPORT & LAYOUT
-   ======================================== */
-
-.ddx-main-viewport {
-  /* Main content viewport - inherits from .screens */
-}
-
-.ddx-view-stack {
-  /* Vertical stack of regions - already uses .stack-8 */
+.ddx-main-viewport,
+.ddx-view-stack,
+.ddx-region {
+  min-width: 0;
 }
 
 .ddx-region {
-  /* Individual screen region - inherits from .screen */
-  /* Smooth transitions when switching screens */
   transition: opacity 0.3s ease;
 }
 
@@ -428,8 +356,184 @@
 }
 
 .ddx-action-strip {
-  /* Sticky footer action strip */
   border-top: 1px solid rgba(255, 217, 136, 0.12);
+}
+
+/* ========================================
+   MOBILE LAYOUT REGRESSION FIX
+   ======================================== */
+
+.app-shell {
+  width: min(100%, 860px);
+  max-width: 860px;
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: clamp(6px, 2.2vw, 10px);
+  padding-bottom: calc(76px + var(--safe-bottom));
+  scroll-padding-bottom: calc(90px + var(--safe-bottom));
+}
+
+.app-shell.combat-active {
+  padding-bottom: calc(118px + var(--safe-bottom));
+}
+
+#stickyBar:empty {
+  display: none !important;
+}
+
+.sticky-actions.ddx-action-strip {
+  display: grid;
+}
+
+.tabs.ddx-nav-guild-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  max-width: 860px;
+  margin: 0 auto;
+  z-index: 20;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.32);
+  touch-action: manipulation;
+}
+
+.app-shell.combat-active .tabs.ddx-nav-guild-bar {
+  display: none;
+}
+
+/* ========================================
+   FULL MOBILE-FRIENDLY HARDENING
+   ======================================== */
+
+.screens,
+.screen,
+.stack-8,
+.panel,
+.stat-box,
+.resource-box,
+.loot-card,
+.equip-slot,
+.monster-card,
+.log-line,
+.quest-card,
+.shop-item,
+.archive-line,
+.item-row,
+.split,
+.card-head,
+.tag-row,
+.item-actions,
+.inline-actions,
+.top-actions {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.panel {
+  padding: clamp(9px, 2.75vw, 12px);
+  border-radius: clamp(14px, 4vw, 18px);
+}
+
+.panel *,
+.tab,
+button,
+.pill,
+.item-name,
+.item-meta,
+.ddx-record-name,
+.ddx-record-meta {
+  min-width: 0;
+}
+
+p,
+small,
+strong,
+span,
+button,
+.pill,
+.item-name,
+.item-meta,
+.muted,
+.mono,
+.ddx-record-name,
+.ddx-record-meta {
+  overflow-wrap: anywhere;
+}
+
+button,
+.tab,
+.ghost,
+.primary,
+.mini {
+  max-width: 100%;
+}
+
+.grid-2,
+.filter-grid,
+.compact-grid,
+.combat-hud,
+.hud-grid,
+.intro-grid {
+  min-width: 0;
+}
+
+.item-row,
+.split,
+.card-head,
+.title-row,
+.inline-actions,
+.top-actions,
+.item-actions,
+.tag-row,
+.sticky-meta,
+.inventory-head,
+.inventory-actions,
+.merchant-head,
+.charter-actions,
+.intro-actions {
+  flex-wrap: wrap;
+}
+
+#screen-town > .stack-8 > .section-header.panel {
+  gap: 8px;
+}
+
+#screen-town > .stack-8 > .section-header.panel > .inline-actions {
+  min-width: 0;
+}
+
+#screen-town > .stack-8 > .section-header.panel > .district-charter-slot {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.district-wallet-slot,
+.revisit-foundation-panel,
+.deep-charter-card,
+.depth-progress-card,
+.district-market,
+.market-subhead,
+.district-ware-list,
+.run-command-strip,
+.log-wrap,
+.inventory-actions,
+.shop-item,
+.loot-card,
+.equip-slot,
+.monster-card,
+.quest-card,
+.archive-line {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.revisit-foundation-panel,
+.deep-charter-card,
+.depth-progress-card {
+  overflow: hidden;
 }
 
 /* ========================================
@@ -437,8 +541,11 @@
    ======================================== */
 
 @media (max-width: 700px) {
+  .app-shell {
+    padding-top: calc(6px + var(--safe-top));
+  }
+
   .ddx-guild-header {
-    flex-direction: column;
     gap: 10px;
     padding: 10px 12px;
   }
@@ -447,23 +554,16 @@
     font-size: 0.95rem;
   }
 
-  .ddx-action-row {
-    width: 100%;
-  }
-
-  .ddx-action-row button {
-    flex: 1 1 auto;
-    min-width: 70px;
-  }
-
   .ddx-nav-guild-bar {
-    gap: 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+    padding: 6px 8px calc(6px + var(--safe-bottom));
   }
 
   .ddx-nav-guild-bar .tab {
-    flex: 1;
-    padding: 8px 10px;
-    font-size: 0.78rem;
+    min-height: 44px;
+    padding: 6px 3px;
+    font-size: 0.70rem;
   }
 
   .ddx-record-title {
@@ -479,20 +579,150 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
+  .app-shell {
+    padding-inline: 7px;
+    padding-bottom: calc(74px + var(--safe-bottom));
+    scroll-padding-bottom: calc(88px + var(--safe-bottom));
+  }
+
+  .app-shell.combat-active {
+    padding-bottom: calc(118px + var(--safe-bottom));
+  }
+
   .ddx-guild-header {
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
     padding: 8px 10px;
+    border-radius: 14px;
   }
 
   .ddx-header-title-slot h1 {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .top-actions.ddx-action-row {
+    width: auto;
+    flex: 0 0 auto;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .top-actions.ddx-action-row button {
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 32px;
+    padding: 5px 7px;
+    font-size: 0.68rem;
+  }
+
+  .top-actions .save-status {
+    display: none;
+  }
+
+  .stack-8 {
+    gap: 7px;
+  }
+
+  .grid-2,
+  .ddx-merchant-pair,
+  .filter-grid,
+  .hero-main {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid,
+  .intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .section-header,
+  .topbar {
+    gap: 8px;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "actions"
+      "district"
+      "charter" !important;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions > button {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 9px;
+  }
+
+  #screen-town > .stack-8 > .section-header.panel > .inline-actions > #restCostPill {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 34px;
+  }
+
+  .inventory-actions,
+  .item-actions,
+  .intro-actions,
+  .charter-actions {
+    width: 100%;
+  }
+
+  .item-actions .mini,
+  .inventory-actions .mini,
+  .intro-actions button,
+  .charter-actions button {
+    flex: 1 1 calc(50% - 4px);
+  }
+
+  .log-wrap {
+    max-height: min(220px, 32dvh);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding-inline: 6px;
+    padding-top: calc(5px + var(--safe-top));
+  }
+
+  .ddx-guild-header {
+    gap: 7px;
+    padding: 7px 9px;
+  }
+
+  .ddx-header-title-slot h1 {
+    font-size: 0.78rem;
+    letter-spacing: 0.01em;
+  }
+
+  .panel {
+    padding: 9px;
+  }
+
+  .ddx-nav-guild-bar {
+    gap: 4px;
+    padding: 6px 7px calc(6px + var(--safe-bottom));
   }
 
   .ddx-nav-guild-bar .tab {
-    padding: 6px 8px;
-    font-size: 0.70rem;
+    min-height: 42px;
+    border-radius: 10px;
+    padding: 5px 2px;
+    font-size: 0.66rem;
+    letter-spacing: 0;
   }
 
   .ddx-cost-indicator {
@@ -504,17 +734,351 @@
     padding: 8px 6px;
     font-size: 0.75rem;
   }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid {
+    gap: 6px;
+  }
+
+  .stat-box,
+  .resource-box,
+  .loot-card,
+  .equip-slot,
+  .monster-card,
+  .log-line,
+  .quest-card,
+  .shop-item,
+  .archive-line {
+    padding: 8px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    padding-inline: 5px;
+  }
+
+  .ddx-header-title-slot h1 {
+    font-size: 0.72rem;
+  }
+
+  .top-actions.ddx-action-row button {
+    min-height: 30px;
+    padding: 4px 6px;
+    font-size: 0.64rem;
+  }
+
+  .ddx-nav-guild-bar {
+    gap: 3px;
+    padding: 5px 5px calc(5px + var(--safe-bottom));
+  }
+
+  .ddx-nav-guild-bar .tab {
+    min-height: 40px;
+    font-size: 0.60rem;
+    padding-inline: 1px;
+  }
+
+  .compact-grid,
+  .combat-hud,
+  .hud-grid,
+  .intro-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .item-actions .mini,
+  .inventory-actions .mini,
+  .intro-actions button,
+  .charter-actions button {
+    flex-basis: 100%;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .app-shell {
+    padding-top: calc(4px + var(--safe-top));
+    padding-bottom: calc(58px + var(--safe-bottom));
+  }
+
+  .ddx-guild-header {
+    padding-block: 6px;
+  }
+
+  .ddx-nav-guild-bar .tab {
+    min-height: 36px;
+  }
+
+  .tabs.ddx-nav-guild-bar {
+    padding-block: 4px;
+  }
+}
+
+/* ========================================
+   COMBAT DENSITY AND ACTION DOCK
+   ======================================== */
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding-bottom: calc(62px + var(--safe-bottom));
+    scroll-padding-bottom: calc(72px + var(--safe-bottom));
+  }
+
+  .stack-8,
+  .screens > .screen > .stack-8 {
+    gap: 5px !important;
+  }
+
+  .panel {
+    padding: 8px !important;
+  }
+
+  .ddx-record-title,
+  .ddx-record-body,
+  .list {
+    gap: 5px !important;
+  }
+
+  .ddx-nav-guild-bar {
+    padding: 5px 6px calc(5px + var(--safe-bottom));
+  }
+
+  .ddx-nav-guild-bar .tab {
+    min-height: 38px;
+    border-radius: 9px;
+    font-size: 0.64rem;
+    padding: 4px 1px;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell.combat-active {
+    max-width: 430px;
+    padding: calc(4px + var(--safe-top)) 5px calc(76px + var(--safe-bottom)) !important;
+    scroll-padding-bottom: calc(98px + var(--safe-bottom)) !important;
+  }
+
+  .app-shell.combat-active #screen-run .stack-8 {
+    gap: 4px !important;
+    border-radius: 14px !important;
+  }
+
+  .app-shell.combat-active #runStatus {
+    padding: 5px 6px !important;
+  }
+
+  .app-shell.combat-active #combatPanel {
+    padding: 0 6px 4px !important;
+  }
+
+  .app-shell.combat-active #combatLog {
+    padding: 5px 6px 7px !important;
+    max-height: 128px;
+    overflow: hidden;
+  }
+
+  .app-shell.combat-active .combat-device-shell {
+    gap: 4px !important;
+  }
+
+  .app-shell.combat-active .run-flow-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .app-shell.combat-active .run-flow-primary,
+  .app-shell.combat-active .run-flow-secondary {
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .app-shell.combat-active .run-flow-primary strong,
+  .app-shell.combat-active .run-flow-secondary strong {
+    font-size: 0.74rem;
+    line-height: 1.05;
+  }
+
+  .app-shell.combat-active .run-flow-primary small:nth-of-type(n+2),
+  .app-shell.combat-active .run-flow-secondary small {
+    display: none;
+  }
+
+  .app-shell.combat-active .combat-haul-row {
+    display: none;
+  }
+
+  .app-shell.combat-active .combat-enemy-header {
+    padding: 0 !important;
+    gap: 1px;
+  }
+
+  .app-shell.combat-active .combat-enemy-header .depth-kicker {
+    font-size: 0.52rem;
+  }
+
+  .app-shell.combat-active .combat-enemy-header p {
+    display: none;
+  }
+
+  .app-shell.combat-active .combat-monster-stage {
+    min-height: 84px !important;
+    max-height: 18dvh;
+    border-radius: 12px !important;
+  }
+
+  .app-shell.combat-active .combat-monster-stage.stage-boss {
+    min-height: 94px !important;
+  }
+
+  .app-shell.combat-active .stage-floor {
+    bottom: 6px;
+    height: 14px;
+  }
+
+  .app-shell.combat-active .monster-aura {
+    transform: translate(-50%, -50%) scale(0.78);
+  }
+
+  .app-shell.combat-active .monster-model {
+    transform: scale(0.82);
+    transform-origin: 50% 70%;
+  }
+
+  .app-shell.combat-active .combat-hp-card {
+    padding: 5px 6px !important;
+    border-radius: 10px !important;
+  }
+
+  .app-shell.combat-active .hp-label-row {
+    font-size: 0.68rem;
+    line-height: 1.05;
+  }
+
+  .app-shell.combat-active .hpbar {
+    height: 7px !important;
+  }
+
+  .app-shell.combat-active .combat-stat-row {
+    gap: 3px !important;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .app-shell.combat-active .combat-stat-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-shell.combat-active .combat-stat-row .pill {
+    flex: 0 0 auto;
+    font-size: 0.58rem;
+    padding: 2px 5px;
+  }
+
+  .app-shell.combat-active .combat-hud.run-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+
+  .app-shell.combat-active .combat-hud.run-stat-grid .stat-box {
+    padding: 5px 4px !important;
+    border-radius: 9px !important;
+  }
+
+  .app-shell.combat-active .combat-hud.run-stat-grid .stat-box .small,
+  .app-shell.combat-active .combat-hud.run-stat-grid .stat-box span {
+    display: none;
+  }
+
+  .app-shell.combat-active .combat-hud.run-stat-grid .stat-box strong {
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  .app-shell.combat-active .combat-device-actions {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 430px;
+    margin: 0 auto;
+    z-index: 45;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+    padding: 6px 7px calc(6px + var(--safe-bottom));
+    border-top: 1px solid rgba(255, 217, 136, 0.16);
+    background: linear-gradient(180deg, rgba(16, 12, 10, 0.88), rgba(5, 4, 3, 0.99));
+    box-shadow: 0 -12px 26px rgba(0, 0, 0, 0.46);
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 6px 2px;
+    border-radius: 11px;
+    font-size: 0.70rem;
+    line-height: 1.05;
+  }
+
+  .app-shell.combat-active .run-log-head {
+    margin-bottom: 3px !important;
+  }
+
+  .app-shell.combat-active .run-log-head h2 {
+    font-size: 0.78rem;
+  }
+
+  .app-shell.combat-active .run-log-list {
+    max-height: 82px;
+    overflow: auto;
+    gap: 4px !important;
+    padding: 0 1px 2px !important;
+  }
+
+  .app-shell.combat-active .run-log-list .combat-feed-line {
+    padding: 5px 6px !important;
+    border-radius: 10px !important;
+  }
+
+  .app-shell.combat-active .feed-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .app-shell.combat-active .feed-kicker {
+    font-size: 0.48rem;
+  }
+
+  .app-shell.combat-active .feed-body {
+    font-size: 0.66rem;
+    line-height: 1.18;
+    -webkit-line-clamp: 2;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell.combat-active {
+    padding-bottom: calc(118px + var(--safe-bottom)) !important;
+  }
+
+  .app-shell.combat-active .combat-device-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-shell.combat-active .combat-device-actions button {
+    min-height: 40px;
+  }
 }
 
 /* ========================================
    NO DISRUPTION TO EXISTING SYSTEMS
    ======================================== */
 
-/* All gameplay, combat math, rewards, save data, and dungeon
-   entry behavior remain unchanged. The .ddx-* classes are
-   purely semantic layout and theming layers over existing
-   .panel, .tab, button, and system-generated HTML.
-   
-   No existing IDs, data-attributes, or JavaScript hooks
-   have been renamed or removed.
-*/
+/* All gameplay, combat math, rewards, save data, and dungeon entry
+   behavior remain unchanged. The .ddx-* classes are purely semantic
+   layout and theming layers over existing .panel, .tab, button, and
+   system-generated HTML. No existing IDs, data-attributes, or
+   JavaScript hooks have been renamed or removed. */
