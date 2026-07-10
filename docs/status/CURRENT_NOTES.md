@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.25.0 - Visual Identity + Side Rail Release
+- DungeonDex v1.25.1 - Mobile Side Rail Toggle
+
+## v1.25.1 Mobile Side Rail Toggle
+- Mobile/touch side rail now uses a tiny `←` drawer button instead of the larger hamburger/close control.
+- Closed mobile/touch rail collapses to a narrow strip and hides route tabs until opened.
+- Desktop hover/focus side-rail behavior remains unchanged.
+- Runtime/cache/version authority labels are now `v1.25.1`.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit, Echo, or Relic collection behavior changed.
 
 ## v1.25.0 Visual Identity + Side Rail Release
 - Added the first custom DungeonDex crest asset and the Hollow Stair gate Town visual.
@@ -101,7 +108,7 @@
 - Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
 - Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern state.
 - The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
-- The Guild Journal Boss Trophy section consumes the readable summary and remains read-only.
+- The Guild Journal Boss Trophy section consumes the completed readable summary and remains read-only.
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
 
 ## Current Revisit Lane Status
