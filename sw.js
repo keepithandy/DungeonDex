@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.25.0-visual-identity-side-rail';
+const CACHE_NAME = 'dungeondex-v1.25.1-mobile-side-rail-toggle';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.25.0-visual-identity-side-rail';
+const BUILD_QS = '1.25.1-mobile-side-rail-toggle';
 const ASSETS = [
   './',
   './index.html',
