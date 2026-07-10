@@ -5,6 +5,8 @@ const ASSETS = [
   './',
   './index.html',
   `./styles.css?build=${BUILD_QS}`,
+  `./styles_lore_layer.css?build=${BUILD_QS}`,
+  `./styles_visual_weight.css?build=${BUILD_QS}`,
   `./app.js?build=${BUILD_QS}`,
   './manifest.json',
   `./js/systems/00_core_constants_data.js?build=${BUILD_QS}`,
