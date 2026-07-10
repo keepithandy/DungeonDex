@@ -9,7 +9,7 @@
 	const CONTRACTS_COLUMN_ID = 'lowfireEliteContractsColumn';
 	const STYLE_ID = 'lowfireRevisitBoardPairStyle';
 	const PLACEHOLDER_ID = 'lowfireRevisitPlaceholder';
-	let renderTownPatched = false;
+	let sweepCount = 0;
 
 	function townBoardShell() {
 		return document.querySelector('#questPanel .town-board-shell');
@@ -37,6 +37,9 @@
 			'  display: grid;',
 			'  gap: 8px;',
 			'  align-content: start;',
+			'}',
+			'.lowfire-elite-contracts-column .elite-contract-list {',
+			'  display: contents;',
 			'}',
 			'.lowfire-revisit-board-slot .revisit-foundation-panel,',
 			'.lowfire-revisit-board-slot .lowfire-revisit-placeholder {',
@@ -127,6 +130,23 @@
 		}
 	}
 
+	function generatedRevisitPanel() {
+		const helper = window.earlierDungeonRevisitMarkup || globalThis.earlierDungeonRevisitMarkup;
+		if (typeof helper !== 'function') return null;
+		const html = helper();
+		if (!html) return null;
+		const holder = document.createElement('div');
+		holder.innerHTML = html;
+		return holder.querySelector('#revisitPanel') || holder.firstElementChild || null;
+	}
+
+	function clearOriginalHeaderSlot(panel) {
+		const headerSlot = document.getElementById('revisitFoundationSlot');
+		if (!headerSlot) return;
+		if (panel && headerSlot.contains(panel)) return;
+		headerSlot.innerHTML = '';
+	}
+
 	function moveRevisitPanelIntoLowfireBoard() {
 		const shell = townBoardShell();
 		if (!shell) return false;
@@ -138,12 +158,16 @@
 		const slot = ensureBoardSlot();
 		ensureContractBody(eliteBoard, slot);
 
-		const panel = document.getElementById('revisitPanel');
+		let panel = document.getElementById('revisitPanel');
+		if (!panel) panel = generatedRevisitPanel();
 		renderPlaceholderIfNeeded(slot, panel);
 
 		if (panel && panel.parentElement !== slot) {
+			slot.innerHTML = '';
 			slot.appendChild(panel);
 		}
+
+		clearOriginalHeaderSlot(panel);
 		return true;
 	}
 
@@ -154,30 +178,21 @@
 			window.setTimeout(moveRevisitPanelIntoLowfireBoard, 0);
 		}
 		window.setTimeout(moveRevisitPanelIntoLowfireBoard, 60);
+		window.setTimeout(moveRevisitPanelIntoLowfireBoard, 180);
 	}
 
-	function patchRenderTown() {
-		if (renderTownPatched) return;
-		const original = window.renderTown || globalThis.renderTown;
-		if (typeof original !== 'function' || original.__lowfireRevisitBoardSlot) return;
-
-		const wrapped = function(){
-			const result = original.apply(this, arguments);
-			scheduleMove();
-			return result;
-		};
-		wrapped.__lowfireRevisitBoardSlot = true;
-		window.renderTown = wrapped;
-		renderTownPatched = true;
+	function sweepMove() {
+		scheduleMove();
+		sweepCount += 1;
+		if (sweepCount < 30) window.setTimeout(sweepMove, 200);
 	}
 
-	patchRenderTown();
-	window.addEventListener('DOMContentLoaded', function(){ patchRenderTown(); scheduleMove(); }, { passive: true });
-	window.addEventListener('load', function(){ patchRenderTown(); scheduleMove(); }, { passive: true });
+	window.addEventListener('DOMContentLoaded', sweepMove, { passive: true });
+	window.addEventListener('load', sweepMove, { passive: true });
+	sweepMove();
 
-	const townScreen = document.getElementById('screen-town');
-	if (townScreen && 'MutationObserver' in window) {
+	if ('MutationObserver' in window) {
 		const observer = new MutationObserver(scheduleMove);
-		observer.observe(townScreen, { childList: true, subtree: true });
+		observer.observe(document.documentElement || document.body, { childList: true, subtree: true });
 	}
 })();
