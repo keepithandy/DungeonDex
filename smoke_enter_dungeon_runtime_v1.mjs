@@ -340,6 +340,37 @@ async function main() {
       );
     }
 
+    await client.send('Emulation.setDeviceMetricsOverride', { width: 500, height: 900, deviceScaleFactor: 1, mobile: false });
+    await sleep(100);
+    const runLayout = await evaluate(client, `(() => {
+      const stack = document.querySelector('#screen-run .stack-8');
+      const status = document.getElementById('runStatus');
+      const log = document.getElementById('combatLog');
+      const statusContent = status?.firstElementChild;
+      const logHead = log?.querySelector('.run-log-head');
+      const logList = log?.querySelector('.run-log-list');
+      if (!stack || !status || !log || !statusContent || !logHead || !logList) return null;
+      const statusRect = status.getBoundingClientRect();
+      const statusContentRect = statusContent.getBoundingClientRect();
+      const logRect = log.getBoundingClientRect();
+      const logHeadRect = logHead.getBoundingClientRect();
+      const logListRect = logList.getBoundingClientRect();
+      return {
+        stackMinHeight: getComputedStyle(stack).minHeight,
+        stackAlignContent: getComputedStyle(stack).alignContent,
+        statusExtraHeight: statusRect.height - statusContentRect.height,
+        logExtraHeight: logRect.height - logHeadRect.height - logListRect.height
+      };
+    })()`);
+    record(
+      'Run panels size to content instead of stretching to the viewport',
+      runLayout?.stackMinHeight === '0px'
+        && runLayout?.stackAlignContent === 'start'
+        && runLayout?.statusExtraHeight <= 24
+        && runLayout?.logExtraHeight <= 28,
+      JSON.stringify(runLayout)
+    );
+
     const feedProbe = await evaluate(client, `(() => {
       S.run.combatLog = [
         'Mireborn Herald hits for 18. The submerged blade drives through the Warden guard and shakes the old stone corridor.',

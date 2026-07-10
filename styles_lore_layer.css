@@ -1145,6 +1145,12 @@ button,
   overflow: visible !important;
 }
 
+.app-shell.combat-active #screen-run .stack-8 {
+  min-height: 0 !important;
+  align-content: start;
+  grid-auto-rows: max-content;
+}
+
 .app-shell.combat-active .run-log-list {
   box-sizing: border-box;
   min-height: clamp(84px, 14dvh, 108px);
