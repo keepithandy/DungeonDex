@@ -1,14 +1,15 @@
-// DungeonDex v1.23.8.09 runtime pointer.
+// DungeonDex v1.25.0 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.23.8.09: Build Label Alignment
-// - Visible browser/build labels now match version and cache authority.
-// - App wiring smoke rejects mixed visible-build and cache-query labels.
+// v1.25.0: Visual Identity + Side Rail Release
+// - Custom header crest and Hollow Stair gate assets are now part of the live identity layer.
+// - Lowfire Forge is the player-facing forge name while legacy relic forge internals remain compatibility-safe.
+// - Guild navigation now uses a side rail with hover/focus reveal and touch/mobile tap toggle.
 // - Gameplay, save data, and system activation remain unchanged.
 
-window.DUNGEONDEX_BUILD = '1.23.8.09';
-window.DUNGEONDEX_BUILD_QS = '1.23.8.09-build-label-alignment';
+window.DUNGEONDEX_BUILD = '1.25.0';
+window.DUNGEONDEX_BUILD_QS = '1.25.0-visual-identity-side-rail';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -55,7 +56,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.23.8.09-build-label-alignment';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.25.0-visual-identity-side-rail';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
@@ -105,7 +106,7 @@ window.ddGetMonsterCue = function(name){
       return;
     }
     if (kind === "player-hit" || kind === "hurt"){
-      ddPulse(player || stage, "player-hit", 260);
+      ddPulse(player, "player-hit", 260);
       return;
     }
     if (kind === "heavy" || kind === "crit"){
