@@ -55,7 +55,7 @@
     slot.classList.add('app-title-lockup');
     var crest = document.createElement('img');
     crest.className = 'app-crest';
-    crest.src = './assets/img/ui/dungeondex-crest.png';
+    crest.src = './assets/img/ui/dungeondex-crest.svg';
     crest.alt = '';
     crest.setAttribute('aria-hidden', 'true');
     crest.decoding = 'async';
