@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.23.8.09 - Build Label Alignment
+- DungeonDex v1.25.0 - Visual Identity + Side Rail Release
+
+## v1.25.0 Visual Identity + Side Rail Release
+- Added the first custom DungeonDex crest asset and the Hollow Stair gate Town visual.
+- Polished the Hollow Stair gate art for clearer arch, stair, and ember readability.
+- Renamed player-facing Relic Forge copy to Lowfire Forge while preserving legacy filenames, globals, and save fields.
+- Replaced the fixed bottom navigation with a side rail that expands on hover/focus and opens by tap toggle on touch/mobile devices.
+- Runtime/cache/version authority labels are now `v1.25.0`.
+- Service-worker cache now includes the custom crest and Hollow Stair gate SVG assets.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Revisit, Echo, or Relic collection behavior changed.
 
 ## v1.23.8.09 Build Label Alignment
 - Visible browser/build labels now agree with the runtime, cache, and version authority.
