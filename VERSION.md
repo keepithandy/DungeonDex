@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.23.8.09 Build Label Alignment
+v1.25.0 Visual Identity + Side Rail Release
 
 ## Current Local Package Version
-v1.23.8.09 Build Label Alignment
+v1.25.0 Visual Identity + Side Rail Release
 
 ## Current Development Target
-v1.23.8.09 Build Label Alignment
+v1.25.0 Visual Identity + Side Rail Release
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
