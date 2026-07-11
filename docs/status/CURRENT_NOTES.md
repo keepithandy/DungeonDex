@@ -99,7 +99,7 @@
 - Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys summarize into one readable display model.
 - Duplicate Rival Trace display records collapse by canonical trace identity.
 - The Guild Journal Rival Traces row consumes the readable summary and remains read-only.
-- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, and Journal rendering, and Famous Gear compatibility.
+- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
 - The compact smoke suite passed 20/20 for this branch before final label alignment.
 
 ## v1.23.5 Famous Gear Memory v1 Completion
@@ -117,3 +117,8 @@
 - The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
 - The Guild Journal Boss Trophy section consumes the completed readable summary and remains read-only.
 - `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
+
+## Current Revisit Lane Status
+- Trophy Echo: live town memory lane tied to boss trophy or boss record history.
+- Famous Gear Memory: live town archive lane tied to retired gear records.
+- Rival Trace: live town archive trace tied to named rival elite history.
