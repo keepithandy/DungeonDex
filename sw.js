@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.25.2-revisit-source-slot';
+const CACHE_NAME = 'dungeondex-v1.26.0-trophy-echo-only';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.25.2-revisit-source-slot';
+const BUILD_QS = '1.26.0-trophy-echo-only';
 const ASSETS = [
   './',
   './index.html',

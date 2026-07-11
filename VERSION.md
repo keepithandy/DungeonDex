@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.25.2 Revisit No-op Stability + Version Alignment
+v1.26.0 Trophy Echo Only Revisit
 
 ## Current Local Package Version
-v1.25.2 Revisit No-op Stability + Version Alignment
+v1.26.0 Trophy Echo Only Revisit
 
 ## Current Development Target
-v1.25.2 Revisit No-op Stability + Version Alignment
+v1.26.0 Trophy Echo Only Revisit
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
