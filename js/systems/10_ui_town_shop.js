@@ -385,6 +385,7 @@ function renderTown() {
 	const questPanel = el('questPanel');
 	const merchantPanel = el('merchantPanel');
 	const forgePanel = el('forgePanel');
+	const revisitBoardMarkup = earlierDungeonRevisitMarkup();
 	if (questPanel) questPanel.classList.add('town-section-shell', 'town-board-shell');
 	if (merchantPanel) merchantPanel.classList.add('town-section-shell', 'town-market-shell');
 	if (forgePanel) forgePanel.classList.add('town-section-shell', 'town-forge-shell');
@@ -395,7 +396,7 @@ function renderTown() {
 	if (el('districtName')) el('districtName').textContent = districtDisplay.name || stagingDistrict.name || 'Lowfire District';
 	if (el('districtLine')) el('districtLine').innerHTML = `<span class="district-subtitle">${escapeHtml(districtDisplay.subtitle || stagingDistrict.line || 'Steady stair.')}</span><br><span class="district-mood">${escapeHtml(districtDisplay.shortFlavor || stagingDistrict.mood || '')}</span><br><span class="district-next-descent">Next descent: ${escapeHtml(`F${format(nextDescent.floorNumber)} • R${format(nextDescent.roomWithinFloor)} • C${format(nextDescent.chapterWithinRoom)}`)}.</span><br><span class="district-next-descent">${escapeHtml(progressionStatusLine)}</span>`;
 	if (el('districtWalletSlot')) el('districtWalletSlot').innerHTML = districtWalletMarkup(S);
-	if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = earlierDungeonRevisitMarkup();
+	if (el('revisitFoundationSlot')) el('revisitFoundationSlot').innerHTML = '';
 	if (el('startRunBtn')) el('startRunBtn').textContent = S.run.active ? 'Continue Run' : 'Enter Dungeon';
 	const restCostNode = el('restCostPill');
 	if (restCostNode) {
@@ -432,6 +433,7 @@ function renderTown() {
               <div class="xpbar"><div class="xpfill" style="width:${(q.progress/q.goal)*100}%"></div></div>
             </div>`).join('')}
         </div>
+        ${revisitBoardMarkup}
         ${eliteContractBoardMarkup(S)}
       </div>`;
 
