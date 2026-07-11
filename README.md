@@ -20,7 +20,7 @@ Focused merchant-upgrade checks are available with:
 node smoke_merchant_gear_upgrades_v1238.mjs
 ```
 
-Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, safe Revisit lanes, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal. The unstable post-render Revisit relocation helper is disabled in v1.25.2 for mobile/Textastic stability; Revisit placement should be handled by a future source-render patch. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
+Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, safe Revisit lanes, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal. The unstable post-render Revisit relocation loop is disabled in v1.25.2 for mobile/Textastic stability; the current source-slot bridge uses a cache-busted loader so Revisit placement can be verified without changing Revisit mechanics. Board Echo and Debt Pressure remain planned/locked until their focused issues land.
 
 ## Player Promise
 
@@ -69,7 +69,7 @@ These systems may appear in docs or locked/planned copy, but they should not be 
 - **Board Echo v1:** Next safe Revisit memory-lane candidate.
 - **Debt Pressure v1:** Debt readability and recovery lane.
 - **Public copy smoke coverage:** Stable smoke checks for important player-facing labels.
-- **Revisit source-render placement:** Move Revisit beside Elite Contracts inside the town renderer without post-render DOM movers.
+- **Revisit source-render placement:** Move Revisit beside Elite Contracts inside the town renderer without post-render DOM mover loops.
 - **Revisit flavor pass:** Copy polish for live lanes without changing mechanics.
 - **Asset hygiene:** Source/license inventory for icons, fonts, screenshots, and other public-facing assets.
 
