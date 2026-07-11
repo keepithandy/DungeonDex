@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.25.2 - Revisit No-op Stability + Version Alignment
+- DungeonDex v1.26.0 - Trophy Echo Only Revisit
+
+## v1.26.0 Trophy Echo Only Revisit
+- Revisit is now a focused Trophy Echo-only player-facing system.
+- The Revisit panel remains housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board.
+- Trophy Echo stays available from boss trophy or boss record history only.
+- The locked Revisit state now points only to Trophy Echo requirements: defeat a boss and create boss trophy/boss record history.
+- Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are removed from the active Revisit surface for this release.
+- Build/cache labels now use `1.26.0-trophy-echo-only`.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Elite Board, Spark Writ, gear, monster, or economy behavior changed.
 
 ## v1.25.2 Revisit No-op Stability + Version Alignment
 - Disabled the unstable post-render Revisit relocation helper after mobile/Textastic lag and unresponsive button reports.
@@ -59,7 +68,7 @@
 
 ## v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
 - The gear detail compare note now explains that an upgraded equipped item keeps its tier if replaced.
-- The note also clarifies that new gear equips at its own upgrade tier instead of inheriting the old item’s tier.
+- The note also clarifies that new gear equips at its own upgrade tier instead of inheriting the equipped item’s upgrade level.
 - Runtime/cache/version authority labels were previously `v1.23.8.04`.
 
 ## v1.23.8.01 Gear Section Polish
@@ -79,46 +88,6 @@
 - `smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- The current open issue set is grouped into playable/system completion, identity/documentation, visual/asset readiness, and smoke hardening tracks.
-- `docs/OPEN_ISSUE_SWEEP.md` maps issues #36 through #51 to concrete repo surfaces and next actions.
-- `docs/PLAYABLE_SYSTEMS_QUEUE.md` defines safe focused boundaries for Board Echo v1 and Debt Pressure v1.
-- `docs/IP_LAYER_GUIDE.md` defines the current premise, glossary, visual identity direction, lore bible, factions/roles, copy rules, README direction, title/logo usage, screenshot plan, Revisit flavor direction, smoke copy targets, public roadmap categories, and loading/title copy.
-- `docs/ASSET_INVENTORY.md` creates the first asset provenance scaffold.
-- The sweep docs remain reference material only. The current runtime baseline is the merchant-upgrade patch described above.
-
-## v1.23.7 Rival Trace Result Detail Polish
-- Rival Trace now exposes a clearer read-only Guild Journal completed-result detail line.
-- Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys still summarize into one readable display model.
-- Duplicate Rival Trace display records still collapse by canonical trace identity.
-- The Guild Journal Rival Traces row now includes rival name, route/status, completed state, memory key/id, flavor summary, and last completed label in read-only copy.
-- `smoke_rival_trace_memory_v1.mjs` now verifies the completed-result detail appears after a Rival Trace completion, along with the existing empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
-- The compact smoke suite remains the branch verification target.
-
-## v1.23.6 Rival Trace Memory v1 Completion
-- Rival Trace now has a read-only Guild Journal summary helper.
-- Modern Rival Trace history records, active trace records, elite rival records, legacy string history entries, and `rival_trace:*` completed keys summarize into one readable display model.
-- Duplicate Rival Trace display records collapse by canonical trace identity.
-- The Guild Journal Rival Traces row consumes the readable summary and remains read-only.
-- `smoke_rival_trace_memory_v1.mjs` verifies empty state, duplicate collapse, legacy key detection, string-history compatibility, JSON reload stability, Journal rendering, and Famous Gear compatibility.
-- The compact smoke suite passed 20/20 for this branch before final label alignment.
-
-## v1.23.5 Famous Gear Memory v1 Completion
-- Famous Gear Memory v1 records retired gear archive memories as durable, readable progression memory records.
-- Legacy string entries and partial records normalize into one canonical duplicate-safe record list.
-- Duplicate records collapse by completion/record identity across repeated normalization, save/reload, and mixed legacy/modern state.
-- The read-only Famous Gear summary reports count, readable names, source labels, latest memory, legacy detection, duplicate-collapse status, duplicate safety, and empty-state copy.
-- The Guild Journal Famous Gear section consumes the readable summary and remains read-only.
-- `smoke_famous_gear_memory_v1.mjs` verifies duplicate collapse, reload persistence, summary output, and Journal rendering.
-
-## v1.23.4 Boss Trophy v1 Completion
-- Boss Trophy v1 records earned boss trophies as durable, readable progression memory records.
-- Modern records and legacy trophy IDs normalize into one canonical duplicate-safe record list.
-- Duplicate records collapse by trophy identity across repeated awards, normalization, save/reload, and mixed legacy/modern trophy state.
-- The read-only Boss Trophy summary reports count, trophy names, source names, latest trophy, legacy ID detection, duplicate-collapse status, and empty-state copy.
-- The Guild Journal Boss Trophy section consumes the completed readable summary and remains read-only.
-- `smoke_boss_trophy_v1.mjs` verifies persistence, duplicate safety, legacy compatibility, Journal integration, and adjacent-system neutrality.
-
-## Current Revisit Lane Status
-- Trophy Echo: live town memory lane tied to boss trophy or boss record history.
-- Famous Gear Memory: live town archive lane tied to retired gear records.
-- Rival Trace: live town archive trace tied to named rival elite history.
+- Current runtime baseline is v1.26.0 Trophy Echo Only Revisit.
+- Existing sweep docs remain reference material only and may include older Revisit planning language.
+- Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
