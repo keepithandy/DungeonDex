@@ -13,7 +13,7 @@ const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const BOARD_SELECTOR = '#questPanel .town-board-shell, #questPanel.town-board-shell, .town-section-shell.town-board-shell';
 const REVISIT_SELECTOR = '.town-section-shell.town-board-shell #revisitPanel, #questPanel #revisitPanel, #revisitPanel';
 const ELITE_SELECTOR = '.town-section-shell.town-board-shell .elite-contract-board, #questPanel .elite-contract-board, .elite-contract-board';
-const TROPHY_START_SELECTOR = `${REVISIT_SELECTOR} [data-start-revisit="trophy_echo_route"]`;
+const TROPHY_START_SELECTOR = '#revisitPanel [data-start-revisit="trophy_echo_route"]';
 
 const results = [];
 const consoleErrors = [];
