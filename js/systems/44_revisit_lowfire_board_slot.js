@@ -1,52 +1,129 @@
 'use strict';
 
-// v1.25.2 Revisit source-render empty shell.
-// Revisit placement is owned by source renderers; this module only gives
-// earlierDungeonRevisitMarkup() a stable locked-state fallback when no lane
-// is currently visible. It does not move DOM nodes or install timing loops.
+// v1.26.0 Revisit surface: Trophy Echo only.
+// Revisit placement is owned by source renderers. This module does not move DOM
+// nodes, observe mutations, or install timing placement loops. It only narrows
+// the player-facing Revisit surface to the one finished lane: Trophy Echo.
 (function(){
-	function emptyRevisitShellMarkup(){
+	const H = value => typeof escapeHtml === 'function'
+		? escapeHtml(value)
+		: String(value ?? '').replace(/[&<>\"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;' }[c]));
+	const C = (value, fallback = '') => typeof cleanDisplayText === 'function'
+		? cleanDisplayText(value, fallback)
+		: String(value || fallback || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+	const N = value => Math.max(0, Math.floor(Number(value) || 0));
+
+	function trophyStatus(){
+		const api = window.DungeonDexEliteContracts || {};
+		return typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
+	}
+
+	function trophyOnlyRevisitMarkup(){
+		const status = trophyStatus();
+		const active = status?.activeEcho || null;
+		const lastResult = status?.lastResult || null;
+		const source = status?.source || active || null;
+		const locked = !status || status.locked === true || status.available !== true;
+		const bossName = C(source?.bossName || active?.bossName, 'Unknown Boss');
+		const trophyName = C(source?.trophyName || active?.trophyName, 'Boss Trophy');
+		const historyCount = N(status?.historyCount);
+		const memoryMarks = N(status?.memoryMarks);
+		const completedCount = N(status?.completedCount);
+		const stateLabel = active ? 'Active' : locked ? 'Locked' : 'Playable';
+		const cardClass = active ? 'active' : 'ready';
+		const summaryLine = active
+			? C(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
+			: locked
+				? 'Defeat a boss and record a boss trophy before Trophy Echo can open.'
+				: `${bossName} is ready as a playable Trophy Echo.`;
+		const flavorLine = active
+			? C(active.reflection || '', '')
+			: locked
+				? 'This Revisit system now focuses only on Trophy Echo. Bring back proof of a boss kill, then return here to read the memory.'
+				: `The ${trophyName} still remembers ${bossName}. Start the echo from town and resolve the memory before the next descent.`;
+		const nextLine = active
+			? 'Next: resolve the active Trophy Echo in town.'
+			: locked
+				? 'Next: defeat a boss, earn a boss trophy or boss record, then return to this board.'
+				: 'Next: start Trophy Echo from town; rewards stay memory-only.';
+		const actionMarkup = active
+			? '<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>'
+			: locked
+				? '<button class="ghost" type="button" disabled aria-disabled="true">Trophy Echo Locked</button>'
+				: '<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>';
+		const resultMarkup = lastResult
+			? `<div class="small revisit-echo-result"><strong>Last Result:</strong> ${H(C(lastResult.summary || '', ''))}</div>`
+			: '';
+
 		return `
-			<section class="panel revisit-foundation-panel" id="revisitPanel" aria-label="Revisit panel">
+			<section class="panel revisit-foundation-panel revisit-trophy-echo-only" id="revisitPanel" aria-label="Trophy Echo Revisit panel">
 				<div class="card-head">
 					<div>
 						<h2>Revisit</h2>
-						<p>Short memory lanes tied to DungeonDex history.</p>
+						<p>Trophy Echo is the only active Revisit lane for v1.26.0.</p>
 					</div>
 				</div>
-				<article class="quest-card revisit-lane-card ready revisit-empty-state-card">
+				<article class="quest-card revisit-echo-card ${cardClass}">
 					<div class="quest-topline">
-						<strong>No Revisit lane ready yet</strong>
-						<span class="small muted">Locked</span>
+						<strong>Trophy Echo</strong>
+						<span class="small ${active ? '' : 'muted'}">${H(stateLabel)}</span>
 					</div>
-					<p class="small">Defeat a boss, retire notable gear, or record rival history to unlock a memory lane.</p>
-					<p class="small muted">This is a town memory board only. No gameplay, rewards, combat, debt, or Talent values change here.</p>
-					<div class="small muted">Next: keep playing the main dungeon loop until a Revisit source exists.</div>
+					<p class="small">${H(summaryLine)}</p>
+					<p class="small muted">${H(flavorLine)}</p>
+					<div class="small muted">Boss history ${historyCount} • Memory Marks ${memoryMarks} • Recorded echoes ${completedCount}</div>
+					<div class="small muted">Trophy Echo is memory-only: no gear, coin, combat, debt, Talent, or dungeon-entry changes.</div>
+					<div class="small muted">${H(nextLine)}</div>
+					${active ? `<div class="small muted">Active Memory: ${H(C(active.memoryTitle || bossName, bossName))}</div>` : ''}
 					<div class="inline-actions revisit-echo-actions">
-						<button class="ghost" type="button" disabled aria-disabled="true">Revisit Locked</button>
+						${actionMarkup}
 					</div>
+					${resultMarkup}
 				</article>
 			</section>`;
 	}
 
-	const original = typeof earlierDungeonRevisitMarkup === 'function'
-		? earlierDungeonRevisitMarkup
-		: (typeof window.earlierDungeonRevisitMarkup === 'function' ? window.earlierDungeonRevisitMarkup : null);
-
-	if (!original || original.__ddRevisitStableEmptyShellWrapped) {
-		window.__dungeondexRevisitSourceRendered = true;
-		window.__dungeondexRevisitStableEmptyShell = true;
-		return;
+	function trophyOnlyRoutes(routes){
+		return Array.isArray(routes) ? routes.filter(route => String(route?.key || '') === 'trophy_echo_route') : [];
 	}
 
-	const wrapped = function(){
-		const markup = original.apply(this, arguments);
-		return String(markup || '').trim() ? markup : emptyRevisitShellMarkup();
-	};
-	wrapped.__ddRevisitStableEmptyShellWrapped = true;
+	function installTrophyOnlyApiFilter(){
+		const api = window.DungeonDexEliteContracts || null;
+		if (!api || api.__ddTrophyEchoOnlyApi) return;
+		if (typeof api.revisitRoutePreviews === 'function') {
+			const originalRoutePreviews = api.revisitRoutePreviews;
+			api.revisitRoutePreviews = function(){
+				return trophyOnlyRoutes(originalRoutePreviews.apply(this, arguments));
+			};
+		}
+		if (typeof api.revisitRouteSummary === 'function') {
+			api.revisitRouteSummary = function(state){
+				const routes = trophyOnlyRoutes(typeof api.revisitRoutePreviews === 'function' ? api.revisitRoutePreviews(state) : []);
+				const finishedRoutes = routes.filter(route => route.completed === true || route.active === true || route.playable === true);
+				const unfinishedRoutes = routes.filter(route => route.completed !== true && route.active !== true && route.playable !== true);
+				return {
+					total: routes.length,
+					finished: finishedRoutes.length,
+					unfinished: unfinishedRoutes.length,
+					planned: 0,
+					active: routes.filter(route => route.active === true).length,
+					playable: routes.filter(route => route.playable === true).length,
+					future: 0,
+					locked: routes.filter(route => route.locked).length,
+					finishedRoutes,
+					unfinishedRoutes
+				};
+			};
+		}
+		api.__ddTrophyEchoOnlyApi = true;
+	}
 
-	try { earlierDungeonRevisitMarkup = wrapped; } catch(_) {}
-	window.earlierDungeonRevisitMarkup = wrapped;
-	window.__dungeondexRevisitSourceRendered = true;
-	window.__dungeondexRevisitStableEmptyShell = true;
+	function installTrophyOnlyRevisitSurface(){
+		try { earlierDungeonRevisitMarkup = trophyOnlyRevisitMarkup; } catch(_) {}
+		window.earlierDungeonRevisitMarkup = trophyOnlyRevisitMarkup;
+		installTrophyOnlyApiFilter();
+		window.__dungeondexRevisitSourceRendered = true;
+		window.__dungeondexRevisitTrophyEchoOnly = true;
+	}
+
+	installTrophyOnlyRevisitSurface();
 })();
