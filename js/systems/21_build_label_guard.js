@@ -8,7 +8,7 @@
 
   const BUILD = '1.25.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.25.2-revisit-noop-stability';
+  const BUILD_QS = '1.25.2-revisit-source-slot';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;
