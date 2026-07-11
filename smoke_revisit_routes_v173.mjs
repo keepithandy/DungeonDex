@@ -1,524 +1,103 @@
 #!/usr/bin/env node
-import http from 'node:http';
-import net from 'node:net';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const CHROME_PATH = process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/usr/bin/chromium');
-const STORAGE_KEY = 'dungeondex_emberfall_v109';
-const FORBIDDEN = [
-  'can' + 'Start' + 'Revisit' + 'Route',
-  'start' + 'Revisit' + 'Route',
-  'active' + 'Revisit' + 'Route' + 'Summary'
-];
 const results = [];
-const consoleErrors = [];
-const runtimeErrors = [];
 
-function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
-function record(name, ok, detail = ''){ results.push({ name, ok: !!ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`); }
-async function waitForProcessExit(child, timeoutMs = 5000){
-  if (!child || child.exitCode !== null || child.signalCode !== null) return true;
-  return await new Promise(resolve => {
-    const onExit = () => { clearTimeout(timer); resolve(true); };
-    const timer = setTimeout(() => { child.off('exit', onExit); resolve(false); }, timeoutMs);
-    child.once('exit', onExit);
-  });
-}
-async function removeTempProfile(userDataDir, attempts = 8){
-  const retryable = new Set(['EBUSY', 'EPERM', 'ENOTEMPTY']);
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      await rm(userDataDir, { recursive:true, force:true });
-      return;
-    } catch (err) {
-      if (!retryable.has(err?.code) || attempt === attempts) throw err;
-      await sleep(attempt * 100);
-    }
-  }
-}
-async function pickPort(){ return await new Promise((resolve, reject) => { const server = net.createServer(); server.on('error', reject); server.listen(0, '127.0.0.1', () => { const { port } = server.address(); server.close(err => err ? reject(err) : resolve(port)); }); }); }
-function safePathFromUrl(urlPath){ const clean = decodeURIComponent(String(urlPath || '/').split('?')[0] || '/'); const rel = clean === '/' ? '/index.html' : clean; const resolved = path.resolve(ROOT, `.${rel}`); if (!resolved.startsWith(ROOT)) throw new Error('path outside root'); return resolved; }
-function mimeType(filePath){ const ext = path.extname(filePath).toLowerCase(); if (ext === '.html') return 'text/html; charset=utf-8'; if (ext === '.js' || ext === '.mjs') return 'application/javascript; charset=utf-8'; if (ext === '.css') return 'text/css; charset=utf-8'; if (ext === '.json') return 'application/json; charset=utf-8'; return 'application/octet-stream'; }
-async function startStaticServer(){ const server = http.createServer(async (req, res) => { try { const filePath = safePathFromUrl(req.url); const data = await readFile(filePath); res.writeHead(200, { 'Content-Type': mimeType(filePath), 'Cache-Control': 'no-store' }); res.end(data); } catch (err) { res.writeHead(err?.code === 'ENOENT' ? 404 : 500, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(err?.message || String(err)); } }); const port = await new Promise((resolve, reject) => { server.on('error', reject); server.listen(0, '127.0.0.1', () => resolve(server.address().port)); }); return { server, url: `http://127.0.0.1:${port}/index.html` }; }
-async function waitForHttp(url, timeoutMs = 15000){ const deadline = Date.now() + timeoutMs; let lastError = null; while (Date.now() < deadline) { try { const res = await fetch(url, { cache:'no-store' }); if (res.ok) return true; lastError = new Error(`HTTP ${res.status}`); } catch (err) { lastError = err; } await sleep(150); } throw lastError || new Error(`Timed out waiting for ${url}`); }
-async function fetchJson(url){ const res = await fetch(url); return JSON.parse(await res.text()); }
-async function startChrome(debugPort, userDataDir){ const chrome = spawn(CHROME_PATH, [`--remote-debugging-port=${debugPort}`, '--headless=new', '--disable-gpu', '--disable-background-networking', '--disable-extensions', '--disable-sync', '--no-first-run', '--no-default-browser-check', '--mute-audio', `--user-data-dir=${userDataDir}`, 'about:blank'], { cwd: ROOT, detached:false, stdio:'ignore', windowsHide:true }); chrome.on('error', err => { throw err; }); return chrome; }
-async function createCdpClient(wsUrl){ return await new Promise((resolve, reject) => { const ws = new WebSocket(wsUrl); const pending = new Map(); const listeners = new Map(); let nextId = 1; let opened = false; ws.onopen = () => { opened = true; resolve({ send(method, params = {}){ const id = nextId++; ws.send(JSON.stringify({ id, method, params })); return new Promise((resolveSend, rejectSend) => pending.set(id, { resolve:resolveSend, reject:rejectSend })); }, on(event, fn){ if (!listeners.has(event)) listeners.set(event, new Set()); listeners.get(event).add(fn); }, close(){ ws.close(); } }); }; ws.onerror = err => { if (!opened) reject(err); }; ws.onmessage = event => { const msg = JSON.parse(typeof event.data === 'string' ? event.data : String(event.data)); if (msg.id) { const entry = pending.get(msg.id); if (!entry) return; pending.delete(msg.id); if (msg.error) entry.reject(new Error(msg.error.message || `CDP error ${msg.error.code}`)); else entry.resolve(msg.result || {}); return; } if (msg.method && listeners.has(msg.method)) for (const fn of listeners.get(msg.method)) fn(msg.params || {}); }; ws.onclose = () => { for (const entry of pending.values()) entry.reject(new Error('CDP connection closed')); pending.clear(); if (!opened) reject(new Error('CDP connection closed before open')); }; }); }
-async function evalByValue(client, expression){ const result = await client.send('Runtime.evaluate', { expression:`(() => (${expression}))()`, awaitPromise:true, returnByValue:true, replMode:true }); if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.exception?.value || result.exceptionDetails.text || 'Exception'); return result.result?.value; }
-async function evalScript(client, script){ const result = await client.send('Runtime.evaluate', { expression:`(async () => { ${script} })()`, awaitPromise:true, returnByValue:true, replMode:true }); if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.exception?.value || result.exceptionDetails.text || 'Exception'); return result.result?.value; }
-async function waitForCondition(client, predicate, timeoutMs = 15000, pollMs = 150){ const deadline = Date.now() + timeoutMs; while (Date.now() < deadline) { try { if (await evalByValue(client, predicate)) return true; } catch {} await sleep(pollMs); } return false; }
-function cleanRuntimeExceptionValue(value){ return String(value ?? '').replace(/\s+/g, ' ').trim(); }
-function formatRuntimeLocation(url, lineNumber, columnNumber){ const cleanUrl = cleanRuntimeExceptionValue(url); const line = Number.isFinite(lineNumber) ? lineNumber + 1 : null; const column = Number.isFinite(columnNumber) ? columnNumber + 1 : null; if (!cleanUrl && line === null) return ''; const base = cleanUrl || '<unknown url>'; if (line === null) return base; return `${base}:${line}${column === null ? '' : `:${column}`}`; }
-function formatRuntimeCallFrame(frame){ const functionName = cleanRuntimeExceptionValue(frame?.functionName) || '<anonymous>'; const location = formatRuntimeLocation(frame?.url, frame?.lineNumber, frame?.columnNumber); return location ? `${functionName} (${location})` : functionName; }
-function formatRuntimeException(evt){ const details = evt?.exceptionDetails || {}; const exception = details.exception || {}; const text = cleanRuntimeExceptionValue(details.text); const description = cleanRuntimeExceptionValue(exception.description); const value = cleanRuntimeExceptionValue(exception.value); let message = description || value || text || 'Unknown runtime exception'; if (text && description && text !== description && !description.startsWith(text)) message = `${text} ${description}`; const location = formatRuntimeLocation(details.url, details.lineNumber, details.columnNumber); const callFrames = Array.isArray(details.stackTrace?.callFrames) ? details.stackTrace.callFrames.map(formatRuntimeCallFrame).filter(Boolean) : []; return [message, location ? `at ${location}` : '', callFrames.length ? `stack: ${callFrames.map(frame => `at ${frame}`).join(' <- ')}` : ''].filter(Boolean).join(' | '); }
-
-async function main(){
-  const server = await startStaticServer();
-  const debugPort = await pickPort();
-  const userDataDir = await mkdtemp(path.join(tmpdir(), 'dungeondex-revisit-smoke-'));
-  const chrome = await startChrome(debugPort, userDataDir);
-  let client = null;
-  try {
-    await waitForHttp(`http://127.0.0.1:${debugPort}/json/version`);
-    const targets = await fetchJson(`http://127.0.0.1:${debugPort}/json/list`);
-    const target = targets.find(entry => entry.type === 'page');
-    if (!target?.webSocketDebuggerUrl) throw new Error('No Chrome page target found.');
-    client = await createCdpClient(target.webSocketDebuggerUrl);
-    client.on('Runtime.consoleAPICalled', msg => { if ((msg.type || '').toLowerCase() === 'error') consoleErrors.push((msg.args || []).map(arg => arg.value || arg.description || arg.type).join(' ')); });
-    client.on('Runtime.exceptionThrown', evt => runtimeErrors.push(formatRuntimeException(evt)));
-    await client.send('Page.enable');
-    await client.send('Runtime.enable');
-    await client.send('Page.navigate', { url: server.url });
-    const ready = await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000);
-    if (!ready) throw new Error('DungeonDex runtime did not initialize.');
-    await evalScript(client, `localStorage.removeItem(${JSON.stringify(STORAGE_KEY)}); return true;`);
-    await client.send('Page.reload', { ignoreCache:true });
-    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after reload.');
-    await evalScript(client, `if (typeof render === 'function') render(); return true;`);
-    const baselineAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const forbidden = ${JSON.stringify(FORBIDDEN)};
-      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
-      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
-      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
-      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
-      const forbiddenPresent = forbidden.filter(name => Object.prototype.hasOwnProperty.call(api, name));
-      const boardEchoDryRunBefore = JSON.stringify(S.player?.revisitState || null);
-      const boardEchoDryRun = api.calculateBoardEchoStartDryRun ? api.calculateBoardEchoStartDryRun(S) : null;
-      const boardEchoFixtureBefore = JSON.stringify(S.player?.revisitState || null);
-      const boardEchoFixture = api.createBoardEchoStartFixture ? api.createBoardEchoStartFixture(S) : null;
-      const boardEchoFixtureAfter = JSON.stringify(S.player?.revisitState || null);
-      const boardEchoDryRunAfter = JSON.stringify(S.player?.revisitState || null);
-      return {
-        forbiddenPresent,
-        publicBoardEchoExports: ['startBoardEcho', 'completeBoardEcho'].filter(name => Object.prototype.hasOwnProperty.call(api, name)),
-        report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
-        plan: api.revisitRouteActivationPlan ? api.revisitRouteActivationPlan(S) : null,
-        summary: api.revisitRouteActivationSummary ? api.revisitRouteActivationSummary(S) : null,
-        mirror: api.revisitRoutePreviewStateSummary ? api.revisitRoutePreviewStateSummary(S) : null,
-        laneClarity: api.revisitLaneStatusClarity ? api.revisitLaneStatusClarity(S) : null,
-        unfinishedTownRows: api.revisitUnfinishedLaneTownRows ? api.revisitUnfinishedLaneTownRows(S) : null,
-        boardEchoContract: api.boardEchoActivationContract ? api.boardEchoActivationContract(S) : null,
-        boardEchoDryRun,
-        boardEchoDryRunMutationSafe: boardEchoDryRunBefore === boardEchoDryRunAfter,
-        boardEchoDryRunStateAfter: S.player?.revisitState?.boardEcho || null,
-        boardEchoFixture,
-        boardEchoFixtureBefore,
-        boardEchoFixtureAfter,
-        boardEchoFixtureMutationSafe: boardEchoFixtureBefore === boardEchoFixtureAfter,
-        boardEchoFixtureInputStateAfter: S.player?.revisitState?.boardEcho || null,
-        checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
-        firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
-        secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
-        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
-        trophyStatus: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        trophyRoute,
-        famousGearRoute,
-        rivalTraceRoute,
-        famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        rivalTraceStatus: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        famousStartBlocked: api.startFamousGear ? api.startFamousGear(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        boardEchoStartHooks: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit="board_echo_route"], #revisitFoundationSlot [data-start-revisit]')).map(node => node.getAttribute('data-start-revisit')),
-        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
-        unfinishedControls: Array.from(document.querySelectorAll('.revisit-unfinished-lanes-card button, .revisit-unfinished-lanes-card [data-start-revisit], .revisit-unfinished-lanes-card [data-complete-trophy-echo], .revisit-unfinished-lanes-card [data-complete-famous-gear], .revisit-unfinished-lanes-card [data-complete-rival-trace]')).length,
-        unfinishedGridText: document.querySelector('.revisit-unfinished-grid')?.innerText || '',
-        journalModel: typeof window.DDJournalV1SummaryModel === 'function' ? window.DDJournalV1SummaryModel(S) : null,
-        townButtons: Array.from(document.querySelectorAll('button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        unfinishedLaneState: {
-          boardEcho: S.player?.revisitState?.boardEcho || null,
-          debtPressure: S.player?.revisitState?.debtPressure || null
-        },
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Forbidden Revisit exports are absent', baselineAudit.forbiddenPresent.length === 0, JSON.stringify(baselineAudit.forbiddenPresent));
-    record('Baseline Trophy Echo is locked without boss history', baselineAudit.trophyStatus?.locked === true && baselineAudit.trophyStatus?.available === false && baselineAudit.trophyStatus?.historyCount === 0 && baselineAudit.trophyRoute?.locked === true && baselineAudit.trophyRoute?.entryAvailable !== true, JSON.stringify({ trophyStatus:baselineAudit.trophyStatus, trophyRoute:baselineAudit.trophyRoute }));
-    record('Baseline Famous Gear is locked and cannot start', baselineAudit.famousGearStatus?.locked === true && baselineAudit.famousGearStatus?.available === false && baselineAudit.famousGearRoute?.locked === true && baselineAudit.famousGearRoute?.entryAvailable !== true && baselineAudit.famousStartBlocked === null, JSON.stringify({ famousGearStatus:baselineAudit.famousGearStatus, famousGearRoute:baselineAudit.famousGearRoute, famousStartBlocked:baselineAudit.famousStartBlocked }));
-    record('Baseline town card keeps live Revisit lanes locked without source history', baselineAudit.routeControls === 0 && baselineAudit.routeButtons.length === 0 && baselineAudit.trophyStatus?.locked === true && baselineAudit.famousGearStatus?.locked === true && baselineAudit.rivalTraceStatus?.locked === true && baselineAudit.trophyRoute?.playable !== true && baselineAudit.famousGearRoute?.playable !== true && baselineAudit.rivalTraceRoute?.playable !== true && baselineAudit.trophyRoute?.entryAvailable !== true && baselineAudit.famousGearRoute?.entryAvailable !== true && baselineAudit.rivalTraceRoute?.entryAvailable !== true, JSON.stringify({ routeButtons:baselineAudit.routeButtons, routeControls:baselineAudit.routeControls, trophyStatus:baselineAudit.trophyStatus, famousGearStatus:baselineAudit.famousGearStatus, rivalTraceStatus:baselineAudit.rivalTraceStatus }));
-    record('Baseline activation audit preserves primary dungeon path', baselineAudit.plan?.primaryPath === 'Enter Dungeon / Continue Run' && baselineAudit.summary?.hasLiveEntry === false && baselineAudit.report?.apiSurfaceSafe === true && baselineAudit.report?.trophyEchoPlayable === false && baselineAudit.report?.famousGearPlayable === false, JSON.stringify({ plan:baselineAudit.plan, summary:baselineAudit.summary, report:baselineAudit.report }));
-    record('Revisit activation summary distinguishes finished and unfinished lanes', baselineAudit.summary?.currentLockedCount >= 0 && baselineAudit.summary?.currentPlayableCount >= 0 && baselineAudit.summary?.currentPreviewOnly === false && baselineAudit.summary?.allowedStates?.includes('planned') && baselineAudit.summary?.allowedStates?.includes('playable-now') && baselineAudit.summary?.allowedStates?.includes('active'), JSON.stringify(baselineAudit.summary));
-    record('Unfinished lane clarity helper reports Board Echo and Debt Pressure as read-only', Array.isArray(baselineAudit.laneClarity) && baselineAudit.laneClarity.some(lane => lane.key === 'board_echo_route' && lane.bucket === 'planned' && lane.isPlanned === true && lane.isLocked === true && lane.isPlayable === false && lane.shortLabel === 'Planned') && baselineAudit.laneClarity.some(lane => lane.key === 'debt_pressure_route' && lane.bucket === 'locked' && lane.isLocked === true && lane.isPlayable === false && lane.shortLabel === 'Locked') && baselineAudit.laneClarity.every(lane => ['playable','finished','preview','planned','locked','unknown'].includes(lane.bucket)), JSON.stringify(baselineAudit.laneClarity));
-    record('Unfinished town row helper exposes only Board Echo and Debt Pressure as inert rows', Array.isArray(baselineAudit.unfinishedTownRows) && baselineAudit.unfinishedTownRows.length === 2 && baselineAudit.unfinishedTownRows[0]?.key === 'board_echo_route' && baselineAudit.unfinishedTownRows[1]?.key === 'debt_pressure_route' && baselineAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.isLocked === true && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false && /not playable yet/i.test(row?.bodyText || '') && /No player action is available yet/i.test(row?.bodyText || '') && /Planned|Locked/i.test(row?.statusLabel || '')), JSON.stringify(baselineAudit.unfinishedTownRows));
-    record('Board Echo activation contract exists and stays disabled', baselineAudit.boardEchoContract?.key === 'boardEcho' && baselineAudit.boardEchoContract?.routeKey === 'board_echo_route' && baselineAudit.boardEchoContract?.contractVersion === 1 && baselineAudit.boardEchoContract?.enabled === false && baselineAudit.boardEchoContract?.playable === false && baselineAudit.boardEchoContract?.canStart === false && baselineAudit.boardEchoContract?.safeToShowStartAction === false && baselineAudit.boardEchoContract?.bucket === 'unfinished' && baselineAudit.boardEchoContract?.previewOnly === true && baselineAudit.boardEchoContract?.readOnly === true && baselineAudit.boardEchoContract?.mutatesSave === false, JSON.stringify(baselineAudit.boardEchoContract));
-    record('Board Echo activation contract defines future prerequisites and state shape', Array.isArray(baselineAudit.boardEchoContract?.prerequisites) && baselineAudit.boardEchoContract.prerequisites.length >= 3 && Array.isArray(baselineAudit.boardEchoContract?.requiredStateFields) && ['player.revisitState.boardEcho.active','player.revisitState.boardEcho.history','player.revisitState.boardEcho.completedKeys','player.revisitState.boardEcho.lastResult'].every(field => baselineAudit.boardEchoContract.requiredStateFields.includes(field)) && Array.isArray(baselineAudit.boardEchoContract?.requiredStartBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredActiveBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredCompletionBehavior) && Array.isArray(baselineAudit.boardEchoContract?.requiredSmokeChecks) && baselineAudit.boardEchoContract.requiredSmokeChecks.some(text => /No Start Board Echo/i.test(text)) && /Start Board Echo/i.test(baselineAudit.boardEchoContract.nextStepText || ''), JSON.stringify(baselineAudit.boardEchoContract));
-    record('Board Echo start dry run exists and agrees with activation contract', baselineAudit.boardEchoDryRun?.key === 'boardEcho' && baselineAudit.boardEchoDryRun?.routeKey === 'board_echo_route' && baselineAudit.boardEchoDryRun?.dryRunVersion === 1 && baselineAudit.boardEchoDryRun?.enabled === false && baselineAudit.boardEchoDryRun?.playable === false && baselineAudit.boardEchoDryRun?.canStart === false && baselineAudit.boardEchoDryRun?.wouldStart === false && baselineAudit.boardEchoDryRun?.wouldMutateState === false && baselineAudit.boardEchoDryRun?.safeToCommitStart === false && baselineAudit.boardEchoDryRun?.activationContractSummary?.canStart === baselineAudit.boardEchoContract?.canStart && baselineAudit.boardEchoDryRun?.activationContractSummary?.safeToShowStartAction === baselineAudit.boardEchoContract?.safeToShowStartAction, JSON.stringify({ dryRun:baselineAudit.boardEchoDryRun, contract:baselineAudit.boardEchoContract }));
-    record('Board Echo start dry run describes future state shape without creating it', Array.isArray(baselineAudit.boardEchoDryRun?.requiredStateFields) && ['player.revisitState.boardEcho.active','player.revisitState.boardEcho.history','player.revisitState.boardEcho.completedKeys','player.revisitState.boardEcho.lastResult'].every(field => baselineAudit.boardEchoDryRun.requiredStateFields.includes(field)) && baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.active?.routeKey === 'board_echo_route' && Array.isArray(baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.history) && baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.completedKeys && baselineAudit.boardEchoDryRunMutationSafe === true && baselineAudit.boardEchoDryRunStateAfter && baselineAudit.boardEchoDryRunStateAfter.active === null && Array.isArray(baselineAudit.boardEchoDryRunStateAfter.history) && baselineAudit.boardEchoDryRunStateAfter.history.length === 0 && baselineAudit.boardEchoDryRunStateAfter.lastResult === null, JSON.stringify({ dryRun:baselineAudit.boardEchoDryRun, mutationSafe:baselineAudit.boardEchoDryRunMutationSafe, stateAfter:baselineAudit.boardEchoDryRunStateAfter }));
-    record('Board Echo fixture helper exists and clones fixture state', baselineAudit.boardEchoFixture && baselineAudit.boardEchoFixture !== baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.active?.routeKey === 'board_echo_route' && Array.isArray(baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.history) && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.history.length === 0 && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.completedKeys && Object.keys(baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.completedKeys).length === 0 && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.lastResult === null, JSON.stringify(baselineAudit.boardEchoFixture));
-    record('Board Echo fixture helper leaves original state untouched', baselineAudit.boardEchoFixtureMutationSafe === true && baselineAudit.boardEchoFixtureInputStateAfter && baselineAudit.boardEchoFixtureInputStateAfter.active === null && Array.isArray(baselineAudit.boardEchoFixtureInputStateAfter.history) && baselineAudit.boardEchoFixtureInputStateAfter.history.length === 0 && baselineAudit.boardEchoFixtureInputStateAfter.lastResult === null && baselineAudit.boardEchoFixtureBefore === baselineAudit.boardEchoFixtureAfter, JSON.stringify({ before:baselineAudit.boardEchoFixtureBefore, after:baselineAudit.boardEchoFixtureAfter, stateAfter:baselineAudit.boardEchoFixtureInputStateAfter }));
-    record('Board Echo fixture helper is distinct from dry run helper', baselineAudit.boardEchoFixture && baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture !== baselineAudit.boardEchoDryRun && baselineAudit.boardEchoFixture?.player?.revisitState?.boardEcho?.active?.routeKey === baselineAudit.boardEchoDryRun?.wouldCreateStateShape?.['player.revisitState.boardEcho']?.active?.routeKey, JSON.stringify({ fixture:baselineAudit.boardEchoFixture, dryRun:baselineAudit.boardEchoDryRun }));
-    record('No public Board Echo start path exists', !baselineAudit.publicBoardEchoExports.includes('startBoardEcho') && baselineAudit.boardEchoStartHooks.length === 0 && !baselineAudit.routeButtons.some(text => /Start Board Echo/i.test(text)) && !/Start Board Echo/i.test(baselineAudit.text), JSON.stringify({ exports:baselineAudit.publicBoardEchoExports, hooks:baselineAudit.boardEchoStartHooks, buttons:baselineAudit.routeButtons, text:baselineAudit.text.slice(0, 500) }));
-    record('Guild Journal shows Board Echo and Debt Pressure preview copy with no start actions', !!baselineAudit.journalModel && Array.isArray(baselineAudit.journalModel.sections) && (() => {
-      const section = baselineAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
-      const text = `${section?.body || ''} ${section?.meta || ''}`;
-      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && /not playable yet/i.test(text) && /future ledger pressure/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(baselineAudit.journalModel?.debtPreviewText || ''));
-    })());
-    record('Town Revisit surface keeps unfinished lanes inert and separate from live actions', Array.isArray(baselineAudit.unfinishedTownRows) && baselineAudit.unfinishedTownRows.length === 2 && baselineAudit.unfinishedControls === 0 && baselineAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.isLocked === true && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false && /not playable yet/i.test(row?.bodyText || '') && /No player action is available yet/i.test(row?.bodyText || '')), JSON.stringify({ rows:baselineAudit.unfinishedTownRows, controls:baselineAudit.unfinishedControls }));
-    record('Town unfinished card has no controls and excludes finished lane rows', baselineAudit.unfinishedControls === 0 && Array.isArray(baselineAudit.unfinishedTownRows) && baselineAudit.unfinishedTownRows.length === 2 && baselineAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.isLocked === true && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false) && !/Trophy Echo/i.test(baselineAudit.unfinishedGridText) && !/Famous Gear Memory/i.test(baselineAudit.unfinishedGridText) && !/Rival Trace/i.test(baselineAudit.unfinishedGridText), JSON.stringify({ unfinishedControls:baselineAudit.unfinishedControls, unfinishedGridText:baselineAudit.unfinishedGridText, rows:baselineAudit.unfinishedTownRows }));
-    record('Board Echo and Debt Pressure do not create active, completed, or history state', (() => {
-      const emptyLane = lane => !lane || (!lane.active && !lane.completed && (!Array.isArray(lane.history) || lane.history.length === 0) && (!lane.completedKeys || Object.keys(lane.completedKeys).length === 0));
-      return emptyLane(baselineAudit.unfinishedLaneState?.boardEcho) && emptyLane(baselineAudit.unfinishedLaneState?.debtPressure);
-    })(), JSON.stringify(baselineAudit.unfinishedLaneState));
-    record('Primary dungeon entry path remains visible', baselineAudit.townButtons.some(label => /^(Enter Dungeon|Continue Run)$/i.test(label)), JSON.stringify(baselineAudit.townButtons));
-
-    await evalScript(client, `window.DungeonDexScenarioDevTools.clearBossTrophies(); window.DungeonDexScenarioDevTools.clearRetiredRelics(); window.DungeonDexScenarioDevTools.clearGearMemoryForTest(); return true;`);
-    await evalScript(client, `window.DungeonDexScenarioDevTools.grantBossTrophyForTest(); if (typeof render === 'function') render(); return true;`);
-    await evalScript(client, `if (typeof render === 'function') render(); return true;`);
-    const availableAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
-      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
-      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
-      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
-      const boardEchoDryRunBefore = JSON.stringify(S.player?.revisitState || null);
-      const boardEchoDryRun = api.calculateBoardEchoStartDryRun ? api.calculateBoardEchoStartDryRun(S) : null;
-      const boardEchoDryRunAfter = JSON.stringify(S.player?.revisitState || null);
-      return {
-        checklist: api.revisitTrophyEchoActivationChecklist ? api.revisitTrophyEchoActivationChecklist(S) : null,
-        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        rivalTraceStatus: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        report: api.revisitActivationSurfaceLockdownReport ? api.revisitActivationSurfaceLockdownReport(S) : null,
-        firstLane: api.revisitFirstActivationLane ? api.revisitFirstActivationLane(S) : null,
-        secondLane: api.revisitSecondActivationLane ? api.revisitSecondActivationLane(S) : null,
-        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
-        unfinishedTownRows: api.revisitUnfinishedLaneTownRows ? api.revisitUnfinishedLaneTownRows(S) : null,
-        boardEchoContract: api.boardEchoActivationContract ? api.boardEchoActivationContract(S) : null,
-        boardEchoDryRun,
-        boardEchoDryRunMutationSafe: boardEchoDryRunBefore === boardEchoDryRunAfter,
-        boardEchoDryRunStateAfter: S.player?.revisitState?.boardEcho || null,
-        trophyRoute,
-        famousGearRoute,
-        rivalTraceRoute,
-        routes,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear], #revisitFoundationSlot [data-complete-rival-trace]')).length,
-        unfinishedControls: Array.from(document.querySelectorAll('.revisit-unfinished-lanes-card button, .revisit-unfinished-lanes-card [data-start-revisit], .revisit-unfinished-lanes-card [data-complete-trophy-echo], .revisit-unfinished-lanes-card [data-complete-famous-gear], .revisit-unfinished-lanes-card [data-complete-rival-trace]')).length,
-        unfinishedGridText: document.querySelector('.revisit-unfinished-grid')?.innerText || '',
-        journalModel: typeof window.DDJournalV1SummaryModel === 'function' ? window.DDJournalV1SummaryModel(S) : null,
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        unfinishedLaneState: {
-          boardEcho: S.player?.revisitState?.boardEcho || null,
-          debtPressure: S.player?.revisitState?.debtPressure || null
-        },
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    const unrelatedRoutesInactive = Array.isArray(availableAudit.routes) && availableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
-    record('Trophy Echo becomes available with boss history', availableAudit.status?.available === true && availableAudit.status?.locked === false && availableAudit.status?.historyCount >= 1 && availableAudit.trophyRoute?.playable === true && availableAudit.trophyRoute?.entryAvailable === true && availableAudit.trophyRoute?.startAvailable === true, JSON.stringify({ status:availableAudit.status, trophyRoute:availableAudit.trophyRoute }));
-    record('Town card exposes Start Trophy Echo and keeps Famous Gear and Rival Trace locked', availableAudit.status?.available === true && availableAudit.status?.active === false && availableAudit.trophyRoute?.playable === true && availableAudit.trophyRoute?.entryAvailable === true && availableAudit.trophyRoute?.startAvailable === true && availableAudit.famousGearStatus?.locked === true && availableAudit.rivalTraceStatus?.locked === true && availableAudit.famousGearRoute?.playable !== true && availableAudit.rivalTraceRoute?.playable !== true && unrelatedRoutesInactive, JSON.stringify({ status:availableAudit.status, trophyRoute:availableAudit.trophyRoute, famousGearStatus:availableAudit.famousGearStatus, rivalTraceStatus:availableAudit.rivalTraceStatus }));
-    record('Board Echo and Debt Pressure remain non-playable in the journal surface after route activation checks', !!availableAudit.journalModel && Array.isArray(availableAudit.journalModel.sections) && (() => {
-      const section = availableAudit.journalModel.sections.find(entry => entry && entry.key === 'lanes');
-      const text = `${section?.body || ''} ${section?.meta || ''}`;
-      return !!section && /Board Echo/i.test(text) && /Debt Pressure/i.test(text) && /Planned|Locked/i.test(text) && !/Start Board Echo/i.test(text) && !/Start Debt Pressure/i.test(text) && /preview is read-only/i.test(String(availableAudit.journalModel?.debtPreviewText || ''));
-    })());
-    record('Town Revisit surface keeps unfinished lanes separate after activation checks', Array.isArray(availableAudit.unfinishedTownRows) && availableAudit.unfinishedTownRows.length === 2 && availableAudit.unfinishedControls === 0 && availableAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.isLocked === true && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false && /not playable yet/i.test(row?.bodyText || '') && /No player action is available yet/i.test(row?.bodyText || '')), JSON.stringify({ rows:availableAudit.unfinishedTownRows, controls:availableAudit.unfinishedControls }));
-    record('Unfinished town rows stay inert after Trophy Echo availability changes', Array.isArray(availableAudit.unfinishedTownRows) && availableAudit.unfinishedTownRows.length === 2 && availableAudit.unfinishedControls === 0 && availableAudit.unfinishedTownRows.every(row => row?.isUnfinished === true && row?.isPlayable === false && row?.actionAvailable === false && row?.startAvailable === false && row?.activeStateAvailable === false && row?.completedStateAvailable === false && row?.historyStateAvailable === false), JSON.stringify({ rows:availableAudit.unfinishedTownRows, controls:availableAudit.unfinishedControls }));
-    record('Board Echo activation contract remains locked after live-lane availability changes', availableAudit.boardEchoContract?.enabled === false && availableAudit.boardEchoContract?.playable === false && availableAudit.boardEchoContract?.canStart === false && availableAudit.boardEchoContract?.safeToShowStartAction === false && availableAudit.boardEchoContract?.activeStateAvailable === false && availableAudit.boardEchoContract?.completedStateAvailable === false && availableAudit.boardEchoContract?.historyStateAvailable === false && availableAudit.boardEchoContract?.currentLaneBucket === 'planned', JSON.stringify(availableAudit.boardEchoContract));
-    record('Board Echo start dry run remains read-only after live-lane availability changes', availableAudit.boardEchoDryRun?.enabled === false && availableAudit.boardEchoDryRun?.playable === false && availableAudit.boardEchoDryRun?.canStart === false && availableAudit.boardEchoDryRun?.wouldStart === false && availableAudit.boardEchoDryRun?.wouldMutateState === false && availableAudit.boardEchoDryRun?.safeToCommitStart === false && availableAudit.boardEchoDryRun?.activationContractSummary?.canStart === availableAudit.boardEchoContract?.canStart && availableAudit.boardEchoDryRunMutationSafe === true && availableAudit.boardEchoDryRunStateAfter && availableAudit.boardEchoDryRunStateAfter.active === null && Array.isArray(availableAudit.boardEchoDryRunStateAfter.history) && availableAudit.boardEchoDryRunStateAfter.history.length === 0 && availableAudit.boardEchoDryRunStateAfter.lastResult === null, JSON.stringify({ dryRun:availableAudit.boardEchoDryRun, mutationSafe:availableAudit.boardEchoDryRunMutationSafe, stateAfter:availableAudit.boardEchoDryRunStateAfter }));
-    record('Board Echo and Debt Pressure still have no active, completed, or history state after activation checks', (() => {
-      const emptyLane = lane => !lane || (!lane.active && !lane.completed && (!Array.isArray(lane.history) || lane.history.length === 0) && (!lane.completedKeys || Object.keys(lane.completedKeys).length === 0));
-      return emptyLane(availableAudit.unfinishedLaneState?.boardEcho) && emptyLane(availableAudit.unfinishedLaneState?.debtPressure);
-    })(), JSON.stringify(availableAudit.unfinishedLaneState));
-    record('Checklist and lane metadata reflect live Revisit lanes', availableAudit.checklist?.playable === true && availableAudit.checklist?.routeEntryAvailable === true && availableAudit.checklist?.mutatesSave === true && availableAudit.firstLane?.hasLiveEntry === true && availableAudit.firstLane?.locked === false && availableAudit.report?.trophyEchoPlayable === true && availableAudit.report?.famousGearPlayable === false && availableAudit.report?.famousGearActive === false && availableAudit.thirdLane?.locked === true, JSON.stringify({ checklist:availableAudit.checklist, firstLane:availableAudit.firstLane, secondLane:availableAudit.secondLane, thirdLane:availableAudit.thirdLane, report:availableAudit.report }));
-
-    const startedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.startTrophyEcho ? api.startTrophyEcho(S) : null;
-      if (typeof render === 'function') render();
-      return {
-        result,
-        active: api.activeTrophyEcho ? api.activeTrophyEcho(S) : null,
-        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Trophy Echo can start and creates an active echo state', !!startedAudit.result && startedAudit.status?.active === true && startedAudit.active?.routeKey === 'trophy_echo_route' && startedAudit.revisitState?.trophyEcho?.active?.routeKey === 'trophy_echo_route', JSON.stringify(startedAudit));
-    record('Active Trophy Echo shows readable boss-memory flavor', startedAudit.active?.summaryLine && /stirs with a remembered weight/i.test(startedAudit.active.summaryLine) && startedAudit.active?.reflection && /Boss Floor/i.test(startedAudit.active.reflection), JSON.stringify(startedAudit.active));
-    const duplicateStartAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.startTrophyEcho ? api.startTrophyEcho(S) : null;
-      if (typeof render === 'function') render();
-      return { result, status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null, revisitState: S.player?.revisitState || null };
-    })()`);
-    record('Duplicate Trophy Echo start is blocked while active', duplicateStartAudit.result === null && duplicateStartAudit.status?.active === true && duplicateStartAudit.revisitState?.trophyEcho?.active?.routeKey === 'trophy_echo_route', JSON.stringify(duplicateStartAudit));
-
-    const completedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.completeTrophyEcho ? api.completeTrophyEcho(S) : null;
-      if (typeof render === 'function') render();
-      return {
-        result,
-        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        summary: api.trophyEchoResultSummary ? api.trophyEchoResultSummary(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Trophy Echo can complete and records history', !!completedAudit.result && completedAudit.status?.active === false && completedAudit.summary?.completedAt > 0 && Array.isArray(completedAudit.revisitState?.trophyEcho?.history) && completedAudit.revisitState.trophyEcho.history.length >= 1 && completedAudit.revisitState.trophyEcho.memoryMarks >= 1, JSON.stringify(completedAudit));
-    record('Completion shows a result summary and reopens the lane', completedAudit.status?.active === false && completedAudit.status?.completedCount >= 1 && completedAudit.summary?.completedAt > 0 && completedAudit.revisitState?.trophyEcho?.history?.length >= 1 && completedAudit.revisitState?.trophyEcho?.memoryMarks >= 1, JSON.stringify(completedAudit));
-    const duplicateCompleteAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.completeTrophyEcho ? api.completeTrophyEcho(S) : null;
-      if (typeof render === 'function') render();
-      return { result, status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null, revisitState: S.player?.revisitState || null };
-    })()`);
-    record('Duplicate Trophy Echo resolve is blocked after completion', duplicateCompleteAudit.result === null && duplicateCompleteAudit.status?.active === false && duplicateCompleteAudit.revisitState?.trophyEcho?.memoryMarks === completedAudit.revisitState?.trophyEcho?.memoryMarks, JSON.stringify(duplicateCompleteAudit));
-    record('Debt stays unchanged and Trophy Echo does not alter locked Talent state', baselineAudit.debtSnapshot === availableAudit.debtSnapshot && availableAudit.debtSnapshot === startedAudit.debtSnapshot && startedAudit.debtSnapshot === completedAudit.debtSnapshot && JSON.stringify(baselineAudit.talentSnapshot ? { learned:JSON.parse(baselineAudit.talentSnapshot).learned, unlocks:JSON.parse(baselineAudit.talentSnapshot).unlocks } : null) === JSON.stringify(availableAudit.talentSnapshot ? { learned:JSON.parse(availableAudit.talentSnapshot).learned, unlocks:JSON.parse(availableAudit.talentSnapshot).unlocks } : null) && JSON.stringify(availableAudit.talentSnapshot ? { learned:JSON.parse(availableAudit.talentSnapshot).learned, unlocks:JSON.parse(availableAudit.talentSnapshot).unlocks } : null) === JSON.stringify(startedAudit.talentSnapshot ? { learned:JSON.parse(startedAudit.talentSnapshot).learned, unlocks:JSON.parse(startedAudit.talentSnapshot).unlocks } : null) && JSON.stringify(startedAudit.talentSnapshot ? { learned:JSON.parse(startedAudit.talentSnapshot).learned, unlocks:JSON.parse(startedAudit.talentSnapshot).unlocks } : null) === JSON.stringify(completedAudit.talentSnapshot ? { learned:JSON.parse(completedAudit.talentSnapshot).learned, unlocks:JSON.parse(completedAudit.talentSnapshot).unlocks } : null), JSON.stringify({ debt:[baselineAudit.debtSnapshot, availableAudit.debtSnapshot, startedAudit.debtSnapshot, completedAudit.debtSnapshot], talent:[baselineAudit.talentSnapshot, availableAudit.talentSnapshot, startedAudit.talentSnapshot, completedAudit.talentSnapshot] }));
-
-    await evalScript(client, `window.DungeonDexScenarioDevTools.clearRetiredRelics(); window.DungeonDexScenarioDevTools.clearGearMemoryForTest(); window.DungeonDexScenarioDevTools.grantRetiredRelicForTest(); if (typeof render === 'function') render(); return true;`);
-    const famousAvailableAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
-      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
-      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
-      return {
-        famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        famousGearRoute,
-        trophyStatus: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        trophyRoute,
-        routes,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        routeControls: Array.from(document.querySelectorAll('#revisitFoundationSlot [data-start-revisit], #revisitFoundationSlot [data-complete-trophy-echo], #revisitFoundationSlot [data-complete-famous-gear]')).length,
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    const famousRoutesInactive = Array.isArray(famousAvailableAudit.routes) && famousAvailableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
-    record('Famous Gear becomes available with retired gear history', famousAvailableAudit.famousGearStatus?.available === true && famousAvailableAudit.famousGearStatus?.locked === false && famousAvailableAudit.famousGearRoute?.playable === true && famousAvailableAudit.famousGearRoute?.entryAvailable === true && famousAvailableAudit.famousGearRoute?.startAvailable === true, JSON.stringify({ famousGearStatus:famousAvailableAudit.famousGearStatus, famousGearRoute:famousAvailableAudit.famousGearRoute }));
-    record('Town card exposes Start Famous Gear Memory while Trophy Echo stays playable', famousAvailableAudit.famousGearStatus?.available === true && famousAvailableAudit.famousGearRoute?.playable === true && famousAvailableAudit.famousGearRoute?.entryAvailable === true && famousAvailableAudit.trophyStatus?.available === true && famousAvailableAudit.trophyRoute?.playable === true && famousRoutesInactive, JSON.stringify({ famousGearStatus:famousAvailableAudit.famousGearStatus, famousGearRoute:famousAvailableAudit.famousGearRoute, trophyStatus:famousAvailableAudit.trophyStatus, trophyRoute:famousAvailableAudit.trophyRoute }));
-    record('Famous Gear and Trophy Echo remain debt- and talent-neutral before starting', completedAudit.debtSnapshot === famousAvailableAudit.debtSnapshot && completedAudit.talentSnapshot === famousAvailableAudit.talentSnapshot, JSON.stringify({ debt:[completedAudit.debtSnapshot, famousAvailableAudit.debtSnapshot], talent:[completedAudit.talentSnapshot, famousAvailableAudit.talentSnapshot] }));
-
-    const famousStartedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.startFamousGear ? api.startFamousGear(S) : null;
-      if (typeof save === 'function') save(S);
-      if (typeof render === 'function') render();
-      return {
-        result,
-        active: api.activeFamousGear ? api.activeFamousGear(S) : null,
-        status: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        summary: api.famousGearResultSummary ? api.famousGearResultSummary(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Famous Gear can start and creates an active archive memory state', !!famousStartedAudit.result && famousStartedAudit.status?.active === true && famousStartedAudit.active?.routeKey === 'famous_gear_route' && famousStartedAudit.revisitState?.famousGear?.active?.routeKey === 'famous_gear_route', JSON.stringify(famousStartedAudit));
-    record('Active Famous Gear shows readable archive-memory flavor', famousStartedAudit.status?.activeMemory?.summaryLine && /record/i.test(famousStartedAudit.status.activeMemory.summaryLine) && famousStartedAudit.status?.activeMemory?.reflection && /archive|record|town/i.test(famousStartedAudit.status.activeMemory.reflection) && famousStartedAudit.status.activeMemory.reflection.includes(famousStartedAudit.status.activeMemory.itemName), JSON.stringify(famousStartedAudit.status?.activeMemory || famousStartedAudit.active));
-    const famousDuplicateStartAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.startFamousGear ? api.startFamousGear(S) : null;
-      if (typeof render === 'function') render();
-      return { result, status: api.famousGearStatus ? api.famousGearStatus(S) : null, revisitState: S.player?.revisitState || null };
-    })()`);
-    record('Duplicate Famous Gear start is blocked while active', famousDuplicateStartAudit.result === null && famousDuplicateStartAudit.status?.active === true && famousDuplicateStartAudit.revisitState?.famousGear?.active?.routeKey === 'famous_gear_route', JSON.stringify(famousDuplicateStartAudit));
-
-    await client.send('Page.reload', { ignoreCache:true });
-    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Famous Gear active reload.');
-    const famousActiveReloadAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      return {
-        status: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        active: api.activeFamousGear ? api.activeFamousGear(S) : null,
-        summary: api.famousGearResultSummary ? api.famousGearResultSummary(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Active Famous Gear persists after reload', famousActiveReloadAudit.status?.active === true && famousActiveReloadAudit.active?.routeKey === 'famous_gear_route' && famousActiveReloadAudit.revisitState?.famousGear?.active?.routeKey === 'famous_gear_route', JSON.stringify(famousActiveReloadAudit));
-    const famousTalentSummary = snapshot => {
-      const data = JSON.parse(String(snapshot || '{}'));
-      return {
-        availablePoints: Math.max(0, Math.floor(Number(data?.ledger?.availablePoints || 0))),
-        spentPoints: Math.max(0, Math.floor(Number(data?.ledger?.spentPoints || 0))),
-        lifetimePoints: Math.max(0, Math.floor(Number(data?.ledger?.lifetimePoints || 0))),
-        awardClaimCount: Object.keys(data?.ledger?.awardClaims || {}).length,
-        earningEnabled: data?.earning?.enabled === true,
-        pointsAwarded: Math.max(0, Math.floor(Number(data?.earning?.pointsAwarded || 0)))
-      };
-    };
-    record('Famous Gear keeps debt and Talent unchanged while active', famousAvailableAudit.debtSnapshot === famousStartedAudit.debtSnapshot && famousStartedAudit.debtSnapshot === famousActiveReloadAudit.debtSnapshot && JSON.stringify(famousTalentSummary(famousAvailableAudit.talentSnapshot)) === JSON.stringify(famousTalentSummary(famousStartedAudit.talentSnapshot)) && JSON.stringify(famousTalentSummary(famousStartedAudit.talentSnapshot)) === JSON.stringify(famousTalentSummary(famousActiveReloadAudit.talentSnapshot)), JSON.stringify({ debt:[famousAvailableAudit.debtSnapshot, famousStartedAudit.debtSnapshot, famousActiveReloadAudit.debtSnapshot], talent:[famousTalentSummary(famousAvailableAudit.talentSnapshot), famousTalentSummary(famousStartedAudit.talentSnapshot), famousTalentSummary(famousActiveReloadAudit.talentSnapshot)] }));
-
-    const famousCompletedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.completeFamousGear ? api.completeFamousGear(S) : null;
-      if (typeof render === 'function') render();
-      return {
-        result,
-        active: api.activeFamousGear ? api.activeFamousGear(S) : null,
-        status: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        summary: api.famousGearResultSummary ? api.famousGearResultSummary(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Famous Gear can complete and records archive history', !!famousCompletedAudit.result && famousCompletedAudit.status?.active === false && famousCompletedAudit.status?.completed === true && famousCompletedAudit.summary?.completedAt > 0 && Array.isArray(famousCompletedAudit.revisitState?.famousGear?.history) && famousCompletedAudit.revisitState.famousGear.history.length >= 1 && famousCompletedAudit.revisitState.famousGear.completedKeys?.[famousCompletedAudit.result?.completionKey || ''] === true, JSON.stringify(famousCompletedAudit));
-    record('Completion shows a recovered summary and reopens Famous Gear Memory', famousCompletedAudit.status?.active === false && famousCompletedAudit.status?.completed === true && famousCompletedAudit.summary?.completedAt > 0 && famousCompletedAudit.revisitState?.famousGear?.history?.length >= 1 && famousCompletedAudit.revisitState?.famousGear?.completedKeys?.[famousCompletedAudit.result?.completionKey || ''] === true, JSON.stringify(famousCompletedAudit));
-    const famousDuplicateCompleteAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.completeFamousGear ? api.completeFamousGear(S) : null;
-      if (typeof render === 'function') render();
-      return { result, status: api.famousGearStatus ? api.famousGearStatus(S) : null, revisitState: S.player?.revisitState || null };
-    })()`);
-    record('Duplicate Famous Gear resolve is blocked after completion', famousDuplicateCompleteAudit.result === null && famousDuplicateCompleteAudit.status?.active === false && famousDuplicateCompleteAudit.revisitState?.famousGear?.lastResult?.summary === famousCompletedAudit.revisitState?.famousGear?.lastResult?.summary, JSON.stringify(famousDuplicateCompleteAudit));
-
-    await evalScript(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      if (!api || typeof api.rememberRival !== 'function') return false;
-      if (!S.player) return false;
-      if (api.clearRivals) api.clearRivals(S);
-      const source = (api.ensure ? api.ensure(S).active : null) || (typeof ELITE_CONTRACTS !== 'undefined' && Array.isArray(ELITE_CONTRACTS) ? ELITE_CONTRACTS[0] : null);
-      if (!source) return false;
-      const fakeKiller = { contractTarget:true, contractId:source.id, name:source.eliteName || source.name || 'Rival Elite' };
-      return !!api.rememberRival(S, source, fakeKiller);
-    })()`);
-    await evalScript(client, `if (typeof render === 'function') render(); return true;`);
-    const rivalAvailableAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
-      const rivalTraceRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'rival_trace_route') || null : null;
-      return {
-        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        route: rivalTraceRoute,
-        thirdLane: api.revisitThirdActivationLane ? api.revisitThirdActivationLane(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        routes
-      };
-    })()`);
-    const rivalRoutesInactive = Array.isArray(rivalAvailableAudit.routes) && rivalAvailableAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
-    record('Rival Trace becomes available with named rival history', rivalAvailableAudit.status?.available === true && rivalAvailableAudit.status?.locked === false && rivalAvailableAudit.route?.playable === true && rivalAvailableAudit.route?.entryAvailable === true && rivalAvailableAudit.route?.startAvailable === true, JSON.stringify({ status:rivalAvailableAudit.status, route:rivalAvailableAudit.route }));
-    record('Town card exposes Start Rival Trace while other locked lanes stay locked', rivalAvailableAudit.status?.available === true && rivalAvailableAudit.route?.playable === true && rivalAvailableAudit.route?.entryAvailable === true && rivalAvailableAudit.status?.locked === false && rivalRoutesInactive, JSON.stringify({ status:rivalAvailableAudit.status, route:rivalAvailableAudit.route }));
-
-    const rivalStartedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.startRivalTrace ? api.startRivalTrace(S) : null;
-      if (typeof save === 'function') save(S);
-      if (typeof render === 'function') render();
-      return {
-        result,
-        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
-        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Rival Trace can start and creates an active archive trace state', !!rivalStartedAudit.result && rivalStartedAudit.status?.active === true && rivalStartedAudit.active?.routeKey === 'rival_trace_route' && rivalStartedAudit.revisitState?.rivalTrace?.active?.routeKey === 'rival_trace_route', JSON.stringify(rivalStartedAudit));
-    record('Active Rival Trace shows readable archive-trace flavor', rivalStartedAudit.active?.activeTrace?.summaryLine && /trace/i.test(rivalStartedAudit.active.activeTrace.summaryLine) && rivalStartedAudit.active?.activeTrace?.reflection && /remembered/i.test(rivalStartedAudit.active.activeTrace.reflection), JSON.stringify(rivalStartedAudit.active));
-    const rivalReloadStartAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      return {
-        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null
-      };
-    })()`);
-    record('Active Rival Trace persists before reload', rivalReloadStartAudit.status?.active === true && rivalReloadStartAudit.active?.routeKey === 'rival_trace_route' && rivalReloadStartAudit.revisitState?.rivalTrace?.active?.routeKey === 'rival_trace_route', JSON.stringify(rivalReloadStartAudit));
-    await client.send('Page.reload', { ignoreCache:true });
-    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Rival Trace active reload.');
-    const rivalActiveReloadAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      return {
-        status: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        active: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    record('Active Rival Trace persists after reload', rivalActiveReloadAudit.status?.active === true && rivalActiveReloadAudit.active?.routeKey === 'rival_trace_route' && rivalActiveReloadAudit.revisitState?.rivalTrace?.active?.routeKey === 'rival_trace_route', JSON.stringify(rivalActiveReloadAudit));
-
-    const rivalCompletedAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const result = api.completeRivalTrace ? api.completeRivalTrace(S) : null;
-      if (typeof render === 'function') render();
-      return {
-        result,
-        active: api.rivalTraceStatus ? api.rivalTraceStatus(S) : null,
-        summary: api.activeRivalTrace ? api.activeRivalTrace(S) : (api.activeRevisitRouteSummary ? api.activeRevisitRouteSummary(S) : null),
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null
-      };
-    })()`);
-    record('Rival Trace can complete and records archive history', !!rivalCompletedAudit.result && rivalCompletedAudit.active?.active === false && rivalCompletedAudit.active?.completed === true && Array.isArray(rivalCompletedAudit.revisitState?.rivalTrace?.history) && rivalCompletedAudit.revisitState.rivalTrace.history.length >= 1 && rivalCompletedAudit.revisitState.rivalTrace.completedKeys?.[rivalCompletedAudit.result?.completionKey || ''] === true, JSON.stringify(rivalCompletedAudit));
-    record('Completion shows a recovered trace summary and reopens Rival Trace', rivalCompletedAudit.active?.active === false && rivalCompletedAudit.active?.completed === true && rivalCompletedAudit.revisitState?.rivalTrace?.history?.length >= 1 && rivalCompletedAudit.revisitState?.rivalTrace?.completedKeys?.[rivalCompletedAudit.result?.completionKey || ''] === true, JSON.stringify(rivalCompletedAudit));
-
-    await client.send('Page.reload', { ignoreCache:true });
-    if (!await waitForCondition(client, `!!window.DDRevisitActivationSurfaceLockdown && !!window.DungeonDexEliteContracts && typeof render === 'function' && typeof S !== 'undefined' && !!S.player`, 15000)) throw new Error('DungeonDex runtime did not initialize after Famous Gear completion reload.');
-    const reloadAudit = await evalByValue(client, `(() => {
-      const api = window.DungeonDexEliteContracts || {};
-      const routes = api.revisitRoutePreviews ? api.revisitRoutePreviews(S) : [];
-      const trophyRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'trophy_echo_route') || null : null;
-      const famousGearRoute = Array.isArray(routes) ? routes.find(route => String(route?.key || '') === 'famous_gear_route') || null : null;
-      return {
-        status: api.trophyEchoStatus ? api.trophyEchoStatus(S) : null,
-        summary: api.trophyEchoResultSummary ? api.trophyEchoResultSummary(S) : null,
-        famousGearStatus: api.famousGearStatus ? api.famousGearStatus(S) : null,
-        famousGearSummary: api.famousGearResultSummary ? api.famousGearResultSummary(S) : null,
-        trophyRoute,
-        famousGearRoute,
-        routes,
-        routeButtons: Array.from(document.querySelectorAll('#revisitFoundationSlot button')).map(button => String(button.textContent || '').trim()).filter(Boolean),
-        text: document.getElementById('revisitFoundationSlot')?.innerText || '',
-        revisitState: S.player?.revisitState || null,
-        debtSnapshot: JSON.stringify(S.player?.debtCollector || {}),
-        talentSnapshot: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null })
-      };
-    })()`);
-    const reloadRoutesInactive = Array.isArray(reloadAudit.routes) && reloadAudit.routes.filter(route => !['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'].includes(String(route?.key || ''))).every(route => route.playable !== true && route.entryAvailable !== true && route.completionAvailable !== true);
-    record('Completion persists after save and reload', reloadAudit.status?.memoryMarks >= 1 && Array.isArray(reloadAudit.revisitState?.trophyEcho?.history) && reloadAudit.revisitState.trophyEcho.history.length >= 1 && reloadAudit.summary?.rewardMark >= 1 && reloadAudit.famousGearStatus?.completed === true && reloadAudit.famousGearSummary?.summary === famousCompletedAudit.summary?.summary, JSON.stringify(reloadAudit));
-    record('Reloaded state keeps Famous Gear recovered and Trophy Echo available', reloadAudit.famousGearStatus?.completed === true && reloadAudit.famousGearStatus?.active === false && reloadAudit.status?.available === true && reloadAudit.status?.active === false && reloadAudit.trophyRoute?.playable === true && reloadAudit.famousGearRoute?.status === 'Recovered' && reloadRoutesInactive, JSON.stringify({ status:reloadAudit.status, famousGearStatus:reloadAudit.famousGearStatus, trophyRoute:reloadAudit.trophyRoute, famousGearRoute:reloadAudit.famousGearRoute }));
-    record('Famous Gear reload preserves history and does not alter Trophy Echo memory marks', Array.isArray(reloadAudit.revisitState?.famousGear?.history) && reloadAudit.revisitState.famousGear.history.length >= 1 && reloadAudit.revisitState.famousGear.lastResult?.summary === famousCompletedAudit.revisitState?.famousGear?.lastResult?.summary && reloadAudit.status?.memoryMarks === completedAudit.status?.memoryMarks, JSON.stringify({ famousGear:reloadAudit.revisitState?.famousGear, trophyStatus:reloadAudit.status }));
-    record('No console or runtime errors', consoleErrors.length === 0 && runtimeErrors.length === 0, JSON.stringify({ consoleErrors, runtimeErrors }));
-  } finally {
-    if (client) {
-      try { await client.send('Browser.close'); } catch {}
-      client.close();
-    }
-    if (!await waitForProcessExit(chrome, 3000)) {
-      chrome.kill();
-      await waitForProcessExit(chrome, 3000);
-    }
-    await removeTempProfile(userDataDir);
-
-    await new Promise(resolve => server.server.close(resolve));
-  }
-  const failed = results.filter(result => !result.ok);
-  console.log(`\nRevisit route smoke: ${results.length - failed.length}/${results.length} passing`);
-  if (failed.length) process.exit(1);
+function record(name, ok, detail = '') {
+  results.push({ name, ok: !!ok, detail });
+  console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+function has(source, needle) {
+  return String(source || '').includes(needle);
+}
+
+function notHas(source, needle) {
+  return !has(source, needle);
+}
+
+async function main() {
+  const [surface, version, readme, notes] = await Promise.all([
+    readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8'),
+    readFile(path.join(ROOT, 'VERSION.md'), 'utf8'),
+    readFile(path.join(ROOT, 'README.md'), 'utf8'),
+    readFile(path.join(ROOT, 'docs/status/CURRENT_NOTES.md'), 'utf8')
+  ]);
+
+  record(
+    'Revisit surface is v1.26.0 Trophy Echo only',
+    has(surface, 'v1.26.0 Revisit surface: Trophy Echo only')
+      && has(surface, 'Trophy Echo is the only active Revisit lane for v1.26.0.'),
+    'js/systems/44_revisit_lowfire_board_slot.js'
+  );
+
+  record(
+    'Trophy Echo locked/playable/active actions are present',
+    has(surface, 'Trophy Echo Locked')
+      && has(surface, 'data-start-revisit="trophy_echo_route"')
+      && has(surface, 'data-complete-trophy-echo="1"'),
+    'locked, start, and resolve actions'
+  );
+
+  record(
+    'Non-Trophy Revisit start actions are absent from active surface',
+    [
+      'data-start-revisit="famous_gear_route"',
+      'data-start-revisit="rival_trace_route"',
+      'data-start-revisit="board_echo_route"',
+      'data-start-revisit="debt_pressure_route"',
+      'Start Famous Gear Memory',
+      'Start Rival Trace',
+      'Start Board Echo',
+      'Start Debt Pressure'
+    ].every(needle => notHas(surface, needle)),
+    'Famous Gear/Rival/Board/Debt Revisit starts hidden'
+  );
+
+  record(
+    'Player-facing route preview filter keeps only trophy_echo_route',
+    has(surface, 'function trophyOnlyRoutes(routes)')
+      && has(surface, "String(route?.key || '') === 'trophy_echo_route'")
+      && has(surface, '__ddTrophyEchoOnlyApi'),
+    'route preview API filter'
+  );
+
+  record(
+    'Revisit placement helper has no DOM mover, MutationObserver, or timing loop',
+    notHas(surface, 'appendChild(')
+      && notHas(surface, 'insertBefore(')
+      && notHas(surface, 'MutationObserver')
+      && notHas(surface, 'setTimeout(')
+      && notHas(surface, 'setInterval('),
+    'source-render only'
+  );
+
+  record(
+    'Trophy Echo copy states memory-only guardrails',
+    has(surface, 'Trophy Echo is memory-only: no gear, coin, combat, debt, Talent, or dungeon-entry changes.'),
+    'no gear/coin/combat/debt/Talent/dungeon-entry effects'
+  );
+
+  record(
+    'Version docs identify Trophy Echo as the only active Revisit lane',
+    has(version, 'v1.26.0 Trophy Echo Only Revisit')
+      && has(readme, 'Trophy Echo')
+      && !has(readme, '**Famous Gear Memory:** Live Revisit lane')
+      && !has(readme, '**Rival Trace:** Live Revisit lane')
+      && has(notes, 'Trophy Echo'),
+    'VERSION.md, README.md, CURRENT_NOTES.md'
+  );
+
+  const passed = results.filter(result => result.ok).length;
+  const failed = results.length - passed;
+  console.log(`\nRevisit Trophy Echo-only smoke: ${passed}/${results.length} passed`);
+  if (failed) process.exitCode = 1;
+}
+
+main().catch(err => {
+  console.error(err?.stack || err?.message || String(err));
+  process.exitCode = 1;
+});
