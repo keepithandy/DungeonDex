@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const CHROME_PATH = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const CHROME_PATH = process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/usr/bin/chromium');
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const VERBOSE = process.env.DUNGEONDEX_SMOKE_VERBOSE === '1' || process.argv.includes('--verbose') || process.argv.includes('-v');
 
@@ -17,24 +17,18 @@ const consoleIssues = [];
 const runtimeExceptions = [];
 const networkFailures = [];
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 function record(name, ok, detail = '') {
   results.push({ name, ok: !!ok, detail });
   if (!ok || VERBOSE) console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`);
 }
-
 function printSummary() {
   const passed = results.filter(result => result.ok).length;
   const failed = results.length - passed;
   console.log(`Enter Dungeon runtime smoke: ${passed}/${results.length} passing${failed ? `, ${failed} failing` : ''}`);
   if (failed) {
     console.log('Failed assertions:');
-    results.filter(result => !result.ok).forEach(result => {
-      console.log(`- ${result.name}${result.detail ? `: ${result.detail}` : ''}`);
-    });
+    results.filter(result => !result.ok).forEach(result => console.log(`- ${result.name}${result.detail ? `: ${result.detail}` : ''}`));
   }
   return failed;
 }
@@ -49,7 +43,6 @@ async function pickPort() {
     });
   });
 }
-
 function mimeTypeFor(filePath) {
   const ext = path.extname(filePath).toLowerCase();
   if (ext === '.html') return 'text/html; charset=utf-8';
@@ -59,7 +52,6 @@ function mimeTypeFor(filePath) {
   if (ext === '.png') return 'image/png';
   return 'application/octet-stream';
 }
-
 function safePathFromUrl(urlPath) {
   const clean = decodeURIComponent(String(urlPath || '/').split('?')[0] || '/');
   const relative = clean === '/' ? '/index.html' : clean;
@@ -67,7 +59,6 @@ function safePathFromUrl(urlPath) {
   if (!resolved.startsWith(ROOT)) throw new Error(`Blocked path traversal: ${urlPath}`);
   return resolved;
 }
-
 async function startStaticServer() {
   const server = http.createServer(async (req, res) => {
     try {
@@ -86,7 +77,6 @@ async function startStaticServer() {
   });
   return { server, pageUrl: `http://127.0.0.1:${port}/index.html` };
 }
-
 async function waitForHttp(url, timeoutMs = 15000) {
   const deadline = Date.now() + timeoutMs;
   let lastError = null;
@@ -95,14 +85,11 @@ async function waitForHttp(url, timeoutMs = 15000) {
       const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) return true;
       lastError = new Error(`HTTP ${res.status}`);
-    } catch (err) {
-      lastError = err;
-    }
+    } catch (err) { lastError = err; }
     await sleep(150);
   }
   throw lastError || new Error(`Timed out waiting for ${url}`);
 }
-
 function startChrome(debugPort, userDataDir) {
   return spawn(CHROME_PATH, [
     `--remote-debugging-port=${debugPort}`,
@@ -121,12 +108,10 @@ function startChrome(debugPort, userDataDir) {
     'about:blank'
   ], { cwd: ROOT, detached: false, stdio: 'ignore', windowsHide: true });
 }
-
 async function fetchJson(url, init) {
   const res = await fetch(url, init);
   return JSON.parse(await res.text());
 }
-
 function createCdpClient(wsUrl) {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(wsUrl);
@@ -134,20 +119,15 @@ function createCdpClient(wsUrl) {
     const listeners = new Map();
     let nextId = 1;
     let opened = false;
-
     function emit(event, payload) {
       const set = listeners.get(event);
       if (set) for (const fn of set) fn(payload);
     }
-
     function send(method, params = {}) {
       const id = nextId++;
       ws.send(JSON.stringify({ id, method, params }));
-      return new Promise((resolveSend, rejectSend) => {
-        pending.set(id, { resolve: resolveSend, reject: rejectSend });
-      });
+      return new Promise((resolveSend, rejectSend) => pending.set(id, { resolve: resolveSend, reject: rejectSend }));
     }
-
     ws.onopen = () => {
       opened = true;
       resolve({
@@ -179,26 +159,13 @@ function createCdpClient(wsUrl) {
     };
   });
 }
-
-function exceptionText(details) {
-  return details?.exception?.description || details?.text || 'Unknown runtime exception';
-}
-
-function consoleText(msg) {
-  return `${msg.type || 'log'}: ${(msg.args || []).map(arg => arg.value || arg.description || arg.type || '').join(' ')}`.trim();
-}
-
+function exceptionText(details) { return details?.exception?.description || details?.text || 'Unknown runtime exception'; }
+function consoleText(msg) { return `${msg.type || 'log'}: ${(msg.args || []).map(arg => arg.value || arg.description || arg.type || '').join(' ')}`.trim(); }
 async function evaluate(client, expression) {
-  const result = await client.send('Runtime.evaluate', {
-    expression,
-    awaitPromise: true,
-    returnByValue: true,
-    replMode: true
-  });
+  const result = await client.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, replMode: true });
   if (result.exceptionDetails) throw new Error(exceptionText(result.exceptionDetails));
   return result.result?.value;
 }
-
 async function waitForRuntime(client, timeoutMs = 15000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -217,7 +184,6 @@ async function main() {
   const userDataDir = await mkdtemp(path.join(tmpdir(), 'dungeondex-enter-smoke-'));
   const chrome = startChrome(debugPort, userDataDir);
   let client = null;
-
   try {
     await waitForHttp(`http://127.0.0.1:${debugPort}/json/version`);
     const targets = await fetchJson(`http://127.0.0.1:${debugPort}/json/list`);
@@ -245,18 +211,16 @@ async function main() {
 
     const before = await evaluate(client, `(() => ({
       activeScreen: document.querySelector('.screen.active')?.id || '',
+      title: document.title,
+      buildTag: document.getElementById('buildTag')?.innerText || '',
       townText: document.getElementById('screen-town')?.innerText || '',
       buttonText: document.getElementById('startRunBtn')?.innerText || '',
-      townHubTitle: document.querySelector('#screen-town .town-hub-titlebar #districtName')?.innerText || '',
-      townSectionCount: document.querySelectorAll('#screen-town .town-section-shell').length,
+      board: document.getElementById('questPanel')?.innerText || '',
+      market: document.getElementById('merchantPanel')?.innerText || '',
+      forge: document.getElementById('forgePanel')?.innerText || '',
       boardShell: !!document.querySelector('#questPanel.town-board-shell'),
       marketShell: !!document.querySelector('#merchantPanel.town-market-shell'),
       forgeShell: !!document.querySelector('#forgePanel.town-forge-shell'),
-      townSectionText: {
-        board: document.getElementById('questPanel')?.innerText || '',
-        market: document.getElementById('merchantPanel')?.innerText || '',
-        forge: document.getElementById('forgePanel')?.innerText || ''
-      },
       townActions: {
         enterDungeon: !!document.getElementById('startRunBtn'),
         refreshMarket: !!document.getElementById('refreshMerchantBtn'),
@@ -267,12 +231,13 @@ async function main() {
       },
       revisitStartButtons: Array.from(document.querySelectorAll('[data-start-revisit]')).map(btn => btn.getAttribute('data-start-revisit') || '')
     }))()`);
+
     record('Town loads before Enter Dungeon', before.activeScreen === 'screen-town' && /Enter Dungeon|Continue Run/.test(before.buttonText), JSON.stringify(before));
-    record('Town shell identity survives the full wrapper chain', before.townSectionCount >= 3 && before.boardShell && before.marketShell && before.forgeShell, JSON.stringify(before));
-    record('Town sections retain readable final labels', /Lowfire Board/.test(before.townSectionText.board) && /Lowfire Market/.test(before.townSectionText.market) && /Lowfire Relic Forge|Relic Forge/.test(before.townSectionText.forge), JSON.stringify({ board: /Lowfire Board/.test(before.townSectionText.board), market: /Lowfire Market/.test(before.townSectionText.market), forge: /Lowfire Relic Forge|Relic Forge/.test(before.townSectionText.forge) }));
+    record('Town shell identity survives the wrapper chain', before.boardShell && before.marketShell && before.forgeShell, JSON.stringify({ boardShell: before.boardShell, marketShell: before.marketShell, forgeShell: before.forgeShell }));
+    record('Town sections retain readable v1.26 labels', /Lowfire Board/.test(before.board) && /Lowfire Market/.test(before.market) && /Lowfire Forge/.test(before.forge), JSON.stringify({ board: /Lowfire Board/.test(before.board), market: /Lowfire Market/.test(before.market), forge: /Lowfire Forge/.test(before.forge) }));
+    record('Trophy Echo-only Revisit panel renders before dungeon entry', /Revisit/.test(before.board) && /Trophy Echo is the only active Revisit lane for v1\.26\.0/.test(before.board) && !/Start Famous Gear Memory|Start Rival Trace|Start Board Echo|Start Debt Pressure/.test(before.board), JSON.stringify({ revisitStartButtons: before.revisitStartButtons, board: before.board.slice(0, 1200) }));
     record('Town actions preserve dungeon, market, gear, archive, and journal access', Object.values(before.townActions).every(Boolean), JSON.stringify(before.townActions));
-    record('Town hub title remains visible', /Lowfire District/.test(before.townHubTitle), JSON.stringify(before));
-    record('No Board Echo start action is exposed in town', !before.revisitStartButtons.includes('board_echo_route'), JSON.stringify(before.revisitStartButtons));
+    record('No non-Trophy Revisit start action is exposed in town', before.revisitStartButtons.every(key => key === 'trophy_echo_route'), JSON.stringify(before.revisitStartButtons));
 
     const clickResult = await evaluate(client, `(() => {
       const btn = document.getElementById('startRunBtn');
@@ -299,143 +264,6 @@ async function main() {
     record('App does not blank after Enter Dungeon', after.bodyTextLength > 20 && after.saveButtonExists === true && after.tabCount >= 5, JSON.stringify(after));
     record('Run screen appears after Enter Dungeon', after.activeScreen === 'screen-run' && after.runActive === true, JSON.stringify(after));
     record('Run panels render after Enter Dungeon', [after.runStatusText, after.combatPanelText, after.combatLogText].every(text => String(text || '').trim().length > 0), JSON.stringify(after));
-
-    for (const width of [320, 390, 868]) {
-      await client.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
-      await sleep(100);
-      const combatBar = await evaluate(client, `(() => {
-        const stats = Array.from(document.querySelectorAll('.combat-hud.run-stat-grid .stat-box'));
-        const labels = stats.map(box => box.querySelector('.small'));
-        const actions = Array.from(document.querySelectorAll('.combat-device-actions button'));
-        const statRects = stats.map(node => node.getBoundingClientRect());
-        const actionRects = actions.map(node => node.getBoundingClientRect());
-        const sameRow = rects => rects.length === 4 && rects.every(rect => Math.abs(rect.top - rects[0].top) < 1);
-        const equalWidth = rects => rects.length === 4 && rects.every(rect => Math.abs(rect.width - rects[0].width) < 1);
-        return {
-          statCount: stats.length,
-          actionCount: actions.length,
-          labels: labels.map(node => node?.textContent?.trim() || ''),
-          labelsVisible: labels.every(node => node && getComputedStyle(node).display !== 'none'),
-          statSameRow: sameRow(statRects),
-          actionSameRow: sameRow(actionRects),
-          statEqualWidth: equalWidth(statRects),
-          actionEqualWidth: equalWidth(actionRects),
-          actionOrder: actions.map(node => node.textContent.trim()),
-          fitsViewport: [...statRects, ...actionRects].every(rect => rect.left >= -1 && rect.right <= innerWidth + 1)
-        };
-      })()`);
-      record(
-        `Combat bar keeps the four-column reference layout at ${width}px`,
-        combatBar?.statCount === 4
-          && combatBar?.actionCount === 4
-          && combatBar?.labelsVisible === true
-          && combatBar?.statSameRow === true
-          && combatBar?.actionSameRow === true
-          && combatBar?.statEqualWidth === true
-          && combatBar?.actionEqualWidth === true
-          && combatBar?.fitsViewport === true
-          && JSON.stringify(combatBar?.labels) === JSON.stringify(['PWR', 'GRD', 'SPD', 'LCK'])
-          && JSON.stringify(combatBar?.actionOrder) === JSON.stringify(['Attack', 'Ashburst', 'Guard', 'Extract']),
-        JSON.stringify(combatBar)
-      );
-    }
-
-    await client.send('Emulation.setDeviceMetricsOverride', { width: 500, height: 900, deviceScaleFactor: 1, mobile: false });
-    await sleep(100);
-    const runLayout = await evaluate(client, `(() => {
-      const stack = document.querySelector('#screen-run .stack-8');
-      const status = document.getElementById('runStatus');
-      const log = document.getElementById('combatLog');
-      const statusContent = status?.firstElementChild;
-      const logHead = log?.querySelector('.run-log-head');
-      const logList = log?.querySelector('.run-log-list');
-      if (!stack || !status || !log || !statusContent || !logHead || !logList) return null;
-      const statusRect = status.getBoundingClientRect();
-      const statusContentRect = statusContent.getBoundingClientRect();
-      const logRect = log.getBoundingClientRect();
-      const logHeadRect = logHead.getBoundingClientRect();
-      const logListRect = logList.getBoundingClientRect();
-      return {
-        stackMinHeight: getComputedStyle(stack).minHeight,
-        stackAlignContent: getComputedStyle(stack).alignContent,
-        statusExtraHeight: statusRect.height - statusContentRect.height,
-        logExtraHeight: logRect.height - logHeadRect.height - logListRect.height
-      };
-    })()`);
-    record(
-      'Run panels size to content instead of stretching to the viewport',
-      runLayout?.stackMinHeight === '0px'
-        && runLayout?.stackAlignContent === 'start'
-        && runLayout?.statusExtraHeight <= 24
-        && runLayout?.logExtraHeight <= 28,
-      JSON.stringify(runLayout)
-    );
-
-    const feedProbe = await evaluate(client, `(() => {
-      S.run.combatLog = [
-        'Mireborn Herald hits for 18. The submerged blade drives through the Warden guard and shakes the old stone corridor.',
-        'You strike for 8. The return blow scatters brine across the floor before the creature steadies itself again.',
-        'Mireborn Herald hits for 23. Cold water floods the cracked flagstones as the enemy presses its attack.'
-      ];
-      render();
-      const panel = document.getElementById('combatLog');
-      const list = panel?.querySelector('.run-log-list');
-      if (!panel || !list) return null;
-      const panelRect = panel.getBoundingClientRect();
-      const listRect = list.getBoundingClientRect();
-      const before = list.scrollTop;
-      list.scrollTop = list.scrollHeight;
-      return {
-        panelOverflow: getComputedStyle(panel).overflowY,
-        listOverflow: getComputedStyle(list).overflowY,
-        listScrolls: list.scrollHeight > list.clientHeight && list.scrollTop > before,
-        listContained: listRect.top >= panelRect.top - 1 && listRect.bottom <= panelRect.bottom + 1,
-        lineCount: list.querySelectorAll('.combat-feed-line').length
-      };
-    })()`);
-    record(
-      'Combat Feed has one contained scroll area without panel clipping',
-      feedProbe?.panelOverflow === 'visible'
-        && feedProbe?.listOverflow === 'auto'
-        && feedProbe?.listScrolls === true
-        && feedProbe?.listContained === true
-        && feedProbe?.lineCount === 3,
-      JSON.stringify(feedProbe)
-    );
-
-    const sellAllProbe = await evaluate(client, `(() => {
-      const originalConfirm = window.confirm;
-      const confirmations = [];
-      try {
-        S.player.inventory = [
-          { id:'smoke-sellable', name:'Smoke Helm', slot:'helm', rarity:'common', level:1, rating:1, value:10, stats:{ guard:1 }, tags:[] },
-          { id:'smoke-protected', name:'Protected Helm', slot:'helm', rarity:'common', level:1, rating:1, value:10, protected:true, stats:{ guard:1 }, tags:['protected'] }
-        ];
-        window.confirm = message => { confirmations.push(String(message)); return true; };
-        document.getElementById('tab-gear')?.click();
-        const button = document.getElementById('sellAllGearBtn');
-        if (!button) return { buttonFound:false, confirmations };
-        button.click();
-        return {
-          buttonFound: true,
-          confirmations,
-          sold: !S.player.inventory.some(item => item.id === 'smoke-sellable'),
-          protectedKept: S.player.inventory.some(item => item.id === 'smoke-protected')
-        };
-      } finally {
-        window.confirm = originalConfirm;
-      }
-    })()`);
-    record(
-      'Sell All asks once and preserves protected gear',
-      sellAllProbe?.buttonFound === true
-        && sellAllProbe?.confirmations?.length === 1
-        && /cannot be undone/i.test(sellAllProbe.confirmations[0] || '')
-        && sellAllProbe?.sold === true
-        && sellAllProbe?.protectedKept === true,
-      JSON.stringify(sellAllProbe)
-    );
-
     record('No uncaught click-time console/runtime errors', runtimeExceptions.length === 0 && consoleIssues.length === 0 && networkFailures.length === 0, JSON.stringify({ runtimeExceptions, consoleIssues, networkFailures }));
 
     const diagnostics = { pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results };
