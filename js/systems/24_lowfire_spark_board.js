@@ -196,6 +196,7 @@
     if (!panel) return;
     const quests = A(state.player.quests);
     const claimed = quests.filter(q => q.claimed).length;
+    const revisitBoardMarkup = typeof earlierDungeonRevisitMarkup === 'function' ? earlierDungeonRevisitMarkup() : '';
     panel.innerHTML = `
       <div class="card-head"><div><h2>Lowfire Board</h2><p>Board work is the steady way to earn Forge Sparks outside random drops.</p><p class="lowfire-board-tip">Sparks craft relics. Shards feed craft costs. Ember powers skills and focused forge work. Favor raises forge tier.</p></div></div>
       <div class="spark-source-strip">
@@ -210,6 +211,7 @@
         <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">One-time board goals paid after descent or forge work.</p></div><span class="pill">${claimed}/${quests.length}</span></div>
       </div>
       <div class="list warden-objective-list">${quests.map(questCard).join('')}</div>
+      ${revisitBoardMarkup}
       ${typeof eliteContractBoardMarkup === 'function' ? eliteContractBoardMarkup(state) : ''}`;
   }
 
