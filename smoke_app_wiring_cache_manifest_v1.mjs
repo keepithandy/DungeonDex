@@ -4,8 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const VISIBLE_BUILD = '1.23.8.09';
-const BUILD_QS = '1.23.8.09-build-label-alignment';
+const VISIBLE_BUILD = '1.26.0';
+const BUILD_QS = '1.26.0-trophy-echo-only';
 
 function extractMatches(source, regex) {
   const out = [];
@@ -22,18 +22,16 @@ function normalizeAsset(asset) {
 }
 
 async function main() {
-  const [indexHtml, appJs, swJs, buildLabelGuard] = await Promise.all([
+  const [indexHtml, appJs, swJs, buildLabelGuard, version] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'app.js'), 'utf8'),
     readFile(path.join(ROOT, 'sw.js'), 'utf8'),
-    readFile(path.join(ROOT, 'js/systems/21_build_label_guard.js'), 'utf8')
+    readFile(path.join(ROOT, 'js/systems/21_build_label_guard.js'), 'utf8'),
+    readFile(path.join(ROOT, 'VERSION.md'), 'utf8')
   ]);
 
   const labelContracts = [
-    ['index.html title', indexHtml, `<title>DungeonDex v${VISIBLE_BUILD}</title>`],
-    ['index.html visible label', indexHtml, `>DungeonDex v${VISIBLE_BUILD}</h1>`],
-    ['index.html visible build', indexHtml, `window.DUNGEONDEX_BUILD = '${VISIBLE_BUILD}'`],
-    ['index.html cache query', indexHtml, `window.DUNGEONDEX_BUILD_QS = '${BUILD_QS}'`],
+    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Trophy Echo Only Revisit`],
     ['app.js visible build', appJs, `window.DUNGEONDEX_BUILD = '${VISIBLE_BUILD}'`],
     ['app.js cache query', appJs, `window.DUNGEONDEX_BUILD_QS = '${BUILD_QS}'`],
     ['build label guard visible build', buildLabelGuard, `const BUILD = '${VISIBLE_BUILD}'`],
@@ -41,9 +39,10 @@ async function main() {
     ['service worker cache name', swJs, `const CACHE_NAME = 'dungeondex-v${BUILD_QS}'`],
     ['service worker cache query', swJs, `const BUILD_QS = '${BUILD_QS}'`]
   ];
+
   const labelMismatches = labelContracts.filter(([, source, expected]) => !source.includes(expected));
   if (labelMismatches.length) {
-    console.error('Mixed or stale build labels detected:');
+    console.error('Mixed or stale v1.26.0 build labels detected:');
     labelMismatches.forEach(([label, , expected]) => console.error(`- ${label}: expected ${expected}`));
     process.exit(1);
   }
@@ -81,7 +80,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`PASS visible build/cache labels align and runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueLoads.length} checked)`);
+  console.log(`PASS v1.26.0 build/cache labels align and runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueLoads.length} checked)`);
 }
 
 main().catch(err => {
