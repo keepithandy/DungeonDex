@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.25.2 Revisit No-op Stability + Version Alignment`
-* Current local package baseline: `v1.25.2 Revisit No-op Stability + Version Alignment`
-* Current development target: `v1.25.2 Revisit No-op Stability + Version Alignment`
+* Public/live itch version: `v1.26.0 Trophy Echo Only Revisit`
+* Current local package baseline: `v1.26.0 Trophy Echo Only Revisit`
+* Current development target: `v1.26.0 Trophy Echo Only Revisit`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.0 - Trophy Echo Only Revisit
+
+* Focused the active Revisit surface on Trophy Echo, available only from existing boss trophy or boss record history.
+* Removed Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure from the active Revisit surface.
+* Aligned current documentation, build, and cache labels to the v1.26.0 baseline.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt, Talent, Elite Board, Spark Writ, gear, monster, or economy behavior changed.
+
+---
 
 ## v1.25.2 - Revisit No-op Stability + Version Alignment
 
