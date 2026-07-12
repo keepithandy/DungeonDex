@@ -214,29 +214,29 @@ Avoid brittle whole-panel `innerText` checks unless a specific regression requir
 
 ### Playable systems
 
-- Board Echo v1
-- Debt Pressure v1
-- Revisit flavor pass after route stability
+- Preserve the live Town -> Dungeon -> Loot -> Return -> Gear Upgrades -> Archive/Journal loop.
+- Trophy Echo is the only active Revisit lane in v1.26.0.
+- Merchant Gear Upgrades and Lowfire Forge are the active progression/crafting surfaces.
+- Future playable work requires its own focused issue; do not present inactive Revisit lanes as current content.
 
 ### Identity and documentation
 
-- Premise and player promise
-- Feature glossary
-- Lore bible
-- Faction/NPC role notes
-- README refresh
+- Feature glossary and player promise
+- Lore, faction, and role notes
+- README and public roadmap upkeep
 
 ### Visual and asset cleanup
 
 - Asset inventory
 - Title/logo usage note
 - Screenshot/hero-card plan
+- Mobile readability validation
 
 ### Smoke/testing guardrails
 
 - Public copy smoke coverage
-- Revisit lane smoke protection
-- Debt pressure recovery smoke protection
+- Trophy Echo-only Revisit smoke protection
+- Compact suite and mobile checklist verification
 
 ## Loading / Title Screen Copy (#51)
 

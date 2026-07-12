@@ -2,7 +2,7 @@
 
 This document groups the current open DungeonDex issue set into safe work lanes so agents can make progress without turning every issue into one oversized runtime patch.
 
-Baseline for this sweep: **v1.23.7 Rival Trace Result Detail Polish**.
+Baseline for this sweep: **v1.26.0 Trophy Echo Only Revisit**.
 
 ## Scope Rule
 
@@ -12,8 +12,8 @@ This sweep advances every open issue by assigning it a concrete repo surface, ne
 
 | Issue | Work lane | Repo surface advanced by this sweep | Next safe implementation action |
 |---:|---|---|---|
-| #36 | Board Echo v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Implement Board Echo as its own focused Revisit patch after reading the Revisit files and smoke. |
-| #37 | Debt Pressure v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Implement Debt Pressure clarity/recovery as its own focused debt patch after reading the debt foundation and smoke. |
+| #36 | Board Echo v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.0; do not activate without a new explicit scope decision. |
+| #37 | Debt Pressure v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.0; do not activate without a new explicit scope decision. |
 | #38 | Premise / player promise | `README.md`, `docs/IP_LAYER_GUIDE.md` | Keep README and player-facing copy anchored to the same premise. |
 | #39 | Feature glossary | `docs/IP_LAYER_GUIDE.md` | Use the glossary before adding new public copy. |
 | #40 | Visual identity rules | `docs/IP_LAYER_GUIDE.md` | Apply rules during future UI/art polish without a broad redesign. |
@@ -31,11 +31,10 @@ This sweep advances every open issue by assigning it a concrete repo surface, ne
 
 ## Recommended Pull Order
 
-1. **#36 Board Echo v1** — best next playable-content patch.
-2. **#37 Debt Pressure v1** — best next system-completion patch.
-3. **#49 Public copy smoke coverage** — protects identity copy after the new wording stabilizes.
-4. **#48 Revisit flavor pass** — improves the live memory lanes once the gameplay boundary is stable.
-5. **#44 Asset hygiene inventory** — keep filling this as public media becomes real.
+1. **#47 Screenshot/hero-card plan** — documentation-only and grounded in current playable surfaces.
+2. **#39 Feature glossary** — public copy clarification without runtime drift.
+3. **#44 Asset hygiene inventory** — keep provenance current as public media becomes real.
+4. **#43 Copy audit** — take one player-facing surface at a time.
 
 ## Guardrails for This Sweep
 
