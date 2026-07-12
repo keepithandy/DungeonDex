@@ -22,12 +22,12 @@ node --check sw.js
 node --check js/systems/21_build_label_guard.js
 node --check js/systems/30_passive_activation_gate_hotfix.js
 node --check js/systems/31_revisit_activation_surface_lockdown.js
-node --check smoke_merchant_gear_upgrades_v1238.mjs
-node --check smoke_debt_collector_v169.mjs
-node --check smoke_revisit_routes_v173.mjs
-node .\smoke_merchant_gear_upgrades_v1238.mjs
-node .\smoke_debt_collector_v169.mjs
-node .\smoke_revisit_routes_v173.mjs
+node --check tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs
+node --check tests/smoke/smoke_debt_collector_v169.mjs
+node --check tests/smoke/smoke_revisit_routes_v173.mjs
+node .\tests\smoke\smoke_merchant_gear_upgrades_v1238.mjs
+node .\tests\smoke\smoke_debt_collector_v169.mjs
+node .\tests\smoke\smoke_revisit_routes_v173.mjs
 ```
 
 For documentation-only audits, this command list is the expected safety net for the next feature patch; do not change runtime behavior just to satisfy the checklist.

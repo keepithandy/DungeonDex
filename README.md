@@ -17,7 +17,7 @@ node smoke_compact_suite.mjs
 Focused Revisit placement and Trophy Echo checks are available with:
 
 ```bash
-node smoke_revisit_lowfire_source_render_v1252.mjs
+node tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs
 ```
 
 Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, Trophy Echo as the only active Revisit lane, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal.

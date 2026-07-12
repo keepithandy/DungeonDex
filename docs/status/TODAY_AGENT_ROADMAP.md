@@ -43,7 +43,7 @@
    - #43: audit one player-facing copy surface per patch.
    - #51 and #46: align title/loading copy with the existing DungeonDex brand rules.
    - #42, #41, and #40: keep faction, lore, and visual guidance compact and subordinate to playable work.
-   - #56: defer smoke-file migration to a dedicated organization patch with the full compact suite.
+   - #56: complete the dedicated smoke-file migration and protect it with the full compact suite.
 
 ## Per-patch routine
 

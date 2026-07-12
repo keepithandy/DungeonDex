@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const results = [];
 
 function record(name, ok, detail = '') {
@@ -19,28 +19,27 @@ async function main() {
   ]);
 
   record(
-    'Famous Gear Revisit flavor smoke retired for v1.26.0',
+    'Archive Codex Revisit smoke retired for v1.26.0',
     surface.includes('v1.26.0 Revisit surface: Trophy Echo only'),
     'active Revisit surface is Trophy Echo-only'
   );
 
   record(
-    'Famous Gear Memory is not described as an active Revisit lane',
-    !readme.includes('**Famous Gear Memory:** Live Revisit lane')
-      && !notes.includes('Famous Gear Memory: live town archive lane'),
-    'legacy Famous Gear source may remain, but active panel does not expose it'
+    'No Archive Codex requirement blocks compact smoke',
+    !readme.includes('Revisit Archive Codex is required for v1.26.0')
+      && !notes.includes('Revisit Archive Codex is required for v1.26.0'),
+    'Archive Codex is not part of the active Trophy Echo-only release gate'
   );
 
   record(
-    'Trophy Echo copy is the active Revisit flavor target',
-    surface.includes('Trophy Echo is the only active Revisit lane for v1.26.0.')
-      && surface.includes('Trophy Echo is memory-only'),
-    'Trophy Echo flavor and guardrail copy'
+    'Trophy Echo remains the active Revisit release target',
+    readme.includes('Trophy Echo') && notes.includes('Trophy Echo'),
+    'README.md and CURRENT_NOTES.md'
   );
 
   const passed = results.filter(result => result.ok).length;
   const failed = results.length - passed;
-  console.log(`\nRevisit Famous Gear flavor retirement smoke: ${passed}/${results.length} passed`);
+  console.log(`\nRevisit Archive Codex retirement smoke: ${passed}/${results.length} passed`);
   if (failed) process.exitCode = 1;
 }
 

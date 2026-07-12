@@ -74,8 +74,8 @@ Before merge to `main`:
 
 ```bash
 node smoke_compact_suite.mjs
-node smoke_revisit_routes_v173.mjs
-node smoke_rival_trace_memory_v1.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_rival_trace_memory_v1.mjs
 ```
 
 Manual gate:

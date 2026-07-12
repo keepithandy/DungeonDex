@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const results = [];
 
 function record(name, ok, detail = '') {
@@ -22,7 +22,7 @@ async function readRepoFile(relativePath) {
 async function main() {
   const contracts = await readRepoFile('js/systems/03_town_contracts_market.js');
   const lockdown = await readRepoFile('js/systems/31_revisit_activation_surface_lockdown.js');
-  const routeSmoke = await readRepoFile('smoke_revisit_routes_v173.mjs');
+  const routeSmoke = await readRepoFile('tests/smoke/smoke_revisit_routes_v173.mjs');
 
   const liveRouteKeys = ['trophy_echo_route', 'famous_gear_route', 'rival_trace_route'];
   const futureRouteKeys = ['debt_pressure_route', 'board_echo_route'];
@@ -113,7 +113,7 @@ async function main() {
   record(
     'Browser Revisit smoke covers all three live lane starts and completions',
     ['Trophy Echo can start', 'Trophy Echo can complete', 'Famous Gear can start', 'Famous Gear can complete', 'Rival Trace can start', 'Rival Trace can complete'].every(label => routeSmoke.includes(label)),
-    'smoke_revisit_routes_v173.mjs should remain the browser/runtime source of truth.'
+    'tests/smoke/smoke_revisit_routes_v173.mjs should remain the browser/runtime source of truth.'
   );
 
   record(

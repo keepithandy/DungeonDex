@@ -59,7 +59,7 @@ Recommended before merging a runtime follow-up:
 
 ```powershell
 node smoke_compact_suite.mjs
-node smoke_revisit_routes_v173.mjs
-node smoke_debt_collector_v169.mjs
-node smoke_journal_v1233.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_debt_collector_v169.mjs
+node tests/smoke/smoke_journal_v1233.mjs
 ```
