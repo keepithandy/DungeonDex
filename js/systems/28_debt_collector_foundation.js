@@ -417,13 +417,13 @@
     const clarityLearned = passiveContract?.learned === true;
     const clarityCopyModelUsed = rendererCopy?.copyModelRendererWired === true;
     const clarityStatusText = liveRendererWired
-      ? 'Clarity: learned copy-only'
+      ? 'Clarity note: known'
       : clarityLearned
-        ? 'Clarity: learned helper only'
-        : 'Clarity: locked';
+        ? 'Clarity note: recorded'
+        : 'Clarity note: locked';
     const clarityDetailText = liveRendererWired
-      ? 'Debt Collector Clarity is display text only; it does not change repayment, pressure relief, debt math, or economy.'
-      : 'Debt Collector Clarity is not active here; repayment, pressure relief, debt math, and economy use Debt rules only.';
+      ? 'This Journal note explains the debt record. Repayment, pressure, and balances remain unchanged.'
+      : 'No clarity note is active. The balance, repayment terms, and pressure shown here remain authoritative.';
     const statusClass = debt.balanceCopper > 0 ? 'rarity-rare' : 'rarity-common';
     const repaymentContract = debtCollectorRepaymentContract(state);
     const canRepay = repaymentContract.enabled === true;
