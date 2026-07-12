@@ -4,7 +4,7 @@
 
 - Baseline: `v1.26.0 Trophy Echo Only Revisit`.
 - Current active Revisit lane: Trophy Echo only.
-- Latest merged main commit at roadmap creation: `03f2b82`.
+- Latest reviewed main commit: `2921a0b`.
 - Compact smoke baseline: 27/27 passed.
 
 ## Non-negotiable boundaries
@@ -18,11 +18,9 @@
 
 ## Work order
 
-1. **Trophy Echo flavor pass (#48)**
-   - Copy/UI text only.
-   - Review locked, available, active, and completed wording.
-   - Keep the boss-history requirement clear and keep all outcomes memory-only.
-   - Update focused smoke assertions if player-facing copy changes.
+1. **Trophy Echo flavor pass (#48) — complete**
+   - Locked, available, and active copy is now boss-record focused without changing actions or state.
+   - `smoke_public_copy_v1260.mjs` protects the updated wording.
 
 2. **Run the mobile validation checklist**
    - Use `docs/status/MOBILE_VALIDATION_V1260.md`.
