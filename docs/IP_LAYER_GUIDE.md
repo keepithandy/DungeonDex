@@ -2,7 +2,7 @@
 
 This guide advances the current identity-layer issues without changing runtime behavior.
 
-Current baseline: **v1.23.7 Rival Trace Result Detail Polish**.
+Current baseline: **v1.26.0 Trophy Echo Only Revisit**.
 
 ## Premise (#38)
 
@@ -34,17 +34,25 @@ DungeonDex is a mobile-first browser RPG about building a record of dungeon surv
 |---|---|
 | Hollow Stair | The main dungeon path where the player pushes deeper through readable encounters. |
 | Town | The safe preparation surface where the player reviews state and starts approved actions. |
-| Guild Journal | The readable memory ledger for trophies, echoes, rivals, debt state, Talent state, and other safe records. |
-| Trophy Echo | A live Revisit lane that reflects on boss trophy history. |
-| Famous Gear Memory | A live Revisit lane tied to retired gear archive history. |
-| Rival Trace | A live Revisit lane tied to named rival elite history. |
-| Board Echo | A planned Revisit lane for safe board/contract memory. It is not currently playable on the baseline described here. |
-| Debt Pressure | A planned debt clarity/recovery lane. It should explain pressure before it becomes punitive. |
-| Talent | A controlled progression foundation with limited approved spending and copy-only passive behavior. |
-| Hunter Board Clarity | The first safe Talent passive path; it improves copy/readability only. |
-| Debt Collector | The town debt system that handles borrowing, repayment, pressure, and collection status. |
-| Memory lane | A safe Revisit loop that reads existing history and records a memory result without opening combat, rewards, or farming. |
-| Locked / planned | A future-facing system that may be described but must not look broken or playable before it is implemented. |
+| Lowfire Market | The Town shop and home of Merchant Gear Upgrades. |
+| Lowfire Forge | The active crafting surface for forging, salvage, and tempering. |
+| Lowfire Board | The Town board for Warden Objectives, Trophy Echo, and Elite Board information. |
+| Warden Objectives | Current Town objectives and notices. |
+| Merchant Gear Upgrades | The active simple progression path for eligible equipped weapons and armor. |
+| Upgrade level | The visible improvement tier on an eligible equipped item. |
+| Copper | The cost shown for Merchant Gear Upgrades. |
+| Guild Journal | The readable archive for trophies and other earned dungeon records. |
+| Boss trophy record | Proof of a defeated boss that can make its Trophy Echo available. |
+| Retired gear record | Journal history for a retired item; it does not make Famous Gear Memory active in v1.26.0. |
+| Trophy Echo | The only active Revisit lane in v1.26.0. It reflects on an earned boss record without adding rewards or replacing a dungeon run. |
+| Locked Trophy Echo | No boss trophy or boss record is available yet. |
+| Active | Available to use now. |
+| Locked | Unavailable until its stated requirement is met. |
+| Completed | Recorded in the Journal or memory history. |
+| History-only | Preserved as a record, not offered as an active player path. |
+| Planned | Not part of the current playable surface. |
+| Talent | Compatibility/history language only; Merchant Gear Upgrades are the active simple progression path. |
+| Famous Gear Memory / Rival Trace / Board Echo / Debt Pressure Revisit | Inactive Revisit concepts in the v1.26.0 baseline. |
 
 ## Visual Identity Direction (#40)
 
@@ -180,15 +188,15 @@ Capture Town at 390px, 430px, and 768px. For public posts, use the cleanest read
 
 ## Revisit Flavor Direction (#48)
 
-Use consistent memory language across live Revisit lanes:
+Use consistent memory language for the one live Revisit lane:
 
 | Lane | Flavor direction |
 |---|---|
 | Trophy Echo | A trophy record vibrating with remembered boss pressure. |
-| Famous Gear Memory | A retired item leaving a final archive impression. |
-| Rival Trace | A named rival's trail resurfacing in the Guild record. |
-| Board Echo | A planned board/contract memory that should stay locked until real history supports it. |
-| Debt Pressure | A planned risk ledger state tied to borrowing pressure and recovery. |
+| Famous Gear Memory | Inactive in v1.26.0; no active-surface copy target. |
+| Rival Trace | Inactive in v1.26.0; no active-surface copy target. |
+| Board Echo | Inactive in v1.26.0; no active-surface copy target. |
+| Debt Pressure | Inactive in v1.26.0; no active-surface copy target. |
 
 Flavor must not imply rewards, combat, farming, or progression payouts.
 
@@ -196,17 +204,13 @@ Flavor must not imply rewards, combat, farming, or progression payouts.
 
 Good smoke targets are stable labels, not full paragraphs.
 
-Candidate labels to protect after copy stabilizes:
+Current labels and boundaries to protect:
 
 - `DungeonDex`
 - `Guild Journal`
 - `Trophy Echo`
-- `Famous Gear Memory`
-- `Rival Trace`
-- `Board Echo`
-- `Debt Pressure`
-- `Locked / planned`
 - visible current version label
+- inactive-lane start labels remain absent from the active Revisit surface
 
 Avoid brittle whole-panel `innerText` checks unless a specific regression requires them.
 
