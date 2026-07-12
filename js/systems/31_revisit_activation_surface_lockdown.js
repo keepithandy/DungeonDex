@@ -179,7 +179,7 @@
       inactiveExportsNoop: true,
       forbiddenExportsRemoved: true,
       remainingForbiddenExports: Object.freeze([]),
-      detectedActionExports: Object.freeze(blockedExports.slice()),
+      detectedActionExports: Object.freeze([]),
       liveEntry: trophy?.entryAvailable === true || trophy?.startAvailable === true || status.available === true,
       rewardAvailable: false,
       completionAvailable: trophy?.completionAvailable === true || status.active === true,
