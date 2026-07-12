@@ -29,14 +29,21 @@
    - Treat any mobile regression as a dedicated stability issue; do not fold it into flavor work.
 
 3. **Public-facing documentation queue**
-   - #50: v1.26.0 roadmap split between playable, stability, and identity work.
-   - #47: honest screenshot/hero-card plan.
-   - #39: player-facing glossary.
+   - #50: v1.26.0 roadmap split — complete.
+   - #47: honest screenshot/hero-card plan — complete.
+   - #39: player-facing glossary — complete on the current glossary branch.
    - Keep each as its own docs-only patch.
 
 4. **Visual/identity queue**
    - Prefer small copy, CSS, or asset-hygiene improvements backed by the existing mobile checklist.
    - Do not introduce new dependencies or replace the current side rail.
+
+5. **Second safe wave**
+   - #44: verify asset provenance and replacement status.
+   - #43: audit one player-facing copy surface per patch.
+   - #51 and #46: align title/loading copy with the existing DungeonDex brand rules.
+   - #42, #41, and #40: keep faction, lore, and visual guidance compact and subordinate to playable work.
+   - #56: defer smoke-file migration to a dedicated organization patch with the full compact suite.
 
 ## Per-patch routine
 
