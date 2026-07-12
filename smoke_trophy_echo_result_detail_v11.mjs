@@ -82,7 +82,8 @@ async function main() {
       'pushLog(',
       'pushCombat(',
       'award',
-      'rewardMark =',
+      '.rewardMark =',
+      '.rewardMark=',
       'memoryMarks +'
     ].every(needle => notHas(detail, needle)),
     'no start/resolve/reward/state mutation hooks'
