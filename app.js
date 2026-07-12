@@ -61,6 +61,7 @@ window.ddGetMonsterCue = function(name){
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/44_revisit_lowfire_board_slot.js?build=' + qs, '__dungeondexRevisitTrophyEchoOnly', 'Trophy Echo-only Revisit surface'); }, 40);
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
+    window.setTimeout(function(){ loadModule('./js/systems/45_trophy_echo_result_detail.js?build=' + qs, 'DDTrophyEchoResultDetail', 'Trophy Echo result detail'); }, 120);
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
     window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
     window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
