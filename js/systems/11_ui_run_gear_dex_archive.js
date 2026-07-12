@@ -954,21 +954,21 @@
 
   function retiredRelicHelpText() {
     // TODO(v1.7): Let archive memory and famous gear point back toward revisited old zones without changing retirement rules.
-    return '<p class="small muted retired-relic-help">Retired gear is a read-only record. Famous Gear Memory can revisit that archive without returning the item as a reward.</p>';
+    return '<p class="small muted retired-relic-help">Retired gear stays in the Journal as a read-only record. It does not open an active Revisit lane or return the item as a reward.</p>';
   }
 
   function revisitArchiveEchoMarkup(state = S) {
     const revisit = state?.player?.revisitState || {};
     if (revisit?.famousGear?.active) {
-      return '<div class="small muted">Famous Gear Memory is active in town. Trophy Echo remains available as its own safe lane.</div>';
+      return '<div class="small muted">A legacy gear-memory record remains readable. Trophy Echo is the only active Revisit lane.</div>';
     }
     if (revisit?.famousGear?.lastResult) {
-      return '<div class="small muted">Famous Gear Memory is recovered in town. Its archive note stays readable after reload.</div>';
+      return '<div class="small muted">A legacy gear-memory result remains preserved as Journal history.</div>';
     }
     if (revisit?.trophyEcho?.active) {
-      return '<div class="small muted">Trophy Echo is active in town. Famous Gear Memory is available when retired gear exists.</div>';
+      return '<div class="small muted">Trophy Echo is active in town. Retired gear remains Journal history only.</div>';
     }
-    return '<div class="small muted">Trophy Echo and Famous Gear Memory are the live Revisit lanes. The remaining lanes stay preview-only.</div>';
+    return '<div class="small muted">Trophy Echo is the only active Revisit lane. Retired gear remains readable in the Journal.</div>';
   }
 
   function retiredRelicCard(entry) {
@@ -978,7 +978,7 @@
     const typeLabel = cleanDisplayText(item.type || entry.type || '', '');
     const rarityLabel = cleanDisplayText(item.rarity || entry.rarity || 'common', 'common');
     const note = cleanDisplayText(entry.note || item.summary || 'Record preserved.', 'Record preserved.');
-    const source = cleanDisplayText(entry.source || 'DevTools Archive Record', 'DevTools Archive Record');
+    const source = cleanDisplayText(entry.source || 'Guild Archive Record', 'Guild Archive Record');
     const stamp = cleanDisplayText(entry.stamp || '', '');
     const valueLabel = typeof moneyText === 'function'
       ? moneyText(numberOr(entry.value, item.value, 0, Number.MAX_SAFE_INTEGER))
@@ -1058,7 +1058,7 @@
     const bossEmptyState = `<div class="boss-trophy-empty-state"><strong>No boss trophies yet</strong><p>Defeat a boss to add a record to the hall.</p><div class="small muted">Recorded collection. Missing trophy case.</div></div>`;
     el('dexSummary').innerHTML = `
       <div class="split trophy-hall-head"><div><h2>Trophy Hall</h2><p>Read-only records for bosses, rivals, boards, and retired gear.</p></div><span class="pill">Best ${escapeHtml(depthShortLabel(bestDepth))}</span></div>
-      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Records</button><button class="trophy-tab" type="button" disabled>DevTools only</button></div>
+      <div class="trophy-tabs"><button class="trophy-tab active" type="button">Records</button><button class="trophy-tab" type="button" disabled>Reserved</button></div>
       <div class="boss-trophy-summary-card">
         <div class="boss-trophy-summary-copy">
           <strong>Boss Trophy Summary</strong>

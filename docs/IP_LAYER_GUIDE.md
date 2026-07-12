@@ -67,6 +67,29 @@ DungeonDex should look and read like a **guild ledger for a dangerous dungeon**:
 - Avoid UI that looks like unfinished debug output.
 - Avoid random fantasy decoration that does not support the systems.
 
+### Color and contrast
+
+- Use charcoal and near-black as the page/panel foundation.
+- Reserve ember orange and warm gold for primary actions, records, and important highlights.
+- Keep body text warm-white with muted text bright enough to remain readable on mobile.
+- Use violet, green, and red as restrained state accents, not as large decorative fills.
+- Never rely on color alone; pair every state color with a label, icon, or readable status line.
+
+### Typography
+
+- Use the existing serif stack for world-facing headings and record titles.
+- Use the existing system UI stack for controls, stats, and dense supporting copy.
+- Keep uppercase micro-labels short and letter-spaced; avoid long all-caps paragraphs.
+- Do not add bundled or remote fonts until their source and license are recorded.
+
+### Icons, images, and mobile rules
+
+- Prefer original DungeonDex marks, simple text glyphs, or clearly licensed assets.
+- Keep icons secondary to readable labels; never make an unlabeled symbol the only way to understand an action.
+- Avoid generic skull clutter, mismatched icon packs, photorealistic stock art, and decorative animation that competes with controls.
+- At narrow widths, preserve 44px-friendly primary tap targets, readable contrast, and one-column card flow without horizontal scrolling.
+- Check 390px, 430px, and 768px before approving a public visual change.
+
 ### Useful visual anchors
 
 - Guild ledger cards
@@ -93,7 +116,7 @@ Echoes are safe reflections of past progress. They do not create new combat path
 
 ### Rivals
 
-Rivals are named threats or competing delvers that leave traces in the archive. Rival Trace should feel like following a remembered encounter, not opening a new hunt.
+Rivals are named threats whose records can remain in the archive. This world concept does not make Rival Trace an active Revisit lane.
 
 ### Trophies
 
@@ -109,15 +132,27 @@ The player is a delver whose value comes from surviving, recording, and learning
 
 ## Factions and Recurring Roles (#42)
 
-| Role / faction | Purpose | Useful surfaces |
-|---|---|---|
-| The Ledger Guild | Keeps records, contracts, trophies, and archive entries. | Guild Journal, README, town records |
-| Hollow Wardens | Explain dungeon rules, warnings, and safe boundaries. | Dungeon entry, locked/planned copy, smoke-protected labels |
-| Archive Keepers | Preserve trophies, gear memories, and echoes. | Trophy Echo, Famous Gear Memory, Board Echo, Guild Journal |
-| Debt Office | Tracks borrowing, repayment, pressure, and recovery. | Debt Collector, Debt Pressure |
-| Rival Scouts | Track named rivals and traces. | Rival Trace, elite/rival memory copy |
+### Institutions
 
-NPC copy can reference these roles without adding actual NPC systems.
+| Institution | Purpose | Existing surfaces |
+|---|---|---|
+| The Ledger Guild | Keeps contracts, trophies, and archive entries. | Guild Journal, Town records |
+| Hollow Wardens | Set descent rules and issue warnings. | Dungeon entry, Warden Objectives |
+| The Lowfire Exchange | Maintains trade, upgrades, and forge records. | Lowfire Market, Lowfire Forge |
+| Debt Office | Records borrowing, repayment, pressure, and recovery. | Debt Collector |
+
+### Recurring roles
+
+| Role | Voice and purpose | Existing surfaces |
+|---|---|---|
+| Guild Archivist | Calm, exact keeper of earned records. | Guild Journal, Trophy Echo |
+| Stair Warden | Direct guide to descent rules and danger. | Dungeon entry, Warden Objectives |
+| Lowfire Smith | Practical voice for gear work. | Lowfire Forge, Merchant Gear Upgrades |
+| Contract Clerk | Concise handler of board notices. | Lowfire Board, Elite Board |
+| Debt Clerk | Firm, readable explanation of balances and recovery. | Debt Collector |
+| Rival Scout | Historical voice for named rival records only. | Guild Journal records; no active Revisit lane |
+
+Copy can reference these institutions and roles without adding NPC systems, routes, rewards, or progression.
 
 ## Copy Audit Rules (#43)
 

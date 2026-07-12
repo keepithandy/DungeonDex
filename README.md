@@ -32,7 +32,7 @@ The project favors:
 - clear HP-driven encounters;
 - records and memories that build from real save history;
 - small focused systems over broad rewrites;
-- safe smoke-backed patches before bigger content expansion.
+- verified, focused patches before bigger content expansion.
 
 DungeonDex is not trying to become an action game, a hidden-stat spreadsheet, a broad live-service framework, or a reward-farming exploit loop.
 
@@ -52,13 +52,13 @@ DungeonDex is built around a simple loop:
 
 - **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
 - **Side rail navigation:** Desktop hover/focus reveal and a tiny mobile/touch `←` drawer button for core routes.
-- **Lowfire Forge:** Gear crafting, salvage, and tempering system formerly labeled Relic Forge; legacy internal names remain compatibility-safe while Relic stays open-ended for future planning.
+- **Lowfire Forge:** Gear crafting, salvage, and tempering; older internal names remain preserved for existing saves.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
 - **Trophy Echo:** The only active Revisit lane for v1.26.0, tied to boss trophy or boss record history.
 - **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
 - **Gear detail modal:** Click a visible equipped or inventory gear card for a simple read-only rundown.
-- **Debt Collector foundation:** Borrowing, repayment, pressure, and collection status foundation with conservative guardrails.
+- **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
 
 ## Planned / Locked Systems
 
