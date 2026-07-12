@@ -47,7 +47,7 @@ Use this when a patch follows a lag report, broken mobile interaction, stale ser
 - Merchant gear upgrades: keep upgrades limited to equipped weapon and armor pieces, fixed costs, and a `+3` cap unless a focused issue explicitly expands that surface.
 - Old Talent compatibility: legacy `talentLedger`, earning, learned-node, preview, and passive helper paths must not restore gameplay effects or become the active progression UI without an explicit issue.
 - Debt Collector clarity prep: display-copy helpers may clarify wording only. They must not change debt math, pressure, repayment, wallet, economy, combat, rewards, save shape, or Revisit state unless a focused debt issue explicitly targets that behavior.
-- Revisit lanes: Trophy Echo, Famous Gear Memory, and Rival Trace are the current live memory lanes. Board Echo and Debt Pressure remain locked/planned until focused issues activate them. Live lanes must remain town/archive memory loops, not reward, combat, farming, or progression loops.
+- Revisit lanes: Trophy Echo is the only current live memory lane. Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are removed from the active Revisit surface. Trophy Echo must remain a town/archive memory loop, not a reward, combat, farming, or progression loop.
 - Service worker/cache labels: `CACHE_NAME`, build query strings, visible title labels, and `VERSION.md` must stay aligned during versioned release patches. Documentation-only audits should not change service worker behavior or cache labels.
 - Public package output: itch-ready or release packages must not ship stale devtool/cache references, old build labels, temp files, or unrelated repo artifacts.
 - Classic script-load ordering: `index.html` is the source of truth for dependency order. Keep the numeric file map in `js/systems/README.md` descriptive; do not reorder runtime scripts as cleanup.
@@ -56,8 +56,8 @@ Use this when a patch follows a lag report, broken mobile interaction, stale ser
 ## Guardrails
 
 - Preview-only systems must stay preview-only unless the issue explicitly activates them.
-- Trophy Echo, Famous Gear Memory, and Rival Trace are the current live Revisit memory lanes.
-- Board Echo and Debt Pressure remain locked/planned unless their focused issues are being implemented.
+- Trophy Echo is the only live Revisit memory lane.
+- Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure must remain inactive unless a focused issue explicitly restores a lane.
 - The Talent tree is deprecated compatibility-only. Merchant gear upgrades are the active progression surface.
 - Do not reactivate Talent nodes, respec, passive stat effects, reward multipliers, combat effects, economy effects, or Revisit effects unless the issue explicitly says so.
 - Service worker and cache label changes should only happen during versioned release or stability patches.

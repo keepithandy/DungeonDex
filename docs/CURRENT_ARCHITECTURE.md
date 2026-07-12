@@ -44,22 +44,19 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Famous Gear Memory is playable from town when retired gear archive history exists.
-- Rival Trace is playable from town when named rival elite history exists.
-- Each live lane records Revisit-local memory/completion history.
-- Board Echo remains locked/planned until a focused Board Echo issue activates it.
-- Debt Pressure remains locked/planned until a focused Debt Pressure issue activates or clarifies it.
+- Trophy Echo is the only active Revisit lane in the v1.26.0 baseline.
+- Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 
-Planned lane direction:
+Deferred lane direction:
 
-1. Trophy Echo — live.
-2. Famous Gear Memory — live.
-3. Rival Trace — live.
-4. Board Echo — next safe Revisit candidate.
-5. Debt Pressure — debt clarity/recovery candidate, not a punitive system.
+1. Trophy Echo — the only live lane.
+2. Famous Gear Memory — inactive unless a focused issue explicitly restores it.
+3. Rival Trace — inactive unless a focused issue explicitly restores it.
+4. Board Echo — inactive; do not activate without a focused issue.
+5. Debt Pressure — inactive; do not activate without a focused issue.
 
-Rival Trace means named rival elite memory only. It does not create a hunt, board mission, route, reward, unlock, currency, or progression mutation.
+Historical Revisit references must not be read as an activation plan. Any future lane work requires a focused issue and must preserve the core dungeon loop.
 
 ### Merchant Gear Upgrades
 
