@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
+const results = [];
+
+function record(name, ok, detail) {
+  results.push({ name, ok });
+  console.log(`${ok ? 'PASS' : 'FAIL'}: ${name} - ${detail}`);
+}
+
+async function main() {
+  const [index, forge, town, revisit] = await Promise.all([
+    readFile(path.join(ROOT, 'index.html'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/16_relic_forge_crafting.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8')
+  ]);
+
+  record('Public shell names the current game and Journal', index.includes('<title>DungeonDex v1.26.0</title>') && index.includes('aria-label="Guild Journal"'), 'title and Guild Journal surface');
+  record('Town progression copy retains Lowfire Forge and Merchant Gear Upgrades', forge.includes('<h2>Lowfire Forge</h2>') && town.includes('<strong>Merchant Gear Upgrades</strong>'), 'active crafting and upgrade labels');
+  record('Active Revisit surface identifies Trophy Echo as the only lane', revisit.includes('Trophy Echo is the only active Revisit lane for v1.26.0.') && revisit.includes('Trophy Echo Locked') && revisit.includes('Start Trophy Echo'), 'locked and available Trophy Echo copy');
+  record('Active Revisit surface rejects inactive lane start copy', ['Start Famous Gear Memory', 'Start Rival Trace', 'Start Board Echo', 'Start Debt Pressure'].every(needle => !revisit.includes(needle)), 'no inactive lane start labels');
+
+  const passed = results.filter(result => result.ok).length;
+  console.log(`\nPublic-copy v1.26 smoke: ${passed}/${results.length} passed`);
+  if (passed !== results.length) process.exitCode = 1;
+}
+
+main().catch(err => {
+  console.error(err?.stack || String(err));
+  process.exitCode = 1;
+});
