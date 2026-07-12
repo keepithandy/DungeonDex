@@ -1,0 +1,73 @@
+# DungeonDex Acting-Agent Roadmap — Today
+
+## Current checkpoint
+
+- Baseline: `v1.26.0 Trophy Echo Only Revisit`.
+- Current active Revisit lane: Trophy Echo only.
+- Latest merged main commit at roadmap creation: `03f2b82`.
+- Compact smoke baseline: 27/27 passed.
+
+## Non-negotiable boundaries
+
+- Preserve the core loop: Town -> Dungeon -> Loot -> Return -> Gear Upgrades -> Archive/Journal -> Repeat.
+- Do not change combat math, player HP/damage, monster or boss scaling, rewards, drops, economy, upgrade costs, or dungeon entry.
+- Do not change save schema without an explicit, documented requirement.
+- Do not reactivate Famous Gear Memory, Rival Trace, Board Echo, or Debt Pressure Revisit.
+- Do not change Talent or Debt behavior.
+- Do not bump version or cache labels unless an explicit version/release issue requires it.
+
+## Work order
+
+1. **Trophy Echo flavor pass (#48)**
+   - Copy/UI text only.
+   - Review locked, available, active, and completed wording.
+   - Keep the boss-history requirement clear and keep all outcomes memory-only.
+   - Update focused smoke assertions if player-facing copy changes.
+
+2. **Run the mobile validation checklist**
+   - Use `docs/status/MOBILE_VALIDATION_V1260.md`.
+   - Check 390px, 430px, and 768px Town states.
+   - Record only observed clipping, covered controls, delayed input, or layout shifts.
+   - Treat any mobile regression as a dedicated stability issue; do not fold it into flavor work.
+
+3. **Public-facing documentation queue**
+   - #50: v1.26.0 roadmap split between playable, stability, and identity work.
+   - #47: honest screenshot/hero-card plan.
+   - #39: player-facing glossary.
+   - Keep each as its own docs-only patch.
+
+4. **Visual/identity queue**
+   - Prefer small copy, CSS, or asset-hygiene improvements backed by the existing mobile checklist.
+   - Do not introduce new dependencies or replace the current side rail.
+
+## Per-patch routine
+
+1. Start from clean, current `main` on one focused branch.
+2. Read `AGENTS.md`, `VERSION.md`, and current notes before editing.
+3. State the patch category, allowed files, protected systems, and intended smoke checks.
+4. Make the smallest useful change.
+5. Run `git diff --check` plus the focused smoke; use `node smoke_compact_suite.mjs` when a runtime surface changes or the boundary is unclear.
+6. Open a draft PR with behavior changed, intentionally unchanged behavior, validation, and risks.
+7. Squash-merge only after the PR is still narrow, mergeable, and green; refresh local `main` before the next branch.
+
+## Handoff format
+
+Report every completed step with:
+
+- Branch and commit.
+- PR link/status.
+- Files changed.
+- Behavior changed.
+- Behavior intentionally not changed.
+- Checks run and result.
+- Risks.
+- Next safest action.
+
+## Stop conditions
+
+Stop editing and report the blocker when:
+
+- `main` is not clean or cannot fast-forward safely.
+- A requested patch would touch a protected system without explicit scope.
+- A smoke failure persists after a focused rerun and cannot be linked to the patch safely.
+- The next action needs a product decision, external approval, or a new gameplay direction.
