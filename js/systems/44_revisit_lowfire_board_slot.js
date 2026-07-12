@@ -2,9 +2,22 @@
 
 // v1.26.1 Revisit surface: Trophy Echo only.
 // Revisit placement is owned by source renderers. This module does not move DOM
-// nodes, observe mutations, or install timing placement loops. It only narrows
-// the player-facing Revisit surface to the one finished lane: Trophy Echo.
+// nodes, observe mutations, or install timing placement loops. It narrows the
+// player-facing Revisit surface and hard-gates public mutation paths to the one
+// finished lane: Trophy Echo.
 (function(){
+	const DD_PUBLIC_REVISIT_ALLOWED_ROUTE = 'trophy_echo_route';
+	const DD_PUBLIC_REVISIT_BLOCKED_ROUTES = Object.freeze([
+		'famous_gear_route',
+		'rival_trace_route',
+		'debt_pressure_route',
+		'board_echo_route'
+	]);
+	const DD_PUBLIC_REVISIT_BLOCKED_COMPLETERS = Object.freeze({
+		completeFamousGearRoute: 'famous_gear_route',
+		completeRivalTraceRoute: 'rival_trace_route',
+		completeBoardEchoRoute: 'board_echo_route'
+	});
 	const H = value => typeof escapeHtml === 'function'
 		? escapeHtml(value)
 		: String(value ?? '').replace(/[&<>\"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;' }[c]));
@@ -16,6 +29,57 @@
 	function trophyStatus(){
 		const api = window.DungeonDexEliteContracts || {};
 		return typeof api.trophyEchoStatus === 'function' ? api.trophyEchoStatus(S) : null;
+	}
+
+	function blockInactiveRoute(routeKey){
+		return Object.freeze({
+			ok: false,
+			blocked: true,
+			routeKey: String(routeKey || '').trim(),
+			reason: 'DungeonDex v1.26.1 public Revisit surface only allows Trophy Echo.'
+		});
+	}
+
+	function isPublicRevisitRoute(routeKey){
+		return String(routeKey || '').trim() === DD_PUBLIC_REVISIT_ALLOWED_ROUTE;
+	}
+
+	function wrapPublicRevisitGate(name, allowedRouteKey){
+		const original = window[name];
+		if (typeof original !== 'function' || original.__ddPublicTrophyOnlyGate) return;
+		const wrapped = function(state, routeKey){
+			const safeRouteKey = String(routeKey || '').trim();
+			if (safeRouteKey && safeRouteKey !== allowedRouteKey) return blockInactiveRoute(safeRouteKey);
+			return original.apply(this, arguments);
+		};
+		wrapped.__ddPublicTrophyOnlyGate = true;
+		wrapped.__ddPublicAllowedRouteKey = allowedRouteKey;
+		try { window[name] = wrapped; } catch (_) {}
+	}
+
+	function wrapPublicCanStartGate(name, allowedRouteKey){
+		const original = window[name];
+		if (typeof original !== 'function' || original.__ddPublicTrophyOnlyGate) return;
+		const wrapped = function(state, routeKey){
+			const safeRouteKey = String(routeKey || '').trim();
+			if (safeRouteKey && safeRouteKey !== allowedRouteKey) return false;
+			return original.apply(this, arguments);
+		};
+		wrapped.__ddPublicTrophyOnlyGate = true;
+		wrapped.__ddPublicAllowedRouteKey = allowedRouteKey;
+		try { window[name] = wrapped; } catch (_) {}
+	}
+
+	function installBlockedCompleter(name, routeKey){
+		const original = window[name];
+		if (typeof original !== 'function' || original.__ddPublicTrophyOnlyBlock) return;
+		const blocked = function(){
+			return blockInactiveRoute(routeKey);
+		};
+		blocked.__ddPublicTrophyOnlyBlock = true;
+		blocked.__ddPublicBlockedRouteKey = routeKey;
+		blocked.__ddOriginalCompleter = original;
+		try { window[name] = blocked; } catch (_) {}
 	}
 
 	function trophyOnlyRevisitMarkup(){
@@ -83,7 +147,7 @@
 	}
 
 	function trophyOnlyRoutes(routes){
-		return Array.isArray(routes) ? routes.filter(route => String(route?.key || '') === 'trophy_echo_route') : [];
+		return Array.isArray(routes) ? routes.filter(route => String(route?.key || '') === DD_PUBLIC_REVISIT_ALLOWED_ROUTE) : [];
 	}
 
 	function installTrophyOnlyApiFilter(){
@@ -117,10 +181,38 @@
 		api.__ddTrophyEchoOnlyApi = true;
 	}
 
+	function installPublicRevisitMutationGate(){
+		wrapPublicCanStartGate('canStartRevisitRoute', DD_PUBLIC_REVISIT_ALLOWED_ROUTE);
+		wrapPublicCanStartGate('canEnterRevisitRoute', DD_PUBLIC_REVISIT_ALLOWED_ROUTE);
+		wrapPublicRevisitGate('startRevisitRoute', DD_PUBLIC_REVISIT_ALLOWED_ROUTE);
+		Object.keys(DD_PUBLIC_REVISIT_BLOCKED_COMPLETERS).forEach(name => {
+			installBlockedCompleter(name, DD_PUBLIC_REVISIT_BLOCKED_COMPLETERS[name]);
+		});
+		const api = window.DungeonDexEliteContracts || null;
+		if (api && typeof api === 'object') {
+			api.__publicRevisitSurface = 'trophy-echo-only';
+			api.__publicRevisitAllowedRouteKey = DD_PUBLIC_REVISIT_ALLOWED_ROUTE;
+			api.__publicRevisitBlockedRouteKeys = DD_PUBLIC_REVISIT_BLOCKED_ROUTES.slice();
+			api.startFamousGear = () => blockInactiveRoute('famous_gear_route');
+			api.startRivalTrace = () => blockInactiveRoute('rival_trace_route');
+			api.startBoardEcho = () => blockInactiveRoute('board_echo_route');
+			api.completeFamousGear = () => blockInactiveRoute('famous_gear_route');
+			api.completeRivalTrace = () => blockInactiveRoute('rival_trace_route');
+			api.completeBoardEcho = () => blockInactiveRoute('board_echo_route');
+		}
+		window.DDPublicRevisitTrophyOnlyGate = {
+			allowedRouteKey: DD_PUBLIC_REVISIT_ALLOWED_ROUTE,
+			blockedRouteKeys: DD_PUBLIC_REVISIT_BLOCKED_ROUTES.slice(),
+			blockInactiveRoute,
+			isPublicRevisitRoute
+		};
+	}
+
 	function installTrophyOnlyRevisitSurface(){
 		try { earlierDungeonRevisitMarkup = trophyOnlyRevisitMarkup; } catch(_) {}
 		window.earlierDungeonRevisitMarkup = trophyOnlyRevisitMarkup;
 		installTrophyOnlyApiFilter();
+		installPublicRevisitMutationGate();
 		window.__dungeondexRevisitSourceRendered = true;
 		window.__dungeondexRevisitTrophyEchoOnly = true;
 	}
