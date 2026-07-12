@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.0 - Trophy Echo Only Revisit
+- DungeonDex v1.26.1 - Public Readiness Sweep
+
+## v1.26.1 Public Readiness Sweep
+- The GitHub issue queue was completed before this patch was prepared.
+- Trophy Echo remains the only active Revisit lane.
+- Focused smoke scripts now live under `tests/smoke/`; `smoke_compact_suite.mjs` remains the stable root runner.
+- Player-facing copy, identity/lore guidance, screenshot planning, and asset provenance records were completed and reviewed.
+- Release builders now package `styles.css`, `styles_lore_layer.css`, and `styles_visual_weight.css`.
+- Build/cache labels now use `1.26.1-public-readiness`.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt math, Talent behavior, gear, monster, or economy behavior changed.
 
 ## v1.26.0 Trophy Echo Only Revisit
 - Revisit is now a focused Trophy Echo-only player-facing system.
@@ -88,6 +97,6 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.0 Trophy Echo Only Revisit.
+- Current runtime baseline is v1.26.1 Public Readiness Sweep.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

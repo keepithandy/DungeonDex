@@ -187,6 +187,8 @@ $requiredRootFiles = @(
     "index.html",
     "app.js",
     "styles.css",
+    "styles_lore_layer.css",
+    "styles_visual_weight.css",
     "sw.js",
     "manifest.json"
 )
@@ -206,7 +208,7 @@ if (!$OutputName.ToLowerInvariant().EndsWith(".zip")) {
 }
 
 $packageDir = Join-Path $root "archive\packages"
-$stageDir = Join-Path $packageDir "_itch_stage"
+$stageDir = Join-Path $packageDir "_itch_staging"
 $outZip = Join-Path $packageDir $OutputName
 
 Write-Step "Preparing clean stage folder"

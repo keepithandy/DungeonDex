@@ -1,8 +1,10 @@
 # DungeonDex v1.24.0 Lore Layer – Integration & Context Note
 
-## Current Status
+## Historical Status
 
-**Live on itch.io:** v1.4.1 (stable public release)  
+Archive notice: this integration note describes an older rewrite snapshot and is not current release or system authority.
+
+**Historical itch.io reference:** v1.4.1
 **This patch:** v1.24.0 (development rewrite branch)  
 **Repo branch:** Designed for the `/rewrite` branch (v1.23.8+ systems)
 

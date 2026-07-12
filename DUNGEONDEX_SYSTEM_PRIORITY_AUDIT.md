@@ -4,6 +4,8 @@ Patch: `v1.23.2 - Newer Systems Priority Audit`
 
 Scope: audit / planning only. No gameplay activation.
 
+Archive notice: this audit captures an older baseline. It is not current version or activation authority; use `VERSION.md` and current notes.
+
 ## 1. Executive Summary
 
 DungeonDex has three distinct classes of newer systems:
@@ -25,9 +27,9 @@ Top repo evidence:
 - Current working notes: [`DUNGEONDEX_CURRENT_NOTES.md`](/C:/Users/quali/Desktop/DungeonDex/DUNGEONDEX_CURRENT_NOTES.md)
 - Architecture summary: [`docs/CURRENT_ARCHITECTURE.md`](/C:/Users/quali/Desktop/DungeonDex/docs/CURRENT_ARCHITECTURE.md)
 
-## 2. Current Safe Baseline
+## 2. Historical Safe Baseline
 
-The current baseline is version `v1.23.1` per [`VERSION.md`](/C:/Users/quali/Desktop/DungeonDex/VERSION.md). The repo notes consistently state:
+The baseline when this audit was written was `v1.23.1`. Current authority now lives in `VERSION.md`. At the time, the repo notes stated:
 
 - Trophy Echo is the only live Revisit lane.
 - Enter Dungeon / Continue Run remains the only active dungeon entry path.

@@ -1,19 +1,19 @@
-# DungeonDex Open Issue Sweep
+# DungeonDex Completed Issue Sweep Archive
 
-This document groups the current open DungeonDex issue set into safe work lanes so agents can make progress without turning every issue into one oversized runtime patch.
+This document preserves the issue sweep that led into v1.26.1. The GitHub open issue queue was empty before the release patch; rows below are historical completion context, not new authorization.
 
-Baseline for this sweep: **v1.26.0 Trophy Echo Only Revisit**.
+Baseline for this sweep: **v1.26.1 Public Readiness Sweep**.
 
 ## Scope Rule
 
 This sweep advances every open issue by assigning it a concrete repo surface, next action, and guardrail. It does not claim that every issue is complete. Runtime behavior remains unchanged unless a later focused issue patch explicitly targets that system and passes the relevant smoke checks.
 
-## Open Issue Matrix
+## Historical Issue Matrix
 
 | Issue | Work lane | Repo surface advanced by this sweep | Next safe implementation action |
 |---:|---|---|---|
-| #36 | Board Echo v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.0; do not activate without a new explicit scope decision. |
-| #37 | Debt Pressure v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.0; do not activate without a new explicit scope decision. |
+| #36 | Board Echo v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.1; do not activate without a new explicit scope decision. |
+| #37 | Debt Pressure v1 | `docs/PLAYABLE_SYSTEMS_QUEUE.md` | Inactive in v1.26.1; do not activate without a new explicit scope decision. |
 | #38 | Premise / player promise | `README.md`, `docs/IP_LAYER_GUIDE.md` | Keep README and player-facing copy anchored to the same premise. |
 | #39 | Feature glossary | `docs/IP_LAYER_GUIDE.md` | Use the glossary before adding new public copy. |
 | #40 | Visual identity rules | `docs/IP_LAYER_GUIDE.md` | Apply rules during future UI/art polish without a broad redesign. |

@@ -2,7 +2,7 @@
 
 This inventory supports the asset hygiene issue and should be updated whenever DungeonDex adds or replaces visual, audio, font, or marketing assets.
 
-Current baseline: **v1.26.0 Trophy Echo Only Revisit**.
+Current baseline: **v1.26.1 Public Readiness Sweep**.
 
 ## Status Key
 

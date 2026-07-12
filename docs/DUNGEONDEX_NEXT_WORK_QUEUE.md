@@ -1,15 +1,15 @@
-# DungeonDex Next Work Queue
+# DungeonDex Historical Next Work Queue
 
-This document is a lightweight planning packet for the next DungeonDex work session.
+This archived document preserves an older planning packet. It is not current authority and must not be used to reactivate Talent or Revisit work.
 
-Current baseline: `v1.21.2`.
+Historical baseline when written: `v1.21.2`. Use `VERSION.md` for the current baseline.
 
 Version note: this PR does not bump `VERSION.md`. Version changes should only happen when an implementation patch is intentionally prepared.
 
 ## Current locked facts
 
 - `VERSION.md` remains the source of truth for versioning.
-- Current public, local package, and development target version is `v1.21.2`.
+- At the time of this archived plan, the public, package, and development target was `v1.21.2`.
 - Hunter Board Clarity is the first complete controlled Talent loop.
 - `hunter_board_clarity` remains the only live Talent spend target.
 - Boss Trophy Milestone remains the first controlled Talent point source.

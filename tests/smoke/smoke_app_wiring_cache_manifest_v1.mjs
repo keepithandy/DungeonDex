@@ -4,8 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.26.0';
-const BUILD_QS = '1.26.0-trophy-echo-only';
+const VISIBLE_BUILD = '1.26.1';
+const BUILD_QS = '1.26.1-public-readiness';
 
 function extractMatches(source, regex) {
   const out = [];
@@ -31,7 +31,7 @@ async function main() {
   ]);
 
   const labelContracts = [
-    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Trophy Echo Only Revisit`],
+    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Public Readiness Sweep`],
     ['index.html title', indexHtml, `<title>DungeonDex v${VISIBLE_BUILD}</title>`],
     ['index.html visible label', indexHtml, `>DungeonDex v${VISIBLE_BUILD}</h1>`],
     ['index.html visible build', indexHtml, `window.DUNGEONDEX_BUILD = '${VISIBLE_BUILD}'`],
@@ -46,7 +46,7 @@ async function main() {
 
   const labelMismatches = labelContracts.filter(([, source, expected]) => !source.includes(expected));
   if (labelMismatches.length) {
-    console.error('Mixed or stale v1.26.0 build labels detected:');
+    console.error('Mixed or stale v1.26.1 build labels detected:');
     labelMismatches.forEach(([label, , expected]) => console.error(`- ${label}: expected ${expected}`));
     process.exit(1);
   }
@@ -104,7 +104,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`PASS v1.26.0 build/cache labels align and runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
+  console.log(`PASS v1.26.1 build/cache labels align and runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
 }
 
 main().catch(err => {

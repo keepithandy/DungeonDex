@@ -11,7 +11,15 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 
-REQUIRED_FILES = ("index.html", "app.js", "styles.css", "sw.js", "manifest.json")
+REQUIRED_FILES = (
+    "index.html",
+    "app.js",
+    "styles.css",
+    "styles_lore_layer.css",
+    "styles_visual_weight.css",
+    "sw.js",
+    "manifest.json",
+)
 LOCAL_ATTRS = {"href", "src"}
 SKIP_SCHEMES = {"data", "blob", "mailto", "tel", "javascript", "http", "https"}
 STALE_RUNTIME_RE = re.compile(

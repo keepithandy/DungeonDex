@@ -16,6 +16,8 @@ ROOT_FILES = (
     "sw.js",
     "manifest.json",
     "styles.css",
+    "styles_lore_layer.css",
+    "styles_visual_weight.css",
 )
 RUNTIME_DIRS = (
     Path("js/systems"),

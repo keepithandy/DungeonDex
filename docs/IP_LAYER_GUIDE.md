@@ -2,7 +2,7 @@
 
 This guide advances the current identity-layer issues without changing runtime behavior.
 
-Current baseline: **v1.26.0 Trophy Echo Only Revisit**.
+Current baseline: **v1.26.1 Public Readiness Sweep**.
 
 ## Premise (#38)
 
@@ -43,8 +43,8 @@ DungeonDex is a mobile-first browser RPG about building a record of dungeon surv
 | Copper | The cost shown for Merchant Gear Upgrades. |
 | Guild Journal | The readable archive for trophies and other earned dungeon records. |
 | Boss trophy record | Proof of a defeated boss that can make its Trophy Echo available. |
-| Retired gear record | Journal history for a retired item; it does not make Famous Gear Memory active in v1.26.0. |
-| Trophy Echo | The only active Revisit lane in v1.26.0. It reflects on an earned boss record without adding rewards or replacing a dungeon run. |
+| Retired gear record | Journal history for a retired item; it does not make Famous Gear Memory active in v1.26.1. |
+| Trophy Echo | The only active Revisit lane in v1.26.1. It reflects on an earned boss record without adding rewards or replacing a dungeon run. |
 | Locked Trophy Echo | No boss trophy or boss record is available yet. |
 | Active | Available to use now. |
 | Locked | Unavailable until its stated requirement is met. |
@@ -52,7 +52,7 @@ DungeonDex is a mobile-first browser RPG about building a record of dungeon surv
 | History-only | Preserved as a record, not offered as an active player path. |
 | Planned | Not part of the current playable surface. |
 | Talent | Compatibility/history language only; Merchant Gear Upgrades are the active simple progression path. |
-| Famous Gear Memory / Rival Trace / Board Echo / Debt Pressure Revisit | Inactive Revisit concepts in the v1.26.0 baseline. |
+| Famous Gear Memory / Rival Trace / Board Echo / Debt Pressure Revisit | Inactive Revisit concepts in the v1.26.1 baseline. |
 
 ## Visual Identity Direction (#40)
 
@@ -228,10 +228,10 @@ Use consistent memory language for the one live Revisit lane:
 | Lane | Flavor direction |
 |---|---|
 | Trophy Echo | A trophy record vibrating with remembered boss pressure. |
-| Famous Gear Memory | Inactive in v1.26.0; no active-surface copy target. |
-| Rival Trace | Inactive in v1.26.0; no active-surface copy target. |
-| Board Echo | Inactive in v1.26.0; no active-surface copy target. |
-| Debt Pressure | Inactive in v1.26.0; no active-surface copy target. |
+| Famous Gear Memory | Inactive in v1.26.1; no active-surface copy target. |
+| Rival Trace | Inactive in v1.26.1; no active-surface copy target. |
+| Board Echo | Inactive in v1.26.1; no active-surface copy target. |
+| Debt Pressure | Inactive in v1.26.1; no active-surface copy target. |
 
 Flavor must not imply rewards, combat, farming, or progression payouts.
 
@@ -254,7 +254,7 @@ Avoid brittle whole-panel `innerText` checks unless a specific regression requir
 ### Playable systems
 
 - Preserve the live Town -> Dungeon -> Loot -> Return -> Gear Upgrades -> Archive/Journal loop.
-- Trophy Echo is the only active Revisit lane in v1.26.0.
+- Trophy Echo is the only active Revisit lane in v1.26.1.
 - Merchant Gear Upgrades and Lowfire Forge are the active progression/crafting surfaces.
 - Future playable work requires its own focused issue; do not present inactive Revisit lanes as current content.
 

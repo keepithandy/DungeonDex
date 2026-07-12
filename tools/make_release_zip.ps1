@@ -19,7 +19,9 @@ $rootFiles = @(
     "app.js",
     "sw.js",
     "manifest.json",
-    "styles.css"
+    "styles.css",
+    "styles_lore_layer.css",
+    "styles_visual_weight.css"
 )
 $runtimeDirs = @(
     "js\\systems",

@@ -2,9 +2,9 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.0 Trophy Echo Only Revisit`.
+- Baseline: `v1.26.1 Public Readiness Sweep`.
 - Current active Revisit lane: Trophy Echo only.
-- Latest reviewed main commit: `2921a0b`.
+- Latest reviewed pre-release main commit: `ac93500`.
 - Compact smoke baseline: 27/27 passed.
 
 ## Non-negotiable boundaries
@@ -39,11 +39,9 @@
    - Do not introduce new dependencies or replace the current side rail.
 
 5. **Second safe wave**
-   - #44: verify asset provenance and replacement status.
-   - #43: audit one player-facing copy surface per patch.
-   - #51 and #46: align title/loading copy with the existing DungeonDex brand rules.
-   - #42, #41, and #40: keep faction, lore, and visual guidance compact and subordinate to playable work.
-   - #56: complete the dedicated smoke-file migration and protect it with the full compact suite.
+   - #40–#44, #46, and #51: complete.
+   - #56 smoke-file migration: complete and compact-suite protected.
+   - GitHub open issue queue: empty before the v1.26.1 release patch.
 
 ## Per-patch routine
 

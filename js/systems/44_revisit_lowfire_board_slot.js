@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.26.0 Revisit surface: Trophy Echo only.
+// v1.26.1 Revisit surface: Trophy Echo only.
 // Revisit placement is owned by source renderers. This module does not move DOM
 // nodes, observe mutations, or install timing placement loops. It only narrows
 // the player-facing Revisit surface to the one finished lane: Trophy Echo.
@@ -60,7 +60,7 @@
 				<div class="card-head">
 					<div>
 						<h2>Revisit</h2>
-						<p>Trophy Echo is the only active Revisit lane for v1.26.0.</p>
+						<p>Trophy Echo is the only active Revisit lane for v1.26.1.</p>
 					</div>
 				</div>
 				<article class="quest-card revisit-echo-card ${cardClass}">
