@@ -11,10 +11,11 @@ Use these filenames when screenshots are ready:
 * `town-overview.png` - Main town preparation surface and system entry points.
 * `combat-backdrop.png` - Combat screen with readable HP-first combat and the monster backdrop visible.
 * `gear-inventory.png` - Inventory, equipment, loot progression, and item readability.
-* `elite-board.png` - Elite Board contracts and Hunter Board Clarity copy behavior.
-* `talent-panel.png` - Locked Talent preview state, Boss Trophy point source, and controlled Hunter Board Clarity spend surface.
-* `revisit-preview.png` - Planned Revisit lanes and locked route language showing non-playable status.
-* `archive-memory.png` - Retired gear archive and Famous Gear memory surface.
+* `lowfire-board-trophy-echo.png` - Town / Lowfire Board with Trophy Echo locked or available.
+* `lowfire-market-upgrades.png` - Merchant Gear Upgrades as the active simple progression surface.
+* `lowfire-forge.png` - Lowfire Forge crafting/salvage/tempering surface.
+* `gear-detail-mobile.png` - Read-only gear detail at a mobile-readable width.
+* `guild-journal-trophy.png` - Guild Journal with current boss-trophy records.
 
 ## Capture Guidelines
 
@@ -23,8 +24,8 @@ Keep screenshots focused and readable:
 * Prefer mobile-first captures when possible.
 * Show one system per image.
 * Avoid duplicate screenshots that explain the same surface.
-* Keep planned systems visibly marked as preview, locked, or non-playable where applicable.
-* Do not use screenshots to imply that Revisit routes, broad Talent spending, or other guarded systems are playable before they are actually activated.
+* Capture Town at 390px, 430px, and 768px before selecting public images.
+* Do not use screenshots to imply that Talent, Famous Gear Memory, Rival Trace, Board Echo, or Debt Pressure are current playable systems.
 
 ## Current Status
 

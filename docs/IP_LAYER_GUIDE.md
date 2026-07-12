@@ -168,15 +168,15 @@ Rules:
 
 Priority screenshots should show honest current gameplay:
 
-1. **Town / Revisit card** — proves the project has safe memory lanes.
-2. **Guild Journal** — strongest identity screenshot because it shows trophies, gear memories, rivals, and records.
-3. **Combat / run surface** — shows the core HP-driven crawler loop.
-4. **Talent panel** — only if copy clearly shows controlled/limited state.
-5. **Debt Collector** — only if the pressure/recovery copy is clear enough.
+1. **Town / Lowfire Board** — best public hero image: Town identity, Trophy Echo, and the active post-run loop in one frame.
+2. **Lowfire Market** — Merchant Gear Upgrades visibly explain the active progression surface.
+3. **Lowfire Forge** — shows the active crafting/salvage identity without implying new mechanics.
+4. **Gear detail modal** — supports a focused mobile-readability post.
+5. **Guild Journal** — use only when it shows current boss-trophy records without presenting inactive lanes as playable.
 
-Hero candidate: **Guild Journal with completed Revisit memories**.
+Hero candidate: **Town / Lowfire Board with Trophy Echo locked or available**.
 
-Avoid hero screenshots that make Board Echo or Debt Pressure look playable before they are implemented.
+Capture Town at 390px, 430px, and 768px. For public posts, use the cleanest readable state; keep rail-toggle and edge-case captures in internal notes. Do not use Talent, Famous Gear Memory, Rival Trace, Board Echo, or Debt Pressure as a current-feature screenshot.
 
 ## Revisit Flavor Direction (#48)
 
