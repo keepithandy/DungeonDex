@@ -28,9 +28,9 @@ async function main() {
   ]);
 
   record(
-    'Revisit surface is v1.26.1 Trophy Echo only',
-    has(surface, 'v1.26.1 Revisit surface: Trophy Echo only')
-      && has(surface, 'Trophy Echo is the only active Revisit lane for v1.26.1.'),
+    'Revisit surface is v1.26.2 Trophy Echo only',
+    has(surface, 'v1.26.2 Revisit surface: Trophy Echo only')
+      && has(surface, 'Trophy Echo is the only active Revisit lane for v1.26.2.'),
     'js/systems/44_revisit_lowfire_board_slot.js'
   );
 
@@ -60,7 +60,8 @@ async function main() {
   record(
     'Player-facing route preview filter keeps only trophy_echo_route',
     has(surface, 'function trophyOnlyRoutes(routes)')
-      && has(surface, "String(route?.key || '') === 'trophy_echo_route'")
+      && has(surface, "const DD_PUBLIC_REVISIT_ALLOWED_ROUTE = 'trophy_echo_route'")
+      && has(surface, "String(route?.key || '') === DD_PUBLIC_REVISIT_ALLOWED_ROUTE")
       && has(surface, '__ddTrophyEchoOnlyApi'),
     'route preview API filter'
   );
@@ -83,7 +84,7 @@ async function main() {
 
   record(
     'Version docs identify Trophy Echo as the only active Revisit lane',
-    has(version, 'v1.26.1 Public Readiness Sweep')
+    has(version, 'v1.26.2 Public Runtime Hygiene + Devtools Gate')
       && has(readme, 'Trophy Echo')
       && !has(readme, '**Famous Gear Memory:** Live Revisit lane')
       && !has(readme, '**Rival Trace:** Live Revisit lane')

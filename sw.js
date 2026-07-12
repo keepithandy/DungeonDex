@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.1-public-readiness';
+const CACHE_NAME = 'dungeondex-v1.26.2-public-runtime-hygiene';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.1-public-readiness';
+const BUILD_QS = '1.26.2-public-runtime-hygiene';
 const ASSETS = [
   './',
   './index.html',
@@ -25,9 +25,6 @@ const ASSETS = [
   `./js/systems/11_ui_run_gear_dex_archive.js?build=${BUILD_QS}`,
   `./js/systems/29_monster_backdrops_canvas.js?build=${BUILD_QS}`,
   `./js/systems/12_render_bindings_boot.js?build=${BUILD_QS}`,
-  `./js/systems/13_devtools_overlay.js?build=${BUILD_QS}`,
-  `./js/systems/14_devtools_scenarios.js?build=${BUILD_QS}`,
-  `./js/systems/15_devtools_balance_reports.js?build=${BUILD_QS}`,
   `./js/systems/36_ui_revisit_archive_codex.js?build=${BUILD_QS}`,
   `./js/systems/37_revisit_famous_gear_flavor_pack.js?build=${BUILD_QS}`,
   `./js/systems/38_journal_v1.js?build=${BUILD_QS}`,
@@ -48,7 +45,6 @@ const ASSETS = [
   `./js/systems/40_gear_detail_modal.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,
   `./js/systems/42_gear_upgrade_money_text_cleanup.js?build=${BUILD_QS}`,
-  `./js/systems/43_devkit_reset_hold.js?build=${BUILD_QS}`,
   `./js/systems/44_revisit_lowfire_board_slot.js?build=${BUILD_QS}`,
   `./js/systems/45_trophy_echo_result_detail.js?build=${BUILD_QS}`,
   './assets/img/ui/dungeondex-crest.svg',

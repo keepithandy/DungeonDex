@@ -27,6 +27,7 @@ const COMMANDS = [
   { tag: 'syntax', name: 'trophy echo result detail smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs'], optionalPath: 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs' },
   { tag: 'syntax', name: 'public copy smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
   { tag: 'syntax', name: 'public trophy-only revisit smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
+  { tag: 'syntax', name: 'devtools gate smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
   { tag: 'syntax', name: 'debt smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
   { tag: 'syntax', name: 'app wiring smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
   { tag: 'syntax', name: 'enter dungeon smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
@@ -37,8 +38,9 @@ const COMMANDS = [
   { tag: 'rival', name: 'rival trace memory v1', cmd: ['node', 'tests/smoke/smoke_rival_trace_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_rival_trace_memory_v1.mjs' },
   { tag: 'revisit', name: 'revisit routes', cmd: ['node', 'tests/smoke/smoke_revisit_routes_v173.mjs'] },
   { tag: 'revisit', name: 'trophy echo result detail', cmd: ['node', 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs'], optionalPath: 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs' },
-  { tag: 'public', name: 'public copy v1.26.1', cmd: ['node', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
-  { tag: 'public', name: 'public trophy-only revisit v1.26.1', cmd: ['node', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
+  { tag: 'public', name: 'public copy v1.26.2', cmd: ['node', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
+  { tag: 'public', name: 'public trophy-only revisit v1.26.2', cmd: ['node', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
+  { tag: 'app', name: 'devtools gate v1.26.2', cmd: ['node', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
   { tag: 'revisit', name: 'revisit archive codex', cmd: ['node', 'tests/smoke/smoke_revisit_archive_codex_v174.mjs'], optionalPath: 'tests/smoke/smoke_revisit_archive_codex_v174.mjs' },
   { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
   { tag: 'debt', name: 'debt collector', cmd: ['node', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
@@ -109,7 +111,9 @@ function runCommand(entry) {
       resolve({ entry, ok: false, code: null, duration: Date.now() - startedAt, output: `${stdout}\n${stderr}\n${err.stack || err.message || String(err)}` });
     });
     child.on('close', code => {
-      resolve({ entry, ok: code === 0, code, duration: Date.now() - startedAt, output: `${stdout}\n${stderr}` });
+      const output = `${stdout}\n${stderr}`;
+      const skipped = code === 0 && /^SKIP:/m.test(output);
+      resolve({ entry, ok: code === 0, skipped, code, duration: Date.now() - startedAt, output });
     });
   });
 }
@@ -133,18 +137,19 @@ const results = [];
 for (const entry of suite) {
   const result = await runCommand(entry);
   results.push(result);
-  const status = result.ok ? 'PASS' : 'FAIL';
+  const status = result.skipped ? 'SKIP' : result.ok ? 'PASS' : 'FAIL';
   const signal = compactSignal(result.output, result.ok);
   console.log(`${status.padEnd(4)} ${entry.name.padEnd(32)} ${formatMs(result.duration).padStart(7)}  ${commandLine(entry)}`);
-  if (!result.ok || verbose) {
+  if (!result.ok || result.skipped || verbose) {
     signal.forEach(line => console.log(`      ${line}`));
   }
 }
 
-const passed = results.filter(result => result.ok).length;
-const failed = results.length - passed;
+const passed = results.filter(result => result.ok && !result.skipped).length;
+const skipped = results.filter(result => result.skipped).length;
+const failed = results.filter(result => !result.ok).length;
 console.log('');
-console.log(`Summary: ${passed}/${results.length} passed${failed ? `, ${failed} failed` : ''}.`);
+console.log(`Summary: ${passed}/${results.length} passed${skipped ? `, ${skipped} skipped` : ''}${failed ? `, ${failed} failed` : ''}.`);
 
 if (failed) {
   console.log('Failed commands:');
@@ -155,4 +160,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log('PASS: Compact smoke suite clean.');
+console.log(`PASS: Compact smoke suite clean${skipped ? ' with declared environment skips' : ''}.`);

@@ -3,6 +3,7 @@
 // DungeonDex v1.6.17 - DevTools Scenario Presets
 // Extension layer for the hidden DevTools overlay. Keeps scenario testing out of normal UI.
 (function(){
+  if (!window.DUNGEONDEX_DEVTOOLS_ENABLED) return;
   const SCENARIO_VERSION = 'DungeonDex v1.6.17';
   const SCENARIO_BUILD = '1.6.17-current-roadmap-refresh-devtools';
   const OVERLAY_ID = 'ddDevToolsOverlay';

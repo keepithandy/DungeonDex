@@ -2,6 +2,7 @@
 
 // Hidden DevKit gesture: hold Reset for 4 seconds to open the internal DevTools overlay.
 (function(){
+  if (!window.DUNGEONDEX_DEVTOOLS_ENABLED) return;
   if (window.DDDevKitResetHold) return;
   window.DDDevKitResetHold = true;
 

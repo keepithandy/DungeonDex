@@ -1,16 +1,58 @@
-// DungeonDex v1.26.1 runtime pointer.
+// DungeonDex v1.26.2 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.1: Public Readiness Sweep
+// v1.26.2: Public Runtime Hygiene + Devtools Gate
 // - Keeps Revisit housed in the Lowfire Board source-render slot.
-// - Narrows the active player-facing Revisit surface to Trophy Echo only.
-// - Cache-busts extension loading to the Trophy Echo-only Revisit surface.
-// - Aligns public copy, smoke organization, and release-package completeness.
+// - Keeps Trophy Echo as the only public Revisit lane.
+// - Gates internal DevTools helpers away from the normal hosted runtime.
+// - Aligns runtime/cache labels to the public runtime hygiene patch.
 // - Gameplay, save data, combat, economy, Debt, Talent, gear, and dungeon entry remain unchanged.
 
-window.DUNGEONDEX_BUILD = '1.26.1';
-window.DUNGEONDEX_BUILD_QS = '1.26.1-public-readiness';
+window.DUNGEONDEX_BUILD = '1.26.2';
+window.DUNGEONDEX_BUILD_QS = '1.26.2-public-runtime-hygiene';
+
+window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
+  var loc = locationLike || {};
+  var protocol = String(loc.protocol || '');
+  var host = String(loc.hostname || '').toLowerCase();
+  var search = String(loc.search || '');
+  var params;
+  try {
+    params = new URLSearchParams(search);
+  } catch (err) {
+    params = new URLSearchParams('');
+  }
+  var queryFlag = params.get('devtools');
+  if (queryFlag == null || queryFlag === '') queryFlag = params.get('dev');
+  var queryEnabled = queryFlag === '1' || /^true$/i.test(String(queryFlag || ''));
+  var explicitOff = queryFlag === '0' || /^false$/i.test(String(queryFlag || ''));
+  var localHost = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '[::1]';
+  var fileReview = protocol === 'file:';
+  var enabled = !explicitOff && (queryEnabled || localHost || fileReview);
+  var reason = explicitOff
+    ? 'query-disabled'
+    : queryEnabled
+      ? 'query-enabled'
+      : localHost
+        ? 'localhost'
+        : fileReview
+          ? 'file-review'
+          : 'public';
+  return {
+    enabled: enabled,
+    reason: reason,
+    queryFlag: queryFlag == null ? '' : String(queryFlag),
+    localHost: localHost,
+    fileReview: fileReview
+  };
+};
+
+(function(){
+  var gate = window.DungeonDexComputeDevtoolsGate(window.location);
+  window.DUNGEONDEX_DEVTOOLS_ENABLED = !!gate.enabled;
+  window.DUNGEONDEX_DEVTOOLS_GATE = gate;
+})();
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -57,9 +99,13 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.1-public-readiness';
-    loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
-    loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.2-public-runtime-hygiene';
+    if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
+      loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
+      window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);
+      window.setTimeout(function(){ loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports'); }, 40);
+      window.setTimeout(function(){ loadModule('./js/systems/43_devkit_reset_hold.js?build=' + qs, 'DDDevKitResetHold', 'DevKit reset hold'); }, 660);
+    }
     window.setTimeout(function(){ loadModule('./js/systems/44_revisit_lowfire_board_slot.js?build=' + qs, '__dungeondexRevisitTrophyEchoOnly', 'Trophy Echo-only Revisit surface'); }, 40);
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/45_trophy_echo_result_detail.js?build=' + qs, 'DDTrophyEchoResultDetail', 'Trophy Echo result detail'); }, 120);
@@ -71,7 +117,6 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/40_gear_detail_modal.js?build=' + qs, 'DDGearDetailModal', 'Gear detail modal'); }, 540);
     window.setTimeout(function(){ loadModule('./js/systems/41_debt_pressure_v1.js?build=' + qs, 'DDDebtPressureV1', 'Debt Pressure v1'); }, 580);
     window.setTimeout(function(){ loadModule('./js/systems/42_gear_upgrade_money_text_cleanup.js?build=' + qs, 'DDGearUpgradeMoneyTextCleanup', 'Gear upgrade money text cleanup'); }, 620);
-    window.setTimeout(function(){ loadModule('./js/systems/43_devkit_reset_hold.js?build=' + qs, 'DDDevKitResetHold', 'DevKit reset hold'); }, 660);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadExtensions);
   else loadExtensions();

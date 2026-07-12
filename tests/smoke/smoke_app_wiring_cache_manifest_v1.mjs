@@ -4,8 +4,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.26.1';
-const BUILD_QS = '1.26.1-public-readiness';
+const VISIBLE_BUILD = '1.26.2';
+const BUILD_QS = '1.26.2-public-runtime-hygiene';
+const DEVTOOLS_ONLY_ASSETS = [
+  './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
+  './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,
+  './js/systems/15_devtools_balance_reports.js?build=' + BUILD_QS,
+  './js/systems/43_devkit_reset_hold.js?build=' + BUILD_QS
+];
 
 function extractMatches(source, regex) {
   const out = [];
@@ -31,7 +37,7 @@ async function main() {
   ]);
 
   const labelContracts = [
-    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Public Readiness Sweep`],
+    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Public Runtime Hygiene + Devtools Gate`],
     ['index.html title', indexHtml, `<title>DungeonDex v${VISIBLE_BUILD}</title>`],
     ['index.html visible label', indexHtml, `>DungeonDex v${VISIBLE_BUILD}</h1>`],
     ['index.html visible build', indexHtml, `window.DUNGEONDEX_BUILD = '${VISIBLE_BUILD}'`],
@@ -46,7 +52,7 @@ async function main() {
 
   const labelMismatches = labelContracts.filter(([, source, expected]) => !source.includes(expected));
   if (labelMismatches.length) {
-    console.error('Mixed or stale v1.26.1 build labels detected:');
+    console.error('Mixed or stale v1.26.2 build labels detected:');
     labelMismatches.forEach(([label, , expected]) => console.error(`- ${label}: expected ${expected}`));
     process.exit(1);
   }
@@ -77,8 +83,8 @@ async function main() {
 
   const dynamicLoads = extractMatches(
     appJs,
-    /loadModule\(\s*['"]([^'"]+\/js\/systems\/[^'"]+?\.js)(?:\?build=([^'"]+))?['"]/g
-  ).map(match => normalizeAsset(`${match[1]}?build=${match[2] || BUILD_QS}`));
+    /loadModule\(\s*['"]([^'"]+\/js\/systems\/[^'"]+?\.js)\?build=/g
+  ).map(match => normalizeAsset(`${match[1]}?build=${BUILD_QS}`));
 
   const cacheAssets = new Set(
     extractMatches(swJs, /`([^`]+)`/g)
@@ -86,11 +92,32 @@ async function main() {
       .map(normalizeAsset)
   );
 
+  const directDevtoolsScripts = directScripts.filter(asset => /\/(?:13_devtools_overlay|14_devtools_scenarios|15_devtools_balance_reports|43_devkit_reset_hold)\.js\?build=/.test(asset));
+  if (directDevtoolsScripts.length) {
+    console.error('Public index.html still directly loads devtools/debug scripts:');
+    directDevtoolsScripts.forEach(asset => console.error(`- ${asset}`));
+    process.exit(1);
+  }
+
+  const gateContracts = [
+    `window.DUNGEONDEX_DEVTOOLS_ENABLED = !!gate.enabled;`,
+    `window.DUNGEONDEX_DEVTOOLS_GATE = gate;`,
+    `if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {`,
+    `window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){`
+  ];
+  const missingGateContracts = gateContracts.filter(needle => !appJs.includes(needle));
+  if (missingGateContracts.length) {
+    console.error('App runtime is missing explicit devtools gate contracts:');
+    missingGateContracts.forEach(needle => console.error(`- ${needle}`));
+    process.exit(1);
+  }
+
   const uniqueLoads = [...new Set(dynamicLoads)];
   const uniqueDirectScripts = [...new Set(directScripts)];
   const uniqueDirectStyles = [...new Set(directStyles)];
   const missingDirect = [...uniqueDirectScripts, ...uniqueDirectStyles].filter(asset => !cacheAssets.has(asset));
-  const missing = uniqueLoads.filter(asset => !cacheAssets.has(asset));
+  const missing = uniqueLoads.filter(asset => !cacheAssets.has(asset) && !DEVTOOLS_ONLY_ASSETS.includes(asset));
+  const cachedDevtoolsOnly = DEVTOOLS_ONLY_ASSETS.filter(asset => cacheAssets.has(asset));
 
   if (missingDirect.length) {
     console.error('Missing service-worker cache entries for direct index.html assets:');
@@ -104,7 +131,13 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`PASS v1.26.1 build/cache labels align and runtime assets are present in sw.js cache manifest (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
+  if (cachedDevtoolsOnly.length) {
+    console.error('Public service-worker cache still includes devtools-only assets:');
+    cachedDevtoolsOnly.forEach(asset => console.error(`- ${asset}`));
+    process.exit(1);
+  }
+
+  console.log(`PASS v1.26.2 build/cache labels align, public runtime excludes direct devtools loads, and sw.js caches only public assets (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
 }
 
 main().catch(err => {

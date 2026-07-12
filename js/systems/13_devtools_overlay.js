@@ -3,6 +3,7 @@
 // Hidden internal DevTools overlay. It is inactive unless enabled by ?dev=1
 // or the version-label gesture.
 (function() {
+  if (!window.DUNGEONDEX_DEVTOOLS_ENABLED) return;
 	const DEVTOOLS_SESSION_KEY = 'dungeondex_devtools_v145_enabled';
 	const DEVTOOLS_LOG_LIMIT = 80;
 	const DEVTOOLS_VISIBLE_LOG_LIMIT = 16;

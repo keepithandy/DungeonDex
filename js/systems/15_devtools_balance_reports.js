@@ -3,6 +3,7 @@
 // DungeonDex v1.6.17 - DevTools Balance Reports
 // Internal-only measurement layer. It injects into the hidden DevTools overlay and does not touch normal UI.
 (function(){
+  if (!window.DUNGEONDEX_DEVTOOLS_ENABLED) return;
   const REPORT_VERSION = 'DungeonDex v1.6.17';
   const REPORT_BUILD = '1.6.17-current-roadmap-refresh-devtools-balance-reports';
   const OVERLAY_ID = 'ddDevToolsOverlay';

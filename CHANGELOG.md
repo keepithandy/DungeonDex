@@ -8,13 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.1 Public Readiness Sweep`
-* Current local package baseline: `v1.26.1 Public Readiness Sweep`
-* Current development target: `v1.26.1 Public Readiness Sweep`
+* Public/live itch version: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
+* Current local package baseline: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
+* Current development target: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.2 - Public Runtime Hygiene + Devtools Gate
+
+* Added a single explicit public-runtime devtools gate so internal overlay, scenario, balance-report, and Reset-hold helpers do not load in normal hosted sessions.
+* Kept intentional local development access through localhost, `file:` review, and an explicit `?devtools=1` / `?dev=1` query override.
+* Removed devtools-only files from the public service-worker precache manifest and added smoke coverage for the new runtime gate.
+* Preserved Trophy Echo as the only active Revisit lane.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt math, Talent behavior, gear, monster, or economy behavior changed.
+
+---
 
 ## v1.26.1 - Public Readiness Sweep
 

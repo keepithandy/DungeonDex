@@ -3,12 +3,12 @@ import http from 'node:http';
 import net from 'node:net';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const CHROME_PATH = process.env.CHROME_PATH || (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/usr/bin/chromium');
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const VERBOSE = process.env.DUNGEONDEX_SMOKE_VERBOSE === '1' || process.argv.includes('--verbose') || process.argv.includes('-v');
 
@@ -18,6 +18,26 @@ const runtimeExceptions = [];
 const networkFailures = [];
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+function candidateBrowserPaths() {
+  const localAppData = process.env.LOCALAPPDATA || '';
+  const candidates = [
+    process.env.CHROME_PATH,
+    process.env.CHROMIUM_PATH,
+    process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+    process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/usr/bin/chromium',
+    process.platform === 'win32' ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe' : '',
+    process.platform === 'win32' ? 'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe' : '',
+    process.platform === 'win32' ? 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' : ''
+  ];
+  if (localAppData) {
+    candidates.push(path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'));
+    candidates.push(path.join(localAppData, 'Microsoft', 'Edge', 'Application', 'msedge.exe'));
+  }
+  return candidates.filter(Boolean);
+}
+function resolveBrowserPath() {
+  return candidateBrowserPaths().find(candidate => existsSync(candidate)) || '';
+}
 function record(name, ok, detail = '') {
   results.push({ name, ok: !!ok, detail });
   if (!ok || VERBOSE) console.log(`${ok ? 'PASS' : 'FAIL'}: ${name}${detail ? ` - ${detail}` : ''}`);
@@ -90,8 +110,8 @@ async function waitForHttp(url, timeoutMs = 15000) {
   }
   throw lastError || new Error(`Timed out waiting for ${url}`);
 }
-function startChrome(debugPort, userDataDir) {
-  return spawn(CHROME_PATH, [
+function startChrome(debugPort, userDataDir, browserPath) {
+  return spawn(browserPath, [
     `--remote-debugging-port=${debugPort}`,
     '--headless=new',
     '--disable-gpu',
@@ -179,10 +199,17 @@ async function waitForRuntime(client, timeoutMs = 15000) {
 }
 
 async function main() {
+  const browserPath = resolveBrowserPath();
+  if (!browserPath) {
+    console.log('SKIP: Enter Dungeon runtime smoke could not find a Chromium browser.');
+    console.log('Set CHROME_PATH, CHROMIUM_PATH, or PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to run this browser smoke.');
+    return;
+  }
+
   const { server, pageUrl } = await startStaticServer();
   const debugPort = await pickPort();
   const userDataDir = await mkdtemp(path.join(tmpdir(), 'dungeondex-enter-smoke-'));
-  const chrome = startChrome(debugPort, userDataDir);
+  const chrome = startChrome(debugPort, userDataDir, browserPath);
   let client = null;
   try {
     await waitForHttp(`http://127.0.0.1:${debugPort}/json/version`);
@@ -235,7 +262,7 @@ async function main() {
     record('Town loads before Enter Dungeon', before.activeScreen === 'screen-town' && /Enter Dungeon|Continue Run/.test(before.buttonText), JSON.stringify(before));
     record('Town shell identity survives the wrapper chain', before.boardShell && before.marketShell && before.forgeShell, JSON.stringify({ boardShell: before.boardShell, marketShell: before.marketShell, forgeShell: before.forgeShell }));
     record('Town sections retain readable v1.26 labels', /Lowfire Board/.test(before.board) && /Lowfire Market/.test(before.market) && /Lowfire Forge/.test(before.forge), JSON.stringify({ board: /Lowfire Board/.test(before.board), market: /Lowfire Market/.test(before.market), forge: /Lowfire Forge/.test(before.forge) }));
-    record('Trophy Echo-only Revisit panel renders before dungeon entry', /Revisit/.test(before.board) && /Trophy Echo is the only active Revisit lane for v1\.26\.1/.test(before.board) && !/Start Famous Gear Memory|Start Rival Trace|Start Board Echo|Start Debt Pressure/.test(before.board), JSON.stringify({ revisitStartButtons: before.revisitStartButtons, board: before.board.slice(0, 1200) }));
+    record('Trophy Echo-only Revisit panel renders before dungeon entry', /Revisit/.test(before.board) && /Trophy Echo is the only active Revisit lane for v1\.26\.2/.test(before.board) && !/Start Famous Gear Memory|Start Rival Trace|Start Board Echo|Start Debt Pressure/.test(before.board), JSON.stringify({ revisitStartButtons: before.revisitStartButtons, board: before.board.slice(0, 1200) }));
     record('Town actions preserve dungeon, market, gear, archive, and journal access', Object.values(before.townActions).every(Boolean), JSON.stringify(before.townActions));
     record('No non-Trophy Revisit start action is exposed in town', before.revisitStartButtons.every(key => key === 'trophy_echo_route'), JSON.stringify(before.revisitStartButtons));
 

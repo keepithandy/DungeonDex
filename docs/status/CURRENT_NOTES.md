@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.1 - Public Readiness Sweep
+- DungeonDex v1.26.2 - Public Runtime Hygiene + Devtools Gate
+
+## v1.26.2 Public Runtime Hygiene + Devtools Gate
+- Public runtime now keeps internal DevTools, scenario presets, balance reports, and DevKit Reset-hold helpers behind one explicit devtools gate.
+- Devtools stay available for intentional local development on localhost, direct `file:` review, or an explicit `?devtools=1` / `?dev=1` query.
+- Public service-worker precache no longer includes devtools-only runtime files.
+- Trophy Echo remains the only active Revisit lane.
+- Build/cache labels now use `1.26.2-public-runtime-hygiene`.
+- No combat, save, rewards, drops, scaling, dungeon entry, Debt math, Talent behavior, gear, monster, or economy behavior changed.
 
 ## v1.26.1 Public Readiness Sweep
 - The GitHub issue queue was completed before this patch was prepared.
@@ -97,6 +105,6 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.1 Public Readiness Sweep.
+- Current runtime baseline is v1.26.2 Public Runtime Hygiene + Devtools Gate.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
