@@ -43,8 +43,8 @@ Forbidden in the focused Board Echo patch:
 
 ```powershell
 node smoke_compact_suite.mjs
-node smoke_revisit_routes_v173.mjs
-node smoke_journal_v1233.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_journal_v1233.mjs
 ```
 
 A focused Board Echo smoke should prove:
@@ -94,8 +94,8 @@ Forbidden in the focused Debt Pressure patch:
 
 ```powershell
 node smoke_compact_suite.mjs
-node smoke_debt_collector_v169.mjs
-node smoke_journal_v1233.mjs
+node tests/smoke/smoke_debt_collector_v169.mjs
+node tests/smoke/smoke_journal_v1233.mjs
 ```
 
 A focused Debt Pressure smoke should prove:

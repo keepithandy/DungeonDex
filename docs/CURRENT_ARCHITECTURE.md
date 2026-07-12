@@ -103,11 +103,11 @@ Use these files to lock existing behavior:
 
 ```text
 smoke_compact_suite.mjs
-smoke_merchant_gear_upgrades_v1238.mjs
-smoke_debt_collector_v169.mjs
-smoke_revisit_routes_v173.mjs
-smoke_journal_v1233.mjs
-smoke_rival_trace_memory_v1.mjs
+tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs
+tests/smoke/smoke_debt_collector_v169.mjs
+tests/smoke/smoke_revisit_routes_v173.mjs
+tests/smoke/smoke_journal_v1233.mjs
+tests/smoke/smoke_rival_trace_memory_v1.mjs
 ```
 
 Prefer adding targeted assertions to existing smoke files instead of creating broad manual audit requirements.

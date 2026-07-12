@@ -42,7 +42,7 @@ Current status notes live at:
 
 ## Smoke tests and validation
 
-The repo currently keeps individual smoke scripts at root because several scripts load runtime files relative to their own location and the compact runner expects those paths.
+The repo keeps the compact runner at root and individual smoke scripts under `tests/smoke/`.
 
 Current stable validation command:
 
@@ -50,22 +50,15 @@ Current stable validation command:
 node smoke_compact_suite.mjs
 ```
 
-Focused checks may still be run from root, for example:
+Run focused checks from the repository root, for example:
 
 ```bash
-node smoke_merchant_gear_upgrades_v1238.mjs
-node smoke_revisit_routes_v173.mjs
-node smoke_journal_v1233.mjs
+node tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_journal_v1233.mjs
 ```
 
-Future cleanup should migrate individual smoke files into a folder such as `tests/smoke/` only as a focused path-aware patch. That migration must update:
-
-- `smoke_compact_suite.mjs`
-- README smoke commands
-- docs/status smoke target notes
-- any smoke scripts that use `new URL('./js/...', import.meta.url)` or similar path-relative loading
-
-Until then, do not move individual smoke scripts blindly.
+Smoke scripts that resolve files from `import.meta.url` must account for the `tests/smoke/` depth. Cwd-relative scripts assume commands are launched from the repository root.
 
 ## Assets
 
@@ -85,7 +78,7 @@ Before adding a new file, choose the folder by purpose:
 | Runtime system code | `js/systems/` |
 | Durable docs/plans | `docs/` |
 | Status/checkpoint notes | `docs/status/` |
-| Future smoke tests | `tests/smoke/` after path migration |
+| Smoke tests | `tests/smoke/` |
 | Future tooling | `tools/` |
 | Future public assets | `assets/` |
 

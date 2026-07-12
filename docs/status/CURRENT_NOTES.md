@@ -85,7 +85,7 @@
 - Upgrade costs are fixed at `50c`, `125c`, and `250c`.
 - Weapon upgrades add flat Power. Armor upgrades add flat Guard and HP.
 - Legacy progression save data remains compatibility-safe but no longer grants gameplay effects or active progression UI.
-- `smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
+- `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
 - Current runtime baseline is v1.26.0 Trophy Echo Only Revisit.

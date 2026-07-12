@@ -78,9 +78,9 @@ git diff --check
 node --check app.js
 node --check sw.js
 node --check js/systems/21_build_label_guard.js
-node smoke_talent_v150b.mjs
-node smoke_debt_collector_v169.mjs
-node smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_talent_v150b.mjs
+node tests/smoke/smoke_debt_collector_v169.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
 ```
 
 If a command is skipped, state why.

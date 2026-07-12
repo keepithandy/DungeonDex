@@ -42,9 +42,9 @@ It writes local captures to `archive/screenshots/town-mobile/`. A missing Chromi
 Run these separately from the visual inspection:
 
 ```powershell
-node smoke_revisit_routes_v173.mjs
-node smoke_enter_dungeon_runtime_v1.mjs
-node smoke_merchant_gear_upgrades_v1238.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_enter_dungeon_runtime_v1.mjs
+node tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs
 node smoke_compact_suite.mjs
 ```
 

@@ -30,18 +30,18 @@ Run where Node is available:
 
 ```bash
 node smoke_compact_suite.mjs
-node smoke_rival_trace_memory_v1.mjs
-node smoke_revisit_routes_v173.mjs
+node tests/smoke/smoke_rival_trace_memory_v1.mjs
+node tests/smoke/smoke_revisit_routes_v173.mjs
 ```
 
 Useful adjacent checks:
 
 ```bash
-node smoke_journal_v1233.mjs
-node smoke_famous_gear_memory_v1.mjs
-node smoke_boss_trophy_v1.mjs
-node smoke_talent_passive_framework_v1232.mjs
-node smoke_debt_collector_v169.mjs
+node tests/smoke/smoke_journal_v1233.mjs
+node tests/smoke/smoke_famous_gear_memory_v1.mjs
+node tests/smoke/smoke_boss_trophy_v1.mjs
+node tests/smoke/smoke_talent_passive_framework_v1232.mjs
+node tests/smoke/smoke_debt_collector_v169.mjs
 ```
 
 ## Main branch rule

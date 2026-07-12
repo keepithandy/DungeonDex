@@ -4,11 +4,11 @@ import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 
 const SYSTEM_FILES = [
-  './js/systems/08_normalization_save.js',
-  './js/systems/35_revisit_famous_gear_memory_state_patch.js',
-  './js/systems/03_town_contracts_market.js',
-  './js/systems/37_revisit_famous_gear_flavor_pack.js',
-  './js/systems/38_journal_v1.js'
+  '../../js/systems/08_normalization_save.js',
+  '../../js/systems/35_revisit_famous_gear_memory_state_patch.js',
+  '../../js/systems/03_town_contracts_market.js',
+  '../../js/systems/37_revisit_famous_gear_flavor_pack.js',
+  '../../js/systems/38_journal_v1.js'
 ];
 
 function makeContext() {
