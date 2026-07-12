@@ -21,7 +21,7 @@ async function main() {
 
   record('Public shell names the current game and Journal', index.includes('<title>DungeonDex v1.26.0</title>') && index.includes('aria-label="Guild Journal"'), 'title and Guild Journal surface');
   record('Town progression copy retains Lowfire Forge and Merchant Gear Upgrades', forge.includes('<h2>Lowfire Forge</h2>') && town.includes('<strong>Merchant Gear Upgrades</strong>'), 'active crafting and upgrade labels');
-  record('Active Revisit surface identifies Trophy Echo as the only lane', revisit.includes('Trophy Echo is the only active Revisit lane for v1.26.0.') && revisit.includes('Trophy Echo Locked') && revisit.includes('Start Trophy Echo'), 'locked and available Trophy Echo copy');
+  record('Active Revisit surface identifies Trophy Echo as the only lane', revisit.includes('Trophy Echo is the only active Revisit lane for v1.26.0.') && revisit.includes('No boss echo is recorded yet.') && revisit.includes("record is ready to be revisited.") && revisit.includes('Trophy Echo Locked') && revisit.includes('Start Trophy Echo') && revisit.includes('Settle Echo'), 'locked, available, and active Trophy Echo copy');
   record('Active Revisit surface rejects inactive lane start copy', ['Start Famous Gear Memory', 'Start Rival Trace', 'Start Board Echo', 'Start Debt Pressure'].every(needle => !revisit.includes(needle)), 'no inactive lane start labels');
 
   const passed = results.filter(result => result.ok).length;

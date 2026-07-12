@@ -34,20 +34,20 @@
 		const summaryLine = active
 			? C(active.summaryLine || `${trophyName} stirs with a remembered weight.`, `${trophyName} stirs with a remembered weight.`)
 			: locked
-				? 'Defeat a boss and record a boss trophy before Trophy Echo can open.'
-				: `${bossName} is ready as a playable Trophy Echo.`;
+				? 'No boss echo is recorded yet. Defeat a boss and bring its trophy back to the board.'
+				: `${bossName}'s record is ready to be revisited.`;
 		const flavorLine = active
 			? C(active.reflection || '', '')
 			: locked
-				? 'This Revisit system now focuses only on Trophy Echo. Bring back proof of a boss kill, then return here to read the memory.'
-				: `The ${trophyName} still remembers ${bossName}. Start the echo from town and resolve the memory before the next descent.`;
+				? 'The board keeps one kind of memory: a boss trophy and the descent that earned it.'
+				: `The ${trophyName} still remembers ${bossName}. Hear the echo in town before the next descent.`;
 		const nextLine = active
-			? 'Next: resolve the active Trophy Echo in town.'
+			? 'Next: settle the active Trophy Echo in town.'
 			: locked
 				? 'Next: defeat a boss, earn a boss trophy or boss record, then return to this board.'
 				: 'Next: start Trophy Echo from town; rewards stay memory-only.';
 		const actionMarkup = active
-			? '<button class="primary" type="button" data-complete-trophy-echo="1">Resolve Echo</button>'
+			? '<button class="primary" type="button" data-complete-trophy-echo="1">Settle Echo</button>'
 			: locked
 				? '<button class="ghost" type="button" disabled aria-disabled="true">Trophy Echo Locked</button>'
 				: '<button class="primary" type="button" data-start-revisit="trophy_echo_route">Start Trophy Echo</button>';
