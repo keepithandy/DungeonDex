@@ -1,8 +1,8 @@
-# DungeonDex Playable Systems Queue
+# DungeonDex Historical Playable Systems Queue
 
-This queue supports the open playable/system issues without bundling protected runtime changes into one unsafe patch.
+This archived queue records earlier Board Echo and Debt Pressure planning. It is not the current work queue and does not authorize either system.
 
-Current baseline: **v1.23.7 Rival Trace Result Detail Polish**.
+Historical baseline when written: **v1.23.7 Rival Trace Result Detail Polish**. Check `VERSION.md` and current notes for the active baseline; Trophy Echo remains the only active Revisit lane unless a new explicit issue says otherwise.
 
 ## Priority 1: Board Echo v1 (#36)
 

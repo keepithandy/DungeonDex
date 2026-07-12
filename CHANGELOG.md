@@ -8,13 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.0 Trophy Echo Only Revisit`
-* Current local package baseline: `v1.26.0 Trophy Echo Only Revisit`
-* Current development target: `v1.26.0 Trophy Echo Only Revisit`
+* Public/live itch version: `v1.26.1 Public Readiness Sweep`
+* Current local package baseline: `v1.26.1 Public Readiness Sweep`
+* Current development target: `v1.26.1 Public Readiness Sweep`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.1 - Public Readiness Sweep
+
+* Completed and closed the remaining GitHub issue queue without activating new gameplay systems.
+* Finished the v1.26 player glossary, visual/lore/brand guidance, screenshot plan, asset provenance inventory, and player-copy audit.
+* Moved focused smoke scripts into `tests/smoke/` while preserving the stable root compact runner.
+* Updated release builders to include all three live stylesheets and aligned runtime, cache, documentation, and smoke labels to `1.26.1-public-readiness`.
+* Preserved Trophy Echo as the only active Revisit lane.
+* No combat, save, rewards, drops, scaling, dungeon entry, Debt math, Talent behavior, gear, monster, or economy behavior changed.
+
+---
 
 ## v1.26.0 - Trophy Echo Only Revisit
 

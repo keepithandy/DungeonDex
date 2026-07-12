@@ -1,15 +1,16 @@
-// DungeonDex v1.26.0 runtime pointer.
+// DungeonDex v1.26.1 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.0: Trophy Echo Only Revisit
+// v1.26.1: Public Readiness Sweep
 // - Keeps Revisit housed in the Lowfire Board source-render slot.
 // - Narrows the active player-facing Revisit surface to Trophy Echo only.
 // - Cache-busts extension loading to the Trophy Echo-only Revisit surface.
+// - Aligns public copy, smoke organization, and release-package completeness.
 // - Gameplay, save data, combat, economy, Debt, Talent, gear, and dungeon entry remain unchanged.
 
-window.DUNGEONDEX_BUILD = '1.26.0';
-window.DUNGEONDEX_BUILD_QS = '1.26.0-trophy-echo-only';
+window.DUNGEONDEX_BUILD = '1.26.1';
+window.DUNGEONDEX_BUILD_QS = '1.26.1-public-readiness';
 
 // Interface density cleanup helpers
 window.DD_MONSTER_ARCHETYPES = [
@@ -56,7 +57,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.0-trophy-echo-only';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.1-public-readiness';
     loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets');
     loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports');
     window.setTimeout(function(){ loadModule('./js/systems/44_revisit_lowfire_board_slot.js?build=' + qs, '__dungeondexRevisitTrophyEchoOnly', 'Trophy Echo-only Revisit surface'); }, 40);
