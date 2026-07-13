@@ -36,7 +36,7 @@
 			ok: false,
 			blocked: true,
 			routeKey: String(routeKey || '').trim(),
-			reason: 'DungeonDex v1.26.1 public Revisit surface only allows Trophy Echo.'
+			reason: 'DungeonDex v1.26.2 public Revisit surface only allows Trophy Echo.'
 		});
 	}
 

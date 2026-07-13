@@ -31,6 +31,13 @@ function Fail {
     throw "ITCH PACKAGE FAIL: $Message"
 }
 
+function Invoke-NativeChecked {
+    param([string]$FilePath, [string[]]$ArgumentList, [string]$Label)
+    & $FilePath @ArgumentList
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) { Fail "$Label failed with exit code $exitCode." }
+}
+
 function Resolve-RepoRoot {
     param([string]$RequestedRoot)
 
@@ -234,10 +241,10 @@ $node = Get-Command node -ErrorAction SilentlyContinue
 if ($node) {
     Push-Location $root
     try {
-        & node --check app.js
-        & node --check sw.js
+        Invoke-NativeChecked -FilePath $node.Source -ArgumentList @('--check', 'app.js') -Label 'Node syntax check: app.js'
+        Invoke-NativeChecked -FilePath $node.Source -ArgumentList @('--check', 'sw.js') -Label 'Node syntax check: sw.js'
         Get-ChildItem -LiteralPath (Join-Path $root "js\systems") -Filter "*.js" -File | ForEach-Object {
-            & node --check $_.FullName
+            Invoke-NativeChecked -FilePath $node.Source -ArgumentList @('--check', $_.FullName) -Label "Node syntax check: $($_.Name)"
         }
     }
     finally {
@@ -245,7 +252,7 @@ if ($node) {
     }
 }
 else {
-    Write-Warning "Node was not found, so syntax checks were skipped. Install Node or run checks manually before uploading."
+    Fail "Node was not found; syntax checks are required for an itch-ready package."
 }
 
 if (!$SkipSmoke) {
@@ -254,14 +261,14 @@ if (!$SkipSmoke) {
         Write-Step "Running compact smoke suite"
         Push-Location $root
         try {
-            & node smoke_compact_suite.mjs
+            Invoke-NativeChecked -FilePath $node.Source -ArgumentList @('smoke_compact_suite.mjs') -Label 'Compact smoke suite'
         }
         finally {
             Pop-Location
         }
     }
     else {
-        Write-Host "==> Compact smoke suite not found; skipping smoke step." -ForegroundColor Yellow
+        Fail "Compact smoke suite is required but was not found."
     }
 }
 
@@ -275,14 +282,14 @@ if (!$SkipPackageCheck) {
             $argsList = @()
             if ($pythonCmd.Count -gt 1) { $argsList += $pythonCmd[1] }
             $argsList += @($packageCheck, $stageDir)
-            & $exe @argsList
+            Invoke-NativeChecked -FilePath $exe -ArgumentList $argsList -Label 'Python package check'
         }
         else {
-            Write-Warning "Python was not found, so tools\check_dungeondex_package.py was skipped."
+            Fail "Python was not found; the package check is required."
         }
     }
     else {
-        Write-Host "==> Package checker not found; skipping Python package check." -ForegroundColor Yellow
+        Fail "Package checker is required but was not found."
     }
 }
 

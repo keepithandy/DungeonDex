@@ -33,6 +33,8 @@ STALE_RUNTIME_RE = re.compile(
     r")",
     re.IGNORECASE,
 )
+VERSION_RE = re.compile(r"v(\d+(?:\.\d+){1,4})")
+BUILD_QS_RE = re.compile(r"\b\d+(?:\.\d+){1,4}-[a-z0-9-]+\b", re.IGNORECASE)
 PROHIBITED_DIRS = {".git", "node_modules"}
 PROHIBITED_FILE_PATTERNS = (
     re.compile(r"[\\/]\.git(?:[\\/]|$)", re.IGNORECASE),
@@ -163,8 +165,22 @@ def runtime_files(root: Path) -> list[Path]:
     return sorted(set(files))
 
 
+def current_public_labels(root: Path) -> tuple[str | None, str | None]:
+    version_path = root / "VERSION.md"
+    version_match = VERSION_RE.search(version_path.read_text(encoding="utf-8")) if version_path.exists() else None
+    expected_version = version_match.group(1) if version_match else None
+    sw_path = root / "sw.js"
+    sw_text = sw_path.read_text(encoding="utf-8") if sw_path.exists() else ""
+    if not expected_version:
+        cache_version = re.search(r"CACHE_NAME\s*=\s*['\"]dungeondex-v(\d+(?:\.\d+){1,4})-", sw_text)
+        expected_version = cache_version.group(1) if cache_version else None
+    build_match = re.search(r"\bBUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", sw_text)
+    return expected_version, build_match.group(1) if build_match else None
+
+
 def stale_runtime_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
+    expected_version, expected_build_qs = current_public_labels(root)
     for path in runtime_files(root):
         try:
             text = path.read_text(encoding="utf-8")
@@ -178,6 +194,12 @@ def stale_runtime_warnings(root: Path) -> list[str]:
             match = STALE_RUNTIME_RE.search(line)
             if match:
                 warnings.append(f"{rel_path}:{line_no} contains stale runtime/build string: {match.group(0)}")
+                break
+            if expected_version and any(value != expected_version and re.search(r"public|runtime|revisit|build", line, re.IGNORECASE) for value in VERSION_RE.findall(line)):
+                warnings.append(f"{rel_path}:{line_no} contains a public/runtime/Revisit version other than {expected_version}")
+                break
+            if expected_build_qs and any(value != expected_build_qs for value in BUILD_QS_RE.findall(line)) and re.search(r"build|cache|runtime", line, re.IGNORECASE):
+                warnings.append(f"{rel_path}:{line_no} contains a build/cache label other than {expected_build_qs}")
                 break
     return warnings
 
@@ -287,9 +309,9 @@ def main() -> int:
         print("  none")
     print()
 
-    status = "FAIL" if missing_required else "PASS"
+    status = "FAIL" if missing_required or warnings else "PASS"
     print(f"Summary: {status} ({len(checked)} paths checked, {len(warnings)} warnings)")
-    return 1 if missing_required else 0
+    return 1 if missing_required or warnings else 0
 
 
 if __name__ == "__main__":
