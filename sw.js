@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.3-boss-2-readiness-scaling';
+const CACHE_NAME = 'dungeondex-v1.26.3.01-boss-scaling-matrix-hardening';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.3-boss-2-readiness-scaling';
+const BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
 const ASSETS = [
   './',
   './index.html',

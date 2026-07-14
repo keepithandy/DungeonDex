@@ -38,13 +38,13 @@ const COMMANDS = [
   { tag: 'famous', name: 'famous gear memory v1', cmd: ['node', 'tests/smoke/smoke_famous_gear_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_famous_gear_memory_v1.mjs' },
   { tag: 'boss', name: 'boss trophy v1', cmd: ['node', 'tests/smoke/smoke_boss_trophy_v1.mjs'], optionalPath: 'tests/smoke/smoke_boss_trophy_v1.mjs' },
   { tag: 'boss', name: 'boss 2 readiness scaling', cmd: ['node', 'tests/smoke/smoke_boss_2_readiness_v1263.mjs'], optionalPath: 'tests/smoke/smoke_boss_2_readiness_v1263.mjs' },
-  { tag: 'boss', name: 'boss scaling matrix', cmd: ['node', 'tests/smoke/smoke_boss_scaling_matrix_v1.mjs'] },
+  { tag: 'boss', name: 'boss scaling matrix', cmd: ['node', 'tests/smoke/smoke_boss_scaling_matrix_v1.mjs'], showSignal: true },
   { tag: 'rival', name: 'rival trace memory v1', cmd: ['node', 'tests/smoke/smoke_rival_trace_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_rival_trace_memory_v1.mjs' },
   { tag: 'revisit', name: 'revisit routes', cmd: ['node', 'tests/smoke/smoke_revisit_routes_v173.mjs'] },
   { tag: 'revisit', name: 'trophy echo result detail', cmd: ['node', 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs'], optionalPath: 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs' },
-  { tag: 'public', name: 'public copy v1.26.3', cmd: ['node', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
-  { tag: 'public', name: 'public trophy-only revisit v1.26.3', cmd: ['node', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
-  { tag: 'app', name: 'devtools gate v1.26.3', cmd: ['node', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
+  { tag: 'public', name: 'public copy v1.26.3.01', cmd: ['node', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
+  { tag: 'public', name: 'public trophy-only revisit v1.26.3.01', cmd: ['node', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
+  { tag: 'app', name: 'devtools gate v1.26.3.01', cmd: ['node', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
   { tag: 'revisit', name: 'revisit archive codex', cmd: ['node', 'tests/smoke/smoke_revisit_archive_codex_v174.mjs'], optionalPath: 'tests/smoke/smoke_revisit_archive_codex_v174.mjs' },
   { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
   { tag: 'debt', name: 'debt collector', cmd: ['node', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
@@ -144,7 +144,7 @@ for (const entry of suite) {
   const status = result.skipped ? 'SKIP' : result.ok ? 'PASS' : 'FAIL';
   const signal = compactSignal(result.output, result.ok);
   console.log(`${status.padEnd(4)} ${entry.name.padEnd(32)} ${formatMs(result.duration).padStart(7)}  ${commandLine(entry)}`);
-  if (!result.ok || result.skipped || verbose) {
+  if (!result.ok || result.skipped || verbose || result.entry.showSignal) {
     signal.forEach(line => console.log(`      ${line}`));
   }
 }

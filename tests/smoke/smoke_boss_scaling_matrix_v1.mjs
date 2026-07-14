@@ -35,12 +35,16 @@ const COMPACT = process.env.DUNGEONDEX_SMOKE_COMPACT === '1';
 // structural/regression coverage green while reporting that audit failure;
 // --strict-bands turns those findings into a non-zero test result.
 
-// These signatures lock rewards, drop probabilities, and adjacent normal-monster
-// generation independently from the provisional readiness/combat audit bands.
+// These signatures lock every deterministic matrix layer independently from
+// the provisional readiness/combat audit bands.
 const EXPECTED_SIGNATURES = Object.freeze({
+  bosses: 'e26ad58c9a701dcfb4cf99a1d4e9a56683aad7b6ea9fec223d723b2bfb165ff4',
+  boundaries: '9289dcf810262f7d20ccaa11f1469fa3b63ced84c9c8b5d6091c1193f9782400',
   rewards: '7e1ffd5d75fed8a069d21861ce1aaec95b4704c3bd4593aeed019c3a7c3c9eaf',
   drops: '1849879d2d98cb7e62ca7f2f99cb247fb24423bad9811f3f3b37d8ab0f1f2e93',
-  adjacentNormals: '8310543e136d8f46599f584f99dd969dbfe393c4f345b27509b6c2cac626d9d1'
+  adjacentNormals: '8310543e136d8f46599f584f99dd969dbfe393c4f345b27509b6c2cac626d9d1',
+  fixtures: 'a32c2f251d9623e34556df882de157248babe7877e73fcaf880d939f95b2bd5f',
+  combat: '56f3a410e42019f5ced4397161b37e0453a5c951c6a0aeefcaaa9c5b78e40f9e'
 });
 
 const ROLL_MODES = Object.freeze([
@@ -52,10 +56,10 @@ const ROLL_MODES = Object.freeze([
 const PROFILE_RULES = Object.freeze({
   natural: Object.freeze({ extraBandClears: 0, upgradeTarget: 1 }),
   strong: Object.freeze({ extraBandClears: 2, upgradeTarget: 3 }),
-  max: Object.freeze({ extraBandClears: 7, upgradeTarget: 3 })
+  reasonableMax: Object.freeze({ extraBandClears: 7, upgradeTarget: 3 })
 });
 
-// Progression can be farmed indefinitely, so "max" is deliberately bounded:
+// Progression can be farmed indefinitely, so "reasonableMax" is deliberately bounded:
 // one natural clear plus seven repeat clears of the preceding 15-depth band.
 // Fixtures use real dropped gear and Ashen Anvil upgrades only; Market purchases
 // and Lowfire Forge crafts are excluded because they need separate budget rules.
@@ -280,9 +284,10 @@ function buildGenerationMatrix(runtime) {
     rows.push(row);
   }
 
-
   assert.equal(Object.keys(runtime.api.BOSS_FLOOR_NAMES).length, BOSS_COUNT, 'boss floor catalog should contain exactly 20 named encounters');
   assert.equal(new Set(rows.map(row => row.encounterName)).size, BOSS_COUNT, 'all 20 boss encounter names should be unique');
+  const bossTwo = rows.find(row => row.bossNumber === 2);
+  assert.ok(bossTwo.rolls.min.power >= 650 && bossTwo.rolls.max.power <= 850, `Boss 2 should remain in its 650-850 PWR band; got ${bossTwo.rolls.min.power}-${bossTwo.rolls.max.power}`);
 
   for (let rawDepth = 1; rawDepth <= BOSS_COUNT * RAW_BOSS_INTERVAL; rawDepth += 1) {
     runtime.setRandom(() => MAX_ROLL);
@@ -457,6 +462,9 @@ function snapshotFixture(runtime, progressionState, candidates, provenance, boss
       assert.ok(itemProvenance.safeExtractDepthAtRoll >= 40, `${profileName} Boss ${bossNumber} Mythic-set gear must respect the real safe-depth gate`);
     }
   }
+  assert.equal(selectedProvenance.length, Object.keys(state.player.equipment).length, `${profileName} Boss ${bossNumber} should retain provenance for every equipped item`);
+  assert.ok(selectedProvenance.length <= runtime.api.SLOT_ORDER.length, `${profileName} Boss ${bossNumber} should not exceed the real equipment slots`);
+  assert.ok(candidates.length >= selectedProvenance.length, `${profileName} Boss ${bossNumber} equipped gear should come from its candidate history`);
 
   return {
     bossNumber,
@@ -503,14 +511,14 @@ function buildFixtureSet(runtime, bossNumber) {
   runDepthBand(runtime, progressionState, candidates, provenance, bandStart, preBossDepth, PROFILE_RULES.strong.extraBandClears);
   const strong = snapshotFixture(runtime, progressionState, candidates, provenance, bossNumber, 'strong');
 
-  runDepthBand(runtime, progressionState, candidates, provenance, bandStart, preBossDepth, PROFILE_RULES.max.extraBandClears - PROFILE_RULES.strong.extraBandClears);
-  const max = snapshotFixture(runtime, progressionState, candidates, provenance, bossNumber, 'max');
+  runDepthBand(runtime, progressionState, candidates, provenance, bandStart, preBossDepth, PROFILE_RULES.reasonableMax.extraBandClears - PROFILE_RULES.strong.extraBandClears);
+  const reasonableMax = snapshotFixture(runtime, progressionState, candidates, provenance, bossNumber, 'reasonableMax');
 
   assert.ok(strong.derived.power >= natural.derived.power, `Boss ${bossNumber} strong fixture should not trail natural fixture power`);
-  assert.ok(max.derived.power >= strong.derived.power, `Boss ${bossNumber} max fixture should not trail strong fixture power`);
+  assert.ok(reasonableMax.derived.power >= strong.derived.power, `Boss ${bossNumber} reasonable-max fixture should not trail strong fixture power`);
   assert.ok(strong.state.player.level >= natural.state.player.level, `Boss ${bossNumber} strong fixture should not trail natural fixture level`);
-  assert.ok(max.state.player.level >= strong.state.player.level, `Boss ${bossNumber} max fixture should not trail strong fixture level`);
-  return { natural, strong, max };
+  assert.ok(reasonableMax.state.player.level >= strong.state.player.level, `Boss ${bossNumber} reasonable-max fixture should not trail strong fixture level`);
+  return { natural, strong, reasonableMax };
 }
 
 function prepareFightState(runtime, fixture, rawDepth, seed) {
@@ -523,6 +531,8 @@ function prepareFightState(runtime, fixture, rawDepth, seed) {
   state.run.active = true;
   state.run.floor = rawDepth;
   state.run.monster = plain(runtime.api.generateMonster(rawDepth, state));
+  assert.equal(state.run.monster.tier, 'Boss', `${fixture.profile} Boss ${fixture.bossNumber} combat target should be a Boss`);
+  assert.equal(state.run.monster.level, rawDepth, `${fixture.profile} Boss ${fixture.bossNumber} combat target should stay at raw depth ${rawDepth}`);
   state.run.choices = ['attack', 'guard', 'skill', 'extract'];
   state.run.roomsCleared = 0;
   state.run.chain = 0;
@@ -614,6 +624,57 @@ function simulateFight(runtime, fixture, policy, trial) {
   };
 }
 
+function fixtureSignatureProjection(fixture) {
+  const equipment = Object.entries(fixture.state.player.equipment || {})
+    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+    .map(([slot, item]) => ({
+      slot,
+      name: item.name,
+      level: item.level,
+      rarity: item.rarity,
+      rating: item.rating,
+      upgradeLevel: item.upgradeLevel || 0,
+      stats: plain(item.stats),
+      tags: plain(item.tags),
+      setId: item.setId || '',
+      mythicSetId: item.mythicSetId || ''
+    }));
+  const provenance = fixture.selectedProvenance
+    .map(entry => ({ slot: entry.item.slot, ...plain(entry.provenance) }))
+    .sort((left, right) => left.slot < right.slot ? -1 : left.slot > right.slot ? 1 : 0);
+  const upgrades = fixture.upgradeResults.map(result => ({
+    slot: result.slot,
+    cost: result.cost,
+    beforeLevel: result.beforeLevel,
+    afterLevel: result.afterLevel,
+    goldAfter: result.goldAfter
+  }));
+  return {
+    bossNumber: fixture.bossNumber,
+    rawDepth: fixture.rawDepth,
+    profile: fixture.profile,
+    player: {
+      level: fixture.state.player.level,
+      xp: fixture.state.player.xp,
+      xpNext: fixture.state.player.xpNext,
+      maxHp: fixture.state.player.maxHp,
+      gold: fixture.state.player.gold,
+      shards: fixture.state.player.shards,
+      ember: fixture.state.player.ember,
+      depth: fixture.state.player.depth,
+      safeExtractDepth: fixture.state.player.safeExtractDepth,
+      returnDepth: fixture.state.player.returnDepth,
+      stats: plain(fixture.state.player.stats)
+    },
+    derived: plain(fixture.derived),
+    candidateCount: fixture.candidateCount,
+    equipmentCount: fixture.equipmentCount,
+    equipment,
+    provenance,
+    upgrades
+  };
+}
+
 function summarizeFights(runtime, fixture, policy) {
   const fights = [];
   for (let trial = 0; trial < TRIALS_PER_POLICY; trial += 1) fights.push(simulateFight(runtime, fixture, policy, trial));
@@ -623,7 +684,8 @@ function summarizeFights(runtime, fixture, policy) {
   const timeouts = fights.filter(fight => fight.timedOut).length;
   const survivingFights = fights.filter(fight => fight.won || fight.extracted);
   assert.equal(wins + defeats + extracts + timeouts, TRIALS_PER_POLICY, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} trial accounting should balance`);
-  return {
+  assert.ok(fights.every(fight => fight.turns >= 1 && fight.turns <= TURN_LIMIT), `${fixture.profile} Boss ${fixture.bossNumber} ${policy} turn counts should stay within the simulation limit`);
+  const row = {
     bossNumber: fixture.bossNumber,
     rawDepth: fixture.rawDepth,
     profile: fixture.profile,
@@ -642,17 +704,30 @@ function summarizeFights(runtime, fixture, policy) {
     extractionAttempts: fights.reduce((sum, fight) => sum + fight.extractionAttempts, 0),
     failedExtractions: fights.reduce((sum, fight) => sum + fight.failedExtractions, 0)
   };
+  assert.equal(row.timeouts, 0, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} should reach a real terminal outcome`);
+  assert.ok(row.winRate >= 0 && row.winRate <= 1, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} win rate should be bounded`);
+  assert.ok(row.oneHitDeaths <= row.defeats, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} one-hit deaths cannot exceed defeats`);
+  assert.ok(row.extracts <= row.extractionAttempts, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} successful extractions require an attempt`);
+  assert.equal(row.extracts + row.failedExtractions, row.extractionAttempts, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} extraction attempts should resolve as success or failure`);
+  assert.ok(row.medianTurns >= 1 && row.medianTurns <= TURN_LIMIT, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} median turns should be bounded`);
+  assert.ok(row.medianSurvivorHp >= 0 && row.medianSurvivorHp <= fixture.state.player.maxHp, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} survivor HP should be bounded`);
+  assert.ok(row.medianSurvivorHpPct >= 0 && row.medianSurvivorHpPct <= 1, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} survivor HP ratio should be bounded`);
+  assert.ok(row.averageEmberUsed >= 0 && row.averageEmberUsed <= fixture.state.player.ember, `${fixture.profile} Boss ${fixture.bossNumber} ${policy} Ember use should be bounded`);
+  return row;
 }
 
 function assertSignatures(contracts) {
   const actual = {
+    bosses: signature(contracts.bosses),
+    boundaries: signature(contracts.boundaries),
     rewards: signature(contracts.rewards),
     drops: signature(contracts.drops),
-    adjacentNormals: signature(contracts.adjacentNormals)
+    adjacentNormals: signature(contracts.adjacentNormals),
+    fixtures: signature(contracts.fixtures),
+    combat: signature(contracts.combat)
   };
   if (PRINT_SIGNATURES) {
     console.log(JSON.stringify(actual, null, 2));
-    return actual;
   }
   for (const [key, value] of Object.entries(actual)) {
     assert.equal(value, EXPECTED_SIGNATURES[key], `${key} regression signature changed`);
@@ -710,7 +785,6 @@ async function main() {
   const generation = buildGenerationMatrix(runtime);
   const boundaryRows = buildBoundaryMatrix(runtime);
   const dropContract = buildDropContract(runtime);
-  assertSignatures({ rewards: generation.rewards, drops: dropContract, adjacentNormals: generation.adjacentNormals });
 
   const atReadinessThreshold = plain(runtime.api.bossReadinessModel(200, 300));
   const aboveReadinessThreshold = plain(runtime.api.bossReadinessModel(200, 301));
@@ -742,6 +816,15 @@ async function main() {
   for (const fixture of fixtures) {
     for (const policy of POLICY_NAMES) combatRows.push(summarizeFights(runtime, fixture, policy));
   }
+  assertSignatures({
+    bosses: generation.rows,
+    boundaries: boundaryRows,
+    rewards: generation.rewards,
+    drops: dropContract,
+    adjacentNormals: generation.adjacentNormals,
+    fixtures: fixtures.map(fixtureSignatureProjection),
+    combat: combatRows
+  });
 
   const strongFixtures = fixtures.filter(fixture => fixture.profile === 'strong');
   const powerFailures = strongFixtures.filter(fixture => !fixture.inPowerTarget).map(fixture => fixture.bossNumber);

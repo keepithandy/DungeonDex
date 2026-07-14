@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.3 - Boss 2 Readiness + Scaling Audit
+- DungeonDex v1.26.3.01 - Boss Scaling Matrix Smoke Hardening
+
+## v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+- The 20-boss matrix now locks min/mid/max boss combat snapshots, boundary rows, legal fixture summaries, and 180 combat summaries from 36,000 seeded fights.
+- Combat metrics now hard-check terminal outcomes, extraction accounting, one-hit accounting, turn limits, HP bounds, and Ember bounds.
+- Boss 2's 650-850 PWR range remains an explicit hard contract; the broader provisional PWR and combat bands remain diagnostic under `--strict-bands`.
+- The compact suite now surfaces the matrix audit signal while keeping gameplay behavior unchanged.
+- Build/cache labels now use `1.26.3.01-boss-scaling-matrix-hardening`.
 
 ## v1.26.3 Boss 2 Readiness + Scaling Audit
 - Boss 2 at raw depth 30 now generates at 676-842 PWR instead of 994-1,239 PWR.
@@ -113,6 +120,6 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.3 Boss 2 Readiness + Scaling Audit.
+- Current runtime baseline is v1.26.3.01 Boss Scaling Matrix Smoke Hardening.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

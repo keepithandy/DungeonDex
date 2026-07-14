@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.3 Boss 2 Readiness + Scaling Audit`
-* Current local package baseline: `v1.26.3 Boss 2 Readiness + Scaling Audit`
-* Current development target: `v1.26.3 Boss 2 Readiness + Scaling Audit`
+* Public/live itch version: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
+* Current local package baseline: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
+* Current development target: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.3.01 - Boss Scaling Matrix Smoke Hardening
+
+* Locked deterministic min/mid/max combat snapshots for all 20 named bosses and the D40, D90, and D800 scaling boundaries.
+* Locked the legal pre-boss fixture summaries and 180 combat summaries from 36,000 seeded real fights against silent drift.
+* Added hard combat-metric integrity checks, retained the explicit Boss 2 650-850 PWR contract, and made the compact suite surface the provisional audit result.
+* Preserved all gameplay scaling, combat, rewards, drops, gear, progression, and save behavior.
+
+---
 
 ## v1.26.3 - Boss 2 Readiness + Scaling Audit
 

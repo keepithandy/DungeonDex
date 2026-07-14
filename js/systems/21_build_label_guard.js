@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.26.3 - Build label guard.
+// DungeonDex v1.26.3.01 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.26.3';
+  const BUILD = '1.26.3.01';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.26.3-boss-2-readiness-scaling';
+  const BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

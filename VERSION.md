@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.3 Boss 2 Readiness + Scaling Audit
+v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 
 ## Current Local Package Version
-v1.26.3 Boss 2 Readiness + Scaling Audit
+v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 
 ## Current Development Target
-v1.26.3 Boss 2 Readiness + Scaling Audit
+v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
