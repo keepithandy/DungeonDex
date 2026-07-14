@@ -34,7 +34,6 @@ STALE_RUNTIME_RE = re.compile(
     re.IGNORECASE,
 )
 VERSION_RE = re.compile(r"v(\d+(?:\.\d+){1,4})")
-BUILD_QS_RE = re.compile(r"\b\d+(?:\.\d+){1,4}-[a-z0-9-]+\b", re.IGNORECASE)
 PROHIBITED_DIRS = {".git", "node_modules"}
 PROHIBITED_FILE_PATTERNS = (
     re.compile(r"[\\/]\.git(?:[\\/]|$)", re.IGNORECASE),
@@ -42,6 +41,7 @@ PROHIBITED_FILE_PATTERNS = (
     re.compile(r"\.zip$", re.IGNORECASE),
     re.compile(r"\.patch$", re.IGNORECASE),
     re.compile(r"\.diff$", re.IGNORECASE),
+    re.compile(r"\.(?:md|mjs|ps1|py)$", re.IGNORECASE),
     re.compile(r"(?:^|[\\/])backup", re.IGNORECASE),
     re.compile(r"(?:^|[\\/]).*debug", re.IGNORECASE),
 )
@@ -169,18 +169,67 @@ def current_public_labels(root: Path) -> tuple[str | None, str | None]:
     version_path = root / "VERSION.md"
     version_match = VERSION_RE.search(version_path.read_text(encoding="utf-8")) if version_path.exists() else None
     expected_version = version_match.group(1) if version_match else None
+    index_path = root / "index.html"
+    index_text = index_path.read_text(encoding="utf-8") if index_path.exists() else ""
+    if not expected_version:
+        index_version = re.search(r"DUNGEONDEX_BUILD\s*=\s*['\"](\d+(?:\.\d+){1,4})['\"]", index_text)
+        expected_version = index_version.group(1) if index_version else None
+    index_build = re.search(r"DUNGEONDEX_BUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", index_text)
     sw_path = root / "sw.js"
     sw_text = sw_path.read_text(encoding="utf-8") if sw_path.exists() else ""
     if not expected_version:
         cache_version = re.search(r"CACHE_NAME\s*=\s*['\"]dungeondex-v(\d+(?:\.\d+){1,4})-", sw_text)
         expected_version = cache_version.group(1) if cache_version else None
     build_match = re.search(r"\bBUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", sw_text)
-    return expected_version, build_match.group(1) if build_match else None
+    expected_build_qs = index_build.group(1) if index_build else (build_match.group(1) if build_match else None)
+    return expected_version, expected_build_qs
+
+
+def public_label_warnings(root: Path) -> list[str]:
+    warnings: list[str] = []
+    expected_version, expected_build_qs = current_public_labels(root)
+    if not expected_version:
+        return ["could not determine the current public version from VERSION.md or index.html"]
+    if not expected_build_qs:
+        return ["could not determine the current build/cache label from index.html or sw.js"]
+
+    checks = (
+        ("index.html", r"<title>DungeonDex v(\d+(?:\.\d+){1,4})</title>", expected_version, "title version"),
+        ("index.html", r"DUNGEONDEX_BUILD\s*=\s*['\"]([^'\"]+)['\"]", expected_version, "public build version"),
+        ("index.html", r"DUNGEONDEX_BUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", expected_build_qs, "build query label"),
+        ("app.js", r"DUNGEONDEX_BUILD\s*=\s*['\"]([^'\"]+)['\"]", expected_version, "runtime build version"),
+        ("app.js", r"DUNGEONDEX_BUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", expected_build_qs, "runtime build query label"),
+        ("sw.js", r"CACHE_NAME\s*=\s*['\"]([^'\"]+)['\"]", f"dungeondex-v{expected_build_qs}", "service-worker cache label"),
+        ("sw.js", r"\bBUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", expected_build_qs, "service-worker build query label"),
+        ("js/systems/21_build_label_guard.js", r"\bBUILD\s*=\s*['\"]([^'\"]+)['\"]", expected_version, "build-guard version"),
+        ("js/systems/21_build_label_guard.js", r"\bBUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", expected_build_qs, "build-guard query label"),
+        ("js/systems/44_revisit_lowfire_board_slot.js", r"DungeonDex v(\d+(?:\.\d+){1,4}) public Revisit surface only allows Trophy Echo", expected_version, "public Revisit response version"),
+    )
+    for rel_path, pattern, expected, label in checks:
+        path = root / rel_path
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        matches = re.findall(pattern, text)
+        if not matches:
+            warnings.append(f"{rel_path} is missing its {label}")
+            continue
+        for value in matches:
+            if value != expected:
+                warnings.append(f"{rel_path} has {label} {value}; expected {expected}")
+
+    index_path = root / "index.html"
+    if index_path.is_file():
+        index_text = index_path.read_text(encoding="utf-8")
+        for value in re.findall(r"[?&]build=([^'\"\s]+)", index_text):
+            if value != expected_build_qs:
+                warnings.append(f"index.html has asset build label {value}; expected {expected_build_qs}")
+                break
+    return warnings
 
 
 def stale_runtime_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
-    expected_version, expected_build_qs = current_public_labels(root)
     for path in runtime_files(root):
         try:
             text = path.read_text(encoding="utf-8")
@@ -194,12 +243,6 @@ def stale_runtime_warnings(root: Path) -> list[str]:
             match = STALE_RUNTIME_RE.search(line)
             if match:
                 warnings.append(f"{rel_path}:{line_no} contains stale runtime/build string: {match.group(0)}")
-                break
-            if expected_version and any(value != expected_version and re.search(r"public|runtime|revisit|build", line, re.IGNORECASE) for value in VERSION_RE.findall(line)):
-                warnings.append(f"{rel_path}:{line_no} contains a public/runtime/Revisit version other than {expected_version}")
-                break
-            if expected_build_qs and any(value != expected_build_qs for value in BUILD_QS_RE.findall(line)) and re.search(r"build|cache|runtime", line, re.IGNORECASE):
-                warnings.append(f"{rel_path}:{line_no} contains a build/cache label other than {expected_build_qs}")
                 break
     return warnings
 
@@ -283,6 +326,7 @@ def main() -> int:
             if rel_path and not add_checked(checked, seen, root, rel_path, source):
                 missing_required.append(f"{source} references missing local asset: {rel_path}")
 
+    warnings.extend(public_label_warnings(root))
     warnings.extend(stale_runtime_warnings(root))
     warnings.extend(prohibited_content_warnings(root))
 

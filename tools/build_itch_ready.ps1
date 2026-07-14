@@ -72,12 +72,14 @@ function Resolve-PythonCommand {
         $arg = $candidate[1]
         $found = Get-Command $cmd -ErrorAction SilentlyContinue
         if ($found) {
-            if ($arg) { return @($cmd, $arg) }
-            return @($cmd, $null)
+            return [pscustomobject]@{
+                FilePath = $found.Source
+                Arguments = @($arg | Where-Object { $_ })
+            }
         }
     }
 
-    return @($null, $null)
+    return $null
 }
 
 function Copy-RequiredFile {
@@ -232,6 +234,10 @@ foreach ($file in $requiredRootFiles) {
 Copy-RuntimeDirectory -Root $root -Stage $stageDir -RelativePath "js\systems"
 Copy-RuntimeDirectory -Root $root -Stage $stageDir -RelativePath "assets"
 
+Get-ChildItem -LiteralPath (Join-Path $stageDir "js\systems") -Recurse -File |
+    Where-Object { $_.Extension -ne ".js" } |
+    Remove-Item -Force
+
 if (!(Test-Path -LiteralPath (Join-Path $stageDir "js\systems") -PathType Container)) {
     Fail "Stage is missing js\systems. The modular browser runtime will not load."
 }
@@ -276,13 +282,11 @@ if (!$SkipPackageCheck) {
     $packageCheck = Join-Path $root "tools\check_dungeondex_package.py"
     if (Test-Path -LiteralPath $packageCheck -PathType Leaf) {
         $pythonCmd = Resolve-PythonCommand
-        if ($pythonCmd.Count -gt 0) {
+        if ($pythonCmd) {
             Write-Step "Running package check against staged itch files"
-            $exe = $pythonCmd[0]
-            $argsList = @()
-            if ($pythonCmd.Count -gt 1) { $argsList += $pythonCmd[1] }
+            $argsList = @($pythonCmd.Arguments)
             $argsList += @($packageCheck, $stageDir)
-            Invoke-NativeChecked -FilePath $exe -ArgumentList $argsList -Label 'Python package check'
+            Invoke-NativeChecked -FilePath $pythonCmd.FilePath -ArgumentList $argsList -Label 'Python package check'
         }
         else {
             Fail "Python was not found; the package check is required."
