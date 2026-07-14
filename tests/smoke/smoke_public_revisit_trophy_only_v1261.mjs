@@ -21,7 +21,7 @@ const revisitSource = await readFile(path.join(ROOT, 'js/systems/44_revisit_lowf
 const lockdownSource = await readFile(path.join(ROOT, 'js/systems/31_revisit_activation_surface_lockdown.js'), 'utf8');
 const bindingSource = await readFile(path.join(ROOT, 'js/systems/12_render_bindings_boot.js'), 'utf8');
 
-assert.match(lockdownSource, /1\.26\.2-public-runtime-hygiene/, 'lockdown report should use the v1.26.2 public build key');
+assert.match(lockdownSource, /1\.26\.3-boss-2-readiness-scaling/, 'lockdown report should use the v1.26.3 public build key');
 assert.match(lockdownSource, /trophy-echo-only/, 'lockdown report should identify the public Trophy Echo-only surface');
 assert.doesNotMatch(lockdownSource, /v1\.23\.4-boss-trophy-v1-completion/, 'lockdown report should not keep the stale v1.23.4 build marker');
 assert.doesNotMatch(lockdownSource, /Famous Gear Memory is the second live Revisit lane/i, 'lockdown report should not describe Famous Gear as a live public lane');
@@ -171,4 +171,4 @@ assert.equal(report.trophyOnly, true, 'lockdown report should assert Trophy-only
 assert.deepEqual(Array.from(report.allowedRouteKeys), [ALLOWED_ROUTE], 'lockdown report should allow only Trophy Echo');
 assert.equal(report.apiSurfaceSafe, true, 'lockdown report should mark API surface as safe after no-op export wrapping');
 
-console.log('PASS: v1.26.2 public Revisit is Trophy Echo-only across DOM markup, route previews, global mutation functions, and exported API methods.');
+console.log('PASS: v1.26.3 public Revisit is Trophy Echo-only across DOM markup, route previews, global mutation functions, and exported API methods.');

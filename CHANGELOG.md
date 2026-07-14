@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
-* Current local package baseline: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
-* Current development target: `v1.26.2 Public Runtime Hygiene + Devtools Gate`
+* Public/live itch version: `v1.26.3 Boss 2 Readiness + Scaling Audit`
+* Current local package baseline: `v1.26.3 Boss 2 Readiness + Scaling Audit`
+* Current development target: `v1.26.3 Boss 2 Readiness + Scaling Audit`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.3 - Boss 2 Readiness + Scaling Audit
+
+* Corrected Boss 2's raw-depth-30 power spike from 994-1,239 PWR to 676-842 PWR.
+* Added a one-time repair for pre-patch saved Boss 2 combat stats without changing rewards or save schema.
+* Added an overmatched warning that directs players to The Ashen Anvil.
+* Preserved normal monster scaling, general combat math, rewards, gear upgrade values, the public DevTools gate, and the Trophy Echo-only Revisit surface.
+
+---
 
 ## v1.26.2 - Public Runtime Hygiene + Devtools Gate
 

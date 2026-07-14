@@ -28,9 +28,9 @@ async function main() {
   ]);
 
   record(
-    'Revisit surface is v1.26.2 Trophy Echo only',
-    has(surface, 'v1.26.2 Revisit surface: Trophy Echo only')
-      && has(surface, 'Trophy Echo is the only active Revisit lane for v1.26.2.'),
+    'Revisit surface is v1.26.3 Trophy Echo only',
+    has(surface, 'v1.26.3 Revisit surface: Trophy Echo only')
+      && has(surface, 'Trophy Echo is the only active Revisit lane for v1.26.3.'),
     'js/systems/44_revisit_lowfire_board_slot.js'
   );
 
@@ -84,7 +84,7 @@ async function main() {
 
   record(
     'Version docs identify Trophy Echo as the only active Revisit lane',
-    has(version, 'v1.26.2 Public Runtime Hygiene + Devtools Gate')
+    has(version, 'v1.26.3 Boss 2 Readiness + Scaling Audit')
       && has(readme, 'Trophy Echo')
       && !has(readme, '**Famous Gear Memory:** Live Revisit lane')
       && !has(readme, '**Rival Trace:** Live Revisit lane')

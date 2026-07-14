@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.26.2**
+Current baseline: **DungeonDex v1.26.3**
 
 ## Try It First
 
@@ -55,14 +55,14 @@ DungeonDex is built around a simple loop:
 - **Lowfire Forge:** Gear crafting, salvage, and tempering; older internal names remain preserved for existing saves.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
-- **Trophy Echo:** The only active Revisit lane for v1.26.2, tied to boss trophy or boss record history.
+- **Trophy Echo:** The only active Revisit lane for v1.26.3, tied to boss trophy or boss record history.
 - **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
 - **Gear detail modal:** Click a visible equipped or inventory gear card for a simple read-only rundown.
 - **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
 
 ## Planned / Locked Systems
 
-These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.2:
+These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.3:
 
 - **Famous Gear Memory:** Removed from the active Revisit surface.
 - **Rival Trace:** Removed from the active Revisit surface.
@@ -72,7 +72,7 @@ These systems may exist in old history or compatibility files, but they are not 
 
 ## Revisit Status
 
-Trophy Echo is the only active Revisit lane for v1.26.2. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
+Trophy Echo is the only active Revisit lane for v1.26.3. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
 
 The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of exposing unfinished lane concepts.
 

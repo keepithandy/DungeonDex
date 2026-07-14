@@ -1,16 +1,15 @@
-// DungeonDex v1.26.2 runtime pointer.
+// DungeonDex v1.26.3 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.2: Public Runtime Hygiene + Devtools Gate
-// - Keeps Revisit housed in the Lowfire Board source-render slot.
-// - Keeps Trophy Echo as the only public Revisit lane.
-// - Gates internal DevTools helpers away from the normal hosted runtime.
-// - Aligns runtime/cache labels to the public runtime hygiene patch.
-// - Gameplay, save data, combat, economy, Debt, Talent, gear, and dungeon entry remain unchanged.
+// v1.26.3: Boss 2 Readiness + Scaling Audit
+// - Tunes Boss 2 into its intended early-game challenge band.
+// - Repairs pre-patch saved Boss 2 encounters and adds overmatched guidance.
+// - Retains the v1.26.2 public DevTools gate and Trophy Echo-only Revisit surface.
+// - Normal monster scaling, rewards, upgrades, and general combat math remain unchanged.
 
-window.DUNGEONDEX_BUILD = '1.26.2';
-window.DUNGEONDEX_BUILD_QS = '1.26.2-public-runtime-hygiene';
+window.DUNGEONDEX_BUILD = '1.26.3';
+window.DUNGEONDEX_BUILD_QS = '1.26.3-boss-2-readiness-scaling';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -99,7 +98,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.2-public-runtime-hygiene';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.3-boss-2-readiness-scaling';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

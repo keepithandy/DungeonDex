@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.2 - Public Runtime Hygiene + Devtools Gate
+- DungeonDex v1.26.3 - Boss 2 Readiness + Scaling Audit
+
+## v1.26.3 Boss 2 Readiness + Scaling Audit
+- Boss 2 at raw depth 30 now generates at 676-842 PWR instead of 994-1,239 PWR.
+- Pre-patch saved Boss 2 encounters above the tuned range repair power, HP, guard, and speed once while preserving HP percentage and rewards.
+- Boss readiness warns an overmatched player to temper gear at The Ashen Anvil.
+- The v1.26.2 public DevTools gate and Trophy Echo-only Revisit surface remain intact.
+- Normal monster scaling, general combat math, rewards, gear upgrade values, save schema, Debt, Talent, Revisit behavior, and dungeon entry remain unchanged.
+- Build/cache labels now use `1.26.3-boss-2-readiness-scaling`.
 
 ## v1.26.2 Public Runtime Hygiene + Devtools Gate
 - Public runtime now keeps internal DevTools, scenario presets, balance reports, and DevKit Reset-hold helpers behind one explicit devtools gate.
@@ -105,6 +113,6 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.2 Public Runtime Hygiene + Devtools Gate.
+- Current runtime baseline is v1.26.3 Boss 2 Readiness + Scaling Audit.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

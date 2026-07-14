@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.2-public-runtime-hygiene';
+const CACHE_NAME = 'dungeondex-v1.26.3-boss-2-readiness-scaling';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.2-public-runtime-hygiene';
+const BUILD_QS = '1.26.3-boss-2-readiness-scaling';
 const ASSETS = [
   './',
   './index.html',

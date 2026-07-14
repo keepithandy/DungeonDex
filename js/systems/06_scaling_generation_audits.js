@@ -138,6 +138,26 @@
     return 3;
   }
 
+  // Boss 2 lands at raw depth 30, where late-floor pressure first reaches 5.5x.
+  // Keep this correction local so normal enemies, Boss 1, and later bosses retain
+  // their established scaling.
+  function earlyBossPowerMultiplier(rawDepth, tier = 'Common') {
+    const bossTwoDepth = BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP * 2;
+    return tier === 'Boss' && depthStageValue(rawDepth) === bossTwoDepth ? 0.68 : 1;
+  }
+
+  function bossReadinessModel(playerPower, bossPower) {
+    const player = Math.max(0, Math.floor(numberOr(playerPower, 0, 0, 9999999)));
+    const boss = Math.max(0, Math.floor(numberOr(bossPower, 0, 0, 9999999)));
+    const overmatched = player <= 0 || boss > player * 1.5;
+    return {
+      overmatched,
+      copy: overmatched
+        ? 'Overmatched: this boss outclasses your current build. Temper gear at The Ashen Anvil before challenging it.'
+        : 'Readiness: your build can challenge this boss. Keep your guard up.'
+    };
+  }
+
   function expectedGearRating(level, rarityKey = 'common', source = 'normal', rawDepth = 0) {
     const safeLevel = normalizeItemLevel(level);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
@@ -155,7 +175,7 @@
     const lateFloorPressure = lateFloorPowerPressure(depth);
     const base = (threatDepth * 9.5 + 15 + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure;
     const tierProfile = boss ? 1.22 : elite ? 1.16 : 1;
-    return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile);
+    return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile * earlyBossPowerMultiplier(depth, tier));
   }
 
   function expectedMonsterHpAtDepth(rawDepth, tier = 'Common') {
@@ -402,7 +422,9 @@
     // The deep multiplier is intentionally dormant before raw depth 800, then ramps so
     // normal monsters do not flatten behind deep Mythic-equipped players.
     const lateFloorPressure = lateFloorPowerPressure(rawDepth);
-    let power = Math.round((threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier));
+    const unscaledPowerRoll = (threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier);
+    const combatPowerScale = earlyBossPowerMultiplier(rawDepth, tier);
+    let power = Math.round(unscaledPowerRoll * combatPowerScale);
     let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * lateFloorHpPressure(rawDepth);
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
@@ -410,12 +432,14 @@
     let name = `${family} ${type}`;
     let reviveUsed = false;
     const eliteReward = elite ? eliteRewardProfile(modifiers, rawDepth) : null;
-    const rewardPower = power;
+    // Boss 2's correction is combat-only. Keep its existing reward basis intact.
+    const rewardPower = Math.round(unscaledPowerRoll);
     const rewardGold = encounterCoinReward(threatDepth, rewardPower, tier, rewardMult);
     if (elite) {
       power = Math.round(power * (1 + contractRisk.damageBonus));
       hp = Math.round(hp * (1 + contractRisk.hpBonus));
     }
+    const rewardXpPower = combatPowerScale === 1 ? power : rewardPower;
     const monster = {
       id: makeId('monster'),
       name,
@@ -437,7 +461,7 @@
       guard,
       speed,
       rewardGold,
-      rewardXp: Math.max(6, Math.round(power * 1.05 * rewardMult)),
+      rewardXp: Math.max(6, Math.round(rewardXpPower * 1.05 * rewardMult)),
       rewardShard: boss ? rand(22, 34) : elite ? rand(7, 12) + (eliteReward?.shardBonus || 0) : rand(1, 4),
       lore: boss ? 'A named ruin-lord waits deeper than prayer.' : `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
     };

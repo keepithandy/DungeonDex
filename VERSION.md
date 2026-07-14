@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.2 Public Runtime Hygiene + Devtools Gate
+v1.26.3 Boss 2 Readiness + Scaling Audit
 
 ## Current Local Package Version
-v1.26.2 Public Runtime Hygiene + Devtools Gate
+v1.26.3 Boss 2 Readiness + Scaling Audit
 
 ## Current Development Target
-v1.26.2 Public Runtime Hygiene + Devtools Gate
+v1.26.3 Boss 2 Readiness + Scaling Audit
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
