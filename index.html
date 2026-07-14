@@ -259,7 +259,6 @@
                 <span class="rest-cost-chip ddx-cost-indicator" id="restCostPill" title="Rest cost">--</span>
               </button>
             </div>
-            <div class="district-charter-slot ddx-charter-display" id="districtCharterSlot"></div>
           </header>
 
           <section class="panel ddx-contract-card ddx-debt-card" id="debtCollectorPanel" aria-label="Debt Pressure" role="region"></section>
@@ -404,6 +403,15 @@
   <script src="./js/systems/08_normalization_save.js?build=1.26.2-public-runtime-hygiene"></script>
   <script src="./js/systems/09_ui_common_intro.js?build=1.26.2-public-runtime-hygiene"></script>
   <script src="./js/systems/10_ui_town_shop.js?build=1.26.2-public-runtime-hygiene"></script>
+  <script>
+    (function(){
+      var originalMarkup = window.merchantGearUpgradePanelMarkup;
+      if (typeof originalMarkup !== 'function') return;
+      window.merchantGearUpgradePanelMarkup = function(state){
+        return originalMarkup(state).replace('<strong>Merchant Gear Upgrades</strong>', '<strong>The Ashen Anvil</strong>');
+      };
+    })();
+  </script>
   <script src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.26.2-public-runtime-hygiene"></script>
   <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.26.2-public-runtime-hygiene"></script>
   <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.26.2-public-runtime-hygiene"></script>
