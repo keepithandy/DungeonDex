@@ -7,7 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.3.01 - Boss Scaling Matrix Smoke Hardening
+- DungeonDex v1.26.3.02 - Town Runtime Layer Cleanup
+
+## v1.26.3.02 Town Runtime Layer Cleanup
+- Town currency is now owned by one compact wallet renderer; the older duplicate strip layer is retired.
+- Repeatable Spark Writ markup no longer emits the redundant Spark Source pill, so no CSS-only suppression file is needed.
+- The inert interface cleanup shell and obsolete runtime/precache references are removed.
+- Build/cache labels now use `1.26.3.02-town-runtime-layer-cleanup`.
+- No currency values, prices, rewards, progression, combat, saves, Revisit behavior, or dungeon entry changed.
 
 ## v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 - The 20-boss matrix now locks min/mid/max boss combat snapshots, boundary rows, legal fixture summaries, and 180 combat summaries from 36,000 seeded fights.
@@ -120,6 +127,6 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.3.01 Boss Scaling Matrix Smoke Hardening.
+- Current runtime baseline is v1.26.3.02 Town Runtime Layer Cleanup.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
