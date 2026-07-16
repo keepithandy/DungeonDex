@@ -4,8 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.26.3.01';
-const BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
+const VISIBLE_BUILD = '1.26.3.02';
+const BUILD_QS = '1.26.3.02-town-runtime-layer-cleanup';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,
@@ -37,7 +37,7 @@ async function main() {
   ]);
 
   const labelContracts = [
-    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Boss Scaling Matrix Smoke Hardening`],
+    ['VERSION.md current version', version, `v${VISIBLE_BUILD} Town Runtime Layer Cleanup`],
     ['index.html title', indexHtml, `<title>DungeonDex v${VISIBLE_BUILD}</title>`],
     ['index.html visible label', indexHtml, `>DungeonDex v${VISIBLE_BUILD}</h1>`],
     ['index.html visible build', indexHtml, `window.DUNGEONDEX_BUILD = '${VISIBLE_BUILD}'`],
@@ -52,7 +52,7 @@ async function main() {
 
   const labelMismatches = labelContracts.filter(([, source, expected]) => !source.includes(expected));
   if (labelMismatches.length) {
-    console.error('Mixed or stale v1.26.3.01 build labels detected:');
+    console.error('Mixed or stale v1.26.3.02 build labels detected:');
     labelMismatches.forEach(([label, , expected]) => console.error(`- ${label}: expected ${expected}`));
     process.exit(1);
   }
@@ -137,7 +137,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`PASS v1.26.3.01 build/cache labels align, public runtime excludes direct devtools loads, and sw.js caches only public assets (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
+  console.log(`PASS v1.26.3.02 build/cache labels align, public runtime excludes direct devtools loads, and sw.js caches only public assets (${uniqueDirectScripts.length + uniqueDirectStyles.length + uniqueLoads.length} checked)`);
 }
 
 main().catch(err => {

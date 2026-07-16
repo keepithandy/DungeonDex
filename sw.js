@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.3.01-boss-scaling-matrix-hardening';
+const CACHE_NAME = 'dungeondex-v1.26.3.02-town-runtime-layer-cleanup';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
+const BUILD_QS = '1.26.3.02-town-runtime-layer-cleanup';
 const ASSETS = [
   './',
   './index.html',
@@ -33,14 +33,11 @@ const ASSETS = [
   `./js/systems/18_relic_forge_compact_text.js?build=${BUILD_QS}`,
   `./js/systems/28_debt_collector_foundation.js?build=${BUILD_QS}`,
   `./js/systems/34_debt_collector_v1_completion.js?build=${BUILD_QS}`,
-  `./js/systems/20_town_currency_clean_strip.js?build=${BUILD_QS}`,
   `./js/systems/21_build_label_guard.js?build=${BUILD_QS}`,
   `./js/systems/22_nav_centering.js?build=${BUILD_QS}`,
   `./js/systems/23_boss_header_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/24_lowfire_spark_board.js?build=${BUILD_QS}`,
   `./js/systems/25_town_wallet_chip_fix.js?build=${BUILD_QS}`,
-  `./js/systems/26_spark_writ_pill_cleanup.js?build=${BUILD_QS}`,
-  `./js/systems/27_interface_density_cleanup.js?build=${BUILD_QS}`,
   `./js/systems/39_gear_upgrade_summary_panel.js?build=${BUILD_QS}`,
   `./js/systems/40_gear_detail_modal.js?build=${BUILD_QS}`,
   `./js/systems/41_debt_pressure_v1.js?build=${BUILD_QS}`,

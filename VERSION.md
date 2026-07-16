@@ -1,13 +1,13 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.3.02 Town Runtime Layer Cleanup
 
 ## Current Local Package Version
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.3.02 Town Runtime Layer Cleanup
 
 ## Current Development Target
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.3.02 Town Runtime Layer Cleanup
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning.
