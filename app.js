@@ -1,14 +1,14 @@
-// DungeonDex v1.26.3.01 runtime pointer.
+// DungeonDex v1.26.3.02 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.3.01: Boss Scaling Matrix Smoke Hardening
-// - Locks all named-boss rolls, scaling boundaries, legal fixtures, and combat summaries.
-// - Retains the v1.26.3 Boss 2 correction and overmatched guidance unchanged.
-// - Preserves gameplay scaling, combat, rewards, upgrades, saves, and Revisit behavior.
+// v1.26.3.02: Town Runtime Layer Cleanup
+// - Consolidates the Town currency strip under one runtime owner.
+// - Removes the redundant Spark Writ pill at its source and retires obsolete cleanup shells.
+// - Preserves gameplay, economy, combat, rewards, saves, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.26.3.01';
-window.DUNGEONDEX_BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
+window.DUNGEONDEX_BUILD = '1.26.3.02';
+window.DUNGEONDEX_BUILD_QS = '1.26.3.02-town-runtime-layer-cleanup';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -97,7 +97,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.3.01-boss-scaling-matrix-hardening';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.3.02-town-runtime-layer-cleanup';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);
@@ -108,8 +108,6 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/45_trophy_echo_result_detail.js?build=' + qs, 'DDTrophyEchoResultDetail', 'Trophy Echo result detail'); }, 120);
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
-    window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
-    window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
     window.setTimeout(function(){ loadModule('./js/systems/31_revisit_activation_surface_lockdown.js?build=' + qs, 'DDRevisitActivationSurfaceLockdown', 'Revisit activation surface lockdown'); }, 420);
     window.setTimeout(function(){ loadModule('./js/systems/39_gear_upgrade_summary_panel.js?build=' + qs, 'DDGearUpgradeSummaryPanel', 'Gear upgrade summary panel'); }, 500);
     window.setTimeout(function(){ loadModule('./js/systems/40_gear_detail_modal.js?build=' + qs, 'DDGearDetailModal', 'Gear detail modal'); }, 540);
