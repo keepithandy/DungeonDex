@@ -8,13 +8,22 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
-* Current local package baseline: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
-* Current development target: `v1.26.3.01 Boss Scaling Matrix Smoke Hardening`
+* Public/live itch version: `v1.26.3.02 Town Runtime Layer Cleanup`
+* Current local package baseline: `v1.26.3.02 Town Runtime Layer Cleanup`
+* Current development target: `v1.26.3.02 Town Runtime Layer Cleanup`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.3.02 - Town Runtime Layer Cleanup
+
+* Consolidated the Town currency strip under one runtime owner while preserving Coin, Spark, Shards, Ember, and Favor output.
+* Removed the redundant Spark Source pill from canonical Lowfire Board markup and retired its CSS-only cleanup layer.
+* Removed obsolete Town currency and inert interface cleanup runtime files from public loading and service-worker precache.
+* Preserved all currency values, prices, rewards, progression, combat, saves, Revisit behavior, and dungeon entry.
+
+---
 
 ## v1.26.3.01 - Boss Scaling Matrix Smoke Hardening
 
