@@ -206,7 +206,7 @@
         <span><b>Favor</b><br>Forge reputation from crafting, salvage, and tempering.</span>
       </div>
       <div class="warden-ledger">
-        <div class="split ledger-subhead"><div><strong>Repeatable Spark Writ</strong><p class="small">One rotating order. Finish it, claim it, then Lowfire posts another.</p></div><span class="pill">Spark Source</span></div>
+        <div class="split ledger-subhead"><div><strong>Repeatable Spark Writ</strong><p class="small">One rotating order. Finish it, claim it, then Lowfire posts another.</p></div></div>
         ${sparkWritMarkup(state)}
         <div class="split ledger-subhead"><div><strong>Warden Objectives</strong><p class="small">One-time board goals paid after descent or forge work.</p></div><span class="pill">${claimed}/${quests.length}</span></div>
       </div>

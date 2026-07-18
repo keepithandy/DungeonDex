@@ -89,7 +89,7 @@ The smoke checks protect runtime contracts. They do not replace checking tap tar
 - `node tests/smoke/smoke_mobile_layout_contracts_v1264.mjs`: 14/14 passed.
 - `node tests/smoke/smoke_interface_accessibility_v1264.mjs`: 19/19 passed.
 - `node tests/smoke/smoke_enter_dungeon_runtime_v1.mjs`: 11/11 passed.
-- `node smoke_compact_suite.mjs`: 39/39 passed.
+- `node smoke_compact_suite.mjs`: 41/41 passed after integrating the Town runtime-cleanup smoke.
 - Real-device/Textastic drawer tapping, an open-rail visual pass, and physical keyboard interaction were not run; those remain explicit handoff checks.
 
 ## Report format

@@ -28,11 +28,21 @@ This changelog records what changed and why.
 * Implemented #125 with one documented `VERSION.md` authority flow for semantic/build-cache labels and field-level mismatch reporting.
 * Fixed the closed desktop-pointer side rail so its discoverable rail no longer covers Town content at narrow widths.
 * Hardened the Town screenshot helper to apply realistic touch profiles before page initialization and verify touch media state before capture.
-* Local verification completed with the 39/39 compact suite, 14/14 mobile-layout contract smoke, 19/19 interface/accessibility smoke, 11/11 dungeon-entry runtime smoke, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
+* Preserved the upstream v1.26.3.02 Town runtime cleanup: the canonical wallet renderer remains, while obsolete systems 20, 26, and 27 stay retired from source loading and service-worker precache.
+* Local verification completed with the 41/41 compact suite, 14/14 mobile-layout contract smoke, 19/19 interface/accessibility smoke, 11/11 dungeon-entry runtime smoke, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
 * Corrected intro Roadmap copy so only the live Trophy Echo lane is described as available; Famous Gear Memory and Rival Trace remain locked, with no Revisit behavior change.
 * Real-device/Textastic drawer tapping and keyboard interaction remain handoff checks; the local touch-emulation captures and behavioral fixtures do not replace physical-device validation.
 * No itch/package builder was run and no release package was created for this work.
 * Preserved save compatibility, combat/player/monster/boss math, rewards, economy, Merchant Gear Upgrade costs/caps/effects, dungeon entry, Talent, Debt, progression, and Trophy Echo-only Revisit behavior.
+
+---
+
+## v1.26.3.02 - Town Runtime Layer Cleanup
+
+* Consolidated the Town currency strip under one runtime owner while preserving Coin, Spark, Shards, Ember, and Favor output.
+* Removed the redundant Spark Source pill from canonical Lowfire Board markup and retired its CSS-only cleanup layer.
+* Removed obsolete Town currency and inert interface cleanup runtime files from public loading and service-worker precache.
+* Preserved all currency values, prices, rewards, progression, combat, saves, Revisit behavior, and dungeon entry.
 
 ---
 

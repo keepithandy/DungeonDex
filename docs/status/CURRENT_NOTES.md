@@ -17,12 +17,20 @@
 - GitHub #125 documents one `VERSION.md` semantic/build-cache authority flow and requires field-level mismatch reporting.
 - Trophy Echo remains the only active Revisit lane.
 - Build/cache labels use `1.26.4-mobile-interface-release-hygiene`.
-- Local verification is complete: compact suite 39/39, mobile-layout contracts 14/14, interface/accessibility contracts 19/19, dungeon-entry runtime 11/11, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
+- The upstream v1.26.3.02 Town cleanup remains intact: the canonical wallet renderer is retained and obsolete systems 20, 26, and 27 remain retired from loading and precache.
+- Local verification is complete: compact suite 41/41, mobile-layout contracts 14/14, interface/accessibility contracts 19/19, dungeon-entry runtime 11/11, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
 - Gear inspection now resolves upgraded and duplicate-name items by stable ID, remains available from pointer/card clicks, and has explicit Enter/Space triggers without changing gear state.
 - Intro Roadmap copy now accurately identifies Trophy Echo as the only live Revisit lane; Famous Gear Memory and Rival Trace remain locked and no Revisit behavior changed.
 - Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; local emulation does not replace a physical-device pass.
 - No itch/package builder was run and no release package was created.
 - Save compatibility, combat/player/monster/boss math, rewards, economy, Merchant Gear Upgrade costs/caps/effects, dungeon entry, Talent, Debt, progression, and Revisit behavior remain unchanged.
+
+## v1.26.3.02 Town Runtime Layer Cleanup
+- Town currency is now owned by one compact wallet renderer; the older duplicate strip layer is retired.
+- Repeatable Spark Writ markup no longer emits the redundant Spark Source pill, so no CSS-only suppression file is needed.
+- The inert interface cleanup shell and obsolete runtime/precache references are removed.
+- Build/cache labels now use `1.26.3.02-town-runtime-layer-cleanup`.
+- No currency values, prices, rewards, progression, combat, saves, Revisit behavior, or dungeon entry changed.
 
 ## v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 - The 20-boss matrix now locks min/mid/max boss combat snapshots, boundary rows, legal fixture summaries, and 180 combat summaries from 36,000 seeded fights.

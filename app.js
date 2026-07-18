@@ -4,6 +4,7 @@
 //
 // v1.26.4: Mobile Interface + Release Hygiene
 // - Hardens navigation, touch capture, Town hierarchy, wrapping, modal access, and state clarity.
+// - Preserves the Town runtime-layer cleanup; obsolete cleanup shells stay retired.
 // - Retains the v1.26.3 Boss 2 correction and scaling matrix unchanged.
 // - Preserves gameplay scaling, combat, rewards, upgrades, saves, and Revisit behavior.
 
@@ -108,8 +109,6 @@ window.ddGetMonsterCue = function(name){
     window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/45_trophy_echo_result_detail.js?build=' + qs, 'DDTrophyEchoResultDetail', 'Trophy Echo result detail'); }, 120);
     window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
-    window.setTimeout(function(){ loadModule('./js/systems/26_spark_writ_pill_cleanup.js?build=' + qs, 'DDSparkWritPillCleanup', 'Spark Writ pill cleanup'); }, 220);
-    window.setTimeout(function(){ loadModule('./js/systems/27_interface_density_cleanup.js?build=' + qs, 'DDInterfaceDensityCleanup', 'Interface Density Cleanup'); }, 300);
     window.setTimeout(function(){ loadModule('./js/systems/31_revisit_activation_surface_lockdown.js?build=' + qs, 'DDRevisitActivationSurfaceLockdown', 'Revisit activation surface lockdown'); }, 420);
     window.setTimeout(function(){ loadModule('./js/systems/39_gear_upgrade_summary_panel.js?build=' + qs, 'DDGearUpgradeSummaryPanel', 'Gear upgrade summary panel'); }, 500);
     window.setTimeout(function(){ loadModule('./js/systems/40_gear_detail_modal.js?build=' + qs, 'DDGearDetailModal', 'Gear detail modal'); }, 540);

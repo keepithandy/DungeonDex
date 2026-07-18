@@ -6,7 +6,7 @@
 - Current active Revisit lane: Trophy Echo only.
 - Working branch: `codex/v1.26.4-interface-hardening`.
 - Implementation status: GitHub #116-#125 and both hotfixes are implemented and locally verified; remote issue closure remains pending publication and acceptance.
-- Final v1.26.4 compact result: 39/39 passed on 2026-07-18. The earlier 29/29 result is retained only as the pre-v1.26.4 historical baseline.
+- Final merged v1.26.4 compact result: 41/41 passed on 2026-07-18. The earlier 29/29 result is retained only as the pre-v1.26.4 historical baseline.
 
 ## Non-negotiable boundaries
 
@@ -68,7 +68,7 @@ These began as separate follow-ups from the 2026-07-18 Town visual audit. The us
    - Primary surface: `js/systems/22_nav_centering.js` and only the narrow visual/smoke coverage needed to prove the fix.
    - Implemented outcome: a closed rail remains discoverable without covering Town headings, controls, or card content at narrow desktop-pointer widths.
    - Guardrails: preserve the existing touch drawer behavior, route IDs, script order, Town layout ownership, save data, combat, economy, Talent, Debt, and Revisit behavior.
-   - Validation completed: the focused 14/14 mobile-layout smoke, inspected 390×844/430×932/768×1024 fine-pointer captures, and 39/39 compact suite passed.
+   - Validation completed: the focused 14/14 mobile-layout smoke, inspected 390×844/430×932/768×1024 fine-pointer captures, and 41/41 compact suite passed.
 
 2. **Smoke Hardening — make Town screenshots emulate real touch devices — implemented and locally verified**
    - Pre-fix evidence: `tools/capture_town_mobile_screenshots.mjs` changed viewport metrics after load without enabling touch emulation, so captures exercised desktop hover/pointer rules rather than the mobile drawer path.

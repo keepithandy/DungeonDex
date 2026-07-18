@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -210,6 +211,18 @@ async function main() {
       expected: BUILD_QS
     });
   }
+
+  const retiredRuntimePaths = [
+    'js/systems/20_town_currency_clean_strip.js',
+    'js/systems/26_spark_writ_pill_cleanup.js',
+    'js/systems/27_interface_density_cleanup.js'
+  ];
+  retiredRuntimePaths.forEach(retiredPath => {
+    expect(retiredPath, 'retired file', existsSync(path.join(ROOT, retiredPath)) ? 'present' : 'absent', 'absent');
+    for (const [file, runtimeSource] of [['index.html', indexHtml], ['app.js', appJs], ['sw.js', swJs]]) {
+      expect(file, `retired runtime reference ${retiredPath}`, runtimeSource.includes(retiredPath) ? 'present' : 'absent', 'absent');
+    }
+  });
 
   if (failures.length) {
     console.error(`FAIL: ${failures.length} v1.26.4 build/cache authority mismatch(es):`);
