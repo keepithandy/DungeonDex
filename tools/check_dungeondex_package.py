@@ -35,9 +35,14 @@ STALE_RUNTIME_RE = re.compile(
 )
 VERSION_RE = re.compile(r"v(\d+(?:\.\d+){1,4})")
 PROHIBITED_DIRS = {".git", "node_modules"}
+PROHIBITED_PATH_PATTERNS = (
+    re.compile(r"(?:^|[\\/])__MACOSX(?:[\\/]|$)", re.IGNORECASE),
+)
 PROHIBITED_FILE_PATTERNS = (
     re.compile(r"[\\/]\.git(?:[\\/]|$)", re.IGNORECASE),
     re.compile(r"[\\/]node_modules(?:[\\/]|$)", re.IGNORECASE),
+    re.compile(r"(?:^|[\\/])\.DS_Store$", re.IGNORECASE),
+    re.compile(r"(?:^|[\\/])\._[^\\/]+$", re.IGNORECASE),
     re.compile(r"\.zip$", re.IGNORECASE),
     re.compile(r"\.patch$", re.IGNORECASE),
     re.compile(r"\.diff$", re.IGNORECASE),
@@ -165,10 +170,21 @@ def runtime_files(root: Path) -> list[Path]:
     return sorted(set(files))
 
 
+def version_authority_value(version_text: str, heading: str) -> str | None:
+    match = re.search(
+        rf"^##\s+{re.escape(heading)}\s*$\s*^`?([^`\r\n]+?)`?\s*$",
+        version_text,
+        re.MULTILINE,
+    )
+    return match.group(1).strip() if match else None
+
+
 def current_public_labels(root: Path) -> tuple[str | None, str | None]:
     version_path = root / "VERSION.md"
-    version_match = VERSION_RE.search(version_path.read_text(encoding="utf-8")) if version_path.exists() else None
+    version_text = version_path.read_text(encoding="utf-8") if version_path.exists() else ""
+    version_match = VERSION_RE.search(version_text) if version_text else None
     expected_version = version_match.group(1) if version_match else None
+    expected_build_qs = version_authority_value(version_text, "Current Build/Cache Label") if version_text else None
     index_path = root / "index.html"
     index_text = index_path.read_text(encoding="utf-8") if index_path.exists() else ""
     if not expected_version:
@@ -181,7 +197,8 @@ def current_public_labels(root: Path) -> tuple[str | None, str | None]:
         cache_version = re.search(r"CACHE_NAME\s*=\s*['\"]dungeondex-v(\d+(?:\.\d+){1,4})-", sw_text)
         expected_version = cache_version.group(1) if cache_version else None
     build_match = re.search(r"\bBUILD_QS\s*=\s*['\"]([^'\"]+)['\"]", sw_text)
-    expected_build_qs = index_build.group(1) if index_build else (build_match.group(1) if build_match else None)
+    if not version_text:
+        expected_build_qs = index_build.group(1) if index_build else (build_match.group(1) if build_match else None)
     return expected_version, expected_build_qs
 
 
@@ -191,7 +208,7 @@ def public_label_warnings(root: Path) -> list[str]:
     if not expected_version:
         return ["could not determine the current public version from VERSION.md or index.html"]
     if not expected_build_qs:
-        return ["could not determine the current build/cache label from index.html or sw.js"]
+        return ["could not determine the current build/cache label from VERSION.md (or index.html/sw.js in a stripped staged package)"]
 
     checks = (
         ("index.html", r"<title>DungeonDex v(\d+(?:\.\d+){1,4})</title>", expected_version, "title version"),
@@ -251,7 +268,9 @@ def prohibited_content_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
     for path in sorted(root.rglob("*")):
         rel_path = path.relative_to(root).as_posix()
-        if any(part in PROHIBITED_DIRS for part in path.parts):
+        if any(part in PROHIBITED_DIRS for part in path.parts) or any(
+            pattern.search(rel_path) for pattern in PROHIBITED_PATH_PATTERNS
+        ):
             warnings.append(f"prohibited package content present: {rel_path}")
             continue
         if path.is_file() and any(pattern.search(rel_path) for pattern in PROHIBITED_FILE_PATTERNS):

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.3.02-town-runtime-layer-cleanup';
+const CACHE_NAME = 'dungeondex-v1.26.4-mobile-interface-release-hygiene';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.3.02-town-runtime-layer-cleanup';
+const BUILD_QS = '1.26.4-mobile-interface-release-hygiene';
 const ASSETS = [
   './',
   './index.html',

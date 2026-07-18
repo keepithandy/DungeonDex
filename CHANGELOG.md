@@ -8,13 +8,34 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.3.02 Town Runtime Layer Cleanup`
-* Current local package baseline: `v1.26.3.02 Town Runtime Layer Cleanup`
-* Current development target: `v1.26.3.02 Town Runtime Layer Cleanup`
+* Public/live itch version: `v1.26.4 Mobile Interface + Release Hygiene`
+* Current local package baseline: `v1.26.4 Mobile Interface + Release Hygiene`
+* Current development target: `v1.26.4 Mobile Interface + Release Hygiene`
+* Current build/cache label: `1.26.4-mobile-interface-release-hygiene`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.4 - Mobile Interface + Release Hygiene
+
+* Implemented GitHub #116 by keeping mobile navigation above documented safe-area/browser-control boundaries while preserving route order and destinations.
+* Implemented #117 and #119 by clarifying the rest-cost hierarchy and consolidating equivalent Town presentation tokens without changing costs, actions, or Town structure.
+* Implemented #118 by protecting the established mobile combat-control placement without changing combat actions, timing, or math.
+* Implemented #120 and #123 by hardening Journal/Archive wrapping and improving status, rarity, and disabled-state contrast/non-color cues without changing record data or rarity meaning.
+* Implemented #121 and #122 by adding focus return, modal-only scroll locking, safe-area/stacking protection, keyboard-operable gear inspection, stable upgraded/duplicate-name gear lookup, and safer touch-target sizing/spacing without changing underlying action semantics.
+* Implemented #124 with an exact-path asset provenance/usage manifest, an explicit Northline Studio asset-policy link, and a release checklist gate for untracked or undocumented assets.
+* Implemented #125 with one documented `VERSION.md` authority flow for semantic/build-cache labels and field-level mismatch reporting.
+* Fixed the closed desktop-pointer side rail so its discoverable rail no longer covers Town content at narrow widths.
+* Hardened the Town screenshot helper to apply realistic touch profiles before page initialization and verify touch media state before capture.
+* Preserved the upstream v1.26.3.02 Town runtime cleanup: the canonical wallet renderer remains, while obsolete systems 20, 26, and 27 stay retired from source loading and service-worker precache.
+* Local verification completed with the 41/41 compact suite, 14/14 mobile-layout contract smoke, 19/19 interface/accessibility smoke, 11/11 dungeon-entry runtime smoke, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
+* Corrected intro Roadmap copy so only the live Trophy Echo lane is described as available; Famous Gear Memory and Rival Trace remain locked, with no Revisit behavior change.
+* Real-device/Textastic drawer tapping and keyboard interaction remain handoff checks; the local touch-emulation captures and behavioral fixtures do not replace physical-device validation.
+* No itch/package builder was run and no release package was created for this work.
+* Preserved save compatibility, combat/player/monster/boss math, rewards, economy, Merchant Gear Upgrade costs/caps/effects, dungeon entry, Talent, Debt, progression, and Trophy Echo-only Revisit behavior.
+
+---
 
 ## v1.26.3.02 - Town Runtime Layer Cleanup
 

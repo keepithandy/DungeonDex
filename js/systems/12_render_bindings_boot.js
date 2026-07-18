@@ -19,7 +19,12 @@
       shell.classList.toggle('combat-active', S.screen === 'run' && S.run.active);
     }
     $$('.screen').forEach(node => node.classList.toggle('active', node.id === `screen-${S.screen}`));
-    $$('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === S.screen));
+    $$('.tab').forEach(node => {
+      const isActive = node.dataset.screen === S.screen;
+      node.classList.toggle('active', isActive);
+      if (isActive) node.setAttribute('aria-current', 'page');
+      else node.removeAttribute('aria-current');
+    });
   }
 
   function render() {
@@ -190,25 +195,53 @@
   }
 
   function bindIntroModalActions() {
+    function focusRunSurface() {
+      const screen = el('screen-run');
+      if (!screen) return;
+      const target = screen.querySelector('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])') || screen;
+      if (target === screen && !screen.hasAttribute('tabindex')) screen.setAttribute('tabindex', '-1');
+      try {
+        target.focus({ preventScroll: true });
+      } catch (_) {
+        target.focus?.();
+      }
+    }
+
+    function focusTownFallback() {
+      const target = document.querySelector('.tab.active') || el('startRunBtn');
+      try {
+        target?.focus({ preventScroll: true });
+      } catch (_) {
+        target?.focus?.();
+      }
+    }
+
     if (el('introModalCloseBtn')) el('introModalCloseBtn').onclick = hideIntroModal;
     if (el('introModalEnterDungeonBtn')) {
       el('introModalEnterDungeonBtn').onclick = () => runGuardedAction(() => {
-        hideIntroModal();
+        hideIntroModal({ restoreFocus: false });
         startRun(S);
         render();
+        focusRunSurface();
       });
     }
     if (el('introModalContinueRunBtn')) {
       el('introModalContinueRunBtn').onclick = () => runGuardedAction(() => {
-        hideIntroModal();
-        if (continueRun(S)) switchScreen('run');
-        else render();
+        hideIntroModal({ restoreFocus: false });
+        if (continueRun(S)) {
+          switchScreen('run');
+          focusRunSurface();
+        } else {
+          render();
+          focusTownFallback();
+        }
       });
     }
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
-      hideIntroModal();
+      hideIntroModal({ restoreFocus: false });
       startCharterRun(S, btn.dataset.charterStart);
       render();
+      focusRunSurface();
     }));
   }
 

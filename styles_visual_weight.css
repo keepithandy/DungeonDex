@@ -229,3 +229,296 @@ button,
     min-height: 46px;
   }
 }
+
+/* v1.26.4 mobile interface and accessibility contracts. */
+.intro-modal-backdrop {
+  z-index: 9000;
+}
+
+#screen-town {
+  --ddx-town-shell-gap: 10px;
+  --ddx-town-head-gap: 10px;
+  --ddx-town-card-radius: 16px;
+  --ddx-town-inner-radius: 14px;
+  --ddx-town-border-neutral: rgba(255,213,148,0.12);
+  --ddx-town-surface-neutral: rgba(0,0,0,0.16);
+}
+
+#screen-town .town-section-shell {
+  gap: var(--ddx-town-shell-gap);
+  min-width: 0;
+}
+
+#screen-town .town-section-head {
+  gap: var(--ddx-town-head-gap);
+  padding-bottom: var(--ddx-town-head-gap);
+  border-bottom-color: var(--ddx-town-border-neutral);
+}
+
+#screen-town .town-district-hub,
+#screen-town .ddx-contract-card,
+#screen-town .ddx-merchant-card,
+#screen-town .ddx-notice-board {
+  border-radius: var(--ddx-town-card-radius);
+}
+
+#screen-town .town-board-ledger {
+  border: 1px solid var(--ddx-town-border-neutral);
+  border-radius: var(--ddx-town-inner-radius);
+  background: var(--ddx-town-surface-neutral);
+}
+
+#screen-town .town-district-hub {
+  gap: var(--ddx-town-shell-gap);
+}
+
+#screen-town #restBtn.rest-action-btn {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label state"
+    "hp cost"
+    "effect cost";
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 3px;
+  min-width: min(100%, 242px);
+  min-height: 64px;
+  padding: 9px 10px;
+  text-align: left;
+}
+
+#screen-town #restBtn .rest-action-copy {
+  display: contents;
+}
+
+#screen-town #restBtn .rest-action-label {
+  grid-area: label;
+  color: rgba(255,248,232,0.98);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+#screen-town #restBtn .rest-action-state {
+  grid-area: state;
+  justify-self: end;
+  padding: 2px 6px;
+  border: 1px solid rgba(137,231,166,0.36);
+  border-radius: 999px;
+  background: rgba(57,154,91,0.14);
+  color: #c9f7d5;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#screen-town #restBtn .rest-action-state.rest-action-state-low {
+  border-color: rgba(255,151,138,0.48);
+  background: rgba(157,54,43,0.18);
+  color: #ffd2cc;
+}
+
+#screen-town #restBtn .rest-current-hp {
+  grid-area: hp;
+  min-width: 0;
+  color: rgba(247,239,226,0.86);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+#screen-town #restBtn .rest-effect-text {
+  grid-area: effect;
+  min-width: 0;
+  color: rgba(235,225,207,0.72);
+  font-size: 0.64rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+#screen-town #restBtn .rest-cost-chip {
+  grid-area: cost;
+  align-self: stretch;
+  min-width: 58px;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,213,128,0.28);
+  border-radius: 11px;
+  background: rgba(255,213,128,0.07);
+  white-space: nowrap;
+}
+
+/* Journal and Archive content must shrink and wrap inside narrow cards. */
+#screen-dex,
+#screen-archive,
+#archivePanel,
+#gearDex,
+#guildJournalPanel,
+.journal-grid,
+.journal-row,
+.run-history-card .feed-copy,
+.run-history-meta-grid,
+.run-history-rewards,
+.archive-log-list,
+.archive-note-line,
+.retired-archive-copy {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.journal-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.journal-row {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid var(--ddx-line-soft);
+  border-radius: 13px;
+  background: var(--ddx-card-wash);
+}
+
+.journal-row > *,
+.archive-note-line > *,
+.retired-archive-copy > *,
+.run-history-card .feed-body,
+.run-history-card .run-history-rewards,
+.run-history-card .run-history-loot-pill,
+.run-history-meta-grid span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.run-history-card .run-history-loot-pill {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.journal-row .small.muted,
+.archive-note-stamp,
+.run-history-sub,
+.run-history-meta-grid span {
+  color: rgba(244,236,223,0.74);
+}
+
+/* Status, rarity, and disabled controls retain readable non-color cues. */
+.rarity-common { color: #d7e0ea; }
+.rarity-uncommon { color: #f0cf91; }
+.rarity-rare { color: #a8cbff; }
+.rarity-epic { color: #dfbdff; }
+.rarity-legendary { color: #ffe29c; }
+.rarity-mythic { color: #ffb2ba; }
+
+.rarity-eyebrow,
+.gear-detail-rarity {
+  border: 1px solid currentColor;
+  font-weight: 900;
+  opacity: 1;
+}
+
+.gear-detail-trigger {
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.gear-detail-trigger:focus-visible {
+  outline: 2px solid rgba(255,214,151,0.72);
+  outline-offset: 3px;
+}
+
+.save-status {
+  color: #ffe09b;
+}
+
+.save-status.save-warn,
+.feed-chip-danger,
+.rest-cost-chip.rest-cost-low {
+  color: #ffd0ca;
+  border-color: rgba(255,151,138,0.52);
+}
+
+.feed-chip-extract {
+  color: #ffe6ae;
+  border-color: rgba(255,222,151,0.46);
+}
+
+button:disabled,
+button[aria-disabled="true"] {
+  opacity: 1 !important;
+  color: rgba(247,239,226,0.72) !important;
+  border-color: rgba(247,239,226,0.28) !important;
+  border-style: dashed !important;
+  background: rgba(247,239,226,0.055) !important;
+  filter: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.archive-locked-copy,
+.empty-relic-copy,
+.empty-slot-pill {
+  color: rgba(247,239,226,0.68) !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 560px) {
+  #screen-town {
+    --ddx-town-shell-gap: 9px;
+    --ddx-town-head-gap: 8px;
+    --ddx-town-card-radius: 15px;
+    --ddx-town-inner-radius: 13px;
+  }
+
+  #screen-town #restBtn.rest-action-btn {
+    min-width: 0;
+    width: 100%;
+    min-height: 70px !important;
+  }
+
+  #screen-town .town-district-hub .inline-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+  }
+
+  #screen-town .town-district-hub #startRunBtn {
+    min-height: 52px;
+  }
+
+  .archive-note-line {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  button:not(.dd-devtools-btn),
+  .tab,
+  select,
+  input,
+  [role="button"] {
+    min-height: 44px !important;
+  }
+
+  .loadout-equip-card,
+  .inventory-card {
+    min-height: 44px;
+  }
+}
+
+/* The four proven combat actions stay in-flow and one-tap reachable. */
+.app-shell.combat-active .combat-device-actions {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.app-shell.combat-active .combat-device-actions button {
+  min-width: 0;
+  min-height: 46px !important;
+}

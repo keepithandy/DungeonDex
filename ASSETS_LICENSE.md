@@ -1,5 +1,9 @@
 # DungeonDex Assets License
 
+**Northline Studio asset licensing policy**
+
+Northline Studio is the project/studio identity for DungeonDex. This document records the policy for DungeonDex non-code assets; it does not change the copyright ownership or rights stated below.
+
 Copyright (c) 2026 Johnny Belles. All rights reserved.
 
 The Apache License 2.0 in `LICENSE` applies to DungeonDex source code only.

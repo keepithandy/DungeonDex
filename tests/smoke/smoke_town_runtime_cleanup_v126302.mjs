@@ -11,10 +11,10 @@ const app = read('app.js');
 const serviceWorker = read('sw.js');
 const board = read('js/systems/24_lowfire_spark_board.js');
 const wallet = read('js/systems/25_town_wallet_chip_fix.js');
-const build = '1.26.3.02-town-runtime-layer-cleanup';
+const build = '1.26.4-mobile-interface-release-hygiene';
 
 for (const source of [index, app, serviceWorker]) {
-  assert.ok(source.includes(build), 'public runtime surfaces should use the v1.26.3.02 build query');
+  assert.ok(source.includes(build), 'public runtime surfaces should use the current v1.26.4 build query');
 }
 
 for (const retiredPath of [
@@ -45,4 +45,4 @@ for (const signal of [
   assert.ok(wallet.includes(signal), `canonical Town wallet signal should remain: ${signal}`);
 }
 
-console.log('PASS: v1.26.3.02 Town runtime cleanup wiring is canonical and obsolete layers are retired.');
+console.log('PASS: v1.26.3.02 Town runtime cleanup remains canonical under v1.26.4 and obsolete layers are retired.');

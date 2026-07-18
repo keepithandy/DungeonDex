@@ -2,10 +2,11 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.1 Public Readiness Sweep`.
+- Baseline: `v1.26.4 Mobile Interface + Release Hygiene`.
 - Current active Revisit lane: Trophy Echo only.
-- Latest reviewed pre-release main commit: `ac93500`.
-- Compact smoke baseline: 27/27 passed.
+- Working branch: `codex/v1.26.4-interface-hardening`.
+- Implementation status: GitHub #116-#125 and both hotfixes are implemented and locally verified; remote issue closure remains pending publication and acceptance.
+- Final merged v1.26.4 compact result: 41/41 passed on 2026-07-18. The earlier 29/29 result is retained only as the pre-v1.26.4 historical baseline.
 
 ## Non-negotiable boundaries
 
@@ -16,16 +17,31 @@
 - Do not change Talent or Debt behavior.
 - Do not bump version or cache labels unless an explicit version/release issue requires it.
 
+## v1.26.4 Work Status
+
+- #116 safe-area navigation — implemented; touch and fine-pointer viewport captures plus the mobile contract smoke passed. Real-device drawer tapping remains a handoff check.
+- #117 rest-cost hierarchy — implemented; all three touch-profile layouts were inspected without wrapping or overlap.
+- #118 mobile combat controls — implemented; established four-control order and equal-width layout are smoke-protected.
+- #119 Town presentation tokens — implemented; focused interface smoke and compact regression suite passed.
+- #120 Journal/Archive wrapping — implemented; wrapping and overflow contracts passed.
+- #121 modal focus, scroll lock, close behavior, stacking, safe areas, and keyboard gear access — implemented; isolated lifecycle and stable-ID/keyboard contracts passed. Physical keyboard/touch interaction remains a handoff check.
+- #122 touch-target sizing/spacing — implemented; 44px route, drawer, and action contracts passed.
+- #123 contrast and non-color cues — implemented; contrast ratios and non-color state contracts passed.
+- #124 asset provenance/usage manifest — implemented and documentation-reviewed against the five tracked visual assets.
+- #125 version/cache authority and mismatch reporting — implemented; the field-level v1.26.4 authority smoke passed, including changelog/current-notes build labels and the dynamic-loader fallback.
+- No package builder has been run and no release package has been created.
+
 ## Work order
 
 1. **Trophy Echo flavor pass (#48) — complete**
    - Locked, available, and active copy is now boss-record focused without changing actions or state.
    - `smoke_public_copy_v1260.mjs` protects the updated wording.
 
-2. **Run the mobile validation checklist**
+2. **Run the final v1.26.4 mobile validation checklist — local profiles complete**
    - Use `docs/status/MOBILE_VALIDATION_V1260.md`.
-   - Check 390px, 430px, and 768px Town states.
-   - Record only observed clipping, covered controls, delayed input, or layout shifts.
+   - Touch-emulation captures at 390×844, 430×932, and 768×1024 were generated and inspected.
+   - No covered controls or left-edge clipping remained after the Rest/action-stack and 44px drawer-gutter fixes.
+   - A real-device/Textastic open/close and physical keyboard pass remains a manual handoff check.
    - Treat any mobile regression as a dedicated stability issue; do not fold it into flavor work.
 
 3. **Public-facing documentation queue**
@@ -41,7 +57,31 @@
 5. **Second safe wave**
    - #40–#44, #46, and #51: complete.
    - #56 smoke-file migration: complete and compact-suite protected.
-   - GitHub open issue queue: empty before the v1.26.1 release patch.
+   - Historical note: the GitHub open issue queue was empty before the v1.26.1 release patch.
+
+## Immediate two-hotfix roadmap
+
+These began as separate follow-ups from the 2026-07-18 Town visual audit. The user later authorized their inclusion in the combined v1.26.4 version/cache alignment. Neither requires an itch/package build, a new dependency, or a gameplay-system change.
+
+1. **Bug Fix — keep the closed desktop side rail off Town content — implemented and locally verified**
+   - Pre-fix evidence: the 390px, 430px, and 768px Town captures showed the closed desktop-pointer rail covering the left edge of content; `Lowfire Market` was visibly clipped.
+   - Primary surface: `js/systems/22_nav_centering.js` and only the narrow visual/smoke coverage needed to prove the fix.
+   - Implemented outcome: a closed rail remains discoverable without covering Town headings, controls, or card content at narrow desktop-pointer widths.
+   - Guardrails: preserve the existing touch drawer behavior, route IDs, script order, Town layout ownership, save data, combat, economy, Talent, Debt, and Revisit behavior.
+   - Validation completed: the focused 14/14 mobile-layout smoke, inspected 390×844/430×932/768×1024 fine-pointer captures, and 41/41 compact suite passed.
+
+2. **Smoke Hardening — make Town screenshots emulate real touch devices — implemented and locally verified**
+   - Pre-fix evidence: `tools/capture_town_mobile_screenshots.mjs` changed viewport metrics after load without enabling touch emulation, so captures exercised desktop hover/pointer rules rather than the mobile drawer path.
+   - Primary surface: `tools/capture_town_mobile_screenshots.mjs`; optional focused smoke coverage only if it can remain tooling-only.
+   - Implemented outcome: touch/mobile emulation is configured before page initialization with realistic viewport heights, so 390px, 430px, and 768px captures exercise the mobile rail state.
+   - Guardrails: no production runtime, CSS, save, route, combat, economy, Talent, Debt, or Revisit changes. Do not treat screenshots as a replacement for a real-device tap check.
+   - Validation completed: syntax passed; the capture helper verified touch/coarse-pointer state at all three profiles and the resulting closed-rail Town images were inspected. Open/close tapping remains a real-device handoff check.
+
+## Hotfix sequencing
+
+- Implementation order was side-rail overlap first, then screenshot-harness hardening.
+- Local touch-emulation checklist and smoke validation are complete; retain real-device/Textastic drawer tapping as a handoff check.
+- The explicit v1.26.4 request supersedes the earlier no-version-bump note; protected systems remain out of scope.
 
 ## Per-patch routine
 

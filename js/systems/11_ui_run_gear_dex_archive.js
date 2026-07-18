@@ -608,13 +608,15 @@
     }
     const rarityKey = itemRarityKey(item);
     const itemName = gearDisplayName(item);
+    const itemId = cleanGearText(item.id);
+    const detailIdAttr = itemId ? ` data-gear-detail-id="${escapeHtml(itemId)}"` : '';
     const typeLabel = slotDisplayName(item.slot || slot);
     const slotTypeLabel = gearSlotTypeText(slotLabel, typeLabel);
     const levelLabel = getItemLevelLabel(item);
     const setMini = setBonusMiniMarkup(item, S);
     const memoryBadges = gearMemoryBadges(item);
-    return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}" aria-label="${escapeHtml(slotLabel)} equipped: ${escapeHtml(itemName)}">
-      <div class="gear-card-name gear-equipped-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
+    return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}"${detailIdAttr} aria-label="${escapeHtml(slotLabel)} equipped: ${escapeHtml(itemName)}">
+      <div class="gear-card-name gear-equipped-name gear-detail-trigger ${rarityClass(rarityKey)}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Inspect ${escapeHtml(itemName)} gear details" data-gear-detail-trigger="1">${escapeHtml(itemName)}</div>
       <div class="gear-card-top gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span><span class="gear-rarity-pill ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span></div>
       <div class="gear-card-subline gear-card-level-line"><span>${escapeHtml(levelLabel)}</span></div>
       ${memoryBadges ? `<div class="gear-badge-row gear-memory-row">${memoryBadges}</div>` : ''}
@@ -760,10 +762,10 @@
     const retireAttrs = itemId && retireEligible ? `data-retire="${safeItemId}"` : 'disabled';
     const retireLabel = retireEligible ? 'Retire' : 'Retire Locked';
     const rarityEyebrow = `<span class="rarity-eyebrow ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span>`;
-    return `<article class="loot-card inventory-card ${delta > 0 ? 'inventory-upgrade-card' : ''} ${getRarityCardClass(item)}">
+    return `<article class="loot-card inventory-card ${delta > 0 ? 'inventory-upgrade-card' : ''} ${getRarityCardClass(item)}"${itemId ? ` data-gear-detail-id="${safeItemId}"` : ''}>
       <div class="inventory-card-main">
         <div class="inventory-title-block">
-          <div class="item-name ${rarityClass(rarityKey)}">${escapeHtml(itemName)}</div>
+          <div class="item-name gear-detail-trigger ${rarityClass(rarityKey)}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Inspect ${escapeHtml(itemName)} gear details" data-gear-detail-trigger="1">${escapeHtml(itemName)}</div>
           <div class="inventory-title-row gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span>${rarityEyebrow}</div>
           <div class="gear-card-subline"><span>${escapeHtml(getItemLevelLabel(item))}</span>${maker ? `<span>${escapeHtml(maker)}</span>` : ''}</div>
         </div>

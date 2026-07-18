@@ -1,14 +1,15 @@
-// DungeonDex v1.26.3.02 runtime pointer.
+// DungeonDex v1.26.4 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.3.02: Town Runtime Layer Cleanup
-// - Consolidates the Town currency strip under one runtime owner.
-// - Removes the redundant Spark Writ pill at its source and retires obsolete cleanup shells.
-// - Preserves gameplay, economy, combat, rewards, saves, and Revisit behavior.
+// v1.26.4: Mobile Interface + Release Hygiene
+// - Hardens navigation, touch capture, Town hierarchy, wrapping, modal access, and state clarity.
+// - Preserves the Town runtime-layer cleanup; obsolete cleanup shells stay retired.
+// - Retains the v1.26.3 Boss 2 correction and scaling matrix unchanged.
+// - Preserves gameplay scaling, combat, rewards, upgrades, saves, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.26.3.02';
-window.DUNGEONDEX_BUILD_QS = '1.26.3.02-town-runtime-layer-cleanup';
+window.DUNGEONDEX_BUILD = '1.26.4';
+window.DUNGEONDEX_BUILD_QS = '1.26.4-mobile-interface-release-hygiene';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -97,7 +98,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.3.02-town-runtime-layer-cleanup';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.4-mobile-interface-release-hygiene';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);
