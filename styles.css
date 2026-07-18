@@ -611,7 +611,7 @@ select, input {
   .tab { font-size: 0.78rem; padding-inline: 4px; }
 }
 @media (max-width: 560px) {
-  .app-shell { padding-inline: 8px; padding-bottom: calc(106px + var(--safe-bottom)); }
+  .app-shell { padding-inline: 4px; padding-bottom: calc(106px + var(--safe-bottom)); }
   .hero-main, .grid-2 { grid-template-columns: 1fr; }
   .intro-head { flex-direction: column; }
   .intro-actions { width: 100%; }
