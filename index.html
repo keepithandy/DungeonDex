@@ -8,10 +8,10 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.26.3.01</title>
-  <link rel="stylesheet" href="./styles.css?build=1.26.3.01-boss-scaling-matrix-hardening" />
-  <link rel="stylesheet" href="./styles_lore_layer.css?build=1.26.3.01-boss-scaling-matrix-hardening" />
-  <link rel="stylesheet" href="./styles_visual_weight.css?build=1.26.3.01-boss-scaling-matrix-hardening" />
+  <title>DungeonDex v1.26.4</title>
+  <link rel="stylesheet" href="./styles.css?build=1.26.4-mobile-interface-release-hygiene" />
+  <link rel="stylesheet" href="./styles_lore_layer.css?build=1.26.4-mobile-interface-release-hygiene" />
+  <link rel="stylesheet" href="./styles_visual_weight.css?build=1.26.4-mobile-interface-release-hygiene" />
   <style>
     /* v1.23.8 Merchant Gear Upgrades Replace Talent System update. */
     .panel {
@@ -225,7 +225,7 @@
   <div class="app-shell ddx-shell">
     <header class="topbar ddx-guild-header" aria-labelledby="buildTag" role="banner">
       <div class="ddx-header-title-slot">
-        <h1 id="buildTag" class="ddx-lore-kicker">DungeonDex v1.26.3.01</h1>
+        <h1 id="buildTag" class="ddx-lore-kicker">DungeonDex v1.26.4</h1>
       </div>
       <div class="top-actions ddx-action-row" aria-label="Save controls">
         <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
@@ -235,7 +235,7 @@
     </header>
 
     <nav class="tabs panel ddx-nav-guild-bar" aria-label="Guild Navigation Routes">
-      <button class="tab active" data-screen="town" id="tab-town" type="button" aria-controls="screen-town">Town</button>
+      <button class="tab active" data-screen="town" id="tab-town" type="button" aria-controls="screen-town" aria-current="page">Town</button>
       <button class="tab" data-screen="run" id="tab-run" type="button" aria-controls="screen-run">Run</button>
       <button class="tab" data-screen="gear" id="tab-gear" type="button" aria-controls="screen-gear">Gear</button>
       <button class="tab" data-screen="dex" id="tab-dex" type="button" aria-controls="screen-dex">Archive</button>
@@ -254,8 +254,13 @@
             </div>
             <div class="inline-actions ddx-action-row" aria-label="Town actions">
               <button class="primary" id="startRunBtn" type="button">Enter Dungeon</button>
-              <button class="ghost rest-action-btn" id="restBtn" type="button">
-                <span class="rest-action-label">Rest</span>
+              <button class="ghost rest-action-btn" id="restBtn" type="button" aria-label="Rest" aria-describedby="restCurrentHp restEffectText restActionState restCostPill">
+                <span class="rest-action-copy">
+                  <span class="rest-action-label">Rest</span>
+                  <span class="rest-action-state" id="restActionState">Ready</span>
+                </span>
+                <span class="rest-current-hp" id="restCurrentHp">HP --/--</span>
+                <span class="rest-effect-text" id="restEffectText">Restore HP • 2 Ember minimum</span>
                 <span class="rest-cost-chip ddx-cost-indicator" id="restCostPill" title="Rest cost">--</span>
               </button>
             </div>
@@ -325,7 +330,7 @@
   </template>
 
   <div class="intro-modal-backdrop" id="introModal" hidden>
-    <section class="panel intro-progress intro-modal-window" id="introModalContent" aria-label="DungeonDex introduction"></section>
+    <section class="panel intro-progress intro-modal-window" id="introModalContent" role="dialog" aria-modal="true" aria-label="DungeonDex introduction" tabindex="-1"></section>
   </div>
 
   <template id="panelShellTemplate">
@@ -342,10 +347,10 @@
   </template>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.26.3.01';
-    window.DUNGEONDEX_BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
+    window.DUNGEONDEX_BUILD = '1.26.4';
+    window.DUNGEONDEX_BUILD_QS = '1.26.4-mobile-interface-release-hygiene';
     (function(){
-      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.26.3.01-boss-scaling-matrix-hardening';
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.26.4-mobile-interface-release-hygiene';
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
         if (tag) tag.textContent = 'DungeonDex v' + window.DUNGEONDEX_BUILD;
@@ -376,7 +381,7 @@
   <script>
     (function(){
       if (!('serviceWorker' in navigator)) return;
-      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.26.3.01-boss-scaling-matrix-hardening';
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.26.4-mobile-interface-release-hygiene';
       var host = window.location.hostname;
       var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
       if (isLocalDev) {
@@ -390,20 +395,20 @@
     })();
   </script>
 
-  <script src="./app.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/00_core_constants_data.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/01_state_recovery.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/02_currency_pending_rewards.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/03_town_contracts_market.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/04_depth_progression_charters.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/05_elite_modifiers.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/06_scaling_generation_audits.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/07_player_combat_runtime.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/08_normalization_save.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/09_ui_common_intro.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/10_ui_town_shop.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
+  <script src="./app.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/00_core_constants_data.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/01_state_recovery.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/02_currency_pending_rewards.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/03_town_contracts_market.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/04_depth_progression_charters.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/05_elite_modifiers.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/06_scaling_generation_audits.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/07_player_combat_runtime.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/08_normalization_save.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/09_ui_common_intro.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/10_ui_town_shop.js?build=1.26.4-mobile-interface-release-hygiene"></script>
   <script>
     (function(){
       var originalMarkup = window.merchantGearUpgradePanelMarkup;
@@ -413,25 +418,25 @@
       };
     })();
   </script>
-  <script src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/12_render_bindings_boot.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/36_ui_revisit_archive_codex.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/38_journal_v1.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/16_relic_forge_crafting.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/17_relic_forge_clarity.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/18_relic_forge_compact_text.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/28_debt_collector_foundation.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/34_debt_collector_v1_completion.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/20_town_currency_clean_strip.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/21_build_label_guard.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/22_nav_centering.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/23_boss_header_cleanup.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/24_lowfire_spark_board.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/25_town_wallet_chip_fix.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/26_spark_writ_pill_cleanup.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
-  <script src="./js/systems/27_interface_density_cleanup.js?build=1.26.3.01-boss-scaling-matrix-hardening"></script>
+  <script src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/12_render_bindings_boot.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/36_ui_revisit_archive_codex.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/38_journal_v1.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/16_relic_forge_crafting.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/17_relic_forge_clarity.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/18_relic_forge_compact_text.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/28_debt_collector_foundation.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/34_debt_collector_v1_completion.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/20_town_currency_clean_strip.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/21_build_label_guard.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/22_nav_centering.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/23_boss_header_cleanup.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/24_lowfire_spark_board.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/25_town_wallet_chip_fix.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/26_spark_writ_pill_cleanup.js?build=1.26.4-mobile-interface-release-hygiene"></script>
+  <script src="./js/systems/27_interface_density_cleanup.js?build=1.26.4-mobile-interface-release-hygiene"></script>
 </body>
 </html>

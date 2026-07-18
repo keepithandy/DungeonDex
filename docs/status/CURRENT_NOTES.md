@@ -7,7 +7,22 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.3.01 - Boss Scaling Matrix Smoke Hardening
+- DungeonDex v1.26.4 - Mobile Interface + Release Hygiene
+
+## v1.26.4 Mobile Interface + Release Hygiene
+- GitHub #116-#123 interface/accessibility work is implemented in source: safe-area-aware navigation, clearer rest hierarchy, protected mobile combat controls, shared Town presentation tokens, mobile Journal/Archive wrapping, modal focus/scroll handling, touch-target spacing, and improved contrast/non-color cues.
+- The closed desktop-pointer side rail no longer covers narrow Town content.
+- The Town screenshot helper now applies realistic touch profiles before initialization and verifies touch media state before capture.
+- GitHub #124 adds an exact-path asset provenance/usage manifest, Northline Studio asset-policy identification, and an untracked/undocumented asset release gate.
+- GitHub #125 documents one `VERSION.md` semantic/build-cache authority flow and requires field-level mismatch reporting.
+- Trophy Echo remains the only active Revisit lane.
+- Build/cache labels use `1.26.4-mobile-interface-release-hygiene`.
+- Local verification is complete: compact suite 39/39, mobile-layout contracts 14/14, interface/accessibility contracts 19/19, dungeon-entry runtime 11/11, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
+- Gear inspection now resolves upgraded and duplicate-name items by stable ID, remains available from pointer/card clicks, and has explicit Enter/Space triggers without changing gear state.
+- Intro Roadmap copy now accurately identifies Trophy Echo as the only live Revisit lane; Famous Gear Memory and Rival Trace remain locked and no Revisit behavior changed.
+- Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; local emulation does not replace a physical-device pass.
+- No itch/package builder was run and no release package was created.
+- Save compatibility, combat/player/monster/boss math, rewards, economy, Merchant Gear Upgrade costs/caps/effects, dungeon entry, Talent, Debt, progression, and Revisit behavior remain unchanged.
 
 ## v1.26.3.01 Boss Scaling Matrix Smoke Hardening
 - The 20-boss matrix now locks min/mid/max boss combat snapshots, boundary rows, legal fixture summaries, and 180 combat summaries from 36,000 seeded fights.
@@ -120,6 +135,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.3.01 Boss Scaling Matrix Smoke Hardening.
+- Current runtime baseline is v1.26.4 Mobile Interface + Release Hygiene.
+- GitHub #116-#125 are implemented and locally verified; remote issue closure remains pending publication and acceptance.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

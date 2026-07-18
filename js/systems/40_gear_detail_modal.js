@@ -8,6 +8,10 @@
 
   const MODAL_ID = 'gearDetailModal';
   const STYLE_ID = 'ddGearDetailModalCss';
+  const TITLE_ID = 'gearDetailModalTitle';
+  let modalAccessibilityHandle = null;
+  let modalOpener = null;
+  let removeTemporaryOpenerTabindex = false;
 
   function text(value, fallback = ''){
     if (typeof cleanDisplayText === 'function') return cleanDisplayText(value, fallback);
@@ -55,9 +59,22 @@
   }
 
   function findGearForCard(card){
+    if (typeof S === 'undefined') return null;
+    const entries = allGearItems();
+    const itemId = text(card?.dataset?.gearDetailId || '').toLowerCase();
+    if (itemId) {
+      const byId = entries.find(entry => text(entry.item?.id || '').toLowerCase() === itemId);
+      if (byId) return byId;
+    }
     const name = cardItemName(card).toLowerCase();
-    if (!name || typeof S === 'undefined') return null;
-    return allGearItems().find(entry => text(entry.item?.name || '').toLowerCase() === name) || null;
+    if (!name) return null;
+    return entries.find(entry => {
+      const rawName = text(entry.item?.name || '').toLowerCase();
+      const displayName = text(typeof formatGearDisplayName === 'function'
+        ? formatGearDisplayName(entry.item)
+        : entry.item?.name || '').toLowerCase();
+      return rawName === name || displayName === name;
+    }) || null;
   }
 
   function itemRarity(item){
@@ -259,10 +276,10 @@
       ? stats.map(([key, value]) => `<span class="gear-detail-stat"><b>${esc(statLabel(key))}</b>${esc(formatNumber(value))}</span>`).join('')
       : `<span class="gear-detail-stat"><b>Power</b>${esc(formatNumber(power))}</span>`;
     return `<div class="gear-detail-backdrop">
-      <section class="gear-detail-window" role="dialog" aria-modal="true" aria-label="Gear details">
+      <section class="gear-detail-window" role="dialog" aria-modal="true" aria-labelledby="${TITLE_ID}" tabindex="-1">
         <button class="ghost mini gear-detail-close" type="button" data-gear-detail-close="1">Close</button>
         <div class="gear-detail-kicker">${esc(entry.source)} • ${esc(slot)} • ${esc(level)}</div>
-        <h2>${esc(text(item?.name, 'Unknown Gear'))}</h2>
+        <h2 id="${TITLE_ID}">${esc(text(item?.name, 'Unknown Gear'))}</h2>
         <div class="tag-row gear-detail-tags">
           <span class="pill">${esc(rarity)}</span>
           <span class="pill">Upgrade +${esc(formatNumber(upgrade))} / +3</span>
@@ -292,14 +309,14 @@
     style.textContent = `
       .loadout-equip-card,.inventory-card{cursor:pointer}
       .loadout-equip-card:focus-visible,.inventory-card:focus-visible{outline:2px solid rgba(255,214,151,.55);outline-offset:2px}
-      .gear-detail-backdrop{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.68);backdrop-filter:blur(8px)}
-      .gear-detail-window{position:relative;width:min(560px,calc(100vw - 28px));max-height:calc(100vh - 36px);overflow:auto;border:1px solid rgba(255,214,151,.22);border-radius:22px;background:linear-gradient(145deg,rgba(30,25,18,.98),rgba(8,8,8,.98));box-shadow:0 24px 80px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.06);padding:18px}
+      .gear-detail-backdrop{--ddx-gear-modal-safe-top:max(18px,env(safe-area-inset-top,0px));--ddx-gear-modal-safe-right:max(18px,env(safe-area-inset-right,0px));--ddx-gear-modal-safe-bottom:max(18px,env(safe-area-inset-bottom,0px));--ddx-gear-modal-safe-left:max(18px,env(safe-area-inset-left,0px));position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:var(--ddx-gear-modal-safe-top) var(--ddx-gear-modal-safe-right) var(--ddx-gear-modal-safe-bottom) var(--ddx-gear-modal-safe-left);background:rgba(0,0,0,.68);backdrop-filter:blur(8px)}
+      .gear-detail-window{position:relative;width:min(560px,100%);max-width:100%;max-height:calc(100vh - var(--ddx-gear-modal-safe-top) - var(--ddx-gear-modal-safe-bottom));max-height:calc(100dvh - var(--ddx-gear-modal-safe-top) - var(--ddx-gear-modal-safe-bottom));overflow:auto;border:1px solid rgba(255,214,151,.22);border-radius:22px;background:linear-gradient(145deg,rgba(30,25,18,.98),rgba(8,8,8,.98));box-shadow:0 24px 80px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.06);padding:18px}
       .gear-detail-window h2{margin:2px 0 8px;font-size:1.32rem;line-height:1.05;color:#f7e4bd}
-      .gear-detail-close{position:absolute;top:12px;right:12px}
+      .gear-detail-window .gear-detail-close{position:absolute;top:12px;right:12px;min-width:44px;min-height:44px}
       .gear-detail-kicker{padding-right:74px;color:rgba(245,222,180,.72);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
       .gear-detail-tags{margin:10px 0 8px}
       .gear-detail-actions{display:flex;justify-content:flex-end;margin:2px 0 10px}
-      .gear-detail-compare-btn{min-height:30px;padding:6px 12px;border-radius:999px;border-color:rgba(255,214,151,.22);background:linear-gradient(180deg,rgba(255,214,151,.10),rgba(255,214,151,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+      .gear-detail-window .gear-detail-compare-btn{min-height:44px;padding:6px 12px;border-radius:999px;border-color:rgba(255,214,151,.22);background:linear-gradient(180deg,rgba(255,214,151,.10),rgba(255,214,151,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
       .gear-detail-compare-panel[hidden]{display:none!important}
       .gear-detail-compare-panel{margin:10px 0 12px;padding:10px;border:1px solid rgba(255,214,151,.14);border-radius:16px;background:rgba(255,214,151,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
       .gear-compare-title{color:#f7e4bd;font-size:.74rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
@@ -337,21 +354,55 @@
     }
   }
 
-  function openGearDetail(entry){
+  function prepareOpener(opener){
+    modalOpener = opener || null;
+    removeTemporaryOpenerTabindex = false;
+    if (!modalOpener?.hasAttribute || modalOpener.hasAttribute('tabindex')) return;
+    modalOpener.setAttribute('tabindex', '-1');
+    removeTemporaryOpenerTabindex = true;
+  }
+
+  function releaseOpener(){
+    if (removeTemporaryOpenerTabindex && modalOpener?.removeAttribute) {
+      modalOpener.removeAttribute('tabindex');
+    }
+    modalOpener = null;
+    removeTemporaryOpenerTabindex = false;
+  }
+
+  function openGearDetail(entry, opener){
     if (!entry?.item) return;
     ensureStyle();
-    closeGearDetail();
+    closeGearDetail({ restoreFocus: false });
+    prepareOpener(opener);
     const wrap = document.createElement('div');
     wrap.id = MODAL_ID;
     wrap.innerHTML = modalMarkup(entry);
     document.body.appendChild(wrap);
-    const close = wrap.querySelector('[data-gear-detail-close]');
-    if (close) close.focus?.();
+    const helper = window.DDModalAccessibility;
+    if (helper?.activate) {
+      modalAccessibilityHandle = helper.activate({
+        root: wrap,
+        dialog: wrap.querySelector('.gear-detail-window'),
+        opener: modalOpener,
+        initialFocus: '[data-gear-detail-close]',
+        fallbackFocus: () => document.querySelector('.tab.active'),
+        onEscape: closeGearDetail
+      });
+    } else {
+      wrap.querySelector('[data-gear-detail-close]')?.focus?.();
+    }
   }
 
-  function closeGearDetail(){
+  function closeGearDetail(options = {}){
     const existing = document.getElementById(MODAL_ID);
     if (existing) existing.remove();
+    if (modalAccessibilityHandle) {
+      const handle = modalAccessibilityHandle;
+      modalAccessibilityHandle = null;
+      handle.deactivate({ restoreFocus: options.restoreFocus !== false });
+    }
+    releaseOpener();
   }
 
   document.addEventListener('click', function(event){
@@ -365,16 +416,25 @@
       toggleCompare(compareTarget);
       return;
     }
-    if (event.target.closest?.('button,select,input,textarea,a')) return;
+    const detailTrigger = event.target.closest?.('[data-gear-detail-trigger]');
+    if (event.target.closest?.('button,select,input,textarea,a') && !detailTrigger) return;
     const card = event.target.closest?.('.loadout-equip-card,.inventory-card');
     if (!card) return;
     const entry = findGearForCard(card);
     if (!entry) return;
-    openGearDetail(entry);
+    openGearDetail(entry, detailTrigger || card);
   });
 
   document.addEventListener('keydown', function(event){
-    if (event.key === 'Escape') closeGearDetail();
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const detailTrigger = event.target.closest?.('[data-gear-detail-trigger]');
+    if (!detailTrigger) return;
+    const card = detailTrigger.closest?.('.loadout-equip-card,.inventory-card');
+    if (!card) return;
+    const entry = findGearForCard(card);
+    if (!entry) return;
+    event.preventDefault();
+    openGearDetail(entry, detailTrigger);
   });
 
   window.DungeonDexGearDetailModal = { open: openGearDetail, close: closeGearDetail };

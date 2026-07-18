@@ -403,13 +403,27 @@ function renderTown() {
 		const cost = restCost(S);
 		const affordable = S.player.gold >= cost;
 		const cleanCost = cleanDisplayText(formatMoney(cost));
+		const currentHp = Math.max(0, Math.floor(Number(S.player.hp) || 0));
+		const maxHp = Math.max(0, Math.floor(Number(S.player.maxHp) || 0));
+		const hpLabel = `HP ${format(currentHp)}/${format(maxHp)}`;
+		const effectLabel = currentHp >= maxHp
+			? 'Full HP • 2 Ember minimum'
+			: 'Restore HP • 2 Ember minimum';
+		const stateLabel = affordable ? 'Ready' : 'Need coin';
 		restCostNode.innerHTML = formatMoney(cost);
 		restCostNode.classList.toggle('rest-cost-low', !affordable);
 		restCostNode.title = affordable ? `Rest and restore HP for ${cleanCost}` : `Need ${cleanCost} to rest`;
+		if (el('restCurrentHp')) el('restCurrentHp').textContent = hpLabel;
+		if (el('restEffectText')) el('restEffectText').textContent = effectLabel;
+		if (el('restActionState')) {
+			el('restActionState').textContent = stateLabel;
+			el('restActionState').classList.toggle('rest-action-state-low', !affordable);
+		}
 		const restAction = el('restBtn');
 		if (restAction) {
 			restAction.classList.toggle('rest-action-unaffordable', !affordable);
-			restAction.setAttribute('aria-label', affordable ? `Rest for ${cleanCost}` : `Rest unavailable. Need ${cleanCost}`);
+			restAction.dataset.restState = affordable ? 'ready' : 'need-coin';
+			restAction.setAttribute('aria-label', 'Rest');
 		}
 	}
 	if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');

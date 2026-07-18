@@ -9,10 +9,14 @@ import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUTPUT_DIR = path.join(ROOT, 'archive', 'screenshots', 'town-mobile');
+const FINE_POINTER_MODE = process.argv.includes('--fine-pointer');
+const OUTPUT_DIR = path.join(ROOT, 'archive', 'screenshots', FINE_POINTER_MODE ? 'town-narrow-pointer' : 'town-mobile');
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
-const WIDTHS = [390, 430, 768];
-const SCREENSHOT_HEIGHT = 2400;
+const MOBILE_PROFILES = Object.freeze([
+  { width: 390, height: 844 },
+  { width: 430, height: 932 },
+  { width: 768, height: 1024 }
+]);
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -217,15 +221,62 @@ async function waitForTown(client, timeoutMs = 15000) {
   return false;
 }
 
-async function captureTownScreenshot(client, width, outputPath) {
+async function applyTouchProfile(client, profile) {
+  await client.send('Emulation.setTouchEmulationEnabled', {
+    enabled: true,
+    maxTouchPoints: 5
+  });
   await client.send('Emulation.setDeviceMetricsOverride', {
-    width,
-    height: SCREENSHOT_HEIGHT,
+    width: profile.width,
+    height: profile.height,
     deviceScaleFactor: 1,
     mobile: true,
-    screenWidth: width,
-    screenHeight: SCREENSHOT_HEIGHT
+    screenWidth: profile.width,
+    screenHeight: profile.height
   });
+}
+
+async function assertTouchProfile(client, profile) {
+  const actual = await evaluate(client, `(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    maxTouchPoints: Number(navigator.maxTouchPoints || 0),
+    touchMedia: !!(window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches)
+  }))()`);
+  const widthMatches = actual?.width === profile.width;
+  const heightMatches = Math.abs(Number(actual?.height || 0) - profile.height) <= 1;
+  if (!widthMatches || !heightMatches || actual?.maxTouchPoints < 1 || actual?.touchMedia !== true) {
+    throw new Error(`Touch profile did not apply: expected ${profile.width}x${profile.height}, received ${JSON.stringify(actual)}`);
+  }
+}
+
+async function applyFinePointerProfile(client, profile) {
+  await client.send('Emulation.setTouchEmulationEnabled', { enabled: false });
+  await client.send('Emulation.setDeviceMetricsOverride', {
+    width: profile.width,
+    height: profile.height,
+    deviceScaleFactor: 1,
+    mobile: false,
+    screenWidth: profile.width,
+    screenHeight: profile.height
+  });
+}
+
+async function assertFinePointerProfile(client, profile) {
+  const actual = await evaluate(client, `(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    maxTouchPoints: Number(navigator.maxTouchPoints || 0),
+    finePointerMedia: !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+  }))()`);
+  const widthMatches = actual?.width === profile.width;
+  const heightMatches = Math.abs(Number(actual?.height || 0) - profile.height) <= 1;
+  if (!widthMatches || !heightMatches || actual?.maxTouchPoints !== 0 || actual?.finePointerMedia !== true) {
+    throw new Error(`Fine-pointer profile did not apply: expected ${profile.width}x${profile.height}, received ${JSON.stringify(actual)}`);
+  }
+}
+
+async function captureTownScreenshot(client, outputPath) {
   await evaluate(client, `(() => {
     const townTab = document.getElementById('tab-town');
     if (townTab) townTab.click();
@@ -237,7 +288,7 @@ async function captureTownScreenshot(client, width, outputPath) {
   const shot = await client.send('Page.captureScreenshot', {
     format: 'png',
     fromSurface: true,
-    captureBeyondViewport: true
+    captureBeyondViewport: false
   });
   await writeFile(outputPath, Buffer.from(shot.data, 'base64'));
 }
@@ -267,26 +318,34 @@ async function main() {
     await client.send('Page.enable');
     await client.send('Runtime.enable');
     await client.send('Network.enable');
+    if (FINE_POINTER_MODE) await applyFinePointerProfile(client, MOBILE_PROFILES[0]);
+    else await applyTouchProfile(client, MOBILE_PROFILES[0]);
     await client.send('Page.navigate', { url: pageUrl });
 
     if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize.');
     await evaluate(client, `localStorage.removeItem(${JSON.stringify(STORAGE_KEY)}); true`);
-    await client.send('Page.reload', { ignoreCache: true });
-    if (!await waitForRuntime(client)) throw new Error('DungeonDex runtime did not initialize after clearing save.');
-    await sleep(700);
-    if (!await waitForTown(client)) throw new Error('Town screen did not render.');
-    await sleep(500);
 
-    for (const width of WIDTHS) {
-      const outputPath = path.join(OUTPUT_DIR, `town-${width}.png`);
-      console.log(`Capturing Town at ${width}px -> ${path.relative(ROOT, outputPath).replaceAll('\\', '/')}`);
-      await captureTownScreenshot(client, width, outputPath);
+    for (const profile of MOBILE_PROFILES) {
+      if (FINE_POINTER_MODE) await applyFinePointerProfile(client, profile);
+      else await applyTouchProfile(client, profile);
+      await client.send('Page.reload', { ignoreCache: true });
+      if (!await waitForRuntime(client)) throw new Error(`DungeonDex runtime did not initialize at ${profile.width}x${profile.height}.`);
+      await sleep(700);
+      if (!await waitForTown(client)) throw new Error(`Town screen did not render at ${profile.width}x${profile.height}.`);
+      if (FINE_POINTER_MODE) await assertFinePointerProfile(client, profile);
+      else await assertTouchProfile(client, profile);
+      await sleep(500);
+
+      const outputPath = path.join(OUTPUT_DIR, `town-${profile.width}.png`);
+      console.log(`Capturing Town at ${profile.width}x${profile.height} -> ${path.relative(ROOT, outputPath).replaceAll('\\', '/')}`);
+      await captureTownScreenshot(client, outputPath);
       const screenshotStat = await stat(outputPath);
       if (!screenshotStat.size) throw new Error(`Screenshot write failed: ${outputPath}`);
     }
 
     await client.send('Emulation.clearDeviceMetricsOverride');
-    console.log(`PASS: Captured Town screenshots at ${WIDTHS.join(', ')} px`);
+    await client.send('Emulation.setTouchEmulationEnabled', { enabled: false });
+    console.log(`PASS: Captured ${FINE_POINTER_MODE ? 'fine-pointer' : 'touch'} Town screenshots at ${MOBILE_PROFILES.map(profile => `${profile.width}x${profile.height}`).join(', ')}`);
   } finally {
     try { if (client) client.close(); } catch {}
     try { chrome.kill(); } catch {}

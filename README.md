@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.26.3.01**
+Current baseline: **DungeonDex v1.26.4**
 
 ## Try It First
 
@@ -20,7 +20,7 @@ Focused Revisit placement and Trophy Echo checks are available with:
 node tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs
 ```
 
-Current status: active flagship browser RPG. The live build includes the core dungeon loop, side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, Trophy Echo as the only active Revisit lane, a Gear-tab upgrade summary, custom header/Town visual identity assets, and a click-to-inspect gear detail modal.
+Current status: active flagship browser RPG. The live build includes the core dungeon loop, safe-area-aware side rail navigation for desktop hover/focus and a tiny mobile/touch `←` drawer button, Lowfire Forge gear crafting/tempering, merchant gear upgrades, Guild Journal memory surfaces, Trophy Echo as the only active Revisit lane, a Gear-tab upgrade summary, custom header/Town visual identity assets, and accessible click-to-inspect detail modals.
 
 ## Player Promise
 
@@ -55,24 +55,24 @@ DungeonDex is built around a simple loop:
 - **Lowfire Forge:** Gear crafting, salvage, and tempering; older internal names remain preserved for existing saves.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
-- **Trophy Echo:** The only active Revisit lane for v1.26.3.01, tied to boss trophy or boss record history.
+- **Trophy Echo:** The only active Revisit lane for v1.26.4, tied to boss trophy or boss record history.
 - **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
-- **Gear detail modal:** Click a visible equipped or inventory gear card for a simple read-only rundown.
+- **Gear detail modal:** Click a visible equipped or inventory gear card for a focus-managed, scroll-safe read-only rundown.
 - **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
+- **Asset and release hygiene:** Tracked asset provenance plus one documented semantic-version/build-cache authority flow.
 
 ## Planned / Locked Systems
 
-These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.3.01:
+These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.4:
 
 - **Famous Gear Memory:** Removed from the active Revisit surface.
 - **Rival Trace:** Removed from the active Revisit surface.
 - **Board Echo:** Removed from the active Revisit surface.
 - **Debt Pressure Revisit:** Removed from the active Revisit surface.
-- **Asset hygiene:** Source/license inventory for icons, fonts, screenshots, and other public-facing assets.
 
 ## Revisit Status
 
-Trophy Echo is the only active Revisit lane for v1.26.3.01. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
+Trophy Echo is the only active Revisit lane for v1.26.4. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
 
 The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of exposing unfinished lane concepts.
 

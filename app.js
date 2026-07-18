@@ -1,14 +1,14 @@
-// DungeonDex v1.26.3.01 runtime pointer.
+// DungeonDex v1.26.4 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.3.01: Boss Scaling Matrix Smoke Hardening
-// - Locks all named-boss rolls, scaling boundaries, legal fixtures, and combat summaries.
-// - Retains the v1.26.3 Boss 2 correction and overmatched guidance unchanged.
+// v1.26.4: Mobile Interface + Release Hygiene
+// - Hardens navigation, touch capture, Town hierarchy, wrapping, modal access, and state clarity.
+// - Retains the v1.26.3 Boss 2 correction and scaling matrix unchanged.
 // - Preserves gameplay scaling, combat, rewards, upgrades, saves, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.26.3.01';
-window.DUNGEONDEX_BUILD_QS = '1.26.3.01-boss-scaling-matrix-hardening';
+window.DUNGEONDEX_BUILD = '1.26.4';
+window.DUNGEONDEX_BUILD_QS = '1.26.4-mobile-interface-release-hygiene';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -97,7 +97,7 @@ window.ddGetMonsterCue = function(name){
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.3.01-boss-scaling-matrix-hardening';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.4-mobile-interface-release-hygiene';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

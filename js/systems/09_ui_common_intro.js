@@ -3,12 +3,181 @@
 // Screen switching, common UI helpers, popups, intro modal
   let S = load();
 
+  (function installModalAccessibilityHelper() {
+    if (window.DDModalAccessibility) return;
+
+    const focusableSelector = [
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled]):not([type="hidden"])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[contenteditable="true"]',
+      '[tabindex]:not([tabindex="-1"])'
+    ].join(',');
+    const activeModals = [];
+    let shellLock = null;
+
+    function isConnected(node) {
+      if (!node) return false;
+      if (typeof node.isConnected === 'boolean') return node.isConnected;
+      return !document.documentElement?.contains || document.documentElement.contains(node);
+    }
+
+    function isAvailable(node) {
+      if (!isConnected(node) || node.disabled) return false;
+      if (node.getAttribute?.('aria-disabled') === 'true') return false;
+      return !node.closest?.('[hidden], [aria-hidden="true"]');
+    }
+
+    function resolveTarget(target, scope) {
+      const resolved = typeof target === 'function' ? target() : target;
+      if (typeof resolved === 'string') return scope?.querySelector?.(resolved) || null;
+      return resolved || null;
+    }
+
+    function focusNode(node) {
+      if (!isAvailable(node) || typeof node.focus !== 'function') return false;
+      try {
+        node.focus({ preventScroll: true });
+      } catch (_) {
+        node.focus();
+      }
+      return true;
+    }
+
+    function focusableNodes(record) {
+      if (!record?.dialog?.querySelectorAll) return [];
+      return Array.from(record.dialog.querySelectorAll(focusableSelector)).filter(isAvailable);
+    }
+
+    function focusRecord(record) {
+      const initial = resolveTarget(record.initialFocus, record.dialog);
+      if (focusNode(initial)) return;
+      const first = focusableNodes(record)[0];
+      if (focusNode(first)) return;
+      focusNode(record.dialog);
+    }
+
+    function lockShell() {
+      if (shellLock) return;
+      const shell = document.querySelector?.('.app-shell');
+      if (!shell) return;
+      shellLock = {
+        node: shell,
+        scrollTop: shell.scrollTop,
+        overflow: shell.style.overflow,
+        overflowY: shell.style.overflowY,
+        touchAction: shell.style.touchAction,
+        overscrollBehavior: shell.style.overscrollBehavior,
+        hadClass: shell.classList?.contains('dd-modal-scroll-locked') || false
+      };
+      shell.classList?.add('dd-modal-scroll-locked');
+      shell.style.overflow = 'hidden';
+      shell.style.overflowY = 'hidden';
+      shell.style.touchAction = 'none';
+      shell.style.overscrollBehavior = 'contain';
+    }
+
+    function unlockShell() {
+      if (!shellLock || activeModals.length) return;
+      const saved = shellLock;
+      shellLock = null;
+      const shell = saved.node;
+      shell.style.overflow = saved.overflow;
+      shell.style.overflowY = saved.overflowY;
+      shell.style.touchAction = saved.touchAction;
+      shell.style.overscrollBehavior = saved.overscrollBehavior;
+      if (!saved.hadClass) shell.classList?.remove('dd-modal-scroll-locked');
+      shell.scrollTop = saved.scrollTop;
+    }
+
+    function restoreFocus(record) {
+      const remaining = activeModals[activeModals.length - 1];
+      if (remaining) {
+        if (remaining.root?.contains?.(record.opener) && focusNode(record.opener)) return;
+        focusRecord(remaining);
+        return;
+      }
+      if (focusNode(record.opener)) return;
+      focusNode(resolveTarget(record.fallbackFocus, document));
+    }
+
+    function deactivate(record, options = {}) {
+      const index = activeModals.indexOf(record);
+      if (index === -1) return;
+      const wasTop = index === activeModals.length - 1;
+      activeModals.splice(index, 1);
+      unlockShell();
+      if (wasTop && options.restoreFocus !== false) restoreFocus(record);
+    }
+
+    function handleKeydown(event) {
+      const record = activeModals[activeModals.length - 1];
+      if (!record) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        record.onEscape?.(event);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = focusableNodes(record);
+      if (!focusable.length) {
+        event.preventDefault();
+        focusNode(record.dialog);
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const current = document.activeElement;
+      if (event.shiftKey && (current === first || !record.dialog.contains?.(current))) {
+        event.preventDefault();
+        focusNode(last);
+      } else if (!event.shiftKey && (current === last || !record.dialog.contains?.(current))) {
+        event.preventDefault();
+        focusNode(first);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeydown, true);
+    window.DDModalAccessibility = Object.freeze({
+      activate(options = {}) {
+        const root = options.root;
+        const dialog = options.dialog || root;
+        if (!root || !dialog) return null;
+        const active = document.activeElement;
+        const record = {
+          root,
+          dialog,
+          opener: options.opener || (active && active !== document.body ? active : null),
+          fallbackFocus: options.fallbackFocus,
+          initialFocus: options.initialFocus,
+          onEscape: options.onEscape
+        };
+        activeModals.push(record);
+        lockShell();
+        focusRecord(record);
+        return Object.freeze({
+          deactivate(deactivateOptions = {}) {
+            deactivate(record, deactivateOptions);
+          }
+        });
+      }
+    });
+  })();
+
   function switchScreen(screen) {
     if (S?.run?.active && screen !== 'run') screen = 'run';
     screen = normalizeScreenName(screen);
     S.screen = screen;
     $$('.screen').forEach(node => node.classList.toggle('active', node.id === `screen-${screen}`));
-    $$('.tab').forEach(node => node.classList.toggle('active', node.dataset.screen === screen));
+    $$('.tab').forEach(node => {
+      const isActive = node.dataset.screen === screen;
+      node.classList.toggle('active', isActive);
+      if (isActive) node.setAttribute('aria-current', 'page');
+      else node.removeAttribute('aria-current');
+    });
     render();
   }
 
@@ -146,24 +315,24 @@
       <div class="threshold-roadmap-card" aria-label="Current Roadmap">
         <div class="threshold-roadmap-head">
           <span class="threshold-label">Current Roadmap</span>
-          <p class="threshold-roadmap-copy">Memory lanes are live. Next up: turn the remaining locked echoes into playable town decisions.</p>
+          <p class="threshold-roadmap-copy">Trophy Echo is the only live memory lane. Other echo concepts remain locked until a focused future issue.</p>
         </div>
         <div class="threshold-roadmap-list">
           <div class="threshold-roadmap-row">
             <span class="threshold-roadmap-key">Live</span>
-            <span class="threshold-roadmap-value">Trophy Echo, Famous Gear Memory, Rival Trace</span>
+            <span class="threshold-roadmap-value">Trophy Echo</span>
           </div>
           <div class="threshold-roadmap-row">
-            <span class="threshold-roadmap-key">Next</span>
-            <span class="threshold-roadmap-value">Debt Pressure becomes a playable Revisit</span>
+            <span class="threshold-roadmap-key">Locked</span>
+            <span class="threshold-roadmap-value">Famous Gear Memory, Rival Trace, Board Echo, Debt Pressure</span>
           </div>
           <div class="threshold-roadmap-row">
-            <span class="threshold-roadmap-key">After</span>
-            <span class="threshold-roadmap-value">Board Echo, cleaner Journal hooks, memory polish</span>
+            <span class="threshold-roadmap-key">Proof</span>
+            <span class="threshold-roadmap-value">Earn a boss trophy or boss record, then return to town</span>
           </div>
           <div class="threshold-roadmap-row">
-            <span class="threshold-roadmap-key">Future</span>
-            <span class="threshold-roadmap-value">Dungeon Court, district identity, deeper rewards</span>
+            <span class="threshold-roadmap-key">Guardrail</span>
+            <span class="threshold-roadmap-value">Memory-only: no rewards, combat, farming, or dungeon-entry replacement</span>
           </div>
         </div>
       </div>`;
@@ -267,10 +436,17 @@
     content.innerHTML = introProgressMarkup();
   }
 
-  function hideIntroModal() {
+  let introModalAccessibilityHandle = null;
+
+  function hideIntroModal(options = {}) {
     const modal = el('introModal');
     if (!modal) return;
     modal.hidden = true;
+    if (introModalAccessibilityHandle) {
+      const handle = introModalAccessibilityHandle;
+      introModalAccessibilityHandle = null;
+      handle.deactivate({ restoreFocus: options.restoreFocus !== false });
+    }
   }
 
   let introModalFallbackSeen = false;
@@ -292,4 +468,11 @@
     renderIntroModal();
     modal.hidden = false;
     bindIntroModalActions();
+    introModalAccessibilityHandle = window.DDModalAccessibility.activate({
+      root: modal,
+      dialog: el('introModalContent'),
+      initialFocus: '#introModalContinueRunBtn, #introModalEnterDungeonBtn, #introModalCloseBtn',
+      fallbackFocus: () => document.querySelector('.tab.active') || el('startRunBtn'),
+      onEscape: hideIntroModal
+    });
   }

@@ -1,16 +1,19 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.4 Mobile Interface + Release Hygiene
 
 ## Current Local Package Version
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.4 Mobile Interface + Release Hygiene
 
 ## Current Development Target
-v1.26.3.01 Boss Scaling Matrix Smoke Hardening
+v1.26.4 Mobile Interface + Release Hygiene
+
+## Current Build/Cache Label
+1.26.4-mobile-interface-release-hygiene
 
 ## Version Rules
-- VERSION.md is the source of truth for DungeonDex versioning.
+- VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.
 - Do not infer the current version from old release notes.
 - Do not infer the current version from zip/package filenames.
 - Do not infer the current version from patch-log history.

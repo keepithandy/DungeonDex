@@ -44,7 +44,7 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Trophy Echo is the only active Revisit lane in the v1.26.3.01 baseline.
+- Trophy Echo is the only active Revisit lane in the v1.26.4 baseline.
 - Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 
@@ -121,11 +121,14 @@ VERSION.md
 README.md
 CHANGELOG.md
 docs/status/CURRENT_NOTES.md
+docs/VERSION_CACHE_AUTHORITY.md
 app.js
 index.html
 sw.js
+js/systems/00_core_constants_data.js
 js/systems/21_build_label_guard.js
-js/systems/27_interface_density_cleanup.js
+tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs
+tools/check_dungeondex_package.py
 ```
 
 Do not bump version labels for docs-only or smoke-only changes unless the user requests a version bump.

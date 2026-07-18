@@ -41,28 +41,51 @@ Before planning or editing, read:
 4. `docs/CURRENT_ARCHITECTURE.md` if present
 5. `docs/PATCH_TEMPLATE.md` before writing a patch plan
 6. `docs/RELEASE_CHECKLIST.md` before version labels, release notes, cache labels, or public-facing package changes
+7. `docs/VERSION_CACHE_AUTHORITY.md` before a version/cache alignment pass
+8. `docs/ASSET_INVENTORY.md` and `ASSETS_LICENSE.md` before adding, replacing, or publishing assets
 
 If a listed document is missing, continue safely and report that it was not present.
 
 ## Version Authority
 
 - Always check `VERSION.md` before changing any version number.
-- `VERSION.md` is the source of truth for the current public version, current development target, and hotfix naming.
+- `VERSION.md` is the source of truth for the current public version, local package version, development target, build/cache label, and hotfix naming.
+- `docs/VERSION_CACHE_AUTHORITY.md` defines the propagation flow but does not replace `VERSION.md` as authority.
 - Do not trust old release notes, old zip filenames, cached build labels, package names, old patch logs, historical comments, or stale issue text as the current version.
 - Do not bump the version unless the user explicitly asks.
 - Before changing version labels, search for all version strings in:
   - `VERSION.md`
+  - `README.md`
+  - `CHANGELOG.md`
+  - `docs/status/CURRENT_NOTES.md`
+  - `docs/VERSION_CACHE_AUTHORITY.md`
   - `index.html`
   - `app.js`
   - `styles.css`
   - `manifest.json`
   - `sw.js`
+  - `js/systems/00_core_constants_data.js`
+  - `js/systems/21_build_label_guard.js`
+  - other loaded systems that expose a current version/build label
+  - `tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs`
+  - `tools/check_dungeondex_package.py`
+  - release/package builder version references
   - `patch-log.md`
   - release notes
   - smoke-test notes
   - current notes
 - Report every relevant version string found before editing.
 - Keep the visible player-facing label short, for example: `DungeonDex v1.23.1`.
+- Treat `manifest.json` and stylesheet contents as intentional non-authorities unless an explicit version field is added; their cache queries are owned by `index.html` and `sw.js`.
+- Do not treat a package filename, generic `DungeonDex.zip`, or an archived stage as version authority.
+
+## Asset Provenance Authority
+
+- `docs/ASSET_INVENTORY.md` is the exact-path manifest for tracked visual, audio, font, screenshot, and marketing assets.
+- `ASSETS_LICENSE.md` is the Northline Studio asset licensing policy; it does not recreate missing third-party or generator-source evidence.
+- Before a public release or marketing refresh, enumerate tracked and untracked assets and require creator/source, license/ownership, modification notes, and usage location.
+- Keep placeholders, third-party material, unknown sources, and incomplete provenance explicit.
+- Do not treat generated or unknown-source material as cleared for new marketing merely because it is already present in the repository.
 
 ## Required Pre-Work Checklist
 
