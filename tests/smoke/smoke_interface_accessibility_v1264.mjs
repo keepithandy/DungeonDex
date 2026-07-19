@@ -128,11 +128,12 @@ function runModalLifecycleFixture(introSource) {
 }
 
 async function main() {
-  const [index, town, playerRuntime, visualCss, intro, gearModal, runUi, bindings] = await Promise.all([
+  const [index, town, playerRuntime, visualCss, loreCss, intro, gearModal, runUi, bindings] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/07_player_combat_runtime.js'), 'utf8'),
     readFile(path.join(ROOT, 'styles_visual_weight.css'), 'utf8'),
+    readFile(path.join(ROOT, 'styles_lore_layer.css'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/40_gear_detail_modal.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8'),
@@ -179,9 +180,12 @@ async function main() {
     combatOrder.join(' -> ')
   );
   record(
-    'Combat actions stay in-flow in four equal columns at 46px',
-    /\.app-shell\.combat-active\s+\.combat-device-actions\s*\{[^}]*position:\s*static;[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s.test(visualCss)
+    'Combat actions have one final visual owner, four equal columns, a 6px gap, and 46px targets',
+    /\.app-shell\.combat-active\s+\.combat-device-actions\s*\{[^}]*position:\s*static\s*!important;[^}]*display:\s*grid\s*!important;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)\s*!important/s.test(visualCss)
       && /\.app-shell\.combat-active\s+\.combat-device-actions\s+button\s*\{[^}]*min-height:\s*46px\s*!important/s.test(visualCss)
+      && /\.app-shell\.combat-active\s+\.combat-device-actions\s*\{[^}]*gap:\s*6px\s*!important/s.test(visualCss)
+      && visualCss.includes('v1.26.4.01 combat-bar authority')
+      && !loreCss.includes('Combat bar layout invariant')
   );
 
   record(
@@ -266,7 +270,7 @@ async function main() {
   );
 
   const passed = results.filter(result => result.ok).length;
-  console.log(`\nInterface accessibility v1.26.4: ${passed}/${results.length} passed`);
+  console.log(`\nInterface accessibility v1.26.4.01: ${passed}/${results.length} passed`);
   if (passed !== results.length) process.exitCode = 1;
 }
 

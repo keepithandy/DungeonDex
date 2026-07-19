@@ -509,16 +509,75 @@ button[aria-disabled="true"] {
   }
 }
 
+/* v1.26.4.01 combat-bar authority.
+   This final visual layer owns the existing four-column HUD and action layout. */
+.app-shell.combat-active .combat-hud.run-stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  width: 100% !important;
+  min-width: 0;
+  gap: clamp(4px, 1vw, 8px) !important;
+}
+
+.app-shell.combat-active .combat-hud.run-stat-grid .stat-box {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: clamp(42px, 6vw, 52px) !important;
+  padding: clamp(5px, 1vw, 8px) !important;
+  border-radius: clamp(12px, 2vw, 16px) !important;
+  text-align: left !important;
+}
+
+.app-shell.combat-active .combat-hud.run-stat-grid .stat-box .small,
+.app-shell.combat-active .combat-hud.run-stat-grid .stat-box span {
+  display: block !important;
+  font-size: clamp(0.58rem, 1.3vw, 0.68rem) !important;
+  line-height: 1 !important;
+  text-align: left !important;
+}
+
+.app-shell.combat-active .combat-hud.run-stat-grid .stat-box strong {
+  display: block;
+  font-size: clamp(0.82rem, 1.9vw, 1rem) !important;
+  line-height: 1 !important;
+  text-align: left !important;
+}
+
 /* The four proven combat actions stay in-flow and one-tap reachable. */
 .app-shell.combat-active .combat-device-actions {
-  position: static;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  width: 100%;
+  position: static !important;
+  inset: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  width: 100% !important;
+  min-width: 0;
+  max-width: none !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: clamp(10px, 2vw, 18px) 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .app-shell.combat-active .combat-device-actions button {
+  width: 100%;
   min-width: 0;
   min-height: 46px !important;
+  padding: clamp(7px, 1.2vw, 10px) 3px !important;
+  border-radius: clamp(12px, 2vw, 16px) !important;
+  font-size: clamp(0.68rem, 2vw, 0.92rem) !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .app-shell.combat-active .combat-device-actions {
+    z-index: auto !important;
+  }
 }
