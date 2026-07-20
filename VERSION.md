@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.4 Mobile Interface + Release Hygiene
+v1.26.4.03 Mobile Navigation Polish
 
 ## Current Local Package Version
-v1.26.4 Mobile Interface + Release Hygiene
+v1.26.4.03 Mobile Navigation Polish
 
 ## Current Development Target
-v1.26.4 Mobile Interface + Release Hygiene
+v1.26.4.03 Mobile Navigation Polish
 
 ## Current Build/Cache Label
-1.26.4-mobile-interface-release-hygiene
+1.26.4.03-mobile-navigation-polish
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.
