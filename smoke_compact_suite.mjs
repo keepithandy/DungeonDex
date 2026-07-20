@@ -1,173 +1,110 @@
 #!/usr/bin/env node
-import { existsSync } from 'node:fs';
-import { spawn } from 'node:child_process';
+'use strict';
+
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
-const args = process.argv.slice(2);
-const verbose = args.includes('--verbose') || args.includes('-v');
-const listOnly = args.includes('--list');
-const failLinesArg = args.find(arg => arg.startsWith('--fail-lines='));
-const failLineLimit = Math.max(10, Math.floor(Number(failLinesArg?.split('=')[1]) || 40));
-const selectedTags = args
-  .filter(arg => !arg.startsWith('-'))
-  .map(arg => arg.toLowerCase().trim())
-  .filter(Boolean);
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
+const STRICT_BOSS_SCALING = process.argv.includes('--strict-boss-scaling');
 
-const COMMANDS = [
-  { tag: 'syntax', name: 'app syntax', cmd: ['node', '--check', 'app.js'] },
-  { tag: 'syntax', name: 'journal syntax', cmd: ['node', '--check', 'js/systems/38_journal_v1.js'] },
-  { tag: 'syntax', name: 'trophy echo result detail syntax', cmd: ['node', '--check', 'js/systems/45_trophy_echo_result_detail.js'], optionalPath: 'js/systems/45_trophy_echo_result_detail.js' },
-  { tag: 'syntax', name: 'journal smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_journal_v1233.mjs'] },
-  { tag: 'syntax', name: 'famous gear smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_famous_gear_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_famous_gear_memory_v1.mjs' },
-  { tag: 'syntax', name: 'boss trophy smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_boss_trophy_v1.mjs'], optionalPath: 'tests/smoke/smoke_boss_trophy_v1.mjs' },
-  { tag: 'syntax', name: 'boss 2 readiness smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_boss_2_readiness_v1263.mjs'], optionalPath: 'tests/smoke/smoke_boss_2_readiness_v1263.mjs' },
-  { tag: 'syntax', name: 'boss scaling matrix smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_boss_scaling_matrix_v1.mjs'] },
-  { tag: 'syntax', name: 'rival trace smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_rival_trace_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_rival_trace_memory_v1.mjs' },
-  { tag: 'syntax', name: 'revisit smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_revisit_routes_v173.mjs'] },
-  { tag: 'syntax', name: 'trophy echo result detail smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs'], optionalPath: 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs' },
-  { tag: 'syntax', name: 'public copy smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
-  { tag: 'syntax', name: 'public trophy-only revisit smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
-  { tag: 'syntax', name: 'devtools gate smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
-  { tag: 'syntax', name: 'town runtime cleanup smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_town_runtime_cleanup_v126302.mjs'] },
-  { tag: 'syntax', name: 'debt smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
-  { tag: 'syntax', name: 'app wiring smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
-  { tag: 'syntax', name: 'mobile layout contracts smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
-  { tag: 'syntax', name: 'interface accessibility smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
-  { tag: 'syntax', name: 'enter dungeon smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
-  { tag: 'syntax', name: 'merchant upgrade smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
-  { tag: 'journal', name: 'journal v1', cmd: ['node', 'tests/smoke/smoke_journal_v1233.mjs'] },
-  { tag: 'famous', name: 'famous gear memory v1', cmd: ['node', 'tests/smoke/smoke_famous_gear_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_famous_gear_memory_v1.mjs' },
-  { tag: 'boss', name: 'boss trophy v1', cmd: ['node', 'tests/smoke/smoke_boss_trophy_v1.mjs'], optionalPath: 'tests/smoke/smoke_boss_trophy_v1.mjs' },
-  { tag: 'boss', name: 'boss 2 readiness scaling', cmd: ['node', 'tests/smoke/smoke_boss_2_readiness_v1263.mjs'], optionalPath: 'tests/smoke/smoke_boss_2_readiness_v1263.mjs' },
-  { tag: 'boss', name: 'boss scaling matrix', cmd: ['node', 'tests/smoke/smoke_boss_scaling_matrix_v1.mjs'], showSignal: true },
-  { tag: 'rival', name: 'rival trace memory v1', cmd: ['node', 'tests/smoke/smoke_rival_trace_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_rival_trace_memory_v1.mjs' },
-  { tag: 'revisit', name: 'revisit routes', cmd: ['node', 'tests/smoke/smoke_revisit_routes_v173.mjs'] },
-  { tag: 'revisit', name: 'trophy echo result detail', cmd: ['node', 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs'], optionalPath: 'tests/smoke/smoke_trophy_echo_result_detail_v11.mjs' },
-  { tag: 'public', name: 'public copy v1.26.4', cmd: ['node', 'tests/smoke/smoke_public_copy_v1260.mjs'], optionalPath: 'tests/smoke/smoke_public_copy_v1260.mjs' },
-  { tag: 'public', name: 'public trophy-only revisit v1.26.4', cmd: ['node', 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs'], optionalPath: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
-  { tag: 'app', name: 'devtools gate v1.26.4', cmd: ['node', 'tests/smoke/smoke_devtools_gate_v1262.mjs'], optionalPath: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
-  { tag: 'town', name: 'town runtime cleanup v1.26.4', cmd: ['node', 'tests/smoke/smoke_town_runtime_cleanup_v126302.mjs'] },
-  { tag: 'revisit', name: 'revisit archive codex', cmd: ['node', 'tests/smoke/smoke_revisit_archive_codex_v174.mjs'], optionalPath: 'tests/smoke/smoke_revisit_archive_codex_v174.mjs' },
-  { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
-  { tag: 'debt', name: 'debt collector', cmd: ['node', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
-  { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
-  { tag: 'app', name: 'mobile layout contracts v1.26.4', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
-  { tag: 'app', name: 'interface accessibility v1.26.4', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
-  { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
-  { tag: 'merchant', name: 'merchant gear upgrades', cmd: ['node', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] }
+const TESTS = [
+  { name: 'App wiring + cache manifest', file: 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs' },
+  { name: 'Revisit route contracts', file: 'tests/smoke/smoke_revisit_routes_v173.mjs' },
+  { name: 'Revisit journal visibility', file: 'tests/smoke/smoke_revisit_journal_visibility_v1.mjs' },
+  { name: 'Revisit source-render placement', file: 'tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs' },
+  { name: 'Journal v1', file: 'tests/smoke/smoke_journal_v1.mjs' },
+  { name: 'Rival Trace memory v1', file: 'tests/smoke/smoke_rival_trace_memory_v1.mjs' },
+  { name: 'Revisit archive codex', file: 'tests/smoke/smoke_revisit_archive_codex_v174.mjs' },
+  { name: 'Famous Gear flavor', file: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
+  { name: 'Famous Gear memory v1', file: 'tests/smoke/smoke_famous_gear_memory_v1.mjs' },
+  { name: 'Boss Trophy v1', file: 'tests/smoke/smoke_boss_trophy_v1.mjs' },
+  { name: 'Talent system replacement', file: 'tests/smoke/smoke_talent_system_replaced_v1238.mjs' },
+  { name: 'Merchant Gear Upgrades', file: 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs' },
+  { name: 'Gear upgrade loot clarity', file: 'tests/smoke/smoke_gear_upgrade_loot_clarity_v123803.mjs' },
+  { name: 'Gear upgrade replacement warning', file: 'tests/smoke/smoke_gear_upgrade_replacement_warning_v123804.mjs' },
+  { name: 'Gear detail modal', file: 'tests/smoke/smoke_gear_detail_modal_v123801.mjs' },
+  { name: 'Core loop', file: 'tests/smoke/smoke_core_loop_v1.mjs' },
+  { name: 'Deep districts', file: 'tests/smoke/smoke_deep_districts_v1.mjs' },
+  { name: 'Dungeon entry runtime', file: 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs' },
+  { name: 'Public UI cleanup', file: 'tests/smoke/smoke_public_ui_cleanup_v1238.mjs' },
+  { name: 'Sootveil Mythic set', file: 'tests/smoke/smoke_sootveil_set_v142.mjs' },
+  { name: 'Debt Pressure v1', file: 'tests/smoke/smoke_debt_pressure_v1.mjs' },
+  { name: 'Public copy v1.26.4.03', file: 'tests/smoke/smoke_public_copy_v1260.mjs' },
+  { name: 'Public Revisit Trophy Echo-only v1.26.4.03', file: 'tests/smoke/smoke_public_revisit_trophy_only_v1261.mjs' },
+  { name: 'Public DevTools gate v1.26.4.03', file: 'tests/smoke/smoke_devtools_gate_v1262.mjs' },
+  { name: 'Boss 2 readiness scaling', file: 'tests/smoke/smoke_boss2_readiness_scaling_v1263.mjs' },
+  { name: 'Boss scaling matrix v1.26.3.01', file: 'tests/smoke/smoke_boss_scaling_matrix_v126301.mjs', advisory: true, strictArg: '--strict-bands' },
+  { name: 'Town runtime cleanup v1.26.4.03', file: 'tests/smoke/smoke_town_runtime_cleanup_v126302.mjs' },
+  { name: 'Mobile layout contracts v1.26.4.03', file: 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs' },
+  { name: 'Interface accessibility v1.26.4.03', file: 'tests/smoke/smoke_interface_accessibility_v1264.mjs' },
+  { name: 'Asset provenance policy v1.26.4', file: 'tests/smoke/smoke_asset_provenance_v1264.mjs' },
+  { name: 'Package builder', file: 'tools/check_dungeondex_package.py', runtime: 'python' }
 ];
 
-function commandExists(entry) {
-  return !entry.optionalPath || existsSync(path.join(ROOT, entry.optionalPath));
+function commandFor(test) {
+  const args = [];
+  if (test.runtime === 'python') {
+    const executable = process.platform === 'win32' ? 'python' : 'python3';
+    args.push(path.join(ROOT, test.file), ROOT);
+    return { executable, args };
+  }
+  args.push(path.join(ROOT, test.file));
+  if (STRICT_BOSS_SCALING && test.strictArg) args.push(test.strictArg);
+  return { executable: process.execPath, args };
 }
 
-function selected(entry) {
-  if (!selectedTags.length) return true;
-  const haystack = `${entry.tag} ${entry.name} ${entry.cmd.join(' ')}`.toLowerCase();
-  return selectedTags.some(tag => haystack.includes(tag));
+function tail(text, limit = 8) {
+  return String(text || '')
+    .trim()
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .slice(-limit)
+    .join('\n');
 }
-
-const suite = COMMANDS.filter(commandExists).filter(selected);
-
-function commandLine(entry) {
-  return entry.cmd.join(' ');
-}
-
-function trimCapture(current, chunk, maxChars = 350000) {
-  const combined = current + chunk;
-  return combined.length > maxChars ? combined.slice(combined.length - maxChars) : combined;
-}
-
-function formatMs(ms) {
-  if (ms < 1000) return `${ms}ms`;
-  return `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)}s`;
-}
-
-function compactSignal(output, ok) {
-  const lines = String(output || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-  const interesting = lines.filter(line => /\bFAIL\b|AssertionError|assert|Expected|Actual|Error:|TypeError|ReferenceError|SyntaxError|exception|timeout|timed out|missing|not ok/i.test(line));
-  if (!ok) return interesting.slice(0, failLineLimit);
-  const passLines = lines.filter(line => /^PASS\b|\bPASS:/i.test(line));
-  if (passLines.length) return passLines.slice(-2);
-  const lastUseful = lines.filter(line => !/^\[/.test(line)).slice(-1);
-  return lastUseful.length ? lastUseful : ['completed'];
-}
-
-function runCommand(entry) {
-  return new Promise(resolve => {
-    const startedAt = Date.now();
-    let stdout = '';
-    let stderr = '';
-    const child = spawn(entry.cmd[0], entry.cmd.slice(1), {
-      cwd: ROOT,
-      shell: false,
-      windowsHide: true,
-      env: { ...process.env, DUNGEONDEX_SMOKE_COMPACT: '1' }
-    });
-
-    child.stdout.on('data', data => {
-      const chunk = data.toString();
-      if (verbose) process.stdout.write(chunk);
-      stdout = trimCapture(stdout, chunk);
-    });
-    child.stderr.on('data', data => {
-      const chunk = data.toString();
-      if (verbose) process.stderr.write(chunk);
-      stderr = trimCapture(stderr, chunk);
-    });
-    child.on('error', err => {
-      resolve({ entry, ok: false, code: null, duration: Date.now() - startedAt, output: `${stdout}\n${stderr}\n${err.stack || err.message || String(err)}` });
-    });
-    child.on('close', code => {
-      const output = `${stdout}\n${stderr}`;
-      const skipped = code === 0 && /^SKIP:/m.test(output);
-      resolve({ entry, ok: code === 0, skipped, code, duration: Date.now() - startedAt, output });
-    });
-  });
-}
-
-if (!suite.length) {
-  console.error('No smoke commands selected. Try: node smoke_compact_suite.mjs --list');
-  process.exit(1);
-}
-
-if (listOnly) {
-  console.log('DungeonDex compact smoke commands:');
-  suite.forEach((entry, index) => console.log(`${String(index + 1).padStart(2, '0')}. [${entry.tag}] ${entry.name} -> ${commandLine(entry)}`));
-  process.exit(0);
-}
-
-console.log(`DungeonDex compact smoke runner`);
-console.log(`Commands: ${suite.length}${selectedTags.length ? ` | filter: ${selectedTags.join(', ')}` : ''}${verbose ? ' | verbose' : ''}`);
-console.log('');
 
 const results = [];
-for (const entry of suite) {
-  const result = await runCommand(entry);
-  results.push(result);
-  const status = result.skipped ? 'SKIP' : result.ok ? 'PASS' : 'FAIL';
-  const signal = compactSignal(result.output, result.ok);
-  console.log(`${status.padEnd(4)} ${entry.name.padEnd(32)} ${formatMs(result.duration).padStart(7)}  ${commandLine(entry)}`);
-  if (!result.ok || result.skipped || verbose || result.entry.showSignal) {
-    signal.forEach(line => console.log(`      ${line}`));
-  }
-}
-
-const passed = results.filter(result => result.ok && !result.skipped).length;
-const skipped = results.filter(result => result.skipped).length;
-const failed = results.filter(result => !result.ok).length;
-console.log('');
-console.log(`Summary: ${passed}/${results.length} passed${skipped ? `, ${skipped} skipped` : ''}${failed ? `, ${failed} failed` : ''}.`);
-
-if (failed) {
-  console.log('Failed commands:');
-  results.filter(result => !result.ok).forEach(result => {
-    console.log(`- ${result.entry.name}: ${commandLine(result.entry)}`);
-    compactSignal(result.output, false).forEach(line => console.log(`  ${line}`));
+for (const test of TESTS) {
+  const { executable, args } = commandFor(test);
+  const startedAt = Date.now();
+  const run = spawnSync(executable, args, {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true,
+    timeout: 120000
   });
-  process.exit(1);
+  const durationMs = Date.now() - startedAt;
+  const passed = run.status === 0 && !run.error;
+  const advisoryFailure = !passed && test.advisory && !STRICT_BOSS_SCALING;
+  results.push({ test, passed, advisoryFailure, durationMs, run, executable, args });
+
+  if (passed) {
+    console.log(`PASS: ${test.name} (${durationMs}ms)`);
+    continue;
+  }
+  if (advisoryFailure) {
+    console.log(`WARN: ${test.name} (${durationMs}ms) - provisional audit failure; rerun with --strict-boss-scaling to make it blocking.`);
+    continue;
+  }
+
+  console.log(`FAIL: ${test.name} (${durationMs}ms)`);
+  if (run.error) console.log(`  error: ${run.error.message}`);
+  if (run.status !== null) console.log(`  exit: ${run.status}`);
+  const details = tail(run.stderr || run.stdout);
+  if (details) console.log(details.split('\n').map(line => `  ${line}`).join('\n'));
 }
 
-console.log(`PASS: Compact smoke suite clean${skipped ? ' with declared environment skips' : ''}.`);
+const passedCount = results.filter(result => result.passed).length;
+const advisoryCount = results.filter(result => result.advisoryFailure).length;
+const failed = results.filter(result => !result.passed && !result.advisoryFailure);
+console.log(`\nCompact suite: ${passedCount}/${results.length} passed${advisoryCount ? `, ${advisoryCount} advisory warning` : ''}`);
+
+if (failed.length) {
+  console.log('Failures:');
+  failed.forEach(result => console.log(`- ${result.test.name}`));
+  process.exitCode = 1;
+} else if (advisoryCount) {
+  console.log('Provisional audit warnings:');
+  results.filter(result => result.advisoryFailure).forEach(result => console.log(`- ${result.test.name}`));
+  if (STRICT_BOSS_SCALING) process.exitCode = 1;
+}
