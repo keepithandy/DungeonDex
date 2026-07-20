@@ -7,7 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.4 - Mobile Interface + Release Hygiene
+- DungeonDex v1.26.4.03 - Mobile Navigation Polish
+
+## v1.26.4.03 Mobile Navigation Polish
+- Touch/mobile navigation no longer reserves a permanent left content gutter; the closed rail and opened drawer overlay the viewport.
+- The opened drawer now has clearer internal padding, 8px route spacing, 46px route targets, improved edge definition, and a better-positioned 44px toggle.
+- Build/cache labels use `1.26.4.03-mobile-navigation-polish`.
+- Desktop side-rail behavior, combat navigation hiding, safe-area handling, route order, and route destinations remain unchanged.
+- Save compatibility, combat, rewards, economy, Merchant Gear Upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain unchanged.
+- No itch/package builder was run and no release package was created.
 
 ## v1.26.4 Mobile Interface + Release Hygiene
 - GitHub #116-#123 interface/accessibility work is implemented in source: safe-area-aware navigation, clearer rest hierarchy, protected mobile combat controls, shared Town presentation tokens, mobile Journal/Archive wrapping, modal focus/scroll handling, touch-target spacing, and improved contrast/non-color cues.
@@ -117,33 +125,3 @@
 - Town now presents a clearer hub shell with stronger sections, hierarchy, and world identity.
 - Runtime/cache/version authority labels are now `v1.23.8.06`.
 - No gameplay mechanics changed.
-
-## v1.23.8.05 Release Audit + Gameplay Foundation Cleanup
-- Runtime/cache/version authority labels were previously `v1.23.8.05`.
-
-## v1.23.8.04 Gear Replacement Warning and Upgrade Ownership Clarity
-- The gear detail compare note now explains that an upgraded equipped item keeps its tier if replaced.
-- The note also clarifies that new gear equips at its own upgrade tier instead of inheriting the equipped item’s upgrade level.
-- Runtime/cache/version authority labels were previously `v1.23.8.04`.
-
-## v1.23.8.01 Gear Section Polish
-- Merchant Gear Upgrade money text no longer leaks raw `<span>` markup in the town or Gear-tab upgrade panels.
-- Gear cards now support a read-only click-to-inspect detail modal.
-- The modal summarizes visible equipped/inventory gear with source, slot, level, rarity, upgrade level, score, sell value, stats, summary, set, maker/theme, and memory labels when available.
-- Gear inspection is display-only. It does not equip, sell, retire, buy upgrades, change costs, mutate state, or change save data.
-- Runtime/cache/version authority labels are now `v1.23.8.01`.
-
-## v1.23.8 Merchant Gear Upgrades
-- Merchant Gear Upgrades are the active simple progression system.
-- The Lowfire Market sells permanent upgrades for equipped weapon and armor pieces.
-- Each eligible item stores `upgradeLevel` from `0` to `3` and persists it through save/reload.
-- Upgrade costs are fixed at `50c`, `125c`, and `250c`.
-- Weapon upgrades add flat Power. Armor upgrades add flat Guard and HP.
-- Legacy progression save data remains compatibility-safe but no longer grants gameplay effects or active progression UI.
-- `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
-
-## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.4 Mobile Interface + Release Hygiene.
-- GitHub #116-#125 are implemented and locally verified; remote issue closure remains pending publication and acceptance.
-- Existing sweep docs remain reference material only and may include older Revisit planning language.
-- Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
