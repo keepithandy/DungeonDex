@@ -4,9 +4,9 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.26.4 Mobile Interface + Release Hygiene`
-- Visible semantic version: `1.26.4`
-- Build/cache slug: `1.26.4-mobile-interface-release-hygiene`
+- Public version: `v1.26.4.03 Mobile Navigation Polish`
+- Visible semantic version: `1.26.4.03`
+- Build/cache slug: `1.26.4.03-mobile-navigation-polish`
 
 No package builder was run and no package was created while documenting this authority flow.
 
