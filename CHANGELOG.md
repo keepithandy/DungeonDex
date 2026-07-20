@@ -8,14 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.4 Mobile Interface + Release Hygiene`
-* Current local package baseline: `v1.26.4 Mobile Interface + Release Hygiene`
-* Current development target: `v1.26.4 Mobile Interface + Release Hygiene`
-* Current build/cache label: `1.26.4-mobile-interface-release-hygiene`
+* Public/live itch version: `v1.26.4.03 Mobile Navigation Polish`
+* Current local package baseline: `v1.26.4.03 Mobile Navigation Polish`
+* Current development target: `v1.26.4.03 Mobile Navigation Polish`
+* Current build/cache label: `1.26.4.03-mobile-navigation-polish`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.4.03 - Mobile Navigation Polish
+
+* Removed the touch-navigation content gutter so the side drawer overlays Town instead of permanently shifting the playable viewport to the right.
+* Added stronger internal padding, route spacing, touch heights, border definition, and toggle placement to the expanded mobile navigation drawer.
+* Preserved the established side-rail routes, combat-only navigation hide, safe-area positioning, desktop behavior, and all gameplay systems.
+* No combat, rewards, economy, save schema, dungeon entry, Talent, Debt, progression, Revisit behavior, or gear behavior changed.
+* No release package was created for this source-only version alignment.
+
+---
 
 ## v1.26.4 - Mobile Interface + Release Hygiene
 
