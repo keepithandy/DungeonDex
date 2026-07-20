@@ -1,0 +1,37 @@
+name: Run v1.26.4.03 alignment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/v126403-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply one-time version alignment
+        run: python tools/one_time_version_bump_v126403.py
+      - name: Validate focused authority
+        run: |
+          node --check app.js
+          node --check js/systems/22_nav_centering.js
+          node --check js/systems/21_build_label_guard.js
+          node tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs
+      - name: Run compact smoke suite
+        run: node smoke_compact_suite.mjs
+      - name: Commit aligned release
+        run: |
+          git config user.name "DungeonDex Release Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add VERSION.md README.md CHANGELOG.md docs/VERSION_CACHE_AUTHORITY.md docs/status/CURRENT_NOTES.md index.html app.js sw.js js/systems/00_core_constants_data.js js/systems/21_build_label_guard.js js/systems/44_revisit_lowfire_board_slot.js tests/smoke smoke_compact_suite.mjs
+          git diff --cached --check
+          git commit -m "release: v1.26.4.03 mobile navigation polish"
+          git push origin HEAD:main
