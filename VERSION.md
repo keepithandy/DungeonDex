@@ -12,6 +12,9 @@ v1.26.4.03 Mobile Navigation Polish
 ## Current Build/Cache Label
 1.26.4.03-mobile-navigation-polish
 
+## Current Release Scope
+Mobile navigation overlay and padding polish only. No gameplay behavior changed.
+
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.
 - Do not infer the current version from old release notes.
