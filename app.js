@@ -51,39 +51,6 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
   window.DUNGEONDEX_DEVTOOLS_GATE = gate;
 })();
 
-// Interface density cleanup helpers
-window.DD_MONSTER_ARCHETYPES = [
-  "Brute","Ritualist","Skulker","Ashbound",
-  "Mireborn","Furnace Spawn","Hollowed","Warden"
-];
-
-window.ddGetMonsterCue = function(name){
-  const monsterName = String(name || "").trim();
-  const cues = [
-    "The creature watches silently.",
-    "Ash drifts from the enemy's armor.",
-    "A hostile presence fills the chamber.",
-    "The monster prepares to strike.",
-    "The enemy's eyes gleam with malice.",
-    "A shadow moves across the floor.",
-    "The creature's breath is ragged and heavy.",
-    "The monster's claws scrape against the stone.",
-    "The enemy lets out a low growl.",
-    "The creature's gaze is fixed on you.",
-    "The monster's movements are deliberate and menacing.",
-    "A chill runs down your spine as the enemy approaches.",
-  ];
-  const namedCues = monsterName ? [
-    `the ${monsterName} studies your stance carefully.`,
-    `the ${monsterName} lets out a low growl.`,
-    `the ${monsterName} shifts its weight, preparing to strike.`,
-    `the ${monsterName} eyes you with a predatory gaze.`,
-    `the ${monsterName} moves with a fluid, dangerous grace.`,
-  ]  : [];
-  const pool = namedCues.length ? cues.concat(namedCues) : cues;
-  return pool[Math.floor(Math.random()*pool.length)];
-};
-
 (function(){
   if (window.DD_EXTRA_EXTENSION_LOADER) return;
   window.DD_EXTRA_EXTENSION_LOADER = true;

@@ -405,20 +405,3 @@
   bindStatic();
   render();
   showIntroModalOnce();
-
-
-// v1.4.2 Sootveil Mythic Set Pass
-window.DD_MONSTER_ARCHETYPES = [
-  "Brute","Ritualist","Skulker","Ashbound",
-  "Mireborn","Furnace Spawn","Hollowed","Warden"
-];
-
-window.ddGetMonsterCue = function(name){
-  const cues = [
-    "The creature watches silently.",
-    "Ash drifts from the enemy's armor.",
-    "A hostile presence fills the chamber.",
-    "The monster prepares to strike."
-  ];
-  return cues[Math.floor(Math.random()*cues.length)];
-};

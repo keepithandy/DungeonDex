@@ -63,6 +63,10 @@ function found(value) {
   return value === '' ? '<missing>' : String(value);
 }
 
+function globalDefinitionCount(source, globalName) {
+  return extractMatches(source, new RegExp(`window\\.${globalName}\\s*=`, 'g')).length;
+}
+
 async function main() {
   const files = {
     'index.html': 'index.html',
@@ -74,6 +78,8 @@ async function main() {
     'docs/status/CURRENT_NOTES.md': 'docs/status/CURRENT_NOTES.md',
     'docs/VERSION_CACHE_AUTHORITY.md': 'docs/VERSION_CACHE_AUTHORITY.md',
     'js/systems/00_core_constants_data.js': 'js/systems/00_core_constants_data.js',
+    'js/systems/10_ui_town_shop.js': 'js/systems/10_ui_town_shop.js',
+    'js/systems/12_render_bindings_boot.js': 'js/systems/12_render_bindings_boot.js',
     'js/systems/21_build_label_guard.js': 'js/systems/21_build_label_guard.js',
     'tools/build_itch_ready.ps1': 'tools/build_itch_ready.ps1',
     'tools/make_release_zip.ps1': 'tools/make_release_zip.ps1',
@@ -94,6 +100,8 @@ async function main() {
   const notes = source['docs/status/CURRENT_NOTES.md'];
   const authority = source['docs/VERSION_CACHE_AUTHORITY.md'];
   const coreConstants = source['js/systems/00_core_constants_data.js'];
+  const townShop = source['js/systems/10_ui_town_shop.js'];
+  const renderBindings = source['js/systems/12_render_bindings_boot.js'];
   const buildLabelGuard = source['js/systems/21_build_label_guard.js'];
   const itchBuilder = source['tools/build_itch_ready.ps1'];
   const releasePs1 = source['tools/make_release_zip.ps1'];
@@ -129,6 +137,17 @@ async function main() {
   expect('js/systems/21_build_label_guard.js', 'BUILD_QS', capture(buildLabelGuard, /const BUILD_QS\s*=\s*'([^']+)'/), BUILD_QS);
   expect('sw.js', 'CACHE_NAME', capture(swJs, /const CACHE_NAME\s*=\s*'([^']+)'/), `dungeondex-v${BUILD_QS}`);
   expect('sw.js', 'BUILD_QS', capture(swJs, /const BUILD_QS\s*=\s*'([^']+)'/), BUILD_QS);
+
+  const monsterCueOwners = [
+    ['app.js', appJs, 0],
+    ['js/systems/00_core_constants_data.js', coreConstants, 1],
+    ['js/systems/10_ui_town_shop.js', townShop, 0],
+    ['js/systems/12_render_bindings_boot.js', renderBindings, 0]
+  ];
+  monsterCueOwners.forEach(([file, contents, expectedCount]) => {
+    expect(file, 'ddGetMonsterCue definition count', globalDefinitionCount(contents, 'ddGetMonsterCue'), expectedCount);
+    expect(file, 'DD_MONSTER_ARCHETYPES definition count', globalDefinitionCount(contents, 'DD_MONSTER_ARCHETYPES'), expectedCount);
+  });
 
   const authorityContracts = [
     ['docs/VERSION_CACHE_AUTHORITY.md', 'target build/cache label', authority.includes(BUILD_QS)],
