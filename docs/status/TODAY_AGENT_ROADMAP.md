@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.4.01 Combat CSS Authority Playtest`.
+- Baseline: `v1.26.4.04 Boss Curve Release`.
 - Current active Revisit lane: Trophy Echo only.
 - Working branch: `codex/v1.26.4.01-combat-css-authority-playtest`.
 - Implementation status: GitHub #116-#125 and both hotfixes are implemented and locally verified; remote issue closure remains pending publication and acceptance.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.4.03-mobile-navigation-polish';
+const CACHE_NAME = 'dungeondex-v1.26.4.04-boss-curve-release';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.4.03-mobile-navigation-polish';
+const BUILD_QS = '1.26.4.04-boss-curve-release';
 const ASSETS = [
   './',
   './index.html',

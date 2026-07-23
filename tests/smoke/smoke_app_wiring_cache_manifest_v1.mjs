@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.26.4.03';
-const RELEASE_NAME = 'Mobile Navigation Polish';
+const VISIBLE_BUILD = '1.26.4.04';
+const RELEASE_NAME = 'Boss Curve Release';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
-const BUILD_QS = '1.26.4.03-mobile-navigation-polish';
+const BUILD_QS = '1.26.4.04-boss-curve-release';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,
@@ -203,14 +203,17 @@ async function main() {
   }));
 
   const activeRuntimeSources = [indexHtml, appJs, swJs, coreConstants, buildLabelGuard];
-  if (activeRuntimeSources.some(text => text.includes('1.26.3.01-boss-scaling-matrix-hardening'))) {
+  [
+    '1.26.4-mobile-interface-release-hygiene',
+    '1.26.3.01-boss-scaling-matrix-hardening'
+  ].filter(staleLabel => activeRuntimeSources.some(text => text.includes(staleLabel))).forEach(staleLabel => {
     failures.push({
       file: 'active runtime',
       field: 'stale cache label',
-      actual: '1.26.3.01-boss-scaling-matrix-hardening',
+      actual: staleLabel,
       expected: BUILD_QS
     });
-  }
+  });
 
   const retiredRuntimePaths = [
     'js/systems/20_town_currency_clean_strip.js',
@@ -225,7 +228,7 @@ async function main() {
   });
 
   if (failures.length) {
-    console.error(`FAIL: ${failures.length} v1.26.4.03 build/cache authority mismatch(es):`);
+    console.error(`FAIL: ${failures.length} v1.26.4.04 build/cache authority mismatch(es):`);
     failures.forEach(({ file, field, expected, actual }) => {
       console.error(`- ${file}: ${field} — expected ${JSON.stringify(expected)}; found ${JSON.stringify(actual)}`);
     });

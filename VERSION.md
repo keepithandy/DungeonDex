@@ -1,19 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.4.03 Mobile Navigation Polish
+v1.26.4.04 Boss Curve Release
 
 ## Current Local Package Version
-v1.26.4.03 Mobile Navigation Polish
+v1.26.4.04 Boss Curve Release
 
 ## Current Development Target
-v1.26.4.03 Mobile Navigation Polish
+v1.26.4.04 Boss Curve Release
 
 ## Current Build/Cache Label
-1.26.4.03-mobile-navigation-polish
-
-## Current Release Scope
-Mobile navigation overlay and padding polish only. No gameplay behavior changed.
+1.26.4.04-boss-curve-release
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

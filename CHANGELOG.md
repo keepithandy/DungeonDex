@@ -8,22 +8,33 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.4.03 Mobile Navigation Polish`
-* Current local package baseline: `v1.26.4.03 Mobile Navigation Polish`
-* Current development target: `v1.26.4.03 Mobile Navigation Polish`
-* Current build/cache label: `1.26.4.03-mobile-navigation-polish`
+* Public/live itch version: `v1.26.4.04 Boss Curve Release`
+* Current local package baseline: `v1.26.4.04 Boss Curve Release`
+* Current development target: `v1.26.4.04 Boss Curve Release`
+* Current build/cache label: `1.26.4.04-boss-curve-release`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
-## v1.26.4.03 - Mobile Navigation Polish
+## v1.26.4.04 - Boss Curve Release
 
-* Removed the touch-navigation content gutter so the side drawer overlays Town instead of permanently shifting the playable viewport to the right.
-* Added stronger internal padding, route spacing, touch heights, border definition, and toggle placement to the expanded mobile navigation drawer.
-* Preserved the established side-rail routes, combat-only navigation hide, safe-area positioning, desktop behavior, and all gameplay systems.
-* No combat, rewards, economy, save schema, dungeon entry, Talent, Debt, progression, Revisit behavior, or gear behavior changed.
-* No release package was created for this source-only version alignment.
+* Promoted the recent combat-surface cleanup and post-Boss-2 boss smoothing work into the live mainline release.
+* Boss 3 onward now follow a recoverable power ladder instead of the old 3,600+ PWR Boss 3 spike, while Boss 1 and Boss 2 keep their existing tuned ranges.
+* Existing over-scaled active boss saves repair combat stats on reload while preserving current HP percentage and rewards.
+* The full 20-boss combat matrix still requires every post-Boss-2 encounter to be beatable by its fully upgraded district fixture; all 18 currently pass.
+* No normal-monster scaling, reward formulas, gear-upgrade values, progression, Revisit behavior, or dungeon entry changed.
+
+---
+
+## v1.26.4.01 - Combat CSS Authority Playtest
+
+* Moved the existing four-column combat HUD and action-bar layout contract into the final visual-weight stylesheet so one loaded layer owns the play-test presentation.
+* Standardized the existing four combat-action gaps at 6px while preserving the established Attack, Ashburst, Guard, and Extract controls and 46px minimum touch target.
+* Removed the superseded cross-layer combat-bar declarations from the lore stylesheet without changing combat markup, math, timing, rewards, saves, or dungeon entry.
+* Follow-up balance pass: Boss 3 onward now use a recoverable power ladder instead of the old 3,600+ PWR Boss 3 spike. Existing over-scaled active boss saves repair combat stats on reload while preserving current HP percentage and rewards.
+* The full 20-boss combat matrix now requires every post-Boss-2 encounter to be beatable by its fully upgraded district fixture; all 18 currently pass.
+* No new combat panels, controls, artwork, effects, dependencies, or gameplay systems were added.
 
 ---
 

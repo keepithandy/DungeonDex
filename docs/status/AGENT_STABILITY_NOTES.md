@@ -1,9 +1,9 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.4.01 Stability Target
+## Current v1.26.4.04 Stability Target
 
-- Current target: `v1.26.4.01 Combat CSS Authority Playtest`.
-- Current build/cache label: `1.26.4.01-combat-css-authority-playtest`.
+- Current target: `v1.26.4.04 Boss Curve Release`.
+- Current build/cache label: `1.26.4.04-boss-curve-release`.
 - GitHub #116-#125 and the two narrow side-rail/screenshot hotfixes are implemented and locally verified: compact suite 41/41, mobile-layout contracts 14/14, interface/accessibility contracts 19/19, dungeon-entry runtime 11/11, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
 - Preserve the merged v1.26.3.02 Town runtime cleanup: system 25 owns the wallet; systems 20, 26, and 27 remain retired and must not be reloaded or precached.
 - Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; do not describe touch emulation as a physical-device pass.
