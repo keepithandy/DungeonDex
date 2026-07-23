@@ -57,7 +57,8 @@ const COMMANDS = [
   { tag: 'app', name: 'mobile layout contracts v1.26.4.04', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
   { tag: 'app', name: 'interface accessibility v1.26.4.04', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
   { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
-  { tag: 'merchant', name: 'merchant gear upgrades', cmd: ['node', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] }
+  { tag: 'merchant', name: 'merchant gear upgrades', cmd: ['node', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
+  { tag: 'forge', name: 'lowfire forge', cmd: ['node', 'tests/smoke/smoke_lowfire_forge_v1.mjs'] }
 ];
 
 function commandExists(entry) {
