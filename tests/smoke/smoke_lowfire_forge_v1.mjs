@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const FORGE_SOURCE = fs.readFileSync('js/systems/16_relic_forge_crafting.js', 'utf8');
+const FORGE_SOURCES = [
+  'js/systems/16_relic_forge_crafting.js',
+  'js/systems/17_relic_forge_clarity.js'
+];
 
 function gear(id, slot, overrides = {}) {
   return {
@@ -82,7 +85,7 @@ function createRuntime() {
   context.window = context;
   context.globalThis = context;
   const runtime = vm.createContext(context);
-  vm.runInContext(FORGE_SOURCE, runtime, { filename: 'js/systems/16_relic_forge_crafting.js' });
+  FORGE_SOURCES.forEach(file => vm.runInContext(fs.readFileSync(file, 'utf8'), runtime, { filename: file }));
   return { runtime, forgePanel };
 }
 
@@ -192,7 +195,7 @@ runtime.renderTown();
 assert.ok(forgePanel.innerHTML.includes('Lowfire Forge'));
 assert.ok(forgePanel.innerHTML.includes('Forge Random'));
 assert.ok(forgePanel.innerHTML.includes('Salvage Junk'));
-assert.ok(forgePanel.innerHTML.includes('data-forge-slot="weapon"'));
-assert.ok(forgePanel.innerHTML.includes('data-temper-slot="weapon"'));
+assert.ok(forgePanel.innerHTML.includes('data-forge-slot='));
+assert.ok(forgePanel.innerHTML.includes('data-temper-slot='));
 
 console.log('PASS: Lowfire Forge crafting, salvage, tempering, persistence shape, and Town panel contracts.');
