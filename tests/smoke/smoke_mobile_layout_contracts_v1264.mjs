@@ -67,12 +67,21 @@ async function main() {
   );
 
   record(
-    'Touch navigation toggle has a 44px hitbox without covering main controls',
+    'Touch navigation toggle has a 44px hitbox and the rail overlays content',
     nav.includes(':root{--ddx-nav-rail-width:44px;')
       && nav.includes('.ddx-nav-toggle{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}')
       && nav.includes('.tabs.panel,nav.tabs{left:env(safe-area-inset-left,0px)!important;')
-      && nav.includes('.app-shell:not(.combat-active).ddx-main-viewport{padding-left:calc(var(--ddx-nav-rail-width)+8px+env(safe-area-inset-left,0px))!important}'),
-    'the touch rail clears the left safe inset and shares one width with the content gutter'
+      && nav.includes('.app-shell:not(.combat-active).ddx-main-viewport{padding-left:0!important}'),
+    'the touch rail clears the safe inset without reserving a blank viewport gutter'
+  );
+
+  record(
+    'Expanded touch drawer keeps padded route spacing and edge definition',
+    nav.includes('.tabs.panel.ddx-nav-open,nav.tabs.ddx-nav-open{padding:58px12px12px10px!important;gap:8px!important;')
+      && nav.includes('border:1pxsolidrgba(255,213,148,.22)!important;border-left:0!important;')
+      && nav.includes('.tabs.panel.ddx-nav-open.tab,nav.tabs.ddx-nav-open.tab{min-height:46px!important;padding:10px12px!important;border-radius:11px!important}')
+      && nav.includes('.ddx-nav-toggle{top:8px!important;right:7px!important;padding:0!important;'),
+    'drawer padding does not reintroduce the content gutter'
   );
 
   const profilePairs = Array.from(
