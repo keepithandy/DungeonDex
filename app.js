@@ -70,11 +70,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
       window.setTimeout(function(){ loadModule('./js/systems/15_devtools_balance_reports.js?build=' + qs, 'DungeonDexBalanceReports', 'DevTools balance reports'); }, 40);
       window.setTimeout(function(){ loadModule('./js/systems/43_devkit_reset_hold.js?build=' + qs, 'DDDevKitResetHold', 'DevKit reset hold'); }, 660);
     }
-    window.setTimeout(function(){ loadModule('./js/systems/44_revisit_lowfire_board_slot.js?build=' + qs, '__dungeondexRevisitTrophyEchoOnly', 'Trophy Echo-only Revisit surface'); }, 40);
-    window.setTimeout(function(){ loadModule('./js/systems/36_ui_revisit_archive_codex.js?build=' + qs, 'DDRevisitArchiveCodex', 'Revisit archive codex'); }, 80);
     window.setTimeout(function(){ loadModule('./js/systems/45_trophy_echo_result_detail.js?build=' + qs, 'DDTrophyEchoResultDetail', 'Trophy Echo result detail'); }, 120);
-    window.setTimeout(function(){ loadModule('./js/systems/21_build_label_guard.js?build=' + qs, 'DDBuildLabelGuard', 'Build label guard'); }, 150);
-    window.setTimeout(function(){ loadModule('./js/systems/31_revisit_activation_surface_lockdown.js?build=' + qs, 'DDRevisitActivationSurfaceLockdown', 'Revisit activation surface lockdown'); }, 420);
     window.setTimeout(function(){ loadModule('./js/systems/39_gear_upgrade_summary_panel.js?build=' + qs, 'DDGearUpgradeSummaryPanel', 'Gear upgrade summary panel'); }, 500);
     window.setTimeout(function(){ loadModule('./js/systems/40_gear_detail_modal.js?build=' + qs, 'DDGearDetailModal', 'Gear detail modal'); }, 540);
     window.setTimeout(function(){ loadModule('./js/systems/41_debt_pressure_v1.js?build=' + qs, 'DDDebtPressureV1', 'Debt Pressure v1'); }, 580);

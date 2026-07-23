@@ -193,6 +193,9 @@ async function main() {
   dynamicLoads.filter(asset => !cacheAssets.has(asset) && !DEVTOOLS_ONLY_ASSETS.includes(asset)).forEach(asset => {
     failures.push({ file: 'sw.js', field: `dynamic runtime cache entry for ${asset}`, actual: '<missing>', expected: asset });
   });
+  dynamicLoads.filter(asset => directAssets.includes(asset)).forEach(asset => {
+    failures.push({ file: 'app.js', field: `duplicate direct/dynamic runtime load for ${asset}`, actual: 'dynamically scheduled', expected: 'single owner' });
+  });
 
   const directDevtools = directAssets.filter(asset => DEVTOOLS_ONLY_ASSETS.includes(asset));
   directDevtools.forEach(asset => failures.push({

@@ -20,9 +20,10 @@ function notHas(source, needle) {
 }
 
 async function main() {
-  const [detail, app, serviceWorker, trophySurface] = await Promise.all([
+  const [detail, app, index, serviceWorker, trophySurface] = await Promise.all([
     readFile(path.join(ROOT, 'js/systems/45_trophy_echo_result_detail.js'), 'utf8'),
     readFile(path.join(ROOT, 'app.js'), 'utf8'),
+    readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'sw.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8')
   ]);
@@ -105,12 +106,13 @@ async function main() {
   );
 
   record(
-    'Runtime loader wires the result detail extension after Trophy Echo surface',
-    has(app, "44_revisit_lowfire_board_slot.js?build=")
+    'Trophy Echo surface is direct while result detail remains deferred',
+    has(index, 'src="./js/systems/44_revisit_lowfire_board_slot.js?build=')
+      && notHas(app, "44_revisit_lowfire_board_slot.js?build=")
       && has(app, "45_trophy_echo_result_detail.js?build=")
       && has(app, "'DDTrophyEchoResultDetail'")
-      && app.indexOf('44_revisit_lowfire_board_slot.js?build=') < app.indexOf('45_trophy_echo_result_detail.js?build='),
-    'app.js loader order'
+      && app.indexOf('45_trophy_echo_result_detail.js?build=') >= 0,
+    'single surface owner and deferred detail loader'
   );
 
   record(
