@@ -198,8 +198,10 @@ function createContext() {
     numberOr,
     cleanDisplayText,
     escapeHtml(value) { return String(value ?? '').replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char])); },
+    rarityClass(value) { return `rarity-${String(value || 'common').replace(/[^a-z0-9_-]/gi, '') || 'common'}`; },
     format(value) { return String(Math.floor(Number(value) || 0)); },
     formatMoney(value) { return `${Math.max(0, Math.floor(Number(value) || 0))}c`; },
+    merchantCostMarkup(_state, baseCost) { return `${Math.max(0, Math.floor(Number(baseCost) || 0))}c`; },
     coins(gold = 0, silver = 0, copper = 0) { return Math.max(0, Math.floor(gold * 10000 + silver * 100 + copper)); },
     toCopper(value) { return Math.max(0, Math.floor(Number(value) || 0)); },
     sanitizeCurrencyValue(value, fallback = 0) { return Math.max(0, Math.floor(numberOr(value, fallback, 0, Number.MAX_SAFE_INTEGER))); },
@@ -375,6 +377,24 @@ assert.equal(poorAttempt.missingCopper, 1);
 assert.equal(poorState.player.gold, 49);
 assert.equal(poorState.player.equipment.weapon.upgradeLevel, 0);
 assert.ok(String(poorState.player.log[poorState.player.log.length - 1] || '').includes('Need 1c more copper'));
+
+context.S = state;
+const hostileStockHtml = context.shopCard({
+  id: '"><img src=x onerror=alert(1)>',
+  kind: 'gear',
+  slot: '<weapon>',
+  level: '<12>',
+  rating: '<99>',
+  theme: '<ember>',
+  rarity: 'common',
+  name: '<img src=x onerror=alert(1)>',
+  summary: '<script>alert(1)</script>',
+  value: 50
+});
+assert.ok(!hostileStockHtml.includes('<img src=x onerror=alert(1)>'));
+assert.ok(!hostileStockHtml.includes('<script>alert(1)</script>'));
+assert.ok(hostileStockHtml.includes('&lt;img src=x onerror=alert(1)&gt;'));
+assert.ok(hostileStockHtml.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
 
 assert.equal(context.save(state), true);
 assert.ok(store.size > 0);

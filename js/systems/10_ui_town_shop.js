@@ -508,9 +508,9 @@ function districtWareCard(ware) {
 function shopCard(item) {
 	const meta = item.kind === 'special' ?
 		`unlocks ${charterDepthCompactLabel(15)} • starts ${charterDepthCompactLabel(20)}` :
-		`${item.slot} • ilvl ${item.level} • pwr ${item.rating} • ${item.theme}`;
+		`${escapeHtml(item.slot)} • ilvl ${escapeHtml(item.level)} • pwr ${escapeHtml(item.rating)} • ${escapeHtml(item.theme)}`;
 	const tags = item.kind === 'special' ?
 		`<span class="pill">Permanent</span><span class="pill">${merchantCostMarkup(S, item.value)}</span>` :
 		`<span class="pill">${merchantCostMarkup(S, item.value)}</span>`;
-	return `<div class="shop-item"><div class="split"><div><div class="item-name ${rarityClass(item.rarity)}">${item.name}</div><div class="item-meta">${meta}</div></div><span class="pill ${rarityClass(item.rarity)}">${item.rarity}</span></div><div class="tag-row">${tags}</div><p class="small">${item.summary || ''}</p><div class="item-actions"><button class="primary mini" data-buy="${item.id}">Buy</button></div></div>`;
+	return `<div class="shop-item"><div class="split"><div><div class="item-name ${rarityClass(item.rarity)}">${escapeHtml(item.name)}</div><div class="item-meta">${meta}</div></div><span class="pill ${rarityClass(item.rarity)}">${escapeHtml(item.rarity)}</span></div><div class="tag-row">${tags}</div><p class="small">${escapeHtml(item.summary || '')}</p><div class="item-actions"><button class="primary mini" data-buy="${escapeHtml(item.id)}">Buy</button></div></div>`;
 }
