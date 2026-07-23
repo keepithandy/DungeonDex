@@ -16,6 +16,7 @@ const selectedTags = args
   .filter(Boolean);
 
 const COMMANDS = [
+  { tag: 'syntax', name: 'repository JavaScript syntax', cmd: ['node', 'tools/ddx_smoke_helper.mjs', '--syntax'] },
   { tag: 'syntax', name: 'app syntax', cmd: ['node', '--check', 'app.js'] },
   { tag: 'syntax', name: 'journal syntax', cmd: ['node', '--check', 'js/systems/38_journal_v1.js'] },
   { tag: 'syntax', name: 'trophy echo result detail syntax', cmd: ['node', '--check', 'js/systems/45_trophy_echo_result_detail.js'], optionalPath: 'js/systems/45_trophy_echo_result_detail.js' },
