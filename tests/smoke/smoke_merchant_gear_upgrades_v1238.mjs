@@ -300,6 +300,7 @@ assert.equal(initialSummary[1].cost, 50);
 assert.equal(initialSummary[1].currentStat, 'Guard 5 • HP 20');
 assert.equal(initialSummary[1].nextStat, 'Guard 7 • HP 28');
 const townFreshHtml = context.merchantGearUpgradePanelMarkup(state);
+assert.ok(townFreshHtml.includes('<strong>The Ashen Anvil</strong>'));
 assert.ok(townFreshHtml.includes('Weapon upgrades are +2 Power per tier.'));
 assert.ok(townFreshHtml.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
 assert.ok(townFreshHtml.includes('Warden Blade'));

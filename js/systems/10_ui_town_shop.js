@@ -367,7 +367,7 @@ function merchantGearUpgradePanelMarkup(state) {
 	return `<div class="district-market lowfire-upgrades">
       <div class="split market-subhead">
         <div>
-          <strong>Merchant Gear Upgrades</strong>
+          <strong>The Ashen Anvil</strong>
           <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.</p>
         </div>
         <span class="pill">${models.filter(model => model.item).length}/${models.length}</span>
