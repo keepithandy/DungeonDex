@@ -4,9 +4,9 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.26.4.04 Boss Curve Release`
-- Visible semantic version: `1.26.4.04`
-- Build/cache slug: `1.26.4.04-boss-curve-release`
+- Public version: `v1.26.4.05 Stability Hardening`
+- Visible semantic version: `1.26.4.05`
+- Build/cache slug: `1.26.4.05-stability-hardening`
 
 No package builder was run and no package was created while documenting this authority flow.
 

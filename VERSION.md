@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.4.04 Boss Curve Release
+v1.26.4.05 Stability Hardening
 
 ## Current Local Package Version
-v1.26.4.04 Boss Curve Release
+v1.26.4.05 Stability Hardening
 
 ## Current Development Target
-v1.26.4.04 Boss Curve Release
+v1.26.4.05 Stability Hardening
 
 ## Current Build/Cache Label
-1.26.4.04-boss-curve-release
+1.26.4.05-stability-hardening
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

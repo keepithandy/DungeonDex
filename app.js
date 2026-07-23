@@ -1,13 +1,13 @@
-// DungeonDex v1.26.4.04 runtime pointer.
+// DungeonDex v1.26.4.05 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.4.04: Boss Curve Release
+// v1.26.4.05: Stability Hardening
 // - Keeps the combat HUD visual-layer cleanup and smooths post-Boss-2 boss scaling.
 // - Preserves combat controls, rewards, saves, progression, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.26.4.04';
-window.DUNGEONDEX_BUILD_QS = '1.26.4.04-boss-curve-release';
+window.DUNGEONDEX_BUILD = '1.26.4.05';
+window.DUNGEONDEX_BUILD_QS = '1.26.4.05-stability-hardening';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -63,7 +63,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.4.04-boss-curve-release';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.4.05-stability-hardening';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

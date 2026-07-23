@@ -8,14 +8,26 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.4.04 Boss Curve Release`
-* Current local package baseline: `v1.26.4.04 Boss Curve Release`
-* Current development target: `v1.26.4.04 Boss Curve Release`
-* Current build/cache label: `1.26.4.04-boss-curve-release`
+* Public/live itch version: `v1.26.4.05 Stability Hardening`
+* Current local package baseline: `v1.26.4.05 Stability Hardening`
+* Current development target: `v1.26.4.05 Stability Hardening`
+* Current build/cache label: `1.26.4.05-stability-hardening`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.4.05 - Stability Hardening
+
+* Repaired the smoke helper and made the compact suite reject syntax errors across every tracked JavaScript and MJS file.
+* Centralized Ashen Anvil heading ownership, monster cue ownership, and Lowfire Forge presentation ownership without changing their player-facing behavior.
+* Added focused Lowfire Forge contract coverage for crafting, salvage, tempering, persistence, and the final Town controls.
+* Removed duplicate startup scheduling for extensions already loaded directly by `index.html` while preserving classic script order and the remaining intentional dynamic loaders.
+* Escaped merchant-stock fields before Town HTML rendering and added a hostile saved-stock regression fixture.
+* Verified the resulting baseline with the 43/43 compact suite, including the 20-boss readiness matrix and 36,000 seeded combat fights.
+* No combat, boss scaling, rewards, economy, upgrade values, save schema, progression, Revisit behavior, or dungeon entry changed.
+
+---
 
 ## v1.26.4.04 - Boss Curve Release
 

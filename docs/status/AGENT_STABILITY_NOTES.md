@@ -1,16 +1,17 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.4.04 Stability Target
+## Current v1.26.4.05 Stability Target
 
-- Current target: `v1.26.4.04 Boss Curve Release`.
-- Current build/cache label: `1.26.4.04-boss-curve-release`.
-- GitHub #116-#125 and the two narrow side-rail/screenshot hotfixes are implemented and locally verified: compact suite 41/41, mobile-layout contracts 14/14, interface/accessibility contracts 19/19, dungeon-entry runtime 11/11, and inspected touch and fine-pointer captures at 390×844, 430×932, and 768×1024.
+- Current target: `v1.26.4.05 Stability Hardening`.
+- Current build/cache label: `1.26.4.05-stability-hardening`.
+- The compact suite passes 43/43, including repository-wide JavaScript syntax, Lowfire Forge contracts, app wiring/cache authority, merchant saved-stock escaping, and the 20-boss readiness matrix.
 - Preserve the merged v1.26.3.02 Town runtime cleanup: system 25 owns the wallet; systems 20, 26, and 27 remain retired and must not be reloaded or precached.
 - Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; do not describe touch emulation as a physical-device pass.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
 - No itch/package builder was run and no release package was created for this work.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
+- Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 
 ## Historical v1.25.2 Stability Baseline
 

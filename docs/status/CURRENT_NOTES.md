@@ -7,7 +7,16 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.4.04 - Boss Curve Release
+- DungeonDex v1.26.4.05 - Stability Hardening
+
+## v1.26.4.05 Stability Hardening
+- Repository JavaScript syntax is now checked as part of the compact suite, and the repaired smoke helper reports the version authority and branch accurately.
+- Ashen Anvil heading, monster cue, Lowfire Forge presentation, and startup extension loading each have one established runtime owner.
+- Lowfire Forge mechanics and final Town controls now have focused smoke coverage.
+- Merchant stock fields are escaped before Town HTML rendering, with hostile saved-stock regression coverage.
+- Compact verification passes 43/43, including all 18 post-Boss-2 readiness fixtures and 36,000 seeded combat fights.
+- No combat, boss scaling, rewards, economy, upgrade values, save schema, progression, Revisit behavior, or dungeon entry changed.
+- Build/cache labels use `1.26.4.05-stability-hardening`.
 
 ## v1.26.4.04 Boss Curve Release
 - The recent combat HUD CSS authority cleanup and post-Boss-2 smoothing pass are now the live mainline baseline.
@@ -157,7 +166,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.4.04 Boss Curve Release.
+- Current runtime baseline is v1.26.4.05 Stability Hardening.
 - GitHub #116-#125 are implemented and locally verified; remote issue closure remains pending publication and acceptance.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

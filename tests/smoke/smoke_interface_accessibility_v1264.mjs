@@ -184,7 +184,7 @@ async function main() {
     /\.app-shell\.combat-active\s+\.combat-device-actions\s*\{[^}]*position:\s*static\s*!important;[^}]*display:\s*grid\s*!important;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)\s*!important/s.test(visualCss)
       && /\.app-shell\.combat-active\s+\.combat-device-actions\s+button\s*\{[^}]*min-height:\s*46px\s*!important/s.test(visualCss)
       && /\.app-shell\.combat-active\s+\.combat-device-actions\s*\{[^}]*gap:\s*6px\s*!important/s.test(visualCss)
-      && visualCss.includes('v1.26.4.04 combat-bar authority')
+      && visualCss.includes('v1.26.4.05 combat-bar authority')
       && !loreCss.includes('Combat bar layout invariant')
   );
 
@@ -270,7 +270,7 @@ async function main() {
   );
 
   const passed = results.filter(result => result.ok).length;
-  console.log(`\nInterface accessibility v1.26.4.04: ${passed}/${results.length} passed`);
+  console.log(`\nInterface accessibility v1.26.4.05: ${passed}/${results.length} passed`);
   if (passed !== results.length) process.exitCode = 1;
 }
 

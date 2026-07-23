@@ -2,11 +2,11 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.4.04 Boss Curve Release`.
+- Baseline: `v1.26.4.05 Stability Hardening`.
 - Current active Revisit lane: Trophy Echo only.
-- Working branch: `codex/v1.26.4.01-combat-css-authority-playtest`.
-- Implementation status: GitHub #116-#125 and both hotfixes are implemented and locally verified; remote issue closure remains pending publication and acceptance.
-- Final merged v1.26.4 compact result: 41/41 passed on 2026-07-18. The earlier 29/29 result is retained only as the pre-v1.26.4 historical baseline.
+- Working branch: `main`.
+- Implementation status: the v1.26.4.05 stability cleanup set is committed locally on `main`; publication remains a separate user-approved action.
+- Current compact result: 43/43 passed on 2026-07-23, including repository-wide JavaScript syntax, Lowfire Forge contracts, and the boss readiness matrix.
 
 ## Non-negotiable boundaries
 
@@ -85,13 +85,13 @@ These began as separate follow-ups from the 2026-07-18 Town visual audit. The us
 
 ## Per-patch routine
 
-1. Start from clean, current `main` on one focused branch.
+1. Start from clean, current `main`; create a focused branch when the user or issue requires one.
 2. Read `AGENTS.md`, `VERSION.md`, and current notes before editing.
 3. State the patch category, allowed files, protected systems, and intended smoke checks.
 4. Make the smallest useful change.
 5. Run `git diff --check` plus the focused smoke; use `node smoke_compact_suite.mjs` when a runtime surface changes or the boundary is unclear.
-6. Open a draft PR with behavior changed, intentionally unchanged behavior, validation, and risks.
-7. Squash-merge only after the PR is still narrow, mergeable, and green; refresh local `main` before the next branch.
+6. When a PR is requested, open it with behavior changed, intentionally unchanged behavior, validation, and risks.
+7. Keep direct-to-main commits small and verified; refresh local `main` before starting work that depends on the remote baseline.
 
 ## Handoff format
 

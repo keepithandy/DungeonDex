@@ -19,8 +19,8 @@ async function main() {
   ]);
 
   record(
-    'Famous Gear Revisit flavor smoke retired for v1.26.4.04',
-    surface.includes('v1.26.4.04 Revisit surface: Trophy Echo only'),
+    'Famous Gear Revisit flavor smoke retired for v1.26.4.05',
+    surface.includes('v1.26.4.05 Revisit surface: Trophy Echo only'),
     'active Revisit surface is Trophy Echo-only'
   );
 
@@ -33,7 +33,7 @@ async function main() {
 
   record(
     'Trophy Echo copy is the active Revisit flavor target',
-    surface.includes('Trophy Echo is the only active Revisit lane for v1.26.4.04.')
+    surface.includes('Trophy Echo is the only active Revisit lane for v1.26.4.05.')
       && surface.includes('Trophy Echo is memory-only'),
     'Trophy Echo flavor and guardrail copy'
   );

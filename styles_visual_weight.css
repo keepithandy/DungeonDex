@@ -509,7 +509,7 @@ button[aria-disabled="true"] {
   }
 }
 
-/* v1.26.4.04 combat-bar authority.
+/* v1.26.4.05 combat-bar authority.
    This final visual layer owns the existing four-column HUD and action layout. */
 .app-shell.combat-active .combat-hud.run-stat-grid {
   display: grid !important;
