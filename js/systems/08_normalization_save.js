@@ -121,7 +121,16 @@
     const bossTwoScale = legacyBossTwo && typeof earlyBossPowerMultiplier === 'function'
       ? earlyBossPowerMultiplier(level, tier)
       : legacyBossTwo ? 0.68 : 1;
-    const repairedMaxHp = legacyBossTwo ? Math.max(1, Math.round(maxHp * bossTwoScale)) : maxHp;
+    const postBossTwoExpectedPower = tier === 'Boss' && level > bossTwoDepth && typeof expectedMonsterPowerAtDepth === 'function'
+      ? expectedMonsterPowerAtDepth(level, tier)
+      : 0;
+    const legacyPostBossTwo = tier === 'Boss' && level > bossTwoDepth && postBossTwoExpectedPower > 0 && power > postBossTwoExpectedPower * 1.3;
+    const postBossTwoScale = legacyPostBossTwo && typeof postBossTwoPowerMultiplier === 'function'
+      ? postBossTwoPowerMultiplier(level)
+      : 1;
+    const legacyBossRepair = legacyBossTwo || legacyPostBossTwo;
+    const bossRepairScale = legacyBossTwo ? bossTwoScale : postBossTwoScale;
+    const repairedMaxHp = legacyBossRepair ? Math.max(1, Math.round(maxHp * bossRepairScale)) : maxHp;
     const normalizedModifiers = [];
     const eliteReward = null;
     const family = String(monster.family || (monster.contractTarget ? 'Elite Hunt' : 'Husk'));
@@ -154,11 +163,11 @@
       contractPowerMult: numberOr(monster.contractPowerMult, 1, 0, 9),
       contractRewardMult: numberOr(monster.contractRewardMult, 1, 0, 9),
       level,
-      power: legacyBossTwo ? Math.max(1, Math.round(power * bossTwoScale)) : power,
+      power: legacyBossRepair ? Math.max(1, Math.round(power * bossRepairScale)) : power,
       maxHp: repairedMaxHp,
-      hp: legacyBossTwo ? Math.max(1, Math.min(repairedMaxHp, Math.round(hp * bossTwoScale))) : hp,
-      guard: legacyBossTwo ? Math.max(0, Math.round(guard * bossTwoScale)) : guard,
-      speed: legacyBossTwo ? Math.max(0, Math.round(speed * bossTwoScale)) : speed,
+      hp: legacyBossRepair ? Math.max(1, Math.min(repairedMaxHp, Math.round(hp * bossRepairScale))) : hp,
+      guard: legacyBossRepair ? Math.max(0, Math.round(guard * bossRepairScale)) : guard,
+      speed: legacyBossRepair ? Math.max(0, Math.round(speed * bossRepairScale)) : speed,
       rewardGold: Math.floor(numberOr(monster.rewardGold, encounterCoinReward(level, Math.max(8, level * 10), tier, 1), 0, Number.MAX_SAFE_INTEGER)),
       rewardXp: Math.floor(numberOr(monster.rewardXp, Math.max(6, level * 10), 0, 999999)),
       rewardShard: Math.floor(numberOr(monster.rewardShard, tier === 'Boss' ? 22 : tier === 'Elite' ? 7 : 1, 0, 999999)),

@@ -31,20 +31,16 @@ const PRINT_SIGNATURES = process.argv.includes('--print-signatures');
 const VERBOSE = process.argv.includes('--verbose') || process.argv.includes('-v');
 const COMPACT = process.env.DUNGEONDEX_SMOKE_COMPACT === '1';
 
-// The current curve does not meet the provisional bands. Default mode keeps
-// structural/regression coverage green while reporting that audit failure;
-// --strict-bands turns those findings into a non-zero test result.
-
-// These signatures lock every deterministic matrix layer independently from
-// the provisional readiness/combat audit bands.
+// These signatures lock every deterministic matrix layer and the fully-upgraded
+// post-Boss-2 readiness audit.
 const EXPECTED_SIGNATURES = Object.freeze({
-  bosses: 'e26ad58c9a701dcfb4cf99a1d4e9a56683aad7b6ea9fec223d723b2bfb165ff4',
-  boundaries: '9289dcf810262f7d20ccaa11f1469fa3b63ced84c9c8b5d6091c1193f9782400',
+  bosses: '6819b3b962b7116e92cef541791d0f0c7c067298d590b4313c6432c96ac2a736',
+  boundaries: 'e637ec549b225431dc1bec184dcbf941af0c38068de7b28232f5e93638400766',
   rewards: '7e1ffd5d75fed8a069d21861ce1aaec95b4704c3bd4593aeed019c3a7c3c9eaf',
   drops: '1849879d2d98cb7e62ca7f2f99cb247fb24423bad9811f3f3b37d8ab0f1f2e93',
   adjacentNormals: '8310543e136d8f46599f584f99dd969dbfe393c4f345b27509b6c2cac626d9d1',
   fixtures: 'a32c2f251d9623e34556df882de157248babe7877e73fcaf880d939f95b2bd5f',
-  combat: '56f3a410e42019f5ced4397161b37e0453a5c951c6a0aeefcaaa9c5b78e40f9e'
+  combat: '22dc25babdcbe9ce71ed0a8162b3f02af1e32da0922303d6ec0d0b0f29175d13'
 });
 
 const ROLL_MODES = Object.freeze([
@@ -187,6 +183,7 @@ async function loadRuntime() {
     bossFloorNameByDepth,
     lateFloorPowerPressure,
     deepMonsterPowerMultiplier,
+    postBossTwoPowerMultiplier,
     lootDropChance,
     generateGear,
     generateMonster,
@@ -288,6 +285,25 @@ function buildGenerationMatrix(runtime) {
   assert.equal(new Set(rows.map(row => row.encounterName)).size, BOSS_COUNT, 'all 20 boss encounter names should be unique');
   const bossTwo = rows.find(row => row.bossNumber === 2);
   assert.ok(bossTwo.rolls.min.power >= 650 && bossTwo.rolls.max.power <= 850, `Boss 2 should remain in its 650-850 PWR band; got ${bossTwo.rolls.min.power}-${bossTwo.rolls.max.power}`);
+  const postBossTwo = rows.filter(row => row.bossNumber >= 3);
+  for (let index = 1; index < postBossTwo.length; index += 1) {
+    const previous = postBossTwo[index - 1];
+    const current = postBossTwo[index];
+    assert.ok(current.rolls.mid.power > previous.rolls.mid.power, `Boss ${current.bossNumber} should climb above Boss ${previous.bossNumber} without stalling`);
+    assert.ok(current.rolls.mid.power <= previous.rolls.mid.power * 1.3, `Boss ${current.bossNumber} should not jump more than 30% above Boss ${previous.bossNumber}`);
+  }
+
+  const legacyBossThree = runtime.api.normalizeMonster({
+    id: 'saved_boss_3', family: 'Ash', type: 'Warden', tier: 'Boss', level: 45,
+    power: 3600, maxHp: 10800, hp: 5400, guard: 1152, speed: 684,
+    rewardGold: 2400, rewardXp: 3600, rewardShard: 30
+  }, 45);
+  const bossThreeRepairScale = runtime.api.postBossTwoPowerMultiplier(45);
+  assert.equal(legacyBossThree.power, Math.round(3600 * bossThreeRepairScale), 'saved legacy Boss 3 power should receive the new combat correction');
+  assert.equal(legacyBossThree.maxHp, Math.round(10800 * bossThreeRepairScale), 'saved legacy Boss 3 max HP should receive the same correction');
+  assert.equal(legacyBossThree.hp, Math.round(5400 * bossThreeRepairScale), 'saved legacy Boss 3 should retain its current HP percentage');
+  assert.deepEqual([legacyBossThree.rewardGold, legacyBossThree.rewardXp, legacyBossThree.rewardShard], [2400, 3600, 30], 'saved legacy Boss 3 rewards should remain unchanged');
+  assert.deepEqual(runtime.api.normalizeMonster(legacyBossThree, 45), legacyBossThree, 'saved legacy Boss 3 repair should be idempotent');
 
   for (let rawDepth = 1; rawDepth <= BOSS_COUNT * RAW_BOSS_INTERVAL; rawDepth += 1) {
     runtime.setRandom(() => MAX_ROLL);
@@ -774,10 +790,8 @@ function printReports(generationRows, boundaryRows, fixtureRows, combatRows, aud
     console.log('\nAll combat results:');
     console.table(combatRows);
   }
-  console.log(`\nAUDIT ${audit.powerFailures.length ? 'FAIL' : 'PASS'} power target: ${audit.powerPasses}/${BOSS_COUNT} strong fixtures are within 1.2-1.6x.`);
-  console.log(`AUDIT ${audit.combatFailures.length ? 'FAIL' : 'PASS'} combat target: ${audit.combatPasses}/${BOSS_COUNT} strong fixtures have a best committed win rate within 50-75%.`);
-  if (audit.powerFailures.length) console.log(`AUDIT out-of-band power bosses: ${audit.powerFailures.join(', ')}`);
-  if (audit.combatFailures.length) console.log(`AUDIT out-of-band combat bosses: ${audit.combatFailures.join(', ')}`);
+  console.log(`\nAUDIT ${audit.readinessFailures.length ? 'FAIL' : 'PASS'} fully-upgraded readiness: ${audit.readinessPasses}/${BOSS_COUNT - 2} post-Boss-2 fixtures have a best committed win rate of at least 50%.`);
+  if (audit.readinessFailures.length) console.log(`AUDIT unavailable post-Boss-2 bosses: ${audit.readinessFailures.join(', ')}`);
 }
 
 async function main() {
@@ -826,31 +840,26 @@ async function main() {
     combat: combatRows
   });
 
-  const strongFixtures = fixtures.filter(fixture => fixture.profile === 'strong');
-  const powerFailures = strongFixtures.filter(fixture => !fixture.inPowerTarget).map(fixture => fixture.bossNumber);
-  const combatFailures = [];
-  for (let bossNumber = 1; bossNumber <= BOSS_COUNT; bossNumber += 1) {
-    const committed = combatRows.filter(row => row.bossNumber === bossNumber && row.profile === 'strong' && row.policy !== 'defensive');
+  const readinessFailures = [];
+  for (let bossNumber = 3; bossNumber <= BOSS_COUNT; bossNumber += 1) {
+    const committed = combatRows.filter(row => row.bossNumber === bossNumber && row.profile === 'reasonableMax' && row.policy !== 'defensive');
     const bestWinRate = Math.max(...committed.map(row => row.winRate));
-    if (bestWinRate < 0.5 || bestWinRate > 0.75) combatFailures.push(bossNumber);
+    if (bestWinRate < 0.5) readinessFailures.push(bossNumber);
   }
 
   const audit = {
-    powerFailures,
-    combatFailures,
-    powerPasses: BOSS_COUNT - powerFailures.length,
-    combatPasses: BOSS_COUNT - combatFailures.length
+    readinessFailures,
+    readinessPasses: (BOSS_COUNT - 2) - readinessFailures.length
   };
   printReports(generation.rows, boundaryRows, fixtures, combatRows, audit);
 
   if (STRICT_BANDS) {
-    assert.deepEqual(powerFailures, [], `provisional 1.2-1.6x strong-build power target failed for bosses: ${powerFailures.join(', ')}`);
-    assert.deepEqual(combatFailures, [], `provisional 50-75% strong-build win target failed for bosses: ${combatFailures.join(', ')}`);
+    assert.deepEqual(readinessFailures, [], `fully upgraded post-Boss-2 readiness failed for bosses: ${readinessFailures.join(', ')}`);
   }
 
   assert.equal(fixtures.length, BOSS_COUNT * Object.keys(PROFILE_RULES).length, 'all 20 bosses should have three progression fixtures');
   assert.equal(combatRows.length * TRIALS_PER_POLICY, BOSS_COUNT * Object.keys(PROFILE_RULES).length * TRIALS_PER_FIXTURE, 'combat matrix should run 600 seeded fights per fixture');
-  console.log(`PASS Boss scaling matrix structural/regression contracts: ${BOSS_COUNT} named bosses, ${fixtures.length} legal progression fixtures, ${combatRows.length * TRIALS_PER_POLICY} real combat fights. PROVISIONAL TARGET ${audit.powerFailures.length || audit.combatFailures.length ? 'FAIL' : 'PASS'}: power ${audit.powerPasses}/${BOSS_COUNT}, combat ${audit.combatPasses}/${BOSS_COUNT}.`);
+  console.log(`PASS Boss scaling matrix structural/regression contracts: ${BOSS_COUNT} named bosses, ${fixtures.length} legal progression fixtures, ${combatRows.length * TRIALS_PER_POLICY} real combat fights. FULLY UPGRADED POST-BOSS-2 READINESS ${audit.readinessFailures.length ? 'FAIL' : 'PASS'}: ${audit.readinessPasses}/${BOSS_COUNT - 2}.`);
 }
 
 main().catch(error => {

@@ -146,6 +146,29 @@
     return tier === 'Boss' && depthStageValue(rawDepth) === bossTwoDepth ? 0.68 : 1;
   }
 
+  // Boss 2 is the established early-game readiness anchor. Before this curve,
+  // Boss 3 inherited the full late-floor pressure and jumped from roughly 780
+  // PWR to more than 3,600 PWR. Boss 3 is a recoverable follow-up, then later
+  // bosses climb in deliberate steps instead of compounding district pressure.
+  function postBossTwoPowerTarget(rawDepth) {
+    const depth = depthStageValue(rawDepth);
+    const bossInterval = BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP;
+    const bossNumber = Math.max(1, Math.floor(depth / bossInterval));
+    if (bossNumber <= 2) return 0;
+    return 700 + (bossNumber - 3) * 160;
+  }
+
+  function postBossTwoPowerMultiplier(rawDepth) {
+    const target = postBossTwoPowerTarget(rawDepth);
+    if (!target) return 1;
+    const depth = depthStageValue(rawDepth);
+    const threatDepth = threatDepthFromDepth(depth);
+    const ladder = depthDifficultyLadder(depth);
+    const earlyPressure = threatDepth <= 3 ? 0.90 : threatDepth <= 5 ? 1.0 : threatDepth <= 10 ? 1.08 : threatDepth <= 15 ? 1.06 : 1;
+    const currentMidpoint = (threatDepth * 9.5 + 15 + 72) * earlyPressure * ladder.powerMult * lateFloorPowerPressure(depth) * deepMonsterPowerMultiplier(depth, 'Boss') * 1.22 * earlyBossPowerMultiplier(depth, 'Boss');
+    return clamp(target / Math.max(1, currentMidpoint), 0.01, 1);
+  }
+
   function bossReadinessModel(playerPower, bossPower) {
     const player = Math.max(0, Math.floor(numberOr(playerPower, 0, 0, 9999999)));
     const boss = Math.max(0, Math.floor(numberOr(bossPower, 0, 0, 9999999)));
@@ -175,7 +198,8 @@
     const lateFloorPressure = lateFloorPowerPressure(depth);
     const base = (threatDepth * 9.5 + 15 + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure;
     const tierProfile = boss ? 1.22 : elite ? 1.16 : 1;
-    return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile * earlyBossPowerMultiplier(depth, tier));
+    const bossCurve = boss ? postBossTwoPowerMultiplier(depth) : 1;
+    return Math.round(base * deepMonsterPowerMultiplier(depth, tier) * tierProfile * earlyBossPowerMultiplier(depth, tier) * bossCurve);
   }
 
   function expectedMonsterHpAtDepth(rawDepth, tier = 'Common') {
@@ -424,7 +448,8 @@
     const lateFloorPressure = lateFloorPowerPressure(rawDepth);
     const unscaledPowerRoll = (threatDepth * rand(8, 11) + rand(10, 20) + (boss ? 72 : 0) + (elite ? 16 : 0)) * earlyPressure * ladder.powerMult * lateFloorPressure * deepMonsterPowerMultiplier(rawDepth, tier);
     const combatPowerScale = earlyBossPowerMultiplier(rawDepth, tier);
-    let power = Math.round(unscaledPowerRoll * combatPowerScale);
+    const bossCurve = boss ? postBossTwoPowerMultiplier(rawDepth) : 1;
+    let power = Math.round(unscaledPowerRoll * combatPowerScale * bossCurve);
     let hp = power * (boss ? 2.95 : elite ? 1.84 : 1.44) * ladder.hpMult * lateFloorHpPressure(rawDepth);
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
@@ -432,14 +457,14 @@
     let name = `${family} ${type}`;
     let reviveUsed = false;
     const eliteReward = elite ? eliteRewardProfile(modifiers, rawDepth) : null;
-    // Boss 2's correction is combat-only. Keep its existing reward basis intact.
+    // Boss power corrections are combat-only. Keep their established reward basis intact.
     const rewardPower = Math.round(unscaledPowerRoll);
     const rewardGold = encounterCoinReward(threatDepth, rewardPower, tier, rewardMult);
     if (elite) {
       power = Math.round(power * (1 + contractRisk.damageBonus));
       hp = Math.round(hp * (1 + contractRisk.hpBonus));
     }
-    const rewardXpPower = combatPowerScale === 1 ? power : rewardPower;
+    const rewardXpPower = combatPowerScale === 1 && bossCurve === 1 ? power : rewardPower;
     const monster = {
       id: makeId('monster'),
       name,
