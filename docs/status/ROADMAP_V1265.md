@@ -26,7 +26,7 @@ The roadmap is being completed in order. The release version and cache label rem
   Compact suite: 47/47.
 - ~~#131 Public runtime console gate~~ - completed; focused browser smoke: 10/10.
   Compact suite: 49/49.
-- **Next: #132 real-device handoff.**
+- **#132 real-device handoff is in progress; physical-device evidence is required.**
 - Then:
   #133 protected-system regression audit, and #134 release authority pass.
 
@@ -333,9 +333,10 @@ At phone widths:
 - Focused public-runtime console smoke: 10/10 passed. Compact suite: 49/49
   passed. No version or cache label changed.
 
-### 7. Planned #132 — Real-device release handoff
+### 7. #132 — Real-device release handoff
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: in progress; GitHub issue #132 is open. The repeatable handoff sheet
+  is ready, but no physical-device result has been claimed.
 - Category: Audit / Release Validation.
 - Goal: verify the release candidate on the physical iPhone/Textastic workflow rather than treating desktop emulation as final proof.
 - Required checks:
@@ -355,6 +356,17 @@ At phone widths:
   - Fail;
   - Blocked.
 - Guardrail: a discovered failure becomes a separate focused issue. Do not hide a device defect inside the release-authority commit.
+
+#### Prepared handoff
+
+- `docs/status/REAL_DEVICE_HANDOFF_V1265.md` identifies the exact candidate
+  commit, version/build label, device metadata, evidence rules, and all twelve
+  required checks.
+- It records only `Pass`, `Fail`, or `Blocked` results and makes the normal
+  Gear inspection precondition explicit without using DevTools or a fabricated
+  player inventory.
+- The issue remains open until a physical iPhone/Textastic run supplies the
+  evidence. Browser emulation is not represented as completion.
 
 ### 8. Planned #133 — Final protected-system regression audit
 
