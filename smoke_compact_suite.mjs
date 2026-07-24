@@ -56,6 +56,7 @@ const COMMANDS = [
   { tag: 'debt', name: 'debt collector', cmd: ['node', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
   { tag: 'app', name: 'mobile layout contracts v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
+  { tag: 'app', name: 'touch navigation geometry', cmd: ['node', 'tools/capture_town_mobile_screenshots.mjs', '--verify-geometry'] },
   { tag: 'app', name: 'interface accessibility v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
   { tag: 'app', name: 'browser-computed contrast', cmd: ['node', 'tests/smoke/smoke_computed_contrast_v1265.mjs'] },
   { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },

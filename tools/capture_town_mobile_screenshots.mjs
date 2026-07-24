@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FINE_POINTER_MODE = process.argv.includes('--fine-pointer');
+const VERIFY_GEOMETRY_MODE = process.argv.includes('--verify-geometry');
 const OUTPUT_DIR = path.join(ROOT, 'archive', 'screenshots', FINE_POINTER_MODE ? 'town-narrow-pointer' : 'town-mobile');
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const MOBILE_PROFILES = Object.freeze([
@@ -276,6 +277,102 @@ async function assertFinePointerProfile(client, profile) {
   }
 }
 
+function rectanglesIntersect(first, second) {
+  return first.left < second.right
+    && first.right > second.left
+    && first.top < second.bottom
+    && first.bottom > second.top;
+}
+
+async function verifyTownNavigationGeometry(client, profile) {
+  const geometry = await evaluate(client, `(() => {
+    const nav = document.querySelector('nav.tabs, .tabs.panel');
+    nav?.classList.remove('ddx-nav-open');
+    const toggle = nav?.querySelector('.ddx-nav-toggle');
+    const title = document.getElementById('districtName');
+    const visible = node => {
+      if (!node) return false;
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      return style.display !== 'none'
+        && style.visibility !== 'hidden'
+        && rect.width > 0
+        && rect.height > 0;
+    };
+    const rect = node => {
+      const value = node.getBoundingClientRect();
+      return {
+        left: value.left,
+        top: value.top,
+        right: value.right,
+        bottom: value.bottom,
+        width: value.width,
+        height: value.height
+      };
+    };
+    const distance = (first, second) => {
+      const horizontal = Math.max(first.left - second.right, second.left - first.right, 0);
+      const vertical = Math.max(first.top - second.bottom, second.top - first.bottom, 0);
+      return Math.hypot(horizontal, vertical);
+    };
+    const toggleRect = toggle ? rect(toggle) : null;
+    const nearest = selector => Array.from(document.querySelectorAll(selector))
+      .filter(node => node !== toggle && visible(node))
+      .map(node => ({ node, rect: rect(node) }))
+      .sort((first, second) => distance(toggleRect, first.rect) - distance(toggleRect, second.rect))[0];
+    const heading = toggleRect ? nearest('#screen-town h1, #screen-town h2, #screen-town h3') : null;
+    const control = toggleRect ? nearest('#screen-town button:not([disabled]), #screen-town select:not([disabled]), #screen-town input:not([disabled]), #screen-town [role="button"]:not([aria-disabled="true"])') : null;
+    return {
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        safeLeft: getComputedStyle(document.documentElement).getPropertyValue('--safe-left').trim() || 'env(safe-area-inset-left, 0px)',
+        touchMedia: !!window.matchMedia?.('(hover: none), (pointer: coarse)').matches,
+        maxTouchPoints: Number(navigator.maxTouchPoints || 0)
+      },
+      navClosed: !!nav && !nav.classList.contains('ddx-nav-open'),
+      toggle: toggle ? { selector: '.ddx-nav-toggle', rect: toggleRect } : null,
+      title: title ? { selector: '#districtName', rect: rect(title) } : null,
+      nearestHeading: heading ? {
+        selector: heading.node.id ? '#' + heading.node.id : heading.node.tagName.toLowerCase(),
+        text: String(heading.node.textContent || '').trim().slice(0, 80),
+        rect: heading.rect
+      } : null,
+      nearestControl: control ? {
+        selector: control.node.id ? '#' + control.node.id : control.node.tagName.toLowerCase(),
+        text: String(control.node.textContent || control.node.getAttribute('aria-label') || '').trim().slice(0, 80),
+        rect: control.rect
+      } : null
+    };
+  })()`);
+
+  const required = ['toggle', 'title', 'nearestHeading', 'nearestControl'];
+  const missing = required.filter(key => !geometry?.[key]?.rect);
+  if (missing.length) {
+    throw new Error(`Geometry targets missing at ${profile.width}x${profile.height}: ${missing.join(', ')}; ${JSON.stringify(geometry)}`);
+  }
+  const conflicts = [
+    ['Town district title', geometry.title],
+    ['nearest heading', geometry.nearestHeading],
+    ['nearest active control', geometry.nearestControl]
+  ].filter(([, target]) => rectanglesIntersect(geometry.toggle.rect, target.rect));
+  if (!geometry.navClosed
+      || geometry.viewport?.touchMedia !== true
+      || geometry.viewport?.maxTouchPoints < 1
+      || conflicts.length) {
+    throw new Error(
+      `Touch navigation geometry failed at ${profile.width}x${profile.height}: `
+      + `${conflicts.map(([name]) => name).join(', ') || 'invalid touch/nav state'}; ${JSON.stringify(geometry)}`
+    );
+  }
+  console.log(
+    `PASS: Touch navigation geometry ${profile.width}x${profile.height}; `
+    + `toggle=${JSON.stringify(geometry.toggle.rect)}; title=${JSON.stringify(geometry.title.rect)}; `
+    + `nearestHeading=${geometry.nearestHeading.selector} ${JSON.stringify(geometry.nearestHeading.rect)}; `
+    + `nearestControl=${geometry.nearestControl.selector} ${JSON.stringify(geometry.nearestControl.rect)}`
+  );
+}
+
 async function captureTownScreenshot(client, outputPath) {
   await evaluate(client, `(() => {
     const townTab = document.getElementById('tab-town');
@@ -294,14 +391,18 @@ async function captureTownScreenshot(client, outputPath) {
 }
 
 async function main() {
+  if (VERIFY_GEOMETRY_MODE && FINE_POINTER_MODE) {
+    throw new Error('--verify-geometry requires touch emulation and cannot be combined with --fine-pointer.');
+  }
   const browserPath = resolveBrowserPath();
   if (!browserPath) {
-    console.log('SKIP: Town screenshot harness could not find a Chromium browser.');
+    console.log(`${VERIFY_GEOMETRY_MODE ? 'FAIL' : 'SKIP'}: Town screenshot harness could not find a Chromium browser.`);
     console.log('Set CHROME_PATH to a Chrome or Edge executable, install Google Chrome or Microsoft Edge, or run `npx playwright install chromium` if Playwright is available.');
+    if (VERIFY_GEOMETRY_MODE) process.exitCode = 1;
     return;
   }
 
-  await mkdir(OUTPUT_DIR, { recursive: true });
+  if (!VERIFY_GEOMETRY_MODE) await mkdir(OUTPUT_DIR, { recursive: true });
   const { server, pageUrl } = await startStaticServer();
   const debugPort = await pickPort();
   const userDataDir = await mkdtemp(path.join(tmpdir(), 'dungeondex-town-shot-'));
@@ -336,6 +437,10 @@ async function main() {
       else await assertTouchProfile(client, profile);
       await sleep(500);
 
+      if (VERIFY_GEOMETRY_MODE) {
+        await verifyTownNavigationGeometry(client, profile);
+        continue;
+      }
       const outputPath = path.join(OUTPUT_DIR, `town-${profile.width}.png`);
       console.log(`Capturing Town at ${profile.width}x${profile.height} -> ${path.relative(ROOT, outputPath).replaceAll('\\', '/')}`);
       await captureTownScreenshot(client, outputPath);
@@ -345,7 +450,11 @@ async function main() {
 
     await client.send('Emulation.clearDeviceMetricsOverride');
     await client.send('Emulation.setTouchEmulationEnabled', { enabled: false });
-    console.log(`PASS: Captured ${FINE_POINTER_MODE ? 'fine-pointer' : 'touch'} Town screenshots at ${MOBILE_PROFILES.map(profile => `${profile.width}x${profile.height}`).join(', ')}`);
+    if (VERIFY_GEOMETRY_MODE) {
+      console.log(`PASS: Touch navigation geometry clear at ${MOBILE_PROFILES.map(profile => `${profile.width}x${profile.height}`).join(', ')}`);
+    } else {
+      console.log(`PASS: Captured ${FINE_POINTER_MODE ? 'fine-pointer' : 'touch'} Town screenshots at ${MOBILE_PROFILES.map(profile => `${profile.width}x${profile.height}`).join(', ')}`);
+    }
   } finally {
     try { if (client) client.close(); } catch {}
     try { chrome.kill(); } catch {}

@@ -138,6 +138,25 @@ async function main() {
   );
 
   record(
+    'Phone touch navigation toggle clears the Town action row',
+    nav.includes('@media(max-width:700px)and(hover:none),(max-width:700px)and(pointer:coarse)')
+      && nav.includes('.app-shell:not(.combat-active)#screen-town.town-district-hub.inline-actions{padding-left:calc(env(safe-area-inset-left,0px)+var(--ddx-nav-rail-width)+4px)!important}'),
+    'the primary Town controls begin beyond the safe inset and closed 44px toggle'
+  );
+
+  record(
+    'Harness verifies closed touch-navigation geometry at every mobile profile',
+    harness.includes("constVERIFY_GEOMETRY_MODE=process.argv.includes('--verify-geometry')")
+      && harness.includes('awaitverifyTownNavigationGeometry(client,profile);')
+      && harness.includes("['Towndistricttitle',geometry.title]")
+      && harness.includes("['nearestheading',geometry.nearestHeading]")
+      && harness.includes("['nearestactivecontrol',geometry.nearestControl]")
+      && harness.includes('rectanglesIntersect(geometry.toggle.rect,target.rect)')
+      && harness.includes('Touchnavigationgeometryfailedat'),
+    'failures identify the viewport and all measured rectangles'
+  );
+
+  record(
     'Harness provides an explicit narrow fine-pointer verification mode',
     harness.includes("constFINE_POINTER_MODE=process.argv.includes('--fine-pointer')")
       && harness.includes("window.matchMedia('(hover:hover)and(pointer:fine)').matches")
