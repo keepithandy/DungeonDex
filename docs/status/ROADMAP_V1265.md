@@ -8,6 +8,23 @@
 - Do not change public/runtime/cache labels until the final release-authority issue is complete and the user explicitly authorizes the version pass.
 - Planned issue numbers in this document are roadmap slots only until corresponding GitHub issues are explicitly created.
 
+## Current execution snapshot
+
+The roadmap is being completed in order. The release version and cache label remain
+`v1.26.4.06` until #134 receives explicit release authorization.
+
+- ~~#126 Package checker source-audit mode~~ - completed before roadmap execution.
+- ~~#127 Browser-computed contrast verification~~ - completed, committed in
+  `ae1621c221dc6e3f096090f51f192ac738a0a324`, and closed. Compact suite: 45/45.
+- ~~#128 Touch-navigation geometry smoke~~ - completed, committed in
+  `1ba2e64f2cb9e7c209278d7c3cb768293c5198a1`, and closed. Compact suite: 46/46.
+- ~~#129 Guild Journal Chronicle Pass~~ - completed, committed in
+  `94875e492b98d8ebc533c38510ba4870286cfb6a`, pushed to `main`, and closed.
+  Focused Archive ledger smoke: 5/5. Compact suite: 46/46.
+- **Next: #130 Public package build and extraction gate.**
+- Then: #131 public runtime console gate, #132 real-device handoff,
+  #133 protected-system regression audit, and #134 release authority pass.
+
 ## Starting baseline
 
 - Source version: `v1.26.4.06 Mobile Interface Audit Closure`.
@@ -68,7 +85,7 @@ Archive and Journal are active parts of the loop. They are not planning-only or 
 
 ### 2. #127 — Browser-computed contrast verification
 
-- Status: queued; existing GitHub issue.
+- Status: completed and verified; GitHub issue closed.
 - Category: Smoke Hardening.
 - Goal: measure effective computed foreground, background, alpha, and opacity values after the full CSS cascade.
 - Required surfaces:
@@ -86,10 +103,14 @@ Archive and Journal are active parts of the loop. They are not planning-only or 
   - existing structural contrast audit remains useful or is narrowed appropriately;
   - compact verification remains green.
 - Guardrail: do not change player-facing colors unless a separate confirmed defect is found and explicitly authorized.
+- Result: added Chromium-computed contrast verification to the compact suite.
+  The smoke reports the selector, surface, and measured effective contrast for a
+  failed state. No player-facing color change was needed.
+- Commit: `ae1621c221dc6e3f096090f51f192ac738a0a324`.
 
 ### 3. #128 — Touch-navigation geometry smoke
 
-- Status: queued; existing GitHub issue.
+- Status: completed and verified; GitHub issue closed.
 - Category: Smoke Hardening.
 - Goal: prove with browser geometry that the closed touch toggle does not overlap Town headings or active controls.
 - Required profiles:
@@ -107,10 +128,14 @@ Archive and Journal are active parts of the loop. They are not planning-only or 
   - preserve combat navigation hiding;
   - preserve safe-area rules;
   - preserve public route and screen IDs.
+- Result: added repeatable browser geometry assertions at all three required
+  profiles. The check found and the patch corrected a real 390x844 overlap
+  between the closed drawer toggle and the Town action row.
+- Commit: `1ba2e64f2cb9e7c209278d7c3cb768293c5198a1`.
 
-### 4. Planned #129 — Guild Journal Chronicle Pass
+### 4. #129 — Guild Journal Chronicle Pass
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: completed and verified; GitHub issue closed.
 - Category: Clarity / UI.
 - Primary system: Archive and Guild Journal presentation.
 - Goal: turn existing earned records into a compact, readable chronicle without adding new saved progression.
@@ -215,9 +240,21 @@ At phone widths:
 - save/reload preserves all existing records;
 - compact suite remains green.
 
+#### Completed result
+
+- Guild Journal now renders an empty-state Chronicle header and derives its
+  record total and latest record from existing save data.
+- Boss Trophies, Trophy Echo, Merchant Upgrades, active Debt, and compatible
+  Famous Gear or Rival history render as semantic cards with no action controls.
+- Historical Famous Gear and Rival records are explicitly read-only; Trophy Echo
+  remains the only active Revisit lane.
+- The Journal and Archive renderers now resolve the live state correctly, so
+  existing saved records appear in the actual UI.
+- Commit: `94875e492b98d8ebc533c38510ba4870286cfb6a`.
+
 ### 5. Planned #130 — Public package build and extraction gate
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: next in sequence; planned issue not yet created.
 - Category: Release / Smoke Hardening.
 - Goal: prove that the actual itch-ready package is clean, complete, and launchable outside the source repository.
 - Acceptance:
