@@ -21,8 +21,11 @@ The roadmap is being completed in order. The release version and cache label rem
 - ~~#129 Guild Journal Chronicle Pass~~ - completed, committed in
   `94875e492b98d8ebc533c38510ba4870286cfb6a`, pushed to `main`, and closed.
   Focused Archive ledger smoke: 5/5. Compact suite: 46/46.
-- **Next: #130 Public package build and extraction gate.**
-- Then: #131 public runtime console gate, #132 real-device handoff,
+- ~~#130 Public package build and extraction gate~~ - completed, committed in
+  `2f5c55dcf6ba4e74d5fa825a9594520398b789fc`. Focused package smoke: 11/11.
+  Compact suite: 47/47.
+- **Next: #131 Public runtime console gate.**
+- Then: #132 real-device handoff,
   #133 protected-system regression audit, and #134 release authority pass.
 
 ## Starting baseline
@@ -252,9 +255,9 @@ At phone widths:
   existing saved records appear in the actual UI.
 - Commit: `94875e492b98d8ebc533c38510ba4870286cfb6a`.
 
-### 5. Planned #130 — Public package build and extraction gate
+### 5. #130 — Public package build and extraction gate
 
-- Status: next in sequence; planned issue not yet created.
+- Status: completed and verified; GitHub issue closed.
 - Category: Release / Smoke Hardening.
 - Goal: prove that the actual itch-ready package is clean, complete, and launchable outside the source repository.
 - Acceptance:
@@ -270,6 +273,19 @@ At phone widths:
   - do not publish automatically;
   - do not bump version labels in this issue;
   - do not include tests, tools, internal docs, Git metadata, old archives, or development-only runtime files.
+
+#### Completed result
+
+- The itch-ready builder can now use a unique staging directory for temporary
+  review work, avoiding replacement of another candidate's staging folder.
+- Staged packages exclude the four DevTools-only runtime files, and strict
+  package mode now rejects those files if they are present.
+- The new focused smoke builds a temporary ZIP, validates its stage and clean
+  extraction, launches the extracted public configuration in Chromium, confirms
+  the Guild Journal Chronicle, and exercises Journal and dungeon navigation.
+- The smoke removes its own temporary ZIP, stage, browser profile, and extracted
+  directory after verification. No upload or version/cache change occurred.
+- Commit: `2f5c55dcf6ba4e74d5fa825a9594520398b789fc`.
 
 ### 6. Planned #131 — Public runtime console gate
 
