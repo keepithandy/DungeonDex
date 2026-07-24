@@ -26,9 +26,11 @@ The roadmap is being completed in order. The release version and cache label rem
   Compact suite: 47/47.
 - ~~#131 Public runtime console gate~~ - completed; focused browser smoke: 10/10.
   Compact suite: 49/49.
-- **#132 real-device handoff is in progress; physical-device evidence is required.**
-- Then:
-  #133 protected-system regression audit, and #134 release authority pass.
+- ~~#132 real-device handoff~~ - completed by a live Textastic Workspace pass;
+  all twelve checks were reported passing. Evidence metadata/screenshots were
+  not captured and remain documented as a release-record limitation.
+- **Next: #133 protected-system regression audit.**
+- Then: #134 release authority pass.
 
 ## Starting baseline
 
@@ -335,8 +337,8 @@ At phone widths:
 
 ### 7. #132 — Real-device release handoff
 
-- Status: in progress; GitHub issue #132 is open. The repeatable handoff sheet
-  is ready, but no physical-device result has been claimed.
+- Status: completed; live Textastic Workspace validation reported all required
+  checks passing. GitHub issue #132 may close after this result record lands.
 - Category: Audit / Release Validation.
 - Goal: verify the release candidate on the physical iPhone/Textastic workflow rather than treating desktop emulation as final proof.
 - Required checks:
@@ -365,8 +367,11 @@ At phone widths:
 - It records only `Pass`, `Fail`, or `Blocked` results and makes the normal
   Gear inspection precondition explicit without using DevTools or a fabricated
   player inventory.
-- The issue remains open until a physical iPhone/Textastic run supplies the
-  evidence. Browser emulation is not represented as completion.
+- The project owner completed the live Textastic Workspace pass and reported
+  all twelve required checks passing. No defect or block was reported.
+- Device/version/viewport metadata and screenshots were not captured. The
+  handoff sheet records that limitation explicitly; browser emulation is still
+  not represented as completion.
 
 ### 8. Planned #133 — Final protected-system regression audit
 
