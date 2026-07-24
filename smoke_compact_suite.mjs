@@ -36,6 +36,7 @@ const COMMANDS = [
   { tag: 'syntax', name: 'app wiring smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
   { tag: 'syntax', name: 'mobile layout contracts smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
   { tag: 'syntax', name: 'interface accessibility smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
+  { tag: 'syntax', name: 'computed contrast smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_computed_contrast_v1265.mjs'] },
   { tag: 'syntax', name: 'enter dungeon smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
   { tag: 'syntax', name: 'merchant upgrade smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
   { tag: 'journal', name: 'journal v1', cmd: ['node', 'tests/smoke/smoke_journal_v1233.mjs'] },
@@ -56,6 +57,7 @@ const COMMANDS = [
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
   { tag: 'app', name: 'mobile layout contracts v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
   { tag: 'app', name: 'interface accessibility v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
+  { tag: 'app', name: 'browser-computed contrast', cmd: ['node', 'tests/smoke/smoke_computed_contrast_v1265.mjs'] },
   { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
   { tag: 'merchant', name: 'merchant gear upgrades', cmd: ['node', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
   { tag: 'forge', name: 'lowfire forge', cmd: ['node', 'tests/smoke/smoke_lowfire_forge_v1.mjs'] }
