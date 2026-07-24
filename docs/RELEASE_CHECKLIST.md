@@ -33,6 +33,7 @@ Run the checks that match the patch scope:
 ```powershell
 git status --short
 git diff --check
+python tools/check_dungeondex_package.py --source .
 node --check app.js
 node --check sw.js
 node --check js/systems/21_build_label_guard.js

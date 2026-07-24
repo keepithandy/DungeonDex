@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
-import sys
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -64,9 +64,29 @@ class LocalReferenceParser(HTMLParser):
                 self.refs.append((attr_map[attr] or "", f"index.html <{tag} {attr}>"))
 
 
-def project_root() -> Path:
-    if len(sys.argv) > 1:
-        return Path(sys.argv[1]).resolve()
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Validate DungeonDex runtime/package wiring and release hygiene."
+    )
+    parser.add_argument(
+        "root",
+        nargs="?",
+        help="Repository source root or staged package root. Defaults to cwd/project root.",
+    )
+    parser.add_argument(
+        "--source",
+        action="store_true",
+        help=(
+            "Audit a repository source tree without treating docs, tests, tools, or VCS "
+            "metadata as prohibited package content."
+        ),
+    )
+    return parser.parse_args()
+
+
+def project_root(root_arg: str | None = None) -> Path:
+    if root_arg:
+        return Path(root_arg).resolve()
     cwd = Path.cwd().resolve()
     if (cwd / "index.html").exists():
         return cwd
@@ -279,7 +299,9 @@ def prohibited_content_warnings(root: Path) -> list[str]:
 
 
 def main() -> int:
-    root = project_root()
+    args = parse_args()
+    root = project_root(args.root)
+    mode = "source" if args.source else "package"
     checked: list[tuple[str, str, bool]] = []
     seen: set[tuple[str, str]] = set()
     missing_required: list[str] = []
@@ -347,10 +369,12 @@ def main() -> int:
 
     warnings.extend(public_label_warnings(root))
     warnings.extend(stale_runtime_warnings(root))
-    warnings.extend(prohibited_content_warnings(root))
+    if not args.source:
+        warnings.extend(prohibited_content_warnings(root))
 
     print("DungeonDex package check")
     print(f"Root: {root}")
+    print(f"Mode: {mode}")
     print()
     print("Checked paths:")
     for rel_path, source, ok in checked:
