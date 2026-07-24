@@ -1,13 +1,13 @@
 'use strict';
 
-// DungeonDex v1.26.4.05 - Public Revisit Activation Surface Lockdown.
+// DungeonDex v1.26.4.06 - Public Revisit Activation Surface Lockdown.
 // Public runtime contract: Trophy Echo is the only active Revisit lane.
 (function(){
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.26.4.05-stability-hardening';
-  const VISIBLE_BUILD = '1.26.4.05';
+  const BUILD = '1.26.4.06-mobile-interface-audit-closure';
+  const VISIBLE_BUILD = '1.26.4.06';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const PUBLIC_ROUTE_KEY = 'trophy_echo_route';
   const PUBLIC_ROUTE_LABEL = 'Trophy Echo';
@@ -43,7 +43,7 @@
       ok: false,
       blocked: true,
       routeKey: String(routeKey || '').trim(),
-      reason: 'DungeonDex v1.26.4.05 public Revisit surface only allows Trophy Echo.'
+      reason: 'DungeonDex v1.26.4.06 public Revisit surface only allows Trophy Echo.'
     });
   }
 
@@ -143,7 +143,7 @@
       ]),
       activationBlockers: Object.freeze(playable ? [] : ['No qualifying boss trophy history yet.']),
       notes: Object.freeze([
-        'Trophy Echo is the only active public Revisit lane in v1.26.4.05.',
+        'Trophy Echo is the only active public Revisit lane in v1.26.4.06.',
         'Inactive Revisit lanes may remain as compatibility/read-only code, but public start and completion mutation paths are blocked.',
         'This contract intentionally does not change combat, economy, rewards, Debt, Talent, gear, dungeon entry, or save schema.'
       ])
@@ -198,7 +198,7 @@
       gateSummary: null,
       previewSummary: null,
       notes: Object.freeze([
-        'Public v1.26.4.05 permits Trophy Echo only.',
+        'Public v1.26.4.06 permits Trophy Echo only.',
         'Non-Trophy Revisit start/complete exports may exist for compatibility but must return blocked/no-op results.',
         'No gameplay, economy, combat, Debt, Talent, gear, dungeon-entry, or save-schema behavior is changed by this report.'
       ])

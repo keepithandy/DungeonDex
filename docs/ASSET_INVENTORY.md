@@ -2,7 +2,7 @@
 
 This manifest records the origin, ownership/license status, modification history, and use of every tracked DungeonDex visual, audio, font, or marketing asset. Update it whenever an asset is added, replaced, or repurposed.
 
-Target baseline: **v1.26.4.05 Stability Hardening**.
+Target baseline: **v1.26.4.06 Mobile Interface Audit Closure**.
 
 Policy: [Northline Studio asset licensing policy](../ASSETS_LICENSE.md).
 

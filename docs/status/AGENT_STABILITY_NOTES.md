@@ -1,9 +1,9 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.4.05 Stability Target
+## Current v1.26.4.06 Mobile Interface Audit Closure Target
 
-- Current target: `v1.26.4.05 Stability Hardening`.
-- Current build/cache label: `1.26.4.05-stability-hardening`.
+- Current target: `v1.26.4.06 Mobile Interface Audit Closure`.
+- Current build/cache label: `1.26.4.06-mobile-interface-audit-closure`.
 - The compact suite passes 43/43, including repository-wide JavaScript syntax, Lowfire Forge contracts, app wiring/cache authority, merchant saved-stock escaping, and the 20-boss readiness matrix.
 - Preserve the merged v1.26.3.02 Town runtime cleanup: system 25 owns the wallet; systems 20, 26, and 27 remain retired and must not be reloaded or precached.
 - Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; do not describe touch emulation as a physical-device pass.

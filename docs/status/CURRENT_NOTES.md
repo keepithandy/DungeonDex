@@ -7,7 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.4.05 - Stability Hardening
+- DungeonDex v1.26.4.06 - Mobile Interface Audit Closure
+
+## v1.26.4.06 Mobile Interface Audit Closure
+- The final mobile interface audit is now published: #116–#125 are implemented, verified, and closed on GitHub.
+- Tablet touch Town headings include the device safe-area inset when clearing the closed navigation toggle.
+- Interface smoke now reconciles all loaded public button/select/input/role-button families against the documented inventory and fails on missing, unexpected, unmapped, or undocumented controls.
+- Rest warning and rarity contrast declarations now win the effective CSS cascade at narrow widths and high-specificity Gear selectors.
+- Compact verification passes 43/43; interface/accessibility passes 21/21; mobile-layout passes 16/16; Enter Dungeon runtime passes 11/11.
+- Fresh touch and fine-pointer captures pass at 390×844, 430×932, and 768×1024.
+- Build/cache labels use `1.26.4.06-mobile-interface-audit-closure`.
+- No combat, boss scaling, rewards, economy, upgrade values, save schema, progression, Revisit behavior, or dungeon entry changed.
 
 ## v1.26.4.05 Stability Hardening
 - Repository JavaScript syntax is now checked as part of the compact suite, and the repaired smoke helper reports the version authority and branch accurately.
@@ -166,7 +176,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.4.05 Stability Hardening.
-- GitHub #116-#125 are implemented and locally verified; remote issue closure remains pending publication and acceptance.
+- Current runtime baseline is v1.26.4.06 Mobile Interface Audit Closure.
+- GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

@@ -1,6 +1,6 @@
-# v1.26.4.05 Mobile Validation Checklist
+# v1.26.4.06 Mobile Validation Checklist
 
-Use this checklist for the current Trophy Echo-only v1.26.4.05 release baseline. It is a visual/manual check, not a gameplay test plan.
+Use this checklist for the current Trophy Echo-only v1.26.4.06 release baseline. It is a visual/manual check, not a gameplay test plan.
 
 ## Target widths
 

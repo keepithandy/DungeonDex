@@ -4,9 +4,9 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.26.4.05 Stability Hardening`
-- Visible semantic version: `1.26.4.05`
-- Build/cache slug: `1.26.4.05-stability-hardening`
+- Public version: `v1.26.4.06 Mobile Interface Audit Closure`
+- Visible semantic version: `1.26.4.06`
+- Build/cache slug: `1.26.4.06-mobile-interface-audit-closure`
 
 No package builder was run and no package was created while documenting this authority flow.
 

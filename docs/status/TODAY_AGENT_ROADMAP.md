@@ -2,10 +2,10 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.4.05 Stability Hardening`.
+- Baseline: `v1.26.4.06 Mobile Interface Audit Closure`.
 - Current active Revisit lane: Trophy Echo only.
 - Working branch: `main`.
-- Implementation status: the v1.26.4.05 stability cleanup set is committed locally on `main`; publication remains a separate user-approved action.
+- Implementation status: the v1.26.4.06 mobile interface audit closure is published on `main` in commit `0a4cc89`.
 - Current compact result: 43/43 passed on 2026-07-23, including repository-wide JavaScript syntax, Lowfire Forge contracts, and the boss readiness matrix.
 
 ## Non-negotiable boundaries

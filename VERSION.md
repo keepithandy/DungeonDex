@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.4.05 Stability Hardening
+v1.26.4.06 Mobile Interface Audit Closure
 
 ## Current Local Package Version
-v1.26.4.05 Stability Hardening
+v1.26.4.06 Mobile Interface Audit Closure
 
 ## Current Development Target
-v1.26.4.05 Stability Hardening
+v1.26.4.06 Mobile Interface Audit Closure
 
 ## Current Build/Cache Label
-1.26.4.05-stability-hardening
+1.26.4.06-mobile-interface-audit-closure
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

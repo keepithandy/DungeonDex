@@ -1,6 +1,6 @@
 'use strict';
 
-// v1.26.4.05 Revisit surface: Trophy Echo only.
+// v1.26.4.06 Revisit surface: Trophy Echo only.
 // Revisit placement is owned by source renderers. This module does not move DOM
 // nodes, observe mutations, or install timing placement loops. It narrows the
 // player-facing Revisit surface and hard-gates public mutation paths to the one
@@ -36,7 +36,7 @@
 			ok: false,
 			blocked: true,
 			routeKey: String(routeKey || '').trim(),
-			reason: 'DungeonDex v1.26.4.05 public Revisit surface only allows Trophy Echo.'
+			reason: 'DungeonDex v1.26.4.06 public Revisit surface only allows Trophy Echo.'
 		});
 	}
 
@@ -124,7 +124,7 @@
 				<div class="card-head">
 					<div>
 						<h2>Revisit</h2>
-						<p>Trophy Echo is the only active Revisit lane for v1.26.4.05.</p>
+						<p>Trophy Echo is the only active Revisit lane for v1.26.4.06.</p>
 					</div>
 				</div>
 				<article class="quest-card revisit-echo-card ${cardClass}">

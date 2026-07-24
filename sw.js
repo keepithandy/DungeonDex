@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.4.05-stability-hardening';
+const CACHE_NAME = 'dungeondex-v1.26.4.06-mobile-interface-audit-closure';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.4.05-stability-hardening';
+const BUILD_QS = '1.26.4.06-mobile-interface-audit-closure';
 const ASSETS = [
   './',
   './index.html',

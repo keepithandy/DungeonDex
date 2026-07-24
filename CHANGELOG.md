@@ -8,14 +8,21 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.4.05 Stability Hardening`
-* Current local package baseline: `v1.26.4.05 Stability Hardening`
-* Current development target: `v1.26.4.05 Stability Hardening`
-* Current build/cache label: `1.26.4.05-stability-hardening`
+* Public/live itch version: `v1.26.4.06 Mobile Interface Audit Closure`
+* Current local package baseline: `v1.26.4.06 Mobile Interface Audit Closure`
+* Current development target: `v1.26.4.06 Mobile Interface Audit Closure`
+* Current build/cache label: `1.26.4.06-mobile-interface-audit-closure`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.4.06 - Mobile Interface Audit Closure
+
+* Published the final mobile interface audit closure for GitHub issues #116–#125, including safe-area navigation clearance, exhaustive public control inventory coverage, and contrast-cascade enforcement.
+* Preserved the v1.26.4.05 stability hardening set: repository-wide JavaScript syntax gating, single-owner forge/monster/startup presentation paths, escaped merchant stock rendering, and the 43/43 compact suite baseline.
+* Verified the release with 43/43 compact checks, 21/21 interface/accessibility checks, 16/16 mobile-layout checks, 11/11 Enter Dungeon checks, and fresh touch/fine-pointer captures at 390×844, 430×932, and 768×1024.
+* No combat, boss scaling, rewards, economy, upgrade values, save schema, progression, Revisit behavior, or dungeon entry changed.
 
 ## v1.26.4.05 - Stability Hardening
 
