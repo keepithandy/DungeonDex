@@ -76,6 +76,13 @@ async function main() {
   );
 
   record(
+    'Tablet touch navigation toggle clears the horizontal Town district copy',
+    nav.includes('@media(min-width:701px)and(hover:none),(min-width:701px)and(pointer:coarse)')
+      && nav.includes('.app-shell:not(.combat-active)#screen-town.town-district-hub>.ddx-record-title{padding-left:calc(env(safe-area-inset-left,0px)+var(--ddx-nav-rail-width)+4px)!important}'),
+    'the 768px Town heading starts beyond the safe inset and closed 44px toggle'
+  );
+
+  record(
     'Expanded touch drawer keeps padded route spacing and edge definition',
     nav.includes('.tabs.panel.ddx-nav-open,nav.tabs.ddx-nav-open{padding:58px12px12px10px!important;gap:8px!important;')
       && nav.includes('border:1pxsolidrgba(255,213,148,.22)!important;border-left:0!important;')

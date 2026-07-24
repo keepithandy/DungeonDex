@@ -417,7 +417,7 @@ button,
 .gear-detail-rarity {
   border: 1px solid currentColor;
   font-weight: 900;
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .gear-detail-trigger {
@@ -437,7 +437,7 @@ button,
 .save-status.save-warn,
 .feed-chip-danger,
 .rest-cost-chip.rest-cost-low {
-  color: #ffd0ca;
+  color: #ffd0ca !important;
   border-color: rgba(255,151,138,0.52);
 }
 

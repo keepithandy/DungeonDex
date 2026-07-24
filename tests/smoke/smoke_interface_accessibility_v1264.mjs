@@ -20,15 +20,98 @@ function occurrences(source, needle) {
   return String(source || '').split(needle).length - 1;
 }
 
-function relativeLuminance(hex) {
-  const rgb = hex.match(/[a-f\d]{2}/gi).map(value => Number.parseInt(value, 16) / 255);
+const PUBLIC_ACTION_ATTRIBUTES = [
+  'data-screen',
+  'data-charter-start',
+  'data-complete-trophy-echo',
+  'data-complete-famous-gear',
+  'data-complete-board-echo',
+  'data-complete-rival-trace',
+  'data-start-revisit',
+  'data-start-contract',
+  'data-merchant-upgrade',
+  'data-buy',
+  'data-buy-district',
+  'data-run-event',
+  'data-action',
+  'data-equip',
+  'data-sell',
+  'data-retire',
+  'data-gear-detail-trigger',
+  'data-forge-slot',
+  'data-temper-slot',
+  'data-debt-borrow',
+  'data-gear-detail-close',
+  'data-gear-detail-compare'
+];
+
+function publicControlTokens(source) {
+  const tags = [
+    ...String(source || '').matchAll(/<(?:button|select|input)\b[^>]*>/gi),
+    ...String(source || '').matchAll(/<[^>]*\brole=["']button["'][^>]*>/gi)
+  ].map(match => match[0]);
+
+  return tags.flatMap(tag => {
+    if (tag.includes('${equipAttrs}')) return ['[data-equip]'];
+    if (tag.includes('${sellAttrs}')) return ['[data-sell]'];
+    if (tag.includes('${retireAttrs}')) return ['[data-retire]'];
+
+    const actionAttribute = PUBLIC_ACTION_ATTRIBUTES.find(attribute => tag.includes(`${attribute}=`));
+    if (actionAttribute) return [`[${actionAttribute}]`];
+
+    const id = tag.match(/\bid=(["'])([^"']+)\1/i)?.[2] || '';
+    if (id === '${actionId}') return ['#introModalEnterDungeonBtn', '#introModalContinueRunBtn'];
+    if (id && !id.includes('${')) return [`#${id}`];
+
+    const classes = tag.match(/\bclass=(["'])([^"']+)\1/i)?.[2]?.split(/\s+/) || [];
+    if (classes.includes('trophy-tab')) return ['.trophy-tab'];
+    if (/\bdisabled\b|aria-disabled=(["'])true\1/i.test(tag)) return ['button[disabled]'];
+
+    return [`UNMAPPED:${tag.replace(/\s+/g, ' ').slice(0, 120)}`];
+  });
+}
+
+function parseColor(value) {
+  const source = String(value || '').trim();
+  const hex = source.match(/^#([a-f\d]{6})$/i);
+  if (hex) {
+    return {
+      r: Number.parseInt(hex[1].slice(0, 2), 16),
+      g: Number.parseInt(hex[1].slice(2, 4), 16),
+      b: Number.parseInt(hex[1].slice(4, 6), 16),
+      a: 1
+    };
+  }
+  const rgba = source.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/i);
+  if (!rgba) throw new Error(`Unsupported color in contrast audit: ${source}`);
+  return {
+    r: Number(rgba[1]),
+    g: Number(rgba[2]),
+    b: Number(rgba[3]),
+    a: rgba[4] === undefined ? 1 : Number(rgba[4])
+  };
+}
+
+function compositeColor(foreground, background) {
+  return {
+    r: foreground.r * foreground.a + background.r * (1 - foreground.a),
+    g: foreground.g * foreground.a + background.g * (1 - foreground.a),
+    b: foreground.b * foreground.a + background.b * (1 - foreground.a),
+    a: 1
+  };
+}
+
+function relativeLuminance(color) {
+  const rgb = [color.r, color.g, color.b].map(value => value / 255);
   const linear = rgb.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
   return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
 }
 
-function contrastRatio(a, b) {
-  const first = relativeLuminance(a);
-  const second = relativeLuminance(b);
+function contrastRatio(foreground, background) {
+  const resolvedBackground = parseColor(background);
+  const resolvedForeground = compositeColor(parseColor(foreground), resolvedBackground);
+  const first = relativeLuminance(resolvedForeground);
+  const second = relativeLuminance(resolvedBackground);
   return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
 }
 
@@ -128,18 +211,44 @@ function runModalLifecycleFixture(introSource) {
 }
 
 async function main() {
-  const [index, town, playerRuntime, visualCss, loreCss, intro, gearModal, runUi, bindings] = await Promise.all([
+  const [
+    index,
+    town,
+    playerRuntime,
+    baseCss,
+    visualCss,
+    loreCss,
+    intro,
+    gearModal,
+    runUi,
+    bindings,
+    forge,
+    lowfireBoard,
+    debt,
+    revisit,
+    nav,
+    mobileAudit
+  ] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/07_player_combat_runtime.js'), 'utf8'),
+    readFile(path.join(ROOT, 'styles.css'), 'utf8'),
     readFile(path.join(ROOT, 'styles_visual_weight.css'), 'utf8'),
     readFile(path.join(ROOT, 'styles_lore_layer.css'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/40_gear_detail_modal.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8'),
-    readFile(path.join(ROOT, 'js/systems/12_render_bindings_boot.js'), 'utf8')
+    readFile(path.join(ROOT, 'js/systems/12_render_bindings_boot.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/17_relic_forge_clarity.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/24_lowfire_spark_board.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/28_debt_collector_foundation.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/22_nav_centering.js'), 'utf8'),
+    readFile(path.join(ROOT, 'docs/status/MOBILE_VALIDATION_V1260.md'), 'utf8')
   ]);
+  const base = compact(baseCss);
   const css = compact(visualCss);
+  const modalCss = compact(gearModal);
   const restMarkup = index.match(/<button class="ghost rest-action-btn"[\s\S]*?<\/button>/)?.[0] || '';
   const restRender = town.slice(town.indexOf("const restCostNode = el('restCostPill')"), town.indexOf("if (el('districtCharterSlot'))"));
 
@@ -235,6 +344,102 @@ async function main() {
       && intro.includes('handle.deactivate({ restoreFocus: options.restoreFocus !== false });')
   );
 
+  const publicControlSources = [
+    index,
+    intro,
+    town,
+    runUi,
+    forge,
+    lowfireBoard,
+    debt,
+    revisit,
+    gearModal
+  ];
+  const extractedControlTokens = new Set(publicControlSources.flatMap(publicControlTokens));
+  if (nav.includes("document.createElement('button')")
+      && nav.includes("toggle.className = 'ddx-nav-toggle'")) {
+    extractedControlTokens.add('.ddx-nav-toggle');
+  }
+  const inactiveFutureControlTokens = new Set([
+    '[data-complete-famous-gear]',
+    '[data-complete-board-echo]',
+    '[data-complete-rival-trace]'
+  ]);
+  const expectedPublicControlTokens = [
+    '#saveBtn',
+    '#resetBtn',
+    '[data-screen]',
+    '.ddx-nav-toggle',
+    '#startRunBtn',
+    '#restBtn',
+    '[data-charter-start]',
+    '[data-debt-borrow]',
+    '#repayDebtBtn',
+    '#refreshMerchantBtn',
+    '[data-merchant-upgrade]',
+    '[data-buy]',
+    '[data-buy-district]',
+    '[data-start-contract]',
+    '#forgeBtn',
+    '#salvageForgeBtn',
+    '[data-forge-slot]',
+    '[data-temper-slot]',
+    '#claimSparkWritBtn',
+    '#refreshSparkWritBtn',
+    '#claimEliteContractBtn',
+    '[data-start-revisit]',
+    '[data-complete-trophy-echo]',
+    'button[disabled]',
+    '#runFromIdleBtn',
+    '[data-run-event]',
+    '[data-action]',
+    '#slotFilter',
+    '#rarityFilter',
+    '#sortFilter',
+    '#searchFilter',
+    '#sellJunkGearBtn',
+    '#sellAllGearBtn',
+    '#retireArchiveBtn',
+    '[data-equip]',
+    '[data-sell]',
+    '[data-retire]',
+    '[data-gear-detail-trigger]',
+    '#introModalEnterDungeonBtn',
+    '#introModalContinueRunBtn',
+    '#introModalCloseBtn',
+    '[data-gear-detail-close]',
+    '[data-gear-detail-compare]',
+    '.trophy-tab',
+    '#clearCacheReloadBtn'
+  ];
+  const activeControlTokens = [...extractedControlTokens]
+    .filter(token => !inactiveFutureControlTokens.has(token));
+  const unmappedControls = activeControlTokens.filter(token => token.startsWith('UNMAPPED:'));
+  const missingControls = expectedPublicControlTokens
+    .filter(token => !extractedControlTokens.has(token));
+  const unexpectedControls = activeControlTokens
+    .filter(token => !token.startsWith('UNMAPPED:') && !expectedPublicControlTokens.includes(token));
+  const undocumentedControls = expectedPublicControlTokens
+    .filter(token => !mobileAudit.includes(`\`${token}\``));
+  const publicControlSource = publicControlSources.join('\n');
+  record(
+    'Loaded player-facing controls are exhaustively reconciled with the documented inventory',
+    missingControls.length === 0
+      && unexpectedControls.length === 0
+      && unmappedControls.length === 0
+      && undocumentedControls.length === 0
+      && mobileAudit.includes('## Player-facing control inventory')
+      && mobileAudit.includes('.dd-devtools-btn')
+      && mobileAudit.includes('No live `<a>`')
+      && !/<a\b/i.test(publicControlSource),
+    [
+      missingControls.length ? `missing: ${missingControls.join(', ')}` : '',
+      unexpectedControls.length ? `unexpected: ${unexpectedControls.join(', ')}` : '',
+      unmappedControls.length ? `unmapped: ${unmappedControls.join(', ')}` : '',
+      undocumentedControls.length ? `undocumented: ${undocumentedControls.join(', ')}` : ''
+    ].filter(Boolean).join('; ') || `${expectedPublicControlTokens.length} selector families; no live anchor controls`
+  );
+
   record(
     'Touch controls retain a 44px minimum without enlarging passive pills',
     /@media\s*\(hover:\s*none\),\s*\(pointer:\s*coarse\)\s*\{[\s\S]*?button:not\(\.dd-devtools-btn\),[\s\S]*?\[role="button"\]\s*\{\s*min-height:\s*44px\s*!important/s.test(visualCss)
@@ -247,12 +452,74 @@ async function main() {
       && css.includes('cursor:not-allowed!important')
   );
 
-  const rarityColors = ['#d7e0ea', '#f0cf91', '#a8cbff', '#dfbdff', '#ffe29c', '#ffb2ba'];
-  const rarityRatios = rarityColors.map(color => contrastRatio(color, '#0c0f16'));
+  const criticalContrastPairs = [
+    {
+      surface: 'Town low-rest status',
+      foreground: '#ffd0ca',
+      background: '#1e160f',
+      source: css,
+      declaration: '.save-status.save-warn,.feed-chip-danger,.rest-cost-chip.rest-cost-low{color:#ffd0ca!important;'
+    },
+    {
+      surface: 'Combat danger status',
+      foreground: '#ffd0ca',
+      background: '#1b120e',
+      source: css,
+      declaration: '.save-status.save-warn,.feed-chip-danger,.rest-cost-chip.rest-cost-low{color:#ffd0ca!important;'
+    },
+    {
+      surface: 'Gear mythic rarity',
+      foreground: '#ffb2ba',
+      background: '#1e160f',
+      source: css,
+      declaration: '.rarity-mythic{color:#ffb2ba;'
+    },
+    {
+      surface: 'Journal history metadata',
+      foreground: 'rgba(244,236,223,.74)',
+      background: '#22180f',
+      source: css,
+      declaration: '.journal-row.small.muted,.archive-note-stamp,.run-history-sub,.run-history-meta-gridspan{color:rgba(244,236,223,0.74);'
+    },
+    {
+      surface: 'Intro roadmap copy',
+      foreground: 'rgba(240,234,222,.76)',
+      background: '#0a0c12',
+      source: base,
+      declaration: '.threshold-roadmap-copy{color:rgba(240,234,222,0.76);'
+    },
+    {
+      surface: 'Gear modal kicker',
+      foreground: 'rgba(245,222,180,.72)',
+      background: '#1e1912',
+      source: modalCss,
+      declaration: '.gear-detail-kicker{padding-right:74px;color:rgba(245,222,180,.72);'
+    },
+    {
+      surface: 'Disabled control text',
+      foreground: 'rgba(247,239,226,.72)',
+      background: '#1e160f',
+      source: css,
+      declaration: 'button:disabled,button[aria-disabled="true"]{opacity:1!important;color:rgba(247,239,226,0.72)!important;'
+    }
+  ].map(pair => ({ ...pair, ratio: contrastRatio(pair.foreground, pair.background) }));
+  const undocumentedContrastPairs = criticalContrastPairs.filter(pair => !pair.source.includes(pair.declaration));
   record(
-    'Rarity text palette clears 4.5:1 on the dark game surface and retains border cues',
+    'Critical Town, combat, Gear, Journal, and modal contrast pairs clear 4.5:1',
+    undocumentedContrastPairs.length === 0
+      && criticalContrastPairs.every(pair => pair.ratio >= 4.5)
+      && mobileAudit.includes('## Contrast audit record')
+      && ['12.85:1', '13.28:1', '10.48:1', '8.58:1', '9.54:1', '7.42:1', '8.53:1']
+        .every(ratio => mobileAudit.includes(ratio)),
+    `minimum ${Math.min(...criticalContrastPairs.map(pair => pair.ratio)).toFixed(2)}:1`
+  );
+
+  const rarityColors = ['#d7e0ea', '#f0cf91', '#a8cbff', '#dfbdff', '#ffe29c', '#ffb2ba'];
+  const rarityRatios = rarityColors.map(color => contrastRatio(color, '#1e160f'));
+  record(
+    'Rarity text palette clears 4.5:1 on the conservative bright Gear surface and retains border cues',
     rarityRatios.every(ratio => ratio >= 4.5)
-      && /\.rarity-eyebrow,\s*\.gear-detail-rarity\s*\{[^}]*border:\s*1px\s+solid\s+currentColor;[^}]*font-weight:\s*900;[^}]*opacity:\s*1/s.test(visualCss),
+      && /\.rarity-eyebrow,\s*\.gear-detail-rarity\s*\{[^}]*border:\s*1px\s+solid\s+currentColor;[^}]*font-weight:\s*900;[^}]*opacity:\s*1\s*!important/s.test(visualCss),
     `minimum ${Math.min(...rarityRatios).toFixed(2)}:1`
   );
   record(
