@@ -32,3 +32,16 @@ python tools/check_dungeondex_package.py --source .
 ```
 
 Source mode keeps required-file, local-reference, version/cache, and stale-runtime checks, but does not treat normal source-only files as package violations. It does not build or publish a package.
+
+## Itch-ready package gate
+
+Build and keep a uniquely named staging candidate while reviewing a release:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\build_itch_ready.ps1 -OutputName DungeonDex_candidate.zip -StageName _itch_staging_candidate -KeepStage
+```
+
+The builder keeps `index.html` at the ZIP root, runs syntax and compact checks unless
+explicitly skipped, validates the stage in strict mode, and excludes development-only
+DevTools runtime files from public packages. Use a unique `-StageName` for temporary
+review work so no existing staging folder is replaced.

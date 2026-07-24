@@ -50,6 +50,11 @@ def main() -> int:
         "default package mode still rejects repo-only content",
         package.stdout,
     )
+    require(
+        "development-only runtime file present: js/systems/13_devtools_overlay.js" in package.stdout,
+        "default mode rejects development-only runtime files",
+        package.stdout,
+    )
     require("Summary: FAIL" in package.stdout, "strict package violations return a failed summary", package.stdout)
 
     print("Package checker modes v1.26.5: 8/8 passed")

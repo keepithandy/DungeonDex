@@ -55,6 +55,7 @@ const COMMANDS = [
   { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
   { tag: 'debt', name: 'debt collector', cmd: ['node', 'tests/smoke/smoke_debt_collector_v169.mjs'] },
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
+  { tag: 'package', name: 'package build and extraction gate', cmd: ['node', 'tests/smoke/smoke_package_build_extraction_v1265.mjs'] },
   { tag: 'app', name: 'mobile layout contracts v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
   { tag: 'app', name: 'touch navigation geometry', cmd: ['node', 'tools/capture_town_mobile_screenshots.mjs', '--verify-geometry'] },
   { tag: 'app', name: 'interface accessibility v1.26.4.06', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },

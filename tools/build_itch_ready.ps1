@@ -14,6 +14,7 @@ Optional:
 param(
     [string]$RepoRoot = "",
     [string]$OutputName = "",
+    [string]$StageName = "_itch_staging",
     [switch]$SkipSmoke,
     [switch]$SkipPackageCheck,
     [switch]$KeepStage
@@ -180,6 +181,14 @@ function Assert-ZipLooksItchReady {
             $_ -match "\.ps1$"
         }
 
+        $developmentOnlyEntries = @(
+            "js/systems/13_devtools_overlay.js",
+            "js/systems/14_devtools_scenarios.js",
+            "js/systems/15_devtools_balance_reports.js",
+            "js/systems/43_devkit_reset_hold.js"
+        )
+        $badEntries += $entries | Where-Object { $_ -in $developmentOnlyEntries }
+
         if ($badEntries.Count -gt 0) {
             Fail "Zip contains non-runtime/dev files:`n$($badEntries -join "`n")"
         }
@@ -215,9 +224,12 @@ if (!$OutputName -or $OutputName.Trim().Length -eq 0) {
 if (!$OutputName.ToLowerInvariant().EndsWith(".zip")) {
     $OutputName = "$OutputName.zip"
 }
+if (!$StageName -or [System.IO.Path]::GetFileName($StageName) -ne $StageName) {
+    Fail "StageName must be a single directory name inside archive\\packages."
+}
 
 $packageDir = Join-Path $root "archive\packages"
-$stageDir = Join-Path $packageDir "_itch_staging"
+$stageDir = Join-Path $packageDir $StageName
 $outZip = Join-Path $packageDir $OutputName
 
 Write-Step "Preparing clean stage folder"
@@ -237,6 +249,19 @@ Copy-RuntimeDirectory -Root $root -Stage $stageDir -RelativePath "assets"
 Get-ChildItem -LiteralPath (Join-Path $stageDir "js\systems") -Recurse -File |
     Where-Object { $_.Extension -ne ".js" } |
     Remove-Item -Force
+
+$developmentOnlyRuntimeFiles = @(
+    "js\systems\13_devtools_overlay.js",
+    "js\systems\14_devtools_scenarios.js",
+    "js\systems\15_devtools_balance_reports.js",
+    "js\systems\43_devkit_reset_hold.js"
+)
+foreach ($relativePath in $developmentOnlyRuntimeFiles) {
+    $stagedPath = Join-Path $stageDir $relativePath
+    if (Test-Path -LiteralPath $stagedPath -PathType Leaf) {
+        Remove-Item -LiteralPath $stagedPath -Force
+    }
+}
 
 if (!(Test-Path -LiteralPath (Join-Path $stageDir "js\systems") -PathType Container)) {
     Fail "Stage is missing js\systems. The modular browser runtime will not load."

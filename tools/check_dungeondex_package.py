@@ -50,6 +50,12 @@ PROHIBITED_FILE_PATTERNS = (
     re.compile(r"(?:^|[\\/])backup", re.IGNORECASE),
     re.compile(r"(?:^|[\\/]).*debug", re.IGNORECASE),
 )
+DEVELOPMENT_ONLY_RUNTIME_FILES = (
+    "js/systems/13_devtools_overlay.js",
+    "js/systems/14_devtools_scenarios.js",
+    "js/systems/15_devtools_balance_reports.js",
+    "js/systems/43_devkit_reset_hold.js",
+)
 
 
 class LocalReferenceParser(HTMLParser):
@@ -295,6 +301,9 @@ def prohibited_content_warnings(root: Path) -> list[str]:
             continue
         if path.is_file() and any(pattern.search(rel_path) for pattern in PROHIBITED_FILE_PATTERNS):
             warnings.append(f"prohibited package content present: {rel_path}")
+    for rel_path in DEVELOPMENT_ONLY_RUNTIME_FILES:
+        if (root / rel_path).is_file():
+            warnings.append(f"development-only runtime file present: {rel_path}")
     return warnings
 
 
