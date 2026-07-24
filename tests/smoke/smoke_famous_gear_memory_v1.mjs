@@ -221,13 +221,16 @@ assert.equal(emptySummary.emptyStateCopy, 'No famous gear memories recorded yet.
 
 const journal = context.renderGuildJournalPanel(afterLoad);
 assert.ok(/Famous Gear/i.test(journal));
-assert.ok(/2 famous gear memory/i.test(journal));
-assert.ok(/Last remembered gear:/i.test(journal));
+assert.ok(/Historical Memories/i.test(journal));
+assert.ok(/2 compatible records remain/i.test(journal));
+assert.ok(/Read-only/i.test(journal));
+assert.ok(!/Memory Key|duplicate-safe|legacy trace detected/i.test(journal));
 
 context.S = afterLoad;
 context.DDJournalV1Render();
 assert.ok(String(journalPanel.innerHTML).includes('Guild Journal'));
 assert.ok(String(journalPanel.innerHTML).includes('Famous Gear'));
+assert.ok(String(journalPanel.innerHTML).includes('Historical Memories'));
 
 assert.ok(store.size > 0);
 const persisted = JSON.parse(store.values().next().value || 'null');

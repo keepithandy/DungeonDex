@@ -3,13 +3,25 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 
 const code = fs.readFileSync('js/systems/38_journal_v1.js', 'utf8');
+const visualCss = fs.readFileSync('styles_visual_weight.css', 'utf8');
 const state = {
   player: {
     bossTrophyRecords: [{ bossName: 'Boss Floor 5', summary: 'First boss recorded', earnedAt: 2 }],
     revisitState: {
       trophyEcho: { history: [{ summary: 'Trophy echo complete' }], lastResult: { summary: 'Trophy echo complete' }, available: true },
       famousGear: { history: [{ itemName: 'Ashcloth Wraps' }], lastResult: { summary: 'Famous gear complete' }, completed: true },
-      rivalTrace: { history: [{ eliteName: 'Glassfang Brute' }], lastResult: { summary: 'Rival trace complete' }, completed: true }
+      rivalTrace: {
+        history: [{
+          eliteName: 'Glassfang Brute With An Unusually Long Historical Name',
+          memoryKey: 'rival_trace:glassfang_brute',
+          routeStatus: 'legacy trace detected',
+          summary: 'duplicate-safe'
+        }],
+        lastResult: { summary: 'Rival trace complete' },
+        completed: true
+      },
+      boardEcho: { available: true, locked: false },
+      debtPressure: { available: true, locked: false }
     },
     debtCollector: { active: true, balanceCopper: 1500, pressure: 3 },
     equipment: {
@@ -77,21 +89,40 @@ const emptyModel = context.journalV1233SummaryModel({});
 const richModel = context.journalV1233SummaryModel(state);
 assert.equal(JSON.stringify(state), before);
 assert.equal(emptyModel.sections.length, 0);
-assert.equal(context.renderGuildJournalPanel({}), '');
+assert.equal(emptyModel.memoryTotal, 0);
+assert.equal(emptyModel.latestRecord, 'No records yet');
+assert.ok(context.renderGuildJournalPanel({}).includes('No deeds have been carved'));
 assert.ok(richModel.sections.some(section => section.title === 'Boss Trophies'));
-assert.ok(richModel.sections.some(section => section.title === 'Revisit Memories'));
-assert.ok(richModel.sections.some(section => section.title === 'Debt Status'));
+assert.ok(richModel.sections.some(section => section.title === 'Trophy Echo'));
+assert.ok(richModel.sections.some(section => section.title === 'Historical Memories'));
+assert.ok(richModel.sections.some(section => section.title === 'Debt Record'));
 assert.ok(richModel.sections.some(section => section.title === 'Merchant Upgrades'));
+assert.ok(!richModel.sections.some(section => section.title === 'Revisit Memories'));
 assert.ok(!richModel.sections.some(section => section.title === 'Account Memory'));
 assert.ok(!richModel.sections.some(section => section.title === 'Unfinished Lanes'));
+assert.equal(richModel.memoryTotal, 7);
 
 context.DDJournalV1Render();
 const html = String(context.document.getElementById('archivePanel').innerHTML);
 assert.ok(html.includes('Guild Journal'));
+assert.ok(html.includes('Guild Chronicle'));
+assert.ok(html.includes('7 records'));
 assert.ok(html.includes('Merchant Upgrades'));
+assert.ok(html.includes('Historical Memories'));
+assert.ok(html.includes('Read-only'));
+assert.ok(html.includes('1500c remains due. Pressure 3.'));
 assert.ok(!html.includes('Account Memory'));
 assert.ok(!html.includes('Unfinished Lanes'));
-assert.ok(!html.includes('No records yet'));
+assert.ok(!html.includes('Board Echo'));
+assert.ok(!html.includes('Debt Pressure'));
+assert.ok(!html.includes('Memory Key'));
+assert.ok(!html.includes('rival_trace:'));
+assert.ok(!html.includes('duplicate-safe'));
+assert.ok(!html.includes('legacy trace detected'));
+assert.ok(!html.match(/\b(?:helper|fixture|normalization|canonical shape|renderer wiring)\b/i));
 assert.ok(!html.match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
+assert.match(visualCss, /@media \(max-width: 560px\)[\s\S]*?\.journal-grid\s*\{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
+assert.match(visualCss, /\.journal-record-head h3,[\s\S]*?overflow-wrap: anywhere/);
+assert.equal(JSON.stringify(state), before);
 
 console.log('PASS: Journal v1 smoke');

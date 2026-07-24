@@ -106,7 +106,7 @@
 		});
 		const empty = `<div class="archive-line archive-note-line revisit-codex-empty">
       <div class="small muted archive-note-stamp">Locked</div>
-      <div><strong>No Revisit memories recorded yet</strong><div class="small muted">Start Trophy Echo, Famous Gear Memory, or Rival Trace from town to add safe memory records here.</div></div>
+      <div><strong>No Revisit memories recorded yet</strong><div class="small muted">Trophy Echo is the only active memory lane. Older Famous Gear and Rival records remain read-only when present.</div></div>
     </div>`;
 		return `<div class="sep"></div>
       <div class="archive-history-head revisit-codex-head">
@@ -120,7 +120,8 @@
 	function injectArchiveCodex() {
 		const panel = document.getElementById('archivePanel');
 		if (!panel || panel.querySelector('.revisit-codex-head')) return;
-		const html = revisitArchiveCodexMarkup(window.S || {});
+		const state = typeof S !== 'undefined' ? S : window.S || {};
+		const html = revisitArchiveCodexMarkup(state);
 		const emberHeading = Array.from(panel.querySelectorAll('h3')).find(node => /Emberfall Notes/i.test(String(node.textContent || '')));
 		if (emberHeading) {
 			const marker = emberHeading.previousElementSibling;

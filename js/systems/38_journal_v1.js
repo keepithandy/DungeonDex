@@ -304,53 +304,114 @@
     const revisit = revisitModel(safeState);
     const famous = famousModel(safeState);
     const rival = rivalModel(safeState);
-    const laneClarity = revisitLaneClarityModel(safeState);
     const debt = debtStatus(safeState);
     const upgrades = merchantUpgradeModel(safeState);
-    const memoryTotal = boss.count + revisit.total + famous.count + rival.count + (debt.balance > 0 ? 1 : 0) + upgrades.totalLevels;
+    const historicalCount = famous.count + rival.count;
+    const memoryTotal = boss.count
+      + revisit.trophyCount
+      + historicalCount
+      + (debt.balance > 0 ? 1 : 0)
+      + upgrades.active.length;
     const sections = [];
-    if (boss.count > 0) sections.push({ key: 'boss', title: 'Boss Trophies', body: boss.body || `${boss.count} boss trophies recorded.`, meta: boss.meta || (boss.latest ? `Last: ${boss.latest}${boss.latestDetail ? ` • ${boss.latestDetail}` : ''}` : '') });
-    if (revisit.total > 0) sections.push({ key: 'revisit', title: 'Revisit Memories', body: `Trophy Echo ${revisit.trophyStatus} • Famous Gear ${revisit.famousStatus} • Board Echo ${revisit.boardStatus} • Rival Trace ${revisit.rivalStatus}.`, meta: revisit.last || '' });
-    if (famous.count > 0) sections.push({ key: 'famous', title: 'Famous Gear', body: famous.body || `${famous.count} famous gear memory${famous.count === 1 ? '' : 'ies'} recorded.`, meta: famous.meta || (famous.latest ? `Last remembered gear: ${famous.latest}` : '') });
-    if (rival.count > 0) sections.push({ key: 'rival', title: 'Rival Traces', body: rival.body || `${rival.count} named rival trace${rival.count === 1 ? '' : 's'} recorded.`, meta: rival.meta || (rival.latest ? `Last rival: ${rival.latest}` : '') + (rival.latestDetail ? ` • ${rival.latestDetail}` : '') });
-    if (debt.balance > 0) sections.push({ key: 'debt', title: 'Debt Status', body: `${debt.status}. Pressure ${debt.pressure}. ${debt.line}`, meta: debt.extra });
-    if (upgrades.totalLevels > 0) sections.push({ key: 'upgrades', title: 'Merchant Upgrades', body: upgrades.body, meta: upgrades.meta });
+    if (boss.count > 0) sections.push({
+      key: 'boss',
+      title: 'Boss Trophies',
+      badge: `${boss.count} recorded`,
+      primary: boss.latest ? `${boss.latest} stands as the latest trophy.` : `${boss.count} trophies endure in the guild ledger.`,
+      detail: boss.latestDetail || 'Proof of the deepest victories remains in the Archive.'
+    });
+    if (revisit.trophyCount > 0) sections.push({
+      key: 'trophy-echo',
+      title: 'Trophy Echo',
+      badge: `${revisit.trophyCount} remembered`,
+      primary: revisit.last || `${revisit.trophyCount} Trophy Echo ${revisit.trophyCount === 1 ? 'memory has' : 'memories have'} been recovered.`,
+      detail: 'The guild remembers this descent without changing its rewards or outcome.'
+    });
+    if (historicalCount > 0) {
+      const historicalNames = [
+        famous.latest ? `Famous gear: ${famous.latest}` : '',
+        rival.latest ? `Rival: ${rival.latest}` : ''
+      ].filter(Boolean);
+      sections.push({
+        key: 'historical',
+        title: 'Historical Memories',
+        badge: 'Read-only',
+        primary: historicalNames.join(' • ') || `${historicalCount} older memories remain in the ledger.`,
+        detail: `${historicalCount} compatible ${historicalCount === 1 ? 'record remains' : 'records remain'} preserved from earlier journeys.`
+      });
+    }
+    if (debt.balance > 0) sections.push({
+      key: 'debt',
+      title: 'Debt Record',
+      badge: debt.mode,
+      primary: `${money(debt.balance)} remains due. Pressure ${debt.pressure}.`,
+      detail: debt.line
+    });
+    if (upgrades.totalLevels > 0) sections.push({
+      key: 'upgrades',
+      title: 'Merchant Upgrades',
+      badge: `${upgrades.totalLevels} total tiers`,
+      primary: upgrades.body,
+      detail: upgrades.meta
+    });
+    const latestRecord = summaryLine([
+      revisit.last,
+      boss.latest ? `${boss.latest} Trophy` : '',
+      famous.latest ? `${famous.latest} memory` : '',
+      rival.latest ? `${rival.latest} trace` : '',
+      upgrades.active[0]?.itemName ? `${text(upgrades.active[0].itemName)} upgrade` : '',
+      debt.balance > 0 ? 'Debt Record' : ''
+    ], 'No records yet');
+    sections.forEach(section => {
+      section.body = section.primary;
+      section.meta = section.detail;
+    });
     return {
       title: 'Guild Journal',
-      flavor: sections.length > 0
-        ? 'Only active records and earned memories are shown here.'
-        : '',
+      flavor: memoryTotal > 0
+        ? `${memoryTotal} ${memoryTotal === 1 ? 'record endures' : 'records endure'} in the guild chronicle.`
+        : 'No deeds have been carved into the guild chronicle yet.',
       memoryTotal,
-      debtPreviewText: laneClarity.debtPreviewText,
+      latestRecord,
       sections
     };
   }
   function row(section){
-    return `<article class="journal-row"><strong>${esc(section.title)}</strong><p>${esc(section.body)}</p>${section.meta ? `<p class="small muted">${esc(section.meta)}</p>` : ''}</article>`;
+    return `<article class="journal-row journal-record-card journal-record-${esc(section.key)}" data-journal-kind="${esc(section.key)}">
+      <div class="journal-record-head">
+        <h3>${esc(section.title)}</h3>
+        <span class="pill journal-record-badge">${esc(section.badge)}</span>
+      </div>
+      <p class="journal-record-primary">${esc(section.primary)}</p>
+      <p class="small muted journal-record-detail">${esc(section.detail)}</p>
+    </article>`;
   }
   function renderGuildJournalPanel(state){
     const model = journalV1233SummaryModel(state);
-    if (!model.sections.length) return '';
     return `<section class="journal-board" id="guildJournalPanel" aria-label="Guild Journal">
-      <div class="card-head">
-        <div><h2>${esc(model.title)}</h2><p>${esc(model.flavor)}</p></div>
-        <span class="pill">Memory Board</span>
-      </div>
-      <div class="journal-grid">
-        ${model.sections.map(row).join('')}
-      </div>
+      <header class="journal-chronicle-head">
+        <div class="journal-chronicle-title">
+          <span class="eyebrow">Guild Chronicle</span>
+          <h2>${esc(model.title)}</h2>
+          <p>${esc(model.flavor)}</p>
+        </div>
+        <div class="journal-chronicle-summary" aria-label="Journal summary">
+          <strong>${esc(model.memoryTotal)}</strong>
+          <span>${model.memoryTotal === 1 ? 'record' : 'records'}</span>
+        </div>
+        <p class="journal-latest"><span>Latest</span><strong>${esc(model.latestRecord)}</strong></p>
+      </header>
+      ${model.sections.length
+        ? `<div class="journal-grid">${model.sections.map(row).join('')}</div>`
+        : '<p class="journal-empty">Defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
     </section>`;
   }
   function injectJournal(){
     const panel = document.getElementById('archivePanel');
     if (!panel) return;
-    const html = renderGuildJournalPanel(window.S || {});
+    const state = typeof S !== 'undefined' ? S : window.S || {};
+    const html = renderGuildJournalPanel(state);
     const existing = panel.querySelector('#guildJournalPanel');
-    if (!html) {
-      if (existing && typeof existing.remove === 'function') existing.remove();
-      else if (existing) existing.outerHTML = '';
-      return;
-    }
     if (existing) existing.outerHTML = html;
     else panel.insertAdjacentHTML('beforeend', html);
   }

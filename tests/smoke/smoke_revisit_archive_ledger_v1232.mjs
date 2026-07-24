@@ -64,27 +64,28 @@ async function main(){
       };
     })()`);
     record('Revisit Archive Codex script loads once', emptyAudit.loaded === true && emptyAudit.codexCount === 1, JSON.stringify(emptyAudit));
-    record('Empty Revisit Memory Ledger renders locked read-only copy', /Revisit Memory Ledger/i.test(emptyAudit.text) && /No Revisit memories recorded yet/i.test(emptyAudit.text) && /Trophy Echo/i.test(emptyAudit.text) && /Famous Gear Memory/i.test(emptyAudit.text) && /Rival Trace/i.test(emptyAudit.text) && emptyAudit.controls === 0, JSON.stringify(emptyAudit));
+    record('Empty Revisit Memory Ledger identifies Trophy Echo as the only active lane', /Revisit Memory Ledger/i.test(emptyAudit.text) && /No Revisit memories recorded yet/i.test(emptyAudit.text) && /Trophy Echo is the only active memory lane/i.test(emptyAudit.text) && /Famous Gear and Rival records remain read-only/i.test(emptyAudit.text) && !/Start Famous Gear Memory|Start Rival Trace/i.test(emptyAudit.text) && emptyAudit.controls === 0, JSON.stringify(emptyAudit));
 
     const populatedAudit = await evalByValue(client, `(() => {
+      const state = window.S || S;
       const before = {
-        debt: JSON.stringify(S.player?.debtCollector || {}),
-        talent: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null }),
-        gear: JSON.stringify(S.player?.gear || {}),
-        wallet: JSON.stringify({ gold:S.player?.gold, xp:S.player?.xp, level:S.player?.level })
+        debt: JSON.stringify(state.player?.debtCollector || {}),
+        talent: JSON.stringify({ ledger:state.player?.talentLedger || null, earning:state.player?.talentEarning || null, learned:state.player?.talentLearnedIds || null, unlocks:state.player?.talentUnlockIds || null }),
+        gear: JSON.stringify(state.player?.gear || {}),
+        wallet: JSON.stringify({ gold:state.player?.gold, xp:state.player?.xp, level:state.player?.level })
       };
-      S.player.revisitState = S.player.revisitState || {};
-      S.player.revisitState.trophyEcho = { memoryMarks:1, history:[{ memoryTitle:'Ashwake Echo', bossName:'Ashwake Brute', summary:'A safe boss memory was recorded.', completedAt:Date.now() - 3000 }] };
-      S.player.revisitState.famousGear = { completedKeys:{ 'famous-test':true }, history:[{ memoryTitle:'Old Blade Memory', itemName:'Old Blade', slot:'weapon', summary:'A retired weapon memory was recovered.', completedAt:Date.now() - 2000 }] };
-      S.player.revisitState.rivalTrace = { completedKeys:{ 'rival-test':true }, history:[{ memoryTitle:'Rival Trace: Ember Warden', eliteName:'Ember Warden', floorName:'Lowfire Stair', summary:'A named rival trace was recovered.', completedAt:Date.now() - 1000 }] };
-      renderArchive();
+      state.player.revisitState = state.player.revisitState || {};
+      state.player.revisitState.trophyEcho = { memoryMarks:1, history:[{ memoryTitle:'Ashwake Echo', bossName:'Ashwake Brute', summary:'A safe boss memory was recorded.', completedAt:Date.now() - 3000 }] };
+      state.player.revisitState.famousGear = { completedKeys:{ 'famous-test':true }, history:[{ memoryTitle:'Old Blade Memory', itemName:'Old Blade', slot:'weapon', summary:'A retired weapon memory was recovered.', completedAt:Date.now() - 2000 }] };
+      state.player.revisitState.rivalTrace = { completedKeys:{ 'rival-test':true }, history:[{ memoryTitle:'Rival Trace: Ember Warden', eliteName:'Ember Warden', floorName:'Lowfire Stair', summary:'A named rival trace was recovered.', completedAt:Date.now() - 1000 }] };
+      document.querySelectorAll('.revisit-codex-head, .revisit-codex-tags, .revisit-codex-list').forEach(node => node.remove());
       if (window.DDRevisitArchiveCodexRender) window.DDRevisitArchiveCodexRender();
       const panel = document.getElementById('archivePanel');
       const after = {
-        debt: JSON.stringify(S.player?.debtCollector || {}),
-        talent: JSON.stringify({ ledger:S.player?.talentLedger || null, earning:S.player?.talentEarning || null, learned:S.player?.talentLearnedIds || null, unlocks:S.player?.talentUnlockIds || null }),
-        gear: JSON.stringify(S.player?.gear || {}),
-        wallet: JSON.stringify({ gold:S.player?.gold, xp:S.player?.xp, level:S.player?.level })
+        debt: JSON.stringify(state.player?.debtCollector || {}),
+        talent: JSON.stringify({ ledger:state.player?.talentLedger || null, earning:state.player?.talentEarning || null, learned:state.player?.talentLearnedIds || null, unlocks:state.player?.talentUnlockIds || null }),
+        gear: JSON.stringify(state.player?.gear || {}),
+        wallet: JSON.stringify({ gold:state.player?.gold, xp:state.player?.xp, level:state.player?.level })
       };
       return {
         text: panel?.innerText || '',

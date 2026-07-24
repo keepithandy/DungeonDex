@@ -99,22 +99,27 @@ assert.equal(reloadedSummary.duplicateRecordsCollapsed, true);
 assert.equal(reloadedSummary.legacyIdsDetected, true);
 
 const model = context.journalV1233SummaryModel(state);
-const rivalRow = model.sections.find(section => section.key === 'rival');
-const famousRow = model.sections.find(section => section.key === 'famous');
-assert.ok(rivalRow);
-assert.ok(famousRow);
-assert.ok(rivalRow.body.includes('3 rival traces remembered'));
-assert.ok(rivalRow.meta.includes('duplicate-safe') || rivalRow.meta.includes('legacy trace detected'));
-assert.ok(rivalRow.meta.includes('Completed result:'));
-assert.ok(rivalRow.meta.includes('Memory Key: rival_trace:glassfang'));
-assert.ok(famousRow.body.includes('1 famous gear memory recorded'));
+const historicalRow = model.sections.find(section => section.key === 'historical');
+assert.ok(historicalRow);
+assert.ok(historicalRow.body.includes('Famous gear: Ashcloth Wraps'));
+assert.ok(historicalRow.body.includes('Rival: Glassfang Brute'));
+assert.ok(historicalRow.meta.includes('4 compatible records remain'));
+assert.equal(historicalRow.badge, 'Read-only');
+assert.ok(!historicalRow.body.includes('Memory Key:'));
+assert.ok(!historicalRow.meta.includes('duplicate-safe'));
+assert.ok(!historicalRow.meta.includes('legacy trace detected'));
 
 const reloadModel = context.journalV1233SummaryModel(reloaded);
-const reloadRivalRow = reloadModel.sections.find(section => section.key === 'rival');
-assert.ok(reloadRivalRow.body.includes('3 rival traces remembered'));
+const reloadHistoricalRow = reloadModel.sections.find(section => section.key === 'historical');
+assert.deepEqual(reloadHistoricalRow, historicalRow);
 
 context.DDJournalV1Render();
-assert.ok(String(context.document.getElementById('archivePanel').innerHTML).includes('Rival Traces'));
-assert.ok(!String(context.document.getElementById('archivePanel').innerHTML).match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
+const journalHtml = String(context.document.getElementById('archivePanel').innerHTML);
+assert.ok(journalHtml.includes('Historical Memories'));
+assert.ok(journalHtml.includes('Rival: Glassfang Brute'));
+assert.ok(!journalHtml.includes('Memory Key:'));
+assert.ok(!journalHtml.includes('duplicate-safe'));
+assert.ok(!journalHtml.includes('legacy trace detected'));
+assert.ok(!journalHtml.match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
 
 console.log('PASS: Rival Trace memory v1 smoke');
