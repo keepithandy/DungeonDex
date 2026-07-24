@@ -24,8 +24,10 @@ The roadmap is being completed in order. The release version and cache label rem
 - ~~#130 Public package build and extraction gate~~ - completed, committed in
   `2f5c55dcf6ba4e74d5fa825a9594520398b789fc`. Focused package smoke: 11/11.
   Compact suite: 47/47.
-- **Next: #131 Public runtime console gate.**
-- Then: #132 real-device handoff,
+- ~~#131 Public runtime console gate~~ - completed; focused browser smoke: 10/10.
+  Compact suite: 49/49.
+- **Next: #132 real-device handoff.**
+- Then:
   #133 protected-system regression audit, and #134 release authority pass.
 
 ## Starting baseline
@@ -287,9 +289,9 @@ At phone widths:
   directory after verification. No upload or version/cache change occurred.
 - Commit: `2f5c55dcf6ba4e74d5fa825a9594520398b789fc`.
 
-### 6. Planned #131 — Public runtime console gate
+### 6. #131 — Public runtime console gate
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: completed and verified.
 - Category: Smoke Hardening.
 - Goal: exercise the public runtime and fail on browser-level errors that source inspection may miss.
 - Required surfaces:
@@ -312,6 +314,24 @@ At phone widths:
   - zero missing public assets;
   - failures identify active route, message, and source location where available.
 - Guardrail: do not turn this issue into a general error-handling refactor.
+
+#### Completed result
+
+- Added `tests/smoke/smoke_public_runtime_console_v1265.mjs`, a Chromium gate
+  that loads the source runtime with `?devtools=0` and a fresh browser profile.
+- It exercises the intro modal, Town, Trophy Echo surface, Gear, the existing
+  read-only Gear inspection modal renderer, Archive, Guild Journal, and a real
+  Town-to-Dungeon entry.
+- It records console errors/warnings/assertions, uncaught exceptions, unhandled
+  promise rejections, HTTP failures, failed local requests, and any request for
+  a development-only runtime script. Each captured failure carries the active
+  surface, message, and browser source location when Chromium provides one.
+- A fresh save intentionally has no owned gear, so the smoke opens the existing
+  read-only modal renderer with an in-memory inspection fixture; it does not
+  mutate save data, inventory, rewards, combat, or any player-facing state.
+- Registered the syntax check and browser gate in the compact runner.
+- Focused public-runtime console smoke: 10/10 passed. Compact suite: 49/49
+  passed. No version or cache label changed.
 
 ### 7. Planned #132 — Real-device release handoff
 
