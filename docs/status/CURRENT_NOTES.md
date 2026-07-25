@@ -7,7 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.4.06 - Mobile Interface Audit Closure
+- DungeonDex v1.26.5 - Guild Journal + Mobile Reliability
+
+## v1.26.5 Guild Journal + Mobile Reliability
+- GitHub #127-#134 deliver the Guild Journal Chronicle Pass and its release safeguards.
+- Guild Journal cards now present existing trophies, Trophy Echo history, Merchant Gear Upgrades, active Debt, and compatible historical records without adding new save fields, rewards, or active Revisit lanes.
+- Browser-computed contrast, touch-navigation geometry, public-runtime console, clean package extraction, real-device handoff, and protected-system regression checks are all part of this release authority pass.
+- Trophy Echo remains the only active Revisit lane; historical Famous Gear and Rival records are read-only where compatible save data exists.
+- Build/cache labels use `1.26.5-guild-journal-mobile-reliability`.
+- Release verification passed: compact suite 49/49; computed contrast 7/7; touch geometry 4/4; interface/accessibility 21/21; mobile layout 18/18; Enter Dungeon runtime 11/11; public-runtime console 10/10; strict source, staged, and extracted package audits 51 paths with zero warnings.
+- The final itch-ready artifact is `archive/packages/DungeonDex_v1.26.5_ItchReady.zip`; its clean extracted public configuration loaded with DevTools disabled and no browser warnings.
+- The physical Textastic Workspace pass covered all twelve required checks, but device model, OS version, browser/version, viewport, and screenshots were not recorded.
+- No combat, boss scaling, rewards, economy, upgrade values, save schema, progression, Revisit behavior, dungeon entry, Debt, or Talent behavior changed.
 
 ## v1.26.4.06 Mobile Interface Audit Closure
 - The final mobile interface audit is now published: #116–#125 are implemented, verified, and closed on GitHub.
@@ -176,7 +187,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.4.06 Mobile Interface Audit Closure.
+- Current runtime baseline is v1.26.5 Guild Journal + Mobile Reliability.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

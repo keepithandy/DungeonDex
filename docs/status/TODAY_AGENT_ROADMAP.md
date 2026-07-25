@@ -2,11 +2,19 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.4.06 Mobile Interface Audit Closure`.
+- Baseline: `v1.26.5 Guild Journal + Mobile Reliability`.
 - Current active Revisit lane: Trophy Echo only.
 - Working branch: `main`.
-- Implementation status: the v1.26.4.06 mobile interface audit closure is published on `main` in commit `0a4cc89`.
-- Current compact result: 43/43 passed on 2026-07-23, including repository-wide JavaScript syntax, Lowfire Forge contracts, and the boss readiness matrix.
+- Implementation status: v1.26.5 release authority is complete on `main` and the release commit is tagged `v1.26.5`.
+- Current compact result: 49/49 passed, including repository-wide JavaScript syntax, Lowfire Forge contracts, the public-runtime console gate, package extraction, and the boss readiness matrix.
+
+## v1.26.5 Release Status
+
+- #127 through #134 are complete and recorded in `docs/status/ROADMAP_V1265.md`.
+- The final itch-ready ZIP is `archive/packages/DungeonDex_v1.26.5_ItchReady.zip`.
+- Strict source, staged, and extracted package audits each passed with 51 checked paths and zero warnings.
+- The physical Textastic Workspace pass reported every required check as passing; device/browser/viewport/screenshot metadata remains unrecorded.
+- Existing generated game assets with incomplete provenance remain a marketing/reuse review risk, but no untracked or undocumented package asset was found.
 
 ## Non-negotiable boundaries
 
@@ -17,7 +25,7 @@
 - Do not change Talent or Debt behavior.
 - Do not bump version or cache labels unless an explicit version/release issue requires it.
 
-## v1.26.4 Work Status
+## Historical v1.26.4 Work Status
 
 - #116 safe-area navigation — implemented; touch and fine-pointer viewport captures plus the mobile contract smoke passed. Real-device drawer tapping remains a handoff check.
 - #117 rest-cost hierarchy — implemented; all three touch-profile layouts were inspected without wrapping or overlap.

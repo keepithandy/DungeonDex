@@ -2,16 +2,17 @@
 
 ## Roadmap status
 
-- This file is the active planning authority for the proposed v1.26.5 work order.
-- v1.26.5 is a development direction only.
+- This file records the completed v1.26.5 work order and release evidence.
+- v1.26.5 is an authorized, completed release.
 - `VERSION.md` remains the version authority.
-- Do not change public/runtime/cache labels until the final release-authority issue is complete and the user explicitly authorizes the version pass.
-- Planned issue numbers in this document are roadmap slots only until corresponding GitHub issues are explicitly created.
+- The final release-authority issue changed public/runtime/cache labels only after explicit user authorization and all required gates passed.
+- Each roadmap slot now has its corresponding completed GitHub issue.
 
 ## Current execution snapshot
 
-The roadmap is being completed in order. The release version and cache label remain
-`v1.26.4.06` until #134 receives explicit release authorization.
+The roadmap completed in order. The current release version is
+`v1.26.5 Guild Journal + Mobile Reliability` with build/cache label
+`1.26.5-guild-journal-mobile-reliability`.
 
 - ~~#126 Package checker source-audit mode~~ - completed before roadmap execution.
 - ~~#127 Browser-computed contrast verification~~ - completed, committed in
@@ -32,7 +33,10 @@ The roadmap is being completed in order. The release version and cache label rem
 - ~~#133 protected-system regression audit~~ - completed with no unauthorized
   protected-system drift found. Focused evidence is recorded in
   `docs/status/PROTECTED_SYSTEM_REGRESSION_AUDIT_V1265.md`; compact suite: 49/49.
-- **Next: #134 release authority pass, pending explicit release authorization.**
+- ~~#134 v1.26.5 release authority pass~~ - completed and verified. The final
+  itch-ready ZIP passed strict staging and clean-extraction audits, and the
+  exact extracted public configuration loaded successfully with DevTools
+  disabled. The release commit is tagged `v1.26.5`.
 
 ## Starting baseline
 
@@ -423,9 +427,9 @@ At phone widths:
   target to its executed evidence, including source and strict staged-package
   validation. No runtime, gameplay, version, or cache label changed.
 
-### 9. Planned #134 — v1.26.5 release authority pass
+### 9. #134 — v1.26.5 release authority pass
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: completed and verified; GitHub issue #134.
 - Category: Version Update / Release.
 - Goal: perform the final label, documentation, package, and release alignment only after all selected gates pass.
 
@@ -456,6 +460,30 @@ Only after authorization:
 - update README, CHANGELOG, current notes, release notes, and package references;
 - build and validate the final public package;
 - tag the exact release commit when explicitly requested.
+
+#### Completed result
+
+- User authorization was received after #127 through #133 completed.
+- `VERSION.md`, visible runtime labels, build/cache queries, service-worker
+  cache, Revisit public-copy labels, version guard, and current documentation
+  now align to `v1.26.5 Guild Journal + Mobile Reliability` and
+  `1.26.5-guild-journal-mobile-reliability`.
+- Focused authority, Journal, Revisit, protected-system, mobile, accessibility,
+  runtime-console, and Enter Dungeon checks passed. The compact suite passed
+  49/49.
+- `DungeonDex_v1.26.5_ItchReady.zip` was built in `archive/packages/`; strict
+  staged and clean-extracted package checks each passed with 51 checked paths
+  and zero warnings. The extracted public configuration loaded with DevTools
+  disabled, showed the v1.26.5 label, Town, Guild Journal route, and Trophy
+  Echo-only surface, with no browser warnings.
+- The Textastic Workspace physical-device handoff reports all twelve checks as
+  passing. Device/browser/viewport/screenshot metadata was not captured and
+  remains the release-record limitation.
+- Existing generated game assets with incomplete provenance remain restricted
+  for new marketing or external reuse under the asset policy; no untracked or
+  undocumented package asset was found.
+- No protected gameplay, save, economy, Revisit, Talent, Debt, Gear Upgrade,
+  or dungeon-entry contract changed.
 
 ## Global protected systems
 

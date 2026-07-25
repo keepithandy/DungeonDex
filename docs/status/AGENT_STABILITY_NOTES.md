@@ -1,15 +1,16 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.4.06 Mobile Interface Audit Closure Target
+## Current v1.26.5 Guild Journal + Mobile Reliability Target
 
-- Current target: `v1.26.4.06 Mobile Interface Audit Closure`.
-- Current build/cache label: `1.26.4.06-mobile-interface-audit-closure`.
-- The compact suite passes 43/43, including repository-wide JavaScript syntax, Lowfire Forge contracts, app wiring/cache authority, merchant saved-stock escaping, and the 20-boss readiness matrix.
+- Current target: `v1.26.5 Guild Journal + Mobile Reliability`.
+- Current build/cache label: `1.26.5-guild-journal-mobile-reliability`.
+- The compact suite passes 49/49, including repository-wide JavaScript syntax, Lowfire Forge contracts, app wiring/cache authority, public-runtime console coverage, package extraction, and the 20-boss readiness matrix.
+- The v1.26.5 Journal Chronicle, browser-computed contrast, touch-navigation geometry, and protected-system release gates are complete.
 - Preserve the merged v1.26.3.02 Town runtime cleanup: system 25 owns the wallet; systems 20, 26, and 27 remain retired and must not be reloaded or precached.
-- Real-device/Textastic drawer tapping and keyboard interaction remain manual handoff checks; do not describe touch emulation as a physical-device pass.
+- The real-device/Textastic Workspace handoff reported all twelve required checks passing. Device, OS, browser, viewport, and screenshot metadata were not captured, so retain that evidence-quality limitation in future release records.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
-- No itch/package builder was run and no release package was created for this work.
+- The final itch-ready package is `archive/packages/DungeonDex_v1.26.5_ItchReady.zip`; strict stage and clean-extraction checks both passed with 51 checked paths and zero warnings.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
 - Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 

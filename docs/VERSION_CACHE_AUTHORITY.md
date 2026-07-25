@@ -4,11 +4,12 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.26.4.06 Mobile Interface Audit Closure`
-- Visible semantic version: `1.26.4.06`
-- Build/cache slug: `1.26.4.06-mobile-interface-audit-closure`
+- Public version: `v1.26.5 Guild Journal + Mobile Reliability`
+- Visible semantic version: `1.26.5`
+- Build/cache slug: `1.26.5-guild-journal-mobile-reliability`
 
-No package builder was run and no package was created while documenting this authority flow.
+The authorized v1.26.5 pass creates a package only after source and release
+verification succeed. The resulting ZIP remains an output, not version authority.
 
 ## Authority Flow
 

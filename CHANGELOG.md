@@ -8,14 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.4.06 Mobile Interface Audit Closure`
-* Current local package baseline: `v1.26.4.06 Mobile Interface Audit Closure`
-* Current development target: `v1.26.4.06 Mobile Interface Audit Closure`
-* Current build/cache label: `1.26.4.06-mobile-interface-audit-closure`
+* Public/live itch version: `v1.26.5 Guild Journal + Mobile Reliability`
+* Current local package baseline: `v1.26.5 Guild Journal + Mobile Reliability`
+* Current development target: `v1.26.5 Guild Journal + Mobile Reliability`
+* Current build/cache label: `1.26.5-guild-journal-mobile-reliability`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.5 - Guild Journal + Mobile Reliability
+
+* Reworked the Guild Journal into a clearer chronicle of existing boss trophies, Trophy Echo history, Merchant Gear Upgrades, active Debt, and compatible historical records without adding save fields, rewards, or new Revisit actions.
+* Added browser-computed contrast verification and touch-navigation geometry checks across the supported 390x844, 430x932, and 768x1024 mobile profiles.
+* Added public-runtime console coverage, clean package extraction coverage, and a structured physical-device handoff record for release validation.
+* Kept Trophy Echo as the only active Revisit lane; historical Famous Gear and Rival records remain read-only where compatible save data exists.
+* Final release validation passed the 49/49 compact suite, 7/7 browser-computed contrast smoke, 4/4 touch-navigation geometry checks, 21/21 interface/accessibility checks, 18/18 mobile-layout checks, 11/11 Enter Dungeon runtime checks, 10/10 public-runtime console checks, and strict source/staged/extracted package audits with 51 checked paths and zero warnings.
+* Preserved combat, monster and boss scaling, rewards, economy, Merchant Gear Upgrade costs/caps/effects, save compatibility, dungeon entry, Debt, Talent, progression, and all inactive Revisit lanes.
 
 ## v1.26.4.06 - Mobile Interface Audit Closure
 

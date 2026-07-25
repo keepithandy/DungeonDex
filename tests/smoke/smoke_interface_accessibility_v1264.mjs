@@ -437,7 +437,7 @@ async function main() {
   );
 
   const passed = results.filter(result => result.ok).length;
-  console.log(`\nInterface accessibility v1.26.4.06: ${passed}/${results.length} passed`);
+  console.log(`\nInterface accessibility v1.26.5: ${passed}/${results.length} passed`);
   if (passed !== results.length) process.exitCode = 1;
 }
 
