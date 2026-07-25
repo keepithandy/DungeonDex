@@ -286,6 +286,39 @@ async function main() {
       };
     })()`);
     record('Town hold does not collapse into a normal Town click', heldTownClick.menuOpen && heldTownClick.active === 'screen-gear', JSON.stringify(heldTownClick));
+    await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, button:0, buttons:1, pointerId:74, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      return !!townTab;
+    })()`);
+    await sleep(520);
+    const closedTownShortcuts = await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      const menu = document.getElementById('ddxTownShortcuts');
+      townTab?.dispatchEvent(new PointerEvent('pointerup', { bubbles:true, button:0, buttons:0, pointerId:74, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      townTab?.dispatchEvent(new MouseEvent('click', { bubbles:true, cancelable:true }));
+      return {
+        closed: !!menu?.hidden,
+        expanded: townTab?.getAttribute('aria-expanded') || '',
+        active: document.querySelector('.screen.active')?.id || ''
+      };
+    })()`);
+    record('Holding Town again closes shortcuts without navigating', closedTownShortcuts.closed
+      && closedTownShortcuts.expanded === 'false'
+      && closedTownShortcuts.active === 'screen-gear', JSON.stringify(closedTownShortcuts));
+    await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, button:0, buttons:1, pointerId:75, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      return !!townTab;
+    })()`);
+    await sleep(520);
+    await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.dispatchEvent(new PointerEvent('pointerup', { bubbles:true, button:0, buttons:0, pointerId:75, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      townTab?.dispatchEvent(new MouseEvent('click', { bubbles:true, cancelable:true }));
+      return true;
+    })()`);
+    await waitFor(client, `document.getElementById('ddxTownShortcuts')?.hidden === false`, 'Town shortcut menu reopen');
     await evaluate(client, `document.querySelector('[data-town-shortcut="forge"]')?.click(); true`);
     await waitFor(client, `document.activeElement?.id === 'forgePanel' && document.getElementById('ddxTownShortcuts')?.hidden === true`, 'Lowfire Forge Town shortcut');
     const forgeShortcut = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', focus: document.activeElement?.id || '' })`);

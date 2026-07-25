@@ -436,8 +436,11 @@ async function main() {
       && bindings.includes("node.removeAttribute('aria-current')")
   );
   record(
-    'Town hold menu exposes labelled live-panel shortcuts with keyboard close behavior',
+    'Town hold menu toggles labelled live-panel shortcuts with keyboard close behavior',
     nav.includes("var TOWN_HOLD_DELAY_MS = 450;")
+      && nav.includes('function toggleTownShortcuts(nav)')
+      && nav.includes('if (!menuState.menu.hidden) {')
+      && nav.includes('toggleTownShortcuts(nav);')
       && nav.includes("menu.setAttribute('role', 'menu')")
       && nav.includes("button.setAttribute('role', 'menuitem')")
       && nav.includes("townTab.setAttribute('aria-haspopup', 'menu')")

@@ -116,6 +116,15 @@
       }
     }, 0);
   }
+  function toggleTownShortcuts(nav){
+    var menuState = nav && nav.__ddxTownShortcutMenu;
+    if (!menuState) return;
+    if (!menuState.menu.hidden) {
+      closeTownShortcuts(nav, false);
+      return;
+    }
+    openTownShortcuts(nav);
+  }
   function selectTownShortcut(nav, key){
     var menuState = nav && nav.__ddxTownShortcutMenu;
     if (!menuState) return;
@@ -167,7 +176,7 @@
     townTab.setAttribute('aria-haspopup', 'menu');
     townTab.setAttribute('aria-controls', menu.id);
     townTab.setAttribute('aria-expanded', menu.hidden ? 'false' : 'true');
-    townTab.title = 'Hold for Town shortcuts';
+    townTab.title = 'Hold to open or close Town shortcuts';
     var holdState = nav.__ddxTownShortcutMenu?.holdState || {
       timer:null,
       pointerId:null,
@@ -196,7 +205,7 @@
       holdState.timer = window.setTimeout(function(){
         holdState.timer = null;
         holdState.didHold = true;
-        openTownShortcuts(nav);
+        toggleTownShortcuts(nav);
       }, TOWN_HOLD_DELAY_MS);
     });
     townTab.addEventListener('pointermove', function(event){
