@@ -12,7 +12,7 @@
 - The real-device/Textastic Workspace handoff reported all twelve required checks passing. Device, OS, browser, viewport, and screenshot metadata were not captured, so retain that evidence-quality limitation in future release records.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
-- `archive/packages/DungeonDex_v1.26.5_ItchReady.zip` is the prior release package. Do not treat it as a v1.26.6 artifact; package creation, upload, and tagging remain owner-authorized follow-up work.
+- `archive/packages/DungeonDex_v1.26.5_ItchReady.zip` is the prior release package. The local v1.26.6 review artifact `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` passed staged and clean-extracted checks; upload and tagging remain owner-authorized follow-up work.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
 - Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 

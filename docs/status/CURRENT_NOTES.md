@@ -16,8 +16,8 @@
 - Town, Gear, and Guild Journal summaries show the Offhand upgrade only when an Offhand is equipped; an empty Offhand slot does not create a new control.
 - Build/cache labels use `1.26.6-ashen-anvil-reinforcements`.
 - Release-candidate verification passed: compact suite 49/49; Merchant Gear Upgrades; Guild Journal; app-wiring/cache authority; public copy; Trophy Echo-only Revisit; public-runtime console 18/18; Enter Dungeon runtime 11/11; interface/accessibility 22/22; mobile layout 19/19; and touch-navigation geometry at 390x844, 430x932, and 768x1024.
-- The source-only package audit passed with 51 checked paths and zero warnings. The compact suite's temporary package build/extraction gate also passed; no final v1.26.6 release artifact was created.
-- No v1.26.6 itch package, upload, or release tag has been created. Owner review determines whether hotfixes or package preparation comes next.
+- The source-only package audit passed with 51 checked paths and zero warnings. The compact suite's temporary package build/extraction gate also passed.
+- Owner-requested local review artifact `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` was built, strictly audited, extracted, and launched with DevTools disabled. No v1.26.6 itch upload or release tag has been created.
 - No combat formula, monster/boss scaling, rewards, drop rates, economy, upgrade prices/cap, save schema, dungeon-entry behavior, Debt, Talent, progression, or Trophy Echo-only Revisit behavior changed.
 
 ## v1.26.5 Guild Journal + Mobile Reliability

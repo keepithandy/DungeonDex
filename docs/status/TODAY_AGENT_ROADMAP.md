@@ -15,7 +15,7 @@
 - Town, Gear, and Guild Journal render the Offhand record only when an Offhand is equipped.
 - Runtime/cache labels now use `v1.26.6` and `1.26.6-ashen-anvil-reinforcements`.
 - Verification passed: Merchant Gear Upgrades, Guild Journal, app-wiring/cache authority, public runtime console 18/18, Enter Dungeon 11/11, interface/accessibility 22/22, mobile layout 19/19, touch geometry at all supported profiles, source package audit 51 paths/zero warnings, and compact suite 49/49.
-- No v1.26.6 itch package, upload, or tag is authorized until the owner reviews this candidate and explicitly requests that work.
+- The local review ZIP `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` passed staged and clean-extracted audits. Upload and release tagging remain pending explicit authorization.
 
 ## v1.26.5 Historical Release Status
 
