@@ -316,6 +316,10 @@ async function main() {
       && nav.includes("toggle.className = 'ddx-nav-toggle'")) {
     extractedControlTokens.add('.ddx-nav-toggle');
   }
+  if (nav.includes("button.dataset.townShortcut = shortcut.key")
+      && nav.includes("button.className = 'ddx-town-shortcut'")) {
+    extractedControlTokens.add('[data-town-shortcut]');
+  }
   const inactiveFutureControlTokens = new Set([
     '[data-complete-famous-gear]',
     '[data-complete-board-echo]',
@@ -326,6 +330,7 @@ async function main() {
     '#resetBtn',
     '[data-screen]',
     '.ddx-nav-toggle',
+    '[data-town-shortcut]',
     '#startRunBtn',
     '#restBtn',
     '[data-charter-start]',
@@ -429,6 +434,17 @@ async function main() {
       && intro.includes("node.removeAttribute('aria-current')")
       && bindings.includes("node.setAttribute('aria-current', 'page')")
       && bindings.includes("node.removeAttribute('aria-current')")
+  );
+  record(
+    'Town hold menu exposes labelled live-panel shortcuts with keyboard close behavior',
+    nav.includes("var TOWN_HOLD_DELAY_MS = 450;")
+      && nav.includes("menu.setAttribute('role', 'menu')")
+      && nav.includes("button.setAttribute('role', 'menuitem')")
+      && nav.includes("townTab.setAttribute('aria-haspopup', 'menu')")
+      && nav.includes("menuState.townTab.setAttribute('aria-expanded', 'false')")
+      && nav.includes("if (event.key === 'Escape')")
+      && ['Lowfire Market', 'Lowfire Forge', 'Elite Contracts'].every(label => nav.includes(label)),
+    'hold opens existing Town sections; Escape returns focus safely'
   );
   record(
     'Intro copy preserves Trophy Echo as the only live Revisit lane',

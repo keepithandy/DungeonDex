@@ -138,6 +138,15 @@ async function main() {
   );
 
   record(
+    'Town hold menu stays inside the open touch drawer with 44px shortcut targets',
+    nav.includes('.ddx-town-quick-menu{display:grid;')
+      && nav.includes('.ddx-town-shortcut{display:flex!important;')
+      && nav.includes('.tabs.panel.ddx-nav-open.ddx-town-shortcut,nav.tabs.ddx-nav-open.ddx-town-shortcut{min-height:44px!important;')
+      && nav.includes("if(isTouchNav())setNavOpen(nav,true);"),
+    'Market, Forge, and Elite shortcuts remain reachable through the safe-area drawer'
+  );
+
+  record(
     'Phone touch navigation toggle clears the Town action row',
     nav.includes('@media(max-width:700px)and(hover:none),(max-width:700px)and(pointer:coarse)')
       && nav.includes('.app-shell:not(.combat-active)#screen-town.town-district-hub.inline-actions{padding-left:calc(env(safe-area-inset-left,0px)+var(--ddx-nav-rail-width)+4px)!important}'),

@@ -56,6 +56,7 @@
     style.textContent += '@media(min-width:701px) and (hover:none),(min-width:701px) and (pointer:coarse){.app-shell:not(.combat-active) #screen-town .town-district-hub>.ddx-record-title{padding-left:calc(env(safe-area-inset-left,0px) + var(--ddx-nav-rail-width) + 4px)!important}}';
     // The phone Town action row begins beside the closed toggle, so reserve its hitbox width.
     style.textContent += '@media(max-width:700px) and (hover:none),(max-width:700px) and (pointer:coarse){.app-shell:not(.combat-active) #screen-town .town-district-hub .inline-actions{padding-left:calc(env(safe-area-inset-left,0px) + var(--ddx-nav-rail-width) + 4px)!important}}';
+    style.textContent += '.ddx-town-quick-menu{display:grid;gap:5px;padding:6px 2px 2px;border-top:1px solid rgba(255,213,148,.14)}.ddx-town-quick-menu[hidden]{display:none!important}.ddx-town-quick-menu-label{color:rgba(246,217,161,.78);font-size:10px;font-weight:900;letter-spacing:.11em;line-height:1.1;text-transform:uppercase}.ddx-town-shortcut{display:flex!important;align-items:center!important;justify-content:flex-start!important;min-height:34px!important;padding:7px 9px!important;border:1px solid rgba(255,213,148,.15)!important;border-radius:9px!important;background:rgba(255,184,91,.07)!important;color:rgba(255,244,221,.94)!important;font:800 12px/1.15 var(--font,system-ui)!important;text-align:left!important}.ddx-town-shortcut:focus-visible{outline:2px solid #ffd18f!important;outline-offset:2px!important}.ddx-town-shortcut:hover{background:rgba(255,184,91,.15)!important;border-color:rgba(255,213,148,.32)!important}@media(hover:none),(pointer:coarse){.tabs.panel.ddx-nav-open .ddx-town-shortcut,nav.tabs.ddx-nav-open .ddx-town-shortcut{min-height:44px!important;padding:10px 12px!important}}';
     document.head.appendChild(style);
   }
   function navShortLabel(tab, index){
@@ -65,12 +66,206 @@
   }
   function setNavOpen(nav, open){
     if (!nav) return;
+    if (!open && nav.__ddxTownShortcutMenu) closeTownShortcuts(nav, false);
     nav.classList.toggle('ddx-nav-open', !!open);
     var toggle = nav.querySelector('.ddx-nav-toggle');
     if (toggle) {
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
       toggle.textContent = '<-';
+    }
+  }
+  var TOWN_HOLD_DELAY_MS = 450;
+  var TOWN_HOLD_MOVE_TOLERANCE = 14;
+  var TOWN_SHORTCUTS = [
+    { key:'market', label:'Lowfire Market', selector:'#merchantPanel' },
+    { key:'forge', label:'Lowfire Forge', selector:'#forgePanel' },
+    { key:'elite', label:'Elite Contracts', selector:'#questPanel' }
+  ];
+  function townShortcutTarget(key){
+    var shortcut = TOWN_SHORTCUTS.find(function(entry){ return entry.key === key; });
+    return shortcut ? document.querySelector(shortcut.selector) : null;
+  }
+  function closeTownShortcuts(nav, focusTown){
+    var menuState = nav && nav.__ddxTownShortcutMenu;
+    if (!menuState) return;
+    menuState.menu.hidden = true;
+    nav.classList.remove('ddx-town-shortcuts-open');
+    menuState.townTab.setAttribute('aria-expanded', 'false');
+    if (!focusTown) return;
+    try {
+      menuState.townTab.focus({ preventScroll:true });
+    } catch (_) {
+      menuState.townTab.focus();
+    }
+  }
+  function openTownShortcuts(nav){
+    var menuState = nav && nav.__ddxTownShortcutMenu;
+    if (!menuState) return;
+    if (isTouchNav()) setNavOpen(nav, true);
+    menuState.menu.hidden = false;
+    nav.classList.add('ddx-town-shortcuts-open');
+    menuState.townTab.setAttribute('aria-expanded', 'true');
+    window.setTimeout(function(){
+      var firstShortcut = menuState.menu.querySelector('[data-town-shortcut]');
+      if (!firstShortcut) return;
+      try {
+        firstShortcut.focus({ preventScroll:true });
+      } catch (_) {
+        firstShortcut.focus();
+      }
+    }, 0);
+  }
+  function selectTownShortcut(nav, key){
+    var menuState = nav && nav.__ddxTownShortcutMenu;
+    if (!menuState) return;
+    closeTownShortcuts(nav, false);
+    menuState.holdState.suppressClick = false;
+    if (typeof window.switchScreen === 'function') window.switchScreen('town');
+    else menuState.townTab.click();
+    if (isTouchNav()) setNavOpen(nav, false);
+    window.setTimeout(function(){
+      var townScreen = document.getElementById('screen-town');
+      var target = townShortcutTarget(key);
+      if (!townScreen || !townScreen.classList.contains('active') || !target) return;
+      target.setAttribute('tabindex', '-1');
+      target.scrollIntoView({ behavior:'smooth', block:'start' });
+      try {
+        target.focus({ preventScroll:true });
+      } catch (_) {
+        target.focus();
+      }
+    }, 0);
+  }
+  function installTownShortcuts(nav){
+    var townTab = nav.querySelector('#tab-town[data-screen="town"]');
+    if (!townTab) return;
+    var menu = nav.querySelector('#ddxTownShortcuts');
+    if (!menu) {
+      menu = document.createElement('div');
+      menu.id = 'ddxTownShortcuts';
+      menu.className = 'ddx-town-quick-menu';
+      menu.hidden = true;
+      menu.setAttribute('role', 'menu');
+      menu.setAttribute('aria-label', 'Town shortcuts');
+      var label = document.createElement('span');
+      label.className = 'ddx-town-quick-menu-label';
+      label.textContent = 'Town shortcuts';
+      label.setAttribute('aria-hidden', 'true');
+      menu.appendChild(label);
+      TOWN_SHORTCUTS.forEach(function(shortcut){
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ddx-town-shortcut';
+        button.dataset.townShortcut = shortcut.key;
+        button.setAttribute('role', 'menuitem');
+        button.textContent = shortcut.label;
+        menu.appendChild(button);
+      });
+      townTab.insertAdjacentElement('afterend', menu);
+    }
+    townTab.setAttribute('aria-haspopup', 'menu');
+    townTab.setAttribute('aria-controls', menu.id);
+    townTab.setAttribute('aria-expanded', menu.hidden ? 'false' : 'true');
+    townTab.title = 'Hold for Town shortcuts';
+    var holdState = nav.__ddxTownShortcutMenu?.holdState || {
+      timer:null,
+      pointerId:null,
+      startX:0,
+      startY:0,
+      didHold:false,
+      suppressClick:false
+    };
+    nav.__ddxTownShortcutMenu = { townTab:townTab, menu:menu, holdState:holdState };
+    if (townTab.__ddxTownShortcutBound) return;
+    townTab.__ddxTownShortcutBound = true;
+    function clearHold(){
+      if (holdState.timer) window.clearTimeout(holdState.timer);
+      holdState.timer = null;
+    }
+    function matchingPointer(event){
+      return holdState.pointerId == null || event.pointerId == null || holdState.pointerId === event.pointerId;
+    }
+    townTab.addEventListener('pointerdown', function(event){
+      if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      clearHold();
+      holdState.pointerId = event.pointerId;
+      holdState.startX = Number(event.clientX || 0);
+      holdState.startY = Number(event.clientY || 0);
+      holdState.didHold = false;
+      holdState.timer = window.setTimeout(function(){
+        holdState.timer = null;
+        holdState.didHold = true;
+        openTownShortcuts(nav);
+      }, TOWN_HOLD_DELAY_MS);
+    });
+    townTab.addEventListener('pointermove', function(event){
+      if (!matchingPointer(event) || !holdState.timer) return;
+      var moved = Math.hypot(Number(event.clientX || 0) - holdState.startX, Number(event.clientY || 0) - holdState.startY);
+      if (moved > TOWN_HOLD_MOVE_TOLERANCE) clearHold();
+    });
+    townTab.addEventListener('pointerup', function(event){
+      if (!matchingPointer(event)) return;
+      clearHold();
+      holdState.pointerId = null;
+      if (!holdState.didHold) return;
+      holdState.suppressClick = true;
+      window.setTimeout(function(){ holdState.suppressClick = false; }, 800);
+      event.preventDefault();
+    });
+    townTab.addEventListener('pointercancel', function(event){
+      if (!matchingPointer(event)) return;
+      clearHold();
+      holdState.pointerId = null;
+      holdState.didHold = false;
+    });
+    townTab.addEventListener('pointerleave', function(event){
+      if (!matchingPointer(event)) return;
+      clearHold();
+    });
+    townTab.addEventListener('contextmenu', function(event){ event.preventDefault(); });
+    townTab.addEventListener('click', function(event){
+      if (holdState.suppressClick) {
+        holdState.suppressClick = false;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      closeTownShortcuts(nav, false);
+    }, true);
+    townTab.addEventListener('keydown', function(event){
+      if (!((event.altKey && event.key === 'ArrowDown') || (event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu')) return;
+      event.preventDefault();
+      openTownShortcuts(nav);
+    });
+    Array.prototype.forEach.call(menu.querySelectorAll('[data-town-shortcut]'), function(button){
+      button.addEventListener('click', function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        selectTownShortcut(nav, button.dataset.townShortcut);
+      });
+    });
+    menu.addEventListener('keydown', function(event){
+      var items = Array.prototype.slice.call(menu.querySelectorAll('[data-town-shortcut]'));
+      var currentIndex = items.indexOf(document.activeElement);
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeTownShortcuts(nav, true);
+        return;
+      }
+      if (!items.length || !['ArrowDown','ArrowUp','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      var nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+      items[nextIndex].focus();
+    });
+    if (!nav.__ddxTownShortcutOutsideBound) {
+      nav.__ddxTownShortcutOutsideBound = true;
+      document.addEventListener('pointerdown', function(event){
+        if (!nav.contains(event.target)) closeTownShortcuts(nav, false);
+      }, true);
+      document.addEventListener('keydown', function(event){
+        if (event.key === 'Escape') closeTownShortcuts(nav, false);
+      });
     }
   }
   function installSideNav(){
@@ -102,6 +297,7 @@
         if (isTouchNav()) window.setTimeout(function(){ setNavOpen(nav, false); }, 80);
       });
     });
+    installTownShortcuts(nav);
     if (!nav.__ddxSideNavOutsideBound) {
       nav.__ddxSideNavOutsideBound = true;
       document.addEventListener('click', function(event){

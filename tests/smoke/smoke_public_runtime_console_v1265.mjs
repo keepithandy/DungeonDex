@@ -253,6 +253,55 @@ async function main() {
     const town = await evaluate(client, `(() => ({ active: document.querySelector('.screen.active')?.id || '', devtoolsDisabled: window.DUNGEONDEX_DEVTOOLS_ENABLED === false, devtoolsReason: window.DUNGEONDEX_DEVTOOLS_GATE?.reason || '' }))()`);
     record('Public runtime loads Town with DevTools disabled', town.active === 'screen-town' && town.devtoolsDisabled, JSON.stringify(town));
 
+    activeSurface = 'Town shortcuts';
+    await evaluate(client, `document.getElementById('tab-gear')?.click(); true`);
+    await waitFor(client, `document.querySelector('.screen.active')?.id === 'screen-gear'`, 'Gear route before Town shortcut');
+    await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.dispatchEvent(new PointerEvent('pointerdown', { bubbles:true, button:0, buttons:1, pointerId:73, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      return !!townTab;
+    })()`);
+    await sleep(520);
+    const townShortcuts = await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      const menu = document.getElementById('ddxTownShortcuts');
+      return {
+        open: !!menu && !menu.hidden,
+        expanded: townTab?.getAttribute('aria-expanded') || '',
+        role: menu?.getAttribute('role') || '',
+        labels: Array.from(menu?.querySelectorAll('[data-town-shortcut]') || []).map(button => button.textContent?.trim() || '')
+      };
+    })()`);
+    record('Holding Town opens live Market, Forge, and Elite shortcuts', townShortcuts.open
+      && townShortcuts.expanded === 'true'
+      && townShortcuts.role === 'menu'
+      && JSON.stringify(townShortcuts.labels) === JSON.stringify(['Lowfire Market', 'Lowfire Forge', 'Elite Contracts']), JSON.stringify(townShortcuts));
+    const heldTownClick = await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.dispatchEvent(new PointerEvent('pointerup', { bubbles:true, button:0, buttons:0, pointerId:73, pointerType:'touch', isPrimary:true, clientX:12, clientY:12 }));
+      townTab?.dispatchEvent(new MouseEvent('click', { bubbles:true, cancelable:true }));
+      return {
+        menuOpen: document.getElementById('ddxTownShortcuts')?.hidden === false,
+        active: document.querySelector('.screen.active')?.id || ''
+      };
+    })()`);
+    record('Town hold does not collapse into a normal Town click', heldTownClick.menuOpen && heldTownClick.active === 'screen-gear', JSON.stringify(heldTownClick));
+    await evaluate(client, `document.querySelector('[data-town-shortcut="forge"]')?.click(); true`);
+    await waitFor(client, `document.activeElement?.id === 'forgePanel' && document.getElementById('ddxTownShortcuts')?.hidden === true`, 'Lowfire Forge Town shortcut');
+    const forgeShortcut = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', focus: document.activeElement?.id || '' })`);
+    record('Town Forge shortcut scrolls and focuses the existing Forge panel', forgeShortcut.active === 'screen-town' && forgeShortcut.focus === 'forgePanel', JSON.stringify(forgeShortcut));
+    await evaluate(client, `(() => {
+      const townTab = document.getElementById('tab-town');
+      townTab?.focus();
+      townTab?.dispatchEvent(new KeyboardEvent('keydown', { key:'F10', shiftKey:true, bubbles:true, cancelable:true }));
+      return true;
+    })()`);
+    await waitFor(client, `document.getElementById('ddxTownShortcuts')?.hidden === false`, 'keyboard Town shortcut menu open');
+    await evaluate(client, `document.querySelector('[data-town-shortcut="elite"]')?.click(); true`);
+    await waitFor(client, `document.activeElement?.id === 'questPanel' && document.getElementById('ddxTownShortcuts')?.hidden === true`, 'Elite Contracts Town shortcut');
+    const eliteShortcut = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', focus: document.activeElement?.id || '' })`);
+    record('Keyboard Town menu reaches the existing Elite Contracts board', eliteShortcut.active === 'screen-town' && eliteShortcut.focus === 'questPanel', JSON.stringify(eliteShortcut));
+
     activeSurface = 'Trophy Echo';
     const trophyEcho = await evaluate(client, `(() => ({ panel: !!document.getElementById('revisitPanel'), text: document.getElementById('revisitPanel')?.innerText || '' }))()`);
     record('Town exposes the Trophy Echo surface', trophyEcho.panel && /Trophy Echo/.test(trophyEcho.text), trophyEcho.text.slice(0, 220));
