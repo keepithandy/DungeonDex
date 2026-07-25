@@ -2,13 +2,22 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.26.5 Guild Journal + Mobile Reliability`.
+- Baseline: `v1.26.6 Ashen Anvil Reinforcements`.
 - Current active Revisit lane: Trophy Echo only.
 - Working branch: `main`.
-- Implementation status: v1.26.5 release authority is complete on `main` and the release commit is tagged `v1.26.5`.
-- Current compact result: 49/49 passed, including repository-wide JavaScript syntax, Lowfire Forge contracts, the public-runtime console gate, package extraction, and the boss readiness matrix.
+- Implementation status: #138 adds the focused Ashen Anvil Offhand upgrade path on `main`; v1.26.6 verification is complete and ready for owner review.
+- Current compact result: 49/49 passed, including repository-wide JavaScript syntax, the 36,000-fight boss readiness matrix, package extraction, and protected-system coverage.
 
-## v1.26.5 Release Status
+## v1.26.6 Release Candidate Status
+
+- #138 adds Offhand upgrades for equipped items only: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs.
+- Weapon and Armor upgrade values remain unchanged. The feature reuses the existing `upgradeLevel` save field and adds no currency, route, or progression system.
+- Town, Gear, and Guild Journal render the Offhand record only when an Offhand is equipped.
+- Runtime/cache labels now use `v1.26.6` and `1.26.6-ashen-anvil-reinforcements`.
+- Verification passed: Merchant Gear Upgrades, Guild Journal, app-wiring/cache authority, public runtime console 18/18, Enter Dungeon 11/11, interface/accessibility 22/22, mobile layout 19/19, touch geometry at all supported profiles, source package audit 51 paths/zero warnings, and compact suite 49/49.
+- No v1.26.6 itch package, upload, or tag is authorized until the owner reviews this candidate and explicitly requests that work.
+
+## v1.26.5 Historical Release Status
 
 - #127 through #134 are complete and recorded in `docs/status/ROADMAP_V1265.md`.
 - The final itch-ready ZIP is `archive/packages/DungeonDex_v1.26.5_ItchReady.zip`.

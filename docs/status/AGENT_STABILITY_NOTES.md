@@ -1,16 +1,18 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.5 Guild Journal + Mobile Reliability Target
+## Current v1.26.6 Ashen Anvil Reinforcements Target
 
-- Current target: `v1.26.5 Guild Journal + Mobile Reliability`.
-- Current build/cache label: `1.26.5-guild-journal-mobile-reliability`.
-- The compact suite passes 49/49, including repository-wide JavaScript syntax, Lowfire Forge contracts, app wiring/cache authority, public-runtime console coverage, package extraction, and the 20-boss readiness matrix.
-- The v1.26.5 Journal Chronicle, browser-computed contrast, touch-navigation geometry, and protected-system release gates are complete.
+- Current target: `v1.26.6 Ashen Anvil Reinforcements`.
+- Current build/cache label: `1.26.6-ashen-anvil-reinforcements`.
+- #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.
+- The feature reuses the existing `upgradeLevel` save field; no Offhand card or action is exposed until an Offhand is equipped.
+- Validation passed: compact suite 49/49; Merchant Gear Upgrades; Guild Journal; app-wiring/cache authority; public runtime console 18/18; Enter Dungeon 11/11; interface/accessibility 22/22; mobile layout 19/19; supported touch-geometry profiles; and the source package audit with 51 paths and zero warnings.
+- The v1.26.5 Journal Chronicle, browser-computed contrast, touch-navigation geometry, and protected-system release gates remain complete and carry forward.
 - Preserve the merged v1.26.3.02 Town runtime cleanup: system 25 owns the wallet; systems 20, 26, and 27 remain retired and must not be reloaded or precached.
 - The real-device/Textastic Workspace handoff reported all twelve required checks passing. Device, OS, browser, viewport, and screenshot metadata were not captured, so retain that evidence-quality limitation in future release records.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
-- The final itch-ready package is `archive/packages/DungeonDex_v1.26.5_ItchReady.zip`; strict stage and clean-extraction checks both passed with 51 checked paths and zero warnings.
+- `archive/packages/DungeonDex_v1.26.5_ItchReady.zip` is the prior release package. Do not treat it as a v1.26.6 artifact; package creation, upload, and tagging remain owner-authorized follow-up work.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
 - Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 

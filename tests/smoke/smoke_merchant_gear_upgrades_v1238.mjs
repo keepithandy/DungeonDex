@@ -70,6 +70,17 @@ function createGearState() {
           value: 120,
           upgradeLevel: 0,
           stats: { power: 0, guard: 5, wit: 0, speed: 0, luck: 0, hp: 20 }
+        },
+        offhand: {
+          id: 'cinderward',
+          name: 'Cinderward',
+          slot: 'offhand',
+          rarity: 'common',
+          level: 3,
+          rating: 9,
+          value: 105,
+          upgradeLevel: 0,
+          stats: { power: 0, guard: 3, wit: 4, speed: 0, luck: 0, hp: 0 }
         }
       },
       inventory: [],
@@ -182,12 +193,13 @@ function createContext() {
     DEPTH_CHAPTERS_PER_THREAT_STEP: 15,
     COMBAT_LOG_STORE_LIMIT: 20,
     CORE_COMBAT_ACTIONS: ['attack', 'guard', 'skill', 'extract'],
-    FUTURE_EQUIPMENT_SLOTS: ['weapon', 'armor'],
-    SLOT_ORDER: ['weapon', 'armor'],
+    FUTURE_EQUIPMENT_SLOTS: ['weapon', 'armor', 'offhand'],
+    SLOT_ORDER: ['weapon', 'armor', 'offhand'],
     LEGACY_MYTHIC_SET_SLOTS: [],
     BASES: {
       weapon: ['Blade'],
-      armor: ['Armor']
+      armor: ['Armor'],
+      offhand: ['Ward']
     },
     RARITIES: [{ key: 'common' }],
     INVENTORY_SORTS: ['power'],
@@ -227,7 +239,7 @@ function createContext() {
     ensurePermanentCharters() {},
     baseSlotForSlot(slot, fallback = 'weapon') {
       const clean = String(slot || '').toLowerCase();
-      if (clean === 'weapon' || clean === 'armor') return clean;
+      if (clean === 'weapon' || clean === 'armor' || clean === 'offhand') return clean;
       return fallback;
     },
     buildMerchantStock() { return []; },
@@ -284,7 +296,7 @@ assert.equal(typeof context.renderGearUpgradeSummaryPanel, 'function');
 
 const state = createGearState();
 const initialSummary = context.merchantGearUpgradeSummary(state);
-assert.equal(initialSummary.length, 2);
+assert.equal(initialSummary.length, 3);
 assert.equal(initialSummary[0].label, 'Weapon');
 assert.equal(initialSummary[0].itemName, 'Warden Blade');
 assert.equal(initialSummary[0].perTierText, '+2 Power per tier');
@@ -301,27 +313,46 @@ assert.equal(initialSummary[1].currentBonusText, '+0 Guard and +0 HP');
 assert.equal(initialSummary[1].cost, 50);
 assert.equal(initialSummary[1].currentStat, 'Guard 5 • HP 20');
 assert.equal(initialSummary[1].nextStat, 'Guard 7 • HP 28');
+assert.equal(initialSummary[2].label, 'Offhand');
+assert.equal(initialSummary[2].itemName, 'Cinderward');
+assert.equal(initialSummary[2].perTierText, '+1 Guard and +1 Wit per tier');
+assert.equal(initialSummary[2].tierText, '+0 / +3');
+assert.equal(initialSummary[2].currentBonusText, '+0 Guard and +0 Wit');
+assert.equal(initialSummary[2].cost, 50);
+assert.equal(initialSummary[2].currentStat, 'Guard 3 • Wit 4');
+assert.equal(initialSummary[2].nextStat, 'Guard 4 • Wit 5');
 const townFreshHtml = context.merchantGearUpgradePanelMarkup(state);
 assert.ok(townFreshHtml.includes('<strong>The Ashen Anvil</strong>'));
 assert.ok(townFreshHtml.includes('Weapon upgrades are +2 Power per tier.'));
 assert.ok(townFreshHtml.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
+assert.ok(townFreshHtml.includes('Equipped Offhands gain +1 Guard and +1 Wit per tier.'));
 assert.ok(townFreshHtml.includes('Warden Blade'));
 assert.ok(townFreshHtml.includes('Ashcoat'));
+assert.ok(townFreshHtml.includes('Cinderward'));
 assert.ok(townFreshHtml.includes('+0 / +3'));
 assert.ok(townFreshHtml.includes('Current bonus +0 Power'));
 assert.ok(townFreshHtml.includes('Current bonus +0 Guard and +0 HP'));
 assert.ok(townFreshHtml.includes('Next cost 50c'));
 assert.ok(townFreshHtml.includes('data-merchant-upgrade="weapon"'));
 assert.ok(townFreshHtml.includes('data-merchant-upgrade="armor"'));
+assert.ok(townFreshHtml.includes('data-merchant-upgrade="offhand"'));
+
+const noOffhandState = createGearState();
+delete noOffhandState.player.equipment.offhand;
+const noOffhandHtml = context.merchantGearUpgradePanelMarkup(noOffhandState);
+assert.ok(!noOffhandHtml.includes('data-merchant-upgrade="offhand"'));
 
 const townLeveledState = createGearState();
 townLeveledState.player.equipment.weapon.upgradeLevel = 1;
 townLeveledState.player.equipment.armor.upgradeLevel = 2;
+townLeveledState.player.equipment.offhand.upgradeLevel = 1;
 const townLeveledHtml = context.merchantGearUpgradePanelMarkup(townLeveledState);
 assert.ok(townLeveledHtml.includes('Warden Blade +1 • +1 / +3'));
 assert.ok(townLeveledHtml.includes('Ashcoat +2 • +2 / +3'));
+assert.ok(townLeveledHtml.includes('Cinderward +1 • +1 / +3'));
 assert.ok(townLeveledHtml.includes('Current bonus +2 Power'));
 assert.ok(townLeveledHtml.includes('Current bonus +4 Guard and +16 HP'));
+assert.ok(townLeveledHtml.includes('Current bonus +1 Guard and +1 Wit'));
 assert.ok(townLeveledHtml.includes('Next cost 125c'));
 assert.ok(townLeveledHtml.includes('Next cost 250c'));
 assert.ok(townLeveledHtml.includes('Weapon +1 / +3 gives +2 Power.'));
@@ -358,15 +389,36 @@ assert.equal(afterArmorSummary[1].nextBonusText, '+4 Guard and +16 HP');
 assert.equal(afterArmorSummary[1].currentStat, 'Guard 7 • HP 28');
 assert.equal(afterArmorSummary[1].nextStat, 'Guard 9 • HP 36');
 const derivedAfterArmor = context.calcDerived(state);
-assert.equal(derivedAfterArmor.guard, 13);
+assert.equal(derivedAfterArmor.guard, 16);
+assert.equal(state.player.maxHp, 138);
+
+const offhandBuy = context.buyMerchantGearUpgrade(state, 'offhand');
+assert.equal(offhandBuy.ok, true);
+assert.equal(offhandBuy.beforeLevel, 0);
+assert.equal(offhandBuy.afterLevel, 1);
+assert.equal(offhandBuy.cost, 50);
+assert.equal(state.player.gold, 850);
+assert.equal(state.player.equipment.offhand.upgradeLevel, 1);
+const afterOffhandSummary = context.merchantGearUpgradeSummary(state);
+assert.equal(afterOffhandSummary[2].cost, 125);
+assert.equal(afterOffhandSummary[2].tierText, '+1 / +3');
+assert.equal(afterOffhandSummary[2].currentBonusText, '+1 Guard and +1 Wit');
+assert.equal(afterOffhandSummary[2].nextBonusText, '+2 Guard and +2 Wit');
+assert.equal(afterOffhandSummary[2].currentStat, 'Guard 4 • Wit 5');
+assert.equal(afterOffhandSummary[2].nextStat, 'Guard 5 • Wit 6');
+const derivedAfterOffhand = context.calcDerived(state);
+assert.equal(derivedAfterOffhand.guard, 17);
+assert.equal(derivedAfterOffhand.wit, 10);
 assert.equal(state.player.maxHp, 138);
 
 const journalBeforeSave = merchantSection(state, context);
 assert.ok(journalBeforeSave.body.includes('Warden Blade +1 +1 / +3 gives +2 Power'));
 assert.ok(journalBeforeSave.body.includes('Ashcoat +1 +1 / +3 gives +2 Guard and +8 HP'));
+assert.ok(journalBeforeSave.body.includes('Cinderward +1 +1 / +3 gives +1 Guard and +1 Wit'));
 assert.ok(journalBeforeSave.body.includes('Next cost 125c'));
 assert.ok(journalBeforeSave.meta.includes('Weapon upgrades are +2 Power per tier.'));
 assert.ok(journalBeforeSave.meta.includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
+assert.ok(journalBeforeSave.meta.includes('Equipped Offhands gain +1 Guard and +1 Wit per tier.'));
 
 const poorState = createGearState();
 poorState.player.gold = 49;
@@ -401,6 +453,7 @@ assert.ok(store.size > 0);
 const rawSaved = JSON.parse(store.get(STORAGE_KEY) || 'null');
 assert.equal(rawSaved.player.equipment.weapon.upgradeLevel, 1);
 assert.equal(rawSaved.player.equipment.armor.upgradeLevel, 1);
+assert.equal(rawSaved.player.equipment.offhand.upgradeLevel, 1);
 let normalizedSaved = null;
 try {
   normalizedSaved = context.normalizeSaveShape(JSON.parse(JSON.stringify(rawSaved)));
@@ -409,36 +462,46 @@ try {
 }
 assert.equal(normalizedSaved.player.equipment.weapon.upgradeLevel, 1);
 assert.equal(normalizedSaved.player.equipment.armor.upgradeLevel, 1);
+assert.equal(normalizedSaved.player.equipment.offhand.upgradeLevel, 1);
 
 const reloaded = context.load();
 assert.equal(reloaded.player.equipment.weapon.upgradeLevel, 1);
 assert.equal(reloaded.player.equipment.armor.upgradeLevel, 1);
+assert.equal(reloaded.player.equipment.offhand.upgradeLevel, 1);
 const reloadedSummary = context.merchantGearUpgradeSummary(reloaded);
 assert.equal(reloadedSummary[0].currentBonusText, '+2 Power');
 assert.equal(reloadedSummary[1].currentBonusText, '+2 Guard and +8 HP');
+assert.equal(reloadedSummary[2].currentBonusText, '+1 Guard and +1 Wit');
 assert.equal(reloadedSummary[0].currentStat, 'Power 14');
 assert.equal(reloadedSummary[1].currentStat, 'Guard 7 • HP 28');
+assert.equal(reloadedSummary[2].currentStat, 'Guard 4 • Wit 5');
 const journalAfterLoad = merchantSection(reloaded, context);
 assert.ok(journalAfterLoad.body.includes('Warden Blade +1 +1 / +3 gives +2 Power'));
 assert.ok(journalAfterLoad.body.includes('Ashcoat +1 +1 / +3 gives +2 Guard and +8 HP'));
+assert.ok(journalAfterLoad.body.includes('Cinderward +1 +1 / +3 gives +1 Guard and +1 Wit'));
 
 context.S = reloaded;
 context.renderGearUpgradeSummaryPanel();
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Weapon upgrades are +2 Power per tier.'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Armor upgrades are +2 Guard and +8 HP per tier.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Equipped Offhands gain +1 Guard and +1 Wit per tier.'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Warden Blade'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Ashcoat'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Cinderward'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Weapon +1 gives +2 Power.'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Armor +1 gives +2 Guard and +8 HP.'));
+assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Offhand +1 gives +1 Guard and +1 Wit.'));
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Next cost 125c'));
 
 const maxedState = createGearState();
 maxedState.player.equipment.weapon.upgradeLevel = 3;
 maxedState.player.equipment.armor.upgradeLevel = 3;
+maxedState.player.equipment.offhand.upgradeLevel = 3;
 const townMaxedHtml = context.merchantGearUpgradePanelMarkup(maxedState);
 assert.ok(townMaxedHtml.includes('Maxed at +3'));
 assert.ok(!townMaxedHtml.includes('data-merchant-upgrade="weapon"'));
 assert.ok(!townMaxedHtml.includes('data-merchant-upgrade="armor"'));
+assert.ok(!townMaxedHtml.includes('data-merchant-upgrade="offhand"'));
 context.S = maxedState;
 context.renderGearUpgradeSummaryPanel();
 assert.ok(String(gearUpgradeSummaryPanel.innerHTML).includes('Maxed at +3'));
@@ -448,5 +511,6 @@ context.DDJournalV1Render();
 assert.ok(String(archivePanel.innerHTML).includes('Guild Journal'));
 assert.ok(String(archivePanel.innerHTML).includes('Merchant Upgrades'));
 assert.ok(String(archivePanel.innerHTML).includes('Warden Blade +1 +1 / +3 gives +2 Power'));
+assert.ok(String(archivePanel.innerHTML).includes('Cinderward +1 +1 / +3 gives +1 Guard and +1 Wit'));
 
 console.log('PASS: Merchant Gear Upgrades smoke');

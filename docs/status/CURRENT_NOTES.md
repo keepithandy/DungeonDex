@@ -7,7 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.5 - Guild Journal + Mobile Reliability
+- DungeonDex v1.26.6 - Ashen Anvil Reinforcements
+
+## v1.26.6 Ashen Anvil Reinforcements
+- GitHub #138 adds the focused Ashen Anvil upgrade path for an equipped Offhand.
+- Offhand upgrades use the established `upgradeLevel` field, `+3` cap, and `50c` / `125c` / `250c` copper costs. Each tier grants `+1 Guard` and `+1 Wit`.
+- Existing Weapon upgrades remain `+2 Power` per tier. Existing Armor upgrades remain `+2 Guard` and `+8 HP` per tier.
+- Town, Gear, and Guild Journal summaries show the Offhand upgrade only when an Offhand is equipped; an empty Offhand slot does not create a new control.
+- Build/cache labels use `1.26.6-ashen-anvil-reinforcements`.
+- Release-candidate verification passed: compact suite 49/49; Merchant Gear Upgrades; Guild Journal; app-wiring/cache authority; public copy; Trophy Echo-only Revisit; public-runtime console 18/18; Enter Dungeon runtime 11/11; interface/accessibility 22/22; mobile layout 19/19; and touch-navigation geometry at 390x844, 430x932, and 768x1024.
+- The source-only package audit passed with 51 checked paths and zero warnings. The compact suite's temporary package build/extraction gate also passed; no final v1.26.6 release artifact was created.
+- No v1.26.6 itch package, upload, or release tag has been created. Owner review determines whether hotfixes or package preparation comes next.
+- No combat formula, monster/boss scaling, rewards, drop rates, economy, upgrade prices/cap, save schema, dungeon-entry behavior, Debt, Talent, progression, or Trophy Echo-only Revisit behavior changed.
 
 ## v1.26.5 Guild Journal + Mobile Reliability
 - GitHub #127-#134 deliver the Guild Journal Chronicle Pass and its release safeguards.
@@ -187,7 +198,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.5 Guild Journal + Mobile Reliability.
+- Current runtime baseline is v1.26.6 Ashen Anvil Reinforcements.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

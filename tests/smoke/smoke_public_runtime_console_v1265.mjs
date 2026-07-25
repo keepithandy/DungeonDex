@@ -335,6 +335,44 @@ async function main() {
     const eliteShortcut = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', focus: document.activeElement?.id || '' })`);
     record('Keyboard Town menu reaches the existing Elite Contracts board', eliteShortcut.active === 'screen-town' && eliteShortcut.focus === 'questPanel', JSON.stringify(eliteShortcut));
 
+    activeSurface = 'Ashen Anvil';
+    const offhandCard = await evaluate(client, `(() => {
+      S.player.gold = 1000;
+      S.player.equipment.offhand = {
+        id: 'runtime-cinderward',
+        name: 'Cinderward',
+        slot: 'offhand',
+        rarity: 'common',
+        level: 3,
+        rating: 9,
+        value: 105,
+        upgradeLevel: 0,
+        stats: { power: 0, guard: 3, wit: 4, speed: 0, luck: 0, hp: 0 }
+      };
+      render();
+      const button = document.querySelector('[data-merchant-upgrade="offhand"]');
+      return {
+        present: !!button,
+        text: button?.closest('.merchant-upgrade-card')?.innerText || ''
+      };
+    })()`);
+    record('Ashen Anvil exposes the equipped Offhand upgrade', offhandCard.present
+      && /Cinderward/.test(offhandCard.text)
+      && /\+1 Guard and \+1 Wit per tier/.test(offhandCard.text), JSON.stringify(offhandCard));
+    await evaluate(client, `document.querySelector('[data-merchant-upgrade="offhand"]')?.click(); true`);
+    await waitFor(client, `S?.player?.equipment?.offhand?.upgradeLevel === 1`, 'Ashen Anvil Offhand upgrade');
+    const offhandPurchase = await evaluate(client, `({
+      gold: S.player.gold,
+      level: S.player.equipment.offhand.upgradeLevel,
+      guard: calcDerived(S).guard,
+      wit: calcDerived(S).wit
+    })`);
+    record('Ashen Anvil Offhand upgrade uses the established first tier and derived stats', offhandPurchase.gold === 950
+      && offhandPurchase.level === 1
+      && offhandPurchase.guard >= 4
+      && offhandPurchase.wit >= 5, JSON.stringify(offhandPurchase));
+    await sleep(200); // Let the intentional duplicate-action guard clear before later route actions.
+
     activeSurface = 'Trophy Echo';
     const trophyEcho = await evaluate(client, `(() => ({ panel: !!document.getElementById('revisitPanel'), text: document.getElementById('revisitPanel')?.innerText || '' }))()`);
     record('Town exposes the Trophy Echo surface', trophyEcho.panel && /Trophy Echo/.test(trophyEcho.text), trophyEcho.text.slice(0, 220));
@@ -370,9 +408,20 @@ async function main() {
 
     activeSurface = 'Dungeon';
     await evaluate(client, `document.getElementById('startRunBtn')?.click(); true`);
-    await waitFor(client, `document.querySelector('.screen.active')?.id === 'screen-run' && !!S?.run?.active`, 'dungeon entry');
-    const dungeon = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', runActive: !!S?.run?.active })`);
-    record('Public runtime enters the dungeon', dungeon.active === 'screen-run' && dungeon.runActive, JSON.stringify(dungeon));
+    let dungeonEntryError = '';
+    try {
+      await waitFor(client, `document.querySelector('.screen.active')?.id === 'screen-run' && !!S?.run?.active`, 'dungeon entry');
+    } catch (error) {
+      dungeonEntryError = error?.message || String(error);
+    }
+    const dungeon = await evaluate(client, `({
+      active: document.querySelector('.screen.active')?.id || '',
+      runActive: !!S?.run?.active,
+      monster: S?.run?.monster?.name || '',
+      startLabel: document.getElementById('startRunBtn')?.innerText || '',
+      latestLog: Array.isArray(S?.player?.log) ? S.player.log.slice(-3) : []
+    })`);
+    record('Public runtime enters the dungeon', dungeon.active === 'screen-run' && dungeon.runActive, JSON.stringify({ ...dungeon, dungeonEntryError }));
 
     const unhandled = await evaluate(client, `window.__ddPublicRuntimeUnhandledRejections || []`);
     unhandled.forEach(entry => addIssue('unhandled-rejection', entry.message, entry.source));

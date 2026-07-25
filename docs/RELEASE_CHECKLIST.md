@@ -61,7 +61,7 @@ Use this when a patch follows a lag report, broken mobile interaction, stale ser
 
 ## Protected Stability Surfaces
 
-- Merchant gear upgrades: keep upgrades limited to equipped weapon and armor pieces, fixed costs, and a `+3` cap unless a focused issue explicitly expands that surface.
+- Merchant gear upgrades: keep upgrades limited to equipped weapon, armor, and Offhand pieces, fixed costs, and a `+3` cap unless a focused issue explicitly expands that surface. Weapon tiers add `+2 Power`; armor tiers add `+2 Guard` and `+8 HP`; Offhand tiers add `+1 Guard` and `+1 Wit`.
 - Old Talent compatibility: legacy `talentLedger`, earning, learned-node, preview, and passive helper paths must not restore gameplay effects or become the active progression UI without an explicit issue.
 - Debt Collector clarity prep: display-copy helpers may clarify wording only. They must not change debt math, pressure, repayment, wallet, economy, combat, rewards, save shape, or Revisit state unless a focused debt issue explicitly targets that behavior.
 - Revisit lanes: Trophy Echo is the only current live memory lane. Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are removed from the active Revisit surface. Trophy Echo must remain a town/archive memory loop, not a reward, combat, farming, or progression loop.

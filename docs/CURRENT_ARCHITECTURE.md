@@ -44,7 +44,7 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Trophy Echo is the only active Revisit lane in the v1.26.5 baseline.
+- Trophy Echo is the only active Revisit lane in the v1.26.6 baseline.
 - Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 
@@ -64,11 +64,12 @@ Merchant Gear Upgrades are the active long-term gear progression path.
 
 Current contract:
 
-- the Lowfire Market upgrades equipped weapon and armor pieces only
+- the Lowfire Market upgrades equipped weapon, armor, and Offhand pieces only
 - each eligible item stores `upgradeLevel` from `0` to `3`
 - upgrade costs are fixed at `50c`, `125c`, and `250c`
 - weapon upgrades add flat Power
 - armor upgrades add flat Guard and HP
+- Offhand upgrades add flat Guard and Wit
 - upgrade state persists through save/reload and repairs malformed levels safely
 - old Talent save fields remain compatibility-only and do not apply gameplay effects
 

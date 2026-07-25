@@ -45,7 +45,7 @@
     const missingText = moneyPlain(model?.missingCopper);
     const tierText = safeText(model?.tierText, `+${level} / +${cap}`);
     const levelText = safeText(model?.levelText, `+${level}`);
-    const perTierText = safeText(model?.perTierText, label === 'Armor' ? '+2 Guard and +8 HP per tier' : '+2 Power per tier');
+    const perTierText = safeText(model?.perTierText, label === 'Armor' ? '+2 Guard and +8 HP per tier' : label === 'Offhand' ? '+1 Guard and +1 Wit per tier' : '+2 Power per tier');
     const currentBonusText = safeText(model?.currentBonusText, model?.currentStat || levelText);
     const nextBonusText = safeText(model?.nextBonusText, model?.nextStat || `+${level + 1}`);
     const statusText = !hasItem
@@ -77,15 +77,16 @@
     const panel = document.getElementById(PANEL_ID);
     if (!panel || typeof S === 'undefined') return;
     const models = upgradeModels(S);
-    const readyCount = models.filter(model => model?.item && !model?.capped).length;
-    const maxedCount = models.filter(model => model?.item && model?.capped).length;
-    const body = models.length
-      ? models.map(upgradeCard).join('')
+    const visibleModels = models.filter(model => model?.slot !== 'offhand' || model?.item);
+    const readyCount = visibleModels.filter(model => model?.item && !model?.capped).length;
+    const maxedCount = visibleModels.filter(model => model?.item && model?.capped).length;
+    const body = visibleModels.length
+      ? visibleModels.map(upgradeCard).join('')
       : '<p class="small muted">Merchant Gear Upgrades are not initialized yet. Visit town to refresh the Lowfire Market.</p>';
     panel.innerHTML = `<div class="split market-subhead gear-upgrade-summary-head">
       <div>
         <h2>Gear Upgrades</h2>
-        <p class="small muted">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.</p>
+        <p class="small muted">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
       </div>
       <span class="pill">${esc(String(maxedCount))} maxed • ${esc(String(readyCount))} ready</span>
     </div>

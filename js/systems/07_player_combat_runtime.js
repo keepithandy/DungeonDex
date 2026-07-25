@@ -10,7 +10,7 @@
 
   function merchantGearUpgradeSlotKey(slot) {
     const baseSlot = baseSlotForSlot(slot || '', '');
-    return baseSlot === 'weapon' || baseSlot === 'armor' ? baseSlot : '';
+    return baseSlot === 'weapon' || baseSlot === 'armor' || baseSlot === 'offhand' ? baseSlot : '';
   }
 
   function merchantGearUpgradeBonuses(item, levelOverride = null) {
@@ -23,6 +23,10 @@
     if (slot === 'armor') {
       bonuses.guard = level * 2;
       bonuses.hp = level * 8;
+    }
+    if (slot === 'offhand') {
+      bonuses.guard = level;
+      bonuses.wit = level;
     }
     return bonuses;
   }
@@ -40,15 +44,19 @@
   }
 
   function merchantGearUpgradePerTierText(slot) {
-    return merchantGearUpgradeSlotKey(slot) === 'armor'
-      ? '+2 Guard and +8 HP per tier'
-      : '+2 Power per tier';
+    const safeSlot = merchantGearUpgradeSlotKey(slot);
+    if (safeSlot === 'armor') return '+2 Guard and +8 HP per tier';
+    if (safeSlot === 'offhand') return '+1 Guard and +1 Wit per tier';
+    return '+2 Power per tier';
   }
 
   function merchantGearUpgradeBonusText(slot, level) {
     const safeLevel = normalizeMerchantGearUpgradeLevel(level);
     if (merchantGearUpgradeSlotKey(slot) === 'armor') {
       return `+${format(safeLevel * 2)} Guard and +${format(safeLevel * 8)} HP`;
+    }
+    if (merchantGearUpgradeSlotKey(slot) === 'offhand') {
+      return `+${format(safeLevel)} Guard and +${format(safeLevel)} Wit`;
     }
     return `+${format(safeLevel * 2)} Power`;
   }
@@ -60,8 +68,10 @@
     const baseStats = isPlainObject(item.stats) ? item.stats : {};
     const power = Math.floor(numberOr(baseStats.power, 0, 0, 999999)) + bonuses.power;
     const guard = Math.floor(numberOr(baseStats.guard, 0, 0, 999999)) + bonuses.guard;
+    const wit = Math.floor(numberOr(baseStats.wit, 0, 0, 999999)) + bonuses.wit;
     const hp = Math.floor(numberOr(baseStats.hp, 0, 0, 999999)) + bonuses.hp;
     if (slot === 'armor') return `Guard ${format(guard)} • HP ${format(hp)}`;
+    if (slot === 'offhand') return `Guard ${format(guard)} • Wit ${format(wit)}`;
     return `Power ${format(power)}`;
   }
 
@@ -77,9 +87,9 @@
     const missingCopper = affordable || !item || capped ? 0 : Math.max(0, cost - gold);
     return {
       slot: safeSlot,
-      label: safeSlot === 'armor' ? 'Armor' : 'Weapon',
+      label: safeSlot === 'armor' ? 'Armor' : safeSlot === 'offhand' ? 'Offhand' : 'Weapon',
       item,
-      itemName: formatGearDisplayName(item) || cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : 'No weapon equipped'),
+      itemName: formatGearDisplayName(item) || cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : safeSlot === 'offhand' ? 'No offhand equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : safeSlot === 'offhand' ? 'No offhand equipped' : 'No weapon equipped'),
       level,
       levelText: merchantGearUpgradeLevelText(level),
       tierText: merchantGearUpgradeTierText(level, MERCHANT_GEAR_UPGRADE_CAP),
@@ -97,7 +107,7 @@
   }
 
   function merchantGearUpgradeSummary(state) {
-    return ['weapon', 'armor'].map(slot => merchantGearUpgradeModel(state, slot));
+    return ['weapon', 'armor', 'offhand'].map(slot => merchantGearUpgradeModel(state, slot));
   }
 
   function formatGearDisplayName(item, options = {}) {

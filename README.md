@@ -2,7 +2,7 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.26.5**
+Current baseline: **DungeonDex v1.26.6**
 
 ## Try It First
 
@@ -51,12 +51,12 @@ DungeonDex is built around a simple loop:
 ## Current Playable / Live Systems
 
 - **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
-- **Side rail navigation:** Desktop hover/focus reveal and a safe-area-aware 44px mobile/touch `←` drawer control for core routes.
+- **Side rail navigation:** Desktop hover/focus reveal and a safe-area-aware 44px mobile/touch `←` drawer control for core routes. Hold Town to open its Market, Forge, and Elite Contracts shortcuts; hold it again to close them.
 - **Lowfire Forge:** Gear crafting, salvage, and tempering; older internal names remain preserved for existing saves.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
-- **Trophy Echo:** The only active Revisit lane for v1.26.5, tied to boss trophy or boss record history.
-- **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon and armor pieces up to +3.
+- **Trophy Echo:** The only active Revisit lane for v1.26.6, tied to boss trophy or boss record history.
+- **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon, armor, and Offhand pieces up to +3. Weapon tiers add Power, armor tiers add Guard and HP, and Offhand tiers add Guard and Wit.
 - **Gear detail modal:** Click/tap a visible gear card or use its Enter/Space inspection trigger for a focus-managed, scroll-safe read-only rundown.
 - **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
 - **Asset and release hygiene:** Tracked asset provenance plus one documented semantic-version/build-cache authority flow.
@@ -64,7 +64,7 @@ DungeonDex is built around a simple loop:
 
 ## Planned / Locked Systems
 
-These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.5:
+These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.26.6:
 
 - **Famous Gear Memory:** Removed from the active Revisit surface.
 - **Rival Trace:** Removed from the active Revisit surface.
@@ -73,7 +73,7 @@ These systems may exist in old history or compatibility files, but they are not 
 
 ## Revisit Status
 
-Trophy Echo is the only active Revisit lane for v1.26.5. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
+Trophy Echo is the only active Revisit lane for v1.26.6. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
 
 The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of exposing unfinished lane concepts.
 

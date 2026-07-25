@@ -8,14 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.5 Guild Journal + Mobile Reliability`
-* Current local package baseline: `v1.26.5 Guild Journal + Mobile Reliability`
-* Current development target: `v1.26.5 Guild Journal + Mobile Reliability`
-* Current build/cache label: `1.26.5-guild-journal-mobile-reliability`
+* Public/live itch version: `v1.26.6 Ashen Anvil Reinforcements`
+* Current local package baseline: `v1.26.6 Ashen Anvil Reinforcements`
+* Current development target: `v1.26.6 Ashen Anvil Reinforcements`
+* Current build/cache label: `1.26.6-ashen-anvil-reinforcements`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.26.6 - Ashen Anvil Reinforcements
+
+* Added the focused Ashen Anvil upgrade path for an equipped Offhand.
+* Offhand tiers grant `+1 Guard` and `+1 Wit` per tier, using the existing `+3` cap and `50c`, `125c`, and `250c` costs.
+* Weapon upgrades remain `+2 Power` per tier. Armor upgrades remain `+2 Guard` and `+8 HP` per tier.
+* The Town, Gear, and Guild Journal upgrade summaries now show the Offhand record only when an Offhand is equipped.
+* Carried forward the Town side-rail shortcut: hold Town to open Market, Forge, and Elite Contracts links; hold it again to close the menu.
+* Preserved the combat formula, monster and boss scaling, rewards, drop rates, economy, upgrade prices/cap, save schema, dungeon entry, Debt, Talent, progression, and Trophy Echo-only Revisit behavior.
 
 ## v1.26.5 - Guild Journal + Mobile Reliability
 

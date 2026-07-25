@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.26.5-guild-journal-mobile-reliability';
+const CACHE_NAME = 'dungeondex-v1.26.6-ashen-anvil-reinforcements';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.26.5-guild-journal-mobile-reliability';
+const BUILD_QS = '1.26.6-ashen-anvil-reinforcements';
 const ASSETS = [
   './',
   './index.html',

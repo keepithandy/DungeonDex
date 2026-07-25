@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.5 Guild Journal + Mobile Reliability
+v1.26.6 Ashen Anvil Reinforcements
 
 ## Current Local Package Version
-v1.26.5 Guild Journal + Mobile Reliability
+v1.26.6 Ashen Anvil Reinforcements
 
 ## Current Development Target
-v1.26.5 Guild Journal + Mobile Reliability
+v1.26.6 Ashen Anvil Reinforcements
 
 ## Current Build/Cache Label
-1.26.5-guild-journal-mobile-reliability
+1.26.6-ashen-anvil-reinforcements
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

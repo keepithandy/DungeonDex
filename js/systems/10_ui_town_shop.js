@@ -364,15 +364,16 @@ function merchantGearUpgradePanelMarkup(state) {
 	const models = typeof merchantGearUpgradeSummary === 'function'
 		? merchantGearUpgradeSummary(state)
 		: [];
+	const visibleModels = models.filter(model => model.slot !== 'offhand' || model.item);
 	return `<div class="district-market lowfire-upgrades">
       <div class="split market-subhead">
         <div>
           <strong>The Ashen Anvil</strong>
-          <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier.</p>
+          <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
         </div>
-        <span class="pill">${models.filter(model => model.item).length}/${models.length}</span>
+        <span class="pill">${visibleModels.filter(model => model.item).length}/${visibleModels.length}</span>
       </div>
-      <div class="list district-ware-list">${models.map(merchantGearUpgradeCard).join('')}</div>
+      <div class="list district-ware-list">${visibleModels.map(merchantGearUpgradeCard).join('')}</div>
     </div>`;
 }
 

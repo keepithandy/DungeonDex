@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.26.5';
-const RELEASE_NAME = 'Guild Journal + Mobile Reliability';
+const VISIBLE_BUILD = '1.26.6';
+const RELEASE_NAME = 'Ashen Anvil Reinforcements';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
-const BUILD_QS = '1.26.5-guild-journal-mobile-reliability';
+const BUILD_QS = '1.26.6-ashen-anvil-reinforcements';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,
