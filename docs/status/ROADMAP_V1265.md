@@ -29,8 +29,10 @@ The roadmap is being completed in order. The release version and cache label rem
 - ~~#132 real-device handoff~~ - completed by a live Textastic Workspace pass;
   all twelve checks were reported passing. Evidence metadata/screenshots were
   not captured and remain documented as a release-record limitation.
-- **Next: #133 protected-system regression audit.**
-- Then: #134 release authority pass.
+- ~~#133 protected-system regression audit~~ - completed with no unauthorized
+  protected-system drift found. Focused evidence is recorded in
+  `docs/status/PROTECTED_SYSTEM_REGRESSION_AUDIT_V1265.md`; compact suite: 49/49.
+- **Next: #134 release authority pass, pending explicit release authorization.**
 
 ## Starting baseline
 
@@ -373,9 +375,10 @@ At phone widths:
   handoff sheet records that limitation explicitly; browser emulation is still
   not represented as completion.
 
-### 8. Planned #133 — Final protected-system regression audit
+### 8. #133 — Final protected-system regression audit
 
-- Status: planned only; not yet created as a GitHub issue.
+- Status: completed and verified; GitHub issue #133 may close after this audit
+  record lands.
 - Category: Audit / Smoke Hardening.
 - Goal: prove that the v1.26.5 presentation and release work did not alter established gameplay contracts.
 - Protected targets:
@@ -406,6 +409,19 @@ At phone widths:
   - strict package checker against staged output;
   - compact suite.
 - Do not perform broad smoke-suite organization or cleanup unless an actual ownership ambiguity blocks diagnosis.
+
+#### Completed result
+
+- No unauthorized protected-system drift was found by the focused audit matrix
+  or the 49/49 compact suite.
+- The prior Debt Collector compact entry was a retired placeholder. It was
+  replaced with a narrow real-runtime Debt/Talent compatibility smoke that
+  verifies Debt borrowing/repayment/pressure/persistence/combat neutrality and
+  Talent's preview-only zero-bonus compatibility state without mutating the
+  live runtime or a player save.
+- `docs/status/PROTECTED_SYSTEM_REGRESSION_AUDIT_V1265.md` maps each protected
+  target to its executed evidence, including source and strict staged-package
+  validation. No runtime, gameplay, version, or cache label changed.
 
 ### 9. Planned #134 — v1.26.5 release authority pass
 
