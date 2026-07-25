@@ -235,8 +235,17 @@ async function main() {
     await sleep(500);
 
     activeSurface = 'Intro modal';
-    const intro = await evaluate(client, `(() => ({ open: document.getElementById('introModal')?.hidden === false, close: !!document.getElementById('introModalCloseBtn') }))()`);
+    const intro = await evaluate(client, `(() => ({
+      open: document.getElementById('introModal')?.hidden === false,
+      close: !!document.getElementById('introModalCloseBtn'),
+      enter: !!document.getElementById('introModalEnterDungeonBtn'),
+      text: document.getElementById('introModalContent')?.innerText || ''
+    }))()`);
     record('Public runtime opens the intro modal', intro.open && intro.close, JSON.stringify(intro));
+    record('Fresh public runtime receives the DungeonDex first-descent welcome', intro.enter
+      && /DungeonDex/.test(intro.text)
+      && /Records from the Hollow Stair/.test(intro.text)
+      && /Welcome to the Guild\. Enter the Hollow Stair, survive what you can, and let the Journal remember what mattered\./.test(intro.text), intro.text.slice(0, 320));
     await evaluate(client, `document.getElementById('introModalCloseBtn')?.click(); true`);
     await waitFor(client, `document.getElementById('introModal')?.hidden === true`, 'intro modal close');
 

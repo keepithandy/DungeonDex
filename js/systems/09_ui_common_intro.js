@@ -385,11 +385,14 @@
     const activeDepthMeta = depthProgressMeta(activeDepth);
     const returnDepth = S.run.active ? activeDepth : defaultRunStartDepth(S);
     const lastRunText = S.run.active ? `Current descent: ${depthWithRawLabel(activeDepth)}` : latestRunSummary(S);
-    const title = S.run.active ? 'Descent In Progress' : 'Hollow Stair Threshold';
-    const subtitle = S.player.runHistory.length || S.player.depth > 0
-      ? stagingDistrict.line
-      : 'The Hollow Stair descends below Emberfall. Only debt is free here.';
-    const kicker = S.run.active ? 'Active Descent' : 'Returning Players';
+    const hasRecordedDescent = S.player.runHistory.length > 0 || S.player.depth > 0;
+    const isFirstDescent = !S.run.active && !hasRecordedDescent;
+    const title = S.run.active ? 'Descent In Progress' : (isFirstDescent ? 'DungeonDex' : 'Hollow Stair Threshold');
+    const subtitle = S.run.active ? stagingDistrict.line : (isFirstDescent ? 'Records from the Hollow Stair' : stagingDistrict.line);
+    const kicker = S.run.active ? 'Active Descent' : (isFirstDescent ? 'First Descent' : 'Returning Players');
+    const firstRunWelcome = isFirstDescent
+      ? '<p class="threshold-welcome">Welcome to the Guild. Enter the Hollow Stair, survive what you can, and let the Journal remember what mattered.</p>'
+      : '';
     const actionId = S.run.active ? 'introModalContinueRunBtn' : 'introModalEnterDungeonBtn';
     const action = S.run.active
       ? `<button class="primary mini threshold-enter" id="${actionId}">Continue Run</button>`
@@ -404,6 +407,7 @@
             <span class="threshold-kicker">${escapeHtml(kicker)}</span>
             <h2>${title}</h2>
             <p class="threshold-copy">${escapeHtml(subtitle)}</p>
+            ${firstRunWelcome}
           </div>
           <div class="intro-actions threshold-actions">${action}${closeAction}</div>
         </div>
