@@ -6,6 +6,8 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const RUN_UI_SOURCE = fs.readFileSync(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8');
+const STYLES_SOURCE = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
 const SYSTEM_FILES = [
   'js/systems/00_core_constants_data.js',
   'js/systems/01_state_recovery.js',
@@ -170,6 +172,13 @@ const completed = state.player.eliteContracts.active;
 assert.equal(completed.completed, true);
 assert.equal(completed.claimable, true);
 assert.equal(completed.status, 'completed');
+assert.match(state.run.combatLog[0], /Return to the Board to claim the writ\./, 'target completion must direct the player back to the Board');
+
+assert.match(RUN_UI_SOURCE, /const isActiveContractTarget = isContractTarget && !!activeContractId && String\(monster\.contractId \|\| ''\) === activeContractId;/, 'the combat cue must require the active contract ID to match');
+assert.match(RUN_UI_SOURCE, /contract-target-badge/, 'the matching target must render a clear text badge');
+assert.match(RUN_UI_SOURCE, /contract-target-objective/, 'the matching target must render a short objective');
+assert.match(STYLES_SOURCE, /\.contract-target-stage/, 'the matching target must receive a visual stage edge');
+assert.match(STYLES_SOURCE, /@media \(prefers-reduced-motion: reduce\)/, 'the target cue must honor reduced-motion preferences');
 
 const completedReload = api.normalizeSaveShape(plain(state));
 assert.equal(completedReload.player.eliteContracts.active.id, 'lowfire_bounty', 'a completed unclaimed hunt must survive save normalization');

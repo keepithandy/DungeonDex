@@ -246,6 +246,8 @@
     const isBossFight = monster && monster.tier === 'Boss';
     const isEliteFight = monster && monster.tier === 'Elite';
     const isContractTarget = !!(monster && monster.contractTarget);
+    const activeContractId = String(S.player?.eliteContracts?.active?.id || '');
+    const isActiveContractTarget = isContractTarget && !!activeContractId && String(monster.contractId || '') === activeContractId;
     const currentFloorText = districtDisplay.name || `Floor ${format(loreDepth.floorNumber)}`;
     const currentProgressRoomText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)}`;
     const currentProgressChapterText = `Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
@@ -272,6 +274,9 @@
     const monsterSubline = isContractTarget
       ? `Elite Hunt • ${monsterFamily}`
       : monsterFamily;
+    const contractTargetMarkup = isActiveContractTarget
+      ? `<div class="contract-target-cue"><span class="contract-target-badge">Contract Target</span><span class="contract-target-objective">Defeat ${escapeHtml(monster.name || 'this target')} to fulfill the hunt.</span></div>`
+      : '';
     const atmosphereProfile = dungeonAtmosphereProfile(S, runDistrict, depth, monster);
     const playerDanger = playerHpPct <= 25 ? 'hp-critical' : playerHpPct <= 50 ? 'hp-warn' : '';
     const monsterDanger = monsterHpPct <= 25 ? 'hp-critical' : monsterHpPct <= 50 ? 'hp-warn' : '';
@@ -333,12 +338,13 @@
 
     combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
-        <section class="combat-enemy-header ${personalityClass}">
+        <section class="combat-enemy-header ${personalityClass} ${isActiveContractTarget ? 'contract-target-header' : ''}">
           <div class="depth-kicker">${monsterTier}</div>
           <p class="small muted">${monsterSubline}</p>
+          ${contractTargetMarkup}
         </section>
 
-        <section class="combat-monster-stage ${stageBackdropClasses} ${personalityClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''}" aria-label="Enemy stage">
+        <section class="combat-monster-stage ${stageBackdropClasses} ${personalityClass} ${isBossFight ? 'stage-boss' : isEliteFight ? 'stage-elite' : ''} ${isActiveContractTarget ? 'contract-target-stage' : ''}" aria-label="Enemy stage">
           <div class="stage-atmosphere-grain" aria-hidden="true"></div>
           <div class="stage-depth-veil ${dungeonAtmosphereClasses(atmosphereProfile)}" aria-hidden="true"></div>
           <div class="stage-motes" aria-hidden="true"></div>
@@ -359,7 +365,7 @@
           <div class="stage-floor"></div>
         </section>
 
-        <section class="combat-hp-card enemy-hp ${monsterDanger} ${isBossFight ? 'boss-hp' : isEliteFight ? 'elite-hp' : ''}">
+        <section class="combat-hp-card enemy-hp ${monsterDanger} ${isBossFight ? 'boss-hp' : isEliteFight ? 'elite-hp' : ''} ${isActiveContractTarget ? 'contract-target-hp' : ''}">
           <div class="hp-label-row"><strong>${escapeHtml(monster.name || 'Enemy')}</strong><span>${format(monster.hp)} / ${format(monster.maxHp)} HP</span></div>
           <div class="hpbar"><span style="width:${monsterHpPct}%"></span></div>
           <div class="combat-stat-row">

@@ -157,7 +157,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Glassfang, Ash-Crowned, and Cinderjaw now have distinct hunt briefings, clauses, reward language, and lore-forward flavor.
 - Contract IDs, target names, trophy links, payout values, payout caps, floor bonuses, risk values, and bonus-writ types are smoke-locked unchanged.
 
-### Planned #142 - In-Combat Contract Target Indicator
+### Completed #142 - In-Combat Contract Target Indicator
 
 **Patch category:** UI / Accessibility
 
@@ -187,6 +187,13 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - It appears on initial target render and remains correct after combat re-renders.
 - It disappears for the next non-target encounter and after the contract is resolved.
 - Mobile, contrast, non-color-cue, and reduced-motion checks pass.
+
+**Completed result:**
+
+- Combat now shows a compact text-and-shape `CONTRACT TARGET` cue and a concise defeat objective only when the current monster is marked as a contract target and its contract ID matches the live active contract.
+- The matching target receives a restrained ember-gold combat edge and a one-time 460ms arrival emphasis that settles to a static state; reduced-motion preferences disable that animation.
+- A fulfilled hunt now tells the player to return to the Board to claim the existing writ. Payouts, claim rules, target selection, monster stats, rewards, and combat timing remain unchanged.
+- The Elite Contract lifecycle smoke locks the match rule, visible cue structure, reduced-motion declaration, completion guidance, save/reload, and one-time-claim behavior.
 
 ### Planned #143 - Fulfillment, Claim, and Guild Journal Polish
 

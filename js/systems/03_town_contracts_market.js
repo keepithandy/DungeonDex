@@ -3101,7 +3101,7 @@
           ? `Trophy duplicate found: ${trophyResult.trophy.name} x${trophyResult.trophy.count}.`
           : 'Trophy roll: no trophy found.';
       if (active.rivalContract) resolveEliteRivalContract(state, active);
-      pushCombat(state, `Contract fulfilled: ${active.eliteName}. ${writLine} ${trophyLine}`);
+      pushCombat(state, `Contract fulfilled: ${active.eliteName}. Return to the Board to claim the writ. ${writLine} ${trophyLine}`);
       pushLog(state, `Elite reward ladder: ${active.eliteName}. ${writLine} ${trophyLine}`);
     }
     return true;
