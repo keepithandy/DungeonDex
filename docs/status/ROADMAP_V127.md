@@ -56,7 +56,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 
 ## Work Order
 
-### Planned #139 - Elite Contract Baseline and Save Contract Audit
+### Completed #139 - Elite Contract Baseline and Save Contract Audit
 
 **Patch category:** Audit / Smoke Hardening
 
@@ -83,6 +83,13 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - The existing lifecycle is protected before UI work begins.
 - No runtime behavior, save schema, balance, version, or cache label changes.
 - Focused smoke and compact verification pass.
+
+**Completed result:**
+
+- Added `tests/smoke/smoke_elite_contract_lifecycle_v127.mjs` and included it in the compact suite.
+- The audit found and corrected one lifecycle defect: validation was discarding a completed but unclaimed active contract before the established claim action could pay it.
+- Completed, unclaimed hunts now survive save normalization until claimed; invalid, failed, expired, and already-claimed active snapshots still clear safely.
+- No payout value, target scaling, combat calculation, save field, or route changed.
 
 ### Planned #140 - Contract Board Choice and Readability Pass
 
@@ -276,4 +283,3 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 ## Definition of Done
 
 v1.27 is complete only when the board choice, named hunts, in-combat target recognition, completion/claim flow, Journal history, mobile presentation, protected-system regression audit, version alignment, and extracted public package all pass as one release.
-

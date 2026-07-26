@@ -14,6 +14,7 @@
 - Planned release identity: `DungeonDex v1.27 - The Contract Board`.
 - The release is intended to combine clearer Elite Contract choice, three distinct named-hunt presentations, a subtle accessible in-combat contract-target indicator, fulfillment/claim clarity, Guild Journal records, and full mobile/runtime/protected-system verification.
 - Elite Contracts are already live; this roadmap extends their presentation and player feedback rather than replacing the existing lifecycle.
+- v1.27 #139 is complete: a focused Elite Contract lifecycle smoke now protects offer availability, one-active acceptance, exact target matching, completion, one-time claim, save/reload, malformed-state repair, and protected-state isolation. The audit corrected validation so a completed but unclaimed contract remains claimable after save normalization.
 - Intermediate roadmap issues do not change the v1.26.6 version/cache authority. A v1.27 label and package require the final release-authority pass and explicit owner approval.
 - No new currency, daily timer, alternate dungeon-entry route, monster-affix framework, or additional Revisit lane is planned for v1.27.
 

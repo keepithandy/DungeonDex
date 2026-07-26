@@ -387,7 +387,8 @@
     contracts.rivals = createEliteRivalState(contracts.rivals);
     if (contracts.active) {
       const activeStatus = String(contracts.active.status || '').toLowerCase();
-      const isInvalid = !normalizeEliteContractId(contracts.active.id) || contracts.active.failed || contracts.active.expired || contracts.active.completed || activeStatus === 'failed' || activeStatus === 'expired';
+      // A completed hunt remains active until its established Town claim is paid.
+      const isInvalid = !normalizeEliteContractId(contracts.active.id) || contracts.active.failed || contracts.active.expired || contracts.active.claimed || activeStatus === 'failed' || activeStatus === 'expired';
       if (isInvalid) contracts.active = null;
       else {
         contracts.active.bonusWritCompleted = !!contracts.active.bonusWritCompleted;
