@@ -8,6 +8,15 @@
 - Implementation status: #138 adds the focused Ashen Anvil Offhand upgrade path on `main`; v1.26.6 verification is complete and ready for owner review.
 - Current compact result: 49/49 passed, including repository-wide JavaScript syntax, the 36,000-fight boss readiness matrix, package extraction, and protected-system coverage.
 
+## Planned v1.27 Work
+
+- Active roadmap: `docs/status/ROADMAP_V127.md`.
+- Planned release: `DungeonDex v1.27 - The Contract Board`.
+- The roadmap extends the already-live Elite Contract system with clearer mobile contract choice, three differentiated named-hunt presentations, a subtle and accessible in-combat `CONTRACT TARGET` indicator, a stronger fulfillment/claim flow, and clearer Guild Journal history.
+- Planned sequence: #139 baseline/save audit; #140 board choice/readability; #141 named hunt identity; #142 combat target indicator; #143 fulfillment/claim/Journal polish; #144 protected-system release audit; #145 release authority and package pass.
+- All roadmap work is intended to ship together in v1.27. Intermediate issues do not authorize separate version or cache bumps.
+- Preserve existing contract payout/risk contracts, combat, scaling, economy, saves, Merchant Gear Upgrades, Debt, Talent, dungeon entry, and Trophy Echo-only Revisit behavior unless a focused roadmap issue explicitly authorizes and verifies a narrow change.
+
 ## v1.26.6 Release Candidate Status
 
 - #138 adds Offhand upgrades for equipped items only: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs.
@@ -33,6 +42,7 @@
 - Do not reactivate Famous Gear Memory, Rival Trace, Board Echo, or Debt Pressure Revisit.
 - Do not change Talent or Debt behavior.
 - Do not bump version or cache labels unless an explicit version/release issue requires it.
+- For the v1.27 roadmap, only the final release-authority issue may bump version/cache labels.
 
 ## Historical v1.26.4 Work Status
 

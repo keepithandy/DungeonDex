@@ -9,6 +9,14 @@
 ## Current Baseline
 - DungeonDex v1.26.6 - Ashen Anvil Reinforcements
 
+## Planned v1.27 Development
+- The active future roadmap is `docs/status/ROADMAP_V127.md`.
+- Planned release identity: `DungeonDex v1.27 - The Contract Board`.
+- The release is intended to combine clearer Elite Contract choice, three distinct named-hunt presentations, a subtle accessible in-combat contract-target indicator, fulfillment/claim clarity, Guild Journal records, and full mobile/runtime/protected-system verification.
+- Elite Contracts are already live; this roadmap extends their presentation and player feedback rather than replacing the existing lifecycle.
+- Intermediate roadmap issues do not change the v1.26.6 version/cache authority. A v1.27 label and package require the final release-authority pass and explicit owner approval.
+- No new currency, daily timer, alternate dungeon-entry route, monster-affix framework, or additional Revisit lane is planned for v1.27.
+
 ## v1.26.6 Ashen Anvil Reinforcements
 - GitHub #138 adds the focused Ashen Anvil upgrade path for an equipped Offhand.
 - Offhand upgrades use the established `upgradeLevel` field, `+3` cap, and `50c` / `125c` / `250c` copper costs. Each tier grants `+1 Guard` and `+1 Wit`.
