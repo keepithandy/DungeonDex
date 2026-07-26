@@ -104,6 +104,7 @@ function createRuntime() {
     completeEliteContractTarget,
     claimEliteContract,
     failEliteContract,
+    eliteContractJournalHistory,
     eliteContractDef,
     eliteContractTargetScaling
   };`, sandbox);
@@ -173,6 +174,13 @@ assert.equal(completed.completed, true);
 assert.equal(completed.claimable, true);
 assert.equal(completed.status, 'completed');
 assert.match(state.run.combatLog[0], /Return to the Board to claim the writ\./, 'target completion must direct the player back to the Board');
+const readyHistoryStateBefore = JSON.stringify(state);
+const readyHistory = plain(api.eliteContractJournalHistory(state));
+assert.equal(JSON.stringify(state), readyHistoryStateBefore, 'reading contract history must not mutate save state');
+assert.equal(readyHistory[0].outcome, 'Target defeated');
+assert.equal(readyHistory[0].badge, 'Ready to claim');
+assert.equal(readyHistory[0].eliteName, 'Glassfang Brute');
+assert.equal(readyHistory[0].bonusResult, 'Bonus Writ completed.');
 
 assert.match(RUN_UI_SOURCE, /const isActiveContractTarget = isContractTarget && !!activeContractId && String\(monster\.contractId \|\| ''\) === activeContractId;/, 'the combat cue must require the active contract ID to match');
 assert.match(RUN_UI_SOURCE, /contract-target-badge/, 'the matching target must render a clear text badge');
@@ -191,6 +199,9 @@ assert.equal(completedReload.player.eliteContracts.active, null);
 assert.ok(completedReload.player.eliteContracts.claimed.includes('lowfire_bounty'));
 assert.equal(api.claimEliteContract(completedReload), false, 'a claimed contract cannot pay twice');
 assert.deepEqual(protectedSnapshot(completedReload), protectedBeforeClaim, 'claiming a contract must not alter protected systems');
+const claimedHistory = plain(api.eliteContractJournalHistory(completedReload));
+assert.equal(claimedHistory[0].outcome, 'Claimed');
+assert.equal(claimedHistory[0].eliteName, 'Glassfang Brute');
 
 const pendingSave = api.createBaseState();
 assert.equal(api.startEliteContract(pendingSave, 'hazard_contract'), true);
@@ -226,5 +237,11 @@ assert.equal(api.failEliteContract(failed, 'failed'), true);
 assert.equal(failed.player.eliteContracts.active, null);
 assert.equal(failed.player.eliteContracts.failed.length, 1);
 assert.equal(api.claimEliteContract(failed), false, 'failed contracts cannot be claimed');
+assert.equal(api.eliteContractJournalHistory(failed)[0].outcome, 'Failed');
+
+const expired = api.createBaseState();
+assert.equal(api.startEliteContract(expired, 'hazard_contract'), true);
+assert.equal(api.failEliteContract(expired, 'expired'), true);
+assert.equal(api.eliteContractJournalHistory(expired)[0].outcome, 'Expired');
 
 console.log('PASS: Elite Contract lifecycle v1.27 smoke');

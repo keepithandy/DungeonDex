@@ -70,6 +70,13 @@ function makeContext(){
         }
       ];
     },
+    DungeonDexEliteContracts: {
+      journalHistory: source => source === state ? [
+          { eliteName: 'Glassfang Brute', location: 'Floor 4 • Room 2', outcome: 'Target defeated', badge: 'Ready to claim', bonusResult: 'Bonus Writ completed.' },
+          { eliteName: 'Ash-Crowned Marauder', location: 'Ashgate Warrens', outcome: 'Claimed', badge: 'Claimed' },
+          { eliteName: 'Cinderjaw Bailiff', location: 'Lowfire District', outcome: 'Expired', badge: 'Expired' }
+        ] : []
+    },
     setTimeout,
     clearTimeout
   };
@@ -100,13 +107,20 @@ assert.ok(richModel.sections.some(section => section.title === 'Merchant Upgrade
 assert.ok(!richModel.sections.some(section => section.title === 'Revisit Memories'));
 assert.ok(!richModel.sections.some(section => section.title === 'Account Memory'));
 assert.ok(!richModel.sections.some(section => section.title === 'Unfinished Lanes'));
-assert.equal(richModel.memoryTotal, 7);
+assert.equal(richModel.memoryTotal, 10);
+assert.equal(richModel.latestRecord, 'Glassfang Brute — Ready to claim');
+assert.equal(richModel.sections.filter(section => section.title === 'Elite Contract').length, 3);
 
 context.DDJournalV1Render();
 const html = String(context.document.getElementById('archivePanel').innerHTML);
 assert.ok(html.includes('Guild Journal'));
 assert.ok(html.includes('Guild Chronicle'));
-assert.ok(html.includes('7 records'));
+assert.ok(html.includes('10 records'));
+assert.ok(html.includes('Target defeated: Glassfang Brute'));
+assert.ok(html.includes('Ready to claim'));
+assert.ok(html.includes('Claimed: Ash-Crowned Marauder'));
+assert.ok(html.includes('Expired: Cinderjaw Bailiff'));
+assert.ok(html.includes('Bonus Writ completed.'));
 assert.ok(html.includes('Merchant Upgrades'));
 assert.ok(html.includes('Historical Memories'));
 assert.ok(html.includes('Read-only'));
@@ -121,6 +135,7 @@ assert.ok(!html.includes('duplicate-safe'));
 assert.ok(!html.includes('legacy trace detected'));
 assert.ok(!html.match(/\b(?:helper|fixture|normalization|canonical shape|renderer wiring)\b/i));
 assert.ok(!html.match(/data-start-|data-complete-|data-spend-|data-borrow-|data-repay-|data-claim-|data-reward-/i));
+assert.ok(!html.includes('<button'));
 assert.match(visualCss, /@media \(max-width: 560px\)[\s\S]*?\.journal-grid\s*\{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
 assert.match(visualCss, /\.journal-record-head h3,[\s\S]*?overflow-wrap: anywhere/);
 assert.equal(JSON.stringify(state), before);

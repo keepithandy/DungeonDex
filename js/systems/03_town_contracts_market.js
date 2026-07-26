@@ -242,6 +242,42 @@
     };
   }
 
+  function eliteContractJournalHistory(state) {
+    const source = isPlainObject(state?.player?.eliteContracts) ? state.player.eliteContracts : {};
+    const records = [];
+    const claimedIds = normalizeEliteContractIds(source.claimed);
+    const completedIds = normalizeEliteContractIds(source.completed);
+    const active = isPlainObject(source.active) ? source.active : null;
+
+    const addRecord = (entry, outcome, badgeOverride = '') => {
+      const contract = eliteContractDef(normalizeEliteContractId(entry?.id));
+      const eliteName = String(entry?.eliteName || contract?.eliteName || contract?.name || '').trim();
+      if (!eliteName) return;
+      const bonusResult = entry?.bonusWritCompleted
+        ? 'Bonus Writ completed.'
+        : entry?.bonusWritMissed
+          ? 'Bonus Writ missed.'
+          : '';
+      const badge = badgeOverride || (outcome === 'Target defeated' ? 'Ready to claim' : outcome);
+      records.push({
+        id: String(entry?.id || contract?.id || ''),
+        eliteName,
+        location: String(entry?.targetLocation || entry?.district || contract?.district || 'Elite Board'),
+        outcome,
+        badge,
+        bonusResult,
+        failureNote: outcome === 'Failed' ? String(entry?.failureNote || '') : ''
+      });
+    };
+
+    if (active && (active.complete || active.completed || active.claimable)) addRecord(active, 'Target defeated');
+    asArray(source.failed, []).filter(isPlainObject).slice(0, 3).forEach(entry => addRecord(entry, 'Failed'));
+    asArray(source.expired, []).filter(isPlainObject).slice(0, 3).forEach(entry => addRecord(entry, 'Expired'));
+    claimedIds.slice().reverse().forEach(id => addRecord({ id }, 'Claimed'));
+    completedIds.filter(id => !claimedIds.includes(id) && (!active || active.id !== id)).forEach(id => addRecord({ id }, 'Target defeated', 'Recorded'));
+    return records.slice(0, 8);
+  }
+
   function contractBaseReward(contract) {
     if (!contract) return 0;
     const base = contract.baseReward ?? contract.reward;
@@ -3496,6 +3532,9 @@
           trophies: eliteTrophySummary(state),
           trophyIds: Object.keys(trophies.collected || {})
         };
+      },
+      journalHistory(state = S) {
+        return eliteContractJournalHistory(state);
       },
       // Summary mirrors the same read-only candidate shape used by the town panel.
       revisitCandidateSummary(state = S) {

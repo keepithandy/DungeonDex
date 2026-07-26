@@ -261,11 +261,11 @@ function eliteContractBoardMarkup(state) {
         <div><h3>Lowfire Elite Board</h3><p>Take elite marks for clean payout.</p></div>
           <span class="pill ${ready ? 'rarity-rare' : ''}">${statusLabel}</span>
         </div>
-        ${contractCard(contract, { ...active, title: `ACTIVE: ${active.eliteName || contract.eliteName || contract.name}` }, {
+		${contractCard(contract, { ...active, title: ready ? `TARGET DEFEATED: ${active.eliteName || contract.eliteName || contract.name}` : `ACTIVE: ${active.eliteName || contract.eliteName || contract.name}` }, {
           active: true,
           ready,
           reward: rewardAmount,
-          action: ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim</button>' : '<span class="small muted">Finish the mark to claim.</span>'
+          action: ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim Writ</button>' : '<span class="small muted">Finish the mark to claim.</span>'
         })}
       </div>`;
 	}
@@ -278,7 +278,7 @@ function eliteContractBoardMarkup(state) {
 	return `<div class="elite-contract-board">
       <div class="elite-contract-head">
         <div><h3>Lowfire Elite Board</h3><p>Take marked danger, earn clear payout.</p></div>
-        <span class="pill">No Active (${contracts.claimed.length}/${ELITE_CONTRACTS.length})</span>
+		<span class="pill">${contracts.claimed.length ? `Claimed ${contracts.claimed.length}/${ELITE_CONTRACTS.length}` : 'No Active'}</span>
       </div>
       <div class="elite-contract-list">${body}</div>
     </div>`;

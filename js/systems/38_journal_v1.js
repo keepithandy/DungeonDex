@@ -298,6 +298,23 @@
         : 'Spend copper at the Lowfire Market to improve equipped gear.'
     };
   }
+  function eliteContractModel(state){
+    const api = window.DungeonDexEliteContracts || null;
+    const history = typeof api?.journalHistory === 'function' ? api.journalHistory(state) : [];
+    const records = list(history).filter(entry => entry && typeof entry === 'object').slice(0, 8).map(entry => ({
+      eliteName: text(entry.eliteName || 'Unknown target', 'Unknown target'),
+      location: text(entry.location || 'Elite Board', 'Elite Board'),
+      outcome: text(entry.outcome || 'Recorded', 'Recorded'),
+      badge: text(entry.badge || entry.outcome || 'Recorded', 'Recorded'),
+      bonusResult: text(entry.bonusResult || '', ''),
+      failureNote: text(entry.failureNote || '', '')
+    }));
+    return {
+      records,
+      count: records.length,
+      latest: records[0] || null
+    };
+  }
   function journalV1233SummaryModel(state){
     const safeState = obj(state);
     const boss = bossModel(safeState);
@@ -306,10 +323,12 @@
     const rival = rivalModel(safeState);
     const debt = debtStatus(safeState);
     const upgrades = merchantUpgradeModel(safeState);
+    const contracts = eliteContractModel(safeState);
     const historicalCount = famous.count + rival.count;
     const memoryTotal = boss.count
       + revisit.trophyCount
       + historicalCount
+      + contracts.count
       + (debt.balance > 0 ? 1 : 0)
       + upgrades.active.length;
     const sections = [];
@@ -327,6 +346,13 @@
       primary: revisit.last || `${revisit.trophyCount} Trophy Echo ${revisit.trophyCount === 1 ? 'memory has' : 'memories have'} been recovered.`,
       detail: 'The guild remembers this descent without changing its rewards or outcome.'
     });
+    contracts.records.forEach((record, index) => sections.push({
+      key: `elite-contract-${index + 1}`,
+      title: 'Elite Contract',
+      badge: record.badge,
+      primary: `${record.outcome}: ${record.eliteName}`,
+      detail: [record.location, record.bonusResult, record.failureNote].filter(Boolean).join(' • ')
+    }));
     if (historicalCount > 0) {
       const historicalNames = [
         famous.latest ? `Famous gear: ${famous.latest}` : '',
@@ -355,6 +381,7 @@
       detail: upgrades.meta
     });
     const latestRecord = summaryLine([
+      contracts.latest ? `${contracts.latest.eliteName} — ${contracts.latest.badge}` : '',
       revisit.last,
       boss.latest ? `${boss.latest} Trophy` : '',
       famous.latest ? `${famous.latest} memory` : '',
@@ -403,7 +430,7 @@
       </header>
       ${model.sections.length
         ? `<div class="journal-grid">${model.sections.map(row).join('')}</div>`
-        : '<p class="journal-empty">Defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
+        : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
     </section>`;
   }
   function injectJournal(){

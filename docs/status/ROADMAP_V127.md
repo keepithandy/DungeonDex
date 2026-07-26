@@ -195,7 +195,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - A fulfilled hunt now tells the player to return to the Board to claim the existing writ. Payouts, claim rules, target selection, monster stats, rewards, and combat timing remain unchanged.
 - The Elite Contract lifecycle smoke locks the match rule, visible cue structure, reduced-motion declaration, completion guidance, save/reload, and one-time-claim behavior.
 
-### Planned #143 - Fulfillment, Claim, and Guild Journal Polish
+### Completed #143 - Fulfillment, Claim, and Guild Journal Polish
 
 **Patch category:** UI / Clarity
 
@@ -217,6 +217,14 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Journal output is read-only and creates no new farming or Revisit path.
 - Historical records remain compatible.
 - Trophy Echo remains the only active Revisit lane.
+
+**Completed result:**
+
+- The active Board card now changes from `ACTIVE` to `TARGET DEFEATED`, shows `Ready to claim`, and uses the established `Claim Writ` action after the exact target falls.
+- A read-only Elite Contract history projection presents ready-to-claim, claimed, failed, and expired outcomes without adding save fields, reward paths, or action controls.
+- Guild Journal cards now record the named target, best available location, outcome, and Bonus Writ result when that result still exists in current save data.
+- Older claimed-ID history remains compatible and readable; it does not invent a missing Bonus Writ result. Failed and expired records remain display-only.
+- Focused lifecycle and Journal smoke coverage protects completion persistence, one-time claims, empty-save behavior, status labels, history copy, and the absence of Journal action buttons.
 
 ### Planned #144 - Mobile, Runtime, and Protected-System Release Audit
 
