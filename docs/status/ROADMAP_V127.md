@@ -126,7 +126,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - The same `data-start-contract` controls, `claimEliteContractBtn`, contract IDs, and Town shortcut remain in place.
 - No offer, payout, risk, spawn, save, or claim logic changed.
 
-### Planned #141 - Named Hunt Identity Pass
+### Completed #141 - Named Hunt Identity Pass
 
 **Patch category:** Content Expansion
 
@@ -151,6 +151,11 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Every displayed promise matches live behavior.
 - Existing saves and historical contract IDs remain compatible through established aliases or normalization.
 - Contract payout and combat balance remain within the existing protected contracts.
+
+**Completed result:**
+
+- Glassfang, Ash-Crowned, and Cinderjaw now have distinct hunt briefings, clauses, reward language, and lore-forward flavor.
+- Contract IDs, target names, trophy links, payout values, payout caps, floor bonuses, risk values, and bonus-writ types are smoke-locked unchanged.
 
 ### Planned #142 - In-Combat Contract Target Indicator
 

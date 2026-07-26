@@ -13,7 +13,7 @@
 - Active roadmap: `docs/status/ROADMAP_V127.md`.
 - Planned release: `DungeonDex v1.27 - The Contract Board`.
 - The roadmap extends the already-live Elite Contract system with clearer mobile contract choice, three differentiated named-hunt presentations, a subtle and accessible in-combat `CONTRACT TARGET` indicator, a stronger fulfillment/claim flow, and clearer Guild Journal history.
-- Planned sequence: #139 baseline/save audit - complete; #140 board choice/readability - complete; #141 named hunt identity; #142 combat target indicator; #143 fulfillment/claim/Journal polish; #144 protected-system release audit; #145 release authority and package pass.
+- Planned sequence: #139 baseline/save audit - complete; #140 board choice/readability - complete; #141 named hunt identity - complete; #142 combat target indicator; #143 fulfillment/claim/Journal polish; #144 protected-system release audit; #145 release authority and package pass.
 - All roadmap work is intended to ship together in v1.27. Intermediate issues do not authorize separate version or cache bumps.
 - Preserve existing contract payout/risk contracts, combat, scaling, economy, saves, Merchant Gear Upgrades, Debt, Talent, dungeon entry, and Trophy Echo-only Revisit behavior unless a focused roadmap issue explicitly authorizes and verifies a narrow change.
 

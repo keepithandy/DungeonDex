@@ -121,6 +121,19 @@ assert.deepEqual(plain(api.availableEliteContracts(state).map(contract => contra
   'hazard_contract',
   'cinderjaw_bailiff'
 ]);
+assert.deepEqual(plain(api.availableEliteContracts(state).map(contract => ({
+  id: contract.id,
+  eliteName: contract.eliteName,
+  reward: contract.reward,
+  maxReward: contract.maxReward,
+  floorBonusPerDepth: contract.floorBonusPerDepth,
+  risk: contract.risk,
+  bonusWritType: contract.bonusWritType
+}))), [
+  { id: 'lowfire_bounty', eliteName: 'Glassfang Brute', reward: 250000, maxReward: 750000, floorBonusPerDepth: 7500, risk: { level: 'Low', label: 'Low risk', spawnBonus: 0.03, hpBonus: 0.04, damageBonus: 0.03, coinBonus: 0.03 }, bonusWritType: 'rest' },
+  { id: 'hazard_contract', eliteName: 'Ash-Crowned Marauder', reward: 600000, maxReward: 1600000, floorBonusPerDepth: 7500, risk: { level: 'Medium', label: 'Medium risk', spawnBonus: 0.05, hpBonus: 0.08, damageBonus: 0.05, coinBonus: 0.05 }, bonusWritType: 'extract' },
+  { id: 'cinderjaw_bailiff', eliteName: 'Cinderjaw Bailiff', reward: 420000, maxReward: 1250000, floorBonusPerDepth: 6000, risk: { level: 'Medium', label: 'Medium risk', spawnBonus: 0.04, hpBonus: 0.06, damageBonus: 0.04, coinBonus: 0.04 }, bonusWritType: 'guard' }
+]);
 
 assert.equal(api.startEliteContract(state, 'lowfire_bounty'), true);
 assert.equal(api.startEliteContract(state, 'hazard_contract'), false, 'only one active contract may be accepted');
