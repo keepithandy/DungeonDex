@@ -91,7 +91,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Completed, unclaimed hunts now survive save normalization until claimed; invalid, failed, expired, and already-claimed active snapshots still clear safely.
 - No payout value, target scaling, combat calculation, save field, or route changed.
 
-### Planned #140 - Contract Board Choice and Readability Pass
+### Completed #140 - Contract Board Choice and Readability Pass
 
 **Patch category:** UI / Clarity
 
@@ -119,6 +119,12 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Disabled and unavailable states explain why without exposing internal terms.
 - No payout, spawn, combat, save, route, or progression behavior changes.
 - Phone layouts remain one-column, readable, and free of horizontal overflow.
+
+**Completed result:**
+
+- Existing cards now lead with target identity, explicit text risk, location, objective, bonus writ, current payout, and one action.
+- The same `data-start-contract` controls, `claimEliteContractBtn`, contract IDs, and Town shortcut remain in place.
+- No offer, payout, risk, spawn, save, or claim logic changed.
 
 ### Planned #141 - Named Hunt Identity Pass
 

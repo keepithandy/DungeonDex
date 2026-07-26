@@ -1864,6 +1864,26 @@ button:focus-visible,
   line-height: 1.2;
 }
 
+.elite-contract-card-head {
+  display: grid;
+  gap: 3px;
+}
+
+.elite-contract-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: rgba(255,213,128,0.9);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.elite-contract-risk {
+  color: rgba(247,240,225,0.82);
+}
+
 .elite-contract-card p {
   font-size: 0.73rem;
   line-height: 1.35;
@@ -1879,6 +1899,15 @@ button:focus-visible,
 .elite-contract-detail-grid span {
   min-width: 0;
   line-height: 1.25;
+}
+
+.elite-contract-detail-grid span b {
+  display: block;
+  margin-bottom: 1px;
+  color: rgba(255,213,128,0.86);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .elite-contract-detail-grid b {

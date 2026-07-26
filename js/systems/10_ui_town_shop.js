@@ -223,6 +223,31 @@ function earlierDungeonRevisitMarkup() {
 function eliteContractBoardMarkup(state) {
 	const contracts = ensureEliteContractState(state);
 	const active = contracts.active;
+	const contractCard = (contract, model, options = {}) => {
+		const risk = eliteContractRisk(contract);
+		const ready = !!options.ready;
+		const activeCard = !!options.active;
+		const reward = options.reward ?? calculateContractReward(contract, state);
+		const status = ready ? 'Ready to claim' : activeCard ? 'Active hunt' : 'Available hunt';
+		const action = options.action || `<button class="primary mini" data-start-contract="${escapeHtml(contract.id)}">Take Mark</button>`;
+		return `<article class="elite-contract-card ${ready ? 'ready' : activeCard ? 'active' : 'elite-contract-offer'}">
+          <div class="elite-contract-card-head">
+            <div class="elite-contract-kicker"><span>${escapeHtml(model.tier || contract.tier || 'Elite hunt')}</span><span class="elite-contract-risk">Risk: ${escapeHtml(risk.level || 'Standard')}</span></div>
+            <strong>${escapeHtml(model.title || contract.title || contract.name)}</strong>
+            <p>${escapeHtml(model.flavor || contract.flavor || contract.summary || '')}</p>
+          </div>
+          <div class="elite-contract-detail-grid small">
+            <span><b>Target</b>${escapeHtml(model.eliteName || contract.eliteName || contract.name || '')}</span>
+            <span><b>Where</b>${escapeHtml(model.targetLocation || `Floor ${model.targetFloor || '?'}`)}</span>
+            <span><b>Objective</b>${escapeHtml(model.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
+            <span><b>Bonus Writ</b>${escapeHtml(model.bonusWrit || contract.bonusWrit || 'None')}</span>
+          </div>
+          <div class="elite-contract-actions">
+            <span class="pill">${status} - ${formatMoney(reward)}</span>
+            ${action}
+          </div>
+        </article>`;
+	};
 
 	if (active) {
 		const contract = eliteContractDef(active.id);
@@ -236,42 +261,18 @@ function eliteContractBoardMarkup(state) {
         <div><h3>Lowfire Elite Board</h3><p>Take elite marks for clean payout.</p></div>
           <span class="pill ${ready ? 'rarity-rare' : ''}">${statusLabel}</span>
         </div>
-        <div class="elite-contract-card ${ready ? 'ready' : 'active'}">
-          <div class="split"><strong>Active Hunt: ${escapeHtml(contract.name)}</strong><span class="small muted">${escapeHtml(active.tier || contract.tier || '')}</span></div>
-          <div class="elite-contract-detail-grid small">
-            <span><b>Mark:</b> ${escapeHtml(contract.eliteName || active.eliteName || contract.name || '')}</span>
-            <span><b>Where:</b> ${escapeHtml(active.targetLocation || `Floor ${active.targetFloor || '?'}`)}</span>
-            <span><b>Status:</b> ${ready ? 'Completed' : active.rivalContract ? 'Rival' : active.bonusWritCompleted ? 'Bonus Complete' : active.bonusWritMissed ? 'Bonus Missed' : 'Active'}</span>
-            <span><b>Objective:</b> ${escapeHtml(active.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
-            <span><b>Bonus Goal:</b> ${escapeHtml(active.bonusWrit || contract.bonusWrit || 'Pending')}</span>
-            <span><b>Danger:</b> ${escapeHtml(active.rivalContract ? 'Rival writ' : 'Elite hunt')}</span>
-            <span><b>Reward Preview:</b> ${formatMoney(rewardAmount)}</span>
-          </div>
-          <div class="elite-contract-actions">
-            <span class="pill">${ready ? 'Ready to Claim' : 'Payment held'}: ${formatMoney(rewardAmount)}</span>
-            ${ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim</button>' : '<span class="small muted">Finish the mark to claim.</span>'}
-          </div>
-        </div>
+        ${contractCard(contract, { ...active, title: `ACTIVE: ${active.eliteName || contract.eliteName || contract.name}` }, {
+          active: true,
+          ready,
+          reward: rewardAmount,
+          action: ready ? '<button class="primary mini" id="claimEliteContractBtn">Claim</button>' : '<span class="small muted">Finish the mark to claim.</span>'
+        })}
       </div>`;
 	}
 
 	const available = availableEliteContracts(state);
 	const body = available.length ?
-		available.map(contract => `<div class="elite-contract-card">
-        <div class="split"><strong>${escapeHtml(contract.title || contract.name)}</strong><span class="small muted">${escapeHtml(contract.tier || '')}</span></div>
-          <div class="elite-contract-detail-grid small">
-            <span><b>Mark:</b> ${escapeHtml(contract.eliteName || contract.name || '')}</span>
-            <span><b>Where:</b> ${escapeHtml(contract.targetLocation || `Floor ${contract.targetFloor || '?'}`)}</span>
-            <span><b>Objective:</b> ${escapeHtml(contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
-            <span><b>Bonus Goal:</b> ${escapeHtml(contract.bonusWrit || 'Pending')}</span>
-            <span><b>Danger:</b> Elite hunt</span>
-            <span><b>Reward Preview:</b> ${formatMoney(calculateContractReward(contract, state))}</span>
-          </div>
-          <div class="elite-contract-actions">
-            <span class="pill">Reward Preview</span>
-            <button class="primary mini" data-start-contract="${escapeHtml(contract.id)}">Take Mark</button>
-          </div>
-        </div>`).join('') :
+		available.map(contract => contractCard(contract, contract)).join('') :
 		'<p class="small muted elite-contract-empty">No paid marks are currently available.</p>';
 
 	return `<div class="elite-contract-board">
