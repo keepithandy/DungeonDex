@@ -1,13 +1,13 @@
-// DungeonDex v1.26.6 runtime pointer.
+// DungeonDex v1.27 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.26.6: Ashen Anvil Reinforcements
-// - Adds the equipped Offhand upgrade path while preserving the established upgrade tiers.
-// - Preserves combat formulas, rewards, saves, progression, and Revisit behavior.
+// v1.27: The Contract Board
+// - Presents clearer named Elite Contracts, exact-target combat cues, and read-only Journal records.
+// - Preserves contract payouts, combat formulas, rewards, saves, progression, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.26.6';
-window.DUNGEONDEX_BUILD_QS = '1.26.6-ashen-anvil-reinforcements';
+window.DUNGEONDEX_BUILD = '1.27';
+window.DUNGEONDEX_BUILD_QS = '1.27-the-contract-board';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -63,7 +63,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.26.6-ashen-anvil-reinforcements';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.27-the-contract-board';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

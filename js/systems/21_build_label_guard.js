@@ -1,14 +1,14 @@
 'use strict';
 
-// DungeonDex v1.26.6 - Build label guard.
+// DungeonDex v1.27 - Build label guard.
 // Keeps the visible title stable when older render helpers try to write stale labels.
 (function(){
   if (window.DDBuildLabelGuard) return;
   window.DDBuildLabelGuard = true;
 
-  const BUILD = '1.26.6';
+  const BUILD = '1.27';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.26.6-ashen-anvil-reinforcements';
+  const BUILD_QS = '1.27-the-contract-board';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

@@ -4,11 +4,11 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.26.6 Ashen Anvil Reinforcements`
-- Visible semantic version: `1.26.6`
-- Build/cache slug: `1.26.6-ashen-anvil-reinforcements`
+- Public version: `v1.27 The Contract Board`
+- Visible semantic version: `1.27`
+- Build/cache slug: `1.27-the-contract-board`
 
-The authorized v1.26.6 source pass aligns release records and runtime labels. An
+The authorized v1.27 release pass aligns release records and runtime labels. An
 itch package is created only after explicit packaging authorization and successful
 release verification. The resulting ZIP remains an output, not version authority.
 

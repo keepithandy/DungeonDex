@@ -8,14 +8,25 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.26.6 Ashen Anvil Reinforcements`
-* Current local package baseline: `v1.26.6 Ashen Anvil Reinforcements`
-* Current development target: `v1.26.6 Ashen Anvil Reinforcements`
-* Current build/cache label: `1.26.6-ashen-anvil-reinforcements`
+* Public/live itch version: `v1.27 The Contract Board`
+* Current local package baseline: `v1.27 The Contract Board`
+* Current development target: `v1.27 The Contract Board`
+* Current build/cache label: `1.27-the-contract-board`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.27 - The Contract Board
+
+* Refined the Lowfire Elite Board into a clearer three-hunt selection surface with target, location, objective, text risk, Bonus Writ, and established payout visible on each card.
+* Gave Glassfang, Ash-Crowned, and Cinderjaw distinct hunt briefings while preserving their IDs, targets, payout bounds, risk values, and writ types.
+* Added an accessible `CONTRACT TARGET` badge, restrained ember-gold edge, concise objective, and reduced-motion-safe arrival emphasis for the exact active target only.
+* Clarified target-defeated, ready-to-claim, claimed, failed, and expired states while preserving the existing one-time claim path.
+* Added read-only Elite Contract records to the Guild Journal using existing save history, with no new farming or Revisit path.
+* Corrected completed-but-unclaimed contract normalization and resolved available-offer location copy without changing the save schema or reward values.
+* Release verification passed the 51/51 compact suite, 26/26 public-runtime gate, 22/22 interface/accessibility checks, 19/19 mobile-layout checks, 7/7 browser-computed contrast checks, supported touch-geometry profiles, 11/11 Enter Dungeon checks, the 20-boss/36,000-fight matrix, and strict source/staged/extracted package audits.
+* Preserved combat formulas, monster and boss scaling, rewards, economy, Merchant Gear Upgrade values/cap, dungeon entry, Debt, Talent, progression, and Trophy Echo-only Revisit behavior.
 
 ## v1.26.6 - Ashen Anvil Reinforcements
 

@@ -1,9 +1,10 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.26.6 Ashen Anvil Reinforcements Target
+## Current v1.27 The Contract Board Target
 
-- Current target: `v1.26.6 Ashen Anvil Reinforcements`.
-- Current build/cache label: `1.26.6-ashen-anvil-reinforcements`.
+- Current target: `v1.27 The Contract Board`.
+- Current build/cache label: `1.27-the-contract-board`.
+- #139-#145 deliver the clearer three-hunt Elite Contract Board, exact-target combat cue, one-time fulfillment/claim clarity, read-only Guild Journal records, protected-system audit, and final package pass.
 - #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.
 - The feature reuses the existing `upgradeLevel` save field; no Offhand card or action is exposed until an Offhand is equipped.
 - Validation passed: compact suite 49/49; Merchant Gear Upgrades; Guild Journal; app-wiring/cache authority; public runtime console 18/18; Enter Dungeon 11/11; interface/accessibility 22/22; mobile layout 19/19; supported touch-geometry profiles; and the source package audit with 51 paths and zero warnings.
@@ -12,7 +13,8 @@
 - The real-device/Textastic Workspace handoff reported all twelve required checks passing. Device, OS, browser, viewport, and screenshot metadata were not captured, so retain that evidence-quality limitation in future release records.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
-- `archive/packages/DungeonDex_v1.26.5_ItchReady.zip` is the prior release package. The local v1.26.6 review artifact `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` passed staged and clean-extracted checks; upload and tagging remain owner-authorized follow-up work.
+- `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` is the prior review artifact. The final local v1.27 artifact is `archive/packages/DungeonDex_v1.27_ItchReady.zip`; upload and tagging still require separate owner authorization.
+- The owner approved a physical-device exception for the local v1.27 package after automated touch/mobile and extracted-runtime checks passed. Run a fresh Textastic/device pass before itch.io upload when practical.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
 - Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 

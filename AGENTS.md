@@ -8,10 +8,11 @@ This file is the first-read operating contract for Codex, Claude, ChatGPT, and o
 
 ## Current Release Baseline
 
-- Current source release candidate: `v1.26.6 Ashen Anvil Reinforcements`.
+- Current source release: `v1.27 The Contract Board`.
 - Merchant Gear Upgrades cover equipped Weapon (`+2 Power` per tier), Armor (`+2 Guard` and `+8 HP` per tier), and Offhand (`+1 Guard` and `+1 Wit` per tier) pieces through `+3`, using the established `50c`, `125c`, and `250c` tier costs.
 - `VERSION.md` remains the sole version authority; do not infer a release state from this summary.
-- No v1.26.6 itch upload or release tag is authorized until the user explicitly requests it. Local review packages may be created when requested.
+- The local v1.27 itch-ready package is authorized. No itch.io upload or release tag is authorized until the user explicitly requests it.
+- The v1.27 local package carries an owner-approved physical-device exception; run a fresh Textastic/device pass before upload when practical.
 
 ## Active Core Loop
 

@@ -182,7 +182,7 @@ async function main() {
   );
 
   const passed = results.filter(result => result.ok).length;
-  console.log(`\nMobile layout contracts v1.26.6: ${passed}/${results.length} passed`);
+  console.log(`\nMobile layout contracts v1.27: ${passed}/${results.length} passed`);
   if (passed !== results.length) process.exitCode = 1;
 }
 

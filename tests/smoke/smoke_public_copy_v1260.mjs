@@ -23,9 +23,9 @@ async function main() {
     readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8')
   ]);
 
-  record('Public shell names the current game and Journal', index.includes('<title>DungeonDex v1.26.6</title>') && index.includes('aria-label="Guild Journal"'), 'title and Guild Journal surface');
+  record('Public shell names the current game and Journal', index.includes('<title>DungeonDex v1.27</title>') && index.includes('aria-label="Guild Journal"'), 'title and Guild Journal surface');
   record('Town progression copy retains Lowfire Forge and The Ashen Anvil', forge.includes('<h2>Lowfire Forge</h2>') && town.includes('<strong>The Ashen Anvil</strong>'), 'active crafting and upgrade labels');
-  record('Active Revisit surface identifies Trophy Echo as the only lane', revisit.includes('Trophy Echo is the only active Revisit lane for v1.26.6.') && revisit.includes('No boss echo is recorded yet.') && revisit.includes("record is ready to be revisited.") && revisit.includes('Trophy Echo Locked') && revisit.includes('Start Trophy Echo') && revisit.includes('Settle Echo'), 'locked, available, and active Trophy Echo copy');
+  record('Active Revisit surface identifies Trophy Echo as the only lane', revisit.includes('Trophy Echo is the only active Revisit lane for v1.27.') && revisit.includes('No boss echo is recorded yet.') && revisit.includes("record is ready to be revisited.") && revisit.includes('Trophy Echo Locked') && revisit.includes('Start Trophy Echo') && revisit.includes('Settle Echo'), 'locked, available, and active Trophy Echo copy');
   record('Active Revisit surface rejects inactive lane start copy', ['Start Famous Gear Memory', 'Start Rival Trace', 'Start Board Echo', 'Start Debt Pressure'].every(needle => !revisit.includes(needle)), 'no inactive lane start labels');
   record('Fresh intro identifies the first descent without changing the live entry actions', [
     'const isFirstDescent = !S.run.active && !hasRecordedDescent;',
@@ -39,7 +39,7 @@ async function main() {
   record('Archive fallback keeps Trophy Echo as the only active lane', archive.includes('Trophy Echo is the only active Revisit lane.') && archive.includes('Guild Archive Record') && archive.includes('Reserved'), 'legacy records remain history-only');
 
   const passed = results.filter(result => result.ok).length;
-  console.log(`\nPublic-copy v1.26.6 smoke: ${passed}/${results.length} passed`);
+  console.log(`\nPublic-copy v1.27 smoke: ${passed}/${results.length} passed`);
   if (passed !== results.length) process.exitCode = 1;
 }
 

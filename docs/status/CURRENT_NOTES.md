@@ -7,19 +7,24 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.26.6 - Ashen Anvil Reinforcements
+- DungeonDex v1.27 - The Contract Board
+- Build/cache labels use `1.27-the-contract-board`.
 
-## Planned v1.27 Development
+## v1.27 The Contract Board
 - The active future roadmap is `docs/status/ROADMAP_V127.md`.
-- Planned release identity: `DungeonDex v1.27 - The Contract Board`.
-- The release is intended to combine clearer Elite Contract choice, three distinct named-hunt presentations, a subtle accessible in-combat contract-target indicator, fulfillment/claim clarity, Guild Journal records, and full mobile/runtime/protected-system verification.
+- Release identity: `DungeonDex v1.27 - The Contract Board`.
+- The release combines clearer Elite Contract choice, three distinct named-hunt presentations, a subtle accessible in-combat contract-target indicator, fulfillment/claim clarity, Guild Journal records, and full mobile/runtime/protected-system verification.
 - Elite Contracts are already live; this roadmap extends their presentation and player feedback rather than replacing the existing lifecycle.
 - v1.27 #139 is complete: a focused Elite Contract lifecycle smoke now protects offer availability, one-active acceptance, exact target matching, completion, one-time claim, save/reload, malformed-state repair, and protected-state isolation. The audit corrected validation so a completed but unclaimed contract remains claimable after save normalization.
 - v1.27 #140 and #141 are complete: the existing Elite Contract Board now presents clearer choice cards and the three established hunts have distinct player-facing briefings without changing their IDs, names, risks, payouts, or writ types.
 - v1.27 #142 is complete: only the exact live contract target receives the accessible `CONTRACT TARGET` combat cue, restrained ember-gold edge, and brief reduced-motion-safe arrival emphasis. Fulfillment now directs the player back to the Board for the existing claim.
 - v1.27 #143 is complete: target defeat, ready-to-claim, claimed, failed, and expired states are now clearly separated across the Board and read-only Guild Journal history. The existing one-time claim path remains the only payout path, and no save field was added.
 - v1.27 #144 is complete: the protected-system release audit passed, the public runtime contract path is covered end to end, and available contract cards now show resolved Floor/Room/Chapter locations instead of `Floor ?`. Compact verification passes 51/51; public runtime passes 26/26.
-- Intermediate roadmap issues do not change the v1.26.6 version/cache authority. A v1.27 label and package require the final release-authority pass and explicit owner approval.
+- Owner authorization advanced version/cache authority to `v1.27 The Contract Board` and `1.27-the-contract-board` for the final #145 package pass.
+- v1.27 #145 is complete: runtime/cache labels, release records, and patch notes are aligned. The final local package is `archive/packages/DungeonDex_v1.27_ItchReady.zip` (`382907` bytes; SHA-256 `454A9A5A7A72E7EADF3147EC4913EE72A93B2329FCC1C4C65E741BA4A8A9C637`).
+- Strict staged and extracted checks passed with 51 paths and zero warnings; the extracted public build launched with DevTools disabled, entered the dungeon, exposed the Guild Journal, and reported no console, runtime, or local-request failures.
+- The owner approved a physical-device exception for this local package. Automated mobile/touch coverage passed, but a fresh Textastic/device pass remains recommended before itch.io upload.
+- No v1.27 release tag or itch.io upload has been created.
 - No new currency, daily timer, alternate dungeon-entry route, monster-affix framework, or additional Revisit lane is planned for v1.27.
 
 ## v1.26.6 Ashen Anvil Reinforcements
@@ -211,7 +216,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.26.6 Ashen Anvil Reinforcements.
+- Current runtime baseline is v1.27 The Contract Board.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

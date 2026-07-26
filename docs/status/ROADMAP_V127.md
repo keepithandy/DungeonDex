@@ -264,7 +264,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - The boss matrix passed 20 bosses, 60 legal fixtures, and 36,000 fights. Temporary staged/extracted package verification passed 11/11, and the compact suite passed 51/51.
 - Full evidence is recorded in `docs/status/PROTECTED_SYSTEM_REGRESSION_AUDIT_V127.md`.
 
-### Planned #145 - v1.27 Release Authority and Package Pass
+### Completed #145 - v1.27 Release Authority and Package Pass
 
 **Patch category:** Version Update / Release
 
@@ -289,6 +289,16 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - strictly audit and launch the extracted ZIP;
 - commit and push the exact release state;
 - create a release tag or upload only with explicit authorization.
+
+**Completed result:**
+
+- Version authority, visible labels, runtime pointers, build guard, public asset queries, and service-worker cache now align on `v1.27 The Contract Board` / `1.27-the-contract-board`.
+- Release documentation and player-facing patch notes now describe the complete #139-#145 Elite Contract release.
+- The final local artifact is `archive/packages/DungeonDex_v1.27_ItchReady.zip` (`382907` bytes; SHA-256 `454A9A5A7A72E7EADF3147EC4913EE72A93B2329FCC1C4C65E741BA4A8A9C637`).
+- The final ZIP passed strict staged and clean-extracted audits with 51 checked paths and zero warnings. Its extracted public runtime launched with DevTools disabled, entered the dungeon, exposed the Guild Journal, and produced zero console, runtime, or local-request failures.
+- The compact suite passed 51/51 after version alignment, including the 20-boss, 60-fixture, 36,000-fight matrix and the complete Elite Contract lifecycle.
+- The owner approved a physical-device exception for this local package. Automated touch/mobile checks passed at 390x844, 430x932, and 768x1024, but a fresh Textastic/device pass remains recommended before any itch.io upload.
+- No release tag or itch.io upload was created.
 
 ## Intended Final Patch Notes Shape
 

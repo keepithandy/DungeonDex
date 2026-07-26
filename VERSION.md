@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.26.6 Ashen Anvil Reinforcements
+v1.27 The Contract Board
 
 ## Current Local Package Version
-v1.26.6 Ashen Anvil Reinforcements
+v1.27 The Contract Board
 
 ## Current Development Target
-v1.26.6 Ashen Anvil Reinforcements
+v1.27 The Contract Board
 
 ## Current Build/Cache Label
-1.26.6-ashen-anvil-reinforcements
+1.27-the-contract-board
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.
