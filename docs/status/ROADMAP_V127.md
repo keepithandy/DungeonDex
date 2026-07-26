@@ -226,7 +226,7 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - Older claimed-ID history remains compatible and readable; it does not invent a missing Bonus Writ result. Failed and expired records remain display-only.
 - Focused lifecycle and Journal smoke coverage protects completion persistence, one-time claims, empty-save behavior, status labels, history copy, and the absence of Journal action buttons.
 
-### Planned #144 - Mobile, Runtime, and Protected-System Release Audit
+### Completed #144 - Mobile, Runtime, and Protected-System Release Audit
 
 **Patch category:** Smoke Hardening / Audit
 
@@ -254,6 +254,15 @@ No new currency, daily timer, real-world timer, battle pass, hidden status, mons
 - No unauthorized change to combat, scaling, rewards, economy, saves, upgrades, Debt, Talent, Revisit, dungeon entry, routes, or script order.
 - All required focused and broad checks pass.
 - Any real defect becomes a separate narrow fix before release authority.
+
+**Completed result:**
+
+- The public Chromium gate now exercises the complete Elite Contract path from three-card initial render through acceptance, matching target cue, ordinary-elite exclusion, completion, save/reload, one-time claim, and read-only Guild Journal history.
+- The audit found and fixed one narrow presentation defect: available offers now show their resolved Floor, Room, and Chapter instead of `Floor ?`.
+- Public runtime passed 26/26; interface/accessibility 22/22; mobile layout 19/19; computed contrast 7/7; touch geometry passed at 390x844, 430x932, and 768x1024; source package audit passed 51 paths with zero warnings.
+- Enter Dungeon passed 11/11; Debt/Talent 4/4; Merchant Gear Upgrades, Trophy Echo-only Revisit, Journal, Elite Contract lifecycle, and app-wiring authority passed.
+- The boss matrix passed 20 bosses, 60 legal fixtures, and 36,000 fights. Temporary staged/extracted package verification passed 11/11, and the compact suite passed 51/51.
+- Full evidence is recorded in `docs/status/PROTECTED_SYSTEM_REGRESSION_AUDIT_V127.md`.
 
 ### Planned #145 - v1.27 Release Authority and Package Pass
 

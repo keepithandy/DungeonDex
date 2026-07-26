@@ -335,6 +335,128 @@ async function main() {
     const eliteShortcut = await evaluate(client, `({ active: document.querySelector('.screen.active')?.id || '', focus: document.activeElement?.id || '' })`);
     record('Keyboard Town menu reaches the existing Elite Contracts board', eliteShortcut.active === 'screen-town' && eliteShortcut.focus === 'questPanel', JSON.stringify(eliteShortcut));
 
+    activeSurface = 'Elite Contracts';
+    const initialContracts = await evaluate(client, `(() => ({
+      cards: Array.from(document.querySelectorAll('.elite-contract-card')).map(card => card.innerText || ''),
+      takeMarks: document.querySelectorAll('[data-start-contract]').length
+    }))()`);
+    record('Public runtime renders all three established contract choices', initialContracts.cards.length === 3
+      && initialContracts.takeMarks === 3
+      && initialContracts.cards.some(text => /Glassfang Brute/.test(text))
+      && initialContracts.cards.some(text => /Ash-Crowned Marauder/.test(text))
+      && initialContracts.cards.some(text => /Cinderjaw Bailiff/.test(text))
+      && initialContracts.cards.every(text => /WHERE\nFloor \d+/.test(text) && !/Floor \?/.test(text)), JSON.stringify(initialContracts));
+
+    await evaluate(client, `document.querySelector('[data-start-contract="lowfire_bounty"]')?.click(); true`);
+    await waitFor(client, `S?.player?.eliteContracts?.active?.id === 'lowfire_bounty'`, 'Elite Contract acceptance');
+    const acceptedContract = await evaluate(client, `(() => ({
+      activeId: S?.player?.eliteContracts?.active?.id || '',
+      status: S?.player?.eliteContracts?.active?.status || '',
+      title: document.querySelector('.elite-contract-card.active strong')?.textContent || '',
+      startActions: document.querySelectorAll('[data-start-contract]').length
+    }))()`);
+    record('Public runtime accepts exactly one active contract', acceptedContract.activeId === 'lowfire_bounty'
+      && acceptedContract.status === 'active'
+      && /ACTIVE: Glassfang Brute/.test(acceptedContract.title)
+      && acceptedContract.startActions === 0, JSON.stringify(acceptedContract));
+
+    activeSurface = 'Contract target combat';
+    const matchingTargetCue = await evaluate(client, `(() => {
+      const active = S.player.eliteContracts.active;
+      const target = applyEliteContractTargetMonster(S, {
+        name: 'Runtime Elite', family: 'Brute', type: 'Elite', tier: 'Elite', level: active.targetFloor,
+        hp: 120, maxHp: 120, power: 24, guard: 8, speed: 5, rewardGold: 25, rewardXp: 30, rewardShard: 3
+      });
+      window.__ddRuntimeContractTarget = target;
+      S.run.active = true;
+      S.run.monster = target;
+      renderRun();
+      return {
+        badge: document.querySelector('.contract-target-badge')?.textContent?.trim() || '',
+        objective: document.querySelector('.contract-target-objective')?.textContent?.trim() || '',
+        stage: document.querySelectorAll('.contract-target-stage').length,
+        hp: document.querySelectorAll('.contract-target-hp').length
+      };
+    })()`);
+    record('Matching active target receives the accessible combat cue', matchingTargetCue.badge === 'Contract Target'
+      && /Defeat Glassfang Brute to fulfill the hunt\./.test(matchingTargetCue.objective)
+      && matchingTargetCue.stage === 1
+      && matchingTargetCue.hp === 1, JSON.stringify(matchingTargetCue));
+
+    const ordinaryEliteCue = await evaluate(client, `(() => {
+      S.run.monster = {
+        name: 'Ordinary Elite', family: 'Brute', type: 'Elite', tier: 'Elite', level: 1,
+        hp: 100, maxHp: 100, power: 20, guard: 6, speed: 4, rewardGold: 20, rewardXp: 20, rewardShard: 2
+      };
+      renderRun();
+      return {
+        badges: document.querySelectorAll('.contract-target-badge').length,
+        stages: document.querySelectorAll('.contract-target-stage').length,
+        hp: document.querySelectorAll('.contract-target-hp').length
+      };
+    })()`);
+    record('Ordinary elites do not receive the contract-target cue', ordinaryEliteCue.badges === 0
+      && ordinaryEliteCue.stages === 0
+      && ordinaryEliteCue.hp === 0, JSON.stringify(ordinaryEliteCue));
+
+    activeSurface = 'Contract fulfillment';
+    const fulfilledContract = await evaluate(client, `(() => {
+      const completed = completeEliteContractTarget(S, window.__ddRuntimeContractTarget);
+      S.run.active = false;
+      S.run.monster = null;
+      render();
+      const active = S.player.eliteContracts.active;
+      return {
+        completed,
+        activeId: active?.id || '',
+        claimable: !!active?.claimable,
+        status: active?.status || '',
+        title: document.querySelector('.elite-contract-card.ready strong')?.textContent || '',
+        claimLabel: document.getElementById('claimEliteContractBtn')?.textContent?.trim() || ''
+      };
+    })()`);
+    record('Target defeat becomes a ready-to-claim Board state', fulfilledContract.completed
+      && fulfilledContract.activeId === 'lowfire_bounty'
+      && fulfilledContract.claimable
+      && fulfilledContract.status === 'completed'
+      && /TARGET DEFEATED: Glassfang Brute/.test(fulfilledContract.title)
+      && fulfilledContract.claimLabel === 'Claim Writ', JSON.stringify(fulfilledContract));
+
+    const reloadedContract = await evaluate(client, `(() => {
+      save(S);
+      S = load();
+      render();
+      return {
+        activeId: S?.player?.eliteContracts?.active?.id || '',
+        claimable: !!S?.player?.eliteContracts?.active?.claimable,
+        claimButton: !!document.getElementById('claimEliteContractBtn')
+      };
+    })()`);
+    record('Completed contract survives public save and reload', reloadedContract.activeId === 'lowfire_bounty'
+      && reloadedContract.claimable
+      && reloadedContract.claimButton, JSON.stringify(reloadedContract));
+
+    await sleep(200);
+    const claimedContract = await evaluate(client, `(() => {
+      const before = S.player.gold;
+      document.getElementById('claimEliteContractBtn')?.click();
+      const after = S.player.gold;
+      const duplicate = claimEliteContract(S);
+      return {
+        paid: after > before,
+        active: S.player.eliteContracts.active,
+        claimed: S.player.eliteContracts.claimed.slice(),
+        duplicate,
+        goldStableAfterDuplicate: S.player.gold === after
+      };
+    })()`);
+    record('Board claim pays once and blocks a duplicate claim', claimedContract.paid
+      && claimedContract.active === null
+      && claimedContract.claimed.includes('lowfire_bounty')
+      && claimedContract.duplicate === false
+      && claimedContract.goldStableAfterDuplicate, JSON.stringify(claimedContract));
+    await sleep(250); // Let the claim action guard clear before the independent Merchant interaction.
+
     activeSurface = 'Ashen Anvil';
     const offhandCard = await evaluate(client, `(() => {
       S.player.gold = 1000;
@@ -399,8 +521,14 @@ async function main() {
 
     await visitTab('Archive', 'tab-dex', 'screen-dex');
     await visitTab('Guild Journal', 'tab-archive', 'screen-archive');
-    const journal = await evaluate(client, `document.getElementById('guildJournalPanel')?.innerText || ''`);
-    record('Guild Journal remains available in the public runtime', /Guild Journal/.test(journal), journal.slice(0, 220));
+    const journal = await evaluate(client, `(() => ({
+      text: document.getElementById('guildJournalPanel')?.innerText || '',
+      actionCount: document.querySelectorAll('#guildJournalPanel button').length
+    }))()`);
+    record('Guild Journal remains available in the public runtime', /Guild Journal/.test(journal.text), journal.text.slice(0, 220));
+    record('Guild Journal shows the claimed contract as read-only history', /Elite Contract/.test(journal.text)
+      && /Claimed: Glassfang Brute/.test(journal.text)
+      && journal.actionCount === 0, journal.text.slice(0, 320));
 
     activeSurface = 'Town';
     await evaluate(client, `document.getElementById('tab-town')?.click(); true`);

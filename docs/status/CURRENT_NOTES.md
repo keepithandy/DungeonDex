@@ -18,6 +18,7 @@
 - v1.27 #140 and #141 are complete: the existing Elite Contract Board now presents clearer choice cards and the three established hunts have distinct player-facing briefings without changing their IDs, names, risks, payouts, or writ types.
 - v1.27 #142 is complete: only the exact live contract target receives the accessible `CONTRACT TARGET` combat cue, restrained ember-gold edge, and brief reduced-motion-safe arrival emphasis. Fulfillment now directs the player back to the Board for the existing claim.
 - v1.27 #143 is complete: target defeat, ready-to-claim, claimed, failed, and expired states are now clearly separated across the Board and read-only Guild Journal history. The existing one-time claim path remains the only payout path, and no save field was added.
+- v1.27 #144 is complete: the protected-system release audit passed, the public runtime contract path is covered end to end, and available contract cards now show resolved Floor/Room/Chapter locations instead of `Floor ?`. Compact verification passes 51/51; public runtime passes 26/26.
 - Intermediate roadmap issues do not change the v1.26.6 version/cache authority. A v1.27 label and package require the final release-authority pass and explicit owner approval.
 - No new currency, daily timer, alternate dungeon-entry route, monster-affix framework, or additional Revisit lane is planned for v1.27.
 

@@ -272,7 +272,10 @@ function eliteContractBoardMarkup(state) {
 
 	const available = availableEliteContracts(state);
 	const body = available.length ?
-		available.map(contract => contractCard(contract, contract)).join('') :
+		available.map(contract => {
+			const offer = eliteContractOfferModel(state, contract.id);
+			return contractCard(contract, eliteBoardContractModel(contract, state, false, offer));
+		}).join('') :
 		'<p class="small muted elite-contract-empty">No paid marks are currently available.</p>';
 
 	return `<div class="elite-contract-board">
