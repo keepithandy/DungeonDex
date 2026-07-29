@@ -109,7 +109,7 @@
       district?.name
     ].filter(Boolean).join(' '));
     const tier = String(monster?.tier || 'Common');
-    const skin = combatBackdropKind(null, district, safeDepth, monster);
+    let skin = combatBackdropKind(null, district, safeDepth, monster);
     let body = 'stalker';
     let head = 'skull';
     let arms = 'claws';
@@ -122,30 +122,37 @@
       arms = 'hooks';
       crest = 'iron-crown';
       feature = 'iron-plates';
+      if (combatBackdropHas(key, ['sunken', 'drowned'])) skin = 'sunken-court';
+      else if (combatBackdropHas(key, ['salt'])) skin = 'salt-forge';
+      else skin = 'veyruhn';
     } else if (combatBackdropHas(key, ['cultist', 'ritual', 'chapel', 'acolyte', 'herald', 'drummer'])) {
       body = 'ritualist';
       head = 'hood';
       arms = 'ritual';
       crest = 'candle-crown';
       feature = 'chapel-sigil';
+      skin = 'red-chapel';
     } else if (combatBackdropHas(key, ['mireborn', 'wyrm', 'spitter', 'mire', 'swamp', 'lurker'])) {
       body = combatBackdropHas(key, ['stalker', 'spitter']) ? 'stalker' : 'crawler';
       head = 'glass';
       arms = 'many';
       crest = 'antlers';
       feature = 'glass-eyes';
+      skin = 'mireglass';
     } else if (combatBackdropHas(key, ['shade', 'watcher', 'seer', 'noctis', 'lanternless', 'void'])) {
       body = 'shade';
       head = 'void';
       arms = 'tendrils';
       crest = 'void-crown';
       feature = 'void-eye';
+      skin = 'noctis';
     } else if (combatBackdropHas(key, ['harpy', 'wing', 'rookery', 'rafter'])) {
       body = 'stalker';
       head = 'beak';
       arms = 'claws';
       crest = 'antlers';
       feature = 'smoke-tendrils';
+      skin = 'rookery';
     } else if (combatBackdropHas(key, ['beast', 'hound', 'ravager', 'maw', 'devourer', 'brute', 'husk', 'ghoul'])) {
       body = combatBackdropHas(key, ['hound', 'stalker']) ? 'stalker' : 'brute';
       head = 'skull';

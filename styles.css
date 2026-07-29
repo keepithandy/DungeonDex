@@ -8327,14 +8327,25 @@ button:focus-visible,
   transform: rotate(18deg);
 }
 
-.monster-core {
+.monster-model .monster-core {
   z-index: 8;
+  width: 20px;
+  height: 22px;
+  left: 50%;
+  bottom: 28%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  border-radius: 50% 50% 45% 45%;
+  font-size: .62rem;
+  font-weight: 900;
   border: 1px solid color-mix(in srgb, var(--monster-accent) 34%, transparent);
   color: var(--monster-eye);
   background:
     radial-gradient(circle, color-mix(in srgb, var(--monster-accent) 32%, transparent), transparent 68%),
     rgba(0,0,0,.22);
   box-shadow: 0 0 16px color-mix(in srgb, var(--monster-accent) 42%, transparent);
+  text-shadow: 0 0 14px var(--monster-eye);
 }
 
 .monster-ornament {
@@ -8545,6 +8556,48 @@ button:focus-visible,
   --monster-mid: rgba(23,24,28,.98);
   --monster-accent: rgba(255,148,74,.88);
   --monster-eye: rgba(255,205,132,.96);
+}
+
+.monster-feature--glass-eyes {
+  --monster-main: rgba(22,54,50,.98);
+  --monster-mid: rgba(10,31,35,.98);
+  --monster-accent: rgba(84,232,186,.96);
+  --monster-eye: rgba(174,255,225,.99);
+  --monster-bone: rgba(136,214,190,.88);
+}
+
+.monster-feature--chain-ornament,
+.monster-feature--iron-plates {
+  --monster-main: rgba(54,47,39,.98);
+  --monster-mid: rgba(29,29,29,.98);
+  --monster-accent: rgba(255,170,70,.95);
+  --monster-eye: rgba(255,220,132,.98);
+  --monster-bone: rgba(198,177,136,.9);
+}
+
+.monster-feature--chapel-sigil {
+  --monster-main: rgba(59,25,34,.98);
+  --monster-mid: rgba(28,12,20,.98);
+  --monster-accent: rgba(255,64,92,.96);
+  --monster-eye: rgba(255,170,150,.98);
+  --monster-bone: rgba(225,184,165,.88);
+}
+
+.monster-feature--smoke-tendrils {
+  --monster-main: rgba(38,38,50,.98);
+  --monster-mid: rgba(17,18,27,.98);
+  --monster-accent: rgba(202,206,255,.88);
+  --monster-eye: rgba(238,238,255,.98);
+  --monster-bone: rgba(190,190,214,.88);
+}
+
+.monster-feature--void-eye {
+  --monster-main: rgba(22,23,54,.98);
+  --monster-mid: rgba(8,10,28,.99);
+  --monster-accent: rgba(126,142,255,.96);
+  --monster-eye: rgba(203,211,255,.99);
+  --monster-bone: rgba(143,150,210,.86);
+  --monster-shadow: rgba(3,4,18,.72);
 }
 
 .monster-skin--lowfire .monster-body::after,
@@ -8782,6 +8835,90 @@ button:focus-visible,
   filter: blur(1.2px);
   opacity: .82;
 }
+
+.monster-feature--void-eye .monster-body {
+  background:
+    radial-gradient(ellipse at 50% 22%, color-mix(in srgb, var(--monster-accent) 25%, transparent), transparent 56%),
+    linear-gradient(180deg, var(--monster-mid), rgba(4,5,18,.22) 84%, transparent);
+}
+
+.monster-feature--void-eye .monster-core {
+  color: rgba(206,214,255,.99) !important;
+  background:
+    radial-gradient(circle, rgba(174,186,255,.5), transparent 68%),
+    rgba(8,10,32,.34) !important;
+  border-color: color-mix(in srgb, var(--monster-eye) 42%, transparent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--monster-eye) 48%, transparent),
+    0 0 34px color-mix(in srgb, var(--monster-accent) 28%, transparent);
+}
+
+.monster-feature--void-eye .monster-crest::before,
+.monster-feature--void-eye .monster-crest::after {
+  background: linear-gradient(180deg, rgba(152,164,255,.86), rgba(20,22,58,.18)) !important;
+  box-shadow: 0 0 14px rgba(126,142,255,.24);
+}
+
+.monster-feature--void-eye .monster-arm {
+  background: linear-gradient(180deg, rgba(31,34,78,.82), rgba(6,7,20,.28)) !important;
+}
+
+.monster-feature--glass-eyes .monster-core {
+  color: rgba(168,255,224,.99) !important;
+  background:
+    radial-gradient(circle, rgba(76,232,180,.46), transparent 68%),
+    rgba(6,35,32,.34) !important;
+  border-color: rgba(124,255,210,.36);
+  box-shadow: 0 0 20px rgba(84,232,186,.36);
+}
+
+.monster-feature--smoke-tendrils .monster-core {
+  color: rgba(235,238,255,.96) !important;
+  background:
+    radial-gradient(circle, rgba(198,204,255,.32), transparent 70%),
+    rgba(12,14,28,.28) !important;
+  border-color: rgba(214,218,255,.25);
+}
+
+.monster-feature--chapel-sigil .monster-core {
+  color: rgba(255,178,154,.98) !important;
+  background:
+    radial-gradient(circle, rgba(255,68,94,.42), transparent 70%),
+    rgba(46,7,16,.28) !important;
+  border-color: rgba(255,96,120,.34);
+}
+
+.monster-feature--chain-ornament .monster-core,
+.monster-feature--iron-plates .monster-core {
+  color: rgba(255,224,140,.98) !important;
+  background:
+    radial-gradient(circle, rgba(255,170,64,.42), transparent 70%),
+    rgba(36,24,8,.28) !important;
+  border-color: rgba(255,180,86,.34);
+}
+
+.monster-feature--smoke-tendrils .monster-ornament::before,
+.monster-feature--void-eye .monster-ornament::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 82%;
+  height: 58%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 20% 45%, color-mix(in srgb, var(--monster-accent) 18%, transparent), transparent 38%),
+    radial-gradient(ellipse at 78% 38%, color-mix(in srgb, var(--monster-accent) 16%, transparent), transparent 42%);
+  filter: blur(2px);
+  opacity: .72;
+}
+
+.monster-feature--glass-eyes .monster-back {
+  background:
+    radial-gradient(ellipse at 50% 18%, color-mix(in srgb, var(--monster-accent) 28%, transparent), transparent 62%),
+    radial-gradient(ellipse at 50% 86%, rgba(12,45,41,.58), transparent 74%);
+}
 .monster-feature--iron-plates .monster-body::after {
   inset: auto 14% 22%;
   height: 28%;
@@ -8823,9 +8960,14 @@ button:focus-visible,
   height: 86%;
   opacity: .92;
 }
-.combat-device-boss .monster-core {
+.combat-device-boss .monster-model .monster-core {
   width: 25px;
   height: 27px;
+  color: var(--monster-eye);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--monster-accent) 38%, transparent), transparent 70%),
+    rgba(0,0,0,.25);
+  text-shadow: 0 0 20px var(--monster-eye);
 }
 .combat-device-boss .monster-crest {
   top: -10%;
