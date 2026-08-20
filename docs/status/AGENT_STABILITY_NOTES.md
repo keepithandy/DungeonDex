@@ -1,9 +1,19 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.27 The Contract Board Target
+## Current v1.28.0 Rarity Baseline Target
 
-- Current target: `v1.27 The Contract Board`.
-- Current build/cache label: `1.27-the-contract-board`.
+- Current target: `v1.28.0 Rarity Baseline`.
+- Current build/cache label: `1.28.0-rarity-baseline`.
+- The runtime-backed rarity audit owns the current drop/rarity baseline. Do not tune against `tools/simulate_deep_scaling.py` or another copied formula model when the runtime audit can measure the active implementation directly.
+- v1.28.0 records, but does not alter, the early/mid elite gear-frequency crossover, the D40 Mythic-set/scarcity boundary, and the four-set duplicate burden.
+- Preserve rarity weights, multipliers, caps, drop rates, deep scarcity, Mythic-set chances, combat, scaling, rewards, economy, saves, upgrades, dungeon entry, Debt, Talent, progression, and Trophy Echo-only Revisit behavior until a focused roadmap patch explicitly scopes and verifies a change.
+- Local non-browser verification passes, including the expanded rarity audit, 20-boss/36,000-fight matrix, app wiring, protected systems, and strict source audit. The compact result is 47/53 passed, one skipped, and five unchanged environment-only failures caused by missing Chromium and PowerShell.
+- The local v1.27 itch-ready ZIP remains the latest authorized package. v1.28.0 has no package, tag, or itch.io upload.
+
+## Historical v1.27 The Contract Board Target
+
+- Historical target: `v1.27 The Contract Board`.
+- Historical build/cache label: `1.27-the-contract-board`.
 - #139-#145 deliver the clearer three-hunt Elite Contract Board, exact-target combat cue, one-time fulfillment/claim clarity, read-only Guild Journal records, protected-system audit, and final package pass.
 - #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.
 - The feature reuses the existing `upgradeLevel` save field; no Offhand card or action is exposed until an Offhand is equipped.

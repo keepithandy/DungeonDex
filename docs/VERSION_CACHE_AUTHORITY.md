@@ -4,11 +4,11 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.27 The Contract Board`
-- Visible semantic version: `1.27`
-- Build/cache slug: `1.27-the-contract-board`
+- Public version: `v1.28.0 Rarity Baseline`
+- Visible semantic version: `1.28.0`
+- Build/cache slug: `1.28.0-rarity-baseline`
 
-The authorized v1.27 release pass aligns release records and runtime labels. An
+The authorized v1.28.0 version pass aligns release records and runtime labels. An
 itch package is created only after explicit packaging authorization and successful
 release verification. The resulting ZIP remains an output, not version authority.
 

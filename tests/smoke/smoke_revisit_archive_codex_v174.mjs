@@ -19,15 +19,15 @@ async function main() {
   ]);
 
   record(
-    'Archive Codex Revisit smoke retired for v1.27',
-    surface.includes('v1.27 Revisit surface: Trophy Echo only'),
+    'Archive Codex Revisit smoke retired for v1.28.0',
+    surface.includes('v1.28.0 Revisit surface: Trophy Echo only'),
     'active Revisit surface is Trophy Echo-only'
   );
 
   record(
     'No Archive Codex requirement blocks compact smoke',
-    !readme.includes('Revisit Archive Codex is required for v1.27')
-      && !notes.includes('Revisit Archive Codex is required for v1.27'),
+    !readme.includes('Revisit Archive Codex is required for v1.28.0')
+      && !notes.includes('Revisit Archive Codex is required for v1.28.0'),
     'Archive Codex is not part of the active Trophy Echo-only release gate'
   );
 

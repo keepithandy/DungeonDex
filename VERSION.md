@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.27 The Contract Board
+v1.28.0 Rarity Baseline
 
 ## Current Local Package Version
-v1.27 The Contract Board
+v1.28.0 Rarity Baseline
 
 ## Current Development Target
-v1.27 The Contract Board
+v1.28.0 Rarity Baseline
 
 ## Current Build/Cache Label
-1.27-the-contract-board
+1.28.0-rarity-baseline
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

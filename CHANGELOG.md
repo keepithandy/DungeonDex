@@ -8,14 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.27 The Contract Board`
-* Current local package baseline: `v1.27 The Contract Board`
-* Current development target: `v1.27 The Contract Board`
-* Current build/cache label: `1.27-the-contract-board`
+* Public/live itch version: `v1.28.0 Rarity Baseline`
+* Current local package baseline: `v1.28.0 Rarity Baseline`
+* Current development target: `v1.28.0 Rarity Baseline`
+* Current build/cache label: `1.28.0-rarity-baseline`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.28.0 - Rarity Baseline
+
+* Added a deterministic audit that executes the real rarity, drop-frequency, deep-scarcity, and Mythic-set formulas across 33 depth/source checkpoints.
+* Locked the current four-set, five-piece Mythic collection contract and measured its duplicate burden over 30,000 seeded trials.
+* Recorded the current early/mid elite frequency crossover and the shared D40 Mythic-set/scarcity boundary as evidence for a later focused balance decision; no tuning is included in this patch.
+* Published the staged v1.28.1-v1.28.9 roadmap leading to an explicitly authorized v1.29 package/release pass.
+* Aligned the visible version, runtime pointer, service-worker cache, direct asset queries, authority docs, and focused mismatch smoke to `1.28.0-rarity-baseline`.
+* Verification passed the new 33-row rarity audit, app-wiring/cache authority, 20-boss/36,000-fight readiness matrix, public copy and Revisit guards, Merchant Gear Upgrades, contracts, Forge, package-checker modes, and the strict 51-path source audit with zero warnings. The full compact suite reports 47/53 passed, one skipped, and the same five environment-only failures present at baseline because Chromium and PowerShell are unavailable locally.
+* Preserved combat formulas, monster and boss scaling, rarity weights and multipliers, rewards and drop rates, economy, save schema, Merchant Gear Upgrades, dungeon entry, Debt, Talent, progression, and Trophy Echo-only Revisit behavior.
 
 ## v1.27 - The Contract Board
 

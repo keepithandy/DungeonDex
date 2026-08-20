@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.27-the-contract-board';
+const CACHE_NAME = 'dungeondex-v1.28.0-rarity-baseline';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.27-the-contract-board';
+const BUILD_QS = '1.28.0-rarity-baseline';
 const ASSETS = [
   './',
   './index.html',

@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.27';
-const RELEASE_NAME = 'The Contract Board';
+const VISIBLE_BUILD = '1.28.0';
+const RELEASE_NAME = 'Rarity Baseline';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
-const BUILD_QS = '1.27-the-contract-board';
+const BUILD_QS = '1.28.0-rarity-baseline';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,

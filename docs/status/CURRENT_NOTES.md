@@ -7,8 +7,20 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.27 - The Contract Board
-- Build/cache labels use `1.27-the-contract-board`.
+- DungeonDex v1.28.0 - Rarity Baseline
+- Build/cache labels use `1.28.0-rarity-baseline`.
+
+## v1.28.0 Rarity Baseline
+- The active roadmap is `docs/status/ROADMAP_V128.md`; v1.28.0 is the non-tuning foundation for the staged v1.28.1-v1.28.9 work.
+- Release identity: `DungeonDex v1.28.0 - Rarity Baseline`.
+- `tests/smoke/smoke_rarity_progression_audit_v1280.mjs` executes the actual runtime formulas across 33 depth/source rows and verifies that the audit does not mutate player or run state.
+- The baseline records four Mythic sets with five pieces each. A 30,000-trial uniform collection simulation reaches the first complete set at 24 set drops median, 36 at p90, and 40 at p95, averaging 10.49 duplicate pieces by completion.
+- Current elite gear frequency is below normal gear frequency through threat 14 (`12%` versus `42%` at D15; `16%` versus `48%` at D30), then crosses above normal at threat 15 (`68.04%` versus `49.14%` at D43 under the first scarcity band).
+- D40 simultaneously activates the first deep-loot scarcity band and permits Mythic-set drops after a recorded safe extraction at D40. Eligible per-drop set chances there are `1.2%` normal, `2.8%` elite, and `7%` boss.
+- Those observations are evidence for the focused v1.28.4 reward-curve decision. v1.28.0 does not change rarity weights, multipliers, caps, drop rates, scarcity, set chances, or duplicate behavior.
+- Focused verification passes: app wiring/cache authority; 33-row rarity audit; 20 named bosses, 60 legal progression fixtures, and 36,000 real combat fights; public copy; Trophy Echo-only Revisit; Town ownership; package-checker modes 8/8; and strict source audit 51 paths with zero warnings.
+- The expanded compact suite reports 47/53 passed, one skipped, and five environment-only failures. Debt/Talent runtime, touch geometry, computed contrast, and public-console checks require an unavailable Chromium browser; the package build/extraction gate requires unavailable `powershell.exe`. The pre-change baseline had the same five failures and one skip across 51 commands; v1.28.0 adds two passing rarity-audit commands.
+- No v1.28 package, release tag, or itch.io upload has been created. The local v1.27 itch-ready ZIP remains the latest authorized package artifact.
 
 ## v1.27 The Contract Board
 - The active future roadmap is `docs/status/ROADMAP_V127.md`.
@@ -216,7 +228,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.27 The Contract Board.
+- Current runtime baseline is v1.28.0 Rarity Baseline.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
