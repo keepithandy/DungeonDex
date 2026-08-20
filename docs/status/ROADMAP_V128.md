@@ -50,6 +50,8 @@ The release should add depth without adding a second game. Town -> Dungeon -> Lo
 - Add the smallest complete encounter slice that proves Town-to-dungeon-to-loot-to-return continuity.
 - Reuse current rendering and generation contracts; do not introduce a second district framework.
 
+Implementation checkpoint: D31-D40 is the selected boss-free band; the district identity and two identity-only encounters are implemented through the existing generation, combat, reward, loot, and return paths. The focused vertical-slice smoke is the acceptance owner for this patch.
+
 ### v1.28.2 — Encounter Expansion
 
 - Add a bounded roster of Reliquary enemies using established families/types/affixes.

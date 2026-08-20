@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.28.0-rarity-baseline';
+const CACHE_NAME = 'dungeondex-v1.28.1-drowned-reliquary-first-descent';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.28.0-rarity-baseline';
+const BUILD_QS = '1.28.1-drowned-reliquary-first-descent';
 const ASSETS = [
   './',
   './index.html',

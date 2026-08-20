@@ -1,13 +1,13 @@
-// DungeonDex v1.28.0 runtime pointer.
+// DungeonDex v1.28.1 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.28.0: Rarity Baseline
-// - Adds a runtime-backed rarity/progression audit and the staged v1.28 roadmap.
-// - Preserves drop rates, rarity formulas, combat, rewards, economy, saves, progression, and Revisit behavior.
+// v1.28.1: Drowned Reliquary - First Descent
+// - Fills the D31-D40 district gap with a dedicated identity, two encounter identities, and visual routing.
+// - Preserves combat math, boss cadence, drop rates, rewards, economy, saves, progression, and Revisit behavior.
 
-window.DUNGEONDEX_BUILD = '1.28.0';
-window.DUNGEONDEX_BUILD_QS = '1.28.0-rarity-baseline';
+window.DUNGEONDEX_BUILD = '1.28.1';
+window.DUNGEONDEX_BUILD_QS = '1.28.1-drowned-reliquary-first-descent';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -63,7 +63,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.28.0-rarity-baseline';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.28.1-drowned-reliquary-first-descent';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

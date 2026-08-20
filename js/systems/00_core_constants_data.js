@@ -96,8 +96,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.28.0';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.28.0';
+  const BUILD = '1.28.1';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.28.1';
   // Legacy preview globals were retired in v1.12.4; the ruleset-backed helper path is the only active talent preview source.
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
@@ -304,6 +304,7 @@
     { id:'lowfire', min:1, max:10, name:'Lowfire District', line:'Lamps stay low and debts stay warm.', tone:'lowfire', mood:'Warm lamps, close markets, shallow hauls.' },
     { id:'ashgate', min:11, max:20, name:'Ashgate Warrens', line:'Every wall is scraped by retreat.', tone:'ashgate', mood:'Coal smoke, narrow paths, scraped stone.' },
     { id:'ember-debtworks', min:21, max:30, name:'Ember Debtworks', line:'Chains tick like ledgers closing.', tone:'debtworks', mood:'Red worklight, iron ledgers, closing chains.' },
+    { id:'drowned-reliquary', min:31, max:40, name:'The Drowned Reliquary', line:'Drowned bells keep ringing beneath sealed water.', tone:'drowned-reliquary', mood:'Black water, sealed relics, bells without air.' },
     { id:'cinderbone', min:41, max:50, name:'Cinderbone Halls', line:'Old champions become furnace architecture.', tone:'cinderbone', mood:'Champion dust, bone pillars, furnace glow.' },
     { id:'blacktithe', min:51, max:60, name:'Blacktithe Deep', line:'Every step is counted like grave coin.', tone:'blacktithe', mood:'Grave tolls, sealed doors, heavy shadow.' },
     { id:'lanternless', min:61, max:70, name:'Lanternless Vault', line:'Hope is stored here without flame.', tone:'lanternless', mood:'Sealed quiet, cold glass, dead lamplight.' },
@@ -311,6 +312,25 @@
     { id:'redwake', min:81, max:90, name:'Redwake Catacombs', line:'The dead do not rest; they accrue.', tone:'redwake', mood:'Red water, bone invoices, wet stone.' },
     { id:'final-lowflame', min:91, max:100, name:'The Final Lowflame', line:'The first ember waits under impossible weight.', tone:'final-lowflame', mood:'Small light, deep silence, impossible weight.' }
   ];
+
+  // Identity-only district encounters. These reuse the established monster stat,
+  // tier, reward, and RNG pipeline; entries must not carry numeric tuning fields.
+  const DISTRICT_ENCOUNTER_IDENTITIES = Object.freeze({
+    'drowned-reliquary': Object.freeze([
+      Object.freeze({
+        name: 'Bell-Drowned Warden',
+        family: 'Revenant',
+        type: 'Warden',
+        lore: 'A drowned keeper still guards the reliquary bells, though no air remains to carry their toll.'
+      }),
+      Object.freeze({
+        name: 'Siltbound Reliquary Lurker',
+        family: 'Mireborn',
+        type: 'Lurker',
+        lore: 'Silt and old prayer-ribbons drag behind a scavenger shaped by the sealed black water.'
+      })
+    ])
+  });
 
   const BOSS_FLOOR_NAMES = {
     5:'The First Collection',

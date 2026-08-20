@@ -37,6 +37,12 @@ Current design guardrails:
 - Avoid monster affixes unless explicitly requested.
 - Elite Board is the optional challenge layer.
 
+### District progression
+
+Depth is owned by the ordered `DISTRICT_DATA` registry. D31-D40 belongs to the Drowned Reliquary and uses the existing monster-generation, combat, reward, loot, and return contracts.
+
+The Reliquary's two v1.28.1 encounters are identity-only overlays: they may replace generated name, family, type, and lore, but they must not carry numeric tuning fields, add random rolls, or bypass the established stat/reward pipeline. D31-D40 contains no boss cadence slot; existing named boss depths remain unchanged.
+
 ### Revisit
 
 Revisit is the town/archive memory layer. It should build from existing save records, not replace the core dungeon loop.
@@ -44,7 +50,7 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Trophy Echo is the only active Revisit lane in the v1.28.0 baseline.
+- Trophy Echo is the only active Revisit lane in the v1.28.1 baseline.
 - Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 

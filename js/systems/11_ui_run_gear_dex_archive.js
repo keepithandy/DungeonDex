@@ -25,6 +25,7 @@
 
     if (safeDepth <= 4 || combatBackdropHas(districtKey, ['lowsteps', 'lowfire', 'ashgate'])) return 'lowfire';
     if (combatBackdropHas(districtKey, ['veyruhn', 'bellforge', 'debtworks', 'cinderbone', 'forge', 'furnace'])) return 'veyruhn';
+    if (combatBackdropHas(districtKey, ['drownedreliquary', 'reliquary'])) return 'drowned-reliquary';
     if (combatBackdropHas(districtKey, ['mireglass', 'mire', 'sootveil', 'swamp'])) return 'mireglass';
     if (combatBackdropHas(districtKey, ['redchapel', 'chapel', 'blacktithe', 'ritual'])) return 'red-chapel';
     if (combatBackdropHas(districtKey, ['saltforge', 'salt', 'hunger', 'kiln', 'mineral'])) return 'salt-forge';
@@ -32,6 +33,7 @@
     if (combatBackdropHas(districtKey, ['rookery', 'rafter'])) return 'rookery';
     if (combatBackdropHas(districtKey, ['noctis', 'atelier', 'lanternless', 'lowflame', 'vault'])) return 'noctis';
 
+    if (combatBackdropHas(monsterKey, ['belldrowned', 'reliquary', 'siltbound'])) return 'drowned-reliquary';
     if (combatBackdropHas(monsterKey, ['harpy', 'silkbound', 'rookery', 'feather', 'wing'])) return 'rookery';
     if (combatBackdropHas(monsterKey, ['mireborn', 'venom', 'spitter', 'frostbit', 'mireglass'])) return 'mireglass';
     if (combatBackdropHas(monsterKey, ['bloodlit', 'cultist', 'gravesworn', 'revenant', 'bleed'])) return 'red-chapel';
@@ -43,7 +45,8 @@
     if (hasDepth) {
       if (safeDepth <= 10) return 'lowfire';
       if (safeDepth <= 25) return 'veyruhn';
-      if (safeDepth <= 38) return 'mireglass';
+      if (safeDepth <= 30) return 'mireglass';
+      if (safeDepth <= 40) return 'drowned-reliquary';
       if (safeDepth <= 50) return 'salt-forge';
       if (safeDepth <= 62) return 'red-chapel';
       if (safeDepth <= 78) return 'sunken-court';
@@ -59,6 +62,7 @@
     const legacyClass = {
       lowfire: safeDepth <= 4 ? 'district-lowsteps' : 'district-lowfire',
       veyruhn: 'district-veyruhn',
+      'drowned-reliquary': 'district-drowned-reliquary',
       mireglass: 'district-mireglass',
       'red-chapel': 'district-redchapel',
       'salt-forge': 'district-saltforge',
@@ -88,6 +92,7 @@
       district?.tone,
       depth
     ].filter(Boolean).join(' '));
+    if (combatBackdropHas(key, ['drownedreliquary', 'reliquary', 'siltbound', 'belldrowned'])) return 'mireborn';
     if (combatBackdropHas(key, ['cultist', 'chapel', 'blood', 'ritual', 'blacktithe', 'hex'])) return 'ritualist';
     if (combatBackdropHas(key, ['construct', 'forge', 'furnace', 'salt', 'kiln', 'guardbreak'])) return 'construct';
     if (combatBackdropHas(key, ['mire', 'venom', 'spitter', 'slime', 'swamp', 'frostbit'])) return 'mireborn';
@@ -206,6 +211,7 @@
     const lines = {
       lowfire: ['Lowfire soot drifts through the stairwell.', 'Old lamps pop in the ash behind you.', 'Warm dust settles on the weapon grip.'],
       veyruhn: ['Forge heat leaks through the stone ribs.', 'A chain ticks somewhere below the landing.', 'Red iron light crawls over the floor.'],
+      'drowned-reliquary': ['A sealed bell moves beneath the black water.', 'Prayer-ribbons drift against a reliquary door.', 'Cold silt slides over the drowned stonework.'],
       'red-chapel': ['Prayer smoke gathers around the arena edge.', 'The stone tastes of rust and candle-wax.', 'A red hush presses against the fight.'],
       'salt-forge': ['Salt ash scratches across the platform.', 'Kiln breath rolls under the floor.', 'White mineral dust cuts the torchlight.'],
       'sunken-court': ['Cold water knocks under the old court stones.', 'Drowned banners shift without wind.', 'Blue-black damp crawls up the walls.'],
@@ -247,7 +253,7 @@
     if (!S.ui) S.ui = { combatLogExpanded:false };
     const depth = S.run.floor || 1;
     const loreDepth = getLoreDepthProgress(depth);
-    const runDistrict = getLoreFloorDistrict(loreDepth.floorNumber);
+    const runDistrict = currentStagingDistrict(S);
     const districtDisplay = currentDistrictDisplay(S);
     const floorName = getLoreFloorName(loreDepth.floorNumber);
     const isBossFight = monster && monster.tier === 'Boss';

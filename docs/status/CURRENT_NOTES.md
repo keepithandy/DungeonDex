@@ -7,8 +7,20 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.28.0 - Rarity Baseline
-- Build/cache labels use `1.28.0-rarity-baseline`.
+- DungeonDex v1.28.1 - Drowned Reliquary: First Descent
+- Build/cache labels use `1.28.1-drowned-reliquary-first-descent`.
+
+## v1.28.1 Drowned Reliquary: First Descent
+- The Drowned Reliquary now owns D31-D40, filling the live district-registry gap between Ember Debtworks and Cinderbone without moving existing boundaries or boss depths.
+- The district has a dedicated title, subtitle, arrival line, atmosphere, CSS treatment, canvas palette, and safe fallback path. Run and canvas presentation now resolve the active raw-depth district instead of letting the old gap fall through to Final Lowflame.
+- Bell-Drowned Warden and Siltbound Reliquary Lurker are the smallest complete encounter slice. Their roster rows contain identity and lore only; generated combat stats, scaling, rewards, loot, elite handling, and return flow still come from the established runtime.
+- Encounter identity selection is deterministic from the two random family/type rolls the generator already consumed. D31 uses the same number of RNG calls as an adjacent normal depth, and no save or runtime-state field was added.
+- D31-D40 contains no raw boss depth under the established 15-depth cadence. The named boss catalog, boss fixtures, combat signatures, reward signatures, and drop signatures remain unchanged.
+- The focused v1.28.1 smoke protects contiguous district ownership, boss cadence, identity-only roster data, deterministic encounter mapping, RNG-call parity, existing stat/reward generation, state isolation, and dedicated visual routing.
+- Verification passes repository syntax for 88 JavaScript/MJS files; app/cache wiring for 34 direct assets and 9 dynamic loads; the Reliquary slice; the 33-row rarity audit; the 20-boss, 60-fixture, 36,000-fight matrix; public copy and Trophy Echo-only Revisit guards; Merchant Gear Upgrades; Elite Contracts; Lowfire Forge; package-checker modes 8/8; and the strict source audit with 51 paths and zero warnings.
+- The compact suite reports 49/55 passed, one skipped, and five unchanged environment-only failures. Debt/Talent runtime, touch geometry, computed contrast, and public-console checks require unavailable Chromium; the package build/extraction gate requires unavailable `powershell.exe`. The Enter Dungeon runtime smoke skips for the same browser limitation.
+- v1.28.0 was committed and pushed to `work/v1.28.0-rarity-audit` at `3e5ab1fa7a5c1f9f17c73f65501f9d1bd42d3c8f`. v1.28.1 work continues on `work/v1.28.1-drowned-reliquary`.
+- No v1.28.1 package, release tag, or itch.io upload has been created. The local v1.27 itch-ready ZIP remains the latest authorized package artifact.
 
 ## v1.28.0 Rarity Baseline
 - The active roadmap is `docs/status/ROADMAP_V128.md`; v1.28.0 is the non-tuning foundation for the staged v1.28.1-v1.28.9 work.
@@ -228,7 +240,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.28.0 Rarity Baseline.
+- Current runtime baseline is v1.28.1 Drowned Reliquary: First Descent.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

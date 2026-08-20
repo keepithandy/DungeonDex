@@ -57,7 +57,7 @@ def main() -> int:
     )
     require("Summary: FAIL" in package.stdout, "strict package violations return a failed summary", package.stdout)
 
-    print("Package checker modes v1.28.0: 8/8 passed")
+    print("Package checker modes v1.28.1: 8/8 passed")
     return 0
 
 

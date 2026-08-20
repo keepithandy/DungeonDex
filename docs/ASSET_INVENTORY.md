@@ -2,7 +2,7 @@
 
 This manifest records the origin, ownership/license status, modification history, and use of every tracked DungeonDex visual, audio, font, or marketing asset. Update it whenever an asset is added, replaced, or repurposed.
 
-Target baseline: **v1.28.0 Rarity Baseline**.
+Target baseline: **v1.28.1 Drowned Reliquary: First Descent**.
 
 Policy: [Northline Studio asset licensing policy](../ASSETS_LICENSE.md).
 

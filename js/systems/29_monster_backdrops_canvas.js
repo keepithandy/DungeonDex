@@ -9,6 +9,7 @@
   const THEMES = Object.freeze({
     lowfire:['Lowfire Crypt','#120c08','#251711','rgba(255,145,63,.14)','#f0a24d','#050302','pillars','crypt'],
     veyruhn:['Bellforge Works','#130908','#2a1510','rgba(255,82,38,.14)','#ff7d44','#070302','chains','forge'],
+    'drowned-reliquary':['Drowned Reliquary','#061318','#0b2026','rgba(72,190,186,.13)','#73d3c8','#020608','banners','court'],
     mireglass:['Mireglass Hollow','#07120d','#122018','rgba(107,219,150,.13)','#76d99a','#030805','reeds','mire'],
     'red-chapel':['Red Chapel','#160809','#241012','rgba(255,80,74,.13)','#ff746c','#070203','arches','chapel'],
     'salt-forge':['Salt Forge','#12100a','#24200f','rgba(255,225,150,.12)','#ffe196','#060504','crystals','salt'],
@@ -30,6 +31,9 @@
   function depthBand(d){ d = Math.floor(num(d,1,1,999999)); return d >= 120 ? 'abyssal' : d >= 80 ? 'grave' : d >= 40 ? 'deep' : d >= 15 ? 'pressured' : 'fresh'; }
 
   function currentDistrict(state, depth){
+    try { /* global districtByDepth */
+      if (typeof districtByDepth === 'function') return districtByDepth(depth);
+    } catch (_) {}
     try { /* global getLoreDepthProgress, getLoreFloorDistrict */
       if (typeof getLoreDepthProgress === 'function' && typeof getLoreFloorDistrict === 'function') return getLoreFloorDistrict(getLoreDepthProgress(depth)?.floorNumber || 1);
     } catch (_) {}
@@ -43,12 +47,13 @@
     if (d <= 4 || has(dk, ['lowsteps','lowfire','ashgate']) || has(mk, ['ashwake','burn','ghoul','husk','beast'])) return 'lowfire';
     if (has(dk, ['saltforge','salt','hunger','kiln','mineral']) || has(mk, ['blacksalt','starved','construct','guardbreak','rage'])) return 'salt-forge';
     if (has(dk, ['veyruhn','bellforge','debtworks','cinderbone','forge','furnace'])) return 'veyruhn';
+    if (has(dk, ['drownedreliquary','reliquary']) || has(mk, ['belldrowned','reliquary','siltbound'])) return 'drowned-reliquary';
     if (has(dk, ['mireglass','mire','sootveil','swamp']) || has(mk, ['mireborn','venom','spitter','frostbit','mireglass'])) return 'mireglass';
     if (has(dk, ['redchapel','chapel','blacktithe','ritual']) || has(mk, ['bloodlit','cultist','gravesworn','revenant','bleed'])) return 'red-chapel';
     if (has(dk, ['sunkencourt','sunken','redwake','catacomb','drowned']) || has(mk, ['sunken','knight','warden','chill','drain'])) return 'sunken-court';
     if (has(dk, ['rookery','rafter']) || has(mk, ['harpy','silkbound','rookery','feather','wing'])) return 'rookery';
     if (has(dk, ['noctis','atelier','lanternless','lowflame','vault']) || has(mk, ['shade','watcher','dreadmarked','lanterneyed','seer','hex'])) return 'noctis';
-    return d <= 10 ? 'lowfire' : d <= 25 ? 'veyruhn' : d <= 38 ? 'mireglass' : d <= 50 ? 'salt-forge' : d <= 62 ? 'red-chapel' : d <= 78 ? 'sunken-court' : d <= 100 ? 'noctis' : 'generic';
+    return d <= 10 ? 'lowfire' : d <= 25 ? 'veyruhn' : d <= 30 ? 'mireglass' : d <= 40 ? 'drowned-reliquary' : d <= 50 ? 'salt-forge' : d <= 62 ? 'red-chapel' : d <= 78 ? 'sunken-court' : d <= 100 ? 'noctis' : 'generic';
   }
 
   function resolveKind(state, monster, district, depth){

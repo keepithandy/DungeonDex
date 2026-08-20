@@ -8,14 +8,26 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.28.0 Rarity Baseline`
-* Current local package baseline: `v1.28.0 Rarity Baseline`
-* Current development target: `v1.28.0 Rarity Baseline`
-* Current build/cache label: `1.28.0-rarity-baseline`
+* Public/live itch version: `v1.28.1 Drowned Reliquary: First Descent`
+* Current local package baseline: `v1.28.1 Drowned Reliquary: First Descent`
+* Current development target: `v1.28.1 Drowned Reliquary: First Descent`
+* Current build/cache label: `1.28.1-drowned-reliquary-first-descent`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.28.1 - Drowned Reliquary: First Descent
+
+* Filled the previously unowned D31-D40 depth band with the Drowned Reliquary without moving any existing district boundary or boss depth.
+* Added the Bell-Drowned Warden and Siltbound Reliquary Lurker as identity-only encounters routed through the existing monster generator, stat curve, reward pipeline, and two existing random identity rolls.
+* Added dedicated district title, arrival copy, atmosphere, CSS treatment, canvas palette, and safe fallback routing while preserving historical Sootveil compatibility styling.
+* Corrected run and canvas district presentation to use the active raw-depth district so D31-D40 no longer inherit Final Lowflame presentation through the old gap fallback.
+* Added a focused vertical-slice smoke covering contiguous district ownership, boss cadence, identity-only roster data, deterministic mapping, unchanged RNG-call count, existing scaling/rewards, visual-only routing, and state isolation.
+* Preserved isolated generator consumers by falling back to the original rolled monster identity when district metadata is not loaded.
+* Verification passed repository syntax for 88 JavaScript/MJS files, version/cache wiring for 34 direct assets and 9 dynamic loads, the Reliquary slice, the 33-row rarity audit, the 20-boss/36,000-fight matrix, public copy and Revisit guards, Merchant Gear Upgrades, Elite Contracts, Lowfire Forge, package-checker modes, and the strict 51-path source audit with zero warnings. The compact suite reports 49/55 passed, one skipped, and five unchanged environment-only failures because Chromium and PowerShell are unavailable locally.
+* Preserved combat formulas, monster and boss scaling, rewards, drops, rarity, economy, save schema, dungeon entry, Merchant Gear Upgrades, Debt, Talent, progression, and Trophy Echo-only Revisit behavior.
+* No v1.28.1 package, release tag, or itch.io upload was created; the local v1.27 ZIP remains the latest authorized package.
 
 ## v1.28.0 - Rarity Baseline
 

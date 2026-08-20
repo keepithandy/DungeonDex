@@ -242,6 +242,30 @@
     return 0.26;
   }
 
+  function districtMonsterIdentity(rawDepth, rolledFamily, rolledType) {
+    const family = String(rolledFamily || 'Husk');
+    const type = String(rolledType || 'Stalker');
+    const fallback = { name: `${family} ${type}`, family, type, lore: '' };
+    // Some focused tools execute this generator without the district module.
+    // Keep that established isolated-use contract by degrading to the rolled identity.
+    const district = typeof districtByDepth === 'function' ? districtByDepth(rawDepth) : null;
+    const identities = typeof DISTRICT_ENCOUNTER_IDENTITIES !== 'undefined'
+      ? DISTRICT_ENCOUNTER_IDENTITIES
+      : null;
+    const roster = district && identities ? identities[district.id] : null;
+    if (!Array.isArray(roster) || !roster.length) return fallback;
+    const familyIndex = Math.max(0, MONSTER_FAMILIES.indexOf(family));
+    const typeIndex = Math.max(0, MONSTER_TYPES.indexOf(type));
+    const entry = roster[(familyIndex + typeIndex) % roster.length];
+    if (!entry) return fallback;
+    return {
+      name: String(entry.name || fallback.name),
+      family: String(entry.family || family),
+      type: String(entry.type || type),
+      lore: String(entry.lore || '')
+    };
+  }
+
   function lootDropChance(floor, source = 'normal', state = null) {
     const rawDepth = depthStageValue(floor);
     const depth = threatDepthFromDepth(rawDepth);
@@ -430,8 +454,11 @@
     const threatDepth = threatDepthFromDepth(rawDepth);
     const ladder = depthDifficultyLadder(rawDepth);
     const contractRisk = activeEliteContractRisk(state);
-    const family = pick(MONSTER_FAMILIES);
-    const type = pick(MONSTER_TYPES);
+    const rolledFamily = pick(MONSTER_FAMILIES);
+    const rolledType = pick(MONSTER_TYPES);
+    const encounterIdentity = districtMonsterIdentity(rawDepth, rolledFamily, rolledType);
+    const family = encounterIdentity.family;
+    const type = encounterIdentity.type;
     const affix = '';
     const skill = 'Basic attack';
     const boss = rawDepth > 0 && rawDepth % (BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP) === 0;
@@ -454,7 +481,7 @@
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;
-    let name = `${family} ${type}`;
+    let name = encounterIdentity.name;
     let reviveUsed = false;
     const eliteReward = elite ? eliteRewardProfile(modifiers, rawDepth) : null;
     // Boss power corrections are combat-only. Keep their established reward basis intact.
@@ -488,7 +515,7 @@
       rewardGold,
       rewardXp: Math.max(6, Math.round(rewardXpPower * 1.05 * rewardMult)),
       rewardShard: boss ? rand(22, 34) : elite ? rand(7, 12) + (eliteReward?.shardBonus || 0) : rand(1, 4),
-      lore: boss ? 'A named ruin-lord waits deeper than prayer.' : `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
+      lore: boss ? 'A named ruin-lord waits deeper than prayer.' : encounterIdentity.lore || `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
     };
     return contractTarget && typeof applyEliteContractTargetMonster === 'function'
       ? applyEliteContractTargetMonster(state, monster, contractTarget)

@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.28.0 Rarity Baseline
+v1.28.1 Drowned Reliquary: First Descent
 
 ## Current Local Package Version
-v1.28.0 Rarity Baseline
+v1.28.1 Drowned Reliquary: First Descent
 
 ## Current Development Target
-v1.28.0 Rarity Baseline
+v1.28.1 Drowned Reliquary: First Descent
 
 ## Current Build/Cache Label
-1.28.0-rarity-baseline
+1.28.1-drowned-reliquary-first-descent
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

@@ -1,14 +1,24 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.28.0 Rarity Baseline Target
+## Current v1.28.1 Drowned Reliquary Target
 
-- Current target: `v1.28.0 Rarity Baseline`.
-- Current build/cache label: `1.28.0-rarity-baseline`.
-- The runtime-backed rarity audit owns the current drop/rarity baseline. Do not tune against `tools/simulate_deep_scaling.py` or another copied formula model when the runtime audit can measure the active implementation directly.
-- v1.28.0 records, but does not alter, the early/mid elite gear-frequency crossover, the D40 Mythic-set/scarcity boundary, and the four-set duplicate burden.
+- Current target: `v1.28.1 Drowned Reliquary: First Descent`.
+- Current build/cache label: `1.28.1-drowned-reliquary-first-descent`.
+- D31-D40 is owned by the Drowned Reliquary. Do not restore the previous gap behavior that allowed those depths to inherit Final Lowflame presentation.
+- Bell-Drowned Warden and Siltbound Reliquary Lurker are identity-only encounter overlays. Keep numeric stats, scaling, rewards, loot, elite handling, and RNG ownership in the established generator.
+- Preserve the existing 15-depth boss cadence. There is no boss slot inside D31-D40, and v1.28.1 must not add or move one.
 - Preserve rarity weights, multipliers, caps, drop rates, deep scarcity, Mythic-set chances, combat, scaling, rewards, economy, saves, upgrades, dungeon entry, Debt, Talent, progression, and Trophy Echo-only Revisit behavior until a focused roadmap patch explicitly scopes and verifies a change.
-- Local non-browser verification passes, including the expanded rarity audit, 20-boss/36,000-fight matrix, app wiring, protected systems, and strict source audit. The compact result is 47/53 passed, one skipped, and five unchanged environment-only failures caused by missing Chromium and PowerShell.
-- The local v1.27 itch-ready ZIP remains the latest authorized package. v1.28.0 has no package, tag, or itch.io upload.
+- Local non-browser verification passes, including 88-file syntax, the Reliquary slice, the rarity audit, 20-boss/36,000-fight matrix, app wiring, protected systems, and strict 51-path source audit. The compact result is 49/55 passed, one skipped, and five unchanged environment-only failures caused by missing Chromium and PowerShell.
+- The local v1.27 itch-ready ZIP remains the latest authorized package. v1.28.1 has no package, tag, or itch.io upload.
+
+## Historical v1.28.0 Rarity Baseline Target
+
+- Historical target: `v1.28.0 Rarity Baseline`.
+- Historical build/cache label: `1.28.0-rarity-baseline`.
+- The runtime-backed rarity audit owns the drop/rarity baseline. Do not tune against `tools/simulate_deep_scaling.py` or another copied formula model when the runtime audit can measure the active implementation directly.
+- v1.28.0 recorded, but did not alter, the early/mid elite gear-frequency crossover, the D40 Mythic-set/scarcity boundary, and the four-set duplicate burden.
+- Its local non-browser verification passed, including the expanded rarity audit, 20-boss/36,000-fight matrix, app wiring, protected systems, and strict source audit. The compact result was 47/53 passed, one skipped, and five unchanged environment-only failures caused by missing Chromium and PowerShell.
+- Remote commit `3e5ab1fa7a5c1f9f17c73f65501f9d1bd42d3c8f` records v1.28.0 on `work/v1.28.0-rarity-audit`.
 
 ## Historical v1.27 The Contract Board Target
 

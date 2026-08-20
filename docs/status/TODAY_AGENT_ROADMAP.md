@@ -2,17 +2,18 @@
 
 ## Current checkpoint
 
-- Baseline: `v1.28.0 Rarity Baseline`.
+- Baseline: `v1.28.1 Drowned Reliquary: First Descent`.
 - Current active Revisit lane: Trophy Echo only.
-- Working branch: `work/v1.28.0-rarity-audit`.
-- Implementation status: v1.28.0 establishes the version-aligned, non-tuning audit baseline for the staged v1.28 roadmap.
-- Active validation target: the runtime-backed 33-row rarity/progression audit plus the existing compact and protected-system suites.
+- Working branch: `work/v1.28.1-drowned-reliquary`.
+- Implementation status: v1.28.1 fills the D31-D40 district gap with one complete Drowned Reliquary slice while keeping the established boss, combat, reward, loot, save, and Revisit contracts intact.
+- Active validation target: the focused Drowned Reliquary vertical-slice smoke, runtime-backed rarity audit, boss matrix, compact suite, and strict source audit.
 
 ## v1.28 Work
 
 - Active roadmap: `docs/status/ROADMAP_V128.md`.
-- Current release: `DungeonDex v1.28.0 - Rarity Baseline`.
-- v1.28.0 measures the live loot and rarity implementation without changing it, including elite frequency thresholds, D40 scarcity/set interaction, and Mythic-set duplicate burden.
+- Current release: `DungeonDex v1.28.1 - Drowned Reliquary: First Descent`.
+- v1.28.1 adds the D31-D40 Reliquary identity, two identity-only encounters, and dedicated visual routing without adding a boss, numeric tuning, an RNG call, or a save field.
+- v1.28.0 remains the measured loot/rarity baseline, including elite frequency thresholds, the D40 scarcity/set interaction, and Mythic-set duplicate burden.
 - Sequence: v1.28.0 baseline; v1.28.1 Reliquary vertical slice; v1.28.2 content expansion; v1.28.3 boss/contracts; v1.28.4 reward-curve decision; v1.28.5 gear/loadouts; v1.28.6 loot clarity; v1.28.7 Town/mobile declutter; v1.28.8 Journal/world reaction; v1.28.9 release candidate; v1.29 package and itch handoff only after separate authorization.
 - Keep each patch independently reviewable and preserve protected systems unless that patch names one exact behavior, updates focused coverage, and passes the compact regression suite.
 

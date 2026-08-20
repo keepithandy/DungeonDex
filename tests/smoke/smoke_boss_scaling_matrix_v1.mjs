@@ -38,7 +38,8 @@ const EXPECTED_SIGNATURES = Object.freeze({
   boundaries: 'e637ec549b225431dc1bec184dcbf941af0c38068de7b28232f5e93638400766',
   rewards: '7e1ffd5d75fed8a069d21861ce1aaec95b4704c3bd4593aeed019c3a7c3c9eaf',
   drops: '1849879d2d98cb7e62ca7f2f99cb247fb24423bad9811f3f3b37d8ab0f1f2e93',
-  adjacentNormals: '8310543e136d8f46599f584f99dd969dbfe393c4f345b27509b6c2cac626d9d1',
+  // v1.28.1 changes the D31 adjacent-normal identity only; combat/stat signatures remain unchanged.
+  adjacentNormals: 'a11cd856414acfd3d3e07604f1dc773d66d215cf7fb95ebd556512a400519fa5',
   fixtures: 'a32c2f251d9623e34556df882de157248babe7877e73fcaf880d939f95b2bd5f',
   combat: '22dc25babdcbe9ce71ed0a8162b3f02af1e32da0922303d6ec0d0b0f29175d13'
 });
