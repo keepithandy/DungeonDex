@@ -13,7 +13,7 @@ It preserves classic browser script load order instead of converting the game to
 - `06_scaling_generation_audits.js` — Rarity scaling, loot rules, base state, gear/monster generation, scaling audit.
 - `07_player_combat_runtime.js` — Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge.
 - `08_normalization_save.js` — Item/monster/save normalization and persistence.
-- `46_named_loadouts.js` — ID-based named equipment snapshots, safe apply-preview status, and Gear-tab controls.
+- `46_named_loadouts.js` — ID-based named equipment snapshots, duplication/reordering, slot-by-slot safe-apply previews, and accessible Gear-tab controls.
 - `09_ui_common_intro.js` — Screen switching, common UI helpers, popups, intro modal.
 - `10_ui_town_shop.js` — Elite contract board, town panels, district wares, shop cards.
 - `11_ui_run_gear_dex_archive.js` — Run, gear, inventory, Dex, archive renderers.

@@ -8,14 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.28.1 Named Loadouts`
-* Current local package baseline: `v1.28.1 Named Loadouts`
-* Current development target: `v1.28.1 Named Loadouts`
-* Current build/cache label: `1.28.1-named-loadouts`
+* Public/live itch version: `v1.28.2 Loadout Polish`
+* Current local package baseline: `v1.28.2 Loadout Polish`
+* Current development target: `v1.28.2 Loadout Polish`
+* Current build/cache label: `1.28.2-loadout-polish`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.28.2 - Loadout Polish
+
+* Added safe duplication with unique names and IDs, plus persistent move-up/move-down ordering without changing the saved item snapshot schema.
+* Expanded the slot preview to distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing states before applying a loadout.
+* Applying now reports an explicit outcome summary while retaining the rule that only matching inventory gear enters empty compatible slots.
+* Added clearer empty/cap guidance, confirmed deletion, labelled 44px mobile-safe controls, Enter-to-save behavior, live status announcements, and focus recovery after rerenders.
+* Save repair still rejects malformed entries and duplicate item/slot references while preserving intentional duplicated configurations through reload.
+* Aligned the development build/cache authority to `1.28.2-loadout-polish`. No package, itch upload, or release tag was created.
+* Preserved combat formulas, monster and boss scaling, economy, reward/drop rates, dungeon entry, Merchant Gear Upgrades, Talent, Debt, Revisit behavior, and the established item equip flow.
 
 ## v1.28.1 - Named Loadouts
 

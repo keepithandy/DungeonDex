@@ -3,7 +3,7 @@
 ## Current v1.28.1 Named Loadouts Target
 
 - Current target: `v1.28.1 Named Loadouts` (development baseline).
-- Current build/cache label: `1.28.1-named-loadouts`.
+- Current build/cache label: `1.28.2-loadout-polish`.
 - The Gear tab supports ID-based named loadouts with safe apply status. Existing gear is never replaced while applying a saved snapshot.
 - #139-#145 deliver the clearer three-hunt Elite Contract Board, exact-target combat cue, one-time fulfillment/claim clarity, read-only Guild Journal records, protected-system audit, and final package pass.
 - #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.

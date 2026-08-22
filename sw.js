@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.28.1-named-loadouts';
+const CACHE_NAME = 'dungeondex-v1.28.2-loadout-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.28.1-named-loadouts';
+const BUILD_QS = '1.28.2-loadout-polish';
 const ASSETS = [
   './',
   './index.html',

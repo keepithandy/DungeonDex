@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.28.1 Named Loadouts
+v1.28.2 Loadout Polish
 
 ## Current Local Package Version
-v1.28.1 Named Loadouts
+v1.28.2 Loadout Polish
 
 ## Current Development Target
-v1.28.1 Named Loadouts
+v1.28.2 Loadout Polish
 
 ## Current Build/Cache Label
-1.28.1-named-loadouts
+1.28.2-loadout-polish
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

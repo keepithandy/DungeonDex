@@ -67,7 +67,7 @@ const COMMANDS = [
   { tag: 'app', name: 'enter dungeon runtime', cmd: ['node', 'tests/smoke/smoke_enter_dungeon_runtime_v1.mjs'] },
   { tag: 'merchant', name: 'merchant gear upgrades', cmd: ['node', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
   { tag: 'elite', name: 'elite contract lifecycle v1.27', cmd: ['node', 'tests/smoke/smoke_elite_contract_lifecycle_v127.mjs'] },
-  { tag: 'loadout', name: 'named loadouts v1.28.1', cmd: ['node', 'tests/smoke/smoke_named_loadouts_v1281.mjs'] },
+  { tag: 'loadout', name: 'named loadouts v1.28.2', cmd: ['node', 'tests/smoke/smoke_named_loadouts_v1281.mjs'] },
   { tag: 'forge', name: 'lowfire forge', cmd: ['node', 'tests/smoke/smoke_lowfire_forge_v1.mjs'] }
 ];
 

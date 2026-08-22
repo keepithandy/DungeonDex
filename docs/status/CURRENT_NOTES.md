@@ -7,8 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.28.1 - Named Loadouts
-- Build/cache labels use `1.28.1-named-loadouts`.
+- DungeonDex v1.28.2 - Loadout Polish
+- Build/cache labels use `1.28.2-loadout-polish`.
+
+## v1.28.2 Loadout Polish (Development)
+- Named loadouts can now be duplicated with unique IDs/names and reordered with labelled move-up/move-down controls; the order and duplicated ID-based snapshots persist through save/reload.
+- Slot previews distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing. Apply Safe Items reports a concise outcome while preserving equipped gear and incompatible or unavailable items.
+- Empty and 12-loadout cap states now give direct next steps. New/loadout actions use native 44px controls, Enter-to-save support, polite status announcements, descriptive labels, deletion confirmation, and focus recovery after rerenders.
+- Normalization continues to repair malformed loadouts and duplicate per-snapshot slot/item references while preserving intentional duplicated configurations.
+- The v1.28.2 version/cache authority is active for development verification. No package, itch upload, or release tag has been created.
 
 ## v1.28.1 Named Loadouts (Development)
 - The Gear tab now supports named, ID-based snapshots of current equipment. Players can save a custom name, inspect all saved sets, rename or delete them, and see each item as Equipped, Ready, Occupied, In use, or Missing.
@@ -222,7 +229,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.28.1 Named Loadouts.
+- Current runtime baseline is v1.28.2 Loadout Polish.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.

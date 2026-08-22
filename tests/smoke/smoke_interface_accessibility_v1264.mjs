@@ -38,6 +38,7 @@ const PUBLIC_ACTION_ATTRIBUTES = [
   'data-sell',
   'data-retire',
   'data-gear-detail-trigger',
+  'data-named-loadout-action',
   'data-forge-slot',
   'data-temper-slot',
   'data-debt-borrow',
@@ -183,6 +184,7 @@ async function main() {
     debt,
     revisit,
     nav,
+    namedLoadouts,
     mobileAudit
   ] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
@@ -200,6 +202,7 @@ async function main() {
     readFile(path.join(ROOT, 'js/systems/28_debt_collector_foundation.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/22_nav_centering.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/46_named_loadouts.js'), 'utf8'),
     readFile(path.join(ROOT, 'docs/status/MOBILE_VALIDATION_V1260.md'), 'utf8')
   ]);
   const base = compact(baseCss);
@@ -293,6 +296,16 @@ async function main() {
       && gearModal.includes('openGearDetail(entry, detailTrigger);')
   );
   record(
+    'Named loadouts expose labelled native actions, list semantics, status announcements, and keyboard focus recovery',
+    namedLoadouts.includes('role="list" aria-label="Saved named loadouts"')
+      && namedLoadouts.includes('aria-label="Slot-by-slot availability"')
+      && namedLoadouts.includes('data-named-loadout-action="move"')
+      && namedLoadouts.includes('aria-label="Move ${escape(loadout.name)} up; currently ${index + 1} of ${total}"')
+      && namedLoadouts.includes('role="status" aria-live="polite"')
+      && namedLoadouts.includes("event.key !== 'Enter' || event.target?.id !== 'namedLoadoutName'")
+      && namedLoadouts.includes('restoreFocus(focus)')
+  );
+  record(
     'Intro modal stays above navigation and run transitions move focus into the active screen',
     css.includes('.intro-modal-backdrop{z-index:9000;')
       && bindings.includes("hideIntroModal({ restoreFocus: false });")
@@ -309,7 +322,8 @@ async function main() {
     lowfireBoard,
     debt,
     revisit,
-    gearModal
+    gearModal,
+    namedLoadouts
   ];
   const extractedControlTokens = new Set(publicControlSources.flatMap(publicControlTokens));
   if (nav.includes("document.createElement('button')")
@@ -365,6 +379,8 @@ async function main() {
     '[data-sell]',
     '[data-retire]',
     '[data-gear-detail-trigger]',
+    '#namedLoadoutName',
+    '[data-named-loadout-action]',
     '#introModalEnterDungeonBtn',
     '#introModalContinueRunBtn',
     '#introModalCloseBtn',
