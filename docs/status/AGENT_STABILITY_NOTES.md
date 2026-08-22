@@ -1,9 +1,10 @@
 # DungeonDex Agent Stability Notes
 
-## Current v1.27 The Contract Board Target
+## Current v1.28.1 Named Loadouts Target
 
-- Current target: `v1.27 The Contract Board`.
-- Current build/cache label: `1.27-the-contract-board`.
+- Current target: `v1.28.1 Named Loadouts` (development baseline).
+- Current build/cache label: `1.28.1-named-loadouts`.
+- The Gear tab supports ID-based named loadouts with safe apply status. Existing gear is never replaced while applying a saved snapshot.
 - #139-#145 deliver the clearer three-hunt Elite Contract Board, exact-target combat cue, one-time fulfillment/claim clarity, read-only Guild Journal records, protected-system audit, and final package pass.
 - #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.
 - The feature reuses the existing `upgradeLevel` save field; no Offhand card or action is exposed until an Offhand is equipped.
@@ -13,8 +14,8 @@
 - The real-device/Textastic Workspace handoff reported all twelve required checks passing. Device, OS, browser, viewport, and screenshot metadata were not captured, so retain that evidence-quality limitation in future release records.
 - The screenshot helper defaults to applying touch/mobile metrics before page initialization and verifying touch media state; `--fine-pointer` provides the separate narrow desktop-pointer audit. Neither mode replaces a real-device tap check.
 - The side rail may remain discoverable when closed, but it must not cover Town, combat, Journal, modal, or other active content.
-- `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` is the prior review artifact. The final local v1.27 artifact is `archive/packages/DungeonDex_v1.27_ItchReady.zip`; upload and tagging still require separate owner authorization.
-- The owner approved a physical-device exception for the local v1.27 package after automated touch/mobile and extracted-runtime checks passed. Run a fresh Textastic/device pass before itch.io upload when practical.
+- `archive/packages/DungeonDex_v1.26.6_ItchReady_Review.zip` and `archive/packages/DungeonDex_v1.27_ItchReady.zip` are historical artifacts; upload and tagging still require separate owner authorization.
+- No v1.28.1 package is authorized. Run a fresh Textastic/device pass before any later itch.io upload when practical.
 - Trophy Echo remains the only active Revisit lane. Save, combat, rewards, economy, upgrades, dungeon entry, Talent, Debt, progression, and Revisit behavior remain protected.
 - Runtime ownership is intentionally singular for Ashen Anvil heading copy, monster cues, Lowfire Forge presentation, and direct startup extensions; do not restore duplicate definitions or duplicate direct/dynamic loads.
 

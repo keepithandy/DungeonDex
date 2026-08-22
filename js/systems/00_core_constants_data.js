@@ -78,6 +78,7 @@
    * @property {StatBlock} stats
    * @property {Object.<string, Item>} equipment
    * @property {Item[]} inventory
+   * @property {Array<{id:string,name:string,items:Array<{slot:string,itemId:string,name:string}>}>} [namedLoadouts]
    * @property {string[]} discoveredMonsters
    * @property {string[]} discoveredGear
    * @property {string[]} log
@@ -96,8 +97,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.27';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.27';
+  const BUILD = '1.28.1';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.28.1';
   // Legacy preview globals were retired in v1.12.4; the ruleset-backed helper path is the only active talent preview source.
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;

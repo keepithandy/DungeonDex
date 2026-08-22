@@ -881,6 +881,9 @@
         state.player.inventory.push(item);
       }
     });
+    if (typeof window !== 'undefined' && typeof window.normalizeNamedLoadouts === 'function') {
+      window.normalizeNamedLoadouts(state);
+    }
     state.player.discoveredMonsters = asArray(savedPlayer.discoveredMonsters, []).map(String).slice(0, 200);
     state.player.discoveredGear = asArray(savedPlayer.discoveredGear, []).map(String).slice(0, 200);
     const rawBossTrophyModel = typeof bossTrophyStateModel === 'function'
@@ -960,6 +963,9 @@
     state.player.ember = sanitizeCurrencyValue(state.player.ember, 0);
     state.player.forgeSpark = sanitizeCurrencyValue(state.player.forgeSpark, 0);
     state.player.log = asArray(state.player.log, []).map(String).slice(0, 60);
+    if (typeof window !== 'undefined' && typeof window.normalizeNamedLoadouts === 'function') {
+      window.normalizeNamedLoadouts(state);
+    }
     state.player.eliteContracts = createEliteContractState(isPlainObject(state.player.eliteContracts) ? state.player.eliteContracts : {}, state);
     state.player.eliteTrophies = typeof createEliteTrophyState === 'function'
       ? createEliteTrophyState(isPlainObject(state.player.eliteTrophies) ? state.player.eliteTrophies : {})

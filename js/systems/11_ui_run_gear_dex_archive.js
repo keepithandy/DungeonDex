@@ -676,6 +676,7 @@
   function renderGear() {
     const gearPlayerPanel = el('gearPlayerPanel');
     const equipmentPanel = el('equipmentPanel');
+    const namedLoadoutsPanel = el('namedLoadoutsPanel');
     const filtersPanel = el('filtersPanel');
     const inventoryPanel = el('inventoryPanel');
     if (!equipmentPanel || !filtersPanel || !inventoryPanel) return;
@@ -694,6 +695,10 @@
         <span class="pill loadout-count-pill">${format(equippedCount)} / ${format(displaySlots.length)} slots</span>
       </div>
       <div class="loadout-groups">${loadoutSlotGroups().map(equippedGroupMarkup).join('')}</div>`;
+
+    if (namedLoadoutsPanel && typeof window.renderNamedLoadoutPanel === 'function') {
+      window.renderNamedLoadoutPanel(namedLoadoutsPanel, S);
+    }
 
     filtersPanel.innerHTML = `
       <div class="filter-head"><h2>Filters</h2><span class="small muted">Inventory</span></div>

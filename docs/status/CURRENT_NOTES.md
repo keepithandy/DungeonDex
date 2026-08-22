@@ -7,8 +7,14 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.27 - The Contract Board
-- Build/cache labels use `1.27-the-contract-board`.
+- DungeonDex v1.28.1 - Named Loadouts
+- Build/cache labels use `1.28.1-named-loadouts`.
+
+## v1.28.1 Named Loadouts (Development)
+- The Gear tab now supports named, ID-based snapshots of current equipment. Players can save a custom name, inspect all saved sets, rename or delete them, and see each item as Equipped, Ready, Occupied, In use, or Missing.
+- Apply Safe Items only moves matching inventory gear into empty target slots. It never replaces currently equipped gear, recreates unavailable equipment, or changes gear values, upgrades, combat math, or the established equip flow.
+- Save normalization limits the list, repairs malformed entries, canonicalizes legacy slot aliases, removes duplicate slot/item references, and collapses duplicate snapshot configurations.
+- The v1.28.1 version/cache authority is active for development verification. No package, itch upload, or release tag has been created.
 
 ## v1.27 The Contract Board
 - The active future roadmap is `docs/status/ROADMAP_V127.md`.
@@ -216,7 +222,7 @@
 - `tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs` is the focused verification target for the current progression path.
 
 ## Open Issue Sweep Notes
-- Current runtime baseline is v1.27 The Contract Board.
+- Current runtime baseline is v1.28.1 Named Loadouts.
 - GitHub #116-#125 are implemented, published in commit `0a4cc89`, and closed as completed.
 - Existing sweep docs remain reference material only and may include older Revisit planning language.
 - Treat Trophy Echo as the only active Revisit lane unless a future focused issue explicitly reintroduces another lane.
