@@ -8,14 +8,33 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.27 The Contract Board`
-* Current local package baseline: `v1.27 The Contract Board`
-* Current development target: `v1.27 The Contract Board`
-* Current build/cache label: `1.27-the-contract-board`
+* Public/live itch version: `v1.28.2 Loadout Polish`
+* Current local package baseline: `v1.28.2 Loadout Polish`
+* Current development target: `v1.28.2 Loadout Polish`
+* Current build/cache label: `1.28.2-loadout-polish`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.28.2 - Loadout Polish
+
+* Added safe duplication with unique names and IDs, plus persistent move-up/move-down ordering without changing the saved item snapshot schema.
+* Expanded the slot preview to distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing states before applying a loadout.
+* Applying now reports an explicit outcome summary while retaining the rule that only matching inventory gear enters empty compatible slots.
+* Added clearer empty/cap guidance, confirmed deletion, labelled 44px mobile-safe controls, Enter-to-save behavior, live status announcements, and focus recovery after rerenders.
+* Save repair still rejects malformed entries and duplicate item/slot references while preserving intentional duplicated configurations through reload.
+* Aligned the development build/cache authority to `1.28.2-loadout-polish`. No package, itch upload, or release tag was created.
+* Preserved combat formulas, monster and boss scaling, economy, reward/drop rates, dungeon entry, Merchant Gear Upgrades, Talent, Debt, Revisit behavior, and the established item equip flow.
+
+## v1.28.1 - Named Loadouts
+
+* Added named, ID-based equipment snapshots to the Gear tab. Players can save current equipment, use a custom name, view availability, rename, and delete saved configurations.
+* Applying a saved loadout is deliberately safe: it only moves a matching inventory item into an empty target slot. Equipped gear is never displaced, unavailable items are never recreated, and occupied or in-use slots remain unchanged.
+* Save normalization rejects malformed entries, duplicate slots/items, duplicate configurations, duplicate names, and over-limit loadout lists while preserving compatible valid snapshots.
+* Added focused smoke coverage for creation, rename, persistence, deletion, item lookup, unavailable gear, safe apply behavior, and malformed-save repair.
+* Aligned the development build/cache authority to `1.28.1-named-loadouts`. No package, itch upload, or release tag was created.
+* Preserved combat formulas, monster and boss scaling, economy, reward/drop rates, dungeon entry, Merchant Gear Upgrades, Talent, Debt, Revisit behavior, and the established item equip flow.
 
 ## v1.27 - The Contract Board
 
