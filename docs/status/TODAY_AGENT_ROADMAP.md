@@ -1,6 +1,14 @@
 # DungeonDex Acting-Agent Roadmap — Today
 
-## Current checkpoint
+## Current checkpoint (2026-09-05)
+
+- Source: v1.28.2 Loadout Polish, `7929698`; branch `work/reliquary-loadout-integration`.
+- Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
+- Audit reconciliation precedes selective Reliquary integration. Fresh regression and browser-loop validation remain outstanding.
+- GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.
+- No new version, cache, package, tag or upload is authorized.
+
+## Historical v1.27 checkpoint
 
 - Baseline: `v1.27 The Contract Board`.
 - Current active Revisit lane: Trophy Echo only.
