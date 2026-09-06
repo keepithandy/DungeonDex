@@ -2,17 +2,17 @@
 
 ## Active integration queue (2026-09-05)
 
-Source baseline: `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3`, v1.28.2 Loadout Polish, build `1.28.2-loadout-polish`. Integration branch: `work/reliquary-loadout-integration`. All three remote refs were fetched and verified; the common ancestor is `e52b68aa30f589d92682885c85e574f75a8a73da` and main/content divergence is intentionally 3/2 commits.
+Source baseline: `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3`, v1.28.2 Loadout Polish, build `1.28.2-loadout-polish`. The selected integration was fast-forward merged into local `main` at `60117cc`; it remains three commits ahead of `origin/main` until pushed. All three remote refs were fetched and verified; the common ancestor is `e52b68aa30f589d92682885c85e574f75a8a73da` and main/content divergence was intentionally 3/2 commits.
 
-Credit: main supplies Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity-audit` supplies audit evidence (3e5ab1f); `work/v1.28.1-drowned-reliquary` supplies the first-descent slice (7384585). Neither content branch is merged into main. Porting is selective; version/cache changes from those branches are excluded.
+Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity-audit` supplied audit evidence (3e5ab1f); `work/v1.28.1-drowned-reliquary` supplied the first-descent slice (7384585). The selected audit and content were ported selectively into local `main`; version/cache changes from those branches were excluded.
 
 | State | Current classification |
 |---|---|
-| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent on the integration branch |
+| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent and four-identity roster on local main |
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Guild Journal/history projections; rarity audit evidence (collection is a conditional model, not live-run yield) |
 | Planned only | Boss/contract decision, reward-curve decision, themed gear, loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
-| Broken or incomplete | Integration branch is not merged into main; physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report) |
+| Broken or incomplete | Physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report); local main has not been pushed |
 
 Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
 

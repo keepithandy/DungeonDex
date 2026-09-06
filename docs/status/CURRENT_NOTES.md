@@ -12,7 +12,7 @@
 
 ## v1.28.2 Loadout Polish (Development)
 <!-- Active integration work retains this version; historical notes below are preserved. -->
-- Active continuation queue: `docs/status/ROADMAP_V128.md`. The rarity audit and D31-D40 Reliquary slice are integrated and automated-browser verified on `work/reliquary-loadout-integration`, not merged into main. See `RELIQUARY_LOADOUT_INTEGRATION.md` for evidence and limitations. Historical branch version labels do not replace v1.28.2.
+- Active continuation queue: `docs/status/ROADMAP_V128.md`. The rarity audit, D31-D40 Reliquary slice, and four-identity roster are merged into local `main` at `60117cc` and automated-browser verified. They are not yet pushed, published, or physically device-validated. See `RELIQUARY_LOADOUT_INTEGRATION.md` and `RELIQUARY_ROSTER_MILESTONE.md` for evidence and limitations. Historical branch version labels do not replace v1.28.2.
 - Named loadouts can now be duplicated with unique IDs/names and reordered with labelled move-up/move-down controls; the order and duplicated ID-based snapshots persist through save/reload.
 - Slot previews distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing. Apply Safe Items reports a concise outcome while preserving equipped gear and incompatible or unavailable items.
 - Empty and 12-loadout cap states now give direct next steps. New/loadout actions use native 44px controls, Enter-to-save support, polite status announcements, descriptive labels, deletion confirmation, and focus recovery after rerenders.

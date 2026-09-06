@@ -2,7 +2,7 @@
 
 ## Scope and baseline
 
-Primary category: Content Expansion, with regression protection and two narrowly required presentation/compatibility fixes. Active checkout: `C:\Users\quali\Desktop\source\DungeonDex`; branch `work/reliquary-loadout-integration`. Version remains v1.28.2 Loadout Polish / `1.28.2-loadout-polish`.
+Primary category: Content Expansion, with regression protection and two narrowly required presentation/compatibility fixes. Active checkout: `C:\Users\quali\Desktop\source\DungeonDex`; merged local `main` commit `60117cc`. Version remains v1.28.2 Loadout Polish / `1.28.2-loadout-polish`.
 
 Fetched baseline `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3`; audit ref `3e5ab1fa7a5c1f9f17c73f65501f9d1bd42d3c8f`; content ref `73845851468b2ef7a661f8cb8e931a4cd459c825`; ancestor `e52b68aa30f589d92682885c85e574f75a8a73da`. Intentional 3/2 main/content divergence verified. Audit/document reconciliation was committed separately as `0fbf46a`.
 
@@ -42,8 +42,8 @@ The optional historical `smoke_gear_identity_compare_v1238.mjs` fails before its
 
 Automated integration checkpoint is complete. Physical-device/Textastic evidence remains missing under [#139: v1.28.2 release gate: complete physical-device loadout validation](https://github.com/keepithandy/DungeonDex/issues/139), so the release gate is incomplete. Emulation does not replace device/OS/browser/viewport/screenshots/results. No historical device exception applies.
 
-No push, PR, merge, retained release package, version update, tag or itch upload performed. Temporary package fixtures were used only by verification. Next narrow milestone: a bounded identity-only Reliquary roster; then concrete boss/contract options resolving the absent boss slot before implementation.
+The integration and roster were fast-forward merged into local `main` at `60117cc`; no push, PR, retained release package, version update, tag or itch upload was performed. Temporary package fixtures were used only by verification. Next narrow milestone: choose a documented boss/contract conclusion that resolves the absent boss slot before implementation.
 
 ## Diff-review handoff
 
-Review the integration branch against `7929698`. Confirm system 46/save hooks/wiring remain intact, D31-D40 identity and visual changes stay bounded, known names persist without remapping older encounters, and numerical/RNG/contract controls are meaningful. Check the complete browser loop and mobile captures. Treat the audit as conditional evidence, record the legacy standalone harness failure, and keep physical-device issue #139 open. Do not infer merge or release authorization.
+Review local `main` at `60117cc` against `7929698`. Confirm system 46/save hooks/wiring remain intact, D31-D40 identity and visual changes stay bounded, known names persist without remapping older encounters, and numerical/RNG/contract controls are meaningful. Check the complete browser loop and mobile captures. Treat the audit as conditional evidence, record the legacy standalone harness failure, and keep physical-device issue #139 open. Do not infer push or release authorization.

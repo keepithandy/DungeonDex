@@ -19,6 +19,14 @@ This changelog records what changed and why.
 
 ## v1.28.2 - Loadout Polish
 
+### Post-loadout source integration
+
+* Merged the verified D31-D40 Drowned Reliquary source work into local `main` at `60117cc`, while retaining v1.28.2 as the development version and cache authority.
+* Added the Reliquary district's arrival, subtitle, visual theme, four identity-only encounters, and active-run name retention through save/reload.
+* Kept D30 and D41 boundaries, raw-depth boss cadence, boss names, combat/scaling/reward values, loot rules, RNG consumption, Elite Contract ownership, loadouts, upgrades, and save schema unchanged.
+* Added deterministic pinned-main comparisons, a complete browser combat/loot/extract/reload/loadout loop, and supported mobile/fine-pointer checks. The compact suite passed 57/57 with no skips.
+* No package, release tag, itch upload, or version bump was created. Physical-device validation remains required under issue #139.
+
 * Added safe duplication with unique names and IDs, plus persistent move-up/move-down ordering without changing the saved item snapshot schema.
 * Expanded the slot preview to distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing states before applying a loadout.
 * Applying now reports an explicit outcome summary while retaining the rule that only matching inventory gear enters empty compatible slots.

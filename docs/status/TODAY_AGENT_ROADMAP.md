@@ -2,7 +2,7 @@
 
 ## Current checkpoint (2026-09-05)
 
-- Source: v1.28.2 Loadout Polish, `7929698`; branch `work/reliquary-loadout-integration`.
+- Source: v1.28.2 Loadout Polish, local `main` at `60117cc` (three unpushed commits ahead of `origin/main`).
 - Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
 - Audit reconciliation and selective Reliquary integration are source-complete: compact 57/57, public browser 36/36, deterministic generation/save comparisons and mobile captures passed. See `RELIQUARY_LOADOUT_INTEGRATION.md`; physical-device validation remains outstanding.
 - GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.

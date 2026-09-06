@@ -1,6 +1,6 @@
 # Reliquary climax: decision before implementation
 
-Primary category: Audit / explicitly requested design documentation. Baseline is the verified integration branch at v1.28.2; no runtime policy in this document has been selected or applied.
+Primary category: Audit / explicitly requested design documentation. Baseline is local `main` at `60117cc`, v1.28.2; no runtime policy in this document has been selected or applied.
 
 ## Verified constraints
 

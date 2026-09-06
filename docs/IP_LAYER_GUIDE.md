@@ -2,7 +2,7 @@
 
 This guide advances the current identity-layer issues without changing runtime behavior.
 
-Current baseline: **v1.28.2 Loadout Polish**. References below to the v1.28.1 foundation preserve historical scope. The [active named roadmap](status/ROADMAP_V128.md) now governs continuation; the integration branch's Drowned Reliquary identity is source-verified, with release/device gates recorded separately in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
+Current baseline: **v1.28.2 Loadout Polish**. References below to the v1.28.1 foundation preserve historical scope. The [active named roadmap](status/ROADMAP_V128.md) now governs continuation; local `main` includes the source-verified Drowned Reliquary identity, with release/device gates recorded separately in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
 
 ## Premise (#38)
 
