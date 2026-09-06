@@ -329,6 +329,18 @@
         family: 'Mireborn',
         type: 'Lurker',
         lore: 'Silt and old prayer-ribbons drag behind a scavenger shaped by the sealed black water.'
+      }),
+      Object.freeze({
+        name: 'Reliquary Chain Herald',
+        family: 'Construct',
+        type: 'Herald',
+        lore: 'An iron messenger trails empty bell-chains through the flooded aisle, bearing a summons worn smooth by water.'
+      }),
+      Object.freeze({
+        name: 'Blackwater Bell Seer',
+        family: 'Watcher',
+        type: 'Seer',
+        lore: 'Pale eyes watch from a cracked diving mask. The drowned bells hold the only prayers it remembers.'
       })
     ])
   });

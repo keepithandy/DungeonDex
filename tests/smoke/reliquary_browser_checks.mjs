@@ -68,7 +68,7 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.equal(band.floor, 31);
   assert.equal(band.zone, 'The Drowned Reliquary');
   assert.match(band.theme, /combat-backdrop--drowned-reliquary/);
-  assert.match(band.monster, /Bell-Drowned Warden|Siltbound Reliquary Lurker/);
+  assert.match(band.monster, /Bell-Drowned Warden|Siltbound Reliquary Lurker|Reliquary Chain Herald|Blackwater Bell Seer/);
   assert.match(await read('document.getElementById("runStatus").innerText'), /Beyond the Reliquary/);
   record('Normal D30 combat advances into the rendered D31 Reliquary', true, band.monster);
 

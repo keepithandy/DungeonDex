@@ -11,10 +11,12 @@ Credit: main supplies Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 | Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent on the integration branch |
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Guild Journal/history projections; rarity audit evidence (collection is a conditional model, not live-run yield) |
-| Planned only | Expanded Reliquary roster, boss/contract decision, reward-curve decision, themed gear, loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
+| Planned only | Boss/contract decision, reward-curve decision, themed gear, loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
 | Broken or incomplete | Integration branch is not merged into main; physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report) |
 
 Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
+
+The [four-identity roster milestone](RELIQUARY_ROSTER_MILESTONE.md) is now source-complete and passed a fresh 57/57 compact run. [Climax options](RELIQUARY_CLIMAX_DECISION.md) are prepared; owner selection is required before boss/contract implementation.
 
 D31-D40 contains no boss slot. Resolve a coherent climax without moving existing bosses or changing cadence/entry before implementing the boss milestone. No balance selection, pity fields, save migration, package, tag, push, or upload is implied by the roadmap.
 

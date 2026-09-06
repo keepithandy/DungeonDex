@@ -20,7 +20,7 @@ const RUNTIME_FILES = [
   'js/systems/11_ui_run_gear_dex_archive.js',
   'js/systems/29_monster_backdrops_canvas.js'
 ];
-const RELIQUARY_NAMES = Object.freeze(['Bell-Drowned Warden', 'Siltbound Reliquary Lurker']);
+const RELIQUARY_NAMES = Object.freeze(['Bell-Drowned Warden', 'Siltbound Reliquary Lurker', 'Reliquary Chain Herald', 'Blackwater Bell Seer']);
 
 function plain(value) {
   return value == null ? value : JSON.parse(JSON.stringify(value));
@@ -108,6 +108,8 @@ async function loadRuntime(baseline = false) {
     DISTRICT_DATA,
     DISTRICT_ENCOUNTER_IDENTITIES: typeof DISTRICT_ENCOUNTER_IDENTITIES === 'undefined' ? {} : DISTRICT_ENCOUNTER_IDENTITIES,
     BOSS_FLOOR_NAMES,
+    MONSTER_FAMILIES,
+    MONSTER_TYPES,
     createBaseState,
     districtByDepth,
     dungeonDistrictIdentityForDepth,
@@ -164,12 +166,22 @@ for (let depth = 31; depth <= 40; depth += 1) {
 }
 
 const roster = plain(runtime.api.DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']);
-assert.equal(roster.length, 2, 'v1.28.1 should add only the two-enemy vertical slice');
+assert.equal(roster.length, 4, 'the bounded roster milestone has exactly four identities');
 assert.deepEqual(roster.map(entry => entry.name).sort(), RELIQUARY_NAMES.slice().sort(), 'the vertical-slice encounter names should remain stable');
 for (const entry of roster) {
+  assert.ok(runtime.api.MONSTER_FAMILIES.includes(entry.family), 'reuse an existing family');
+  assert.ok(runtime.api.MONSTER_TYPES.includes(entry.type), 'reuse an existing role');
   assert.deepEqual(Object.keys(entry).sort(), ['family', 'lore', 'name', 'type'], `${entry.name} should remain identity-only data`);
   assert.ok(!Object.values(entry).some(value => typeof value === 'number'), `${entry.name} should add no numeric combat or reward modifier`);
 }
+
+const reachedIdentities = new Set();
+for (const family of runtime.api.MONSTER_FAMILIES) {
+  for (const type of runtime.api.MONSTER_TYPES) {
+    reachedIdentities.add(runtime.api.districtMonsterIdentity(31, family, type).name);
+  }
+}
+assert.deepEqual([...reachedIdentities].sort(), RELIQUARY_NAMES.slice().sort(), 'all four identities are reachable through existing rolls');
 
 const outsideIdentity = plain(runtime.api.districtMonsterIdentity(30, 'Ghoul', 'Maw'));
 assert.deepEqual(outsideIdentity, { name: 'Ghoul Maw', family: 'Ghoul', type: 'Maw', lore: '' }, 'existing districts should keep the rolled monster identity');
