@@ -2,7 +2,7 @@
 
 ## Active integration checkpoint (2026-09-05)
 
-Current source is v1.28.2 Loadout Polish. Local `main` at `60117cc` retains its build/cache labels and all loadout protections while adding the D31-D40 Reliquary. Fresh compact verification is 57/57 and public browser verification is 36/36; see [complete evidence and limitations](RELIQUARY_LOADOUT_INTEGRATION.md). The merge is local and unpushed. Physical-device issue #139 remains open. The older target and counts below are historical, not current release evidence; numbered #139-#145 roadmap work is unrelated to today's GitHub issue #139.
+Current source is v1.28.2 Loadout Polish. Local `main` retains its build/cache labels and all loadout protections while adding the D31-D40 Reliquary, D45 conclusion, and a no-change reward-curve control. Fresh compact verification is 57/57 and public browser verification is 36/36; see [complete evidence and limitations](RELIQUARY_LOADOUT_INTEGRATION.md) and [reward-curve decision](REWARD_CURVE_DECISION_V128.md). Physical-device issue #139 remains open. The older target and counts below are historical, not current release evidence; numbered #139-#145 roadmap work is unrelated to today's GitHub issue #139.
 
 ## Current v1.28.1 Named Loadouts Target
 

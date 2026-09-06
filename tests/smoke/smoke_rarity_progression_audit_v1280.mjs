@@ -24,6 +24,15 @@ const SOURCES = Object.freeze(['normal', 'elite', 'boss']);
 const RARITY_SAMPLES = 20_000;
 const SET_COLLECTION_TRIALS = 30_000;
 const COMPACT = process.env.DUNGEONDEX_SMOKE_COMPACT === '1';
+const NO_CHANGE_CONTROL_ROWS = Object.freeze([
+  { rawDepth:30, source:'normal', drops:'0.4800', highTier:'0.0048' },
+  { rawDepth:30, source:'elite', drops:'0.1600', highTier:'0.0032' },
+  { rawDepth:40, source:'normal', drops:'0.4914', highTier:'0.0097' },
+  { rawDepth:40, source:'elite', drops:'0.1512', highTier:'0.0067' },
+  { rawDepth:40, source:'boss', drops:'1.3378', highTier:'0.1367' },
+  { rawDepth:43, source:'normal', drops:'0.4914', highTier:'0.0168' },
+  { rawDepth:43, source:'elite', drops:'0.6804', highTier:'0.0416' }
+]);
 
 function plain(value) {
   return value == null ? value : JSON.parse(JSON.stringify(value));
@@ -317,6 +326,22 @@ assert.equal(rowAt(rows, 42, 'normal').conditional.mythic, 0, 'non-set normal My
 assert.ok(rowAt(rows, 43, 'normal').conditional.mythic > 0, 'non-set normal Mythic rolls should start at threat 15');
 assert.equal(rowAt(rows, 42, 'boss').conditional.mythic, 0, 'non-set boss Mythic rolls should still be unavailable at threat 14');
 assert.ok(rowAt(rows, 43, 'boss').conditional.mythic > 0, 'non-set boss Mythic rolls should start at threat 15');
+
+for (const control of NO_CHANGE_CONTROL_ROWS) {
+  const row = rowAt(rows, control.rawDepth, control.source);
+  assert.equal(row.dropsPerEncounter.toFixed(4), control.drops, `D${control.rawDepth} ${control.source} no-change gear yield should stay fixed`);
+  assert.equal(row.highTierPerEncounter.toFixed(4), control.highTier, `D${control.rawDepth} ${control.source} no-change high-tier yield should stay fixed`);
+}
+
+let firstEliteCrossover = 0;
+for (let rawDepth = 1; rawDepth <= 120; rawDepth += 1) {
+  const state = auditState(runtime, rawDepth >= 40 ? 40 : rawDepth, rawDepth);
+  if (runtime.api.lootDropChance(rawDepth, 'elite', state) > runtime.api.lootDropChance(rawDepth, 'normal', state)) {
+    firstEliteCrossover = rawDepth;
+    break;
+  }
+}
+assert.equal(firstEliteCrossover, 43, 'the no-change elite gear-frequency crossover should remain at raw D43 / threat 15');
 
 // Verify each equal-width selection cell against the actual set-piece owner.
 const setIds = Object.keys(setDefinitions);

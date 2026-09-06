@@ -26,6 +26,7 @@ This changelog records what changed and why.
 * Kept D30 and D41 boundaries, raw-depth boss cadence, boss names, combat/scaling/reward values, loot rules, RNG consumption, Elite Contract ownership, loadouts, upgrades, and save schema unchanged.
 * Added deterministic pinned-main comparisons, a complete browser combat/loot/extract/reload/loadout loop, and supported mobile/fine-pointer checks. The compact suite passed 57/57 with no skips.
 * Added a D45 Gravetoll Bell conclusion and a briefing for existing Elite Contracts that naturally target D31-D40. Neither creates a boss or contract, changes target selection, or alters payout, rewards, boss cadence, or saves.
+* Recorded the no-change reward-curve control, including total high-tier yield, the D43 elite crossover, D40 scarcity/set collision, and the Mythic duplicate tail. Exact unselected tuning alternatives are documented; no balance, reward, drop, or save change was made.
 * No package, release tag, itch upload, or version bump was created. Physical-device validation remains required under issue #139.
 
 * Added safe duplication with unique names and IDs, plus persistent move-up/move-down ordering without changing the saved item snapshot schema.

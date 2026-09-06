@@ -2,9 +2,9 @@
 
 ## Current checkpoint (2026-09-05)
 
-- Source: v1.28.2 Loadout Polish, local `main` at `60117cc` (three unpushed commits ahead of `origin/main`).
+- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, and no-change reward-curve evidence are current source work.
 - Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
-- Audit reconciliation and selective Reliquary integration are source-complete: compact 57/57, public browser 36/36, deterministic generation/save comparisons and mobile captures passed. See `RELIQUARY_LOADOUT_INTEGRATION.md`; physical-device validation remains outstanding.
+- Audit reconciliation, selective Reliquary integration, D45 conclusion, and reward-curve decision evidence are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. See `RELIQUARY_LOADOUT_INTEGRATION.md` and `REWARD_CURVE_DECISION_V128.md`; physical-device validation remains outstanding.
 - GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.
 - No new version, cache, package, tag or upload is authorized.
 
