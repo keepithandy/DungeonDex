@@ -162,6 +162,13 @@
     return Math.max(1, (floor - 1) * DEPTH_CHAPTERS_PER_THREAT_STEP + 1);
   }
 
+  function eliteContractTargetBriefing(targetFloor) {
+    const rawDepth = eliteContractRawDepthForThreatFloor(targetFloor);
+    return rawDepth >= 31 && rawDepth <= 40
+      ? 'The mark waits among the sealed bells. Follow the writ\'s listed location.'
+      : '';
+  }
+
   function eliteContractTargetFloor(state) {
     const current = eliteContractThreatFloor(state);
     let target = current + rand(3, 8);
@@ -188,6 +195,7 @@
       district,
       targetFloor,
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
+      locationBriefing: eliteContractTargetBriefing(targetFloor),
       killedPlayerAtLocation: seed?.killedPlayerAtLocation || contract.killedPlayerAtLocation || '',
       rivalDefeats: Math.max(1, Math.floor(numberOr(seed?.rivalDefeats || seed?.defeats || contract.rivalDefeats, 1, 1, 9999))),
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),

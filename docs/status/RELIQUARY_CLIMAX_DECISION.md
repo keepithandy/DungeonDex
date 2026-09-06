@@ -2,6 +2,10 @@
 
 Primary category: Audit / explicitly requested design documentation. Baseline is local `main` at `60117cc`, v1.28.2; no runtime policy in this document has been selected or applied.
 
+## Selected implementation
+
+Option A was selected and implemented as a narrow source patch on `work/reliquary-d45-conclusion`. It adds only the D45 Gravetoll Bell conclusion and a derived briefing for existing contracts whose normal target maps to raw D31-D40. It does not rename or add a boss, trophy, contract, route, reward, save field, or boss slot. Boss/cadence and contract-lifecycle controls plus the loaded public-browser presentation passed.
+
 ## Verified constraints
 
 System 06 creates bosses when raw depth is divisible by `BOSS_INTERVAL * DEPTH_CHAPTERS_PER_THREAT_STEP` (5 * 3 = 15). The adjacent real slots are D30 and D45, not D40. System 04's named-floor lookup uses threat depth: D45 maps to the existing `Ashgate Butcher Step`, and system 00's third trophy remains `Gravetoll Bell`. D41 is already Cinderbone Halls. The separate lore chapter UI cadence is not authority for spawning a boss.

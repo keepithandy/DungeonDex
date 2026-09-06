@@ -213,6 +213,14 @@
     return fallbackInput ? { ...identity, safeFallback: true } : identity;
   }
 
+  function dungeonBossApproachLineForDepth(depth) {
+    const rawDepth = progressDepthValue(depth, 1);
+    if (rawDepth === 45) {
+      return 'Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect.';
+    }
+    return dungeonDistrictIdentityForDepth(rawDepth).bossApproachLine;
+  }
+
   function dungeonDistrictSummary(depth){
     const identity = dungeonDistrictIdentityForDepth(depth);
     return {

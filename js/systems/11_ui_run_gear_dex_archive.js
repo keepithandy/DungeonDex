@@ -265,7 +265,7 @@
     const currentFloorText = districtDisplay.name || `Floor ${format(loreDepth.floorNumber)}`;
     const currentProgressRoomText = `Room ${format(loreDepth.roomWithinFloor)} / ${format(loreDepth.roomsPerFloor)}`;
     const currentProgressChapterText = `Chapter ${format(loreDepth.chapterWithinRoom)} / ${format(loreDepth.chaptersPerRoom)}`;
-    const bossStatusText = depth >= 31 && depth <= 40 ? 'Beyond the Reliquary' : loreDepth.isBossChapter
+    const bossStatusText = depth >= 31 && depth <= 40 ? 'Beyond the Reliquary' : depth === 45 ? 'Gravetoll Bell' : loreDepth.isBossChapter
       ? 'Boss Chapter'
       : `Boss in ${format(loreDepth.chaptersUntilBoss)} chapter${loreDepth.chaptersUntilBoss === 1 ? '' : 's'}`;
     const playerHpPct = Math.max(0, Math.min(100, (S.player.hp / Math.max(1, S.player.maxHp)) * 100));
@@ -316,7 +316,7 @@
           <div class="run-flow-secondary">
             <span>Boss</span>
             <strong>${escapeHtml(bossStatusText)}</strong>
-            <small>${escapeHtml(districtDisplay.bossApproachLine || '')}</small>
+            <small>${escapeHtml(dungeonBossApproachLineForDepth(depth) || districtDisplay.bossApproachLine || '')}</small>
           </div>
         </div>
         <div class="run-progress-only combat-haul-row" aria-label="Run haul">

@@ -106,7 +106,10 @@ function createRuntime() {
     failEliteContract,
     eliteContractJournalHistory,
     eliteContractDef,
-    eliteContractTargetScaling
+    eliteContractTargetScaling,
+    eliteContractRawDepthForThreatFloor,
+    eliteContractTargetBriefing,
+    eliteBoardContractModel
   };`, sandbox);
   return { api: sandbox.__eliteLifecycleApi, store };
 }
@@ -115,6 +118,15 @@ const { api, store } = createRuntime();
 assert.equal(typeof api.startEliteContract, 'function');
 assert.equal(typeof api.claimEliteContract, 'function');
 assert.equal(typeof api.applyEliteContractTargetMonster, 'function');
+assert.equal(api.eliteContractRawDepthForThreatFloor(11), 31, 'Reliquary briefing begins at the existing D31 target mapping');
+assert.equal(api.eliteContractRawDepthForThreatFloor(14), 40, 'Reliquary briefing ends at the existing D40 target mapping');
+assert.equal(api.eliteContractTargetBriefing(11), "The mark waits among the sealed bells. Follow the writ's listed location.");
+assert.equal(api.eliteContractTargetBriefing(14), "The mark waits among the sealed bells. Follow the writ's listed location.");
+assert.equal(api.eliteContractTargetBriefing(15), '', 'the briefing must not leak beyond D40');
+const inBandOffer = api.eliteBoardContractModel(api.eliteContractDef('lowfire_bounty'), null, false, { targetFloor: 11 });
+const outsideOffer = api.eliteBoardContractModel(api.eliteContractDef('lowfire_bounty'), null, false, { targetFloor: 15 });
+assert.equal(inBandOffer.locationBriefing, api.eliteContractTargetBriefing(11));
+assert.equal(outsideOffer.locationBriefing, '');
 
 const state = api.createBaseState();
 const board = api.validateEliteBoardState(state);

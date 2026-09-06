@@ -23,6 +23,21 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   })()`);
   assert.ok(setup.legacy && setup.town === 'screen-town' && setup.depth === 30, JSON.stringify(setup));
   record('Reliquary legacy save without loadouts reloads into normal Town entry', true);
+  const contractBriefing = await read(`(() => {
+    const offers = S.town.eliteBoardContracts;
+    S.town.eliteBoardContracts = [{ id:'lowfire_bounty', targetFloor:11 }];
+    render();
+    const inBand = document.getElementById('questPanel')?.innerText || '';
+    S.town.eliteBoardContracts = [{ id:'lowfire_bounty', targetFloor:15 }];
+    render();
+    const outside = document.getElementById('questPanel')?.innerText || '';
+    S.town.eliteBoardContracts = offers;
+    render();
+    return { inBand, outside };
+  })()`);
+  assert.match(contractBriefing.inBand, /The mark waits among the sealed bells\. Follow the writ's listed location\./);
+  assert.doesNotMatch(contractBriefing.outside, /The mark waits among the sealed bells\./);
+  record('Only existing contracts naturally targeting D31-D40 receive the Reliquary briefing', true);
   await read(`document.getElementById('tab-gear').click(); true`);
   await read(`(() => {
     const input = document.getElementById('namedLoadoutName');
@@ -118,6 +133,26 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   await advanceTo(40);
   assert.match(await read('document.getElementById("runStatus").innerText'), /Beyond the Reliquary/);
   assert.equal(await read('!!document.querySelector(".run-flow-summary.is-boss-floor")'), false);
+  await read(`(() => {
+    window.__reliquaryActiveState = S;
+    const preview = createBaseState();
+    preview.screen = 'run'; preview.run.active = true; preview.run.floor = 45; preview.run.zone = zoneName(45);
+    preview.run.monster = generateMonster(45, preview);
+    S = preview; render();
+    return true;
+  })()`);
+  await pause();
+  const d45Conclusion = await read(`(() => {
+    const status = document.getElementById('runStatus');
+    const label = status?.querySelector('.run-flow-secondary strong');
+    const detail = status?.querySelector('.run-flow-secondary small');
+    return { label:label?.textContent || '', detail:detail?.textContent || '', detailMarkup:status?.textContent || '', visible:!!label && getComputedStyle(label).display !== 'none' && getComputedStyle(label).visibility !== 'hidden', active:S.run.active, floor:S.run.floor, screen:S.screen, event:!!S.run.event };
+  })()`);
+  await read(`S = window.__reliquaryActiveState; delete window.__reliquaryActiveState; render(); true`);
+  assert.equal(d45Conclusion.label, 'Gravetoll Bell', JSON.stringify(d45Conclusion));
+  assert.ok(d45Conclusion.visible, JSON.stringify(d45Conclusion));
+  assert.match(d45Conclusion.detailMarkup, /Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect\./, JSON.stringify(d45Conclusion));
+  record('The existing D45 boss presentation concludes the Reliquary story without a new boss slot', true);
   const haul = await read(`({ gold:S.run.pendingRewards.gold, loot:S.run.pendingRewards.loot.map(i=>i.id), banked:S.player.gold })`);
   assert.ok(haul.gold > 0 && haul.loot.length > 0, JSON.stringify(haul));
   await pause();

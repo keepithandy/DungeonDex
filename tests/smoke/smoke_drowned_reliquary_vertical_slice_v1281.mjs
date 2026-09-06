@@ -113,6 +113,7 @@ async function loadRuntime(baseline = false) {
     createBaseState,
     districtByDepth,
     dungeonDistrictIdentityForDepth,
+    dungeonBossApproachLineForDepth: typeof dungeonBossApproachLineForDepth === 'undefined' ? null : dungeonBossApproachLineForDepth,
     districtArrivalLine,
     districtArrivalMarkup,
     districtMonsterIdentity: typeof districtMonsterIdentity === 'undefined' ? null : districtMonsterIdentity,
@@ -151,6 +152,8 @@ assert.equal(runtime.api.districtByDepth(30).id, 'ember-debtworks', 'D30 should 
 assert.equal(runtime.api.districtByDepth(31).id, 'drowned-reliquary', 'D31 should enter the Drowned Reliquary');
 assert.equal(runtime.api.districtByDepth(40).id, 'drowned-reliquary', 'D40 should remain in the Drowned Reliquary');
 assert.equal(runtime.api.districtByDepth(41).id, 'cinderbone', 'D41 should remain Cinderbone Halls');
+assert.equal(runtime.api.dungeonBossApproachLineForDepth(45), 'Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect.', 'D45 should conclude the Reliquary story through the existing boss path');
+assert.equal(runtime.api.dungeonBossApproachLineForDepth(40), 'Boss approach: no named toll answers from this sealed band.', 'D40 should not gain a new boss conclusion');
 
 const identity = plain(runtime.api.dungeonDistrictIdentityForDepth(31));
 assert.equal(identity.name, 'The Drowned Reliquary', 'district identity should expose the Reliquary name');
