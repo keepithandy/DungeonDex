@@ -8,17 +8,19 @@ Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 
 | State | Current classification |
 |---|---|
-| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent and four-identity roster on local main |
+| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent, four-identity roster, and themed gear presentation on local main |
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Guild Journal/history projections; rarity audit evidence (collection is a conditional model, not live-run yield) |
-| Planned only | Themed gear, loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
+| Planned only | Loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
 | Broken or incomplete | Physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report); local main has not been pushed |
 
-Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
+Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Themed gear and named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
 
 The [four-identity roster milestone](RELIQUARY_ROSTER_MILESTONE.md) and [D45 conclusion](RELIQUARY_CLIMAX_DECISION.md) are source-complete. The conclusion connects the Reliquary to the existing D45 boss and conditionally briefs existing in-band contract targets without creating a boss or contract. A fresh compact run passed 57/57.
 
 The [reward-curve decision](REWARD_CURVE_DECISION_V128.md) is evidence-complete. It retains the no-change control and documents exact, unselected alternatives; no balance policy, pity field, or runtime tuning is implied.
+
+The [themed-gear milestone](RELIQUARY_THEMED_GEAR.md) is source-complete. It adds D31-D40 Reliquary presentation through existing item metadata only, preserves all gear mechanics and random consumption, and is covered by seeded pinned-main, browser reload, and Gear-screen checks.
 
 D31-D40 contains no boss slot. Resolve a coherent climax without moving existing bosses or changing cadence/entry before implementing the boss milestone. No balance selection, pity fields, save migration, package, tag, push, or upload is implied by the roadmap.
 

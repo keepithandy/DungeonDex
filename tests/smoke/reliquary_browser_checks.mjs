@@ -16,13 +16,17 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     S.player.equipment.weapon = generateGear('weapon', 150, { forcedRarity:'mythic' });
     S.player.equipment.armor = generateGear('armor', 150, { forcedRarity:'mythic' });
     S.player.equipment.armor.upgradeLevel = 2;
+    const reliquaryGear = generateGear('charm', 11, { source:'normal', depthRaw:31 });
+    S.player.inventory.push(reliquaryGear);
+    window.__reliquaryThemedGearId = reliquaryGear.id;
     delete S.player.namedLoadouts;
     save(S); S = load(); render();
     return { legacy: Array.isArray(S.player.namedLoadouts) && S.player.namedLoadouts.length === 0,
-      town: document.querySelector('.screen.active')?.id, depth: S.player.returnDepth };
+      town: document.querySelector('.screen.active')?.id, depth: S.player.returnDepth,
+      themed: (() => { const item = S.player.inventory.find(entry => entry.id === window.__reliquaryThemedGearId); return item && item.maker === 'Drowned Reliquary' && item.tags.includes('drowned-reliquary'); })() };
   })()`);
-  assert.ok(setup.legacy && setup.town === 'screen-town' && setup.depth === 30, JSON.stringify(setup));
-  record('Reliquary legacy save without loadouts reloads into normal Town entry', true);
+  assert.ok(setup.legacy && setup.town === 'screen-town' && setup.depth === 30 && setup.themed, JSON.stringify(setup));
+  record('Reliquary legacy save and themed gear reload into normal Town entry', true);
   const contractBriefing = await read(`(() => {
     const offers = S.town.eliteBoardContracts;
     S.town.eliteBoardContracts = [{ id:'lowfire_bounty', targetFloor:11 }];
@@ -163,13 +167,14 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     return { returnDepth:S.player.returnDepth, safe:S.player.safeExtractDepth, gold:S.player.gold,
       inventory:S.player.inventory.map(i=>i.id), pending:S.run.pendingRewards,
       loadouts:window.__reliquaryLoadouts === JSON.stringify(S.player.namedLoadouts),
-      equipment:window.__reliquaryEquipment === JSON.stringify(S.player.equipment) };
+      equipment:window.__reliquaryEquipment === JSON.stringify(S.player.equipment),
+      themed:S.player.inventory.some(item => item.id === window.__reliquaryThemedGearId && item.maker === 'Drowned Reliquary' && item.tags.includes('drowned-reliquary')) };
   })()`);
   assert.equal(returned.returnDepth,40); assert.ok(returned.safe >= 40);
   assert.ok(returned.gold >= haul.banked + haul.gold);
   assert.ok(haul.loot.every(id => returned.inventory.includes(id)));
   assert.equal(returned.pending.loot.length,0);
-  assert.ok(returned.loadouts && returned.equipment);
+  assert.ok(returned.loadouts && returned.equipment && returned.themed);
   record('D31-D40 combat/loot extracts through the normal bank, return and reload path', true);
   await read(`document.getElementById('tab-gear').click(); true`);
   const applied = await read(`(() => {
@@ -179,9 +184,10 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     render(); document.querySelector('[data-named-loadout-action="apply"]').click();
     return { weapon:S.player.equipment.weapon.id === weapon, armor:S.player.equipment.armor?.id === armor.id,
       upgrade:S.player.equipment.armor?.upgradeLevel, focus:document.activeElement?.dataset.namedLoadoutAction,
-      notice:document.querySelector('.named-loadout-notice')?.innerText };
+      notice:document.querySelector('.named-loadout-notice')?.innerText,
+      themedVisible:(document.getElementById('inventoryPanel')?.innerText || '').includes('Drowned Reliquary') };
   })()`);
-  assert.ok(applied.weapon && applied.armor && applied.upgrade === 2 && applied.focus === 'apply', JSON.stringify(applied));
+  assert.ok(applied.weapon && applied.armor && applied.upgrade === 2 && applied.focus === 'apply' && applied.themedVisible, JSON.stringify(applied));
   assert.match(applied.notice,/1 equipped/);
   record('Post-return Apply Safe Items restores only the empty slot and retains upgrades/focus',true);
   await read('Math.random = window.__reliquaryRandom; true');

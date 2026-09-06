@@ -21,6 +21,8 @@ This changelog records what changed and why.
 
 ### Post-loadout source integration
 
+* Added Drowned Reliquary presentation identity to normal, elite, and boss gear generated at raw D31-D40 through the existing ten slots, maker/theme metadata, names, tags, and summaries. Existing stat budgets, rarity rolls, values, item IDs, loadouts, upgrades, and save schema remain unchanged.
+* Added seeded pinned-main mechanics controls for every source and slot, outside-band controls, and public-browser save/reload plus Gear-screen coverage. The boss matrix records the resulting presentation-only fixture signature while combat, reward, drop, and boundary signatures remain fixed.
 * Merged the verified D31-D40 Drowned Reliquary source work into local `main` at `60117cc`, while retaining v1.28.2 as the development version and cache authority.
 * Added the Reliquary district's arrival, subtitle, visual theme, four identity-only encounters, and active-run name retention through save/reload.
 * Kept D30 and D41 boundaries, raw-depth boss cadence, boss names, combat/scaling/reward values, loot rules, RNG consumption, Elite Contract ownership, loadouts, upgrades, and save schema unchanged.

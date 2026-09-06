@@ -107,9 +107,11 @@ async function loadRuntime(baseline = false) {
   vm.runInContext(`globalThis.__reliquaryApi = {
     DISTRICT_DATA,
     DISTRICT_ENCOUNTER_IDENTITIES: typeof DISTRICT_ENCOUNTER_IDENTITIES === 'undefined' ? {} : DISTRICT_ENCOUNTER_IDENTITIES,
+    RELIQUARY_GEAR_IDENTITIES: typeof RELIQUARY_GEAR_IDENTITIES === 'undefined' ? {} : RELIQUARY_GEAR_IDENTITIES,
     BOSS_FLOOR_NAMES,
     MONSTER_FAMILIES,
     MONSTER_TYPES,
+    SLOT_ORDER,
     createBaseState,
     districtByDepth,
     dungeonDistrictIdentityForDepth,
@@ -118,6 +120,8 @@ async function loadRuntime(baseline = false) {
     districtArrivalMarkup,
     districtMonsterIdentity: typeof districtMonsterIdentity === 'undefined' ? null : districtMonsterIdentity,
     generateMonster,
+    generateGear,
+    normalizeItem,
     normalizeMonster,
     startEliteContract,
     combatBackdropKind,
@@ -249,6 +253,10 @@ function mechanics(monster) {
   const { id, name, family, type, lore, ...values } = monster;
   return values;
 }
+function gearMechanics(item) {
+  const { id, name, maker, theme, tags, summary, ...values } = item;
+  return values;
+}
 let comparisons = 0;
 for (const depth of [1, 15, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 45, 60, 120, 800]) {
   for (let seed = 1; seed <= 100; seed += 1) {
@@ -291,5 +299,34 @@ for (const contractId of ['lowfire_bounty', 'hazard_contract', 'cinderjaw_bailif
   delete target.id; delete original.id;
   assert.deepEqual(target, original, `${contractId} overrides district identity and preserves rewards/stats`);
   assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), 'contract RNG stays fixed');
+}
+
+assert.deepEqual(plain(Object.keys(runtime.api.RELIQUARY_GEAR_IDENTITIES).sort()), plain(runtime.api.SLOT_ORDER).sort(), 'each existing gear slot should have one Reliquary identity');
+for (const source of ['normal', 'elite', 'boss']) {
+  for (const slot of runtime.api.SLOT_ORDER) {
+    runtime.setRandom(seeded(101)); baseline.setRandom(seeded(101));
+    const themed = plain(runtime.api.generateGear(slot, 11, { source, depthRaw:31 }));
+    const control = plain(baseline.api.generateGear(slot, 11, { source, depthRaw:31 }));
+    const identity = runtime.api.RELIQUARY_GEAR_IDENTITIES[slot];
+    assert.equal(themed.maker, 'Drowned Reliquary', `${slot} should carry its Reliquary maker identity`);
+    assert.equal(themed.theme, identity.theme, `${slot} should use only its identity theme`);
+    assert.ok(themed.name.startsWith(`${identity.prefix} `) && themed.name.endsWith(` ${identity.suffix}`), `${slot} should use its Reliquary display name`);
+    assert.ok(themed.tags.includes('drowned-reliquary'), `${slot} should be searchable by Reliquary identity`);
+    assert.deepEqual(gearMechanics(themed), gearMechanics(control), `${slot} ${source} gear mechanics should match pinned main`);
+    assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `${slot} ${source} gear should consume no extra RNG`);
+    const normalized = plain(runtime.api.normalizeItem(themed, slot));
+    assert.equal(normalized.name, themed.name, `${slot} Reliquary identity should survive normalization`);
+    assert.equal(normalized.maker, themed.maker, `${slot} Reliquary maker should survive normalization`);
+    assert.equal(normalized.theme, themed.theme, `${slot} Reliquary theme should survive normalization`);
+  }
+}
+for (const rawDepth of [30, 41]) {
+  runtime.setRandom(seeded(rawDepth)); baseline.setRandom(seeded(rawDepth));
+  const actual = plain(runtime.api.generateGear('weapon', 11, { source:'normal', depthRaw:rawDepth }));
+  const control = plain(baseline.api.generateGear('weapon', 11, { source:'normal', depthRaw:rawDepth }));
+  assert.match(actual.id, /^[0-9a-f-]{36}$/i, `outside-band D${rawDepth} gear should retain its item ID format`);
+  delete actual.id; delete control.id;
+  assert.deepEqual(actual, control, `outside-band D${rawDepth} gear should remain exactly unchanged`);
+  assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `outside-band D${rawDepth} gear RNG should remain unchanged`);
 }
 console.log(`PASS Drowned Reliquary vertical slice: district/identity/visual assertions and ${comparisons} seeded comparisons against pinned main; numeric values, elite modifiers, RNG consumption, bosses and outside-band visuals preserved.`);

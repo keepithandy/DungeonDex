@@ -418,6 +418,12 @@
     const maker = pick(MAKERS);
     const theme = pick(THEMES);
     const rawDepth = Math.floor(numberOr(opts.depthRaw || opts.depth, itemLevel, 1, 999999));
+    const reliquaryIdentity = rawDepth >= 31 && rawDepth <= 40 && ['normal','elite','boss'].includes(source)
+      ? RELIQUARY_GEAR_IDENTITIES?.[slot] || null
+      : null;
+    const displayName = reliquaryIdentity ? `${reliquaryIdentity.prefix} ${base} ${reliquaryIdentity.suffix}` : `${prefix} ${base} ${suffix}`;
+    const displayMaker = reliquaryIdentity ? 'Drowned Reliquary' : maker;
+    const displayTheme = reliquaryIdentity ? reliquaryIdentity.theme : theme;
     const lowFloorScale = source === 'starter' ? 0.5 : earlyStatScale(itemLevel);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;
     const brokenScale = opts.broken ? 0.55 : 1;
@@ -437,15 +443,17 @@
       id: makeId('gear'),
       slot,
       rarity: rarity.key,
-      theme,
-      maker,
-      name: `${prefix} ${base} ${suffix}`,
+      theme: displayTheme,
+      maker: displayMaker,
+      name: displayName,
       level: itemLevel,
       rating,
       value: gearPriceFromRating(rating, itemLevel, rarity.key, source),
       stats,
-      tags: [theme, maker, slot, source],
-      summary: `${maker} ${slot === 'charm' ? 'trinket' : slot} attuned for ${theme} paths.`
+      tags: reliquaryIdentity ? [displayTheme, displayMaker, 'drowned-reliquary', slot, source] : [theme, maker, slot, source],
+      summary: reliquaryIdentity
+        ? `Drowned Reliquary ${slot === 'charm' ? 'trinket' : slot} carried from the sealed bells.`
+        : `${maker} ${slot === 'charm' ? 'trinket' : slot} attuned for ${theme} paths.`
     };
   }
 

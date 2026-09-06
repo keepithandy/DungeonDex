@@ -147,6 +147,18 @@
   const TRINKET_SUFFIXES = ['of the Hollow Bell','of Ember Debt','of Room-Tithes','of Last Light'];
   const MAKERS = ['Emberfall','Rookery','Sunken Court','Lowfire','Mireglass','Red Chapel','Salt Forge','Ivory Span','Silt Borough','Noctis Atelier'];
   const THEMES = ['breaker','guardian','duelist','skirmisher','seer','warden','reaver','sage','ranger','occult'];
+  const RELIQUARY_GEAR_IDENTITIES = Object.freeze({
+    weapon: Object.freeze({ prefix:'Bellbound', suffix:'of the Reliquary', theme:'bellbound' }),
+    offhand: Object.freeze({ prefix:'Blackwater', suffix:'of Sealed Bells', theme:'blackwater' }),
+    helm: Object.freeze({ prefix:'Siltbound', suffix:'of the Drowned Watch', theme:'siltbound' }),
+    armor: Object.freeze({ prefix:'Drowned', suffix:'of the Reliquary', theme:'reliquary' }),
+    gloves: Object.freeze({ prefix:'Reliquary', suffix:'of the Last Toll', theme:'bellbound' }),
+    boots: Object.freeze({ prefix:'Tollbound', suffix:'of Blackwater', theme:'blackwater' }),
+    ring: Object.freeze({ prefix:'Bellbound', suffix:'of the Sunken Aisle', theme:'reliquary' }),
+    amulet: Object.freeze({ prefix:'Sealed', suffix:'of the Drowned Reliquary', theme:'siltbound' }),
+    cloak: Object.freeze({ prefix:'Blackwater', suffix:'of Prayer-Ribbons', theme:'blackwater' }),
+    charm: Object.freeze({ prefix:'Drowned', suffix:'of the Last Bell', theme:'bellbound' })
+  });
 
 
   // Mythic sets must not add extra equipment slots.

@@ -2,9 +2,9 @@
 
 ## Current checkpoint (2026-09-05)
 
-- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, and no-change reward-curve evidence are current source work.
+- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, no-change reward-curve evidence, and themed gear presentation are current source work.
 - Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
-- Audit reconciliation, selective Reliquary integration, D45 conclusion, and reward-curve decision evidence are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. See `RELIQUARY_LOADOUT_INTEGRATION.md` and `REWARD_CURVE_DECISION_V128.md`; physical-device validation remains outstanding.
+- Audit reconciliation, selective Reliquary integration, D45 conclusion, reward-curve decision, and themed gear presentation are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. The themed identity uses existing item presentation fields, with pinned mechanics/RNG controls and browser save/reload/Gear coverage. See `RELIQUARY_LOADOUT_INTEGRATION.md`, `REWARD_CURVE_DECISION_V128.md`, and `RELIQUARY_THEMED_GEAR.md`; physical-device validation remains outstanding.
 - GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.
 - No new version, cache, package, tag or upload is authorized.
 

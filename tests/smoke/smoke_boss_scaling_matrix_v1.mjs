@@ -40,7 +40,8 @@ const EXPECTED_SIGNATURES = Object.freeze({
   drops: '1849879d2d98cb7e62ca7f2f99cb247fb24423bad9811f3f3b37d8ab0f1f2e93',
   // D31 four-identity Reliquary roster; seeded numeric comparisons and all other signatures stay fixed.
   adjacentNormals: 'b4a15d9dae16ea53d6acec8e464d6d9b701024e5036a887e9bf951d9fa58dbbb',
-  fixtures: 'a32c2f251d9623e34556df882de157248babe7877e73fcaf880d939f95b2bd5f',
+  // Reliquary gear presentation changes fixture identity only; combat, rewards, drops, and seeded numeric layers remain fixed.
+  fixtures: '40fe25f8d8a6d9f65f010921eb45c9f4caef401ddfb9ee0c16b07590974998cd',
   combat: '22dc25babdcbe9ce71ed0a8162b3f02af1e32da0922303d6ec0d0b0f29175d13'
 });
 
