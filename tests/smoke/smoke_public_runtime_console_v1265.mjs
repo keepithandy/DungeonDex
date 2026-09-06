@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import { verifyReliquaryBrowser } from './reliquary_browser_checks.mjs';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
@@ -550,6 +551,9 @@ async function main() {
       latestLog: Array.isArray(S?.player?.log) ? S.player.log.slice(-3) : []
     })`);
     record('Public runtime enters the dungeon', dungeon.active === 'screen-run' && dungeon.runActive, JSON.stringify({ ...dungeon, dungeonEntryError }));
+
+    activeSurface = 'Reliquary integrated loop and loadouts';
+    await verifyReliquaryBrowser({ client, evaluate, waitFor, record });
 
     const unhandled = await evaluate(client, `window.__ddPublicRuntimeUnhandledRejections || []`);
     unhandled.forEach(entry => addIssue('unhandled-rejection', entry.message, entry.source));

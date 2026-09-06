@@ -137,6 +137,14 @@
         bossApproachLine: 'Boss approach: chains tick faster below.',
         safeFallback: false
       },
+      'drowned-reliquary': {
+        key: 'drowned-reliquary',
+        name: 'The Drowned Reliquary',
+        subtitle: 'Black water, sealed bells.',
+        shortFlavor: 'The Reliquary keeps its relics below black water, where drowned bells still answer the Stair.',
+        bossApproachLine: 'Boss approach: no named toll answers from this sealed band.',
+        safeFallback: false
+      },
       sootveil: {
         key: 'sootveil',
         name: 'Sootveil Depths',
@@ -245,6 +253,7 @@
       lowfire: 'Lowfire District stays close behind you, lamps low and warm.',
       ashgate: 'Ashgate Warrens narrows around the stair; every wall is scraped by retreat.',
       'ember-debtworks': 'Ember Debtworks glows red below; chains tick like ledgers closing.',
+      'drowned-reliquary': 'The Drowned Reliquary opens under black water; sealed bells move without air.',
       sootveil: 'Sootveil Depths swallows the light and leaves only breath and ash.',
       cinderbone: 'Cinderbone Halls opens in furnace heat and old champion dust.',
       blacktithe: 'Blacktithe Deep weighs each step like coin dropped into a grave.',

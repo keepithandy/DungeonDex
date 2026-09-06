@@ -8,11 +8,11 @@ Credit: main supplies Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 
 | State | Current classification |
 |---|---|
-| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo |
+| Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent on the integration branch |
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Guild Journal/history projections; rarity audit evidence (collection is a conditional model, not live-run yield) |
 | Planned only | Expanded Reliquary roster, boss/contract decision, reward-curve decision, themed gear, loot/return clarity, Town/mobile polish, world response, release candidate, v1.29 handoff |
-| Broken or incomplete | D31-D40 registry gap on main; Reliquary branch slice is unmerged and its complete browser loop is unverified; physical-device evidence is outstanding |
+| Broken or incomplete | Integration branch is not merged into main; physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report) |
 
 Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
 
@@ -20,7 +20,7 @@ D31-D40 contains no boss slot. Resolve a coherent climax without moving existing
 
 GitHub snapshot: [#139 — v1.28.2 release gate: complete physical-device loadout validation](https://github.com/keepithandy/DungeonDex/issues/139) is the sole open issue; no open PRs. Historical #139-#145 labels below and in ROADMAP_V127 are planning numbers, not current issue identities. ROADMAP_V1265 and ROADMAP_V127 are completed history. Older Talent/Revisit queues do not authorize activation.
 
-The branch's 49/55 compact passes, one skip and five environment failures are historical incomplete validation. Integration requires fresh focused, compact, browser-loop and mobile results. Real-device evidence needs device, OS, browser, viewport, screenshots and results; the v1.27 exception does not carry forward.
+The branch's 49/55 compact passes, one skip and five environment failures are historical incomplete validation. Fresh integration verification passed 57/57 compact checks and 36/36 public-browser assertions, including the complete Reliquary combat/loot/return/loadout loop. See [integration evidence](RELIQUARY_LOADOUT_INTEGRATION.md). Real-device evidence still needs device, OS, browser, viewport, screenshots and results; the v1.27 exception does not carry forward.
 
 ## Historical proposal (numbering retained, superseded by named queue above)
 

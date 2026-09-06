@@ -135,9 +135,13 @@
     const eliteReward = null;
     const family = String(monster.family || (monster.contractTarget ? 'Elite Hunt' : 'Husk'));
     const type = String(monster.type || (monster.contractTarget ? 'Contract' : 'Stalker'));
+    // Retain a known identity on reload without remapping historical encounters.
+    const districtIdentity = level >= 31 && level <= 40 && typeof DISTRICT_ENCOUNTER_IDENTITIES !== 'undefined'
+      ? DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']?.find(entry => entry.name === monster.name && entry.family === family && entry.type === type)
+      : null;
     const name = monster.contractTarget
       ? String(monster.contractEliteName || monster.name || 'Recovered Elite Hunt')
-      : `${family} ${type}`.trim();
+      : districtIdentity?.name || `${family} ${type}`.trim();
     return {
       id: monster.id || makeId('monster'),
       name: name || 'Recovered Hollow Threat',

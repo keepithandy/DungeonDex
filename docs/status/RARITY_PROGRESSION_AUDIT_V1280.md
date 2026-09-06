@@ -8,7 +8,7 @@ The executable evidence for this report is `tests/smoke/smoke_rarity_progression
 
 ## Current Runtime Contract
 
-Integration review (v1.28.2): `shouldDropLoot` in system 06 owns the guaranteed first and probabilistic second boss roll; the audit now measures its threshold directly. `grantKill` in system 07 owns the two-roll loop and separate bounty/early-aid additions. Those additions, encounter mix, active-contract modifiers, and charter warmup are outside this baseline table. System 04 selects a uniform set then a uniform shared slot; all 20 selection cells are verified against `generateMythicSetPiece`, and the collection model derives its dimensions from the runtime catalog. The reported collection quantiles remain conditional on independent eligible set drops, with no playtime estimate or tuning authority.
+Integration review (v1.28.2): `shouldDropLoot` in system 06 owns the guaranteed first and probabilistic second boss roll; the audit now measures its threshold directly. `winEncounter` in system 07 owns the two-roll loop and separate bounty/early-aid additions. Those additions, encounter mix, active-contract modifiers, and charter warmup are outside this baseline table. System 04 selects a uniform set then a uniform shared slot; all 20 selection cells are verified against `generateMythicSetPiece`, and the collection model derives its dimensions from the runtime catalog. The reported collection quantiles remain conditional on independent eligible set drops, with no playtime estimate or tuning authority.
 
 - Rarity ladder: Common, Uncommon, Rare, Epic, Legendary, Mythic.
 - Mythic-set pool: four sets, five existing equipment slots per set, twenty equally selectable set/slot combinations.
