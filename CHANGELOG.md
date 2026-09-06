@@ -21,6 +21,9 @@ This changelog records what changed and why.
 
 ### Post-loadout source integration
 
+* Added a read-only Latest Return receipt in Town from the existing completed-run history. It states the secured floor, next start, banked rewards, kills, loot, and recovered item names, then links only to the existing Gear and Journal views.
+* Inventory cards now state their currently equipped context and score delta before the player chooses an action. The existing detail modal remains the full read-only comparison, with the established Offhand upgrade display corrected to Guard and Wit.
+* Refined the Town preparation hierarchy and narrow-screen layout around the existing Enter Dungeon, Rest, Gear, Journal, Market, Forge, Contracts, and Charter paths. Receipt actions use the global 44px touch contract and pass supported touch geometry.
 * Added Drowned Reliquary presentation identity to normal, elite, and boss gear generated at raw D31-D40 through the existing ten slots, maker/theme metadata, names, tags, and summaries. Existing stat budgets, rarity rolls, values, item IDs, loadouts, upgrades, and save schema remain unchanged.
 * Added seeded pinned-main mechanics controls for every source and slot, outside-band controls, and public-browser save/reload plus Gear-screen coverage. The boss matrix records the resulting presentation-only fixture signature while combat, reward, drop, and boundary signatures remain fixed.
 * Merged the verified D31-D40 Drowned Reliquary source work into local `main` at `60117cc`, while retaining v1.28.2 as the development version and cache authority.

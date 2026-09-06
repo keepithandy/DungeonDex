@@ -37,6 +37,7 @@ const PUBLIC_ACTION_ATTRIBUTES = [
   'data-equip',
   'data-sell',
   'data-retire',
+  'data-town-route',
   'data-gear-detail-trigger',
   'data-named-loadout-action',
   'data-forge-slot',
@@ -296,6 +297,21 @@ async function main() {
       && gearModal.includes('openGearDetail(entry, detailTrigger);')
   );
   record(
+    'Inventory cards state their equipped comparison context while the detail modal keeps actions read-only',
+    runUi.includes('function gearComparisonContext(item, state)')
+      && runUi.includes('inventory-comparison-context')
+      && gearModal.includes('This panel is read-only and does not equip, sell, upgrade, or retire anything.')
+      && gearModal.includes("if (slot === 'offhand')")
+  );
+  record(
+    'Town return receipt is derived from existing run history and routes only to existing Gear or Journal screens',
+    index.includes('id="townReturnReceipt"')
+      && town.includes('function townReturnReceiptMarkup(state)')
+      && town.includes("state?.player?.runHistory")
+      && bindings.includes("$$('[data-town-route]')")
+      && bindings.includes("['gear', 'archive'].includes(route)")
+  );
+  record(
     'Named loadouts expose labelled native actions, list semantics, status announcements, and keyboard focus recovery',
     namedLoadouts.includes('role="list" aria-label="Saved named loadouts"')
       && namedLoadouts.includes('aria-label="Slot-by-slot availability"')
@@ -378,6 +394,7 @@ async function main() {
     '[data-equip]',
     '[data-sell]',
     '[data-retire]',
+    '[data-town-route]',
     '[data-gear-detail-trigger]',
     '#namedLoadoutName',
     '[data-named-loadout-action]',

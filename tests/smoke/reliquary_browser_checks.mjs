@@ -176,6 +176,15 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.equal(returned.pending.loot.length,0);
   assert.ok(returned.loadouts && returned.equipment && returned.themed);
   record('D31-D40 combat/loot extracts through the normal bank, return and reload path', true);
+  const receipt = await read(`(() => {
+    const panel = document.getElementById('townReturnReceipt');
+    return { text:panel?.innerText || '', review:!!panel?.querySelector('[data-town-route="gear"]'), history:!!panel?.querySelector('[data-town-route="archive"]') };
+  })()`);
+  assert.ok(/Extraction secured/.test(receipt.text) && /Banked/.test(receipt.text) && receipt.review && receipt.history, JSON.stringify(receipt));
+  await read(`document.querySelector('#townReturnReceipt [data-town-route="archive"]')?.click(); true`);
+  assert.equal(await read(`document.querySelector('.screen.active')?.id`), 'screen-archive');
+  await read(`document.querySelector('#tab-town')?.click(); true`);
+  record('Town latest-return receipt reports the banked haul and routes to the existing Gear or Journal views', true);
   await read(`document.getElementById('tab-gear').click(); true`);
   const applied = await read(`(() => {
     const weapon = S.player.equipment.weapon.id;

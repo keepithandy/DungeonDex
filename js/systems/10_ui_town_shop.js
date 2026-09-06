@@ -383,6 +383,32 @@ function merchantGearUpgradePanelMarkup(state) {
     </div>`;
 }
 
+function townReturnReceiptMarkup(state) {
+	const latest = Array.isArray(state?.player?.runHistory) ? state.player.runHistory[0] : null;
+	const extracted = String(latest?.reason || '').toLowerCase() === 'extract';
+	if (!extracted) {
+		return `<div class="town-return-receipt-empty"><span class="eyebrow town-section-kicker">Preparation</span><strong>Set your next descent.</strong><p class="small muted">Review your Gear, rest if needed, then enter the Hollow Stair.</p><div class="town-return-actions"><button class="ghost mini" type="button" data-town-route="gear">Review Gear</button></div></div>`;
+	}
+	const floor = Math.max(1, Math.floor(Number(latest.floor) || 1));
+	const lootCount = Math.max(0, Math.floor(Number(latest.lootCount) || 0));
+	const kills = Math.max(0, Math.floor(Number(latest.kills) || 0));
+	const restart = cleanDisplayText(latest.restartLabel || latest.checkpointLabel || `Floor ${floor}`, `Floor ${floor}`);
+	const rewards = typeof runHistoryRewardText === 'function'
+		? cleanDisplayText(runHistoryRewardText(latest), 'Rewards banked')
+		: cleanDisplayText(latest.rewards || 'Rewards banked', 'Rewards banked');
+	const lootPreview = (Array.isArray(latest.lootPreview) ? latest.lootPreview : []).slice(0, 3)
+		.map(name => cleanDisplayText(name || ''))
+		.filter(Boolean)
+		.map(name => `<span class="pill town-return-loot-pill">${escapeHtml(name)}</span>`)
+		.join('');
+	return `<div class="town-return-receipt-content">
+		<div class="town-return-receipt-head"><div><span class="eyebrow town-section-kicker">Latest Return</span><h2>Extraction secured</h2><p>Banked at Floor ${format(floor)} • Next start: ${escapeHtml(restart)}</p></div><span class="pill town-return-status">Banked</span></div>
+		<div class="town-return-receipt-stats"><span><b>${format(kills)}</b> kills</span><span><b>${format(lootCount)}</b> loot</span><span>${escapeHtml(rewards)}</span></div>
+		${lootPreview ? `<div class="tag-row town-return-loot-row">${lootPreview}</div>` : ''}
+		<div class="town-return-actions"><button class="primary mini" type="button" data-town-route="gear">Review Gear</button><button class="ghost mini" type="button" data-town-route="archive">Descent History</button></div>
+	</div>`;
+}
+
 function renderTown() {
 	const stagingDistrict = currentStagingDistrict(S);
 	const districtDisplay = currentDistrictDisplay(S);
@@ -392,10 +418,15 @@ function renderTown() {
 	const questPanel = el('questPanel');
 	const merchantPanel = el('merchantPanel');
 	const forgePanel = el('forgePanel');
+	const returnReceipt = el('townReturnReceipt');
 	const revisitBoardMarkup = earlierDungeonRevisitMarkup();
 	if (questPanel) questPanel.classList.add('town-section-shell', 'town-board-shell');
 	if (merchantPanel) merchantPanel.classList.add('town-section-shell', 'town-market-shell');
 	if (forgePanel) forgePanel.classList.add('town-section-shell', 'town-forge-shell');
+	if (returnReceipt) {
+		returnReceipt.classList.add('town-section-shell', 'town-return-receipt-shell');
+		returnReceipt.innerHTML = townReturnReceiptMarkup(S);
+	}
 	const districtPanel = el('districtName')?.closest('.panel');
 	if (districtPanel) {
 		districtPanel.className = `panel section-header district-banner town-district-hub town-hub-card town-hub-titlebar district-charter-hub ${districtToneClass(stagingDistrict)}`;

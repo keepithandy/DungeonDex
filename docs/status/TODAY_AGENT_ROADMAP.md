@@ -2,9 +2,9 @@
 
 ## Current checkpoint (2026-09-05)
 
-- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, no-change reward-curve evidence, and themed gear presentation are current source work.
+- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, no-change reward-curve evidence, themed gear presentation, loot/return clarity, and Town/mobile polish are current source work.
 - Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
-- Audit reconciliation, selective Reliquary integration, D45 conclusion, reward-curve decision, and themed gear presentation are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. The themed identity uses existing item presentation fields, with pinned mechanics/RNG controls and browser save/reload/Gear coverage. See `RELIQUARY_LOADOUT_INTEGRATION.md`, `REWARD_CURVE_DECISION_V128.md`, and `RELIQUARY_THEMED_GEAR.md`; physical-device validation remains outstanding.
+- Audit reconciliation, selective Reliquary integration, D45 conclusion, reward-curve decision, themed gear presentation, loot/return clarity, and Town/mobile polish are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. Gear comparison is read-only, latest return is history-derived, and Town actions retain their existing route/action ownership with supported touch geometry. See `RELIQUARY_LOADOUT_INTEGRATION.md`, `REWARD_CURVE_DECISION_V128.md`, `RELIQUARY_THEMED_GEAR.md`, and `LOOT_RETURN_TOWN_MOBILE_MILESTONES.md`; physical-device validation remains outstanding.
 - GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.
 - No new version, cache, package, tag or upload is authorized.
 

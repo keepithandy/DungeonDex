@@ -187,6 +187,9 @@
     if (slot === 'armor') {
       return `+${formatNumber(level * 2)} Guard and +${formatNumber(level * 8)} HP from upgrades`;
     }
+    if (slot === 'offhand') {
+      return `+${formatNumber(level)} Guard and +${formatNumber(level)} Wit from upgrades`;
+    }
     return `+${formatNumber(level * 2)} Power from upgrades`;
   }
 

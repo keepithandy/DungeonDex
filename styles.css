@@ -10376,3 +10376,71 @@ button.dd-devtools-btn-danger {
     grid-column: auto;
   }
 }
+
+/* Loot/return clarity and Town preparation hierarchy. */
+.town-return-receipt-shell {
+  border-color: rgba(122, 232, 178, 0.22);
+  background: linear-gradient(135deg, rgba(28, 73, 60, 0.28), rgba(12, 17, 18, 0.82));
+}
+
+.town-return-receipt-content,
+.town-return-receipt-empty {
+  display: grid;
+  gap: 10px;
+}
+
+.town-return-receipt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.town-return-receipt-head h2,
+.town-return-receipt-empty strong {
+  display: block;
+  margin: 2px 0 3px;
+  color: rgba(232, 255, 244, 0.96);
+}
+
+.town-return-receipt-head p,
+.town-return-receipt-empty p { margin: 0; }
+
+.town-return-status {
+  flex: 0 0 auto;
+  border-color: rgba(122, 232, 178, 0.34);
+  color: rgba(190, 250, 213, 0.96);
+}
+
+.town-return-receipt-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  color: rgba(236, 247, 241, 0.82);
+  font-size: 0.76rem;
+}
+
+.town-return-receipt-stats span:last-child { color: rgba(255, 231, 184, 0.92); }
+.town-return-loot-row { margin: 0; }
+.town-return-loot-pill { max-width: 100%; overflow-wrap: anywhere; }
+.town-return-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.town-return-actions button { min-height: 44px; }
+
+.inventory-comparison-context {
+  margin: 5px 0 0;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  #screen-town .town-return-receipt-shell { padding: 12px; }
+  .town-return-receipt-head { align-items: stretch; }
+  .town-return-status { align-self: start; }
+  .town-return-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .town-return-actions button { width: 100%; }
+}
+
+@media (max-width: 370px) {
+  .town-return-receipt-head { display: grid; }
+  .town-return-actions { grid-template-columns: 1fr; }
+}

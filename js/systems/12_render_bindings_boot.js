@@ -246,6 +246,14 @@
   }
 
   function bindDynamic() {
+    $$('[data-town-route]').forEach(btn => btn.onclick = () => {
+      const route = String(btn.dataset.townRoute || '').trim();
+      if (!['gear', 'archive'].includes(route)) return;
+      switchScreen(route);
+      const screen = el(`screen-${route}`);
+      const target = screen?.querySelector('button:not([disabled]), [role="button"], [tabindex]:not([tabindex="-1"])');
+      try { target?.focus({ preventScroll: true }); } catch (_) { target?.focus?.(); }
+    });
     $$('[data-buy]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantItem(S, btn.dataset.buy); render(); }));
     $$('[data-merchant-upgrade]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantGearUpgrade(S, btn.dataset.merchantUpgrade); render(); }));
     $$('[data-buy-district]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyDistrictWare(S, btn.dataset.buyDistrict); render(); }));

@@ -597,6 +597,18 @@
     return Math.max(0, Math.floor(gearPowerValue(item) - gearPowerValue(equipped)));
   }
 
+  function gearComparisonContext(item, state) {
+    const slot = item?.slot;
+    const equipment = isPlainObject(state?.player?.equipment) ? state.player.equipment : {};
+    const equipped = slot ? equipment[slot] : null;
+    const slotLabel = slotDisplayName(slot);
+    if (!equipped) return `Empty ${slotLabel} slot • ready to equip`;
+    const diff = Math.floor(gearPowerValue(item) - gearPowerValue(equipped));
+    const diffLabel = diff > 0 ? `+${format(diff)}` : diff < 0 ? `−${format(Math.abs(diff))}` : '0';
+    const equippedName = gearDisplayName(equipped);
+    return `Compared with ${equippedName} • Score ${diffLabel}`;
+  }
+
   function gearStatusBadges(item) {
     const badges = [];
     const delta = gearUpgradeDelta(item, S);
@@ -779,6 +791,7 @@
     const maker = cleanGearText(item.maker);
     const summary = cleanGearText(item.summary);
     const delta = gearUpgradeDelta(item, S);
+    const comparisonContext = gearComparisonContext(item, S);
     const statusBadges = gearStatusBadges(item);
     const setBonusPreview = setBonusPreviewMarkup(item, S, true);
     const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
@@ -797,6 +810,7 @@
         ${statusBadges ? `<div class="gear-badge-row">${statusBadges}</div>` : ''}
       </div>
       ${gearScoreMarkup(item)}
+      <p class="small muted inventory-comparison-context">${escapeHtml(comparisonContext)}</p>
       ${summary ? `<p class="small inventory-card-summary">${escapeHtml(summary)}</p>` : ''}
       ${setBonusPreview}
       <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button><button class="ghost mini retire-item-btn" ${retireAttrs}>${retireLabel}</button></div>
