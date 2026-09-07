@@ -223,10 +223,13 @@ assert.equal(rows(fixture).filter(entry => entry.key === 'reliquary-boss').lengt
 assert.equal(row(fixture, 'boss').badge, 'Completed');
 fixture.player.runHistory = [{ floor: 40, reason: 'extract', restartDepth: 40 }];
 fixture.player.eliteContracts = { active: { id: contractId, eliteName: '<svg onload=alert(1)>', targetFloor: 11, completed: true } };
+fixture.player.equipment = { weapon: { ...item, upgradeLevel: 1, stats: { power: 10 } } };
 const beforeComplete = JSON.stringify(fixture);
 const markup = live.renderGuildJournalPanel(fixture);
 assert.equal(JSON.stringify(fixture), beforeComplete, 'rendering does not change existing records');
 assert.match(markup, /Drowned Reliquary records/);
+assert.match(markup, /Next cost/);
+assert.ok(!markup.includes('&lt;span'), 'Journal currency is plain text before HTML escaping');
 assert.ok(!/<svg|onload="|<button|data-(?:claim|reward|start|complete)-/.test(markup));
 const receipt = live.townReturnReceiptMarkup(fixture);
 assert.match(receipt, /Banked at Floor 1 • Room 4 • Chapter 10 \(D40\)/);

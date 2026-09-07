@@ -411,6 +411,13 @@ button,
   margin-top: 12px;
 }
 
+/* Keep scrolling Journal text clear of the fixed closed navigation handle. */
+@media (max-width: 900px) {
+  #guildJournalPanel {
+    padding-inline-start: calc(44px + env(safe-area-inset-left, 0px));
+  }
+}
+
 .journal-chronicle-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

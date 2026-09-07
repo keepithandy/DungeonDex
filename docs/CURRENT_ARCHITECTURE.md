@@ -58,6 +58,10 @@ Deferred lane direction:
 
 Historical Revisit references must not be read as an activation plan. Any future lane work requires a focused issue and must preserve the core dungeon loop.
 
+### Journal and world reaction
+
+Town and Guild Journal share a read-only Reliquary projection in system 38. It reads existing trophy identities, located contract records, explicit gear metadata, and retained run history. It adds no save fields, actions, rewards or record-count increments. Claimed contract IDs without location remain historical; best depth cannot prove a boss victory, safe return or full-band clear. New acknowledgement and receipt locations use `getLoreDepthProgress`, keeping raw depth distinct from displayed Floor/Room/Chapter.
+
 ### Merchant Gear Upgrades
 
 Merchant Gear Upgrades are the active long-term gear progression path.

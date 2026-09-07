@@ -4,7 +4,7 @@
 
 Current baseline: **DungeonDex v1.28.2**
 
-Development continuation: local `main` includes the D31-D40 Drowned Reliquary while preserving named loadouts. See the [active named milestones](docs/status/ROADMAP_V128.md) and [integration verification](docs/status/RELIQUARY_LOADOUT_INTEGRATION.md). This source work has not been pushed, published, or physically device-validated.
+Development continuation: local `main` includes the D31-D40 Drowned Reliquary while preserving named loadouts. Journal/world acknowledgements and automated release-candidate preparation are complete, with feature scope frozen. See the [active named milestones](docs/status/ROADMAP_V128.md) and [candidate verification and remaining device gate](docs/status/RELEASE_CANDIDATE_V128.md). This source work has not been pushed, published, or physically device-validated.
 
 ## Try It First
 

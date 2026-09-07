@@ -18,4 +18,4 @@ Raw depths D31-D40 now give normal, elite, and boss gear a Drowned Reliquary pre
 
 ## Remaining work
 
-The next named milestone is loot comparison and return clarity. Physical-device validation under GitHub issue #139 remains a release gate.
+Loot comparison, return clarity, Town/mobile polish and Journal/world reaction are now source-complete. Automated release preparation is recorded in `RELEASE_CANDIDATE_V128.md`; physical-device validation under the recorded GitHub issue #139 remains a release gate.

@@ -1,5 +1,8 @@
 # Reliquary / Loadout integration checkpoint
 
+Historical checkpoint: the follow-up queue and standalone gear-harness limitation below describe this milestone at completion. Current closure and release gates are recorded in [RELEASE_CANDIDATE_V128.md](RELEASE_CANDIDATE_V128.md).
+
+
 ## Scope and baseline
 
 Primary category: Content Expansion, with regression protection and two narrowly required presentation/compatibility fixes. Active checkout: `C:\Users\quali\Desktop\source\DungeonDex`; merged local `main` commit `60117cc`. Version remains v1.28.2 Loadout Polish / `1.28.2-loadout-polish`.

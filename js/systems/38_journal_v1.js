@@ -27,7 +27,7 @@
     return num(fallback, 0);
   }
   function money(value){
-    return typeof formatMoney === 'function' ? formatMoney(value) : `${num(value)}c`;
+    return typeof moneyText === 'function' ? moneyText(value) : `${num(value)}c`;
   }
   function summaryLine(lines, fallback){
     return lines.find(Boolean) || fallback;

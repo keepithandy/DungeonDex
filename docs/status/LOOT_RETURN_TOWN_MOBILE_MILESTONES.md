@@ -6,7 +6,7 @@ Inventory cards now identify the item currently equipped in the same slot and sh
 
 ## Return receipt
 
-Town now derives a Latest Return receipt from the first existing `player.runHistory` entry after a safe extraction. It reports the secured floor, next start, banked rewards, kills, loot count, and up to three recovered names. Its buttons only navigate to the established Gear and Guild Journal screens; they grant no rewards and do not alter extraction, pending rewards, equip, sell, retire, or save behavior.
+Town now derives a Latest Return receipt from the first existing `player.runHistory` entry after a safe extraction. It reports the secured location, next start, banked rewards, kills, loot count, and up to three recovered names. Its buttons only navigate to the established Gear and Guild Journal screens; they grant no rewards and do not alter extraction, pending rewards, equip, sell, retire, or save behavior.
 
 ## Town and mobile polish
 

@@ -44,6 +44,7 @@ const COMMANDS = [
   { tag: 'syntax', name: 'merchant upgrade smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs'] },
   { tag: 'syntax', name: 'elite contract lifecycle smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_elite_contract_lifecycle_v127.mjs'] },
   { tag: 'syntax', name: 'named loadouts smoke syntax', cmd: ['node', '--check', 'tests/smoke/smoke_named_loadouts_v1281.mjs'] },
+  { tag: 'gear', name: 'gear identity and comparison', cmd: ['node', 'tests/smoke/smoke_gear_identity_compare_v1238.mjs'] },
   { tag: 'journal', name: 'journal v1', cmd: ['node', 'tests/smoke/smoke_journal_v1233.mjs'] },
   { tag: 'famous', name: 'famous gear memory v1', cmd: ['node', 'tests/smoke/smoke_famous_gear_memory_v1.mjs'], optionalPath: 'tests/smoke/smoke_famous_gear_memory_v1.mjs' },
   { tag: 'boss', name: 'boss trophy v1', cmd: ['node', 'tests/smoke/smoke_boss_trophy_v1.mjs'], optionalPath: 'tests/smoke/smoke_boss_trophy_v1.mjs' },

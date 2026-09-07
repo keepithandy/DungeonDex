@@ -21,6 +21,8 @@ This changelog records what changed and why.
 
 ### Post-loadout source integration
 
+* Completed automated release-candidate preparation with feature scope frozen, repaired gear-comparison regression coverage, expanded Journal/Town contrast checks, a scrolling Journal gutter beside the fixed drawer, and plain Journal currency text. Release evidence and the outstanding physical-device gate are recorded in `docs/status/RELEASE_CANDIDATE_V128.md`; no version/cache bump or public artifact is implied.
+
 * Completed Journal/world reaction with read-only Reliquary trophy, located-contract, identified-gear and retained-run acknowledgements shared by Town and Guild Journal. Historical and missing evidence never imply a new achievement or Revisit lane.
 * Corrected the Latest Return's raw-depth-as-floor label and isolated legacy Famous Gear summary preparation from live save state. See `docs/status/RELIQUARY_JOURNAL_WORLD_REACTION.md` for evidence and limitations.
 

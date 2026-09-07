@@ -1,12 +1,14 @@
 # DungeonDex Acting-Agent Roadmap — Today
 
-## Current checkpoint (2026-09-05)
+## Current checkpoint (2026-09-07)
 
-- Source: v1.28.2 Loadout Polish, local `main`; Drowned Reliquary, D45 conclusion, no-change reward-curve evidence, themed gear presentation, loot/return clarity, and Town/mobile polish are current source work.
-- Active queue: `ROADMAP_V128.md`, using named milestones and preserving completed loadouts.
-- Audit reconciliation, selective Reliquary integration, D45 conclusion, reward-curve decision, themed gear presentation, loot/return clarity, and Town/mobile polish are source-complete: compact 57/57, public browser checks, deterministic generation/save comparisons, mobile captures, and fixed no-change yield controls passed. Gear comparison is read-only, latest return is history-derived, and Town actions retain their existing route/action ownership with supported touch geometry. See `RELIQUARY_LOADOUT_INTEGRATION.md`, `REWARD_CURVE_DECISION_V128.md`, `RELIQUARY_THEMED_GEAR.md`, and `LOOT_RETURN_TOWN_MOBILE_MILESTONES.md`; physical-device validation remains outstanding.
-- GitHub issue #139 is physical-device loadout validation; no PRs are open. Earlier #139-#145 labels are historical planning numbers.
-- No new version, cache, package, tag or upload is authorized.
+- Source: v1.28.2 Loadout Polish / `1.28.2-loadout-polish`. This local continuation began at clean `main` `99bddca`; Journal/world reaction is `3819246` and automated release preparation is recorded in `RELEASE_CANDIDATE_V128.md`.
+- Active queue: `ROADMAP_V128.md`, using named milestones. All source milestones through Journal/world reaction and automated release-candidate preparation are complete; feature scope is frozen.
+- Named loadouts, rarity/no-change reward evidence, D31-D40 district/roster/themed gear, D45 conclusion, contract briefings, gear comparison, return receipt, and Town/mobile work remain preserved.
+- Town and Guild Journal now acknowledge only supported trophy, located-contract, identified-gear and retained-run evidence. Raw depth alone never proves a completion. No new save field or gameplay reward was introduced.
+- The candidate report records the final regression, browser, accessibility, contrast and package-hygiene evidence. The previously broken standalone gear-comparison harness is repaired and part of the compact suite.
+- Physical-device/Textastic testing remains pending; use `REAL_DEVICE_HANDOFF_V128.md`. The last recorded GitHub issue is #139; issue/PR status has not been refreshed during this local-only continuation.
+- No version/cache bump, retained release package, tag, push or upload is authorized. Local commits and merge into `main` were explicitly requested.
 
 ## Historical v1.27 checkpoint
 

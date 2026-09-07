@@ -1,5 +1,8 @@
 # Reliquary encounters milestone
 
+Historical checkpoint: the follow-up queue and standalone gear-harness limitation below describe this milestone at completion. Current closure and release gates are recorded in [RELEASE_CANDIDATE_V128.md](RELEASE_CANDIDATE_V128.md).
+
+
 Primary category: Content Expansion. Started from `work/reliquary-loadout-integration` at `1b6863e`; the completed roster is merged into local `main` at `60117cc`. Version remains v1.28.2 Loadout Polish. Scope announced before editing: system 00 identity data and focused/public regression coverage only.
 
 The roster now contains four identities: Bell-Drowned Warden (Revenant/Warden), Siltbound Reliquary Lurker (Mireborn/Lurker), Reliquary Chain Herald (Construct/Herald), and Blackwater Bell Seer (Watcher/Seer). The first two remain intact. All four reuse existing families and roles and contain only name, family, type and lore. These roles are presentation, not new combat behavior.

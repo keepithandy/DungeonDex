@@ -215,6 +215,7 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
     return { unchanged:before === JSON.stringify(oldSave), badges:model.rows.map(row => row.badge) };
   })()`);
   assert.ok(projection.unchanged, JSON.stringify(projection));
+  assert.ok(!await read(`document.getElementById('guildJournalPanel')?.innerText.includes('<span')`), 'Journal must not print currency HTML');
   assert.deepEqual(projection.badges, ['Completed', 'Historical — location unrecorded', 'Locked — no identified gear', 'Locked — no return record']);
   record('Loaded Journal preserves legacy saves and does not infer Reliquary returns or contract locations from depth', true);
   const reload = await read(`(() => {
@@ -239,7 +240,7 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
   assert.match(reload.text, /Recorded — in your gear/);
   record('Reliquary boss, gear, return and historical contract acknowledgements survive real save/reload without new actions', true);
 
-  await new Promise(resolve => setTimeout(resolve, 8000)); // Let the normal extraction notice finish before visual capture.
+  if (process.env.DD_RELIQUARY_CAPTURE_DIR) await new Promise(resolve => setTimeout(resolve, 3000)); // Let the normal extraction notice finish before visual capture.
   for (const touch of [true, false]) {
     for (const [width, height] of [[390,844], [430,932], [768,1024]]) {
       await client.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor:1, mobile:touch });
@@ -248,16 +249,17 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
         S.screen = 'archive'; render();
         const panel = document.querySelector('.journal-reliquary'); panel.scrollIntoView({block:'start'});
         const cards = [...panel.querySelectorAll('.journal-record-card')];
-        return {count:cards.length, overflow:document.documentElement.scrollWidth > innerWidth + 1,
+        const toggle = document.querySelector('.ddx-nav-toggle').getBoundingClientRect();
+        return {count:cards.length, gutter:panel.getBoundingClientRect().left >= toggle.right + 6, overflow:document.documentElement.scrollWidth > innerWidth + 1,
           clipped:cards.some(card => card.scrollWidth > card.clientWidth + 1),
           badges:cards.every(card => card.querySelector('.journal-record-badge')?.innerText.length > 0)};
       })()`);
-      assert.deepEqual(geometry, {count:4,overflow:false,clipped:false,badges:true});
+      assert.deepEqual(geometry, {count:4,gutter:true,overflow:false,clipped:false,badges:true});
       if (process.env.DD_RELIQUARY_CAPTURE_DIR) {
         const shot = await client.send('Page.captureScreenshot', {format:'png', captureBeyondViewport:false});
         await writeFile(path.join(process.env.DD_RELIQUARY_CAPTURE_DIR, `journal-${width}-${touch ? 'touch' : 'mouse'}.png`), Buffer.from(shot.data,'base64'));
       }
-      record(`Reliquary Journal ${width}x${height} ${touch ? 'touch' : 'fine pointer'}: long-name wrapping and visible state labels`, true);
+      record(`Reliquary Journal ${width}x${height} ${touch ? 'touch' : 'fine pointer'}: drawer clearance, long-name wrapping and visible state labels`, true);
     }
   }
   const town = await read(`(() => {

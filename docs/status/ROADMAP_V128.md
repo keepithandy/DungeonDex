@@ -1,8 +1,10 @@
 # DungeonDex v1.28 Roadmap
 
-## Active integration queue (2026-09-05)
+## Active integration queue (2026-09-07)
 
-Source baseline: `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3`, v1.28.2 Loadout Polish, build `1.28.2-loadout-polish`. The selected integration was fast-forward merged into local `main` at `60117cc`; it remains three commits ahead of `origin/main` until pushed. All three remote refs were fetched and verified; the common ancestor is `e52b68aa30f589d92682885c85e574f75a8a73da` and main/content divergence was intentionally 3/2 commits.
+Active source: v1.28.2 Loadout Polish, build `1.28.2-loadout-polish`. The continuation began from clean local `main` at `99bddca`, three commits ahead of the locally recorded `origin/main`. Journal/world reaction is committed at `3819246`; the automated release-candidate preparation and local-main delivery are recorded in [the candidate report](RELEASE_CANDIDATE_V128.md). No remote push is part of this continuation.
+
+Historical integration baseline: `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3`; the initial integration/roster merge was `60117cc`. The fetched common ancestor was `e52b68aa30f589d92682885c85e574f75a8a73da`, with intentional 3/2 main/content divergence at that earlier checkpoint.
 
 Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity-audit` supplied audit evidence (3e5ab1f); `work/v1.28.1-drowned-reliquary` supplied the first-descent slice (7384585). The selected audit and content were ported selectively into local `main`; version/cache changes from those branches were excluded.
 
@@ -10,11 +12,12 @@ Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 |---|---|
 | Playable now | Existing core loop, three Elite Contracts, Merchant Gear Upgrades, Lowfire Forge, Debt, polished Named Loadouts, Trophy Echo; D31-D40 Reliquary first descent, four-identity roster, and themed gear presentation on local main |
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
-| Read-only foundation | Guild Journal/history projections; rarity audit evidence (collection is a conditional model, not live-run yield) |
-| Planned only | Journal/world response, release candidate, v1.29 handoff |
-| Broken or incomplete | Physical-device evidence is outstanding; legacy standalone gear comparison harness has missing DOM mocks (see integration report); local main has not been pushed |
+| Read-only foundation | Completed Reliquary boss/contract/gear/run acknowledgements in Town and Guild Journal; rarity audit evidence remains conditional, not live-run yield |
+| Automated preparation | Feature scope frozen; release-candidate regression, accessibility, source/package hygiene and documentation checks complete; see the candidate report |
+| Pending release work | Fresh physical-device/Textastic validation, then separately authorized version/package/push/tag/upload decisions |
+| Broken or incomplete | Physical-device evidence remains outstanding. The historical gear comparison harness is repaired and included in the compact suite. Local main has not been pushed by this continuation |
 
-Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. Themed gear, loot/return clarity, Town/mobile polish, and named loadouts are complete and must not be rebuilt. Safe application only fills available empty slots.
+Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. All source milestones through Journal/world response and automated release-candidate preparation are complete and must not be rebuilt. Feature scope is frozen. Safe application only fills available empty slots.
 
 The [four-identity roster milestone](RELIQUARY_ROSTER_MILESTONE.md) and [D45 conclusion](RELIQUARY_CLIMAX_DECISION.md) are source-complete. The conclusion connects the Reliquary to the existing D45 boss and conditionally briefs existing in-band contract targets without creating a boss or contract. A fresh compact run passed 57/57.
 
@@ -24,11 +27,13 @@ The [themed-gear milestone](RELIQUARY_THEMED_GEAR.md) is source-complete. It add
 
 The [loot/return and Town/mobile milestones](LOOT_RETURN_TOWN_MOBILE_MILESTONES.md) are source-complete. Gear cards now surface current-slot comparison context, Town derives a read-only latest-return receipt from existing history, and the existing preparation routes remain clear and touch-safe at the supported viewports.
 
-D31-D40 contains no boss slot. Resolve a coherent climax without moving existing bosses or changing cadence/entry before implementing the boss milestone. No balance selection, pity fields, save migration, package, tag, push, or upload is implied by the roadmap.
+D31-D40 contains no boss slot. The completed D45 narrative conclusion resolved that constraint through the existing boss and trophy, with no cadence or entry change. No balance selection, pity fields, save migration, package, tag, push, or upload is implied by the roadmap.
 
-GitHub snapshot: [#139 — v1.28.2 release gate: complete physical-device loadout validation](https://github.com/keepithandy/DungeonDex/issues/139) is the sole open issue; no open PRs. Historical #139-#145 labels below and in ROADMAP_V127 are planning numbers, not current issue identities. ROADMAP_V1265 and ROADMAP_V127 are completed history. Older Talent/Revisit queues do not authorize activation.
+Historical GitHub snapshot (2026-09-05; not refreshed during this local-only continuation): [#139 — v1.28.2 release gate: complete physical-device loadout validation](https://github.com/keepithandy/DungeonDex/issues/139) is the sole open issue; no open PRs. Historical #139-#145 labels below and in ROADMAP_V127 are planning numbers, not current issue identities. ROADMAP_V1265 and ROADMAP_V127 are completed history. Older Talent/Revisit queues do not authorize activation.
 
 The branch's 49/55 compact passes, one skip and five environment failures are historical incomplete validation. Fresh integration verification passed 57/57 compact checks and 36/36 public-browser assertions, including the complete Reliquary combat/loot/return/loadout loop. See [integration evidence](RELIQUARY_LOADOUT_INTEGRATION.md). Real-device evidence still needs device, OS, browser, viewport, screenshots and results; the v1.27 exception does not carry forward.
+
+The [Journal/world milestone](RELIQUARY_JOURNAL_WORLD_REACTION.md) is source-complete. The [release-candidate report](RELEASE_CANDIDATE_V128.md) reconciles every named milestone, verification, known limitations, and the fresh [physical-device handoff](REAL_DEVICE_HANDOFF_V128.md). Automated preparation does not complete the physical-device release gate.
 
 ## Historical proposal (numbering retained, superseded by named queue above)
 

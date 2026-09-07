@@ -5,8 +5,16 @@ import assert from 'node:assert/strict';
 
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const SYSTEM_FILES = [
+  'js/systems/00_core_constants_data.js',
+  'js/systems/01_state_recovery.js',
+  'js/systems/02_currency_pending_rewards.js',
+  'js/systems/03_town_contracts_market.js',
+  'js/systems/04_depth_progression_charters.js',
+  'js/systems/05_elite_modifiers.js',
+  'js/systems/06_scaling_generation_audits.js',
   'js/systems/07_player_combat_runtime.js',
   'js/systems/08_normalization_save.js',
+  'js/systems/09_ui_common_intro.js',
   'js/systems/11_ui_run_gear_dex_archive.js',
   'js/systems/39_gear_upgrade_summary_panel.js',
   'js/systems/40_gear_detail_modal.js'
@@ -138,9 +146,10 @@ function createContext() {
     addEventListener() {},
     document: {
       readyState: 'complete',
+      addEventListener() {},
       body: { appendChild(node) { panels.set(node.id, node); } },
       head: { appendChild() {} },
-      createElement(tag) { return { tagName: tag.toUpperCase(), id: '', innerHTML: '', classList: { add() {}, remove() {} }, setAttribute() {}, appendChild() {} }; },
+      createElement(tag) { return { tagName: tag.toUpperCase(), id: '', innerHTML: '', classList: { add() {}, remove() {} }, setAttribute() {}, appendChild() {}, querySelector() { return null; }, remove() { panels.delete(this.id); } }; },
       getElementById(id) { return panels.get(id) || null; },
       querySelector() { return null; },
       querySelectorAll() { return []; }
@@ -151,6 +160,8 @@ function createContext() {
       removeItem(key) { store.delete(key); },
       clear() { store.clear(); }
     },
+    el(id) { return panels.get(id) || null; },
+    $$(selector) { return []; },
     STORAGE_KEY,
     BUILD: '1.23.8.04-gear-replacement-ownership-clarity',
     COPPER_PER_GOLD: 10000,
@@ -192,6 +203,8 @@ function createContext() {
     gearScoreMarkup(item) { return `<div class="gear-score-grid"><span><b>${Math.max(0, Math.floor(numberOr(item?.rating || 0)))}</b><small>Power</small></span></div>`; },
     sellValue(item) { return Math.max(0, Math.floor(numberOr(item?.value || 0))); },
     canRetireInventoryItem() { return false; },
+    canQuickSellItem() { return false; },
+    canSellAllGearItem() { return false; },
     loadoutSlotGroups() { return []; },
     depthShortLabel() { return 'F1'; },
     bestDepthReached() { return 1; },
@@ -222,6 +235,7 @@ assert.equal(typeof context.DungeonDexGearDetailModal?.open, 'function');
 
 const state = createState();
 context.S = state;
+vm.runInContext('S = globalThis.S;', context);
 context.renderGear();
 
 const equipmentHtml = String(panels.get('equipmentPanel').innerHTML);
@@ -232,11 +246,14 @@ assert.ok(equipmentHtml.includes('Warden Blade +2'));
 assert.ok(equipmentHtml.includes('Ashcoat +1'));
 assert.ok(inventoryHtml.includes('Shale Blade'));
 assert.ok(inventoryHtml.includes('Ember Plate +1'));
+assert.ok(inventoryHtml.includes('Compared with Warden Blade +2 • Score −3'));
+assert.ok(inventoryHtml.includes('Compared with Ashcoat +1 • Score −2'));
 assert.ok(summaryHtml.includes('Warden Blade +2'));
 assert.ok(summaryHtml.includes('Ashcoat +1'));
 assert.ok(summaryHtml.includes('Current bonus +4 Power'));
 assert.ok(summaryHtml.includes('Current bonus +2 Guard and +8 HP'));
 
+const beforeInspection = JSON.stringify(state);
 context.DungeonDexGearDetailModal.open({ item: state.player.inventory[0], source: 'Inventory', slot: 'weapon' });
 const modalHtml = String(panels.get('gearDetailModal')?.innerHTML || '');
 assert.ok(modalHtml.includes('Equipped'));
@@ -246,4 +263,5 @@ assert.ok(modalHtml.includes('Selected gear is compared against the current equi
 assert.ok(modalHtml.includes('Warden Blade +2 keeps its upgrade tier if replaced.'));
 assert.ok(modalHtml.includes('New gear equips at its own upgrade tier.'));
 
+assert.equal(JSON.stringify(state), beforeInspection, 'Gear inspection must not change equipment, upgrades, or inventory');
 console.log('PASS: Gear identity and comparison smoke');
