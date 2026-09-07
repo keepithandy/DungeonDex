@@ -342,9 +342,9 @@
       ? bossTrophyStateModel({ player: { bossTrophyRecords: list(player.bossTrophyRecords), bossTrophies } }).ids : [];
     const bossComplete = bossIds.includes('gravetoll_bell');
     const bossActive = run.active === true && depth(run.floor) === 45 && obj(run.monster).tier === 'Boss';
-    const boss = makeRow('boss', 'Beyond the sealed bells', bossComplete ? 'Completed' : bossActive ? 'Active' : 'Locked — no trophy record',
-      bossComplete ? 'Lowfire has entered the Gravetoll Bell in the ledger.' : bossActive ? 'The Gravetoll Bell encounter is underway.' : 'The Gravetoll Bell has no trophy record here yet.',
-      `${location(45)}. ${bossComplete ? 'The trophy records the victory beyond the Reliquary.' : 'Reaching this location alone does not record a victory.'}`);
+    const boss = makeRow('boss', 'The bell beyond the water', bossComplete ? 'Completed' : bossActive ? 'Active' : 'Locked — no trophy record',
+      bossComplete ? 'The Gravetoll Bell now has a place in the guild ledger.' : bossActive ? 'The Gravetoll Bell is calling from the next descent.' : 'The Gravetoll Bell has not been recorded in the ledger yet.',
+      `${location(45)}. ${bossComplete ? 'Its trophy keeps the Reliquary’s story ringing.' : 'Reaching this location alone does not record a victory.'}`);
 
     const contracts = obj(player.eliteContracts);
     const knownContract = entry => typeof normalizeEliteContractId === 'function' && !!normalizeEliteContractId(obj(entry).id);
@@ -357,11 +357,11 @@
     const completedActive = !failedActive && (active.completed === true || active.complete === true || active.claimable === true || active.status === 'completed');
     const oldContract = list(contracts.failed).find(locatedContract) || list(contracts.expired).find(locatedContract);
     const unlocatedCompletion = [...list(contracts.claimed), ...list(contracts.completed)].some(id => knownContract({ id }));
-    const contract = makeRow('contract', 'Writs among the bells', 'Locked — no located record',
-      'No Reliquary contract location is recorded here.', 'Only a writ with a recorded target among the sealed bells belongs in this account.');
+    const contract = makeRow('contract', 'A writ beneath the bells', 'Locked — no located record',
+      'No Reliquary contract location is recorded here.', 'Only a writ with a recorded target beneath the bells belongs in this account.');
     if (activeLocated) {
       contract.badge = failedActive ? 'Historical' : completedActive ? 'Completed — target defeated' : 'Active';
-      contract.primary = `${text(active.eliteName || active.name, 'Contract target')}: ${failedActive ? 'the writ ended without a recorded victory' : completedActive ? 'the guild acknowledges the target defeat' : 'the guild awaits word from the sealed bells'}.`;
+      contract.primary = `${text(active.eliteName || active.name, 'Contract target')}: ${failedActive ? 'the writ ended without a recorded victory' : completedActive ? 'the guild has marked the target defeated' : 'the guild awaits word from beneath the bells'}.`;
       contract.detail = `${location(contractDepth(active))}. ${failedActive ? 'An ended writ is not a completed hunt.' : completedActive ? 'Return to the existing Contract Board for its claim status.' : 'Accepting a writ is not proof of reaching or defeating its target.'}`;
     } else if (oldContract) {
       contract.badge = 'Historical';
@@ -382,16 +382,16 @@
     };
     const held = [...Object.values(obj(player.equipment)), ...list(player.inventory)].find(themedItem);
     const retired = list(player.retiredRelics).map(entry => obj(entry).item || entry).find(themedItem);
-    const gear = makeRow('gear', 'Gear from the black water', held ? 'Recorded — in your gear' : retired ? 'Historical — retired' : 'Locked — no identified gear',
-      held || retired ? `${text((held || retired).name)} carries the Reliquary's mark.` : 'No identified Reliquary piece remains in your gear or retired archive.',
-      held ? 'Lowfire recognizes this piece among your equipped gear or inventory.' : retired ? 'Its retired record endures. This is a historical acknowledgement.' : 'Names and old loot previews alone cannot establish where a piece came from.');
+    const gear = makeRow('gear', 'A mark from the black water', held ? 'Recorded — in your gear' : retired ? 'Historical — retired' : 'Locked — no identified gear',
+      held || retired ? `${text((held || retired).name)} still carries the Reliquary’s mark.` : 'No identified Reliquary piece remains in your gear or retired archive.',
+      held ? 'Lowfire recognizes this piece in your equipped gear or inventory.' : retired ? 'Its retired record endures as a memory of the descent.' : 'Names and old loot previews alone cannot establish where a piece came from.');
 
     const history = list(player.runHistory).filter(entry => inBand(obj(entry).floor));
     const extracted = history.find(entry => entry.reason === 'extract');
     const ended = history.find(entry => ['defeat', 'ended'].includes(entry.reason));
     const activeRun = run.active === true && inBand(run.floor);
-    const returned = makeRow('return', 'Word from the Reliquary', extracted ? 'Completed — safe return' : activeRun ? 'Active' : ended ? 'Historical' : 'Locked — no return record',
-      extracted ? 'Lowfire remembers a safe return from the sealed bells.' : activeRun ? 'Your descent is among the sealed bells.' : ended ? 'The guild preserves an ended Reliquary descent.' : 'No safe Reliquary return appears in the retained descent history.',
+    const returned = makeRow('return', 'A return from the Reliquary', extracted ? 'Completed — safe return' : activeRun ? 'Active' : ended ? 'Historical' : 'Locked — no return record',
+      extracted ? 'Lowfire remembers your safe return from beneath the bells.' : activeRun ? 'Your current descent is among the sealed bells.' : ended ? 'The guild preserves an ended Reliquary descent.' : 'No safe Reliquary return appears in the retained descent history.',
       extracted ? `${location(extracted.floor)}. This records an extraction, not a clear of every room.${activeRun ? ' Another Reliquary descent is active.' : ''}`
         : activeRun ? `${location(run.floor)}. The descent is still underway; its haul is not yet a safe return.`
         : ended ? `${location(ended.floor)}. ${ended.reason === 'defeat' ? 'This descent was lost; unsecured loot was not recovered.' : 'No safe extraction is recorded for this descent.'}`
@@ -524,7 +524,7 @@
         : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
       <section class="journal-reliquary" aria-label="Drowned Reliquary records">
         <h2>Drowned Reliquary</h2>
-        <p class="small muted">The guild keeps only what your records can tell. These acknowledgements are read-only.</p>
+        <p class="small muted">The guild records what your journey can prove. These acknowledgements are read-only.</p>
         <div class="journal-grid">${model.reliquary.rows.map(row).join('')}</div>
       </section>
     </section>`;
