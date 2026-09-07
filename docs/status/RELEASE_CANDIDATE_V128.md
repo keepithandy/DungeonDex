@@ -23,7 +23,7 @@
 | Town/mobile polish | Existing entry, preparation, merchant/forge/contracts and navigation remain intact. Supported touch geometry, public-control inventory, accessibility and narrow pointer checks pass. The scrolling Journal now reserves a gutter beside the fixed navigation handle. |
 | Journal/world reaction | Complete. Read-only boss, located-contract, identified-gear and retained-run acknowledgements share one projection between Town and Journal. Empty/partial/complete/malformed/legacy cases, exact depth mapping, duplicate identities, unsafe text, actual save/reload and nonmutation are covered. See `RELIQUARY_JOURNAL_WORLD_REACTION.md`. |
 | Automated release-candidate preparation | Complete after final checks below. Feature scope is frozen. Physical-device release validation remains a separate open gate. |
-| Public package / release | Pending separate owner authorization and device evidence. No version/cache bump, retained release package, push, tag or upload was performed. |
+| Public package / release | Local package authorized and built as `archive/packages/DungeonDex_v1.28.2_ItchReady.zip` (396,820 bytes; SHA-256 `00E5852524EA6953D00FA355DD8E475C90EED339F4BABFAA4DB3237742895496`). Physical-device evidence remains pending; no push, tag or upload was performed. |
 
 ## Verified fixes during preparation
 
@@ -57,6 +57,13 @@ Local verification artifacts (outside the active repository): `C:\Users\quali\Do
 - Existing older displays/logs may use threat-floor terminology. New Journal acknowledgements and the return receipt explicitly derive their Floor/Room/Chapter location from the lore mapping and include raw D notation. Progression, boss cadence and stored history were not rewritten.
 - Retained run history is limited and claimed contract IDs lose location detail. Sold gear may leave insufficient origin evidence. The new presentation reports those limits rather than creating permanent achievements or inferring unrecorded progress.
 - No new marketing or external asset reuse is cleared by this source audit. Incomplete provenance remains documented in the existing asset inventory.
+
+## Authorized local package
+
+- The versioned itch-ready package was built after explicit owner authorization.
+- Compact smoke: **58/58 passing**.
+- Staged package audit: **52 paths checked, zero warnings**.
+- The package is a local release candidate only. Physical-device evidence, remote push, release tag and itch.io upload remain separate actions.
 
 Next action: complete the fresh physical-device handoff, then request the desired version/package/push/tag/upload actions explicitly. Automated preparation and the authorized local-main merge can complete independently of that physical release gate.
 
