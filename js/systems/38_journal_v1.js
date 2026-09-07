@@ -68,7 +68,7 @@
       famousStatus: famous.active ? 'Active' : famous.locked ? 'Locked' : famous.completed ? 'Recovered' : famous.available ? 'Playable' : 'Quiet',
       boardStatus: board.active ? 'Active' : board.locked ? 'Locked' : board.completed ? 'Recovered' : board.available ? 'Playable' : 'Quiet',
       rivalStatus: rival.active ? 'Active' : rival.locked ? 'Locked' : rival.completed ? 'Recovered' : rival.available ? 'Playable' : 'Quiet',
-      last: summaryLine([text(trophy.lastResult?.summary), text(famous.lastResult?.summary), text(board.lastResult?.summary), text(rival.lastResult?.summary)], '')
+      last: text(trophy.lastResult?.summary)
     };
   }
   function bossModel(state){
@@ -100,7 +100,9 @@
   }
   function famousModel(state){
     const api = window.DungeonDexEliteContracts || null;
-    const summary = typeof api?.famousGearMemorySummary === 'function' ? api.famousGearMemorySummary(state) : null;
+    // The legacy summary repairs Revisit state; isolate that work from the live save.
+    const summaryState = { ...obj(state), player: { ...obj(state?.player), revisitState: JSON.parse(JSON.stringify(obj(state?.player?.revisitState))) } };
+    const summary = typeof api?.famousGearMemorySummary === 'function' ? api.famousGearMemorySummary(summaryState) : null;
     if (summary) {
       return {
         count: num(summary.totalRecorded, 0),
@@ -315,6 +317,94 @@
       latest: records[0] || null
     };
   }
+  // Presentation only: depth is a location, never proof of a victory or a full-band clear.
+  function reliquaryJournalModel(state){
+    const player = obj(state?.player);
+    const run = obj(state?.run);
+    const depth = value => {
+      if (typeof value !== 'number' && typeof value !== 'string') return 0;
+      const n = Number(value);
+      return Number.isSafeInteger(n) && n > 0 && n <= 999999 ? n : 0;
+    };
+    const inBand = value => depth(value) >= 31 && depth(value) <= 40;
+    const location = value => {
+      if (typeof getLoreDepthProgress !== 'function' || !depth(value)) return 'Location not recorded';
+      const lore = getLoreDepthProgress(depth(value));
+      return `Floor ${lore.floorNumber} • Room ${lore.roomWithinFloor} • Chapter ${lore.chapterWithinRoom} (D${depth(value)})`;
+    };
+    const makeRow = (key, title, badge, primary, detail) => ({ key: `reliquary-${key}`, title, badge, primary, detail });
+
+    // Reuse the established ID/legacy-name resolver without its mutation option.
+    const legacy = player.bossTrophies;
+    const bossTrophies = Array.isArray(legacy) ? legacy.filter(entry => typeof entry === 'string' || Object.keys(obj(entry)).length)
+      : Object.fromEntries(Object.entries(obj(legacy)).filter(([, value]) => value === true || typeof value === 'number' && value > 0 || Object.keys(obj(value)).length));
+    const bossIds = typeof bossTrophyStateModel === 'function'
+      ? bossTrophyStateModel({ player: { bossTrophyRecords: list(player.bossTrophyRecords), bossTrophies } }).ids : [];
+    const bossComplete = bossIds.includes('gravetoll_bell');
+    const bossActive = run.active === true && depth(run.floor) === 45 && obj(run.monster).tier === 'Boss';
+    const boss = makeRow('boss', 'Beyond the sealed bells', bossComplete ? 'Completed' : bossActive ? 'Active' : 'Locked — no trophy record',
+      bossComplete ? 'Lowfire has entered the Gravetoll Bell in the ledger.' : bossActive ? 'The Gravetoll Bell encounter is underway.' : 'The Gravetoll Bell has no trophy record here yet.',
+      `${location(45)}. ${bossComplete ? 'The trophy records the victory beyond the Reliquary.' : 'Reaching this location alone does not record a victory.'}`);
+
+    const contracts = obj(player.eliteContracts);
+    const knownContract = entry => typeof normalizeEliteContractId === 'function' && !!normalizeEliteContractId(obj(entry).id);
+    const contractDepth = entry => depth(obj(entry).targetFloor) && typeof eliteContractRawDepthForThreatFloor === 'function'
+      ? eliteContractRawDepthForThreatFloor(depth(entry.targetFloor)) : 0;
+    const locatedContract = entry => knownContract(entry) && inBand(contractDepth(entry));
+    const active = obj(contracts.active);
+    const activeLocated = locatedContract(active);
+    const failedActive = active.failed === true || active.expired === true || ['failed', 'expired'].includes(active.status);
+    const completedActive = !failedActive && (active.completed === true || active.complete === true || active.claimable === true || active.status === 'completed');
+    const oldContract = list(contracts.failed).find(locatedContract) || list(contracts.expired).find(locatedContract);
+    const unlocatedCompletion = [...list(contracts.claimed), ...list(contracts.completed)].some(id => knownContract({ id }));
+    const contract = makeRow('contract', 'Writs among the bells', 'Locked — no located record',
+      'No Reliquary contract location is recorded here.', 'Only a writ with a recorded target among the sealed bells belongs in this account.');
+    if (activeLocated) {
+      contract.badge = failedActive ? 'Historical' : completedActive ? 'Completed — target defeated' : 'Active';
+      contract.primary = `${text(active.eliteName || active.name, 'Contract target')}: ${failedActive ? 'the writ ended without a recorded victory' : completedActive ? 'the guild acknowledges the target defeat' : 'the guild awaits word from the sealed bells'}.`;
+      contract.detail = `${location(contractDepth(active))}. ${failedActive ? 'An ended writ is not a completed hunt.' : completedActive ? 'Return to the existing Contract Board for its claim status.' : 'Accepting a writ is not proof of reaching or defeating its target.'}`;
+    } else if (oldContract) {
+      contract.badge = 'Historical';
+      contract.primary = `${text(oldContract.eliteName, 'Contract target')}: an ended writ remains in the ledger.`;
+      contract.detail = `${location(contractDepth(oldContract))}. Failed or expired writs do not record a victory.`;
+    } else if (unlocatedCompletion) {
+      contract.badge = 'Historical — location unrecorded';
+      contract.primary = 'Earlier contract completions remain in the Guild Journal.';
+      contract.detail = 'Those completion records retain the hunt, but not its target location. The guild cannot place them in the Reliquary.';
+    }
+
+    // Only explicit item identity is evidence. A name, item level, or retirement depth is insufficient.
+    const themedItem = item => {
+      const source = obj(item);
+      return typeof source.id === 'string' && !!source.id.trim() && typeof source.name === 'string' && !!source.name.trim()
+        && typeof source.slot === 'string' && (typeof SLOT_ORDER === 'undefined' || SLOT_ORDER.includes(source.slot))
+        && (source.maker === 'Drowned Reliquary' || list(source.tags).includes('drowned-reliquary'));
+    };
+    const held = [...Object.values(obj(player.equipment)), ...list(player.inventory)].find(themedItem);
+    const retired = list(player.retiredRelics).map(entry => obj(entry).item || entry).find(themedItem);
+    const gear = makeRow('gear', 'Gear from the black water', held ? 'Recorded — in your gear' : retired ? 'Historical — retired' : 'Locked — no identified gear',
+      held || retired ? `${text((held || retired).name)} carries the Reliquary's mark.` : 'No identified Reliquary piece remains in your gear or retired archive.',
+      held ? 'Lowfire recognizes this piece among your equipped gear or inventory.' : retired ? 'Its retired record endures. This is a historical acknowledgement.' : 'Names and old loot previews alone cannot establish where a piece came from.');
+
+    const history = list(player.runHistory).filter(entry => inBand(obj(entry).floor));
+    const extracted = history.find(entry => entry.reason === 'extract');
+    const ended = history.find(entry => ['defeat', 'ended'].includes(entry.reason));
+    const activeRun = run.active === true && inBand(run.floor);
+    const returned = makeRow('return', 'Word from the Reliquary', extracted ? 'Completed — safe return' : activeRun ? 'Active' : ended ? 'Historical' : 'Locked — no return record',
+      extracted ? 'Lowfire remembers a safe return from the sealed bells.' : activeRun ? 'Your descent is among the sealed bells.' : ended ? 'The guild preserves an ended Reliquary descent.' : 'No safe Reliquary return appears in the retained descent history.',
+      extracted ? `${location(extracted.floor)}. This records an extraction, not a clear of every room.${activeRun ? ' Another Reliquary descent is active.' : ''}`
+        : activeRun ? `${location(run.floor)}. The descent is still underway; its haul is not yet a safe return.`
+        : ended ? `${location(ended.floor)}. ${ended.reason === 'defeat' ? 'This descent was lost; unsecured loot was not recovered.' : 'No safe extraction is recorded for this descent.'}`
+        : 'Only retained run entries can place a return here; deeper progress alone cannot.');
+    const rows = [boss, contract, gear, returned];
+    const townRecord = bossComplete || bossActive ? boss : activeLocated ? contract : extracted ? returned : held || retired ? gear : activeRun || ended ? returned : null;
+    return { rows, townRecord };
+  }
+  function renderReliquaryTownAcknowledgement(state){
+    const record = reliquaryJournalModel(state).townRecord;
+    return record ? `<p class="small journal-record-detail town-reliquary-reaction"><strong>Drowned Reliquary · ${esc(record.badge)}</strong><br>${esc(record.primary)}</p>` : '';
+  }
+
   function journalV1233SummaryModel(state){
     const safeState = obj(state);
     const boss = bossModel(safeState);
@@ -394,6 +484,7 @@
       section.meta = section.detail;
     });
     return {
+      reliquary: reliquaryJournalModel(safeState),
       title: 'Guild Journal',
       flavor: memoryTotal > 0
         ? `${memoryTotal} ${memoryTotal === 1 ? 'record endures' : 'records endure'} in the guild chronicle.`
@@ -431,6 +522,11 @@
       ${model.sections.length
         ? `<div class="journal-grid">${model.sections.map(row).join('')}</div>`
         : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
+      <section class="journal-reliquary" aria-label="Drowned Reliquary records">
+        <h2>Drowned Reliquary</h2>
+        <p class="small muted">The guild keeps only what your records can tell. These acknowledgements are read-only.</p>
+        <div class="journal-grid">${model.reliquary.rows.map(row).join('')}</div>
+      </section>
     </section>`;
   }
   function injectJournal(){
@@ -450,6 +546,8 @@
       return result;
     };
   }
+  window.reliquaryJournalModel = reliquaryJournalModel;
+  window.renderReliquaryTownAcknowledgement = renderReliquaryTownAcknowledgement;
   window.rivalTraceReadableSummary = rivalTraceReadableSummary;
   window.journalV1233SummaryModel = journalV1233SummaryModel;
   window.renderGuildJournalPanel = renderGuildJournalPanel;

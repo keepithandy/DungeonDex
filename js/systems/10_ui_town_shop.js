@@ -384,15 +384,24 @@ function merchantGearUpgradePanelMarkup(state) {
 }
 
 function townReturnReceiptMarkup(state) {
+	const reaction = typeof window.renderReliquaryTownAcknowledgement === 'function' ? window.renderReliquaryTownAcknowledgement(state) : '';
 	const latest = Array.isArray(state?.player?.runHistory) ? state.player.runHistory[0] : null;
 	const extracted = String(latest?.reason || '').toLowerCase() === 'extract';
 	if (!extracted) {
-		return `<div class="town-return-receipt-empty"><span class="eyebrow town-section-kicker">Preparation</span><strong>Set your next descent.</strong><p class="small muted">Review your Gear, rest if needed, then enter the Hollow Stair.</p><div class="town-return-actions"><button class="ghost mini" type="button" data-town-route="gear">Review Gear</button></div></div>`;
+		return `<div class="town-return-receipt-empty"><span class="eyebrow town-section-kicker">Preparation</span><strong>Set your next descent.</strong><p class="small muted">Review your Gear, rest if needed, then enter the Hollow Stair.</p>${reaction}<div class="town-return-actions"><button class="ghost mini" type="button" data-town-route="gear">Review Gear</button></div></div>`;
 	}
-	const floor = Math.max(1, Math.floor(Number(latest.floor) || 1));
+	const rawDepth = Number(latest.floor);
+	const validDepth = (typeof latest.floor === 'number' || typeof latest.floor === 'string') && Number.isSafeInteger(rawDepth) && rawDepth >= 1 && rawDepth <= 999999;
+	const locationLabel = value => {
+		const lore = getLoreDepthProgress(value);
+		return `Floor ${lore.floorNumber} • Room ${lore.roomWithinFloor} • Chapter ${lore.chapterWithinRoom} (D${value})`;
+	};
+	const location = validDepth ? locationLabel(rawDepth) : 'an unrecorded location';
 	const lootCount = Math.max(0, Math.floor(Number(latest.lootCount) || 0));
 	const kills = Math.max(0, Math.floor(Number(latest.kills) || 0));
-	const restart = cleanDisplayText(latest.restartLabel || latest.checkpointLabel || `Floor ${floor}`, `Floor ${floor}`);
+	const restartDepth = Number(latest.restartDepth);
+	const restart = (typeof latest.restartDepth === 'number' || typeof latest.restartDepth === 'string') && Number.isSafeInteger(restartDepth) && restartDepth >= 1 && restartDepth <= 999999
+		? locationLabel(restartDepth) : 'See the descent entry';
 	const rewards = typeof runHistoryRewardText === 'function'
 		? cleanDisplayText(runHistoryRewardText(latest), 'Rewards banked')
 		: cleanDisplayText(latest.rewards || 'Rewards banked', 'Rewards banked');
@@ -402,9 +411,10 @@ function townReturnReceiptMarkup(state) {
 		.map(name => `<span class="pill town-return-loot-pill">${escapeHtml(name)}</span>`)
 		.join('');
 	return `<div class="town-return-receipt-content">
-		<div class="town-return-receipt-head"><div><span class="eyebrow town-section-kicker">Latest Return</span><h2>Extraction secured</h2><p>Banked at Floor ${format(floor)} • Next start: ${escapeHtml(restart)}</p></div><span class="pill town-return-status">Banked</span></div>
+		<div class="town-return-receipt-head"><div><span class="eyebrow town-section-kicker">Latest Return</span><h2>Extraction secured</h2><p>Banked at ${escapeHtml(location)} • Next start: ${escapeHtml(restart)}</p></div><span class="pill town-return-status">Banked</span></div>
 		<div class="town-return-receipt-stats"><span><b>${format(kills)}</b> kills</span><span><b>${format(lootCount)}</b> loot</span><span>${escapeHtml(rewards)}</span></div>
 		${lootPreview ? `<div class="tag-row town-return-loot-row">${lootPreview}</div>` : ''}
+		${reaction}
 		<div class="town-return-actions"><button class="primary mini" type="button" data-town-route="gear">Review Gear</button><button class="ghost mini" type="button" data-town-route="archive">Descent History</button></div>
 	</div>`;
 }

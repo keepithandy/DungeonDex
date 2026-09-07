@@ -199,5 +199,79 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.ok(applied.weapon && applied.armor && applied.upgrade === 2 && applied.focus === 'apply' && applied.themedVisible, JSON.stringify(applied));
   assert.match(applied.notice,/1 equipped/);
   record('Post-return Apply Safe Items restores only the empty slot and retains upgrades/focus',true);
+  await verifyReliquaryJournalBrowser({ client, evaluate, record });
   await read('Math.random = window.__reliquaryRandom; true');
+}
+
+async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
+  const read = expression => evaluate(client, expression);
+  const projection = await read(`(() => {
+    window.__journalReturnState = S;
+    const oldSave = { player: { depth:999, safeExtractDepth:999, bossTrophies:['Gravetoll Bell'],
+      eliteContracts:{ claimed:['lowfire_bounty'] }, runHistory:[{floor:99,reason:'extract'}] } };
+    const before = JSON.stringify(oldSave);
+    const model = reliquaryJournalModel(oldSave);
+    renderGuildJournalPanel(oldSave); renderReliquaryTownAcknowledgement(oldSave);
+    return { unchanged:before === JSON.stringify(oldSave), badges:model.rows.map(row => row.badge) };
+  })()`);
+  assert.ok(projection.unchanged, JSON.stringify(projection));
+  assert.deepEqual(projection.badges, ['Completed', 'Historical — location unrecorded', 'Locked — no identified gear', 'Locked — no return record']);
+  record('Loaded Journal preserves legacy saves and does not infer Reliquary returns or contract locations from depth', true);
+  const reload = await read(`(() => {
+    S = JSON.parse(JSON.stringify(window.__journalReturnState));
+    S.run.active = false;
+    S.player.bossTrophies = ['gravetoll_bell']; S.player.bossTrophyRecords = [];
+    S.player.eliteContracts = {active:null,completed:['lowfire_bounty'],claimed:['lowfire_bounty'],failed:[],expired:[],rivals:[]};
+    S.player.runHistory = [null, {floor:40,reason:'extract',restartDepth:40}];
+    const item = generateGear('weapon', 11, {source:'normal',depthRaw:31});
+    item.name = 'Bellbound Blade ' + 'carried through the long flooded passage '.repeat(6);
+    S.player.equipment = {}; S.player.inventory = [item];
+    const before = JSON.stringify(reliquaryJournalModel(S));
+    save(S); S = load();
+    const after = JSON.stringify(reliquaryJournalModel(S));
+    S.screen = 'archive'; render();
+    const journal = document.querySelector('.journal-reliquary');
+    return {same:before === after, text:journal?.innerText, actions:journal?.querySelectorAll('button,a,input,[role="button"]').length};
+  })()`);
+  assert.ok(reload.same, JSON.stringify(reload));
+  assert.equal(reload.actions, 0);
+  assert.match(reload.text, /Completed — safe return/);
+  assert.match(reload.text, /Recorded — in your gear/);
+  record('Reliquary boss, gear, return and historical contract acknowledgements survive real save/reload without new actions', true);
+
+  await new Promise(resolve => setTimeout(resolve, 8000)); // Let the normal extraction notice finish before visual capture.
+  for (const touch of [true, false]) {
+    for (const [width, height] of [[390,844], [430,932], [768,1024]]) {
+      await client.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor:1, mobile:touch });
+      await client.send('Emulation.setTouchEmulationEnabled', { enabled:touch, maxTouchPoints:touch ? 5 : 1 });
+      const geometry = await read(`(() => {
+        S.screen = 'archive'; render();
+        const panel = document.querySelector('.journal-reliquary'); panel.scrollIntoView({block:'start'});
+        const cards = [...panel.querySelectorAll('.journal-record-card')];
+        return {count:cards.length, overflow:document.documentElement.scrollWidth > innerWidth + 1,
+          clipped:cards.some(card => card.scrollWidth > card.clientWidth + 1),
+          badges:cards.every(card => card.querySelector('.journal-record-badge')?.innerText.length > 0)};
+      })()`);
+      assert.deepEqual(geometry, {count:4,overflow:false,clipped:false,badges:true});
+      if (process.env.DD_RELIQUARY_CAPTURE_DIR) {
+        const shot = await client.send('Page.captureScreenshot', {format:'png', captureBeyondViewport:false});
+        await writeFile(path.join(process.env.DD_RELIQUARY_CAPTURE_DIR, `journal-${width}-${touch ? 'touch' : 'mouse'}.png`), Buffer.from(shot.data,'base64'));
+      }
+      record(`Reliquary Journal ${width}x${height} ${touch ? 'touch' : 'fine pointer'}: long-name wrapping and visible state labels`, true);
+    }
+  }
+  const town = await read(`(() => {
+    S.screen = 'town'; render();
+    const panel = document.querySelector('#townReturnReceipt'); panel.scrollIntoView({block:'center'});
+    return {text:panel.innerText, overflow:panel.scrollWidth > panel.clientWidth + 1};
+  })()`);
+  assert.match(town.text, /Drowned Reliquary · Completed/);
+  assert.match(town.text, /Banked at Floor 1 • Room 4 • Chapter 10 \(D40\)/);
+  assert.ok(!town.overflow);
+  if (process.env.DD_RELIQUARY_CAPTURE_DIR) {
+    const shot = await client.send('Page.captureScreenshot', {format:'png', captureBeyondViewport:false});
+    await writeFile(path.join(process.env.DD_RELIQUARY_CAPTURE_DIR, 'journal-town-acknowledgement.png'), Buffer.from(shot.data,'base64'));
+  }
+  record('Town acknowledges the recorded Gravetoll victory and uses displayed floor/room/chapter for its return receipt', true);
+  await read(`S = window.__journalReturnState; delete window.__journalReturnState; save(S); render(); true`);
 }

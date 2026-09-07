@@ -21,6 +21,9 @@ This changelog records what changed and why.
 
 ### Post-loadout source integration
 
+* Completed Journal/world reaction with read-only Reliquary trophy, located-contract, identified-gear and retained-run acknowledgements shared by Town and Guild Journal. Historical and missing evidence never imply a new achievement or Revisit lane.
+* Corrected the Latest Return's raw-depth-as-floor label and isolated legacy Famous Gear summary preparation from live save state. See `docs/status/RELIQUARY_JOURNAL_WORLD_REACTION.md` for evidence and limitations.
+
 * Added a read-only Latest Return receipt in Town from the existing completed-run history. It states the secured floor, next start, banked rewards, kills, loot, and recovered item names, then links only to the existing Gear and Journal views.
 * Inventory cards now state their currently equipped context and score delta before the player chooses an action. The existing detail modal remains the full read-only comparison, with the established Offhand upgrade display corrected to Guard and Wit.
 * Refined the Town preparation hierarchy and narrow-screen layout around the existing Enter Dungeon, Rest, Gear, Journal, Market, Forge, Contracts, and Charter paths. Receipt actions use the global 44px touch contract and pass supported touch geometry.

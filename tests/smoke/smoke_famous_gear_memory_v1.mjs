@@ -17,7 +17,7 @@ function makeContext() {
     innerHTML: '',
     querySelector(selector) {
       return selector === '#guildJournalPanel' && this.innerHTML.includes('guildJournalPanel')
-        ? { outerHTML: this.innerHTML }
+        ? { get outerHTML() { return journalPanel.innerHTML; }, set outerHTML(value) { journalPanel.innerHTML = value; } }
         : null;
     },
     insertAdjacentHTML(_pos, html) {
@@ -229,7 +229,7 @@ assert.ok(!/Memory Key|duplicate-safe|legacy trace detected/i.test(journal));
 context.S = afterLoad;
 context.DDJournalV1Render();
 assert.ok(String(journalPanel.innerHTML).includes('Guild Journal'));
-assert.ok(String(journalPanel.innerHTML).includes('Famous Gear'));
+assert.match(String(journalPanel.innerHTML), /Famous gear: Ashcloth Wraps/i);
 assert.ok(String(journalPanel.innerHTML).includes('Historical Memories'));
 
 assert.ok(store.size > 0);
