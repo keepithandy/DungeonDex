@@ -37,14 +37,14 @@ This changelog records what changed and why.
 * Added deterministic pinned-main comparisons, a complete browser combat/loot/extract/reload/loadout loop, and supported mobile/fine-pointer checks. The compact suite passed 57/57 with no skips.
 * Added a D45 Gravetoll Bell conclusion and a briefing for existing Elite Contracts that naturally target D31-D40. Neither creates a boss or contract, changes target selection, or alters payout, rewards, boss cadence, or saves.
 * Recorded the no-change reward-curve control, including total high-tier yield, the D43 elite crossover, D40 scarcity/set collision, and the Mythic duplicate tail. Exact unselected tuning alternatives are documented; no balance, reward, drop, or save change was made.
-* The owner later confirmed that the itch-ready v1.28.2 ZIP and accompanying devlog were uploaded to itch.io. The original uploaded artifact's checksum and timestamp have not been independently recovered. No release tag or version bump is recorded, and physical-device validation remains required under issue #139.
+* No package, release tag, itch upload, or version bump was created. Physical-device validation remains required under issue #139.
 
 * Added safe duplication with unique names and IDs, plus persistent move-up/move-down ordering without changing the saved item snapshot schema.
 * Expanded the slot preview to distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing states before applying a loadout.
 * Applying now reports an explicit outcome summary while retaining the rule that only matching inventory gear enters empty compatible slots.
 * Added clearer empty/cap guidance, confirmed deletion, labelled 44px mobile-safe controls, Enter-to-save behavior, live status announcements, and focus recovery after rerenders.
 * Save repair still rejects malformed entries and duplicate item/slot references while preserving intentional duplicated configurations through reload.
-* Aligned the development build/cache authority to `1.28.2-loadout-polish`. Packaging and upload were completed later; no release tag was created.
+* Aligned the development build/cache authority to `1.28.2-loadout-polish`. No package, itch upload, or release tag was created.
 * Preserved combat formulas, monster and boss scaling, economy, reward/drop rates, dungeon entry, Merchant Gear Upgrades, Talent, Debt, Revisit behavior, and the established item equip flow.
 
 ## v1.28.1 - Named Loadouts

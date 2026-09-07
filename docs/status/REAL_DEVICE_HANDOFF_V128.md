@@ -2,8 +2,6 @@
 
 Automated preparation is recorded in `RELEASE_CANDIDATE_V128.md`. This sheet is intentionally fresh: it does not inherit any historical device pass or exception.
 
-Closure status: **In progress — physical testing has been opened, but no checklist row is passed until the owner records real-device evidence below.**
-
 ## Candidate identity
 
 | Field | Record before testing |
@@ -22,7 +20,7 @@ Use a disposable device copy of the exact source commit and an ordinary save. Co
 
 ## Required checks
 
-All rows below remain **Blocked pending the owner's physical-device session**. Replace each with Pass, Fail, or a specific remaining Blocked reason after physical testing. Record a screenshot filename, or explain why a screenshot cannot show the result.
+All rows below are **Blocked — no physical device session was available to the automated agent**. Replace each with Pass, Fail, or a specific remaining Blocked reason after physical testing. Record a screenshot filename, or explain why a screenshot cannot show the result.
 
 | # | Check | Result | Evidence / notes |
 |---:|---|---|---|
@@ -40,6 +38,6 @@ All rows below remain **Blocked pending the owner's physical-device session**. R
 | 12 | Rotate portrait/landscape on Town, Gear, Journal and Run; verify recovery and no covered controls. | Blocked | Awaiting physical session |
 | 13 | Check VoiceOver/screen-reader names and reading order, physical keyboard focus where available, reduced-motion behavior and readable text contrast. | Blocked | Awaiting physical session |
 
-Overall physical-device verdict: **In progress, not passed**. All 13 checks currently remain blocked pending the physical session, and no exception has been granted for this candidate. A failure should be recorded as a focused defect; rerun affected checks after its fix. If a row cannot be exercised naturally, record the missing prerequisite rather than fabricating an achievement.
+Overall physical-device verdict: **Blocked, not passed**. No exception has been granted for this candidate. A failure should be recorded as a focused defect; rerun affected checks after its fix. If a row cannot be exercised naturally, record the missing prerequisite rather than fabricating an achievement.
 
 The last recorded tracking issue is GitHub #139 (physical-device loadout validation). This sheet adds the combined Reliquary/Journal checks without changing gameplay, version authority, or release authorization.

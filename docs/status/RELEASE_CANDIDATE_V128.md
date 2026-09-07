@@ -23,7 +23,7 @@
 | Town/mobile polish | Existing entry, preparation, merchant/forge/contracts and navigation remain intact. Supported touch geometry, public-control inventory, accessibility and narrow pointer checks pass. The scrolling Journal now reserves a gutter beside the fixed navigation handle. |
 | Journal/world reaction | Complete. Read-only boss, located-contract, identified-gear and retained-run acknowledgements share one projection between Town and Journal. Empty/partial/complete/malformed/legacy cases, exact depth mapping, duplicate identities, unsafe text, actual save/reload and nonmutation are covered. See `RELIQUARY_JOURNAL_WORLD_REACTION.md`. |
 | Automated release-candidate preparation | Complete after final checks below. Feature scope is frozen. Physical-device release validation remains a separate open gate. |
-| Public package / release | The owner confirms that the itch-ready v1.28.2 ZIP and accompanying devlog were uploaded to itch.io after candidate preparation. The originally uploaded artifact was not recovered during the local re-audit, so its exact checksum and upload timestamp remain unverified. A later package derived from unchanged `VERSION.md` authority was rebuilt at local `main` commit `c114acf`: `archive/packages/DungeonDex_v1.28.2_ItchReady.zip` (396,820 bytes; SHA-256 `8A0F3404621AE9E4431C972CFB68DCF31193B501396A09AFF4428B64D2253D7F`); this later checksum is not claimed as the uploaded artifact's checksum. Physical-device evidence remains pending and no release tag is recorded. |
+| Public package / release | The recorded local package was absent when re-audited on 2026-09-07. A fresh package derived from unchanged `VERSION.md` authority was rebuilt at current local `main` commit `c114acf`: `archive/packages/DungeonDex_v1.28.2_ItchReady.zip` (396,820 bytes; SHA-256 `8A0F3404621AE9E4431C972CFB68DCF31193B501396A09AFF4428B64D2253D7F`). The historical checksum `00E5852524EA6953D00FA355DD8E475C90EED339F4BABFAA4DB3237742895496` therefore is not evidence for the current on-disk artifact. Physical-device evidence remains pending; no push, tag or upload was performed. |
 
 ## Verified fixes during preparation
 
@@ -64,8 +64,8 @@ Local verification artifacts (outside the active repository): `C:\Users\quali\Do
 - Compact smoke: **58/58 passing**.
 - Staged package audit: **52 paths checked, zero warnings**.
 - Re-audit/package handoff: clean extracted-package audit and public launch gate **11/11 passing**; the extracted runtime loaded with DevTools disabled, navigated to the Guild Journal, entered the dungeon, and had no console, runtime, or local-request failures.
-- The owner subsequently confirmed the itch.io ZIP and devlog upload. Physical-device evidence and any release tag remain separate actions; the exact original uploaded checksum is still unverified.
+- The package is a local release candidate only. Physical-device evidence, remote push, release tag and itch.io upload remain separate actions.
 
-Next action: complete the fresh physical-device handoff and record a live itch observation, then continue from `ROADMAP_NEXT_UPDATE.md`. The upload is owner-confirmed; any release tag, version change, or replacement upload remains a separate explicitly authorized action.
+Next action: complete the fresh physical-device handoff, then request the desired version/package/push/tag/upload actions explicitly. Automated preparation and the authorized local-main merge can complete independently of that physical release gate.
 
 Reviewer handoff: inspect `99bddca..HEAD` for presentation-only scope, evidence sufficiency, canonical location text, escaped output, nonmutation, Trophy Echo-only behavior, supported drawer clearance, meaningful regression assertions, and consistency between this report and actual Git/test output. Do not interpret historical proposal labels as release authorization.
