@@ -6,7 +6,7 @@ Automated preparation is recorded in `RELEASE_CANDIDATE_V128.md`. This sheet is 
 
 | Field | Record before testing |
 |---|---|
-| Candidate commit | Record the exact local `main` SHA containing the release-candidate report; verify the copied source matches it |
+| Candidate commit | `d58808b` (`main`; verify the copied source matches this exact commit) |
 | Source version | v1.28.2 Loadout Polish |
 | Visible build | DungeonDex v1.28.2 |
 | Cache label | 1.28.2-loadout-polish |
