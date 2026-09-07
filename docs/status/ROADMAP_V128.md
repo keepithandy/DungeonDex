@@ -14,10 +14,10 @@ Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Completed Reliquary boss/contract/gear/run acknowledgements in Town and Guild Journal; rarity audit evidence remains conditional, not live-run yield |
 | Automated preparation | Feature scope frozen; release-candidate regression, accessibility, source/package hygiene and documentation checks complete; see the candidate report |
-| Pending release work | Fresh physical-device/Textastic validation, then separately authorized version/package/push/tag/upload decisions |
-| Broken or incomplete | Physical-device evidence remains outstanding. The historical gear comparison harness is repaired and included in the compact suite. Local main has not been pushed by this continuation |
+| Pending release work | Fresh physical-device/Textastic validation, live itch observation, and any separately authorized release tag |
+| Broken or incomplete | Physical-device evidence and independently verified metadata for the original uploaded ZIP remain outstanding. The historical gear comparison harness is repaired and included in the compact suite |
 
-Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. All source milestones through Journal/world response and automated release-candidate preparation are complete and must not be rebuilt. Feature scope is frozen. Safe application only fills available empty slots.
+The named v1.28 work order is complete through release candidate and the owner-confirmed itch handoff: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> itch handoff. These milestones must not be rebuilt. Continue from `ROADMAP_NEXT_UPDATE.md`; no version update is implied. Safe application only fills available empty slots.
 
 The [four-identity roster milestone](RELIQUARY_ROSTER_MILESTONE.md) and [D45 conclusion](RELIQUARY_CLIMAX_DECISION.md) are source-complete. The conclusion connects the Reliquary to the existing D45 boss and conditionally briefs existing in-band contract targets without creating a boss or contract. A fresh compact run passed 57/57.
 
