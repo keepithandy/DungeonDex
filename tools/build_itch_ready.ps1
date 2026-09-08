@@ -202,6 +202,9 @@ $root = Resolve-RepoRoot -RequestedRoot $RepoRoot
 Write-Step "Using repo root: $root"
 
 $requiredRootFiles = @(
+    "LICENSE",
+    "LICENSE-APACHE-2.0.txt",
+    "ASSETS_LICENSE.md",
     "index.html",
     "app.js",
     "styles.css",

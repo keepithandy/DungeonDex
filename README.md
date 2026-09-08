@@ -6,6 +6,12 @@ Current baseline: **DungeonDex v1.29.0**
 
 Development continuation: local `main` completes the D31-D40 Drowned Reliquary through authored incidents, a D40 choice-driven finale, existing D45 conclusion, themed gear, Journal/Town acknowledgements, and protected replay/extraction flow. See the player-facing [v1.29.0 Drowned Reliquary dev-log](docs/DEVLOG_V1290_DROWNED_RELIQUARY.md) and [release-candidate report](docs/status/DROWNED_RELIQUARY_CHAPTER_RC_V1290.md). This source work has not been pushed, published, tagged, or uploaded.
 
+## License
+
+DungeonDex uses a [proprietary license](LICENSE): personal play of official, unmodified releases is allowed; reuse, modification, redistribution, and sale of code or assets require written permission, subject to the exceptions in that license. See also the [asset terms](ASSETS_LICENSE.md).
+
+Earlier Apache 2.0 grants remain valid for the source code they cover, including previously licensed code retained in this version. The [prior license and notice](LICENSE-APACHE-2.0.txt) are preserved. The new terms do not retroactively restrict those grants or override third-party rights.
+
 ## Try It First
 
 Open `index.html` directly in a browser to review the current playable build.

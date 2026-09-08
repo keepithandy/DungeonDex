@@ -11,6 +11,9 @@ from pathlib import Path
 PACKAGE_DIR = Path("archive/packages")
 OUTPUT_NAME = "DungeonDex.zip"
 ROOT_FILES = (
+    "LICENSE",
+    "LICENSE-APACHE-2.0.txt",
+    "ASSETS_LICENSE.md",
     "index.html",
     "app.js",
     "sw.js",

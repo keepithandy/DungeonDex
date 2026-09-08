@@ -12,6 +12,9 @@ from urllib.parse import unquote, urlsplit
 
 
 REQUIRED_FILES = (
+    "LICENSE",
+    "LICENSE-APACHE-2.0.txt",
+    "ASSETS_LICENSE.md",
     "index.html",
     "app.js",
     "styles.css",
@@ -294,6 +297,8 @@ def prohibited_content_warnings(root: Path) -> list[str]:
     warnings: list[str] = []
     for path in sorted(root.rglob("*")):
         rel_path = path.relative_to(root).as_posix()
+        if rel_path == "ASSETS_LICENSE.md":
+            continue  # Required root legal notice; other Markdown remains prohibited.
         if any(part in PROHIBITED_DIRS for part in path.parts) or any(
             pattern.search(rel_path) for pattern in PROHIBITED_PATH_PATTERNS
         ):

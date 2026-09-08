@@ -211,6 +211,13 @@ async function main() {
     record('ZIP extracts into a clean directory', expand.code === 0 && existsSync(path.join(extractedDir, 'index.html')), expand.stderr || expand.stdout.slice(-500));
     assert.equal(expand.code, 0, expand.stderr || expand.stdout);
 
+    for (const legalFile of ['LICENSE', 'LICENSE-APACHE-2.0.txt', 'ASSETS_LICENSE.md']) {
+      const sourceNotice = await readFile(path.join(ROOT, legalFile));
+      const packagedNotice = await readFile(path.join(extractedDir, legalFile));
+      assert.deepEqual(packagedNotice, sourceNotice, `Packaged legal notice differs: ${legalFile}`);
+      record(`Extracted ZIP preserves ${legalFile}`, true);
+    }
+
     const strictExtracted = await run('python', [path.join(ROOT, 'tools', 'check_dungeondex_package.py'), extractedDir]);
     record('Strict checker accepts the extracted package', strictExtracted.code === 0 && /Summary: PASS/.test(strictExtracted.stdout), strictExtracted.stdout.slice(-500));
     assert.equal(strictExtracted.code, 0, strictExtracted.stdout);
