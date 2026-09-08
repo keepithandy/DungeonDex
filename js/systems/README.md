@@ -25,38 +25,20 @@ It preserves classic browser script load order instead of converting the game to
 - `16_relic_forge_crafting.js` — Lowfire Forge crafting actions and forge state helpers; filename/global names are legacy compatibility only.
 - `17_relic_forge_clarity.js` — Lowfire Forge clarity copy and UI support; filename/global names are legacy compatibility only.
 - `18_relic_forge_compact_text.js` — Compact Lowfire Forge text adjustments; filename/global names are legacy compatibility only.
-- `19_warden_talents_lowfire_board.js` — Warden Talent foundation, passive inventory/contracts, and Lowfire Board support.
-- `20_town_currency_clean_strip.js` — Compact town currency strip cleanup.
 - `21_build_label_guard.js` — Build label guard and cache query alignment.
 - `22_nav_centering.js` — Navigation centering cleanup.
 - `23_boss_header_cleanup.js` — Boss header readability cleanup.
 - `24_lowfire_spark_board.js` — Lowfire Spark Board UI/support pass.
 - `25_town_wallet_chip_fix.js` — Town wallet chip layout fix.
-- `26_spark_writ_pill_cleanup.js` — Spark writ pill cleanup.
-- `27_interface_density_cleanup.js` — Interface density and app-feel cleanup.
 - `28_debt_collector_foundation.js` — Debt Collector foundation UI and helpers.
-- `30_passive_activation_gate_hotfix.js` — Passive activation gate verification layer.
 - `31_revisit_activation_surface_lockdown.js` — Revisit activation surface lockdown.
-- `32_talent_award_claim_repair_contract.js` — Talent award claim repair and boss trophy award mutation helpers.
-- `33_talent_hunter_board_clarity_spend.js` — Controlled one-node Hunter Board Clarity spend helper and readiness model.
-- `smoke_talent_v150b.mjs` — Browser smoke coverage including v1.21.2 button, readiness, reload persistence, and smoke-hardening audits for the controlled Hunter Board Clarity spend.
-- `smoke_talent_passive_framework_v1232.mjs` — Focused Node smoke for passive inventory shape, lifecycle flags, guarded Debt Collector clarity, Hunter Board Clarity spend, award preview, and activation gate metadata.
 
-## Talent Passive Contract Vocabulary
+## Talent Compatibility
 
-- `passiveReady` means the node is learned and eligible for passive helper checks.
-- `passiveEnabled` means an approved copy surface may consume the passive.
-- `appliesEffect` is reserved for gameplay or state changes.
-- `appliesCopyEffect` means display copy changes only.
-- `liveRendererWired` means a live renderer intentionally consumes the helper.
-- `copyModelRendererWired` means the Debt Collector panel consumes display-only copy-model text without activating the Talent passive.
-- `hunter_board_clarity` is the only current controlled spend target and live copy-only passive.
-- `debt_collector_clarity` is guarded: contract and copy-model helpers exist, but the live Debt renderer is not wired.
-- Debt Collector repayment is a Debt-owned live action; it mutates only wallet, debt balance, and bounded pressure relief through the Debt Collector API and does not spend Talent points.
-- Placeholder passives have generic inventory contracts only and remain preview-only until a future issue adds specific contracts, renderer or gameplay wiring, and smoke coverage.
+- Talent compatibility is owned by the loaded save-normalization, Debt Collector, and Town systems. Retired compatibility shims are intentionally absent from this map.
 
 Notes:
-- `index.html` now loads these files directly in order and remains the source of truth for runtime order.
+- `index.html` remains the source of truth for direct runtime order; `app.js` owns its small dynamic extension list.
 - `app.js` should stay small. It currently retains build labels, compatibility helpers, and fallback effects that can be split later through targeted system passes.
 - This map is documentation only; future passes can split internals further once a target system is chosen.
 - Player-facing forge copy now calls the active gear crafting/tempering system `Lowfire Forge`; legacy `relic_*` file names, globals, and save fields remain stable for compatibility.

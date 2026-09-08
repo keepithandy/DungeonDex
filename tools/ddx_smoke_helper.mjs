@@ -54,8 +54,9 @@ function readVersion() {
   const versionPath = path.join(REPO_ROOT, 'VERSION.md');
   if (!fs.existsSync(versionPath)) return 'VERSION.md not found';
   const text = fs.readFileSync(versionPath, 'utf8');
-  const match = text.match(/^## Current Public\/Live Version\s*\r?\n([^\r\n]+)/m);
-  return match?.[1]?.trim() || 'Current public version not found';
+  const match = text.match(/^## Current Release Candidate \/ Local Package Version\s*\r?\n([^\r\n]+)/m)
+    || text.match(/^## Current Public\/Live Version\s*\r?\n([^\r\n]+)/m);
+  return match?.[1]?.trim() || 'Current release candidate version not found';
 }
 
 function getGitInfo() {

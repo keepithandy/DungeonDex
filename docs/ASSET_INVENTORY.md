@@ -2,7 +2,7 @@
 
 This manifest records the origin, ownership/license status, modification history, and use of every tracked DungeonDex visual, audio, font, or marketing asset. Update it whenever an asset is added, replaced, or repurposed.
 
-Target baseline: **v1.28.1 Named Loadouts**.
+Target baseline: **v1.29.0 Drowned Reliquary**.
 
 Policy: [Northline Studio asset licensing policy](../ASSETS_LICENSE.md).
 
@@ -23,12 +23,9 @@ Policy: [Northline Studio asset licensing policy](../ASSETS_LICENSE.md).
 
 | Asset path | Status | Creator / source | License / ownership | Modification notes | Usage location |
 |---|---|---|---|---|---|
-| `assets/img/ui/dungeondex-crest-shaded.svg` | Generated; provenance incomplete | Shaded revision of the original repo-native crest; added by John Belles in `f3abe23`. | Governed by the Northline Studio asset policy; original generation-source terms are not recorded. | Replaced the original SVG filename in `f3abe23`; retained as an unused source variant. | Not loaded by the game or precached. |
 | `assets/img/ui/dungeondex-crest-realistic.png` | Generated | OpenAI built-in image generation in Codex, 2026-09-07, at the project owner's request; based on the original DungeonDex crest SVG. | Governed by the Northline Studio asset policy; original crest provenance limitations remain recorded above. | Rebuilt with bronze relief, carved stone, an amber triangle, recessed doorway, separated trim, and a solid near-black background. Prompt summary: preserve the shield/ember/doorway identity; render realistic materials; remove intersecting geometry; shorten the lower bar for rim clearance; replace the generated checkerboard with solid near-black. Final PNG copied without image modifications. | Header crest installed by `js/systems/22_nav_centering.js`; cached by `sw.js`. |
 | `assets/img/ui/hollow-stair-gate.svg` | Generated; provenance incomplete | Repo-native generated SVG; exact tool and prompt are unrecorded. Added by John Belles in `01621f1`. | Governed by the Northline Studio asset policy; generation-source terms are not recorded. | Polished in `043e710`. | Town gate art installed by `js/systems/22_nav_centering.js`; cached by `sw.js`. |
 | `assets/trophies/hollow_stair_skull_trophy.png` | Generated; provenance incomplete | Exact generator, prompt, and source terms are unrecorded. Added by John Belles in `9f712c6`; the historical v1.4.3a release note identifies it as generated art. | Governed by the Northline Studio asset policy, but the generation-source license chain is unverified. Do not treat it as cleared for external reuse or new marketing. | No later image modification is recorded in the current history. | Runtime fallback/image for the ten boss trophy definitions, save repair/normalization, and Journal trophy cards; cached by `sw.js`. |
-| `.codex_monster_qa_320.png` | Generated QA capture | Captured from the DungeonDex runtime and added by John Belles in `157cfd0`; capture-tool details are not retained with the file. | Governed by the Northline Studio asset policy; internal QA use only. | No later image modification is recorded in the current history. | Internal 320px monster-rendering QA only; not loaded by the game or included by the release builders. |
-| `.codex_monster_qa_430.png` | Generated QA capture | Captured from the DungeonDex runtime and added by John Belles in `157cfd0`; capture-tool details are not retained with the file. | Governed by the Northline Studio asset policy; internal QA use only. | No later image modification is recorded in the current history. | Internal 430px monster-rendering QA only; not loaded by the game or included by the release builders. |
 
 The commit author records above establish who added each file to this repository. They do not substitute for a missing original generator, prompt, source file, or third-party license record.
 

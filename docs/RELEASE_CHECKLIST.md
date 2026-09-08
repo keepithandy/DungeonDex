@@ -4,7 +4,7 @@ Use this short checklist before committing a DungeonDex patch.
 
 ## Version Authority
 
-- `VERSION.md` is the public build authority.
+- `VERSION.md` is the release-candidate/local package authority and records public deployment status separately.
 - [`docs/VERSION_CACHE_AUTHORITY.md`](VERSION_CACHE_AUTHORITY.md) defines how the semantic version and build/cache slug flow from that authority into runtime, cache, smoke, and package tooling.
 - `CHANGELOG.md` is the permanent release history.
 - `docs/status/CURRENT_NOTES.md` is the current working summary.
@@ -37,7 +37,6 @@ python tools/check_dungeondex_package.py --source .
 node --check app.js
 node --check sw.js
 node --check js/systems/21_build_label_guard.js
-node --check js/systems/30_passive_activation_gate_hotfix.js
 node --check js/systems/31_revisit_activation_surface_lockdown.js
 node --check tests/smoke/smoke_merchant_gear_upgrades_v1238.mjs
 node --check tests/smoke/smoke_debt_collector_v169.mjs
