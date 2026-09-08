@@ -386,6 +386,14 @@
       held || retired ? `${text((held || retired).name)} still carries the Reliquary’s mark.` : 'No identified Reliquary piece remains in your gear or retired archive.',
       held ? 'Lowfire recognizes this piece in your equipped gear or inventory.' : retired ? 'Its retired record endures as a memory of the descent.' : 'Names and old loot previews alone cannot establish where a piece came from.');
 
+    const reliquaryRoster = typeof DISTRICT_ENCOUNTER_IDENTITIES !== 'undefined'
+      ? list(DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']) : [];
+    const discovered = new Set(list(player.discoveredMonsters).map(value => String(value || '').trim()).filter(Boolean));
+    const encountered = reliquaryRoster.find(entry => discovered.has(String(entry?.name || '').trim())) || null;
+    const encounter = makeRow('encounter', 'A keeper beneath the seventh bell', encountered ? 'Discovered' : 'Locked — no encounter record',
+      encountered ? `${text(encountered.name)} has been entered in the Reliquary bestiary.` : 'The seventh bell’s keeper has not been entered in the bestiary yet.',
+      encountered ? text(encountered.lore, 'The bestiary keeps the keeper’s drowned account.') : 'Meeting the named keeper uses the existing encounter and bestiary record; no separate achievement is created.');
+
     const history = list(player.runHistory).filter(entry => inBand(obj(entry).floor));
     const extracted = history.find(entry => entry.reason === 'extract');
     const ended = history.find(entry => ['defeat', 'ended'].includes(entry.reason));
@@ -396,8 +404,8 @@
         : activeRun ? `${location(run.floor)}. The descent is still underway; its haul is not yet a safe return.`
         : ended ? `${location(ended.floor)}. ${ended.reason === 'defeat' ? 'This descent was lost; unsecured loot was not recovered.' : 'No safe extraction is recorded for this descent.'}`
         : 'Only retained run entries can place a return here; deeper progress alone cannot.');
-    const rows = [boss, contract, gear, returned];
-    const townRecord = bossComplete || bossActive ? boss : activeLocated ? contract : extracted ? returned : held || retired ? gear : activeRun || ended ? returned : null;
+    const rows = [boss, contract, gear, encounter, returned];
+    const townRecord = bossComplete || bossActive ? boss : activeLocated ? contract : extracted ? returned : held || retired ? gear : encountered ? encounter : activeRun || ended ? returned : null;
     return { rows, townRecord };
   }
   function renderReliquaryTownAcknowledgement(state){

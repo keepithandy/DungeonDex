@@ -66,9 +66,9 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
 
   async function advanceTo(depth) {
     for (let action = 0; action < 160; action += 1) {
-      const current = await read(`({ active:S.run.active, floor:S.run.floor })`);
+      const current = await read(`({ active:S.run.active, floor:S.run.floor, event:!!S.run.event })`);
       assert.ok(current.active, `run ended before D${depth}: ${JSON.stringify(current)}`);
-      if (current.floor >= depth) return;
+      if (current.floor >= depth && !current.event) return;
       await pause();
       await read(`(() => {
         const button = S.run.event
@@ -87,7 +87,7 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.equal(band.floor, 31);
   assert.equal(band.zone, 'The Drowned Reliquary');
   assert.match(band.theme, /combat-backdrop--drowned-reliquary/);
-  assert.match(band.monster, /Bell-Drowned Warden|Siltbound Reliquary Lurker|Reliquary Chain Herald|Blackwater Bell Seer/);
+  assert.match(band.monster, /Bell-Drowned Warden|Siltbound Reliquary Lurker|Reliquary Chain Herald|Blackwater Bell Seer|Seventh-Toll Bell-Keeper/);
   assert.match(await read('document.getElementById("runStatus").innerText'), /Beyond the Reliquary/);
   record('Normal D30 combat advances into the rendered D31 Reliquary', true, band.monster);
 
@@ -216,7 +216,7 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
   })()`);
   assert.ok(projection.unchanged, JSON.stringify(projection));
   assert.ok(!await read(`document.getElementById('guildJournalPanel')?.innerText.includes('<span')`), 'Journal must not print currency HTML');
-  assert.deepEqual(projection.badges, ['Completed', 'Historical — location unrecorded', 'Locked — no identified gear', 'Locked — no return record']);
+  assert.deepEqual(projection.badges, ['Completed', 'Historical — location unrecorded', 'Locked — no identified gear', 'Locked — no encounter record', 'Locked — no return record']);
   record('Loaded Journal preserves legacy saves and does not infer Reliquary returns or contract locations from depth', true);
   const reload = await read(`(() => {
     S = JSON.parse(JSON.stringify(window.__journalReturnState));
@@ -254,7 +254,7 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
           clipped:cards.some(card => card.scrollWidth > card.clientWidth + 1),
           badges:cards.every(card => card.querySelector('.journal-record-badge')?.innerText.length > 0)};
       })()`);
-      assert.deepEqual(geometry, {count:4,gutter:true,overflow:false,clipped:false,badges:true});
+      assert.deepEqual(geometry, {count:5,gutter:true,overflow:false,clipped:false,badges:true});
       if (process.env.DD_RELIQUARY_CAPTURE_DIR) {
         const shot = await client.send('Page.captureScreenshot', {format:'png', captureBeyondViewport:false});
         await writeFile(path.join(process.env.DD_RELIQUARY_CAPTURE_DIR, `journal-${width}-${touch ? 'touch' : 'mouse'}.png`), Buffer.from(shot.data,'base64'));

@@ -1,4 +1,6 @@
-# Fresh Physical-Device Handoff — v1.28 Source Candidate
+# Retired Physical-Device Handoff — v1.28 Source Candidate
+
+> Retired on 2026-09-08 by owner direction. This checklist is preserved as historical documentation and is no longer a release gate or required next action. Automated verification is accepted for the next phase.
 
 Automated preparation is recorded in `RELEASE_CANDIDATE_V128.md`. This sheet is intentionally fresh: it does not inherit any historical device pass or exception.
 

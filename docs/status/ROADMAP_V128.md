@@ -14,8 +14,8 @@ Credit: main supplied Named Loadouts (48d7a4b and 743b0c5); `work/v1.28.0-rarity
 | Implemented but inactive | Famous Gear Memory, Rival Trace, Board Echo and Debt Pressure Revisit compatibility/helpers; no activation authorized |
 | Read-only foundation | Completed Reliquary boss/contract/gear/run acknowledgements in Town and Guild Journal; rarity audit evidence remains conditional, not live-run yield |
 | Automated preparation | Feature scope frozen; release-candidate regression, accessibility, source/package hygiene and documentation checks complete; see the candidate report |
-| Pending release work | Fresh physical-device/Textastic validation, then separately authorized version/package/push/tag/upload decisions |
-| Broken or incomplete | Physical-device evidence remains outstanding. The historical gear comparison harness is repaired and included in the compact suite. Local main has not been pushed by this continuation |
+| Pending release work | Separately authorized version/package/push/tag/upload decisions |
+| Broken or incomplete | No known automated validation gap. The historical gear comparison harness is repaired and included in the compact suite. Local main has not been pushed by this continuation |
 
 Work order uses **named milestones** until a version update is explicitly authorized: audit reconciliation -> first-descent integration and regression protection -> Reliquary encounters -> boss/contract integration -> reward-curve decision -> themed gear -> loot/return clarity -> Town/mobile polish -> Journal/world response -> release candidate -> v1.29 itch handoff. All source milestones through Journal/world response and automated release-candidate preparation are complete and must not be rebuilt. Feature scope is frozen. Safe application only fills available empty slots.
 
@@ -31,9 +31,9 @@ D31-D40 contains no boss slot. The completed D45 narrative conclusion resolved t
 
 Historical GitHub snapshot (2026-09-05; not refreshed during this local-only continuation): [#139 — v1.28.2 release gate: complete physical-device loadout validation](https://github.com/keepithandy/DungeonDex/issues/139) is the sole open issue; no open PRs. Historical #139-#145 labels below and in ROADMAP_V127 are planning numbers, not current issue identities. ROADMAP_V1265 and ROADMAP_V127 are completed history. Older Talent/Revisit queues do not authorize activation.
 
-The branch's 49/55 compact passes, one skip and five environment failures are historical incomplete validation. Fresh integration verification passed 57/57 compact checks and 36/36 public-browser assertions, including the complete Reliquary combat/loot/return/loadout loop. See [integration evidence](RELIQUARY_LOADOUT_INTEGRATION.md). Real-device evidence still needs device, OS, browser, viewport, screenshots and results; the v1.27 exception does not carry forward.
+The branch's 49/55 compact passes, one skip and five environment failures are historical incomplete validation. Fresh integration verification passed 57/57 compact checks and 36/36 public-browser assertions, including the complete Reliquary combat/loot/return/loadout loop. See [integration evidence](RELIQUARY_LOADOUT_INTEGRATION.md). The owner has accepted the repeated automated verification baseline; the physical-device checklist is retired.
 
-The [Journal/world milestone](RELIQUARY_JOURNAL_WORLD_REACTION.md) is source-complete. The [release-candidate report](RELEASE_CANDIDATE_V128.md) reconciles every named milestone, verification, known limitations, and the fresh [physical-device handoff](REAL_DEVICE_HANDOFF_V128.md). Automated preparation does not complete the physical-device release gate.
+The [Journal/world milestone](RELIQUARY_JOURNAL_WORLD_REACTION.md) is source-complete. The [release-candidate report](RELEASE_CANDIDATE_V128.md) reconciles every named milestone and verification. The owner has retired the physical-device/Textastic checklist as a release gate; automated verification is accepted for the next phase.
 
 ## Historical proposal (numbering retained, superseded by named queue above)
 
@@ -58,7 +58,7 @@ The release should add depth without adding a second game. Town -> Dungeon -> Lo
 | v1.28.6 | Loot compare and return summary | Faster keep/equip/retire decisions | Keyboard/touch/accessibility coverage; no action-semantic drift |
 | v1.28.7 | Town and mobile declutter | Less scrolling and clearer next action | Supported viewport geometry and public-control inventory |
 | v1.28.8 | Journal and world reaction | The game remembers the Reliquary journey | Read-only/default-safe history coverage; Trophy Echo remains sole Revisit lane |
-| v1.28.9 | Release candidate | One coherent, stable v1.28 line | Full clean regression, device handoff, release notes; no new feature scope |
+| v1.28.9 | Release candidate | One coherent, stable v1.28 line | Full clean regression and release notes; no new feature scope |
 | v1.29 | Package and itch handoff | Public release | Explicit package, tag, and upload authorization plus clean extracted audit |
 
 ## Balance Rules for the Whole Line
@@ -130,7 +130,7 @@ The release should add depth without adding a second game. Town -> Dungeon -> Lo
 - Establish one obvious primary action and a readable hierarchy for preparation, Market, Forge, Contracts, Revisit, and Journal routes.
 - Reduce repeated explanatory copy and vertical churn without hiding costs, locks, risks, or active status.
 - Preserve the current side-rail and Town shortcut destinations and the canonical wallet owner.
-- Pass supported touch geometry, fine-pointer narrow layout, contrast, public-control inventory, and real-device handoff checks.
+- Pass supported touch geometry, fine-pointer narrow layout, contrast, and public-control inventory checks.
 
 ### v1.28.8 — Journal and World Reaction
 
@@ -143,7 +143,7 @@ The release should add depth without adding a second game. Town -> Dungeon -> Lo
 
 - Freeze feature scope; fix only verified regressions, release-label mismatches, accessibility defects, and package blockers.
 - Run repository syntax, compact suite, rarity audit, boss matrix, contracts, Merchant Gear Upgrades, Journal/Revisit, mobile/accessibility/contrast, Enter Dungeon, public runtime, and strict source package audit.
-- Record browser automation limitations and complete a fresh physical-device/Textastic handoff when practical.
+- Record browser automation limitations; automated verification is the accepted release baseline.
 - Align final v1.28.9 authority and release notes. Do not build or upload the v1.29 artifact in this patch.
 
 ### v1.29 — Package and Itch Release

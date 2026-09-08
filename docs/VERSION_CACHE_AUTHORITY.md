@@ -4,13 +4,11 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.28.2 Loadout Polish`
-- Visible semantic version: `1.28.2`
-- Build/cache slug: `1.28.2-loadout-polish`
+- Public version: `v1.29.0 Drowned Reliquary`
+- Visible semantic version: `1.29.0`
+- Build/cache slug: `1.29.0-drowned-reliquary`
 
-The authorized v1.28.2 development pass aligns release records and runtime labels. An
-itch package is created only after explicit packaging authorization and successful
-release verification. The resulting ZIP remains an output, not version authority.
+The authorized v1.29.0 release-candidate pass aligns release records and runtime labels. The resulting ZIP remains an output, not version authority.
 
 ## Authority Flow
 

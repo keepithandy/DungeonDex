@@ -3,11 +3,11 @@
 ## Current checkpoint (2026-09-07)
 
 - Source: v1.28.2 Loadout Polish / `1.28.2-loadout-polish`. This local continuation began at clean `main` `99bddca`; Journal/world reaction is `3819246` and automated release preparation is recorded in `RELEASE_CANDIDATE_V128.md`.
-- Active queue: `ROADMAP_V128.md`, using named milestones. All source milestones through Journal/world reaction and automated release-candidate preparation are complete; feature scope is frozen.
+- Active queue: `ROADMAP_NEXT_PHASE.md`. v1.28 source milestones through Journal/world reaction and automated release-candidate preparation are complete; feature scope is frozen.
 - Named loadouts, rarity/no-change reward evidence, D31-D40 district/roster/themed gear, D45 conclusion, contract briefings, gear comparison, return receipt, and Town/mobile work remain preserved.
 - Town and Guild Journal now acknowledge only supported trophy, located-contract, identified-gear and retained-run evidence. Raw depth alone never proves a completion. No new save field or gameplay reward was introduced.
 - The candidate report records the final regression, browser, accessibility, contrast and package-hygiene evidence. The previously broken standalone gear-comparison harness is repaired and part of the compact suite.
-- Physical-device/Textastic testing remains pending; use `REAL_DEVICE_HANDOFF_V128.md`. The last recorded GitHub issue is #139; issue/PR status has not been refreshed during this local-only continuation.
+- The physical-device/Textastic checklist is retired as a release gate by owner direction. Automated smoke and browser verification are the accepted validation baseline for the next phase.
 - No version/cache bump, retained release package, tag, push or upload is authorized. Local commits and merge into `main` were explicitly requested.
 
 ## Historical v1.27 checkpoint

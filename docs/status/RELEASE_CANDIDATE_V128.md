@@ -22,15 +22,15 @@
 | Loot comparison / return receipt | Complete. Existing equipped-item comparison, signed score differences and read-only detail inspection pass. Town receipt derives only from existing history and retains Gear/Journal navigation ownership. Its extraction and next-start locations now use the displayed Floor/Room/Chapter mapping. |
 | Town/mobile polish | Existing entry, preparation, merchant/forge/contracts and navigation remain intact. Supported touch geometry, public-control inventory, accessibility and narrow pointer checks pass. The scrolling Journal now reserves a gutter beside the fixed navigation handle. |
 | Journal/world reaction | Complete. Read-only boss, located-contract, identified-gear and retained-run acknowledgements share one projection between Town and Journal. Empty/partial/complete/malformed/legacy cases, exact depth mapping, duplicate identities, unsafe text, actual save/reload and nonmutation are covered. See `RELIQUARY_JOURNAL_WORLD_REACTION.md`. |
-| Automated release-candidate preparation | Complete after final checks below. Feature scope is frozen. Physical-device release validation remains a separate open gate. |
-| Public package / release | The recorded local package was absent when re-audited on 2026-09-07. A fresh package derived from unchanged `VERSION.md` authority was rebuilt at current local `main` commit `c114acf`: `archive/packages/DungeonDex_v1.28.2_ItchReady.zip` (396,820 bytes; SHA-256 `8A0F3404621AE9E4431C972CFB68DCF31193B501396A09AFF4428B64D2253D7F`). The historical checksum `00E5852524EA6953D00FA355DD8E475C90EED339F4BABFAA4DB3237742895496` therefore is not evidence for the current on-disk artifact. Physical-device evidence remains pending; no push, tag or upload was performed. |
+| Automated release-candidate preparation | Complete after final checks below. Feature scope is frozen. The physical-device/Textastic checklist has been retired as a release gate by owner direction. |
+| Public package / release | The recorded local package was absent when re-audited on 2026-09-07. A fresh package derived from unchanged `VERSION.md` authority was rebuilt at current local `main` commit `c114acf`: `archive/packages/DungeonDex_v1.28.2_ItchReady.zip` (396,820 bytes; SHA-256 `8A0F3404621AE9E4431C972CFB68DCF31193B501396A09AFF4428B64D2253D7F`). The historical checksum `00E5852524EA6953D00FA355DD8E475C90EED339F4BABFAA4DB3237742895496` therefore is not evidence for the current on-disk artifact. No push, tag or upload was performed. |
 
 ## Verified fixes during preparation
 
 1. Journal upgrade costs could display escaped `<span>` currency markup. They now use the existing plain-text money helper before escaping. Focused and loaded-browser assertions protect this.
 2. At supported widths, scrolling could place a Journal heading beneath the fixed closed drawer handle. A 44px Journal gutter with safe-area inset keeps text clear. Browser geometry checks now require drawer clearance at all six touch/fine-pointer profiles; fresh captures were inspected after the extraction notice expired.
 3. The historical standalone gear-comparison test could not reach its assertions because its DOM mocks and runtime dependencies were incomplete. It now loads the existing core/shared UI owners, binds its fixture through the runtime state binding, and supplies the missing DOM methods. Its original comparison/upgrade assertions remain; signed score differences and nonmutation are also checked. It is now a compact-suite gate.
-4. Current queue documents still asked for already-completed boss/loot/Journal work and called the stale gear harness unresolved. Active records now distinguish completed source work, historical checkpoint evidence, and the pending physical-device/public-release steps.
+4. Current queue documents still asked for already-completed boss/loot/Journal work and called the stale gear harness unresolved. Active records now distinguish completed source work, historical checkpoint evidence, and the pending public-release steps.
 
 The preceding Journal milestone also fixed raw-depth-as-floor receipt text, isolated legacy Famous Gear summary normalization from the live save, and stopped Trophy Echo from borrowing unrelated historical-lane result text. No protected gameplay behavior changed.
 
@@ -50,9 +50,9 @@ Reproduction: use the installed Node runtime, make the bundled Python runtime av
 
 Local verification artifacts (outside the active repository): `C:\Users\quali\Documents\ChatGPT\DungeonDex\_codex_work\rc-final-compact.log`, `rc-browser.log`, `rc-source-package.log`, and `captures/journal-*.png`. The Documents folder holds working evidence only; it is not the active source repository. Test captures use disposable generated fixtures, including deliberately long gear names, and are not marketing material.
 
-## Limits and remaining release gate
+## Limits and remaining release decisions
 
-- **Physical-device/Textastic validation is not complete.** Use the fresh `REAL_DEVICE_HANDOFF_V128.md`, recording exact commit, device, OS, Textastic/browser version, portrait/landscape viewports, screenshots and row results. The historical v1.27 exception does not carry forward. The last recorded related GitHub issue is #139; remote issue/PR status was not refreshed in this local continuation.
+- **Physical-device/Textastic validation is retired as a release gate by owner direction.** Automated smoke, browser, accessibility, mobile, package and regression checks are accepted as the current validation baseline.
 - Browser fixtures are synthetic and isolated from player saves. They prove wiring, persistence and layout contracts, not natural player difficulty, real touch responsiveness, screen-reader speech, physical keyboard behavior or mobile browser chrome/safe-area behavior.
 - Existing older displays/logs may use threat-floor terminology. New Journal acknowledgements and the return receipt explicitly derive their Floor/Room/Chapter location from the lore mapping and include raw D notation. Progression, boss cadence and stored history were not rewritten.
 - Retained run history is limited and claimed contract IDs lose location detail. Sold gear may leave insufficient origin evidence. The new presentation reports those limits rather than creating permanent achievements or inferring unrecorded progress.
@@ -64,8 +64,8 @@ Local verification artifacts (outside the active repository): `C:\Users\quali\Do
 - Compact smoke: **58/58 passing**.
 - Staged package audit: **52 paths checked, zero warnings**.
 - Re-audit/package handoff: clean extracted-package audit and public launch gate **11/11 passing**; the extracted runtime loaded with DevTools disabled, navigated to the Guild Journal, entered the dungeon, and had no console, runtime, or local-request failures.
-- The package is a local release candidate only. Physical-device evidence, remote push, release tag and itch.io upload remain separate actions.
+- The package is a local release candidate only. Remote push, release tag and itch.io upload remain separate actions.
 
-Next action: complete the fresh physical-device handoff, then request the desired version/package/push/tag/upload actions explicitly. Automated preparation and the authorized local-main merge can complete independently of that physical release gate.
+Next action: use `ROADMAP_NEXT_PHASE.md` to choose the next focused player-facing slice. Version/package/push/tag/upload actions still require explicit authorization.
 
 Reviewer handoff: inspect `99bddca..HEAD` for presentation-only scope, evidence sufficiency, canonical location text, escaped output, nonmutation, Trophy Echo-only behavior, supported drawer clearance, meaningful regression assertions, and consistency between this report and actual Git/test output. Do not interpret historical proposal labels as release authorization.

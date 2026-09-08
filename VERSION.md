@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Public/Live Version
-v1.28.2 Loadout Polish
+v1.29.0 Drowned Reliquary
 
 ## Current Local Package Version
-v1.28.2 Loadout Polish
+v1.29.0 Drowned Reliquary
 
 ## Current Development Target
-v1.28.2 Loadout Polish
+v1.29.0 Drowned Reliquary
 
 ## Current Build/Cache Label
-1.28.2-loadout-polish
+1.29.0-drowned-reliquary
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

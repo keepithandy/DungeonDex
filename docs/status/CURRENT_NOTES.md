@@ -7,14 +7,21 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.28.2 - Loadout Polish
-- Build/cache labels use `1.28.2-loadout-polish`.
+- DungeonDex v1.29.0 - Drowned Reliquary
+- Build/cache labels use `1.29.0-drowned-reliquary`.
 
-## v1.28.2 Loadout Polish (Development)
+## v1.29.0 Drowned Reliquary (Release Candidate)
+<!-- This local candidate supersedes the development authority without asserting an itch upload. -->
+- The Drowned Reliquary is a complete D31-D40 chapter: existing encounter/combat families produce its registered normal and Elite identities; three authored incidents use the existing choice and pending-haul flow; and `The Seventh Toll` is a D40 finale event before the unchanged final room. The existing D45 Gravetoll Bell presentation remains the chapter’s boss-linked conclusion.
+- Reliquary event caches use the existing item generator and its D31-D40 maker/theme/tag presentation. Item slots, rarity/stat/value rolls, IDs, comparison, selling, equipment, and Merchant Gear Upgrades are unchanged.
+- Town, the Notice Board’s existing in-band contract briefing, Archive, Guild Journal, extraction receipt, replay depth, and Trophy Echo-only Revisit surface remain connected through existing records and routes. No new Revisit lane, save field, claim, farming loop, or entry route was added.
+- Focused event/save and existing Reliquary smoke coverage now protect entry, event choices, D40 finale, gear identity, old-save loading, reload of a pending finale, chapter extraction/replay, Journal/Archive/Town presentation, and Trophy Echo isolation. See `DROWNED_RELIQUARY_CHAPTER_RC_V1290.md` for final candidate evidence.
+
+## v1.28.2 Loadout Polish (Historical Development)
 <!-- Active integration work retains this version; historical notes below are preserved. -->
 - Journal/world reaction and automated release-candidate preparation are source-complete; feature scope is frozen. Town and Guild Journal derive read-only Reliquary acknowledgements from existing trophy, located-contract, identified-gear and retained-run evidence. New location text uses Floor/Room/Chapter, and the latest-return raw-depth label, Journal currency markup and legacy-summary mutation were corrected. Release hardening also repairs the standalone gear test and protects scrolling Journal text from the fixed drawer handle. See `RELIQUARY_JOURNAL_WORLD_REACTION.md` and `RELEASE_CANDIDATE_V128.md` for acceptance and final evidence.
-- The next release gate is fresh physical-device/Textastic testing with `REAL_DEVICE_HANDOFF_V128.md`; earlier device exceptions do not carry forward. The authorized local candidate package is `archive/packages/DungeonDex_v1.28.2_ItchReady.zip`; tag, push and upload remain separate actions.
-- Active continuation queue: `docs/status/ROADMAP_V128.md`. Local `main` includes the rarity audit, D31-D40 Reliquary slice, four-identity roster, D45 conclusion, themed gear presentation, loot/return clarity, and Town/mobile polish with automated-browser verification. The no-change reward-curve decision locks its live control points without tuning balance; themed gear uses existing metadata only, while return and Town changes use existing records/routes and preserve actions, rewards, item mechanics, rolls, slots, loadouts, upgrades, and saves. See `RELIQUARY_LOADOUT_INTEGRATION.md`, `RELIQUARY_ROSTER_MILESTONE.md`, `RELIQUARY_D45_CONCLUSION.md`, `REWARD_CURVE_DECISION_V128.md`, `RELIQUARY_THEMED_GEAR.md`, and `LOOT_RETURN_TOWN_MOBILE_MILESTONES.md` for evidence and limitations. This source work is not physically device-validated. Historical branch version labels do not replace v1.28.2.
+- The physical-device/Textastic checklist is retired as a release gate by owner direction. Automated smoke and browser verification are accepted for the next phase. The authorized local candidate package is `archive/packages/DungeonDex_v1.28.2_ItchReady.zip`; tag, push and upload remain separate actions.
+- Active continuation queue: `docs/status/ROADMAP_NEXT_PHASE.md`. Local `main` includes the rarity audit, D31-D40 Reliquary slice, four-identity roster, D45 conclusion, themed gear presentation, loot/return clarity, and Town/mobile polish with repeated automated verification. The no-change reward-curve decision locks its live control points without tuning balance; themed gear uses existing metadata only, while return and Town changes use existing records/routes and preserve actions, rewards, item mechanics, rolls, slots, loadouts, upgrades, and saves. Historical branch version labels do not replace v1.28.2.
 - Named loadouts can now be duplicated with unique IDs/names and reordered with labelled move-up/move-down controls; the order and duplicated ID-based snapshots persist through save/reload.
 - Slot previews distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing. Apply Safe Items reports a concise outcome while preserving equipped gear and incompatible or unavailable items.
 - Empty and 12-loadout cap states now give direct next steps. New/loadout actions use native 44px controls, Enter-to-save support, polite status announcements, descriptive labels, deletion confirmation, and focus recovery after rerenders.

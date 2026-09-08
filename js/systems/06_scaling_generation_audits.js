@@ -418,7 +418,7 @@
     const maker = pick(MAKERS);
     const theme = pick(THEMES);
     const rawDepth = Math.floor(numberOr(opts.depthRaw || opts.depth, itemLevel, 1, 999999));
-    const reliquaryIdentity = rawDepth >= 31 && rawDepth <= 40 && ['normal','elite','boss'].includes(source)
+    const reliquaryIdentity = rawDepth >= 31 && rawDepth <= 40 && ['normal','elite','boss','event'].includes(source)
       ? RELIQUARY_GEAR_IDENTITIES?.[slot] || null
       : null;
     const displayName = reliquaryIdentity ? `${reliquaryIdentity.prefix} ${base} ${reliquaryIdentity.suffix}` : `${prefix} ${base} ${suffix}`;

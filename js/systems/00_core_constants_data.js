@@ -97,8 +97,8 @@
    */
 
   const STORAGE_KEY = 'dungeondex_emberfall_v109';
-  const BUILD = '1.28.2';
-  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.28.2';
+  const BUILD = '1.29.0';
+  const VISIBLE_VERSION_LABEL = 'DungeonDex v1.29.0';
   // Legacy preview globals were retired in v1.12.4; the ruleset-backed helper path is the only active talent preview source.
   const MAX_ITEM_LEVEL = 3250;
   const BOSS_INTERVAL = 5;
@@ -353,8 +353,67 @@
         family: 'Watcher',
         type: 'Seer',
         lore: 'Pale eyes watch from a cracked diving mask. The drowned bells hold the only prayers it remembers.'
+      }),
+      Object.freeze({
+        name: 'Seventh-Toll Bell-Keeper',
+        family: 'Knight',
+        type: 'Warden',
+        lore: 'A bell-keeper waits beyond the last prayer-ribbon, still counting the tolls owed to the drowned.'
       })
     ])
+  });
+
+  // Chapter incidents use the established event choice and unsecured-haul flow.
+  // Their effect data is presentation/content only; system 07 owns resolution.
+  const DISTRICT_RUN_EVENT_REGISTRY = Object.freeze({
+    'drowned-reliquary': Object.freeze({
+      random: Object.freeze([
+        Object.freeze({
+          id: 'reliquary_bell_rope_vault',
+          kicker: 'Reliquary Incident',
+          title: 'Bell-Rope Vault',
+          text: 'A coil of soaked bell-rope disappears into a sealed vault. Each pull wakes something beneath the black water.',
+          options: Object.freeze([
+            Object.freeze({ id:'unspool', label:'Unspool the rope', detail:'Take a Reliquary cache and a small hit.', effect:Object.freeze({ kind:'gear', damageFactor:0.65, tag:'bell-rope-vault' }) }),
+            Object.freeze({ id:'cut', label:'Cut the silver thread', detail:'Take loose coin and silted shards.', effect:Object.freeze({ kind:'salvage', goldMultiplier:1.2, shardsBonus:2, tag:'bell-rope-vault' }) }),
+            Object.freeze({ id:'leave', label:'Leave the bell silent', detail:'Move on without disturbing the vault.', effect:Object.freeze({ kind:'leave' }) })
+          ])
+        }),
+        Object.freeze({
+          id: 'reliquary_siltbound_coffer',
+          kicker: 'Reliquary Incident',
+          title: 'Siltbound Coffer',
+          text: 'A bronze coffer leans against the flooded wall. Prayer-ribbons knot around its latch, still warm beneath the silt.',
+          options: Object.freeze([
+            Object.freeze({ id:'lift', label:'Lift the coffer', detail:'Claim an unsecured shard cache.', effect:Object.freeze({ kind:'salvage', shardsMultiplier:1.3, shardsBonus:5, tag:'siltbound-coffer' }) }),
+            Object.freeze({ id:'listen', label:'Listen at the latch', detail:'Recover breath and catch a stray ember.', effect:Object.freeze({ kind:'heal', healBase:7, ember:1, tag:'siltbound-coffer' }) }),
+            Object.freeze({ id:'leave', label:'Leave it buried', detail:'Keep the descent moving.', effect:Object.freeze({ kind:'leave' }) })
+          ])
+        }),
+        Object.freeze({
+          id: 'reliquary_blackwater_tithe',
+          kicker: 'Reliquary Incident',
+          title: 'Blackwater Tithe',
+          text: 'Coins flash at the bottom of a drowned offering bowl. The water reflects a bell that is not hanging above it.',
+          options: Object.freeze([
+            Object.freeze({ id:'offer', label:'Offer one ember', detail:'Trade an ember for a richer unsecured haul.', effect:Object.freeze({ kind:'ember-offer', costEmber:1, goldMultiplier:1.8, shardsBonus:3, tag:'blackwater-tithe' }) }),
+            Object.freeze({ id:'wade', label:'Wade into the bowl', detail:'Take a Reliquary cache and a small hit.', effect:Object.freeze({ kind:'gear', damageFactor:0.5, tag:'blackwater-tithe' }) }),
+            Object.freeze({ id:'leave', label:'Refuse the tithe', detail:'Leave the drowned offering untouched.', effect:Object.freeze({ kind:'leave' }) })
+          ])
+        })
+      ]),
+      finale: Object.freeze({
+        id: 'reliquary_seventh_toll',
+        kicker: 'Reliquary Finale',
+        title: 'The Seventh Toll',
+        text: 'At the last flooded threshold, the seventh bell answers. Its note turns the black water toward the door beyond.',
+        options: Object.freeze([
+          Object.freeze({ id:'answer', label:'Answer the bell', detail:'Claim a final Reliquary cache before the last room.', effect:Object.freeze({ kind:'gear', tag:'seventh-toll' }) }),
+          Object.freeze({ id:'seal', label:'Seal the threshold', detail:'Bank loose shards and a stray ember in the haul.', effect:Object.freeze({ kind:'salvage', shardsBonus:4, ember:1, tag:'seventh-toll' }) }),
+          Object.freeze({ id:'leave', label:'Pass beneath it', detail:'Face the final room without taking a tithe.', effect:Object.freeze({ kind:'leave' }) })
+        ])
+      })
+    })
   });
 
   const BOSS_FLOOR_NAMES = {

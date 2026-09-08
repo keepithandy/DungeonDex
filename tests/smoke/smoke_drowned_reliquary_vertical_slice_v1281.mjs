@@ -20,7 +20,8 @@ const RUNTIME_FILES = [
   'js/systems/11_ui_run_gear_dex_archive.js',
   'js/systems/29_monster_backdrops_canvas.js'
 ];
-const RELIQUARY_NAMES = Object.freeze(['Bell-Drowned Warden', 'Siltbound Reliquary Lurker', 'Reliquary Chain Herald', 'Blackwater Bell Seer']);
+const RELIQUARY_NAMES = Object.freeze(['Bell-Drowned Warden', 'Siltbound Reliquary Lurker', 'Reliquary Chain Herald', 'Blackwater Bell Seer', 'Seventh-Toll Bell-Keeper']);
+const BASELINE_COMMIT = process.env.DD_RELIQUARY_BASELINE || 'HEAD';
 
 function plain(value) {
   return value == null ? value : JSON.parse(JSON.stringify(value));
@@ -99,7 +100,7 @@ async function loadRuntime(baseline = false) {
 
   for (const file of RUNTIME_FILES) {
     const source = baseline
-      ? execFileSync('git', ['show', `7929698e22ccfbc92cdbf41830296e0d2b7bc5b3:${file}`], { cwd: ROOT, encoding: 'utf8' })
+      ? execFileSync('git', ['show', `${BASELINE_COMMIT}:${file}`], { cwd: ROOT, encoding: 'utf8' })
       : await readFile(path.join(ROOT, file), 'utf8');
     vm.runInContext(source, sandbox, { filename: file });
   }
@@ -173,7 +174,7 @@ for (let depth = 31; depth <= 40; depth += 1) {
 }
 
 const roster = plain(runtime.api.DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']);
-assert.equal(roster.length, 4, 'the bounded roster milestone has exactly four identities');
+assert.equal(roster.length, RELIQUARY_NAMES.length, 'the bounded roster has the focused encounter slice');
 assert.deepEqual(roster.map(entry => entry.name).sort(), RELIQUARY_NAMES.slice().sort(), 'the vertical-slice encounter names should remain stable');
 for (const entry of roster) {
   assert.ok(runtime.api.MONSTER_FAMILIES.includes(entry.family), 'reuse an existing family');
@@ -329,4 +330,4 @@ for (const rawDepth of [30, 41]) {
   assert.deepEqual(actual, control, `outside-band D${rawDepth} gear should remain exactly unchanged`);
   assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `outside-band D${rawDepth} gear RNG should remain unchanged`);
 }
-console.log(`PASS Drowned Reliquary vertical slice: district/identity/visual assertions and ${comparisons} seeded comparisons against pinned main; numeric values, elite modifiers, RNG consumption, bosses and outside-band visuals preserved.`);
+console.log(`PASS Drowned Reliquary vertical slice: district/identity/visual assertions and ${comparisons} seeded comparisons against ${BASELINE_COMMIT}; numeric values, elite modifiers, RNG consumption, bosses and outside-band visuals preserved.`);

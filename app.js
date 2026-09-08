@@ -1,13 +1,13 @@
-// DungeonDex v1.28.2 runtime pointer.
+// DungeonDex v1.29.0 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.28.2: Loadout Polish
-// - Adds duplication, reordering, explicit slot preview, and accessible feedback.
-// - Preserves combat formulas, rewards, progression, and existing equip behavior.
+// v1.29.0: Drowned Reliquary
+// - Completes D31-D40 through data-first encounters, incidents, and a D40 finale.
+// - Preserves the established combat, reward, progression, and equip behavior.
 
-window.DUNGEONDEX_BUILD = '1.28.2';
-window.DUNGEONDEX_BUILD_QS = '1.28.2-loadout-polish';
+window.DUNGEONDEX_BUILD = '1.29.0';
+window.DUNGEONDEX_BUILD_QS = '1.29.0-drowned-reliquary';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -63,7 +63,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.28.2-loadout-polish';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.29.0-drowned-reliquary';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

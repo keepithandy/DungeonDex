@@ -8,14 +8,24 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.28.2 Loadout Polish`
-* Current local package baseline: `v1.28.2 Loadout Polish`
-* Current development target: `v1.28.2 Loadout Polish`
-* Current build/cache label: `1.28.2-loadout-polish`
+* Public/live itch version: `v1.29.0 Drowned Reliquary`
+* Current local package baseline: `v1.29.0 Drowned Reliquary`
+* Current development target: `v1.29.0 Drowned Reliquary`
+* Current build/cache label: `1.29.0-drowned-reliquary`
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.29.0 - Drowned Reliquary
+
+* Completes the D31-D40 Drowned Reliquary with its registered encounter roster, ordinary and Elite variants through the existing combat pipeline, black-water presentation, and the pre-existing D45 Gravetoll Bell conclusion.
+* Adds three authored Reliquary incidents and the D40 `The Seventh Toll` finale through the existing event choices and unsecured pending-haul flow. The finale is a choice before the final room; it does not add a route, boss slot, reward framework, or progression track.
+* Extends the existing chapter gear presentation to event caches at raw D31-D40, retaining the same item slots, rarity rolls, stats, values, IDs, comparison, sale, and upgrade behavior.
+* Keeps the existing Contract Board briefing, Guild Journal/Archive/Town acknowledgement, extraction receipt, safe replay depth, and Trophy Echo-only Revisit presentation intact.
+* Adds focused event/save smoke coverage and updates the browser Reliquary traversal to resolve the established event card before inspecting each reached floor.
+* Preserves combat formulas, status behavior, turn order, scaling, reward formulas, loot-roll mechanics, Charter flow, Merchant Gear Upgrade costs/effects, Talent, Debt, entry rules, save schema, and all non-Reliquary content.
+* A local release candidate is prepared separately; no push, tag, upload, or publication is included.
 
 ## v1.28.2 - Loadout Polish
 

@@ -1167,6 +1167,7 @@
     applyFloorMilestoneReward(state, beforeDepth, state.run.floor);
     trackEquippedFamousGearMemory(state, { chaptersCleared: 1 });
 
+    if (maybeTriggerReliquaryFinaleEvent(state) || maybeTriggerReliquaryRunEvent(state)) return;
     nextEncounter(state);
   }
 
@@ -1226,9 +1227,31 @@
     return clamp(base + chainBonus, 0.06, 0.28);
   }
 
-  function createRunEvent(state) {
+  function drownedReliquaryEventRegistry(state) {
     const depth = progressDepthValue(state?.run?.floor, 1);
-    const event = pick(RUN_EVENT_REGISTRY);
+    const district = typeof districtByDepth === 'function' ? districtByDepth(depth) : null;
+    const registry = typeof DISTRICT_RUN_EVENT_REGISTRY !== 'undefined' ? DISTRICT_RUN_EVENT_REGISTRY : null;
+    return district?.id === 'drowned-reliquary' && registry ? registry['drowned-reliquary'] || null : null;
+  }
+
+  function copyRunEventOption(option) {
+    return {
+      id: String(option?.id || 'leave'),
+      label: String(option?.label || 'Move on'),
+      detail: String(option?.detail || ''),
+      effect: option?.effect && typeof option.effect === 'object' ? { ...option.effect } : null
+    };
+  }
+
+  function createRunEvent(state, kind = 'random') {
+    const depth = progressDepthValue(state?.run?.floor, 1);
+    const reliquaryRegistry = drownedReliquaryEventRegistry(state);
+    const event = kind === 'finale'
+      ? reliquaryRegistry?.finale || null
+      : Array.isArray(reliquaryRegistry?.random) && reliquaryRegistry.random.length
+        ? pick(reliquaryRegistry.random)
+        : pick(RUN_EVENT_REGISTRY);
+    if (!event) return null;
     return {
       id: event.id,
       kicker: event.kicker,
@@ -1236,8 +1259,18 @@
       text: event.text,
       floor: depth,
       zone: state?.run?.zone || zoneName(depth),
-      options: event.options.map(option => ({ ...option }))
+      chapter: reliquaryRegistry ? 'drowned-reliquary' : '',
+      finale: kind === 'finale',
+      options: event.options.map(copyRunEventOption)
     };
+  }
+
+  function beginRunEvent(state, event) {
+    if (!event) return false;
+    state.run.event = event;
+    state.run.choices = ['event'];
+    pushCombat(state, `Run Event: ${event.title} interrupts the descent.`);
+    return true;
   }
 
   function maybeTriggerRunEvent(state) {
@@ -1245,10 +1278,16 @@
     const floor = progressDepthValue(state.run.floor, 1);
     if (floor <= 1 || floor % 5 === 0) return false;
     if (Math.random() > runEventChance(state)) return false;
-    state.run.event = createRunEvent(state);
-    state.run.choices = ['event'];
-    pushCombat(state, `Run Event: ${state.run.event.title} interrupts the descent.`);
-    return true;
+    return beginRunEvent(state, createRunEvent(state));
+  }
+
+  function maybeTriggerReliquaryRunEvent(state) {
+    return drownedReliquaryEventRegistry(state) ? maybeTriggerRunEvent(state) : false;
+  }
+
+  function maybeTriggerReliquaryFinaleEvent(state) {
+    if (!state?.run?.active || state.run.event || progressDepthValue(state.run.floor, 1) !== 40) return false;
+    return beginRunEvent(state, createRunEvent(state, 'finale'));
   }
 
   function applySootveilRunEventSalvage(state, rewards = {}) {
@@ -1294,6 +1333,50 @@
     return `${parts.join(', ') || 'no salvage'}${rewards.sootveilBonus ? ' (+Sootveil)' : ''}`;
   }
 
+  function resolveReliquaryRunEvent(state, event, choice, stats, depthThreat, coin, shard, hit) {
+    if (event?.chapter !== 'drowned-reliquary') return null;
+    const option = asArray(event.options, []).find(entry => String(entry?.id || '') === choice)
+      || asArray(event.options, []).find(entry => String(entry?.id || '') === 'leave')
+      || null;
+    const effect = option?.effect && typeof option.effect === 'object' ? option.effect : { kind:'leave' };
+    const kind = String(effect.kind || 'leave');
+    const tag = String(effect.tag || 'reliquary-incident').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'reliquary-incident';
+    const gold = Math.max(0, Math.round(coin * numberOr(effect.goldMultiplier, 0, 0, 4)));
+    const shards = Math.max(0, Math.round(shard * numberOr(effect.shardsMultiplier, 1, 0, 4)) + Math.floor(numberOr(effect.shardsBonus, 0, 0, 99)));
+    const ember = Math.max(0, Math.floor(numberOr(effect.ember, 0, 0, 9)));
+
+    if (kind === 'gear') {
+      const damage = Math.max(0, Math.round(hit * numberOr(effect.damageFactor, 0, 0, 1)));
+      const loot = generateGear(pick(SLOT_ORDER), depthThreat + rand(0, 1), { source:'event', depthRaw: state.run.floor, state });
+      loot.tags = asArray(loot.tags, []).concat([tag]);
+      addPendingRunLoot(state, loot);
+      if (damage) state.player.hp -= damage;
+      updateQuest(state, 'loot', 1);
+      return `Event resolved: ${event.finale ? 'the seventh bell leaves a final cache' : 'the Reliquary yields a cache'}. ${loot.name} added to the unsecured haul.${damage ? ` Took ${damage}.` : ''}`;
+    }
+    if (kind === 'ember-offer') {
+      const cost = Math.max(1, Math.floor(numberOr(effect.costEmber, 1, 1, 9)));
+      if (state.player.ember < cost) {
+        const fallback = grantRunEventSalvage(state, { shards: shards + 2 });
+        return `Event resolved: the bowl rejects an empty offering. Unsecured ${runEventSalvageText(fallback)}.`;
+      }
+      state.player.ember -= cost;
+      const salvage = grantRunEventSalvage(state, { gold, shards, ember });
+      return `Event resolved: ${format(cost)} ember offered to the black water. Unsecured ${runEventSalvageText(salvage)}.`;
+    }
+    if (kind === 'salvage') {
+      const salvage = grantRunEventSalvage(state, { gold, shards, ember });
+      return `Event resolved: the sealed water releases ${runEventSalvageText(salvage)} into the unsecured haul.`;
+    }
+    if (kind === 'heal') {
+      const heal = Math.max(1, Math.round(stats.guard * 0.08 + numberOr(effect.healBase, 4, 1, 99)));
+      state.player.hp = Math.min(state.player.maxHp, state.player.hp + heal);
+      const salvage = grantRunEventSalvage(state, { ember });
+      return `Event resolved: the bell’s echo restores ${heal} HP${ember ? ` and leaves ${runEventSalvageText(salvage)} unsecured` : ''}.`;
+    }
+    return `Event resolved: you leave ${event.finale ? 'the seventh bell' : 'the Reliquary incident'} undisturbed.`;
+  }
+
   function resolveRunEvent(state, optionId) {
     ensureRunShell(state);
     const event = state.run.event;
@@ -1305,7 +1388,10 @@
     const shard = Math.max(1, Math.round(depthThreat * 1.5 + rand(1, 5)));
     const hit = Math.max(2, Math.round(depthThreat * 1.4 + rand(2, 8) - stats.guard * 0.04));
 
-    if (event.id === 'wounded_delver') {
+    const reliquaryResult = resolveReliquaryRunEvent(state, event, choice, stats, depthThreat, coin, shard, hit);
+    if (reliquaryResult) {
+      pushCombat(state, reliquaryResult);
+    } else if (event.id === 'wounded_delver') {
       if (choice === 'help') {
         const cost = Math.min(state.player.gold || 0, Math.max(coins(0, 1, 0), Math.round(coin * 0.6)));
         state.player.gold = Math.max(0, (state.player.gold || 0) - cost);

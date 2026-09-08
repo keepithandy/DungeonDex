@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.28.2-loadout-polish';
+const CACHE_NAME = 'dungeondex-v1.29.0-drowned-reliquary';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.28.2-loadout-polish';
+const BUILD_QS = '1.29.0-drowned-reliquary';
 const ASSETS = [
   './',
   './index.html',
