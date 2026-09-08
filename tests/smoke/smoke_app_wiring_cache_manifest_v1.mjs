@@ -161,12 +161,12 @@ async function main() {
 
   const directScripts = directAssetRecords(
     indexHtml,
-    /<script\s+src=["']([^"']+?\.js)(?:\?build=([^"']+))?["']/g,
+    /<script\b[^>]*\bsrc=["']([^"']+?\.js)(?:\?build=([^"']+))?["']/g,
     'script'
   );
   const directStyles = directAssetRecords(
     indexHtml,
-    /<link\s+rel=["']stylesheet["']\s+href=["']([^"']+?\.css)(?:\?build=([^"']+))?["']/g,
+    /<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["']([^"']+?\.css)(?:\?build=([^"']+))?["']/g,
     'stylesheet'
   );
   [...directScripts, ...directStyles].forEach(asset => {

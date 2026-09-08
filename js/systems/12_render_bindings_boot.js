@@ -304,23 +304,13 @@
   }
 
   function clearCacheAndReload() {
-    const tasks = [];
-    const reload = () => window.location.reload();
     const btn = el('clearCacheReloadBtn');
     if (btn) btn.disabled = true;
-    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
-      tasks.push(navigator.serviceWorker.getRegistrations()
-        .then(registrations => Promise.all(registrations.map(registration => registration.unregister()))));
-    }
-    if (window.caches && window.caches.keys) {
-      tasks.push(window.caches.keys()
-        .then(keys => Promise.all(keys.map(key => window.caches.delete(key)))));
-    }
-    if (!tasks.length) {
-      reload();
+    if (window.DungeonDexBootHealth?.clearScopedCachesAndReload) {
+      window.DungeonDexBootHealth.clearScopedCachesAndReload();
       return;
     }
-    Promise.allSettled(tasks).finally(reload);
+    window.location.reload();
   }
 
   function escapeHtml(s) {
@@ -412,4 +402,5 @@
 
   bindStatic();
   render();
+  if (window.DungeonDexBootHealth?.markReady) window.DungeonDexBootHealth.markReady();
   showIntroModalOnce();

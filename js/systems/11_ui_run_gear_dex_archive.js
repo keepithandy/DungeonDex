@@ -1223,7 +1223,8 @@
       <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
       <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>
-      <button class="ghost mini" id="clearCacheReloadBtn" type="button">Clear Cache & Reload</button>
+      <button class="ghost mini" id="clearCacheReloadBtn" type="button">Clear DungeonDex Cache &amp; Reload</button>
+      <p class="small muted">This removes only DungeonDex caches and keeps your player save data.</p>
       <div class="sep"></div>
       <div class="log-wrap">${S.player.log.map(line => `<div class="log-line small">${escapeHtml(cleanDisplayText(line))}</div>`).join('')}</div>`;
   }

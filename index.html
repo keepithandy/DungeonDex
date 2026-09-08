@@ -9,9 +9,9 @@
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
   <title>DungeonDex v1.28.2</title>
-  <link rel="stylesheet" href="./styles.css?build=1.28.2-loadout-polish" />
-  <link rel="stylesheet" href="./styles_lore_layer.css?build=1.28.2-loadout-polish" />
-  <link rel="stylesheet" href="./styles_visual_weight.css?build=1.28.2-loadout-polish" />
+  <link rel="stylesheet" data-dd-required="true" href="./styles.css?build=1.28.2-loadout-polish" />
+  <link rel="stylesheet" data-dd-required="true" href="./styles_lore_layer.css?build=1.28.2-loadout-polish" />
+  <link rel="stylesheet" data-dd-required="true" href="./styles_visual_weight.css?build=1.28.2-loadout-polish" />
   <style>
     /* v1.23.8 Merchant Gear Upgrades Replace Talent System update. */
     .panel {
@@ -220,8 +220,103 @@
       }
     }
   </style>
+  <script>
+    (function(){
+      var state = { acknowledged: false, ready: false, failure: null };
+      var build = '1.28.2';
+      var cachePrefix = 'dungeondex-';
+      function assetPath(value){
+        try { return new URL(value, window.location.href).pathname; }
+        catch (_) { return String(value || 'unknown local asset'); }
+      }
+      function panel(){ return document.getElementById('bootRecoveryPanel'); }
+      function showFailure(detail){
+        if (state.acknowledged) return;
+        state.failure = detail || state.failure || { path: '' };
+        var node = panel();
+        if (!node) return;
+        var pathNode = document.getElementById('bootRecoveryAsset');
+        if (pathNode) pathNode.textContent = state.failure.path ? 'Failed local asset: ' + state.failure.path : 'The failed local asset could not be identified.';
+        node.hidden = false;
+        document.documentElement.setAttribute('data-dd-boot-failed', 'true');
+      }
+      function clearScopedCaches(){
+        var tasks = [];
+        if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+          tasks.push(navigator.serviceWorker.getRegistration().then(function(registration){
+            return registration ? registration.unregister() : false;
+          }));
+        }
+        if (window.caches && window.caches.keys) {
+          tasks.push(window.caches.keys().then(function(keys){
+            return Promise.all(keys.filter(function(key){ return key.indexOf(cachePrefix) === 0; }).map(function(key){ return window.caches.delete(key); }));
+          }));
+        }
+        return Promise.all(tasks);
+      }
+      function clearScopedCachesAndReload(){
+        ['bootRecoveryClearBtn', 'clearCacheReloadBtn'].forEach(function(id){
+          var retry = document.getElementById(id);
+          if (retry) retry.disabled = true;
+        });
+        clearScopedCaches().catch(function(){}).finally(function(){ window.location.reload(); });
+      }
+      function markReady(){ state.ready = true; }
+      function acknowledge(){
+        state.acknowledged = true;
+        var node = panel();
+        if (node) node.hidden = true;
+        document.documentElement.removeAttribute('data-dd-boot-failed');
+      }
+      function retry(){ window.location.reload(); }
+      function onResourceError(event){
+        var target = event.target;
+        if (!target || target.getAttribute('data-dd-required') !== 'true') return;
+        showFailure({ path: assetPath(target.src || target.href) });
+      }
+      function onRuntimeError(event){
+        var target = event.target;
+        if (target && target.getAttribute && target.getAttribute('data-dd-required') === 'true') {
+          showFailure({ path: assetPath(target.src || target.href) });
+        }
+      }
+      window.DungeonDexBootHealth = {
+        acknowledge: acknowledge,
+        markReady: markReady,
+        fail: showFailure,
+        retry: retry,
+        clearScopedCaches: clearScopedCaches,
+        clearScopedCachesAndReload: clearScopedCachesAndReload,
+        state: state
+      };
+      window.addEventListener('error', onRuntimeError, true);
+      document.addEventListener('error', onResourceError, true);
+      document.addEventListener('DOMContentLoaded', function(){
+        var retryBtn = document.getElementById('bootRecoveryRetryBtn');
+        var clearBtn = document.getElementById('bootRecoveryClearBtn');
+        if (retryBtn) retryBtn.onclick = retry;
+        if (clearBtn) clearBtn.onclick = clearScopedCachesAndReload;
+      });
+      window.addEventListener('load', function(){
+        window.setTimeout(function(){
+          if (state.ready && !state.failure) acknowledge();
+          else if (!state.acknowledged && !state.failure) showFailure({ path: '' });
+        }, 250);
+      });
+    })();
+  </script>
 </head>
 <body>
+  <section class="panel" id="bootRecoveryPanel" hidden role="alertdialog" aria-labelledby="bootRecoveryTitle" aria-describedby="bootRecoveryMessage">
+    <h2 id="bootRecoveryTitle">DungeonDex could not finish loading.</h2>
+    <p id="bootRecoveryMessage">A required local game file did not finish loading. Your player save data was not erased.</p>
+    <p class="small" id="bootRecoveryAsset"></p>
+    <p class="small muted">Current build: DungeonDex v1.28.2</p>
+    <div class="inline-actions">
+      <button class="primary" id="bootRecoveryRetryBtn" type="button">Retry</button>
+      <button class="ghost" id="bootRecoveryClearBtn" type="button">Clear DungeonDex Cache &amp; Reload</button>
+    </div>
+  </section>
   <div class="app-shell ddx-shell">
     <header class="topbar ddx-guild-header" aria-labelledby="buildTag" role="banner">
       <div class="ddx-header-title-slot">
@@ -388,8 +483,7 @@
       var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
       if (isLocalDev) {
         window.addEventListener('load', function(){
-          navigator.serviceWorker.getRegistrations().then(function(registrations){ registrations.forEach(function(reg){ reg.unregister(); }); }).catch(function(){});
-          if (window.caches && caches.keys) caches.keys().then(function(keys){ keys.filter(function(key){ return key.indexOf('dungeon') !== -1 || key.indexOf('Dungeon') !== -1; }).forEach(function(key){ caches.delete(key); }); }).catch(function(){});
+          if (window.DungeonDexBootHealth) window.DungeonDexBootHealth.clearScopedCaches().catch(function(){});
         });
         return;
       }
@@ -397,37 +491,37 @@
     })();
   </script>
 
-  <script src="./app.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/00_core_constants_data.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/01_state_recovery.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/02_currency_pending_rewards.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/03_town_contracts_market.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/04_depth_progression_charters.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/05_elite_modifiers.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/06_scaling_generation_audits.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/07_player_combat_runtime.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/08_normalization_save.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/46_named_loadouts.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/09_ui_common_intro.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/10_ui_town_shop.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/29_monster_backdrops_canvas.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/12_render_bindings_boot.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/36_ui_revisit_archive_codex.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/38_journal_v1.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/16_relic_forge_crafting.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/17_relic_forge_clarity.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/18_relic_forge_compact_text.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/28_debt_collector_foundation.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/34_debt_collector_v1_completion.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/21_build_label_guard.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/22_nav_centering.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/23_boss_header_cleanup.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/24_lowfire_spark_board.js?build=1.28.2-loadout-polish"></script>
-  <script src="./js/systems/25_town_wallet_chip_fix.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./app.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/00_core_constants_data.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/01_state_recovery.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/02_currency_pending_rewards.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/03_town_contracts_market.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/04_depth_progression_charters.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/05_elite_modifiers.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/06_scaling_generation_audits.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/07_player_combat_runtime.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/08_normalization_save.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/46_named_loadouts.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/09_ui_common_intro.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/10_ui_town_shop.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/29_monster_backdrops_canvas.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/12_render_bindings_boot.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/36_ui_revisit_archive_codex.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/38_journal_v1.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/16_relic_forge_crafting.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/17_relic_forge_clarity.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/18_relic_forge_compact_text.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/28_debt_collector_foundation.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/34_debt_collector_v1_completion.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/21_build_label_guard.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/22_nav_centering.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/23_boss_header_cleanup.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/24_lowfire_spark_board.js?build=1.28.2-loadout-polish"></script>
+  <script data-dd-required="true" src="./js/systems/25_town_wallet_chip_fix.js?build=1.28.2-loadout-polish"></script>
 </body>
 </html>

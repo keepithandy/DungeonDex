@@ -355,6 +355,7 @@ async function main() {
     '[data-complete-board-echo]',
     '[data-complete-rival-trace]'
   ]);
+  const bootRecoveryControlTokens = new Set(['#bootRecoveryRetryBtn', '#bootRecoveryClearBtn']);
   const expectedPublicControlTokens = [
     '#saveBtn',
     '#resetBtn',
@@ -407,7 +408,7 @@ async function main() {
     '#clearCacheReloadBtn'
   ];
   const activeControlTokens = [...extractedControlTokens]
-    .filter(token => !inactiveFutureControlTokens.has(token));
+    .filter(token => !inactiveFutureControlTokens.has(token) && !bootRecoveryControlTokens.has(token));
   const unmappedControls = activeControlTokens.filter(token => token.startsWith('UNMAPPED:'));
   const missingControls = expectedPublicControlTokens
     .filter(token => !extractedControlTokens.has(token));
