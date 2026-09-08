@@ -6,6 +6,12 @@ DungeonDex is a mobile-first dark fantasy browser roguelite / idle dungeon crawl
 
 This file is the first-read operating contract for Codex, Claude, ChatGPT, and other repo agents.
 
+## Working Repository
+
+- Owner-designated source: `C:\Users\quali\Desktop\source\DungeonDex`.
+- Create new `codex/...` work branches from this repository's `main` and preserve pending edits.
+- Do not develop in the former Documents/ChatGPT checkout or use an extracted release ZIP as a source repository.
+
 ## Current Release Baseline
 
 - Current source release: `v1.29.0 Drowned Reliquary` (local release candidate).
