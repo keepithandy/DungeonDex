@@ -9,6 +9,7 @@ const VISIBLE_BUILD = '1.29.0';
 const RELEASE_NAME = 'Drowned Reliquary';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
 const BUILD_QS = '1.29.0-drowned-reliquary';
+const PUBLIC_DEPLOYMENT_STATUS = 'The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.29.0 candidate is local only until an explicitly authorized upload.';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,
@@ -113,15 +114,15 @@ async function main() {
     if (actual !== expected) failures.push({ file, field, actual: found(actual), expected });
   }
 
-  expect('VERSION.md', 'Current Public/Live Version', sectionValue(version, 'Current Public/Live Version'), RELEASE_LABEL);
-  expect('VERSION.md', 'Current Local Package Version', sectionValue(version, 'Current Local Package Version'), RELEASE_LABEL);
+  expect('VERSION.md', 'Current Release Candidate / Local Package Version', sectionValue(version, 'Current Release Candidate / Local Package Version'), RELEASE_LABEL);
   expect('VERSION.md', 'Current Development Target', sectionValue(version, 'Current Development Target'), RELEASE_LABEL);
   expect('VERSION.md', 'Current Build/Cache Label', sectionValue(version, 'Current Build/Cache Label'), BUILD_QS);
+  expect('VERSION.md', 'Public Itch Deployment Status', sectionValue(version, 'Public Itch Deployment Status'), PUBLIC_DEPLOYMENT_STATUS);
   expect('README.md', 'Current baseline', capture(readme, /Current baseline:\s+\*\*DungeonDex (v[^*]+)\*\*/), `v${VISIBLE_BUILD}`);
-  expect('CHANGELOG.md', 'Public/live itch version', capture(changelog, /Public\/live itch version:\s+`([^`]+)`/), RELEASE_LABEL);
-  expect('CHANGELOG.md', 'Current local package baseline', capture(changelog, /Current local package baseline:\s+`([^`]+)`/), RELEASE_LABEL);
+  expect('CHANGELOG.md', 'Current release candidate/local package baseline', capture(changelog, /Current release candidate\/local package baseline:\s+`([^`]+)`/), RELEASE_LABEL);
   expect('CHANGELOG.md', 'Current development target', capture(changelog, /Current development target:\s+`([^`]+)`/), RELEASE_LABEL);
   expect('CHANGELOG.md', 'Current build/cache label', capture(changelog, /Current build\/cache label:\s+`([^`]+)`/), BUILD_QS);
+  expect('CHANGELOG.md', 'Public itch deployment', capture(changelog, /Public itch deployment:\s+([^\r\n]+)/), 'pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.');
   expect('docs/status/CURRENT_NOTES.md', 'Current Baseline', capture(notes, /## Current Baseline\s*\r?\n- DungeonDex ([^\r\n]+)/), `v${VISIBLE_BUILD} - ${RELEASE_NAME}`);
   expect('docs/status/CURRENT_NOTES.md', 'Build/cache label', capture(notes, /Build\/cache labels use `([^`]+)`/), BUILD_QS);
   expect('index.html', 'title version', capture(indexHtml, /<title>DungeonDex v([^<]+)<\/title>/), VISIBLE_BUILD);

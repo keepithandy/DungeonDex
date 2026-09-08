@@ -57,7 +57,7 @@ If a listed document is missing, continue safely and report that it was not pres
 ## Version Authority
 
 - Always check `VERSION.md` before changing any version number.
-- `VERSION.md` is the source of truth for the current public version, local package version, development target, build/cache label, and hotfix naming.
+- `VERSION.md` is the source of truth for the current release candidate/local package version, development target, build/cache label, deployment status, and hotfix naming.
 - `docs/VERSION_CACHE_AUTHORITY.md` defines the propagation flow but does not replace `VERSION.md` as authority.
 - Do not trust old release notes, old zip filenames, cached build labels, package names, old patch logs, historical comments, or stale issue text as the current version.
 - Do not bump the version unless the user explicitly asks.

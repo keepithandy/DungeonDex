@@ -1,6 +1,6 @@
 # DungeonDex v1.29.0 Drowned Reliquary — Local Release Candidate
 
-**Status:** verified locally; deliberately not published, uploaded, tagged, committed, or pushed.
+**Status:** verified and committed locally on main as a8f5b0f; deliberately not published, uploaded, tagged, or pushed.
 
 ## Release baseline and package alignment
 

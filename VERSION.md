@@ -1,9 +1,6 @@
 # DungeonDex Version Authority
 
-## Current Public/Live Version
-v1.29.0 Drowned Reliquary
-
-## Current Local Package Version
+## Current Release Candidate / Local Package Version
 v1.29.0 Drowned Reliquary
 
 ## Current Development Target
@@ -12,11 +9,15 @@ v1.29.0 Drowned Reliquary
 ## Current Build/Cache Label
 1.29.0-drowned-reliquary
 
+## Public Itch Deployment Status
+The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.29.0 candidate is local only until an explicitly authorized upload.
+
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.
 - Do not infer the current version from old release notes.
 - Do not infer the current version from zip/package filenames.
 - Do not infer the current version from patch-log history.
+- Do not infer deployment status from local version labels or package filenames.
 - Do not bump the version unless the user explicitly asks.
 - If version strings conflict, report the conflict before changing anything.
 - Keep the visible player-facing game label short, like: DungeonDex v1.4.17

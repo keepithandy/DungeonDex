@@ -8,10 +8,10 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Public/live itch version: `v1.29.0 Drowned Reliquary`
-* Current local package baseline: `v1.29.0 Drowned Reliquary`
+* Current release candidate/local package baseline: `v1.29.0 Drowned Reliquary`
 * Current development target: `v1.29.0 Drowned Reliquary`
 * Current build/cache label: `1.29.0-drowned-reliquary`
+* Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.

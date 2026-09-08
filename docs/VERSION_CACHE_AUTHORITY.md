@@ -4,9 +4,10 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Public version: `v1.29.0 Drowned Reliquary`
+- Release candidate and local package version: v1.29.0 Drowned Reliquary
 - Visible semantic version: `1.29.0`
 - Build/cache slug: `1.29.0-drowned-reliquary`
+- Public deployment status: pending explicit upload; the observed hosted runtime is v1.28.2 and the latest downloadable package is v1.27.
 
 The authorized v1.29.0 release-candidate pass aligns release records and runtime labels. The resulting ZIP remains an output, not version authority.
 
@@ -14,7 +15,7 @@ The authorized v1.29.0 release-candidate pass aligns release records and runtime
 
 ```text
 VERSION.md
-  -> public/local/development release value
+  -> release-candidate/local/development release value
   -> visible semantic version + build/cache slug
   -> browser/runtime labels and asset queries
   -> service-worker cache name and manifest entries
@@ -22,8 +23,8 @@ VERSION.md
   -> versioned package-builder filename derivation when packaging is explicitly requested
 ```
 
-1. `VERSION.md` owns the current public/live version, local package version, development target, and build/cache slug.
-2. The three release values must agree for a completed version pass. The visible label uses only `DungeonDex v<semantic-version>`.
+1. `VERSION.md` owns the current release-candidate/local package version, development target, build/cache slug, and public-deployment status.
+2. The release-candidate, local package, and development values must agree for a completed version pass. Public deployment may intentionally lag until upload is authorized. The visible label uses only `DungeonDex v<semantic-version>`.
 3. Runtime and cache files mirror the semantic version and slug; they do not become competing authorities.
 4. The focused smoke reads the authority, reports every mismatch by file and field, and verifies the service-worker asset manifest.
 5. The versioned package builder derives its output name from the authority only when packaging is separately authorized. Generic builders retain a generic filename and never contribute version data. Editing or validating source does not imply that a package should be created.
@@ -34,7 +35,7 @@ VERSION.md
 |---|---|
 | `VERSION.md` | Sole source for the long release value, visible semantic version, and build/cache slug. |
 | `README.md` | Mirrors the short current baseline for readers. |
-| `CHANGELOG.md` | Mirrors the three current version pointers and records the permanent release entry. Historical entries remain unchanged. |
+| `CHANGELOG.md` | Mirrors the current candidate, local-package, development, and public-deployment pointers and records the permanent release entry. Historical entries remain unchanged. |
 | `docs/status/CURRENT_NOTES.md` | Mirrors the current baseline and records the active build/cache slug. |
 | `index.html` | Mirrors the short title/H1, `DUNGEONDEX_BUILD`, `DUNGEONDEX_BUILD_QS`, and every direct script/stylesheet `?build=` query. |
 | `app.js` | Mirrors the runtime pointer, `DUNGEONDEX_BUILD`, `DUNGEONDEX_BUILD_QS`, and loader fallback slug. |
