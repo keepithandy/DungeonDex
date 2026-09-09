@@ -86,6 +86,14 @@
     var shortcut = TOWN_SHORTCUTS.find(function(entry){ return entry.key === key; });
     return shortcut ? document.querySelector(shortcut.selector) : null;
   }
+  function openTownSection(key){
+    var sectionKey = key === 'elite' ? 'board' : key;
+    var fold = document.querySelector('[data-town-section="' + sectionKey + '"]');
+    if (!fold || fold.tagName !== 'DETAILS') return;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-town-section]'), function(candidate){
+      candidate.open = candidate === fold;
+    });
+  }
   function closeTownShortcuts(nav, focusTown){
     var menuState = nav && nav.__ddxTownShortcutMenu;
     if (!menuState) return;
@@ -135,6 +143,7 @@
     if (isTouchNav()) setNavOpen(nav, false);
     window.setTimeout(function(){
       var townScreen = document.getElementById('screen-town');
+      openTownSection(key);
       var target = townShortcutTarget(key);
       if (!townScreen || !townScreen.classList.contains('active') || !target) return;
       target.setAttribute('tabindex', '-1');

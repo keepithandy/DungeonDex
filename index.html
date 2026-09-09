@@ -366,12 +366,21 @@
 
           <section class="panel ddx-contract-card ddx-debt-card" id="debtCollectorPanel" aria-label="Debt Pressure" role="region"></section>
 
-          <div class="grid-2 ddx-merchant-pair">
-            <section class="panel ddx-merchant-card ddx-merchant-ledger" id="merchantPanel" aria-label="Merchant Ledger" role="region"></section>
-            <section class="panel ddx-merchant-card ddx-forge-counter" id="forgePanel" aria-label="Forge Counter" role="region"></section>
+          <div class="grid-2 ddx-merchant-pair town-section-fold-pair" aria-label="Town commerce">
+            <details class="town-section-fold" data-town-section="market">
+              <summary>Market</summary>
+              <section class="panel ddx-merchant-card ddx-merchant-ledger" id="merchantPanel" aria-label="Merchant Ledger" role="region"></section>
+            </details>
+            <details class="town-section-fold" data-town-section="forge">
+              <summary>Forge</summary>
+              <section class="panel ddx-merchant-card ddx-forge-counter" id="forgePanel" aria-label="Forge Counter" role="region"></section>
+            </details>
           </div>
 
-          <section class="panel ddx-notice-board ddx-quest-board" id="questPanel" aria-label="Town Notice Board" role="region"></section>
+          <details class="town-section-fold" data-town-section="board">
+            <summary>Board</summary>
+            <section class="panel ddx-notice-board ddx-quest-board" id="questPanel" aria-label="Town Notice Board" role="region"></section>
+          </details>
         </div>
       </section>
 
