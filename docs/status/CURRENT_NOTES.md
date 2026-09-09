@@ -17,6 +17,12 @@
 - Town, the Notice Board’s existing in-band contract briefing, Archive, Guild Journal, extraction receipt, replay depth, and Trophy Echo-only Revisit surface remain connected through existing records and routes. No new Revisit lane, save field, claim, farming loop, or entry route was added.
 - Focused event/save and existing Reliquary smoke coverage now protect entry, event choices, D40 finale, gear identity, old-save loading, reload of a pending finale, chapter extraction/replay, Journal/Archive/Town presentation, and Trophy Echo isolation. See `DROWNED_RELIQUARY_CHAPTER_RC_V1290.md` for final candidate evidence.
 
+## Unreleased local spellbook work
+- The current source adds a level-gated combat spellbook without changing version or cache labels: Ashburst at level 1, Cinder Ward at level 4, Ruin Lance at level 8, and Grave Mend at level 12.
+- The existing Spell slot remains one of the four combat actions. Tap casts the selected spell; hold opens its spellbook, and choosing an unlocked spell casts it immediately. Keyboard users can open the spellbook with Arrow Down or F4 while the Spell action is focused.
+- Selected spells persist safely in player saves. Older, invalid, or level-locked selections recover to Ashburst. No Talent, Revisit, Debt, gear, reward, or dungeon-entry behavior is used or changed by this feature.
+- This is source-only work. The existing v1.29.0 package remains unchanged and must not be rebuilt or replaced before v1.30.
+
 ## v1.28.2 Loadout Polish (Historical Development)
 <!-- Active integration work retains this version; historical notes below are preserved. -->
 - Journal/world reaction and automated release-candidate preparation are source-complete; feature scope is frozen. Town and Guild Journal derive read-only Reliquary acknowledgements from existing trophy, located-contract, identified-gear and retained-run evidence. New location text uses Floor/Room/Chapter, and the latest-return raw-depth label, Journal currency markup and legacy-summary mutation were corrected. Release hardening also repairs the standalone gear test and protects scrolling Journal text from the fixed drawer handle. See `RELIQUARY_JOURNAL_WORLD_REACTION.md` and `RELEASE_CANDIDATE_V128.md` for acceptance and final evidence.

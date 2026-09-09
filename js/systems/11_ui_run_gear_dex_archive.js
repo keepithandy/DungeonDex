@@ -350,6 +350,19 @@
       return;
     }
 
+    const spellbook = combatSpellbook(S);
+    const selectedSpell = spellbook.selected;
+    const spellOptions = spellbook.spells.map(spell => {
+      const locked = !spell.unlocked;
+      const stateLabel = locked ? `Unlocks at Level ${spell.unlockLevel}` : spell.selected ? 'Selected' : `${spell.emberCost} Ember`;
+      return `
+        <button class="combat-spell-option ${spell.selected ? 'is-selected' : ''}" type="button" role="menuitem" data-spell-select="${escapeHtml(spell.id)}" ${locked ? 'disabled aria-disabled="true"' : ''} aria-label="${escapeHtml(spell.name)} — ${escapeHtml(locked ? `unlocks at level ${spell.unlockLevel}` : spell.detail)}">
+          <span class="combat-spell-option-name">${escapeHtml(spell.name)}</span>
+          <span class="combat-spell-option-detail">${escapeHtml(spell.detail)}</span>
+          <span class="combat-spell-option-state">${escapeHtml(stateLabel)}</span>
+        </button>`;
+    }).join('');
+
     combatPanel.innerHTML = `
       <div class="combat-device-shell ${shellTone}" aria-label="Combat screen">
         <section class="combat-enemy-header ${personalityClass} ${isActiveContractTarget ? 'contract-target-header' : ''}">
@@ -407,9 +420,14 @@
           ${statBox('LCK', d.luck)}
         </section>
 
+        <section id="combatSpellMenu" class="combat-spell-menu" role="menu" aria-label="Choose a combat spell" hidden>
+          <div class="combat-spell-menu-heading"><span>Spellbook</span><strong>Level ${format(spellbook.level)}</strong></div>
+          <div class="combat-spell-option-list">${spellOptions}</div>
+        </section>
+
         <section class="combat-device-actions" aria-label="Combat actions">
           <button class="primary combat-btn attack-btn" data-action="attack" aria-label="Attack enemy">Attack</button>
-          <button class="ghost combat-btn skill-btn" data-action="skill" aria-label="Use Ashburst skill">Ashburst</button>
+          <button class="ghost combat-btn skill-btn" data-action="skill" data-spell-button aria-haspopup="menu" aria-controls="combatSpellMenu" aria-expanded="false" aria-label="Cast ${escapeHtml(selectedSpell.name)} for ${format(selectedSpell.emberCost)} Ember. Hold to choose a spell, or press Arrow Down.">${escapeHtml(selectedSpell.name)}</button>
           <button class="ghost combat-btn guard-btn" data-action="guard" aria-label="Guard and recover HP">Guard</button>
           <button class="ghost combat-btn danger-btn extract-btn" data-action="extract" aria-label="Attempt to extract from the Hollow Stair">Extract</button>
         </section>

@@ -63,6 +63,7 @@
    * @property {number} level
    * @property {number} xp
    * @property {number} xpNext
+   * @property {string} [selectedSpellId]
    * @property {number} hp
    * @property {number} maxHp
    * @property {Currency} gold
@@ -117,6 +118,29 @@
   const INTRO_MODAL_SESSION_KEY = 'dungeondex_intro_v130_seen';
   const VALID_SCREENS = ['town','run','gear','dex','archive'];
   const CORE_COMBAT_ACTIONS = ['attack','guard','skill','extract'];
+  const COMBAT_SPELLS = Object.freeze([
+    Object.freeze({ id:'ashburst', name:'Ashburst', unlockLevel:1, emberCost:1, detail:'A searing strike that returns a little health.' }),
+    Object.freeze({ id:'cinder_ward', name:'Cinder Ward', unlockLevel:4, emberCost:1, detail:'Raise a stronger ward and recover a little health.' }),
+    Object.freeze({ id:'ruin_lance', name:'Ruin Lance', unlockLevel:8, emberCost:2, detail:'Drive a heavy lance through the target.' }),
+    Object.freeze({ id:'grave_mend', name:'Grave Mend', unlockLevel:12, emberCost:2, detail:'Restore a large measure of health beneath a thin ward.' })
+  ]);
+  const DEFAULT_COMBAT_SPELL_ID = COMBAT_SPELLS[0].id;
+  const COMBAT_SPELL_HOLD_MS = 420;
+
+  function combatSpellById(value) {
+    const id = String(value || '').trim();
+    return COMBAT_SPELLS.find(spell => spell.id === id) || COMBAT_SPELLS[0];
+  }
+
+  function combatSpellUnlocked(spell, level) {
+    return Math.max(1, Math.floor(numberOr(level, 1, 1, 999))) >= Math.max(1, Math.floor(numberOr(spell?.unlockLevel, 1, 1, 999)));
+  }
+
+  function normalizeSelectedCombatSpell(value, level) {
+    const spell = combatSpellById(value);
+    return combatSpellUnlocked(spell, level) ? spell.id : DEFAULT_COMBAT_SPELL_ID;
+  }
+
   const DEFAULT_PLAYER_STATS = Object.freeze({ power: 8, guard: 6, wit: 5, luck: 4, speed: 5 });
   const SLOT_ORDER = ['weapon','offhand','helm','armor','gloves','boots','ring','amulet','cloak','charm'];
   const INVENTORY_SORTS = ['power','level','rarity','value','slot','newest'];

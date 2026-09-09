@@ -168,21 +168,25 @@
       btn.onpointerdown = handler;
     });
 
+    const runCombatAction = (btn, action, forceSave = false) => {
+      if (!hasActiveCombat(S) || !CORE_COMBAT_ACTIONS.includes(action)) return;
+      btn.classList.add('tap-now');
+      window.setTimeout(() => btn.classList.remove('tap-now'), 90);
+      runCombatGuardedAction(() => {
+        const result = combatAction(S, action) || {};
+        if (result.fullRender || !S.run.active) {
+          render();
+        } else {
+          renderCombatTick(forceSave || !!result.saveNow);
+        }
+      });
+    };
+
     $$('[data-action]').forEach(btn => {
+      if (btn.dataset.action === 'skill') return;
       const handler = (e) => {
         if (e) e.preventDefault();
-        const action = btn.dataset.action;
-        if (!hasActiveCombat(S) || !CORE_COMBAT_ACTIONS.includes(action)) return;
-        btn.classList.add('tap-now');
-        window.setTimeout(() => btn.classList.remove('tap-now'), 90);
-        runCombatGuardedAction(() => {
-          const result = combatAction(S, action) || {};
-          if (result.fullRender || !S.run.active) {
-            render();
-          } else {
-            renderCombatTick(!!result.saveNow);
-          }
-        });
+        runCombatAction(btn, btn.dataset.action);
       };
       const canAct = hasActiveCombat(S) && CORE_COMBAT_ACTIONS.includes(btn.dataset.action);
       btn.disabled = !canAct;
@@ -191,6 +195,98 @@
         handler(e);
       };
       btn.onpointerdown = handler;
+    });
+
+    const spellButton = document.querySelector('[data-spell-button]');
+    const spellMenu = el('combatSpellMenu');
+    const spellOptions = $$('[data-spell-select]');
+    if (!spellButton || !spellMenu) return;
+
+    let spellHoldTimer = 0;
+    let spellMenuOpened = false;
+    const clearSpellHold = () => {
+      if (!spellHoldTimer) return;
+      window.clearTimeout(spellHoldTimer);
+      spellHoldTimer = 0;
+    };
+    const closeSpellMenu = () => {
+      clearSpellHold();
+      spellMenu.hidden = true;
+      spellMenuOpened = false;
+      spellButton.setAttribute('aria-expanded', 'false');
+    };
+    const openSpellMenu = () => {
+      if (!hasActiveCombat(S)) return;
+      clearSpellHold();
+      spellMenu.hidden = false;
+      spellMenuOpened = true;
+      spellButton.setAttribute('aria-expanded', 'true');
+    };
+    const castSelectedSpell = () => {
+      closeSpellMenu();
+      runCombatAction(spellButton, 'skill');
+    };
+    const releaseSpellPointer = event => {
+      if (event?.pointerId != null && spellButton.hasPointerCapture?.(event.pointerId)) {
+        try { spellButton.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
+    };
+
+    spellButton.disabled = !hasActiveCombat(S);
+    spellButton.onpointerdown = event => {
+      if (event?.button != null && event.button !== 0) return;
+      if (!hasActiveCombat(S)) return;
+      event?.preventDefault();
+      spellMenuOpened = false;
+      if (event?.pointerId != null) {
+        try { spellButton.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+      clearSpellHold();
+      spellHoldTimer = window.setTimeout(openSpellMenu, COMBAT_SPELL_HOLD_MS);
+    };
+    spellButton.onpointerup = event => {
+      if (!hasActiveCombat(S)) return;
+      event?.preventDefault();
+      releaseSpellPointer(event);
+      const wasTap = !!spellHoldTimer;
+      clearSpellHold();
+      if (wasTap && !spellMenuOpened) castSelectedSpell();
+    };
+    spellButton.onpointercancel = event => {
+      event?.preventDefault();
+      releaseSpellPointer(event);
+      clearSpellHold();
+    };
+    spellButton.onclick = event => {
+      if (event && event.detail !== 0) return;
+      event?.preventDefault();
+      castSelectedSpell();
+    };
+    spellButton.onkeydown = event => {
+      if (event.key === 'ArrowDown' || event.key === 'F4') {
+        event.preventDefault();
+        openSpellMenu();
+        spellOptions.find(option => !option.disabled)?.focus();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        closeSpellMenu();
+      }
+    };
+    spellOptions.forEach(option => {
+      option.onclick = event => {
+        event.preventDefault();
+        if (option.disabled) return;
+        const choice = selectCombatSpell(S, option.dataset.spellSelect);
+        if (!choice.ok) return;
+        closeSpellMenu();
+        runCombatAction(spellButton, 'skill', true);
+      };
+      option.onkeydown = event => {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        closeSpellMenu();
+        spellButton.focus();
+      };
     });
   }
 

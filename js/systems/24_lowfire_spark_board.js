@@ -202,7 +202,7 @@
       <div class="spark-source-strip">
         <span><b>Forge Spark</b><br>Earn from elite, boss, extraction, salvage, and temper board work.</span>
         <span><b>Shards</b><br>Dropped by fights and gained by salvaging junk gear.</span>
-        <span><b>Ember</b><br>Bosses, events, and deeper runs. Spent on Ashburst and focused forging.</span>
+        <span><b>Ember</b><br>Bosses, events, and deeper runs. Spent on combat spells and focused forging.</span>
         <span><b>Favor</b><br>Forge reputation from crafting, salvage, and tempering.</span>
       </div>
       <div class="warden-ledger">

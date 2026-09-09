@@ -828,6 +828,7 @@
     state.player.level = Math.floor(numberOr(state.player.level, 1, 1, 999));
     state.player.xp = Math.floor(numberOr(state.player.xp, 0, 0, Number.MAX_SAFE_INTEGER));
     state.player.xpNext = Math.floor(numberOr(state.player.xpNext, 100, 1, Number.MAX_SAFE_INTEGER));
+    state.player.selectedSpellId = normalizeSelectedCombatSpell(savedPlayer.selectedSpellId, state.player.level);
     state.player.maxHp = Math.floor(numberOr(state.player.maxHp, base.player.maxHp, 1, 999999));
     state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
     state.player.gold = Math.floor(numberOr(state.player.gold, base.player.gold, 0, Number.MAX_SAFE_INTEGER));

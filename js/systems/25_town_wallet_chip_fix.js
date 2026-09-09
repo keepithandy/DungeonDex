@@ -34,7 +34,7 @@
       <span title="Coins pay for rest, market gear, board shuffles, and repairs.">Coin ${compactCoin(player.gold || 0)}</span>
       <span title="Forge Spark is earned from Lowfire Board work and spent on relic crafts.">Spark ${shortNumber(player.forgeSpark || 0)}</span>
       <span title="Shards come from fights and salvaging gear. Used for crafting and tempering.">Shards ${shortNumber(player.shards || 0)}</span>
-      <span title="Ember comes from bosses, events, and deeper runs. Used for Ashburst and focused forge work.">Ember ${shortNumber(player.ember || 0)}</span>
+      <span title="Ember comes from bosses, events, and deeper runs. Used for combat spells and focused forge work.">Ember ${shortNumber(player.ember || 0)}</span>
       <span title="Favor rises from forge work and raises Forge Tier.">Favor ${shortNumber(town.relicFavor || 0)}</span>
     </div>`;
   }

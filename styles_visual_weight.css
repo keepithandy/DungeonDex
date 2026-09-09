@@ -720,6 +720,57 @@ button[aria-disabled="true"] {
   }
 }
 
+/* Level-gated spell selection stays inside the combat flow and leaves the four action slots intact. */
+.combat-spell-menu[hidden] { display: none !important; }
+.app-shell.combat-active .combat-spell-menu {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid rgba(177, 131, 255, 0.34);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(45, 30, 72, 0.9), rgba(21, 18, 32, 0.96));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+.combat-spell-menu-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(240, 227, 255, 0.92);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.combat-spell-menu-heading strong { color: #d9c5ff; font-size: 0.72rem; }
+.combat-spell-option-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.combat-spell-option {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  min-height: 68px;
+  padding: 9px;
+  border: 1px solid rgba(203, 175, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(244, 238, 255, 0.95);
+  text-align: left;
+}
+.combat-spell-option:not(:disabled):hover,
+.combat-spell-option:not(:disabled):focus-visible,
+.combat-spell-option.is-selected {
+  border-color: rgba(213, 174, 255, 0.72);
+  background: rgba(164, 111, 255, 0.2);
+}
+.combat-spell-option:disabled { cursor: not-allowed; opacity: 0.5; }
+.combat-spell-option-name { font-weight: 800; }
+.combat-spell-option-detail { color: rgba(228, 215, 244, 0.78); font-size: 0.72rem; line-height: 1.25; }
+.combat-spell-option-state { color: #f0c980; font-size: 0.7rem; font-weight: 800; }
+@media (max-width: 420px) {
+  .combat-spell-option-list { grid-template-columns: 1fr; }
+  .combat-spell-option { min-height: 54px; }
+}
+
 /* v1.28.2 Loadout Polish: compact, touch-safe Gear-tab management. */
 .named-loadouts-panel { display: grid; gap: 12px; }
 .named-loadout-head, .named-loadout-card-head, .named-loadout-create { display: flex; gap: 10px; align-items: center; justify-content: space-between; }

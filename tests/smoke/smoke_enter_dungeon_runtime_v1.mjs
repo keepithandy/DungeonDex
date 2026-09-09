@@ -291,6 +291,74 @@ async function main() {
     record('App does not blank after Enter Dungeon', after.bodyTextLength > 20 && after.saveButtonExists === true && after.tabCount >= 5, JSON.stringify(after));
     record('Run screen appears after Enter Dungeon', after.activeScreen === 'screen-run' && after.runActive === true, JSON.stringify(after));
     record('Run panels render after Enter Dungeon', [after.runStatusText, after.combatPanelText, after.combatLogText].every(text => String(text || '').trim().length > 0), JSON.stringify(after));
+
+    const levelOneSpellbook = await evaluate(client, `(() => {
+      S.player.level = 1;
+      S.player.ember = 4;
+      S.player.selectedSpellId = 'grave_mend';
+      renderCombatTick(true);
+      const options = Array.from(document.querySelectorAll('[data-spell-select]'));
+      const recovered = normalizeSaveShape({ ...S, player: { ...S.player, level: 1, selectedSpellId: 'grave_mend' } });
+      return {
+        selectedSpellId: S.player.selectedSpellId,
+        optionIds: options.map(option => option.dataset.spellSelect),
+        lockedIds: options.filter(option => option.disabled).map(option => option.dataset.spellSelect),
+        recoveredSpellId: recovered.player.selectedSpellId,
+        actionIds: Array.from(document.querySelectorAll('[data-action]')).map(button => button.dataset.action)
+      };
+    })()`);
+    record('Level one spellbook keeps Ashburst selected and locks later spells', levelOneSpellbook.selectedSpellId === 'ashburst' && JSON.stringify(levelOneSpellbook.optionIds) === JSON.stringify(['ashburst', 'cinder_ward', 'ruin_lance', 'grave_mend']) && JSON.stringify(levelOneSpellbook.lockedIds) === JSON.stringify(['cinder_ward', 'ruin_lance', 'grave_mend']), JSON.stringify(levelOneSpellbook));
+    record('Legacy or locked spell selections safely recover to Ashburst', levelOneSpellbook.recoveredSpellId === 'ashburst', JSON.stringify(levelOneSpellbook));
+    record('Spellbook preserves the four combat action slots', JSON.stringify(levelOneSpellbook.actionIds) === JSON.stringify(['attack', 'skill', 'guard', 'extract']), JSON.stringify(levelOneSpellbook));
+
+    const spellHoldStarted = await evaluate(client, `(() => {
+      S.player.level = 12;
+      S.player.ember = 6;
+      S.player.hp = Math.max(1, Math.floor(S.player.maxHp * 0.15));
+      S.player.selectedSpellId = 'ashburst';
+      renderCombatTick(true);
+      const spellButton = document.querySelector('[data-spell-button]');
+      spellButton?.onpointerdown?.({ button: 0, pointerId: 1, preventDefault() {} });
+      return !!spellButton;
+    })()`);
+    await sleep(540);
+    const spellMenuState = await evaluate(client, `(() => ({
+      opened: document.getElementById('combatSpellMenu')?.hidden === false,
+      unlockedCount: Array.from(document.querySelectorAll('[data-spell-select]')).filter(option => !option.disabled).length
+    }))()`);
+    const selectedSpell = await evaluate(client, `(() => {
+      document.querySelector('[data-spell-select="grave_mend"]')?.click();
+      return {
+        selectedSpellId: S.player.selectedSpellId,
+        ember: S.player.ember,
+        graveMendLogged: (S.run.combatLog || []).some(line => String(line).startsWith('Grave Mend restores ')),
+        menuHiddenAfterChoice: document.getElementById('combatSpellMenu')?.hidden === true
+      };
+    })()`);
+    record('Holding the spell action opens all level-twelve spells and casts the chosen spell', spellHoldStarted === true && spellMenuState.opened === true && spellMenuState.unlockedCount === 4 && selectedSpell.selectedSpellId === 'grave_mend' && selectedSpell.ember === 4 && selectedSpell.graveMendLogged === true && selectedSpell.menuHiddenAfterChoice === true, JSON.stringify({ spellHoldStarted, spellMenuState, selectedSpell }));
+
+    const spellEffects = await evaluate(client, `(() => {
+      S.player.level = 12;
+      S.player.hp = S.player.maxHp;
+      S.player.ember = 5;
+      S.run.active = true;
+      S.run.floor = 1;
+      S.run.event = null;
+      S.run.combatLog = [];
+      S.run.monster = { name: 'Spellbook Fixture', hp: 999, maxHp: 999, power: 1, guard: 1, tier: 'Common', level: 1 };
+      S.player.selectedSpellId = 'cinder_ward';
+      combatAction(S, 'skill');
+      const cinder = { ember: S.player.ember, logged: (S.run.combatLog || []).some(line => String(line).startsWith('Cinder Ward absorbs ')) };
+      S.player.ember = 4;
+      S.run.combatLog = [];
+      const hpBeforeRuin = S.run.monster.hp;
+      S.player.selectedSpellId = 'ruin_lance';
+      combatAction(S, 'skill');
+      const ruin = { ember: S.player.ember, dealt: hpBeforeRuin - S.run.monster.hp, logged: (S.run.combatLog || []).some(line => String(line).startsWith('Ruin Lance hits for ')) };
+      return { cinder, ruin };
+    })()`);
+    record('Cinder Ward and Ruin Lance spend their intended Ember and resolve in combat', spellEffects.cinder.ember === 4 && spellEffects.cinder.logged === true && spellEffects.ruin.ember === 2 && spellEffects.ruin.dealt > 0 && spellEffects.ruin.logged === true, JSON.stringify(spellEffects));
+
     record('No uncaught click-time console/runtime errors', runtimeExceptions.length === 0 && consoleIssues.length === 0 && networkFailures.length === 0, JSON.stringify({ runtimeExceptions, consoleIssues, networkFailures }));
 
     const diagnostics = { pageUrl, before, clickResult, after, runtimeExceptions, consoleIssues, networkFailures, results };

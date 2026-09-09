@@ -507,6 +507,33 @@
     return Math.max(1, Math.round((offense * swing) - defense * 0.33 + rand(-4, 5)));
   }
 
+  function combatSpellbook(state) {
+    const player = state?.player || {};
+    const level = Math.max(1, Math.floor(numberOr(player.level, 1, 1, 999)));
+    const selectedSpellId = normalizeSelectedCombatSpell(player.selectedSpellId, level);
+    if (state?.player) state.player.selectedSpellId = selectedSpellId;
+    const selected = combatSpellById(selectedSpellId);
+    return {
+      level,
+      selected,
+      spells: COMBAT_SPELLS.map(spell => ({
+        ...spell,
+        unlocked: combatSpellUnlocked(spell, level),
+        selected: spell.id === selected.id
+      }))
+    };
+  }
+
+  function selectCombatSpell(state, spellId) {
+    if (!state?.player) return { ok:false, reason:'missing_player', spell:combatSpellById(DEFAULT_COMBAT_SPELL_ID) };
+    const requested = COMBAT_SPELLS.find(spell => spell.id === String(spellId || '').trim());
+    const spellbook = combatSpellbook(state);
+    if (!requested) return { ok:false, reason:'unknown_spell', spell:spellbook.selected };
+    if (!combatSpellUnlocked(requested, spellbook.level)) return { ok:false, reason:'locked', spell:spellbook.selected };
+    state.player.selectedSpellId = requested.id;
+    return { ok:true, reason:'selected', spell:requested };
+  }
+
   function combatAction(state, action) {
     const result = { saveNow: false, fullRender: false };
     ensureRunShell(state);
@@ -554,16 +581,36 @@
       if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractGuard) window.DungeonDexEliteContracts.markEliteContractGuard(state);
       pushCombat(state, `You brace and recover ${recovered} HP.`);
     } else if (action === 'skill') {
-      if (state.player.ember <= 0) {
-        pushCombat(state, 'No ember left. Ashburst fizzles.');
+      const spell = combatSpellbook(state).selected;
+      const emberCost = Math.max(0, Math.floor(numberOr(spell.emberCost, 0, 0, 99)));
+      if (state.player.ember < emberCost) {
+        if (spell.id === 'ashburst') pushCombat(state, 'No ember left. Ashburst fizzles.');
+        else pushCombat(state, `Need ${emberCost} Ember. ${spell.name} fizzles.`);
       } else {
-        state.player.ember -= 1;
-        const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
-        const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
-        monster.hp -= dealt;
-        const siphon = Math.max(1, Math.round(stats.wit * 0.18));
-        state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
-        pushCombat(state, `Ashburst hits for ${dealt} and returns ${siphon} HP.`);
+        state.player.ember -= emberCost;
+        if (spell.id === 'cinder_ward') {
+          playerShield = Math.round(stats.guard * 1.65 + stats.wit * 0.5);
+          const recovered = Math.max(1, Math.round(stats.guard * 0.14 + stats.wit * 0.08));
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+          pushCombat(state, `Cinder Ward absorbs ${playerShield} and restores ${recovered} HP.`);
+        } else if (spell.id === 'ruin_lance') {
+          const skillSwing = 2.1 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
+          const dealt = damageRoll(stats.power + stats.wit * 0.9, monster.guard * 0.45, skillSwing);
+          monster.hp -= dealt;
+          pushCombat(state, `Ruin Lance hits for ${dealt}.`);
+        } else if (spell.id === 'grave_mend') {
+          playerShield = Math.round(stats.guard * 0.35);
+          const recovered = Math.max(5, Math.round(state.player.maxHp * 0.22 + stats.wit * 0.2));
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+          pushCombat(state, `Grave Mend restores ${recovered} HP beneath a ${playerShield} ward.`);
+        } else {
+          const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
+          const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
+          monster.hp -= dealt;
+          const siphon = Math.max(1, Math.round(stats.wit * 0.18));
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
+          pushCombat(state, `Ashburst hits for ${dealt} and returns ${siphon} HP.`);
+        }
       }
     } else if (action === 'extract') {
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);

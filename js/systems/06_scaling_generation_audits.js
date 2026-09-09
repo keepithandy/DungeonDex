@@ -315,6 +315,7 @@
         level: 1,
         xp: 0,
         xpNext: 100,
+        selectedSpellId: DEFAULT_COMBAT_SPELL_ID,
         hp: 100,
         maxHp: 100,
         gold: coins(0, 12, 50),
