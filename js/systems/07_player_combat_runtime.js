@@ -1647,6 +1647,7 @@
     const idx = state.player.inventory.findIndex(x => x.id === id);
     if (idx === -1) return 0;
     const item = state.player.inventory[idx];
+    if (!canSellAllGearItem(state, item)) return 0;
     const bonusUsed = ensureGoldSinkState(state).junkSaleBonusCharges > 0 && isJunkSaleBonusItem(item);
     const paid = sellValueWithGoldSink(state, item, true);
     consumeJunkSaleBonus(state, bonusUsed);

@@ -3395,7 +3395,44 @@
     return Object.values(state.player.equipment).some(equipped => equipped && (equipped === item || equipped.id === item.id));
   }
 
+  function itemInNamedLoadout(state, item) {
+    return !!item?.id && asArray(state.player?.namedLoadouts, []).some(loadout =>
+      asArray(loadout?.items, []).some(entry => entry?.itemId === item.id));
+  }
+
+  function itemProtectionReason(state, item) {
+    if (!item) return 'Unavailable';
+    const tags = asArray(item.tags, []).map(tag => String(tag).toLowerCase());
+    if (item.kind === 'special' || tags.includes('special')) return 'Special';
+    if (item.locked) return 'Locked';
+    if (item.favorite) return 'Favorite';
+    if (item.protected || tags.includes('protected')) return 'Protected';
+    if (itemIsEquipped(state, item)) return 'Equipped';
+    if (itemInNamedLoadout(state, item)) return 'In loadout';
+    return '';
+  }
+
+  function itemMarkedJunk(item) {
+    return asArray(item?.tags, []).some(tag => String(tag).toLowerCase() === 'junk')
+      || item?.junk === true || item?.isJunk === true || item?.markedJunk === true;
+  }
+
+  function toggleInventoryFlag(state, id, flag) {
+    const item = asArray(state.player?.inventory, []).find(entry => entry?.id === id);
+    if (!item || !['locked', 'junk'].includes(flag)) return false;
+    if (flag === 'locked') item.locked = !item.locked;
+    else {
+      const marked = itemMarkedJunk(item);
+      item.tags = asArray(item.tags, []).filter(tag => String(tag).toLowerCase() !== 'junk');
+      item.junk = !marked;
+      item.isJunk = false;
+      item.markedJunk = false;
+    }
+    return true;
+  }
+
   function canQuickSellItem(state, item) {
+    if (itemProtectionReason(state, item)) return false;
     if (!item || item.kind === 'special') return false;
     if (item.locked || item.favorite || item.protected) return false;
     const tags = asArray(item.tags, []).map(tag => String(tag).toLowerCase());
@@ -3407,6 +3444,7 @@
   }
 
   function canSellAllGearItem(state, item) {
+    if (itemProtectionReason(state, item)) return false;
     if (!item || item.kind === 'special') return false;
     if (!item.slot) return false;
     if (item.locked || item.favorite || item.protected) return false;
@@ -3417,6 +3455,7 @@
   }
 
   function canRetireInventoryItem(state, item) {
+    if (itemProtectionReason(state, item)) return false;
     if (!item || item.kind === 'special') return false;
     if (!item.slot) return false;
     if (item.locked || item.favorite || item.protected) return false;
@@ -3497,6 +3536,19 @@
     if (!used) return;
     const sink = ensureGoldSinkState(state);
     sink.junkSaleBonusCharges = Math.max(0, Math.floor(numberOr(sink.junkSaleBonusCharges, 0, 0, 3)) - 1);
+  }
+
+  function bulkSalePreview(state, junkOnly = false) {
+    const inventory = asArray(state.player?.inventory, []);
+    const eligible = junkOnly ? canQuickSellItem : canSellAllGearItem;
+    const items = inventory.filter(item => eligible(state, item));
+    // Calculate against a copy: previews must not normalize or spend live charges.
+    const pricingState = { player: { ...state.player, goldSink: { ...state.player.goldSink } } };
+    return {
+      count: items.length,
+      paid: items.reduce((total, item) => total + sellValueWithGoldSink(pricingState, item, true), 0),
+      protectedCount: inventory.filter(item => !!itemProtectionReason(state, item)).length
+    };
   }
 
   function validateEliteContractsEnv() {

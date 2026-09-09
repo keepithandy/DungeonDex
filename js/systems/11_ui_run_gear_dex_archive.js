@@ -633,7 +633,9 @@
     if (delta > 0) badges.push(`<span class="gear-status-badge better">Better +${format(delta)}</span>`);
     const setDef = getMythicSetDefinition(getItemSetId(item));
     if (setDef) badges.push(`<span class="gear-status-badge set">${escapeHtml(setDef.name)}</span>`);
-    if (canQuickSellItem(S, item)) badges.push('<span class="gear-status-badge junk">Junk</span>');
+    if (itemMarkedJunk(item)) badges.push('<span class="gear-status-badge junk">Junk</span>');
+    if (item.locked) badges.push('<span class="gear-status-badge">Locked</span>');
+    if (itemInNamedLoadout(S, item)) badges.push('<span class="gear-status-badge">In loadout</span>');
     const memoryBadges = gearMemoryBadges(item);
     if (memoryBadges) badges.push(memoryBadges);
     return badges.join('');
@@ -738,7 +740,7 @@
     }
 
     filtersPanel.innerHTML = `
-      <div class="filter-head"><h2>Filters</h2><span class="small muted">Inventory</span></div>
+      <div class="filter-head"><h2>Filters</h2><button class="ghost mini" type="button" data-clear-gear-filters="1">Clear Filters</button></div>
       <div class="filter-grid loadout-filter-grid">
         <select id="slotFilter" aria-label="Filter inventory by slot">${['all', ...FUTURE_EQUIPMENT_SLOTS].map(x => `<option value="${escapeHtml(x)}" ${filters.slot===x?'selected':''}>${x === 'all' ? 'All slots' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
         <select id="rarityFilter" aria-label="Filter inventory by rarity">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${escapeHtml(x)}" ${filters.rarity===x?'selected':''}>${x === 'all' ? 'All rarities' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
@@ -762,15 +764,21 @@
     inventoryPanel.classList.add('loadout-inventory-panel');
     const inv = filteredInventory();
     const inventory = asArray(S.player?.inventory, []);
-    const safeSellCount = inventory.filter(item => canQuickSellItem(S, item)).length;
-    const allSellCount = inventory.filter(item => canSellAllGearItem(S, item)).length;
+    const junkPreview = bulkSalePreview(S, true);
+    const allPreview = bulkSalePreview(S);
+    const safeSellCount = junkPreview.count;
+    const allSellCount = allPreview.count;
     const retireCount = inventory.filter(item => canRetireInventoryItem(S, item)).length;
-    const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" title="Sells unequipped gear marked as Junk" ${safeSellCount ? '' : 'disabled'}>Sell Junk</button>`;
-    const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" title="Sells all unequipped sellable gear after one confirmation" ${allSellCount ? '' : 'disabled'}>Sell All</button>`;
-    const retireAllBtn = `<button class="ghost mini tiny-sell-all" id="retireArchiveBtn" title="Manual retirement happens one item at a time from inventory cards." disabled>Retire ${format(retireCount)}</button>`;
+    const sellJunkBtn = `<button class="ghost mini tiny-sell-all" id="sellJunkGearBtn" ${safeSellCount ? '' : 'disabled'}>Sell Junk (${safeSellCount}) · ${formatMoney(junkPreview.paid)}</button>`;
+    const sellAllBtn = `<button class="ghost mini tiny-sell-all danger-sell-all" id="sellAllGearBtn" ${allSellCount ? '' : 'disabled'}>Sell All (${allSellCount}) · ${formatMoney(allPreview.paid)}</button>`;
+    const retireAllBtn = `<span class="small muted">Retire eligible items individually (${format(retireCount)}).</span>`;
+    const emptyMarkup = inventory.length
+      ? '<div class="empty-inventory-card"><strong>No items match these filters</strong><button class="ghost mini" type="button" data-clear-gear-filters="1">Clear Filters</button></div>'
+      : '<div class="empty-inventory-card"><strong>Your inventory is empty</strong><span>Keep delving to find gear.</span></div>';
     inventoryPanel.innerHTML = `
       <div class="split inventory-head loadout-inventory-head"><div><h2>Inventory</h2><p class="small muted inventory-subline">Equip, sell, retire, or filter.</p></div><div class="inventory-actions"><span class="pill item-count-pill">${format(inv.length)} shown</span>${sellJunkBtn}${sellAllBtn}${retireAllBtn}</div></div>
-      <div class="list inventory-list">${inv.map(itemCard).join('') || '<div class="empty-inventory-card"><strong>No matching gear</strong><span>Adjust filters or keep delving.</span></div>'}</div>`;
+      <p class="small muted">Bulk sales cover the entire inventory, including items hidden by filters. ${allPreview.protectedCount} protected items stay, including saved-loadout gear.</p>
+      <div class="list inventory-list">${inv.map(itemCard).join('') || emptyMarkup}</div>`;
   }
 
   function filteredInventory() {
@@ -813,7 +821,7 @@
     const statusBadges = gearStatusBadges(item);
     const setBonusPreview = setBonusPreviewMarkup(item, S, true);
     const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
-    const sellAttrs = itemId ? `data-sell="${safeItemId}"` : 'disabled';
+    const sellAttrs = itemId && canSellAllGearItem(S, item) ? `data-sell="${safeItemId}"` : 'disabled';
     const retireEligible = canRetireInventoryItem(S, item);
     const retireAttrs = itemId && retireEligible ? `data-retire="${safeItemId}"` : 'disabled';
     const retireLabel = retireEligible ? 'Retire' : 'Retire Locked';
@@ -831,7 +839,7 @@
       <p class="small muted inventory-comparison-context">${escapeHtml(comparisonContext)}</p>
       ${summary ? `<p class="small inventory-card-summary">${escapeHtml(summary)}</p>` : ''}
       ${setBonusPreview}
-      <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button><button class="ghost mini retire-item-btn" ${retireAttrs}>${retireLabel}</button></div>
+      <div class="item-actions polished-actions inventory-card-actions"><button class="primary mini" ${equipAttrs}>${delta > 0 ? 'Equip Better' : 'Equip'}</button><button class="ghost mini sell-value-btn" ${sellAttrs}>Sell ${formatMoney(sellValue(item))}</button><button class="ghost mini retire-item-btn" ${retireAttrs}>${retireLabel}</button><button class="ghost mini" type="button" data-gear-flag="locked" data-gear-id="${safeItemId}" aria-pressed="${!!item.locked}">${item.locked ? 'Unlock' : 'Lock'}</button><button class="ghost mini" type="button" data-gear-flag="junk" data-gear-id="${safeItemId}" aria-pressed="${itemMarkedJunk(item)}">${itemMarkedJunk(item) ? 'Unmark Junk' : 'Mark Junk'}</button></div>
     </article>`;
   }
 
@@ -1238,6 +1246,14 @@
 
     el('settingsPanel').innerHTML = `
       <h2>System</h2>
+      <div class="save-transfer-controls">
+        <p class="small">Download a backup to keep your progress or transfer it to another browser.</p>
+        ${typeof saveRecovery !== 'undefined' && saveRecovery.blocked ? '<p class="small" role="alert">Your save could not be loaded. Autosave is paused and the original data is preserved. Export it, import a backup, or choose Start Fresh.</p><button class="ghost mini" id="startFreshSaveBtn" type="button">Start Fresh</button>' : ''}
+        <div class="item-actions"><button class="ghost mini" id="exportSaveBtn" type="button">Export Save</button><button class="ghost mini" id="exportPreviousSaveBtn" type="button">Export Previous Backup</button><button class="ghost mini" id="exportRecoverySaveBtn" type="button">Export Recovery Original</button></div>
+        <label class="small" for="importSaveInput">Import save file (replaces current progress after confirmation)</label>
+        <input id="importSaveInput" type="file" accept=".json,application/json" />
+        <p class="small" role="status" aria-live="polite">${typeof saveTransferNotice !== 'undefined' ? escapeHtml(saveTransferNotice) : ''}</p>
+      </div>
       <p class="small">${escapeHtml(VISIBLE_VERSION_LABEL)}</p>
       <div class="tag-row"><span class="pill">Safe return</span><span class="pill">Hollow Stair</span><span class="pill">Guarded loop</span></div>
       <div class="sep"></div>

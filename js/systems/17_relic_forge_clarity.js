@@ -30,6 +30,8 @@
   }
 
   function canSalvage(state, item){
+    if (typeof window.DungeonDexRelicForge?.canSalvage === 'function') return window.DungeonDexRelicForge.canSalvage(state, item);
+    if ((item?.tags || []).some(tag => ['protected','special'].includes(String(tag).toLowerCase()))) return false;
     if (!item || item.kind === 'special' || equipped(state, item) || item.locked || item.favorite || item.protected) return false;
     const rarity = String(item.rarity || 'common').toLowerCase();
     const tags = Array.isArray(item.tags) ? item.tags : [];

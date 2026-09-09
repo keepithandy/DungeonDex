@@ -250,7 +250,8 @@
   function updateSaveStatus(ok, label = '') {
     const node = el('saveStatus');
     if (!node) return;
-    node.textContent = label || (ok ? 'Saved' : 'Save blocked');
+    node.textContent = label || (typeof saveRecovery !== 'undefined' && saveRecovery.blocked
+      ? 'Save paused · recover in Journal' : ok ? 'Saved' : 'Save blocked');
     node.classList.toggle('save-warn', !ok);
   }
 

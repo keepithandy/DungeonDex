@@ -16,6 +16,7 @@ const selectedTags = args
   .filter(Boolean);
 
 const COMMANDS = [
+  { tag: 'qol', name: 'gear QoL and save recovery', cmd: ['node', 'tests/smoke/smoke_gear_qol_save_recovery.mjs'] },
   { tag: 'syntax', name: 'repository JavaScript syntax', cmd: ['node', 'tools/ddx_smoke_helper.mjs', '--syntax'] },
   { tag: 'syntax', name: 'app syntax', cmd: ['node', '--check', 'app.js'] },
   { tag: 'syntax', name: 'journal syntax', cmd: ['node', '--check', 'js/systems/38_journal_v1.js'] },

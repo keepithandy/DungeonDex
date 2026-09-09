@@ -37,6 +37,8 @@ const PUBLIC_ACTION_ATTRIBUTES = [
   'data-equip',
   'data-sell',
   'data-retire',
+  'data-clear-gear-filters',
+  'data-gear-flag',
   'data-town-route',
   'data-gear-detail-trigger',
   'data-named-loadout-action',

@@ -112,6 +112,18 @@
   }
 
   function bindInventoryActions() {
+    $$('[data-clear-gear-filters]').forEach(btn => btn.onclick = () => {
+      S.filters = { slot:'all', rarity:'all', sort:'power', search:'' };
+      render();
+      el('searchFilter')?.focus();
+    });
+    $$('[data-gear-flag]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      const id = btn.dataset.gearId;
+      const flag = btn.dataset.gearFlag;
+      toggleInventoryFlag(S, id, flag);
+      render();
+      $$('[data-gear-flag]').find(node => node.dataset.gearId === id && node.dataset.gearFlag === flag)?.focus();
+    }));
     $$('[data-equip]').forEach(btn => btn.onclick = () => runGuardedAction(() => { equipItem(S, btn.dataset.equip); render(); }));
     $$('[data-sell]').forEach(btn => btn.onclick = () => runGuardedAction(() => { const paid = sellItem(S, btn.dataset.sell); if (paid) showGoldPopup(paid); render(); }));
     $$('[data-retire]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
@@ -133,6 +145,8 @@
     }));
     const sellJunkBtn = el('sellJunkGearBtn');
     if (sellJunkBtn) sellJunkBtn.onclick = () => runGuardedAction(() => {
+      const preview = bulkSalePreview(S, true);
+      if (!preview.count || !window.confirm(bulkSaleConfirmation(preview, true))) return;
       const result = sellAllQuickSafeGear(S);
       if (result.paid) showGoldPopup(result.paid);
       render();
@@ -140,14 +154,19 @@
 
     const sellAllBtn = el('sellAllGearBtn');
     if (sellAllBtn) sellAllBtn.onclick = () => runGuardedAction(() => {
-      const count = S.player.inventory.filter(item => canSellAllGearItem(S, item)).length;
+      const preview = bulkSalePreview(S);
+      const count = preview.count;
       if (!count) return;
-      const confirmed = window.confirm(`Sell ALL ${count} unequipped sellable gear items? This cannot be undone. Equipped, protected, favorite, locked, and special items will stay.`);
+      const confirmed = window.confirm(bulkSaleConfirmation(preview));
       if (!confirmed) return;
       const result = sellAllGear(S);
       if (result.paid) showGoldPopup(result.paid);
       render();
     });
+  }
+
+  function bulkSaleConfirmation(preview, junkOnly = false) {
+    return `Sell ${junkOnly ? 'Junk: ' : 'ALL: '}${preview.count} items for ${stripHtml(formatMoney(preview.paid))}? This covers the entire inventory, including items hidden by filters. ${preview.protectedCount} protected items stay, including saved-loadout gear. This cannot be undone.`;
   }
 
   function bindCombatActions() {
@@ -397,6 +416,59 @@
     $$('[data-charter-start]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startCharterRun(S, btn.dataset.charterStart); render(); }));
     if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { startRun(S); render(); });
     if (el('clearCacheReloadBtn')) el('clearCacheReloadBtn').onclick = clearCacheAndReload;
+    bindSaveTransferActions();
+  }
+
+  function bindSaveTransferActions() {
+    const report = message => { saveTransferNotice = message; render(); };
+    const exportButton = el('exportSaveBtn');
+    if (exportButton) exportButton.onclick = () => {
+      try {
+        const raw = saveRecovery.blocked ? (saveRecovery.raw ?? localStorage.getItem(STORAGE_KEY)) : JSON.stringify(S);
+        if (raw == null) return report('No saved data is available to export.');
+        downloadSaveText(raw, saveRecovery.blocked ? 'DungeonDex-recovery.json' : 'DungeonDex-save.json');
+        report('Download requested. Keep the file somewhere safe.');
+      } catch (_) { report('Could not export the save. Your current progress was not replaced.'); }
+    };
+    const previousButton = el('exportPreviousSaveBtn');
+    if (previousButton) previousButton.onclick = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY + '_before_import');
+        if (raw == null) return report('No previous save backup is available.');
+        downloadSaveText(raw, 'DungeonDex-previous-save.json');
+      } catch (_) { report('Could not read the previous backup.'); }
+    };
+    const originalButton = el('exportRecoverySaveBtn');
+    if (originalButton) originalButton.onclick = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY + '_recovery');
+        if (raw == null) return report('No recovery original is available.');
+        downloadSaveText(raw, 'DungeonDex-recovery-original.json');
+      } catch (_) { report('Could not read the recovery original.'); }
+    };
+    const input = el('importSaveInput');
+    if (input) input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        if (file.size > 10 * 1024 * 1024) throw new Error('Choose a save smaller than 10 MB.');
+        const candidate = prepareSaveImport(await file.text());
+        const summary = `Level ${candidate.player.level} • ${candidate.player.inventory.length} inventory items • ${candidate.run.active ? 'active descent' : 'in town'}`;
+        if (!window.confirm(`Import this save? ${summary}. This replaces current progress. A copy of the previous save will be retained in this browser.`)) { input.value = ''; return; }
+        const result = replaceSavedState(candidate, S);
+        if (!result.ok) return report('Import failed: browser storage could not preserve and replace the save. Current progress is unchanged.');
+        S = result.state;
+        report('Save imported. Export Previous Backup retrieves the save kept before replacement.');
+      } catch (err) { report(`Import failed: ${err.message || 'invalid save file'}. Current progress is unchanged.`); }
+    };
+    const recoveryButton = el('startFreshSaveBtn');
+    if (recoveryButton) recoveryButton.onclick = () => {
+      if (!window.confirm('Start a fresh game? The unreadable save will be retained as a recovery backup in this browser. Export it first to keep a separate copy.')) return;
+      const result = replaceSavedState(createBaseState(), S);
+      if (!result.ok) return report('Could not preserve the original save. Recovery remains paused.');
+      S = result.state;
+      report('Fresh game started. The original is available through Export Recovery Original.');
+    };
   }
 
   function clearCacheAndReload() {

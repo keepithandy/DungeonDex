@@ -226,6 +226,40 @@
       counts.missing ? `${counts.missing} missing` : ''
     ].filter(Boolean).join(' • ') || 'No matching gear found';
   }
+
+  function switchPreview(state, id){
+    const preview = inspect(state, id);
+    if (!preview.ok) return preview;
+    if (state.run?.active) return { ...preview, ok:false, reason:'active-run' };
+    if (preview.items.some(entry => !['equipped','ready','occupied'].includes(entry.status))) {
+      return { ...preview, ok:false, reason:'unavailable-gear' };
+    }
+    const equipment = state.player.equipment || {};
+    const changes = preview.items.filter(entry => entry.status !== 'equipped').map(entry => {
+      const slots = typeof equipmentConflictSlots === 'function' ? equipmentConflictSlots(entry.slot) : [entry.slot];
+      const displaced = slots.map(slot => equipment[slot]).filter(Boolean);
+      return { ...entry, displaced };
+    });
+    return { ...preview, changes };
+  }
+
+  function switchLoadout(state, id){
+    const preview = switchPreview(state, id);
+    if (!preview.ok) return preview;
+    if (typeof equipItem !== 'function' || typeof calcDerived !== 'function') return { ok:false, reason:'invalid-state' };
+    // Stage every replacement before committing, so an unavailable item or error cannot half-switch a build.
+    const staged = JSON.parse(JSON.stringify(state));
+    const hpBefore = staged.player.hp;
+    for (const entry of preview.changes) equipItem(staged, entry.itemId, true);
+    if (preview.items.some(entry => staged.player.equipment[entry.slot]?.id !== entry.itemId)) {
+      return { ok:false, reason:'unavailable-gear' };
+    }
+    staged.player.hp = hpBefore;
+    calcDerived(staged);
+    state.player = staged.player;
+    if (typeof pushLog === 'function') pushLog(state, `Switched to ${preview.loadout.name}: ${preview.changes.length} replacements.`);
+    return { ...preview, ok:true };
+  }
   function applicationSummary(result){
     if (!result?.ok || !result.preview?.counts) return '';
     const counts = result.preview.counts;
@@ -242,6 +276,7 @@
   }
   function noticeFor(result, action){
     if (result?.ok) {
+      if (action === 'switch') return `Switched to ${result.loadout.name}: ${result.changes.length} pieces equipped. Displaced gear is in inventory; unlisted slots stay equipped.`;
       if (action === 'apply') return applicationSummary(result);
       if (action === 'delete') return 'Loadout deleted.';
       if (action === 'rename') return 'Loadout renamed.';
@@ -255,7 +290,9 @@
       'limit':`Loadout limit reached (${MAX_LOADOUTS} of ${MAX_LOADOUTS}). Delete one before saving or duplicating.`,
       'not-found':'That loadout is no longer available.', 'at-start':'That loadout is already first.',
       'at-end':'That loadout is already last.', 'invalid-direction':'That loadout could not be moved.',
-      'invalid-state':'Loadouts are not available in this save yet.'
+      'invalid-state':'Loadouts are not available in this save yet.',
+      'active-run':'Return to town before switching loadouts.',
+      'unavailable-gear':'Switch cancelled: a saved item is missing, in use elsewhere, or in the wrong slot. No equipment changed.'
     })[result?.reason] || 'The loadout action could not be completed.';
   }
   function statusLabel(status){ return ({ equipped:'Already equipped', ready:'Ready', occupied:'Occupied', elsewhere:'In use', wrongSlot:'Wrong slot', missing:'Missing' })[status] || 'Unavailable'; }
@@ -269,7 +306,7 @@
     const upDisabled = index === 0 ? ' disabled' : '';
     const downDisabled = index === total - 1 ? ' disabled' : '';
     const duplicateDisabled = atLimit ? ' disabled' : '';
-    return `<article class="named-loadout-card" id="${cardId}" role="listitem" aria-labelledby="${titleId}" aria-describedby="${summaryId}"><div class="named-loadout-card-head"><div><h3 id="${titleId}">${escape(loadout.name)}</h3><p class="small muted" id="${summaryId}">${escape(summary)}</p></div><span class="pill" aria-label="${escape(String(loadout.items.length))} saved slots">${escape(String(loadout.items.length))} slots</span></div><ul class="named-loadout-items" aria-label="Slot-by-slot availability">${items}</ul><div class="named-loadout-order" role="group" aria-label="Reorder ${escape(loadout.name)}"><button class="ghost mini" type="button" data-named-loadout-action="move" data-named-loadout-direction="up" data-named-loadout-id="${escape(loadout.id)}" aria-label="Move ${escape(loadout.name)} up; currently ${index + 1} of ${total}"${upDisabled}>↑ Up</button><button class="ghost mini" type="button" data-named-loadout-action="move" data-named-loadout-direction="down" data-named-loadout-id="${escape(loadout.id)}" aria-label="Move ${escape(loadout.name)} down; currently ${index + 1} of ${total}"${downDisabled}>↓ Down</button></div><div class="item-actions named-loadout-actions"><button class="primary mini" type="button" data-named-loadout-action="apply" data-named-loadout-id="${escape(loadout.id)}" aria-label="Apply safe items for ${escape(loadout.name)}" aria-describedby="${summaryId}">Apply Safe Items</button><button class="ghost mini" type="button" data-named-loadout-action="duplicate" data-named-loadout-id="${escape(loadout.id)}" aria-label="Duplicate ${escape(loadout.name)}"${duplicateDisabled}>Duplicate</button><button class="ghost mini" type="button" data-named-loadout-action="rename" data-named-loadout-id="${escape(loadout.id)}" aria-label="Rename ${escape(loadout.name)}">Rename</button><button class="ghost mini named-loadout-delete" type="button" data-named-loadout-action="delete" data-named-loadout-id="${escape(loadout.id)}" aria-label="Delete ${escape(loadout.name)}">Delete</button></div></article>`;
+    return `<article class="named-loadout-card" id="${cardId}" role="listitem" aria-labelledby="${titleId}" aria-describedby="${summaryId}"><div class="named-loadout-card-head"><div><h3 id="${titleId}">${escape(loadout.name)}</h3><p class="small muted" id="${summaryId}">${escape(summary)}</p></div><span class="pill" aria-label="${escape(String(loadout.items.length))} saved slots">${escape(String(loadout.items.length))} slots</span></div><ul class="named-loadout-items" aria-label="Slot-by-slot availability">${items}</ul><div class="named-loadout-order" role="group" aria-label="Reorder ${escape(loadout.name)}"><button class="ghost mini" type="button" data-named-loadout-action="move" data-named-loadout-direction="up" data-named-loadout-id="${escape(loadout.id)}" aria-label="Move ${escape(loadout.name)} up; currently ${index + 1} of ${total}"${upDisabled}>↑ Up</button><button class="ghost mini" type="button" data-named-loadout-action="move" data-named-loadout-direction="down" data-named-loadout-id="${escape(loadout.id)}" aria-label="Move ${escape(loadout.name)} down; currently ${index + 1} of ${total}"${downDisabled}>↓ Down</button></div><div class="item-actions named-loadout-actions"><button class="primary mini" type="button" data-named-loadout-action="apply" data-named-loadout-id="${escape(loadout.id)}" aria-label="Apply safe items for ${escape(loadout.name)}" aria-describedby="${summaryId}">Apply Safe Items</button><button class="ghost mini" type="button" data-named-loadout-action="switch" data-named-loadout-id="${escape(loadout.id)}" aria-label="Switch to ${escape(loadout.name)}">Switch Loadout</button><button class="ghost mini" type="button" data-named-loadout-action="duplicate" data-named-loadout-id="${escape(loadout.id)}" aria-label="Duplicate ${escape(loadout.name)}"${duplicateDisabled}>Duplicate</button><button class="ghost mini" type="button" data-named-loadout-action="rename" data-named-loadout-id="${escape(loadout.id)}" aria-label="Rename ${escape(loadout.name)}">Rename</button><button class="ghost mini named-loadout-delete" type="button" data-named-loadout-action="delete" data-named-loadout-id="${escape(loadout.id)}" aria-label="Delete ${escape(loadout.name)}">Delete</button></div></article>`;
   }
   function renderPanel(panel, state){
     if (!panel || !plainObject(state?.player)) return;
@@ -282,7 +319,7 @@
       : `${remaining} ${remaining === 1 ? 'loadout slot remains' : 'loadout slots remain'}.`;
     const disabled = atLimit ? ' disabled' : '';
     const empty = '<p class="small muted named-loadout-empty">No saved loadouts yet. Equip at least one item, enter a unique name, and choose Save Equipped.</p>';
-    panel.innerHTML = `<div class="named-loadout-head"><div><h2>Named Loadouts</h2><p class="small muted">Save this equipment set by name. Applying only equips matching inventory gear into empty slots; existing gear is never replaced.</p></div><span class="pill" aria-label="${loadouts.length} of ${MAX_LOADOUTS} named loadouts">${escape(String(loadouts.length))} / ${MAX_LOADOUTS}</span></div><div class="named-loadout-create"><label for="namedLoadoutName">Loadout name<input id="namedLoadoutName" maxlength="${MAX_NAME_LENGTH}" placeholder="e.g. Deep Delver" aria-label="New loadout name" aria-describedby="namedLoadoutCapacity"${disabled} /></label><button class="primary" type="button" data-named-loadout-action="create" aria-describedby="namedLoadoutCapacity"${disabled}>Save Equipped</button></div><p class="small muted named-loadout-capacity" id="namedLoadoutCapacity">${escape(capacity)}</p>${notice ? `<p class="small named-loadout-notice" role="status" aria-live="polite">${escape(notice)}</p>` : ''}<div class="named-loadout-list" role="list" aria-label="Saved named loadouts">${loadouts.map((loadout, index) => loadoutCard(state, loadout, index, loadouts.length, atLimit)).join('') || empty}</div>`;
+    panel.innerHTML = `<div class="named-loadout-head"><div><h2>Named Loadouts</h2><p class="small muted">Save this equipment set by name. Apply Safe Items fills empty slots. Switch Loadout previews replacements and returns displaced gear to inventory.</p></div><span class="pill" aria-label="${loadouts.length} of ${MAX_LOADOUTS} named loadouts">${escape(String(loadouts.length))} / ${MAX_LOADOUTS}</span></div><div class="named-loadout-create"><label for="namedLoadoutName">Loadout name<input id="namedLoadoutName" maxlength="${MAX_NAME_LENGTH}" placeholder="e.g. Deep Delver" aria-label="New loadout name" aria-describedby="namedLoadoutCapacity"${disabled} /></label><button class="primary" type="button" data-named-loadout-action="create" aria-describedby="namedLoadoutCapacity"${disabled}>Save Equipped</button></div><p class="small muted named-loadout-capacity" id="namedLoadoutCapacity">${escape(capacity)}</p>${notice ? `<p class="small named-loadout-notice" role="status" aria-live="polite">${escape(notice)}</p>` : ''}<div class="named-loadout-list" role="list" aria-label="Saved named loadouts">${loadouts.map((loadout, index) => loadoutCard(state, loadout, index, loadouts.length, atLimit)).join('') || empty}</div>`;
   }
   function currentState(){ return typeof S !== 'undefined' && plainObject(S) ? S : null; }
   function restoreFocus(focus){
@@ -349,6 +386,13 @@
         return;
       }
       if (action === 'apply') rerender(apply(state, id), action, { id, action:'apply' });
+      if (action === 'switch') {
+        const preview = switchPreview(state, id);
+        if (!preview.ok) return rerender(preview, action, { id, action });
+        const lines = preview.changes.map(entry => `${slotName(entry.slot)}: ${entry.displaced.map(item => item.name).join(', ') || 'Empty'} → ${entry.name}`);
+        if (!global.confirm(`Switch to “${preview.loadout.name}”?\n${lines.join('\n') || 'All saved items are already equipped.'}\nDisplaced gear returns to inventory. Slots not listed in this loadout stay equipped.`)) return;
+        return rerender(switchLoadout(state, id), action, { id, action });
+      }
     });
     document.addEventListener('keydown', event => {
       if (event.key !== 'Enter' || event.target?.id !== 'namedLoadoutName') return;
@@ -360,7 +404,7 @@
     });
   }
 
-  global.DungeonDexNamedLoadouts = Object.freeze({ MAX_LOADOUTS, normalize, normalizeState, create, rename, duplicate, move, remove, inspect, apply, applicationSummary });
+  global.DungeonDexNamedLoadouts = Object.freeze({ MAX_LOADOUTS, normalize, normalizeState, create, rename, duplicate, move, remove, inspect, apply, switchPreview, switchLoadout, applicationSummary });
   global.normalizeNamedLoadouts = normalizeState;
   global.renderNamedLoadoutPanel = renderPanel;
   bindActions();

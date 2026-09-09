@@ -1003,7 +1003,12 @@
     return true;
   }
 
+  // A failed load must never let startup autosaves replace the original payload.
+  const saveRecovery = { blocked: false, raw: null };
+  let saveTransferNotice = '';
+
   function save(state) {
+    if (saveRecovery.blocked) return false;
     try {
       if (!sanitizeLiveStateForSave(state)) return false;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1014,15 +1019,11 @@
     }
   }
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return createBaseState();
+  function decodeSave(raw) {
       const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return createBaseState();
+      if (!isPlainObject(parsed) || !isPlainObject(parsed.player)) throw new Error('Not a DungeonDex save.');
       parsed.build = BUILD;
       if (!parsed.archive) parsed.archive = [];
-      if (!isPlainObject(parsed.player)) return createBaseState();
       if (parsed.player.permanentStartFloor == null) parsed.player.permanentStartFloor = 1;
       if (parsed.player.boughtStart20Scroll == null) parsed.player.boughtStart20Scroll = false;
       if ((parsed.player.currencyVersion || 1) < 2) {
@@ -1048,8 +1049,62 @@
       if (parsed.player.earlyAidGiven == null) parsed.player.earlyAidGiven = false;
       if (parsed.player.talents == null && parsed.player.talentPointsEarned == null && parsed.player.talentPoints == null) parsed.player.talents = createTalentState();
       return normalizeSaveShape(parsed);
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      saveRecovery.raw = raw;
+      if (raw == null) {
+        saveRecovery.blocked = false;
+        saveRecovery.raw = null;
+        return createBaseState();
+      }
+      const state = decodeSave(raw);
+      saveRecovery.blocked = false;
+      saveRecovery.raw = null;
+      return state;
     } catch (err) {
-      console.warn('DungeonDex save recovery used a fresh state.');
+      saveRecovery.blocked = true;
+      console.warn('DungeonDex could not load the save. The original is preserved; autosave is paused.');
       return createBaseState();
     }
+  }
+
+  function prepareSaveImport(raw) {
+    if (typeof raw !== 'string' || raw.length > 10 * 1024 * 1024) throw new Error('Choose a save smaller than 10 MB.');
+    const parsed = JSON.parse(raw);
+    if (!isPlainObject(parsed) || !isPlainObject(parsed.player)) throw new Error('This file is not a DungeonDex save.');
+    return decodeSave(raw);
+  }
+
+  function replaceSavedState(candidate, currentState) {
+    // Finish validation and preserve the previous bytes before committing a replacement.
+    try {
+      const next = JSON.parse(JSON.stringify(candidate));
+      if (!sanitizeLiveStateForSave(next)) return { ok:false };
+      const serialized = JSON.stringify(next);
+      const previous = saveRecovery.blocked
+        ? (saveRecovery.raw ?? localStorage.getItem(STORAGE_KEY))
+        : JSON.stringify(currentState);
+      const backupKey = STORAGE_KEY + (saveRecovery.blocked ? '_recovery' : '_before_import');
+      if (previous != null) localStorage.setItem(backupKey, previous);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      saveRecovery.blocked = false;
+      saveRecovery.raw = null;
+      return { ok:true, state:next };
+    } catch (err) {
+      return { ok:false };
+    }
+  }
+
+  function downloadSaveText(raw, filename) {
+    const url = URL.createObjectURL(new Blob([raw], { type:'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }

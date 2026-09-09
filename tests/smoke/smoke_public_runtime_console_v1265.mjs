@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import { verifyReliquaryBrowser } from './reliquary_browser_checks.mjs';
+import { verifyGearQolBrowser } from './gear_qol_browser_checks.mjs';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
@@ -554,6 +555,8 @@ async function main() {
 
     activeSurface = 'Reliquary integrated loop and loadouts';
     await verifyReliquaryBrowser({ client, evaluate, waitFor, record });
+    activeSurface = 'Gear QoL and save transfer';
+    await verifyGearQolBrowser({ client, evaluate, record });
 
     const unhandled = await evaluate(client, `window.__ddPublicRuntimeUnhandledRejections || []`);
     unhandled.forEach(entry => addIssue('unhandled-rejection', entry.message, entry.source));
