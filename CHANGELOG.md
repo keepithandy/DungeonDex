@@ -8,14 +8,29 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.30.0 Spellbook & Gear Quality of Life`
-* Current development target: `v1.30.0 Spellbook & Gear Quality of Life`
-* Current build/cache label: `1.30.0-spellbook-gear-qol`
+* Current release candidate/local package baseline: `v1.31.0 Town, Gear & Guild Navigation Quality of Life`
+* Current development target: `v1.31.0 Town, Gear & Guild Navigation Quality of Life`
+* Current build/cache label: `1.31.0-town-gear-navigation-qol`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.31.0 - Town, Gear & Guild Navigation Quality of Life
+
+### Compact Town and Gear navigation (`480ffab`, `9024713`)
+
+* Grouped the existing Town Market, Forge, and Board into native collapsible sections while keeping the district header and entry actions visible.
+* Made existing Town Market, Forge, and Elite Contracts shortcuts expand their matching section before focusing its original panel.
+* Grouped the existing Gear Upgrade, Equipment, Loadouts, and Inventory surfaces into native collapsible sections, with Filters retained inside Inventory.
+* Preserved all established panel IDs, routes, actions, save behavior, gear rules, combat, economy, progression, and player discovery.
+
+### Guild Routes rail (`ff65abd`)
+
+* Refreshed the existing side rail with guild-route sigils, a brass-and-obsidian plaque treatment, an ember active marker, and clearer hover/focus states.
+* Kept the route order, Town shortcut behavior, keyboard handling, safe-area layout, combat hide rule, and 44px touch targets unchanged.
+* Added no recommendations, upgrade/buy advice, or gameplay guidance.
 
 ## v1.30.0 - Spellbook & Gear Quality of Life
 

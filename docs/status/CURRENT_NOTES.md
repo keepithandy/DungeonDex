@@ -7,34 +7,42 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.30.0 - Spellbook & Gear Quality of Life
-- Build/cache labels use `1.30.0-spellbook-gear-qol`.
+- DungeonDex v1.31.0 - Town, Gear & Guild Navigation Quality of Life
+- Build/cache labels use `1.31.0-town-gear-navigation-qol`.
+
+## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Local Release Candidate)
+<!-- This local candidate is the current development authority without asserting an itch upload. -->
+- Town now keeps its existing Market, Forge, and Board inside named native collapsible groups; the district header and entry actions remain visible.
+- Gear now keeps its existing Upgrades, Equipment, Loadouts, and Inventory inside named native collapsible groups; Filters remain with Inventory.
+- Existing Town shortcuts reveal the matching Town group before focusing its original panel, and the Guild Routes rail has a brass-and-obsidian visual refresh with existing route behavior intact.
+- These changes are presentation/navigation only. They add no recommendations, upgrade/buy advice, gameplay guidance, save fields, actions, rewards, economy, combat, progression, or route changes.
+- This is source-only work. No v1.31.0 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.29.0 Drowned Reliquary (Release Candidate)
-<!-- This local candidate supersedes the development authority without asserting an itch upload. -->
+<!-- Historical release-candidate evidence; it does not supersede the current authority. -->
 - The Drowned Reliquary is a complete D31-D40 chapter: existing encounter/combat families produce its registered normal and Elite identities; three authored incidents use the existing choice and pending-haul flow; and `The Seventh Toll` is a D40 finale event before the unchanged final room. The existing D45 Gravetoll Bell presentation remains the chapter’s boss-linked conclusion.
 - Reliquary event caches use the existing item generator and its D31-D40 maker/theme/tag presentation. Item slots, rarity/stat/value rolls, IDs, comparison, selling, equipment, and Merchant Gear Upgrades are unchanged.
 - Town, the Notice Board’s existing in-band contract briefing, Archive, Guild Journal, extraction receipt, replay depth, and Trophy Echo-only Revisit surface remain connected through existing records and routes. No new Revisit lane, save field, claim, farming loop, or entry route was added.
 - Focused event/save and existing Reliquary smoke coverage now protect entry, event choices, D40 finale, gear identity, old-save loading, reload of a pending finale, chapter extraction/replay, Journal/Archive/Town presentation, and Trophy Echo isolation. See `DROWNED_RELIQUARY_CHAPTER_RC_V1290.md` for final candidate evidence.
 
-## v1.30.0 Spellbook & Gear Quality of Life (Local Release Candidate)
-<!-- This local candidate supersedes the development authority without asserting an itch upload. -->
+## v1.30.0 Spellbook & Gear Quality of Life (Historical Local Candidate)
+<!-- Historical release-candidate evidence; it does not supersede the current authority. -->
 - The current source adds a level-gated combat spellbook: Ashburst at level 1, Cinder Ward at level 4, Ruin Lance at level 8, and Grave Mend at level 12.
 - The existing Spell slot remains one of the four combat actions. Tap casts the selected spell; hold opens its spellbook, and choosing an unlocked spell casts it immediately. Keyboard users can open the spellbook with Arrow Down or F4 while the Spell action is focused.
 - Selected spells persist safely in player saves. Older, invalid, or level-locked selections recover to Ashburst. No Talent, Revisit, Debt, gear, reward, or dungeon-entry behavior is used or changed by this feature.
 - Gear quality-of-life work adds clearer inventory controls, sale and forge safeguards, loadout switching previews, and save export/import and recovery handling without changing combat, rewards, economy, Talent, Debt, Revisit, or dungeon-entry rules.
-- This is source-only work. No v1.30.0 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
+- The v1.30.0 package was prepared separately for local review only; publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.28.2 Loadout Polish (Historical Development)
-<!-- Active integration work retains this version; historical notes below are preserved. -->
+<!-- Historical integration snapshot; notes below are preserved as evidence. -->
 - Journal/world reaction and automated release-candidate preparation are source-complete; feature scope is frozen. Town and Guild Journal derive read-only Reliquary acknowledgements from existing trophy, located-contract, identified-gear and retained-run evidence. New location text uses Floor/Room/Chapter, and the latest-return raw-depth label, Journal currency markup and legacy-summary mutation were corrected. Release hardening also repairs the standalone gear test and protects scrolling Journal text from the fixed drawer handle. See `RELIQUARY_JOURNAL_WORLD_REACTION.md` and `RELEASE_CANDIDATE_V128.md` for acceptance and final evidence.
 - The physical-device/Textastic checklist is retired as a release gate by owner direction. Automated smoke and browser verification are accepted for the next phase. The authorized local candidate package is `archive/packages/DungeonDex_v1.28.2_ItchReady.zip`; tag, push and upload remain separate actions.
-- Active continuation queue: `docs/status/ROADMAP_NEXT_PHASE.md`. Local `main` includes the rarity audit, D31-D40 Reliquary slice, four-identity roster, D45 conclusion, themed gear presentation, loot/return clarity, and Town/mobile polish with repeated automated verification. The no-change reward-curve decision locks its live control points without tuning balance; themed gear uses existing metadata only, while return and Town changes use existing records/routes and preserve actions, rewards, item mechanics, rolls, slots, loadouts, upgrades, and saves. Historical branch version labels do not replace v1.28.2.
+- Historical continuation queue at this checkpoint: `docs/status/ROADMAP_NEXT_PHASE.md`. Local `main` included the rarity audit, D31-D40 Reliquary slice, four-identity roster, D45 conclusion, themed gear presentation, loot/return clarity, and Town/mobile polish with repeated automated verification. The no-change reward-curve decision locked its live control points without tuning balance; themed gear used existing metadata only, while return and Town changes used existing records/routes and preserved actions, rewards, item mechanics, rolls, slots, loadouts, upgrades, and saves. Historical branch version labels did not replace v1.28.2 at that time.
 - Named loadouts can now be duplicated with unique IDs/names and reordered with labelled move-up/move-down controls; the order and duplicated ID-based snapshots persist through save/reload.
 - Slot previews distinguish Already equipped, Ready, Occupied, In use, Wrong slot, and Missing. Apply Safe Items reports a concise outcome while preserving equipped gear and incompatible or unavailable items.
 - Empty and 12-loadout cap states now give direct next steps. New/loadout actions use native 44px controls, Enter-to-save support, polite status announcements, descriptive labels, deletion confirmation, and focus recovery after rerenders.
 - Normalization continues to repair malformed loadouts and duplicate per-snapshot slot/item references while preserving intentional duplicated configurations.
-- The v1.28.2 version/cache authority is active for development verification. The local itch-ready candidate package has been created; no itch upload or release tag has been created.
+- At that time, v1.28.2 version/cache authority was active for development verification. The local itch-ready candidate package had been created; no itch upload or release tag had been created.
 
 ## v1.28.1 Named Loadouts (Development)
 - The Gear tab now supports named, ID-based snapshots of current equipment. Players can save a custom name, inspect all saved sets, rename or delete them, and see each item as Equipped, Ready, Occupied, In use, or Missing.

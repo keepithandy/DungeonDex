@@ -1,6 +1,13 @@
 # DungeonDex Acting-Agent Roadmap — Today
 
-## Current checkpoint (2026-09-07)
+## Current checkpoint (2026-09-09)
+
+- Source authority: `v1.31.0 Town, Gear & Guild Navigation Quality of Life` / `1.31.0-town-gear-navigation-qol`.
+- Active queue: `ROADMAP_NEXT_PHASE.md`. Town and Gear now use existing-surface collapsible groups, and the Guild Routes rail is presentation/navigation only.
+- Preserve player discovery: navigation must not recommend upgrades, purchases, or progression choices.
+- No v1.31.0 package, tag, push, or upload is authorized by this checkpoint.
+
+## Historical v1.28.2 checkpoint (2026-09-07)
 
 - Source: v1.28.2 Loadout Polish / `1.28.2-loadout-polish`. This local continuation began at clean `main` `99bddca`; Journal/world reaction is `3819246` and automated release preparation is recorded in `RELEASE_CANDIDATE_V128.md`.
 - Active queue: `ROADMAP_NEXT_PHASE.md`. v1.28 source milestones through Journal/world reaction and automated release-candidate preparation are complete; feature scope is frozen.

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.30.0-spellbook-gear-qol';
+const CACHE_NAME = 'dungeondex-v1.31.0-town-gear-navigation-qol';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.30.0-spellbook-gear-qol';
+const BUILD_QS = '1.31.0-town-gear-navigation-qol';
 const ASSETS = [
   './',
   './index.html',

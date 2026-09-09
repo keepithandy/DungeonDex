@@ -1,13 +1,13 @@
-// DungeonDex v1.30.0 runtime pointer.
+// DungeonDex v1.31.0 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.30.0: Spellbook & Gear Quality of Life
-// - Aligns the level-gated combat spellbook and gear/save quality-of-life release.
-// - Preserves the established combat, reward, progression, and equip behavior.
+// v1.31.0: Town, Gear & Guild Navigation Quality of Life
+// - Aligns compact Town/Gear presentation and the Guild Routes visual refresh.
+// - Preserves the established combat, reward, progression, equip, and discovery behavior.
 
-window.DUNGEONDEX_BUILD = '1.30.0';
-window.DUNGEONDEX_BUILD_QS = '1.30.0-spellbook-gear-qol';
+window.DUNGEONDEX_BUILD = '1.31.0';
+window.DUNGEONDEX_BUILD_QS = '1.31.0-town-gear-navigation-qol';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -63,7 +63,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.30.0-spellbook-gear-qol';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.31.0-town-gear-navigation-qol';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

@@ -1,13 +1,13 @@
 # DungeonDex Agent Stability Notes
 
-## Active integration checkpoint (2026-09-05)
+## Current authority pointer (2026-09-09)
 
-Current source is v1.28.2 Loadout Polish. Local `main` retains its build/cache labels and all loadout protections while adding the D31-D40 Reliquary, D45 conclusion, and a no-change reward-curve control. Fresh compact verification is 57/57 and public browser verification is 36/36; see [complete evidence and limitations](RELIQUARY_LOADOUT_INTEGRATION.md) and [reward-curve decision](REWARD_CURVE_DECISION_V128.md). Physical-device issue #139 remains open. The older target and counts below are historical, not current release evidence; numbered #139-#145 roadmap work is unrelated to today's GitHub issue #139.
+Current source authority is v1.31.0 Town, Gear & Guild Navigation Quality of Life with build/cache label `1.31.0-town-gear-navigation-qol`. Town and Gear navigation presentation is compact, and Guild Routes remains constrained by the existing route, touch, and accessibility contracts. See `VERSION.md`, `docs/VERSION_CACHE_AUTHORITY.md`, and `ROADMAP_NEXT_PHASE.md` for current status. The older checkpoint and counts below are historical, not current release evidence.
 
-## Current v1.28.1 Named Loadouts Target
+## Historical v1.28.1 Named Loadouts Target
 
-- Current target: `v1.28.1 Named Loadouts` (development baseline).
-- Current build/cache label: `1.28.2-loadout-polish`.
+- Historical target at this checkpoint: `v1.28.1 Named Loadouts` (development baseline).
+- Historical build/cache label at this checkpoint: `1.28.2-loadout-polish`.
 - The Gear tab supports ID-based named loadouts with safe apply status. Existing gear is never replaced while applying a saved snapshot.
 - #139-#145 deliver the clearer three-hunt Elite Contract Board, exact-target combat cue, one-time fulfillment/claim clarity, read-only Guild Journal records, protected-system audit, and final package pass.
 - #138 adds the equipped Offhand Merchant Gear Upgrade path: `+1 Guard` and `+1 Wit` per tier through `+3`, with the established `50c`, `125c`, and `250c` costs. Weapon and Armor upgrade values remain unchanged.

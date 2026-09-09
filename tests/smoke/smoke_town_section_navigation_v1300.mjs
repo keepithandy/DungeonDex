@@ -31,7 +31,7 @@ record(
 record(
   'Section summaries use only existing place names and retain touch-sized native controls',
   ['<summary>Market</summary>', '<summary>Forge</summary>', '<summary>Board</summary>'].every(copy => index.includes(copy))
-    && styles.includes('.town-section-fold > summary {')
+    && /\.town-section-fold > summary,\s*\.gear-section-fold > summary \{/.test(styles)
     && styles.includes('min-height: 48px;')
     && styles.includes('.town-section-fold > summary:focus-visible')
 );

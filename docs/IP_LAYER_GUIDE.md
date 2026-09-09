@@ -2,7 +2,7 @@
 
 This guide advances the current identity-layer issues without changing runtime behavior.
 
-Current baseline: **v1.28.2 Loadout Polish**. References below to the v1.28.1 foundation preserve historical scope. The [active named roadmap](status/ROADMAP_V128.md) now governs continuation; local `main` includes the source-verified Drowned Reliquary identity, with release/device gates recorded separately in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
+Current baseline: **v1.31.0 Town, Gear & Guild Navigation Quality of Life**. References below to earlier v1.28 foundations preserve historical scope. The [active roadmap](status/ROADMAP_NEXT_PHASE.md) governs continuation; local `main` includes the source-verified Drowned Reliquary identity and the compact navigation presentation work. Historical release/device evidence remains recorded in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
 
 ## Premise (#38)
 

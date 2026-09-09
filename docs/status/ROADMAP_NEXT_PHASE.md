@@ -2,7 +2,7 @@
 
 ## Status
 
-- v1.30.0 Spellbook & Gear Quality of Life is a local release candidate.
+- v1.31.0 Town, Gear & Guild Navigation Quality of Life is a local release candidate.
 - Automated smoke, browser, accessibility, mobile, package, and regression checks are the release baseline.
 - The physical-device/Textastic checklist is retired and is not a release blocker.
 - Do not publish, upload, tag, or push the candidate until explicitly requested.
@@ -16,6 +16,8 @@ Pick one small improvement that strengthens the existing loop:
 `Town -> Dungeon -> Loot -> Return -> Gear -> Journal -> Repeat`
 
 Keep the change focused, reuse existing systems, and preserve saves, combat, rewards, economy, dungeon entry, Talent, Debt, and Revisit behavior.
+
+Navigation may expose existing surfaces, but must not recommend what to upgrade, buy, or pursue; player discovery remains intentional.
 
 ### Phase 2 — Build the slice
 

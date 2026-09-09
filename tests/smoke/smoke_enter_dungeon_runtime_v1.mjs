@@ -242,9 +242,9 @@ async function main() {
       buildTag: document.getElementById('buildTag')?.innerText || '',
       townText: document.getElementById('screen-town')?.innerText || '',
       buttonText: document.getElementById('startRunBtn')?.innerText || '',
-      board: document.getElementById('questPanel')?.innerText || '',
-      market: document.getElementById('merchantPanel')?.innerText || '',
-      forge: document.getElementById('forgePanel')?.innerText || '',
+      board: document.getElementById('questPanel')?.textContent || '',
+      market: document.getElementById('merchantPanel')?.textContent || '',
+      forge: document.getElementById('forgePanel')?.textContent || '',
       boardShell: !!document.querySelector('#questPanel.town-board-shell'),
       marketShell: !!document.querySelector('#merchantPanel.town-market-shell'),
       forgeShell: !!document.querySelector('#forgePanel.town-forge-shell'),
@@ -261,8 +261,8 @@ async function main() {
 
     record('Town loads before Enter Dungeon', before.activeScreen === 'screen-town' && /Enter Dungeon|Continue Run/.test(before.buttonText), JSON.stringify(before));
     record('Town shell identity survives the wrapper chain', before.boardShell && before.marketShell && before.forgeShell, JSON.stringify({ boardShell: before.boardShell, marketShell: before.marketShell, forgeShell: before.forgeShell }));
-    record('Town sections retain readable v1.26 labels', /Lowfire Board/.test(before.board) && /Lowfire Market/.test(before.market) && /Lowfire Forge/.test(before.forge), JSON.stringify({ board: /Lowfire Board/.test(before.board), market: /Lowfire Market/.test(before.market), forge: /Lowfire Forge/.test(before.forge) }));
-    record('Trophy Echo-only Revisit panel renders before dungeon entry', /Revisit/.test(before.board) && /Trophy Echo is the only active Revisit lane for v1\.29\.0/.test(before.board) && !/Start Famous Gear Memory|Start Rival Trace|Start Board Echo|Start Debt Pressure/.test(before.board), JSON.stringify({ revisitStartButtons: before.revisitStartButtons, board: before.board.slice(0, 1200) }));
+    record('Town sections retain readable v1.31 labels', /Lowfire Board/.test(before.board) && /Lowfire Market/.test(before.market) && /Lowfire Forge/.test(before.forge), JSON.stringify({ board: /Lowfire Board/.test(before.board), market: /Lowfire Market/.test(before.market), forge: /Lowfire Forge/.test(before.forge) }));
+    record('Trophy Echo-only Revisit panel renders before dungeon entry', /Revisit/.test(before.board) && /Trophy Echo is the only active Revisit lane for v1\.31\.0/.test(before.board) && !/Start Famous Gear Memory|Start Rival Trace|Start Board Echo|Start Debt Pressure/.test(before.board), JSON.stringify({ revisitStartButtons: before.revisitStartButtons, board: before.board.slice(0, 1200) }));
     record('Town actions preserve dungeon, market, gear, archive, and journal access', Object.values(before.townActions).every(Boolean), JSON.stringify(before.townActions));
     record('No non-Trophy Revisit start action is exposed in town', before.revisitStartButtons.every(key => key === 'trophy_echo_route'), JSON.stringify(before.revisitStartButtons));
 

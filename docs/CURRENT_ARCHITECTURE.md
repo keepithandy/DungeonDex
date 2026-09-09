@@ -44,7 +44,7 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Trophy Echo is the only active Revisit lane in the v1.30.0 baseline.
+- Trophy Echo is the only active Revisit lane in the v1.31.0 baseline.
 - Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 
@@ -89,7 +89,11 @@ Debt Pressure v1 should be treated as a focused debt clarity/recovery patch, not
 
 These systems provide identity, record, and optional challenge structure. Do not expand or alter their reward/progression behavior unless explicitly requested.
 
-The v1.28.2 baseline retains the established Elite Contract surface: three named hunts, one active contract, exact-target combat cues, the one-time Town claim, and read-only Guild Journal records.
+The v1.31.0 baseline retains the established Elite Contract surface: three named hunts, one active contract, exact-target combat cues, the one-time Town claim, and read-only Guild Journal records.
+
+### Navigation and discovery
+
+Town and Gear use native collapsible groups, and the Guild Routes rail provides route access and existing Town shortcuts. These are presentation/navigation surfaces only: they must not recommend purchases, upgrades, routes, or progression choices, and must preserve the existing route IDs, actions, keyboard behavior, saves, and core loop.
 
 ## Identity / IP Layer
 
