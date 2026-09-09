@@ -9,11 +9,13 @@
 | Starting playable runtime | v1.28.2 |
 | Latest publicly downloadable itch package | DungeonDex_v1.27_ItchReady (2).zip |
 | Candidate runtime and package version | v1.29.0 — Drowned Reliquary |
-| Candidate package | archive/packages/DungeonDex_v1.29.0_ItchReady.zip |
+| Candidate package | archive/packages/DungeonDex_v1.29.0_ItchReady.zip — existing pre-license-notice artifact; do not rebuild |
 | Package size | 2,663,273 bytes |
 | SHA-256 | A8A10B826F8412B4F607C5F7DC453B4ABCD02073BF82EB72C1254E1A1989A27F |
 
 At the last recorded public check, the itch-downloadable package was **not aligned** with this candidate: it was the v1.27 package. Public deployment was not rechecked during this local package review, and no external operation was performed here to change it.
+
+The existing `DungeonDex_v1.29.0_ItchReady.zip` predates the current proprietary `LICENSE`, preserved `LICENSE-APACHE-2.0.txt`, and `ASSETS_LICENSE.md` files. Future package builds require those notices, but this v1.29.0 artifact must not be rebuilt or replaced; package regeneration is intentionally deferred until v1.30.
 
 ## Files changed
 
@@ -40,8 +42,8 @@ At the last recorded public check, the itch-downloadable package was **not align
 
 - Compact suite: **64/64 passed**.
 - Public browser runtime console gate: **48/48 passed**, including a complete Reliquary loop and event resolution.
-- Package builder: syntax checks, staged package check, root-level ZIP structure check: **passed**. The rebuilt ZIP excludes every retired artifact and its packaged manifest identifies v1.29.0 as the complete Drowned Reliquary chapter.
-- Independently extracted candidate package check: **52 paths checked, 0 warnings**.
+- At the time of the original package review, the package builder's syntax checks, staged package check, and root-level ZIP structure check **passed**. That pre-license-notice ZIP excludes every retired artifact and its packaged manifest identifies v1.29.0 as the complete Drowned Reliquary chapter.
+- The original independently extracted candidate package check reported **52 paths checked, 0 warnings**. It predates the current required legal notices and is not a validation of a rebuilt package.
 - Mobile layout, touch geometry, accessibility, computed contrast, save, combat, loot, economy, Debt, Talent, Charter, Journal, Archive, and Trophy Echo/Revisit checks all passed through the compact suite.
 
 ## Review handoff
@@ -49,8 +51,8 @@ At the last recorded public check, the itch-downloadable package was **not align
 ### Completion metadata and package review
 
 - Working repository: `C:\Users\quali\Desktop\source\DungeonDex`; review branch: `codex/package-completion`, based on `main` at `1c7e9b4`.
-- The exact ZIP and size/hash recorded above were checked again after the cleanup. All 46 packaged files match the Desktop source byte-for-byte, and the packaged manifest identifies the chapter as complete.
-- Fresh independent extraction validation: **52 paths checked, 0 warnings**. The rebuilt ZIP contains none of the retired source artifacts.
+- The exact ZIP and size/hash recorded above were checked again after the cleanup. At that time, all 46 packaged files matched the Desktop source byte-for-byte, and the packaged manifest identified the chapter as complete. That comparison predates the current legal-notice additions.
+- Historical independent extraction validation: **52 paths checked, 0 warnings**. The pre-license-notice ZIP contains none of the retired source artifacts.
 - The compact/browser results above record the preceding chapter and cleanup verification. This metadata review does not claim a fresh full gameplay-suite run.
 
-The candidate is ready for explicit review at archive/packages/DungeonDex_v1.29.0_ItchReady.zip. Publishing it would be the action that aligns the itch-downloadable package; that action remains intentionally pending.
+The existing candidate remains available for historical review at `archive/packages/DungeonDex_v1.29.0_ItchReady.zip`. It must not be rebuilt or replaced for v1.29.0, because it predates the legal notices now required in future packages. Rebuilding and revalidating a package with those notices is intentionally deferred until v1.30; publishing remains separately pending.
