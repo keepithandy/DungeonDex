@@ -17,6 +17,26 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
 
+## v1.30.0 - Spellbook & Gear Quality of Life
+
+### Level-Gated Combat Spellbook (`e2cd67a`)
+
+* Added Ashburst at level 1, Cinder Ward at level 4, Ruin Lance at level 8, and Grave Mend at level 12.
+* Added tap-to-cast and hold-to-open spellbook interactions.
+* Added keyboard access with Arrow Down and F4.
+* Persisted selected spells through save/reload, with invalid or level-locked selections recovering to Ashburst.
+* Added focused spellbook and dungeon-runtime smoke coverage.
+
+### Gear QoL and Save Recovery (`624e479`)
+
+* Added Clear Filters, Lock, Mark Junk, clearer inventory states, bulk-sale previews, and touch-friendly gear controls.
+* Protected equipped, locked, favorited, special, protected, and saved-loadout gear from accidental sale or forge salvage.
+* Added save export/import, malformed-save recovery, autosave pausing, recovery backups, and safe Start Fresh handling.
+* Added loadout switching with displaced-gear previews.
+* Added save-recovery, browser, interface/accessibility, and mobile smoke coverage.
+* Preserved combat, rewards, economy, Talent, Debt, Revisit, and dungeon-entry rules.
+
+
 ## v1.29.0 - Drowned Reliquary
 
 * Completes the D31-D40 Drowned Reliquary with its registered encounter roster, ordinary and Elite variants through the existing combat pipeline, black-water presentation, and the pre-existing D45 Gravetoll Bell conclusion.
