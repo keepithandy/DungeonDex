@@ -395,11 +395,23 @@
       <section class="screen ddx-region ddx-region-gear" id="screen-gear" aria-labelledby="tab-gear" role="region" aria-label="Gear Hall">
         <div class="stack-8 ddx-view-stack">
           <section class="panel gear-player-panel ddx-ledger-card ddx-gear-player-ledger" id="gearPlayerPanel" aria-label="Gear Hall Status" role="region"></section>
-          <section class="panel gear-upgrade-summary-panel ddx-merchant-card ddx-gear-summary" id="gearUpgradeSummaryPanel" aria-label="Upgrade Receipt" role="region"></section>
-          <section class="panel ddx-merchant-card ddx-equipment-ledger" id="equipmentPanel" aria-label="Equipment Ledger" role="region"></section>
-          <section class="panel named-loadouts-panel ddx-equipment-ledger" id="namedLoadoutsPanel" aria-label="Named Loadouts" role="region"></section>
-          <section class="panel ddx-archive-card ddx-filter-record" id="filtersPanel" aria-label="Archive Filters" role="region"></section>
-          <section class="panel ddx-archive-card ddx-gear-archive" id="inventoryPanel" aria-label="Gear Archive" role="region"></section>
+          <details class="gear-section-fold" data-gear-section="upgrades">
+            <summary>Upgrades</summary>
+            <section class="panel gear-upgrade-summary-panel ddx-merchant-card ddx-gear-summary" id="gearUpgradeSummaryPanel" aria-label="Upgrade Receipt" role="region"></section>
+          </details>
+          <details class="gear-section-fold" data-gear-section="equipment">
+            <summary>Equipment</summary>
+            <section class="panel ddx-merchant-card ddx-equipment-ledger" id="equipmentPanel" aria-label="Equipment Ledger" role="region"></section>
+          </details>
+          <details class="gear-section-fold" data-gear-section="loadouts">
+            <summary>Loadouts</summary>
+            <section class="panel named-loadouts-panel ddx-equipment-ledger" id="namedLoadoutsPanel" aria-label="Named Loadouts" role="region"></section>
+          </details>
+          <details class="gear-section-fold" data-gear-section="inventory">
+            <summary>Inventory</summary>
+            <section class="panel ddx-archive-card ddx-filter-record" id="filtersPanel" aria-label="Archive Filters" role="region"></section>
+            <section class="panel ddx-archive-card ddx-gear-archive" id="inventoryPanel" aria-label="Gear Archive" role="region"></section>
+          </details>
         </div>
       </section>
 

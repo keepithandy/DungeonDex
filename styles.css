@@ -82,14 +82,16 @@ p { color: var(--soft); line-height: 1.35; }
   display: grid;
   gap: 10px;
 }
-.town-section-fold {
+.town-section-fold,
+.gear-section-fold {
   min-width: 0;
   border: 1px solid rgba(255,213,148,0.16);
   border-radius: 16px;
   background: rgba(13,10,8,0.72);
   overflow: clip;
 }
-.town-section-fold > summary {
+.town-section-fold > summary,
+.gear-section-fold > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -101,26 +103,35 @@ p { color: var(--soft); line-height: 1.35; }
   font-weight: 850;
   list-style: none;
 }
-.town-section-fold > summary::-webkit-details-marker { display: none; }
-.town-section-fold > summary::after {
+.town-section-fold > summary::-webkit-details-marker,
+.gear-section-fold > summary::-webkit-details-marker { display: none; }
+.town-section-fold > summary::after,
+.gear-section-fold > summary::after {
   content: '+';
   flex: 0 0 auto;
   color: #f6d9a1;
   font-size: 1.15rem;
   line-height: 1;
 }
-.town-section-fold[open] > summary {
+.town-section-fold[open] > summary,
+.gear-section-fold[open] > summary {
   border-bottom: 1px solid rgba(255,213,148,0.12);
   background: rgba(255,184,91,0.06);
 }
-.town-section-fold[open] > summary::after { content: '−'; }
-.town-section-fold > .panel {
+.town-section-fold[open] > summary::after,
+.gear-section-fold[open] > summary::after { content: '−'; }
+.town-section-fold > .panel,
+.gear-section-fold > .panel {
   margin: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
 }
-.town-section-fold > summary:focus-visible {
+.gear-section-fold > .panel + .panel {
+  border-top: 1px solid rgba(255,213,148,0.12);
+}
+.town-section-fold > summary:focus-visible,
+.gear-section-fold > summary:focus-visible {
   outline: 2px solid #ffd18f;
   outline-offset: -3px;
 }
@@ -317,7 +328,8 @@ p { color: var(--soft); line-height: 1.35; }
 }
 @media (max-width: 560px) {
   .town-section-shell { gap: 9px; }
-  .town-section-fold > summary { min-height: 52px; padding: 12px; }
+  .town-section-fold > summary,
+  .gear-section-fold > summary { min-height: 52px; padding: 12px; }
   .town-section-head { gap: 8px; padding-bottom: 8px; }
   .town-section-head h2 { font-size: 1rem; }
   .town-section-head p { font-size: 0.78rem; line-height: 1.38; }
