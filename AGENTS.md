@@ -14,10 +14,10 @@ This file is the first-read operating contract for Codex, Claude, ChatGPT, and o
 
 ## Current Release Baseline
 
-- Current source release: `v1.29.0 Drowned Reliquary` (local release candidate).
+- Current source release: `v1.30.0 Spellbook & Gear Quality of Life` (local release candidate).
 - Merchant Gear Upgrades cover equipped Weapon (`+2 Power` per tier), Armor (`+2 Guard` and `+8 HP` per tier), and Offhand (`+1 Guard` and `+1 Wit` per tier) pieces through `+3`, using the established `50c`, `125c`, and `250c` tier costs.
 - `VERSION.md` remains the sole version authority; do not infer a release state from this summary.
-- The v1.29.0 package is authorized for local review only; itch.io upload, release tag, and push require explicit authorization.
+- The v1.30.0 package is authorized for local review only; itch.io upload, release tag, and push require explicit authorization.
 - The historical v1.27 local package carries an owner-approved physical-device exception; run a fresh Textastic/device pass before any later upload when practical.
 
 ## Active Core Loop

@@ -4,12 +4,12 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Release candidate and local package version: v1.29.0 Drowned Reliquary
-- Visible semantic version: `1.29.0`
-- Build/cache slug: `1.29.0-drowned-reliquary`
+- Release candidate and local package version: v1.30.0 Spellbook & Gear Quality of Life
+- Visible semantic version: `1.30.0`
+- Build/cache slug: `1.30.0-spellbook-gear-qol`
 - Public deployment status: pending explicit upload; the observed hosted runtime is v1.28.2 and the latest downloadable package is v1.27.
 
-The authorized v1.29.0 release-candidate pass aligns release records and runtime labels. The resulting ZIP remains an output, not version authority.
+The authorized v1.30.0 release-candidate pass aligns release records and runtime labels. The resulting ZIP remains an output, not version authority.
 
 ## Authority Flow
 

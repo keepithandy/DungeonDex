@@ -8,9 +8,9 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.29.0 Drowned Reliquary`
-* Current development target: `v1.29.0 Drowned Reliquary`
-* Current build/cache label: `1.29.0-drowned-reliquary`
+* Current release candidate/local package baseline: `v1.30.0 Spellbook & Gear Quality of Life`
+* Current development target: `v1.30.0 Spellbook & Gear Quality of Life`
+* Current build/cache label: `1.30.0-spellbook-gear-qol`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 

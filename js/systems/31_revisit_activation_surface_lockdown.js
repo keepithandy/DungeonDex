@@ -1,13 +1,13 @@
 'use strict';
 
-// DungeonDex v1.29.0 - Public Revisit Activation Surface Lockdown.
+// DungeonDex v1.30.0 - Public Revisit Activation Surface Lockdown.
 // Public runtime contract: Trophy Echo is the only active Revisit lane.
 (function(){
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.29.0-drowned-reliquary';
-  const VISIBLE_BUILD = '1.29.0';
+  const BUILD = '1.30.0-spellbook-gear-qol';
+  const VISIBLE_BUILD = '1.30.0';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const PUBLIC_ROUTE_KEY = 'trophy_echo_route';
   const PUBLIC_ROUTE_LABEL = 'Trophy Echo';
@@ -43,7 +43,7 @@
       ok: false,
       blocked: true,
       routeKey: String(routeKey || '').trim(),
-      reason: 'DungeonDex v1.29.0 public Revisit surface only allows Trophy Echo.'
+      reason: 'DungeonDex v1.30.0 public Revisit surface only allows Trophy Echo.'
     });
   }
 

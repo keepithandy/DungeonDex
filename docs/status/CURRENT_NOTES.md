@@ -7,8 +7,8 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.29.0 - Drowned Reliquary
-- Build/cache labels use `1.29.0-drowned-reliquary`.
+- DungeonDex v1.30.0 - Spellbook & Gear Quality of Life
+- Build/cache labels use `1.30.0-spellbook-gear-qol`.
 
 ## v1.29.0 Drowned Reliquary (Release Candidate)
 <!-- This local candidate supersedes the development authority without asserting an itch upload. -->
@@ -17,11 +17,13 @@
 - Town, the Notice Board’s existing in-band contract briefing, Archive, Guild Journal, extraction receipt, replay depth, and Trophy Echo-only Revisit surface remain connected through existing records and routes. No new Revisit lane, save field, claim, farming loop, or entry route was added.
 - Focused event/save and existing Reliquary smoke coverage now protect entry, event choices, D40 finale, gear identity, old-save loading, reload of a pending finale, chapter extraction/replay, Journal/Archive/Town presentation, and Trophy Echo isolation. See `DROWNED_RELIQUARY_CHAPTER_RC_V1290.md` for final candidate evidence.
 
-## Unreleased local spellbook work
-- The current source adds a level-gated combat spellbook without changing version or cache labels: Ashburst at level 1, Cinder Ward at level 4, Ruin Lance at level 8, and Grave Mend at level 12.
+## v1.30.0 Spellbook & Gear Quality of Life (Local Release Candidate)
+<!-- This local candidate supersedes the development authority without asserting an itch upload. -->
+- The current source adds a level-gated combat spellbook: Ashburst at level 1, Cinder Ward at level 4, Ruin Lance at level 8, and Grave Mend at level 12.
 - The existing Spell slot remains one of the four combat actions. Tap casts the selected spell; hold opens its spellbook, and choosing an unlocked spell casts it immediately. Keyboard users can open the spellbook with Arrow Down or F4 while the Spell action is focused.
 - Selected spells persist safely in player saves. Older, invalid, or level-locked selections recover to Ashburst. No Talent, Revisit, Debt, gear, reward, or dungeon-entry behavior is used or changed by this feature.
-- This is source-only work. The existing v1.29.0 package remains unchanged and must not be rebuilt or replaced before v1.30.
+- Gear quality-of-life work adds clearer inventory controls, sale and forge safeguards, loadout switching previews, and save export/import and recovery handling without changing combat, rewards, economy, Talent, Debt, Revisit, or dungeon-entry rules.
+- This is source-only work. No v1.30.0 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.28.2 Loadout Polish (Historical Development)
 <!-- Active integration work retains this version; historical notes below are preserved. -->

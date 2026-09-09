@@ -2,7 +2,7 @@
 
 ## Status
 
-- v1.29.0 Drowned Reliquary is a local release candidate.
+- v1.30.0 Spellbook & Gear Quality of Life is a local release candidate.
 - Automated smoke, browser, accessibility, mobile, package, and regression checks are the release baseline.
 - The physical-device/Textastic checklist is retired and is not a release blocker.
 - Do not publish, upload, tag, or push the candidate until explicitly requested.

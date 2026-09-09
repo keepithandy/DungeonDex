@@ -5,11 +5,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const VISIBLE_BUILD = '1.29.0';
-const RELEASE_NAME = 'Drowned Reliquary';
+const VISIBLE_BUILD = '1.30.0';
+const RELEASE_NAME = 'Spellbook & Gear Quality of Life';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
-const BUILD_QS = '1.29.0-drowned-reliquary';
-const PUBLIC_DEPLOYMENT_STATUS = 'The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.29.0 candidate is local only until an explicitly authorized upload.';
+const BUILD_QS = '1.30.0-spellbook-gear-qol';
+const PUBLIC_DEPLOYMENT_STATUS = 'The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.30.0 candidate is local only until an explicitly authorized upload.';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
   './js/systems/14_devtools_scenarios.js?build=' + BUILD_QS,

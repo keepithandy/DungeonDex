@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.29.0-drowned-reliquary';
+const CACHE_NAME = 'dungeondex-v1.30.0-spellbook-gear-qol';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.29.0-drowned-reliquary';
+const BUILD_QS = '1.30.0-spellbook-gear-qol';
 const ASSETS = [
   './',
   './index.html',
