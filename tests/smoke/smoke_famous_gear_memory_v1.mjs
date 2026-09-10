@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 
 const SYSTEM_FILES = [
+  '../../js/systems/00_core_constants_data.js',
   '../../js/systems/08_normalization_save.js',
   '../../js/systems/35_revisit_famous_gear_memory_state_patch.js',
   '../../js/systems/03_town_contracts_market.js',

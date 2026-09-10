@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 
 const STORAGE_KEY = 'dungeondex_emberfall_v109';
 const SYSTEM_FILES = [
+  'js/systems/00_core_constants_data.js',
   'js/systems/07_player_combat_runtime.js',
   'js/systems/08_normalization_save.js',
   'js/systems/10_ui_town_shop.js',
