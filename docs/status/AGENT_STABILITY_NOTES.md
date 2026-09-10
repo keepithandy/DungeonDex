@@ -2,7 +2,7 @@
 
 ## Current authority pointer (2026-09-09)
 
-Current source authority is v1.31.0 Town, Gear & Guild Navigation Quality of Life with build/cache label `1.31.0-town-gear-navigation-qol`. Town and Gear navigation presentation is compact, and Guild Routes remains constrained by the existing route, touch, and accessibility contracts. See `VERSION.md`, `docs/VERSION_CACHE_AUTHORITY.md`, and `ROADMAP_NEXT_PHASE.md` for current status. The older checkpoint and counts below are historical, not current release evidence.
+Current source authority is v1.31.1 Quiet Route Restore Hotfix with build/cache label `1.31.1-quiet-route-restore`. Town and Gear navigation presentation is compact, route transitions restore the viewport, and Guild Routes remains constrained by the existing route, touch, and accessibility contracts. See `VERSION.md`, `docs/VERSION_CACHE_AUTHORITY.md`, and `ROADMAP_NEXT_PHASE.md` for current status. The older checkpoint and counts below are historical, not current release evidence.
 
 ## Historical v1.28.1 Named Loadouts Target
 

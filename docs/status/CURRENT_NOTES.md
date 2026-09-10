@@ -7,11 +7,18 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.31.0 - Town, Gear & Guild Navigation Quality of Life
-- Build/cache labels use `1.31.0-town-gear-navigation-qol`.
+- DungeonDex v1.31.1 - Quiet Route Restore Hotfix
+- Build/cache labels use `1.31.1-quiet-route-restore`.
 
-## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Local Release Candidate)
-<!-- This local candidate is the current development authority without asserting an itch upload. -->
+## v1.31.1 Quiet Route Restore Hotfix (Local Release Candidate)
+<!-- This local candidate restores route viewport state without asserting an itch upload. -->
+- Route changes now reset document, body, and destination-screen scroll positions after the existing renderer runs.
+- The Guild Routes rail closes through one bridge whenever a route changes, keeping touch, pointer, and keyboard navigation from leaving stale navigation chrome open.
+- The patch is UI/stability-only. It adds no recommendations, upgrade/buy advice, gameplay guidance, save fields, actions, rewards, economy, combat, progression, or route behavior.
+- This is source-only work. No v1.31.1 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
+
+## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Historical Local Candidate)
+<!-- Historical candidate details are preserved here; v1.31.1 is the current development authority. -->
 - Town now keeps its existing Market, Forge, and Board inside named native collapsible groups; the district header and entry actions remain visible.
 - Gear now keeps its existing Upgrades, Equipment, Loadouts, and Inventory inside named native collapsible groups; Filters remain with Inventory.
 - Existing Town shortcuts reveal the matching Town group before focusing its original panel, and the Guild Routes rail has a brass-and-obsidian visual refresh with existing route behavior intact.

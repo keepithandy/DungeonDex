@@ -2,7 +2,8 @@
 
 ## Status
 
-- v1.31.0 Town, Gear & Guild Navigation Quality of Life is a local release candidate.
+- v1.31.1 Quiet Route Restore Hotfix is a local release candidate.
+- Route transitions reset stale document and destination-screen scroll state and close the existing Guild Routes rail through one bridge.
 - Automated smoke, browser, accessibility, mobile, package, and regression checks are the release baseline.
 - The physical-device/Textastic checklist is retired and is not a release blocker.
 - Do not publish, upload, tag, or push the candidate until explicitly requested.

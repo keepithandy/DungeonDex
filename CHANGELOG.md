@@ -8,14 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.31.0 Town, Gear & Guild Navigation Quality of Life`
-* Current development target: `v1.31.0 Town, Gear & Guild Navigation Quality of Life`
-* Current build/cache label: `1.31.0-town-gear-navigation-qol`
+* Current release candidate/local package baseline: `v1.31.1 Quiet Route Restore Hotfix`
+* Current development target: `v1.31.1 Quiet Route Restore Hotfix`
+* Current build/cache label: `1.31.1-quiet-route-restore`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.31.1 - Quiet Route Restore Hotfix
+
+### Route viewport stability
+
+* Reset document, body, and destination-screen scroll positions after existing route renders so compact Town, Gear, Archive, Journal, and Run surfaces do not reopen at a stale deep-scroll position.
+* Close the existing Guild Routes rail through one bridge whenever a route changes, covering touch, pointer, keyboard, and programmatic navigation without changing route IDs or actions.
+* Preserve native Town/Gear disclosure state, save data, combat, rewards, economy, progression, and the discovery-first presentation.
+* Added focused route-scroll stability coverage; this remains a local source candidate with no package build, upload, tag, or push.
 
 ## v1.31.0 - Town, Gear & Guild Navigation Quality of Life
 
