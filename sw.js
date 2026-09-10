@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.31.1-quiet-route-restore';
+const CACHE_NAME = 'dungeondex-v1.32.0-spell-mastery';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.31.1-quiet-route-restore';
+const BUILD_QS = '1.32.0-spell-mastery';
 const ASSETS = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const ASSETS = [
   `./js/systems/06_scaling_generation_audits.js?build=${BUILD_QS}`,
   `./js/systems/07_player_combat_runtime.js?build=${BUILD_QS}`,
   `./js/systems/08_normalization_save.js?build=${BUILD_QS}`,
+  `./js/systems/47_spell_mastery.js?build=${BUILD_QS}`,
   `./js/systems/46_named_loadouts.js?build=${BUILD_QS}`,
   `./js/systems/09_ui_common_intro.js?build=${BUILD_QS}`,
   `./js/systems/10_ui_town_shop.js?build=${BUILD_QS}`,

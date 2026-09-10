@@ -557,6 +557,7 @@
     let playerSwing = 1;
     let playerShield = 0;
     let lethalStrikeTaken = false;
+    let spellCounterRatio = 0;
 
     if (action === 'attack') {
       playerSwing = 1.0 + stats.speed * 0.008;
@@ -582,6 +583,10 @@
       pushCombat(state, `You brace and recover ${recovered} HP.`);
     } else if (action === 'skill') {
       const spell = combatSpellbook(state).selected;
+      const spellMasteryApi = window.DungeonDexSpellMastery;
+      const masteryModifiers = typeof spellMasteryApi?.combatModifiers === 'function'
+        ? spellMasteryApi.combatModifiers(state, spell.id, monster)
+        : { damageMultiplier:1, defenseMultiplier:1, shieldMultiplier:1, healMultiplier:1, lowHealthHealMultiplier:1, siphonMultiplier:1, reflectRatio:0, emberOnKill:0 };
       const emberCost = Math.max(0, Math.floor(numberOr(spell.emberCost, 0, 0, 99)));
       if (state.player.ember < emberCost) {
         if (spell.id === 'ashburst') pushCombat(state, 'No ember left. Ashburst fizzles.');
@@ -589,28 +594,39 @@
       } else {
         state.player.ember -= emberCost;
         if (spell.id === 'cinder_ward') {
-          playerShield = Math.round(stats.guard * 1.65 + stats.wit * 0.5);
-          const recovered = Math.max(1, Math.round(stats.guard * 0.14 + stats.wit * 0.08));
+          playerShield = Math.round((stats.guard * 1.65 + stats.wit * 0.5) * masteryModifiers.shieldMultiplier);
+          const recovered = Math.max(1, Math.round((stats.guard * 0.14 + stats.wit * 0.08) * masteryModifiers.healMultiplier));
+          spellCounterRatio = Math.max(0, Number(masteryModifiers.reflectRatio) || 0);
           state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
           pushCombat(state, `Cinder Ward absorbs ${playerShield} and restores ${recovered} HP.`);
         } else if (spell.id === 'ruin_lance') {
           const skillSwing = 2.1 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
-          const dealt = damageRoll(stats.power + stats.wit * 0.9, monster.guard * 0.45, skillSwing);
+          const dealt = damageRoll(stats.power + stats.wit * 0.9, monster.guard * 0.45 * masteryModifiers.defenseMultiplier, skillSwing * masteryModifiers.damageMultiplier);
           monster.hp -= dealt;
           pushCombat(state, `Ruin Lance hits for ${dealt}.`);
         } else if (spell.id === 'grave_mend') {
-          playerShield = Math.round(stats.guard * 0.35);
-          const recovered = Math.max(5, Math.round(state.player.maxHp * 0.22 + stats.wit * 0.2));
+          const lowHealth = state.player.hp <= state.player.maxHp * 0.35;
+          playerShield = Math.round(stats.guard * 0.35 * masteryModifiers.shieldMultiplier);
+          const recovered = Math.max(5, Math.round((state.player.maxHp * 0.22 + stats.wit * 0.2) * masteryModifiers.healMultiplier * (lowHealth ? masteryModifiers.lowHealthHealMultiplier : 1)));
           state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
           pushCombat(state, `Grave Mend restores ${recovered} HP beneath a ${playerShield} ward.`);
         } else {
           const skillSwing = 1.45 + (hasEquippedSetBonus(state, 'veyruhn_bellforge', 3) && monster.tier === 'Boss' ? 0.12 : 0) + (consumeDebtbrandCombatBoost(state) ? 0.18 : 0);
-          const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6, skillSwing);
+          const dealt = damageRoll(stats.power + stats.wit * 0.7, monster.guard * 0.6 * masteryModifiers.defenseMultiplier, skillSwing * masteryModifiers.damageMultiplier);
           monster.hp -= dealt;
-          const siphon = Math.max(1, Math.round(stats.wit * 0.18));
+          const siphon = Math.max(1, Math.round(stats.wit * 0.18 * masteryModifiers.siphonMultiplier));
           state.player.hp = Math.min(state.player.maxHp, state.player.hp + siphon);
           pushCombat(state, `Ashburst hits for ${dealt} and returns ${siphon} HP.`);
         }
+        if (masteryModifiers.emberOnKill > 0 && monster.hp <= 0) {
+          state.player.ember += Math.floor(masteryModifiers.emberOnKill);
+          pushCombat(state, `Eclipse Script returns ${Math.floor(masteryModifiers.emberOnKill)} Ember.`);
+        }
+        const masteryResult = typeof spellMasteryApi?.recordCast === 'function'
+          ? spellMasteryApi.recordCast(state, spell.id)
+          : null;
+        if (masteryResult?.reachedAdept) pushCombat(state, `${spell.name} reaches Adept mastery. Visit the Scriptorium in Lowfire.`);
+        if (masteryResult?.reachedMastery) pushCombat(state, `${spell.name} is ready to master its inscription.`);
       }
     } else if (action === 'extract') {
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
@@ -652,6 +668,16 @@
       state.player.hp -= incoming;
       if (state.player.hp <= 0) lethalStrikeTaken = true;
       pushCombat(state, `${monster.name} hits for ${incoming}.`);
+      if (spellCounterRatio > 0 && state.player.hp > 0) {
+        const reflected = Math.max(1, Math.round(incoming * spellCounterRatio));
+        monster.hp -= reflected;
+        pushCombat(state, `Mirror Verse reflects ${reflected}.`);
+        if (monster.hp <= 0) {
+          winEncounter(state);
+          result.saveNow = true;
+          return result;
+        }
+      }
     }
 
     if (state.player.hp <= 0) {
@@ -1137,7 +1163,11 @@
     const rewardParts = [`Gold +${formatMoney(earnedGold)}`, `Shards +${m.rewardShard}`, `XP +${format(m.rewardXp)}`];
     pushCombat(state, `${rewardLead}: ${m.name} ${victoryVerb}. Unsecured ${rewardParts.join(' • ')}${runGoldBonus > 0 ? ' (+gold charm)' : ''}${debtbrandGoldBonus > 0 ? ' (+Debtbrand)' : ''}${eliteContractGoldBonus > 0 ? ' (+contract)' : ''}${eliteReward?.modifierCount ? ' (+elite risk)' : ''}.`);
     pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
-    if (source === 'boss') recordBossTrophyUnlock(state, state.run.floor, m.name);
+    if (source === 'boss') {
+      recordBossTrophyUnlock(state, state.run.floor, m.name);
+      const discovery = window.DungeonDexSpellMastery?.discoverRareInscription?.(state, 'boss');
+      if (discovery?.unlocked) pushCombat(state, `Boss folio found: ${discovery.inscription.name} is available at the Scriptorium.`);
+    }
     updateQuest(state, 'kill', 1);
 
     const lootRolls = source === 'boss' ? 2 : 1;
@@ -1496,6 +1526,8 @@
       }
     }
 
+    const discovery = window.DungeonDexSpellMastery?.discoverRareInscription?.(state, 'event');
+    if (discovery?.unlocked) pushCombat(state, `Event folio found: ${discovery.inscription.name} is available at the Scriptorium.`);
     state.run.event = null;
     state.run.choices = ['attack','guard','skill','extract'];
     if (state.player.hp <= 0) defeat(state, null);

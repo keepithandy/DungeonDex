@@ -35,4 +35,4 @@ record(
     && navSource.includes('window.DungeonDexCloseSideNav = function(){ setNavOpen(nav, false); };')
 );
 
-console.log('PASS: v1.31.1 route-scroll stability contract keeps navigation compact without changing game actions.');
+console.log('PASS: v1.32.0 route-scroll stability contract keeps navigation compact without changing game actions.');

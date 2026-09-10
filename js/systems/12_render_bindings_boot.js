@@ -371,6 +371,16 @@
     });
     $$('[data-buy]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantItem(S, btn.dataset.buy); render(); }));
     $$('[data-merchant-upgrade]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyMerchantGearUpgrade(S, btn.dataset.merchantUpgrade); render(); }));
+    $$('[data-spell-inscribe]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      const [spellId, inscriptionId] = String(btn.dataset.spellInscribe || '').split(':');
+      if (window.DungeonDexSpellMastery?.chooseInscription(S, spellId, inscriptionId)?.ok) render();
+    }));
+    $$('[data-spell-master]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (window.DungeonDexSpellMastery?.masterInscription(S, btn.dataset.spellMaster)?.ok) render();
+    }));
+    $$('[data-spell-respec]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      if (window.DungeonDexSpellMastery?.respecSpell(S, btn.dataset.spellRespec)?.ok) render();
+    }));
     $$('[data-buy-district]').forEach(btn => btn.onclick = () => runGuardedAction(() => { buyDistrictWare(S, btn.dataset.buyDistrict); render(); }));
     $$('[data-start-contract]').forEach(btn => btn.onclick = () => runGuardedAction(() => { startEliteContract(S, btn.dataset.startContract); render(); }));
     $$('[data-start-revisit]').forEach(btn => btn.onclick = () => runGuardedAction(() => {

@@ -8,10 +8,10 @@
   <meta name="theme-color" content="#06070a" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="data:," />
-  <title>DungeonDex v1.31.1</title>
-  <link rel="stylesheet" data-dd-required="true" href="./styles.css?build=1.31.1-quiet-route-restore" />
-  <link rel="stylesheet" data-dd-required="true" href="./styles_lore_layer.css?build=1.31.1-quiet-route-restore" />
-  <link rel="stylesheet" data-dd-required="true" href="./styles_visual_weight.css?build=1.31.1-quiet-route-restore" />
+  <title>DungeonDex v1.32.0</title>
+  <link rel="stylesheet" data-dd-required="true" href="./styles.css?build=1.32.0-spell-mastery" />
+  <link rel="stylesheet" data-dd-required="true" href="./styles_lore_layer.css?build=1.32.0-spell-mastery" />
+  <link rel="stylesheet" data-dd-required="true" href="./styles_visual_weight.css?build=1.32.0-spell-mastery" />
   <style>
     /* v1.23.8 Merchant Gear Upgrades Replace Talent System update. */
     .panel {
@@ -310,7 +310,7 @@
     <h2 id="bootRecoveryTitle">DungeonDex could not finish loading.</h2>
     <p id="bootRecoveryMessage">A required local game file did not finish loading. Your player save data was not erased.</p>
     <p class="small" id="bootRecoveryAsset"></p>
-    <p class="small muted">Current build: DungeonDex v1.31.1</p>
+    <p class="small muted">Current build: DungeonDex v1.32.0</p>
     <div class="inline-actions">
       <button class="primary" id="bootRecoveryRetryBtn" type="button">Retry</button>
       <button class="ghost" id="bootRecoveryClearBtn" type="button">Clear DungeonDex Cache &amp; Reload</button>
@@ -319,7 +319,7 @@
   <div class="app-shell ddx-shell">
     <header class="topbar ddx-guild-header" aria-labelledby="buildTag" role="banner">
       <div class="ddx-header-title-slot">
-        <h1 id="buildTag" class="ddx-lore-kicker">DungeonDex v1.31.1</h1>
+        <h1 id="buildTag" class="ddx-lore-kicker">DungeonDex v1.32.0</h1>
       </div>
       <div class="top-actions ddx-action-row" aria-label="Save controls">
         <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
@@ -364,6 +364,11 @@
           <section class="panel town-return-receipt" id="townReturnReceipt" aria-label="Latest Return" role="region"></section>
 
           <section class="panel ddx-contract-card ddx-debt-card" id="debtCollectorPanel" aria-label="Debt Pressure" role="region"></section>
+
+          <details class="town-section-fold" data-town-section="scriptorium">
+            <summary>Scriptorium</summary>
+            <section class="panel" id="scriptoriumPanel" aria-label="Spell Mastery Scriptorium" role="region"></section>
+          </details>
 
           <div class="grid-2 ddx-merchant-pair town-section-fold-pair" aria-label="Town commerce">
             <details class="town-section-fold" data-town-section="market">
@@ -465,8 +470,8 @@
   </template>
 
   <script>
-    window.DUNGEONDEX_BUILD = '1.31.1';
-    window.DUNGEONDEX_BUILD_QS = '1.31.1-quiet-route-restore';
+    window.DUNGEONDEX_BUILD = '1.32.0';
+    window.DUNGEONDEX_BUILD_QS = '1.32.0-spell-mastery';
     (function(){
       function forceBuildLabel(){
         var tag = document.getElementById('buildTag');
@@ -498,7 +503,7 @@
   <script>
     (function(){
       if (!('serviceWorker' in navigator)) return;
-      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.31.1-quiet-route-restore';
+      var buildQs = window.DUNGEONDEX_BUILD_QS || '1.32.0-spell-mastery';
       var host = window.location.hostname;
       var isLocalDev = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
       if (isLocalDev) {
@@ -511,37 +516,38 @@
     })();
   </script>
 
-  <script data-dd-required="true" src="./app.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/00_core_constants_data.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/01_state_recovery.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/02_currency_pending_rewards.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/03_town_contracts_market.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/04_depth_progression_charters.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/05_elite_modifiers.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/06_scaling_generation_audits.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/07_player_combat_runtime.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/08_normalization_save.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/46_named_loadouts.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/09_ui_common_intro.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/10_ui_town_shop.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/29_monster_backdrops_canvas.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/12_render_bindings_boot.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/36_ui_revisit_archive_codex.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/38_journal_v1.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/16_relic_forge_crafting.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/17_relic_forge_clarity.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/18_relic_forge_compact_text.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/28_debt_collector_foundation.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/34_debt_collector_v1_completion.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/21_build_label_guard.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/22_nav_centering.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/23_boss_header_cleanup.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/24_lowfire_spark_board.js?build=1.31.1-quiet-route-restore"></script>
-  <script data-dd-required="true" src="./js/systems/25_town_wallet_chip_fix.js?build=1.31.1-quiet-route-restore"></script>
+  <script data-dd-required="true" src="./app.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/00_core_constants_data.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/01_state_recovery.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/02_currency_pending_rewards.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/03_town_contracts_market.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/35_revisit_famous_gear_memory_state_patch.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/31_revisit_activation_surface_lockdown.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/04_depth_progression_charters.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/05_elite_modifiers.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/06_scaling_generation_audits.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/07_player_combat_runtime.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/08_normalization_save.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/47_spell_mastery.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/46_named_loadouts.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/09_ui_common_intro.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/10_ui_town_shop.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/44_revisit_lowfire_board_slot.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/11_ui_run_gear_dex_archive.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/29_monster_backdrops_canvas.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/12_render_bindings_boot.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/36_ui_revisit_archive_codex.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/37_revisit_famous_gear_flavor_pack.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/38_journal_v1.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/16_relic_forge_crafting.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/17_relic_forge_clarity.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/18_relic_forge_compact_text.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/28_debt_collector_foundation.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/34_debt_collector_v1_completion.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/21_build_label_guard.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/22_nav_centering.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/23_boss_header_cleanup.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/24_lowfire_spark_board.js?build=1.32.0-spell-mastery"></script>
+  <script data-dd-required="true" src="./js/systems/25_town_wallet_chip_fix.js?build=1.32.0-spell-mastery"></script>
 </body>
 </html>

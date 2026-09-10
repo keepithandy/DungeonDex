@@ -8,14 +8,29 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.31.1 Quiet Route Restore Hotfix`
-* Current development target: `v1.31.1 Quiet Route Restore Hotfix`
-* Current build/cache label: `1.31.1-quiet-route-restore`
+* Current release candidate/local package baseline: `v1.32.0 Spell Mastery`
+* Current development target: `v1.32.0 Spell Mastery`
+* Current build/cache label: `1.32.0-spell-mastery`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.32.0 - Spell Mastery
+
+### Scriptorium and inscriptions
+
+* Spell casts now earn per-spell mastery. At 8 mastery an unlocked spell can take one inscription; at 24 mastery its chosen path can be mastered.
+* Lowfire's new compact Scriptorium keeps inscription choice and a 1s50c per-spell respec in Town. A respec preserves earned mastery and discovered folios.
+* Ashburst, Cinder Ward, Ruin Lance, and Grave Mend each have two clear standard paths. Their baseline spell effects, Ember costs, unlock levels, and four-action combat layout remain intact until a path is chosen.
+
+### Long-term discoveries and records
+
+* A first boss record preserves Wildfire Verse for Ashburst, and a first run incident preserves Mirror Verse for Cinder Ward. Those folios only add Scriptorium choices; they add no loot, XP, currency, or new route.
+* Equipped gear now displays one explicit spell affinity by its established slot. Matching equipped affinities add up to two mastery per cast, without changing gear rolls, stats, value, upgrades, or sale rules.
+* The Guild Journal records inscribed or mastered spell paths and preserved rare folios as a read-only chronicle entry.
+* Older saves normalize safely to an empty mastery ledger while retaining their selected spell and every unrelated progression field. No package, upload, tag, or push is included in this source-only candidate.
 
 ## v1.31.1 - Quiet Route Restore Hotfix
 

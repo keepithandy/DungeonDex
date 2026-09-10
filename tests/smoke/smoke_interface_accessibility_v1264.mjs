@@ -30,6 +30,9 @@ const PUBLIC_ACTION_ATTRIBUTES = [
   'data-start-revisit',
   'data-start-contract',
   'data-merchant-upgrade',
+  'data-spell-inscribe',
+  'data-spell-master',
+  'data-spell-respec',
   'data-buy',
   'data-buy-district',
   'data-run-event',
@@ -181,6 +184,7 @@ async function main() {
     intro,
     gearModal,
     runUi,
+    spellMastery,
     bindings,
     forge,
     lowfireBoard,
@@ -199,6 +203,7 @@ async function main() {
     readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/40_gear_detail_modal.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/47_spell_mastery.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/12_render_bindings_boot.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/17_relic_forge_clarity.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/24_lowfire_spark_board.js'), 'utf8'),
@@ -341,6 +346,7 @@ async function main() {
     debt,
     revisit,
     gearModal,
+    spellMastery,
     namedLoadouts
   ];
   const extractedControlTokens = new Set(publicControlSources.flatMap(publicControlTokens));
@@ -371,6 +377,9 @@ async function main() {
     '#repayDebtBtn',
     '#refreshMerchantBtn',
     '[data-merchant-upgrade]',
+    '[data-spell-inscribe]',
+    '[data-spell-master]',
+    '[data-spell-respec]',
     '[data-buy]',
     '[data-buy-district]',
     '[data-start-contract]',

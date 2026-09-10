@@ -7,8 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.31.1 - Quiet Route Restore Hotfix
-- Build/cache labels use `1.31.1-quiet-route-restore`.
+- DungeonDex v1.32.0 - Spell Mastery
+- Build/cache labels use `1.32.0-spell-mastery`.
+
+## v1.32.0 Spell Mastery (Local Release Candidate)
+<!-- This local candidate extends the existing spellbook without replacing the combat loop. -->
+- Every successful spell cast records mastery for that spell. Adept mastery at 8 unlocks one Scriptorium inscription; 24 mastery can master the selected path.
+- Lowfire's compact Scriptorium includes safe per-spell respec at 1s50c. Respec clears the path but retains earned mastery and rare folios.
+- Standard paths exist for Ashburst, Cinder Ward, Ruin Lance, and Grave Mend. A first boss record preserves Ashburst's Wildfire Verse, while a first run event preserves Cinder Ward's Mirror Verse.
+- Equipped gear displays a deterministic affinity and matching equipped pieces add up to two mastery per cast. Gear generation, stats, values, Merchant Gear Upgrades, currency rewards, and dungeon entry are unchanged.
+- The Guild Journal adds a read-only spell-mastery record only when a path or rare folio exists. No new Revisit lane, reward track, monster affix, or persistent combat status is added.
+- This is source-only work. No v1.32.0 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.31.1 Quiet Route Restore Hotfix (Local Release Candidate)
 <!-- This local candidate restores route viewport state without asserting an itch upload. -->
@@ -18,7 +27,7 @@
 - This is source-only work. No v1.31.1 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Historical Local Candidate)
-<!-- Historical candidate details are preserved here; v1.31.1 is the current development authority. -->
+<!-- Historical candidate details are preserved here; v1.32.0 is the current development authority. -->
 - Town now keeps its existing Market, Forge, and Board inside named native collapsible groups; the district header and entry actions remain visible.
 - Gear now keeps its existing Upgrades, Equipment, Loadouts, and Inventory inside named native collapsible groups; Filters remain with Inventory.
 - Existing Town shortcuts reveal the matching Town group before focusing its original panel, and the Guild Routes rail has a brass-and-obsidian visual refresh with existing route behavior intact.

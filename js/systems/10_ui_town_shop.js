@@ -428,11 +428,13 @@ function renderTown() {
 	const questPanel = el('questPanel');
 	const merchantPanel = el('merchantPanel');
 	const forgePanel = el('forgePanel');
+	const scriptoriumPanel = el('scriptoriumPanel');
 	const returnReceipt = el('townReturnReceipt');
 	const revisitBoardMarkup = earlierDungeonRevisitMarkup();
 	if (questPanel) questPanel.classList.add('town-section-shell', 'town-board-shell');
 	if (merchantPanel) merchantPanel.classList.add('town-section-shell', 'town-market-shell');
 	if (forgePanel) forgePanel.classList.add('town-section-shell', 'town-forge-shell');
+	if (scriptoriumPanel) scriptoriumPanel.classList.add('town-section-shell', 'town-scriptorium-shell');
 	if (returnReceipt) {
 		returnReceipt.classList.add('town-section-shell', 'town-return-receipt-shell');
 		returnReceipt.innerHTML = townReturnReceiptMarkup(S);
@@ -475,6 +477,9 @@ function renderTown() {
 		}
 	}
 	if (el('districtCharterSlot')) el('districtCharterSlot').innerHTML = deepStairCharterMarkup('hollow');
+	if (scriptoriumPanel) scriptoriumPanel.innerHTML = typeof window.renderSpellMasteryTownPanel === 'function'
+		? window.renderSpellMasteryTownPanel(S)
+		: '';
 	if (questPanel) questPanel.innerHTML = `
       <div class="town-section-shell town-board-shell">
         <div class="town-section-head">

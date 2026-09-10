@@ -44,7 +44,7 @@ Revisit is the town/archive memory layer. It should build from existing save rec
 Current contract:
 
 - Trophy Echo is playable from town when boss trophy or boss record history exists.
-- Trophy Echo is the only active Revisit lane in the v1.31.1 baseline.
+- Trophy Echo is the only active Revisit lane in the v1.32.0 baseline.
 - Famous Gear Memory, Rival Trace, Board Echo, and Debt Pressure are not exposed on the active Revisit surface.
 - Memory lanes must not add rewards, farming, combat paths, board missions, dungeon-entry replacement, Talent effects, debt effects, or progression shortcuts unless explicitly scoped.
 
@@ -61,6 +61,20 @@ Historical Revisit references must not be read as an activation plan. Any future
 ### Journal and world reaction
 
 Town and Guild Journal share a read-only Reliquary projection in system 38. It reads existing trophy identities, located contract records, explicit gear metadata, and retained run history. It adds no save fields, actions, rewards or record-count increments. Claimed contract IDs without location remain historical; best depth cannot prove a boss victory, safe return or full-band clear. New acknowledgement and receipt locations use `getLoreDepthProgress`, keeping raw depth distinct from displayed Floor/Room/Chapter.
+
+### Spell Mastery
+
+Spell Mastery extends the existing level-gated spellbook without changing its action slot, unlock levels, Ember costs, or selection interaction.
+
+Current contract:
+
+- successful casts build mastery for the selected spell
+- at 8 mastery, the Lowfire Scriptorium offers one standard inscription; at 24, it can master that chosen path
+- a first boss record preserves Ashburst's Wildfire Verse; a first run event preserves Cinder Ward's Mirror Verse
+- established gear slots visibly carry deterministic affinities that grant up to two extra mastery per matching cast
+- a 1s50c per-spell Scriptorium respec preserves mastery and discoveries while clearing the chosen path
+- the Guild Journal is a read-only record of inscribed/mastered paths and rare folios
+- no monster affix, persistent combat status, new route, reward track, or alternate dungeon entry is added
 
 ### Merchant Gear Upgrades
 
@@ -89,13 +103,13 @@ Debt Pressure v1 should be treated as a focused debt clarity/recovery patch, not
 
 These systems provide identity, record, and optional challenge structure. Do not expand or alter their reward/progression behavior unless explicitly requested.
 
-The v1.31.1 baseline retains the established Elite Contract surface: three named hunts, one active contract, exact-target combat cues, the one-time Town claim, and read-only Guild Journal records.
+The v1.32.0 baseline retains the established Elite Contract surface: three named hunts, one active contract, exact-target combat cues, the one-time Town claim, and read-only Guild Journal records.
 
 ### Navigation and discovery
 
 Town and Gear use native collapsible groups, and the Guild Routes rail provides route access and existing Town shortcuts. These are presentation/navigation surfaces only: they must not recommend purchases, upgrades, routes, or progression choices, and must preserve the existing route IDs, actions, keyboard behavior, saves, and core loop.
 
-The v1.31.1 route-scroll stability hotfix resets the document and destination-screen scroll positions after a route change and closes the side rail through one bridge. It does not alter route actions, disclosure state, saves, or gameplay.
+The retained v1.31.1 route-scroll stability hotfix resets the document and destination-screen scroll positions after a route change and closes the side rail through one bridge. It does not alter route actions, disclosure state, saves, or gameplay.
 
 ## Identity / IP Layer
 

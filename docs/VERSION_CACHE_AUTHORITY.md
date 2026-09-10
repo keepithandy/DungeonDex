@@ -4,12 +4,12 @@ This document defines the release-label flow. It is a procedure, not an independ
 
 Target for the current authorized version pass:
 
-- Release candidate and local package version: v1.31.1 Quiet Route Restore Hotfix
-- Visible semantic version: `1.31.1`
-- Build/cache slug: `1.31.1-quiet-route-restore`
+- Release candidate and local package version: v1.32.0 Spell Mastery
+- Visible semantic version: `1.32.0`
+- Build/cache slug: `1.32.0-spell-mastery`
 - Public deployment status: pending explicit upload; the observed hosted runtime is v1.28.2 and the latest downloadable package is v1.27.
 
-The authorized v1.31.1 stability-hotfix pass aligns release records and runtime labels. Any resulting ZIP remains an output, not version authority.
+The authorized v1.32.0 content pass aligns release records and runtime labels. Any resulting ZIP remains an output, not version authority.
 
 ## Authority Flow
 

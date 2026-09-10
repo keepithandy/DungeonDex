@@ -304,6 +304,9 @@
         xp: 0,
         xpNext: 100,
         selectedSpellId: DEFAULT_COMBAT_SPELL_ID,
+        spellMastery: typeof createSpellMasteryState === 'function'
+          ? createSpellMasteryState()
+          : { version:1, spells:{}, discoveries:[], respecs:0 },
         hp: 100,
         maxHp: 100,
         gold: coins(0, 12, 50),

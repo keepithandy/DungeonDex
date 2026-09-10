@@ -663,11 +663,13 @@
     const levelLabel = getItemLevelLabel(item);
     const setMini = setBonusMiniMarkup(item, S);
     const memoryBadges = gearMemoryBadges(item);
+    const affinity = typeof spellAffinityForGear === 'function' ? spellAffinityForGear(item) : '';
+    const affinityLabel = affinity === 'cinder_ward' ? 'Cinder Ward' : affinity === 'ruin_lance' ? 'Ruin Lance' : affinity === 'grave_mend' ? 'Grave Mend' : affinity === 'ashburst' ? 'Ashburst' : '';
     return `<article class="equip-slot loadout-equip-card equip-slot-filled ${getRarityCardClass(item)}"${detailIdAttr} aria-label="${escapeHtml(slotLabel)} equipped: ${escapeHtml(itemName)}">
       <div class="gear-card-name gear-equipped-name gear-detail-trigger ${rarityClass(rarityKey)}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Inspect ${escapeHtml(itemName)} gear details" data-gear-detail-trigger="1">${escapeHtml(itemName)}</div>
       <div class="gear-card-top gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span><span class="gear-rarity-pill ${rarityClass(rarityKey)}">${escapeHtml(gearRarityLabel(item))}</span></div>
       <div class="gear-card-subline gear-card-level-line"><span>${escapeHtml(levelLabel)}</span></div>
-      ${memoryBadges ? `<div class="gear-badge-row gear-memory-row">${memoryBadges}</div>` : ''}
+      ${memoryBadges || affinityLabel ? `<div class="gear-badge-row gear-memory-row">${memoryBadges}<span class="gear-status-badge">${escapeHtml(affinityLabel)} affinity</span></div>` : ''}
       ${gearScoreMarkup(item, slot)}
       ${setMini}
     </article>`;
@@ -815,6 +817,8 @@
     const delta = gearUpgradeDelta(item, S);
     const comparisonContext = gearComparisonContext(item, S);
     const statusBadges = gearStatusBadges(item);
+    const affinity = typeof spellAffinityForGear === 'function' ? spellAffinityForGear(item) : '';
+    const affinityLabel = affinity === 'cinder_ward' ? 'Cinder Ward' : affinity === 'ruin_lance' ? 'Ruin Lance' : affinity === 'grave_mend' ? 'Grave Mend' : affinity === 'ashburst' ? 'Ashburst' : '';
     const setBonusPreview = setBonusPreviewMarkup(item, S, true);
     const equipAttrs = itemId ? `data-equip="${safeItemId}"` : 'disabled';
     const sellAttrs = itemId && canSellAllGearItem(S, item) ? `data-sell="${safeItemId}"` : 'disabled';
@@ -829,7 +833,7 @@
           <div class="inventory-title-row gear-card-meta-row"><span class="gear-slot-label">${escapeHtml(slotTypeLabel)}</span>${rarityEyebrow}</div>
           <div class="gear-card-subline"><span>${escapeHtml(getItemLevelLabel(item))}</span>${maker ? `<span>${escapeHtml(maker)}</span>` : ''}</div>
         </div>
-        ${statusBadges ? `<div class="gear-badge-row">${statusBadges}</div>` : ''}
+        ${statusBadges || affinityLabel ? `<div class="gear-badge-row">${statusBadges}<span class="gear-status-badge">${escapeHtml(affinityLabel)} affinity</span></div>` : ''}
       </div>
       ${gearScoreMarkup(item)}
       <p class="small muted inventory-comparison-context">${escapeHtml(comparisonContext)}</p>

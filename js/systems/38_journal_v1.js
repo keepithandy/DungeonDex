@@ -422,13 +422,17 @@
     const debt = debtStatus(safeState);
     const upgrades = merchantUpgradeModel(safeState);
     const contracts = eliteContractModel(safeState);
+    const spellMastery = typeof window.spellMasteryJournalModel === 'function'
+      ? window.spellMasteryJournalModel(safeState)
+      : { activeCount:0, masteredCount:0, discoveryCount:0, latest:'', body:'', detail:'' };
     const historicalCount = famous.count + rival.count;
     const memoryTotal = boss.count
       + revisit.trophyCount
       + historicalCount
       + contracts.count
       + (debt.balance > 0 ? 1 : 0)
-      + upgrades.active.length;
+      + upgrades.active.length
+      + spellMastery.activeCount;
     const sections = [];
     if (boss.count > 0) sections.push({
       key: 'boss',
@@ -478,6 +482,13 @@
       primary: upgrades.body,
       detail: upgrades.meta
     });
+    if (spellMastery.activeCount > 0 || spellMastery.discoveryCount > 0) sections.push({
+      key: 'spell-mastery',
+      title: 'Spell Mastery',
+      badge: `${spellMastery.masteredCount} mastered`,
+      primary: spellMastery.body,
+      detail: spellMastery.detail
+    });
     const latestRecord = summaryLine([
       contracts.latest ? `${contracts.latest.eliteName} — ${contracts.latest.badge}` : '',
       revisit.last,
@@ -485,6 +496,7 @@
       famous.latest ? `${famous.latest} memory` : '',
       rival.latest ? `${rival.latest} trace` : '',
       upgrades.active[0]?.itemName ? `${text(upgrades.active[0].itemName)} upgrade` : '',
+      spellMastery.latest ? `${spellMastery.latest} mastery` : '',
       debt.balance > 0 ? 'Debt Record' : ''
     ], 'No records yet');
     sections.forEach(section => {
