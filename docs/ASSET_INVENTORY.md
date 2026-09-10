@@ -2,7 +2,7 @@
 
 This manifest records the origin, ownership/license status, modification history, and use of every tracked DungeonDex visual, audio, font, or marketing asset. Update it whenever an asset is added, replaced, or repurposed.
 
-Target baseline: **v1.31.0 Town, Gear & Guild Navigation Quality of Life**.
+Target baseline: **v1.31.1 Quiet Route Restore Hotfix**.
 
 Policy: [Northline Studio asset licensing policy](../ASSETS_LICENSE.md).
 

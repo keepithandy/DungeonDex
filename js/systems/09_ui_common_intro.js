@@ -167,6 +167,30 @@
     });
   })();
 
+  function resetRouteViewport(screen) {
+    const root = document.scrollingElement || document.documentElement;
+    if (root) root.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    const activeScreen = document.getElementById(`screen-${screen}`);
+    if (activeScreen) activeScreen.scrollTop = 0;
+    if (typeof window.scrollTo === 'function') {
+      try { window.scrollTo(0, 0); } catch (_) {}
+    }
+  }
+
+  function focusRouteSurface(screen) {
+    const activeScreen = document.getElementById(`screen-${screen}`);
+    if (!activeScreen) return;
+    const hadTabIndex = activeScreen.hasAttribute('tabindex');
+    if (!hadTabIndex) activeScreen.setAttribute('tabindex', '-1');
+    try { activeScreen.focus({ preventScroll: true }); } catch (_) { activeScreen.focus(); }
+    if (!hadTabIndex) {
+      window.setTimeout(() => {
+        if (activeScreen.isConnected && document.activeElement === activeScreen) activeScreen.removeAttribute('tabindex');
+      }, 0);
+    }
+  }
+
   function switchScreen(screen) {
     if (S?.run?.active && screen !== 'run') screen = 'run';
     screen = normalizeScreenName(screen);
@@ -178,7 +202,10 @@
       if (isActive) node.setAttribute('aria-current', 'page');
       else node.removeAttribute('aria-current');
     });
+    if (typeof window.DungeonDexCloseSideNav === 'function') window.DungeonDexCloseSideNav();
     render();
+    resetRouteViewport(screen);
+    focusRouteSurface(screen);
   }
 
   function rarityClass(key) {

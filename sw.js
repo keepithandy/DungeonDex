@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.31.0-town-gear-navigation-qol';
+const CACHE_NAME = 'dungeondex-v1.31.1-quiet-route-restore';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.31.0-town-gear-navigation-qol';
+const BUILD_QS = '1.31.1-quiet-route-restore';
 const ASSETS = [
   './',
   './index.html',

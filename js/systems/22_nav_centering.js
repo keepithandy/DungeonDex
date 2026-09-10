@@ -329,6 +329,7 @@
         if (event.key === 'Escape') setNavOpen(nav, false);
       });
     }
+    window.DungeonDexCloseSideNav = function(){ setNavOpen(nav, false); };
   }
   function addHeaderCrestCss(){
     if (document.getElementById('ddHeaderCrestCss')) return;

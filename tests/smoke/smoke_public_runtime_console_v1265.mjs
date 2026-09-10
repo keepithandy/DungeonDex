@@ -288,6 +288,44 @@ async function main() {
     const town = await evaluate(client, `(() => ({ active: document.querySelector('.screen.active')?.id || '', devtoolsDisabled: window.DUNGEONDEX_DEVTOOLS_ENABLED === false, devtoolsReason: window.DUNGEONDEX_DEVTOOLS_GATE?.reason || '' }))()`);
     record('Public runtime loads Town with DevTools disabled', town.active === 'screen-town' && town.devtoolsDisabled, JSON.stringify(town));
 
+    activeSurface = 'Route viewport stability';
+    const routeViewport = await evaluate(client, `(() => {
+      const spacer = document.createElement('div');
+      spacer.dataset.routeScrollFixture = '1';
+      spacer.style.height = '1800px';
+      document.body.appendChild(spacer);
+      const html = document.documentElement;
+      const body = document.body;
+      const oldHtmlMinHeight = html.style.minHeight;
+      const oldBodyMinHeight = body.style.minHeight;
+      html.style.minHeight = '2200px';
+      body.style.minHeight = '2200px';
+      const nav = document.querySelector('nav.tabs, .tabs.panel');
+      nav?.classList.add('ddx-nav-open');
+      const root = document.scrollingElement || html;
+      root.scrollTop = 480;
+      window.scrollTo(0, 480);
+      const before = Math.max(root.scrollTop, window.scrollY);
+      document.getElementById('tab-gear')?.click();
+      const after = Math.max(root.scrollTop, window.scrollY);
+      const result = {
+        before,
+        after,
+        active: document.querySelector('.screen.active')?.id || '',
+        railOpen: !!nav?.classList.contains('ddx-nav-open'),
+        focus: document.activeElement?.id || ''
+      };
+      spacer.remove();
+      html.style.minHeight = oldHtmlMinHeight;
+      body.style.minHeight = oldBodyMinHeight;
+      return result;
+    })()`);
+    record('Route changes restore the viewport and close the Guild Routes rail', routeViewport.before > 0
+      && routeViewport.after === 0
+      && routeViewport.active === 'screen-gear'
+      && !routeViewport.railOpen
+      && routeViewport.focus === 'screen-gear', JSON.stringify(routeViewport));
+
     activeSurface = 'Town shortcuts';
     await evaluate(client, `document.getElementById('tab-gear')?.click(); true`);
     await waitFor(client, `document.querySelector('.screen.active')?.id === 'screen-gear'`, 'Gear route before Town shortcut');

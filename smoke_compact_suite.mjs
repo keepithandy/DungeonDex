@@ -71,6 +71,7 @@ const COMMANDS = [
   { tag: 'navigation', name: 'Town compact navigation', cmd: ['node', 'tests/smoke/smoke_town_section_navigation_v1300.mjs'] },
   { tag: 'navigation', name: 'Gear compact navigation', cmd: ['node', 'tests/smoke/smoke_gear_section_navigation_v1300.mjs'] },
   { tag: 'navigation', name: 'Guild Routes navigation', cmd: ['node', 'tests/smoke/smoke_side_nav_visual_contract_v1300.mjs'] },
+  { tag: 'navigation', name: 'Route scroll stability', cmd: ['node', 'tests/smoke/smoke_route_scroll_stability_v1311.mjs'] },
   { tag: 'debt', name: 'debt and Talent compatibility', cmd: ['node', 'tests/smoke/smoke_debt_talent_compatibility_v1265.mjs'] },
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
   ...(includePackageGate ? [{ tag: 'package', name: 'package build and extraction gate', cmd: ['node', 'tests/smoke/smoke_package_build_extraction_v1265.mjs'] }] : []),

@@ -1,11 +1,11 @@
 # DungeonDex Acting-Agent Roadmap — Today
 
-## Current checkpoint (2026-09-09)
+## Current checkpoint (2026-09-10)
 
-- Source authority: `v1.31.0 Town, Gear & Guild Navigation Quality of Life` / `1.31.0-town-gear-navigation-qol`.
-- Active queue: `ROADMAP_NEXT_PHASE.md`. Town and Gear now use existing-surface collapsible groups, and the Guild Routes rail is presentation/navigation only.
+- Source authority: `v1.31.1 Quiet Route Restore Hotfix` / `1.31.1-quiet-route-restore`.
+- Active queue: `ROADMAP_NEXT_PHASE.md`. Town and Gear now use existing-surface collapsible groups, the Guild Routes rail is presentation/navigation only, and route changes restore the viewport.
 - Preserve player discovery: navigation must not recommend upgrades, purchases, or progression choices.
-- No v1.31.0 package, tag, push, or upload is authorized by this checkpoint.
+- No v1.31.1 package, tag, push, or upload is authorized by this checkpoint.
 
 ## Historical v1.28.2 checkpoint (2026-09-07)
 

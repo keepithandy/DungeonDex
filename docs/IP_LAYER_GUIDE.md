@@ -2,7 +2,7 @@
 
 This guide advances the current identity-layer issues without changing runtime behavior.
 
-Current baseline: **v1.31.0 Town, Gear & Guild Navigation Quality of Life**. References below to earlier v1.28 foundations preserve historical scope. The [active roadmap](status/ROADMAP_NEXT_PHASE.md) governs continuation; local `main` includes the source-verified Drowned Reliquary identity and the compact navigation presentation work. Historical release/device evidence remains recorded in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
+Current baseline: **v1.31.1 Quiet Route Restore Hotfix**. References below to earlier v1.28 foundations preserve historical scope. The [active roadmap](status/ROADMAP_NEXT_PHASE.md) governs continuation; local `main` includes the source-verified Drowned Reliquary identity, compact navigation presentation, and route-scroll restoration. Historical release/device evidence remains recorded in the [integration report](status/RELIQUARY_LOADOUT_INTEGRATION.md).
 
 ## Premise (#38)
 
