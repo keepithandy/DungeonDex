@@ -299,7 +299,6 @@
           ${maker ? `<span>Maker / theme: ${esc(maker)}</span>` : ''}
           ${set ? `<span>Set: ${esc(set)}</span>` : ''}
           ${memory ? `<span>Memory: ${esc(memory)}</span>` : ''}
-          <span>Tip: use the normal Equip, Sell, Retire, or Lowfire Market buttons for actions.</span>
         </div>
       </section>
     </div>`;

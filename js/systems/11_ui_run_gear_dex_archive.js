@@ -274,9 +274,6 @@
     const hasUnsecured = hasPendingRunRewards(pendingRewards);
     const haulSummary = hasUnsecured ? runRewardSummaryText(pendingRewards) : 'No haul yet';
     const monsterGuard = monster ? Math.max(0, Math.floor(numberOr(monster.guard, 0, 0, 999999))) : 0;
-    const bossReadiness = isBossFight && typeof bossReadinessModel === 'function'
-      ? bossReadinessModel(d.power, monster.power)
-      : null;
     const shellTone = `${districtToneClass(runDistrict)} ${isBossFight ? 'combat-device-boss boss-atmosphere' : isEliteFight ? 'combat-device-elite' : ''}`;
     const stageBackdropClasses = combatBackdropClasses(S, runDistrict, depth, monster);
     const personalityKind = combatPersonalityKind(monster, runDistrict, depth);
@@ -399,7 +396,6 @@
             <span class="pill">PWR ${format(monster.power || 0)}</span>
             <span class="pill">GRD ${format(monsterGuard)}</span>
           </div>
-          ${bossReadiness?.overmatched ? `<p class="boss-warning-line">${escapeHtml(bossReadiness.copy)}</p>` : ''}
         </section>
 
         <section class="combat-hp-card player-hp ${playerDanger}">

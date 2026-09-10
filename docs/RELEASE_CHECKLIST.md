@@ -44,9 +44,12 @@ node --check tests/smoke/smoke_revisit_routes_v173.mjs
 node .\tests\smoke\smoke_merchant_gear_upgrades_v1238.mjs
 node .\tests\smoke\smoke_debt_collector_v169.mjs
 node .\tests\smoke\smoke_revisit_routes_v173.mjs
+node smoke_compact_suite.mjs
 ```
 
 For documentation-only audits, this command list is the expected safety net for the next feature patch; do not change runtime behavior just to satisfy the checklist.
+
+The compact suite does not build a package by default. Run `node smoke_compact_suite.mjs --include-package-gate` only when temporary package construction is explicitly authorized. If the package gate needs a non-default interpreter, set `DUNGEONDEX_PYTHON` to its Python executable before running it.
 
 ## Stability Hotfix / Cache Recovery Checks
 

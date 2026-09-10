@@ -15,6 +15,7 @@ const OUTPUT_NAME = 'DungeonDex_v1265_package_gate_smoke.zip';
 const OUTPUT_ZIP = path.join(PACKAGE_DIR, OUTPUT_NAME);
 const STAGE_NAME = '_itch_staging_v1265_package_gate';
 const STAGE_DIR = path.join(PACKAGE_DIR, STAGE_NAME);
+const PYTHON = process.env.DUNGEONDEX_PYTHON || process.env.PYTHON || 'python';
 const DEVTOOLS_ONLY_FILES = [
   'js/systems/13_devtools_overlay.js',
   'js/systems/14_devtools_scenarios.js',
@@ -193,7 +194,7 @@ async function main() {
     record('Itch package builder creates a staged ZIP', builder.code === 0 && existsSync(OUTPUT_ZIP) && existsSync(STAGE_DIR), builder.stderr || builder.stdout.slice(-500));
     assert.equal(builder.code, 0, builder.stderr || builder.stdout);
 
-    const strictStage = await run('python', [path.join(ROOT, 'tools', 'check_dungeondex_package.py'), STAGE_DIR]);
+    const strictStage = await run(PYTHON, [path.join(ROOT, 'tools', 'check_dungeondex_package.py'), STAGE_DIR]);
     record('Strict checker accepts the staged package', strictStage.code === 0 && /Summary: PASS/.test(strictStage.stdout), strictStage.stdout.slice(-500));
     assert.equal(strictStage.code, 0, strictStage.stdout);
 
@@ -218,7 +219,7 @@ async function main() {
       record(`Extracted ZIP preserves ${legalFile}`, true);
     }
 
-    const strictExtracted = await run('python', [path.join(ROOT, 'tools', 'check_dungeondex_package.py'), extractedDir]);
+    const strictExtracted = await run(PYTHON, [path.join(ROOT, 'tools', 'check_dungeondex_package.py'), extractedDir]);
     record('Strict checker accepts the extracted package', strictExtracted.code === 0 && /Summary: PASS/.test(strictExtracted.stdout), strictExtracted.stdout.slice(-500));
     assert.equal(strictExtracted.code, 0, strictExtracted.stdout);
 

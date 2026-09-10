@@ -112,6 +112,7 @@ async function waitForHttp(url, timeoutMs = 15000) {
 function startChrome(debugPort, userDataDir, browserPath) {
   return spawn(browserPath, [
     `--remote-debugging-port=${debugPort}`,
+    '--remote-allow-origins=*',
     '--headless=new',
     '--disable-gpu',
     '--disable-background-networking',
@@ -171,6 +172,29 @@ function createCdpClient(wsUrl) {
       if (!opened) reject(new Error('CDP connection closed before open'));
     };
   });
+}
+
+async function connectToChrome(debugPort, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    let client = null;
+    try {
+      const targets = await fetchJson(`http://127.0.0.1:${debugPort}/json/list`, { cache: 'no-store' });
+      const target = targets.find(entry => entry.type === 'page');
+      if (!target?.webSocketDebuggerUrl) throw new Error('No Chrome page target found.');
+      client = await createCdpClient(target.webSocketDebuggerUrl);
+      await client.send('Page.enable');
+      await client.send('Runtime.enable');
+      await client.send('Network.enable');
+      return client;
+    } catch (err) {
+      lastError = err;
+      try { client?.close(); } catch {}
+      await sleep(200);
+    }
+  }
+  throw lastError || new Error('Timed out connecting to Chrome DevTools.');
 }
 
 function exceptionText(details) {
@@ -411,14 +435,7 @@ async function main() {
 
   try {
     await waitForHttp(`http://127.0.0.1:${debugPort}/json/version`);
-    const targets = await fetchJson(`http://127.0.0.1:${debugPort}/json/list`);
-    const target = targets.find(entry => entry.type === 'page');
-    if (!target?.webSocketDebuggerUrl) throw new Error('No Chrome page target found.');
-
-    client = await createCdpClient(target.webSocketDebuggerUrl);
-    await client.send('Page.enable');
-    await client.send('Runtime.enable');
-    await client.send('Network.enable');
+    client = await connectToChrome(debugPort);
     if (FINE_POINTER_MODE) await applyFinePointerProfile(client, MOBILE_PROFILES[0]);
     else await applyTouchProfile(client, MOBILE_PROFILES[0]);
     await client.send('Page.navigate', { url: pageUrl });

@@ -17,6 +17,8 @@ export async function verifyGearQolBrowser({ client, evaluate, record }) {
     S.player.equipment = {weapon:old};
     S.player.inventory = [kept, loose];
     S.screen = 'gear'; render();
+    document.querySelector('details[data-gear-section="inventory"]')?.setAttribute('open', '');
+    document.querySelector('details[data-gear-section="loadouts"]')?.setAttribute('open', '');
     window.__qolConfirm = window.confirm;
     window.confirm = text => { window.__qolConfirmation = text; return true; };
     return true;
@@ -52,6 +54,8 @@ export async function verifyGearQolBrowser({ client, evaluate, record }) {
     await client.send('Emulation.setTouchEmulationEnabled', {enabled:true,maxTouchPoints:5});
     const geometry = await read(`(() => {
       S.screen='gear'; render();
+      document.querySelector('details[data-gear-section="inventory"]')?.setAttribute('open', '');
+      document.querySelector('details[data-gear-section="loadouts"]')?.setAttribute('open', '');
       const panel=document.getElementById('inventoryPanel'); panel.scrollIntoView({block:'start'});
       const buttons=[...panel.querySelectorAll('button')];
       return {page:document.documentElement.scrollWidth <= innerWidth+1, panel:panel.scrollWidth <= panel.clientWidth+1,
@@ -74,19 +78,30 @@ export async function verifyGearQolBrowser({ client, evaluate, record }) {
     return true;
   })()`);
   assert.equal(await read(`JSON.parse(window.__qolExport.raw).player.equipment.weapon.id`),'qol-kept');
-  const imported = await read(`(async () => {
+  await read(`(() => {
     const candidate=JSON.parse(window.__qolExport.raw); candidate.player.gold=4321;
     const file=new File([JSON.stringify(candidate)],'transfer.json',{type:'application/json'});
     const transfer=new DataTransfer(); transfer.items.add(file);
     const input=document.getElementById('importSaveInput'); input.files=transfer.files;
-    await input.onchange();
-    const good=S.player.gold===4321 && JSON.parse(localStorage.getItem(STORAGE_KEY+'_before_import')).player.equipment.weapon.id==='qol-kept';
-    const invalid=new DataTransfer(); invalid.items.add(new File(['{}'],'invalid.json'));
-    const next=document.getElementById('importSaveInput'); next.files=invalid.files; await next.onchange();
-    return {good,unchanged:S.player.gold===4321,message:document.querySelector('#settingsPanel [role="status"]').innerText};
+    input.onchange();
+    return true;
   })()`);
-  assert.ok(imported.good && imported.unchanged && imported.message.includes('Import failed'), JSON.stringify(imported));
-  record('Save export/import controls transfer progress and reject an invalid file without replacing it',true);
+  await pause();
+  const good = await read(`S.player.gold===4321 && JSON.parse(localStorage.getItem(STORAGE_KEY+'_before_import')).player.equipment.weapon.id==='qol-kept'`);
+  await read(`(() => {
+    const invalid=new DataTransfer(); invalid.items.add(new File(['{}'],'invalid.json'));
+    const next=document.getElementById('importSaveInput'); next.files=invalid.files; next.onchange();
+    return true;
+  })()`);
+  await pause();
+  const imported = {
+    good,
+    unchanged: await read(`S.player.gold===4321`),
+    message: await read(`document.querySelector('#settingsPanel [role="status"]').innerText`)
+  };
+  const importedSafely = imported.good && imported.unchanged && imported.message.includes('Import failed');
+  record('Save export/import controls transfer progress and reject an invalid file without replacing it', importedSafely, JSON.stringify(imported));
+  assert.ok(importedSafely, JSON.stringify(imported));
   await read(`(() => {
     const panel=document.getElementById('settingsPanel'); panel.scrollIntoView({block:'start'});
     return true;

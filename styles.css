@@ -1313,10 +1313,6 @@ button:disabled {
   font-size: 0.73rem;
   line-height: 1.25;
 }
-.boss-warning-line {
-  color: rgba(255,214,185,0.84);
-  margin-bottom: 6px;
-}
 .boss-floor-sigil {
   display: inline-flex;
   align-items: center;

@@ -7,9 +7,9 @@
   window.DDLowfireSparkBoard = true;
 
   const SPARK_OBJECTIVES = [
-    { id:'q4', title:'Elite Heat Audit', goal:3, progress:0, reward:'1 forge spark + 20 shards', type:'elite', detail:'Defeat elite enemies. Elite marks are the best combat source of Sparks.', rewardSpec:{ spark:1, shards:20 } },
-    { id:'q5', title:'Boss Cinder Tithe', goal:1, progress:0, reward:'2 forge sparks + 1 ember', type:'boss', detail:'Clear one boss floor. Bosses pay the largest Spark bounties.', rewardSpec:{ spark:2, ember:1 } },
-    { id:'q6', title:'Safe Return Receipt', goal:2, progress:0, reward:'1 forge spark', type:'extract', detail:'Extract safely twice. Lowfire only pays this after the haul is banked.', rewardSpec:{ spark:1 } },
+    { id:'q4', title:'Elite Heat Audit', goal:3, progress:0, reward:'1 forge spark + 20 shards', type:'elite', detail:'Defeat elite enemies. Their marks carry a stubborn heat.', rewardSpec:{ spark:1, shards:20 } },
+    { id:'q5', title:'Boss Cinder Tithe', goal:1, progress:0, reward:'2 forge sparks + 1 ember', type:'boss', detail:'Clear one boss floor. Cinders gather in its wake.', rewardSpec:{ spark:2, ember:1 } },
+    { id:'q6', title:'Safe Return Receipt', goal:2, progress:0, reward:'1 forge spark', type:'extract', detail:'Extract safely twice. Lowfire honors a haul that returns.', rewardSpec:{ spark:1 } },
     { id:'q7', title:'Junk to Kindling', goal:6, progress:0, reward:'1 forge spark + 30 shards', type:'salvage', detail:'Salvage safe common/uncommon gear at the Relic Forge.', rewardSpec:{ spark:1, shards:30 } },
     { id:'q8', title:'Hammer Mark Trial', goal:2, progress:0, reward:'1 forge spark + 25 favor', type:'temper', detail:'Temper equipped gear. Tempering proves a relic can hold more heat.', rewardSpec:{ spark:1, favor:25 } },
     { id:'q9', title:'Focused Pattern Work', goal:1, progress:0, reward:'1 forge spark rebate', type:'focusedForge', detail:'Use Focused Forge once. Lowfire refunds a Spark for learning slot control.', rewardSpec:{ spark:1 } }
@@ -198,9 +198,9 @@
     const claimed = quests.filter(q => q.claimed).length;
     const revisitBoardMarkup = typeof earlierDungeonRevisitMarkup === 'function' ? earlierDungeonRevisitMarkup() : '';
     panel.innerHTML = `
-      <div class="card-head"><div><h2>Lowfire Board</h2><p>Board work is the steady way to earn Forge Sparks outside random drops.</p><p class="lowfire-board-tip">Sparks craft relics. Shards feed craft costs. Ember powers skills and focused forge work. Favor raises forge tier.</p></div></div>
+      <div class="card-head"><div><h2>Lowfire Board</h2><p>The board keeps its own account in ash and cinder.</p><p class="lowfire-board-tip">Sparks, shards, ember, and favor leave different marks in the ledger.</p></div></div>
       <div class="spark-source-strip">
-        <span><b>Forge Spark</b><br>Earn from elite, boss, extraction, salvage, and temper board work.</span>
+        <span><b>Forge Spark</b><br>Seen in elite marks, boss cinders, returned hauls, salvage, and temper work.</span>
         <span><b>Shards</b><br>Dropped by fights and gained by salvaging junk gear.</span>
         <span><b>Ember</b><br>Bosses, events, and deeper runs. Spent on combat spells and focused forging.</span>
         <span><b>Favor</b><br>Forge reputation from crafting, salvage, and tempering.</span>

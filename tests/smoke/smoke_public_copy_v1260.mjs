@@ -12,7 +12,7 @@ function record(name, ok, detail) {
 }
 
 async function main() {
-  const [index, forge, town, revisit, archive, debt, readme, intro] = await Promise.all([
+  const [index, forge, town, revisit, archive, debt, readme, intro, scaling, sparkBoard, gearDetail] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/16_relic_forge_crafting.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/10_ui_town_shop.js'), 'utf8'),
@@ -20,7 +20,10 @@ async function main() {
     readFile(path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/28_debt_collector_foundation.js'), 'utf8'),
     readFile(path.join(ROOT, 'README.md'), 'utf8'),
-    readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8')
+    readFile(path.join(ROOT, 'js/systems/09_ui_common_intro.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/06_scaling_generation_audits.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/24_lowfire_spark_board.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/40_gear_detail_modal.js'), 'utf8')
   ]);
 
   record('Public shell names the current game and Journal', index.includes('<title>DungeonDex v1.31.0</title>') && index.includes('aria-label="Guild Journal"'), 'title and Guild Journal surface');
@@ -36,6 +39,13 @@ async function main() {
     "id=\"${actionId}\">Continue Run"
   ].every(needle => intro.includes(needle)), 'first-run title, welcome, and existing entry actions');
   record('Player surfaces avoid internal development wording', ['DevTools only', 'DevTools Archive Record', 'learned copy-only', 'learned helper only', 'display text only', 'smoke-backed', 'compatibility-safe'].every(needle => !`${archive}\n${debt}\n${readme}`.includes(needle)), 'Archive, Debt Collector, and README copy');
+  record('Player surfaces preserve discovery instead of prescribing progression', [
+    'Temper gear at The Ashen Anvil before challenging it.',
+    'your build can challenge this boss',
+    'best combat source of Sparks',
+    'largest Spark bounties',
+    'Tip: use the normal Equip, Sell, Retire, or Lowfire Market buttons for actions.'
+  ].every(needle => !`${scaling}\n${sparkBoard}\n${gearDetail}`.includes(needle)), 'no boss grading, source ranking, or action tips');
   record('Archive fallback keeps Trophy Echo as the only active lane', archive.includes('Trophy Echo is the only active Revisit lane.') && archive.includes('Guild Archive Record') && archive.includes('Reserved'), 'legacy records remain history-only');
 
   const passed = results.filter(result => result.ok).length;

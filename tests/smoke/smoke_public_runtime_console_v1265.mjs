@@ -100,6 +100,22 @@ async function waitForHttp(url, timeout = 15000) {
   throw new Error(`Timed out waiting for ${url}`);
 }
 
+async function fetchJson(url, timeout = 15000) {
+  const deadline = Date.now() + timeout;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      await sleep(150);
+    }
+  }
+  throw lastError || new Error(`Timed out waiting for ${url}`);
+}
+
 function createClient(wsUrl) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(wsUrl);
@@ -141,6 +157,29 @@ function createClient(wsUrl) {
       if (!opened) reject(new Error('CDP connection closed before open'));
     };
   });
+}
+
+async function connectToChrome(debugPort, timeout = 15000) {
+  const deadline = Date.now() + timeout;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    let client = null;
+    try {
+      const targets = await fetchJson(`http://127.0.0.1:${debugPort}/json/list`, 1000);
+      const target = targets.find(entry => entry.type === 'page');
+      if (!target?.webSocketDebuggerUrl) throw new Error('Chromium did not expose a page debugging target.');
+      client = await createClient(target.webSocketDebuggerUrl);
+      await client.send('Page.enable');
+      await client.send('Runtime.enable');
+      await client.send('Network.enable');
+      return client;
+    } catch (error) {
+      lastError = error;
+      try { client?.close(); } catch {}
+      await sleep(200);
+    }
+  }
+  throw lastError || new Error('Timed out connecting to Chromium DevTools.');
 }
 
 async function evaluate(client, expression) {
@@ -186,16 +225,13 @@ async function main() {
     const debugPort = await pickPort();
     profileDir = await mkdtemp(path.join(tmpdir(), 'dungeondex-public-runtime-'));
     chrome = spawn(chromePath, [
-      `--remote-debugging-port=${debugPort}`, '--headless=new', '--disable-gpu', '--disable-background-networking',
+      `--remote-debugging-port=${debugPort}`, '--remote-allow-origins=*', '--headless=new', '--disable-gpu', '--disable-background-networking',
       '--disable-extensions', '--disable-sync', '--no-first-run', '--no-default-browser-check', '--mute-audio',
       `--user-data-dir=${profileDir}`, 'about:blank'
     ], { cwd: ROOT, detached: false, stdio: 'ignore', windowsHide: true });
 
     await waitForHttp(`http://127.0.0.1:${debugPort}/json/version`);
-    const targets = await (await fetch(`http://127.0.0.1:${debugPort}/json/list`)).json();
-    const target = targets.find(entry => entry.type === 'page');
-    assert.ok(target?.webSocketDebuggerUrl, 'Chromium did not expose a page debugging target.');
-    client = await createClient(target.webSocketDebuggerUrl);
+    client = await connectToChrome(debugPort);
 
     let activeSurface = 'startup';
     const issues = [];
@@ -216,9 +252,6 @@ async function main() {
     });
     client.on('Network.loadingFailed', event => addIssue('network-failure', event.errorText || 'Network load failed', requests.get(event.requestId) || 'source unavailable'));
 
-    await client.send('Page.enable');
-    await client.send('Runtime.enable');
-    await client.send('Network.enable');
     await client.send('Page.addScriptToEvaluateOnNewDocument', { source: `
       window.__ddPublicRuntimeUnhandledRejections = [];
       window.addEventListener('unhandledrejection', event => {
@@ -475,6 +508,8 @@ async function main() {
       };
       render();
       const button = document.querySelector('[data-merchant-upgrade="offhand"]');
+      const section = button?.closest('details');
+      if (section) section.open = true;
       return {
         present: !!button,
         text: button?.closest('.merchant-upgrade-card')?.innerText || ''

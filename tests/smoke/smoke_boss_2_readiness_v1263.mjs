@@ -9,7 +9,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const SCALING_FILE = path.join(ROOT, 'js/systems/06_scaling_generation_audits.js');
 const NORMALIZATION_FILE = path.join(ROOT, 'js/systems/08_normalization_save.js');
 const RENDER_FILE = path.join(ROOT, 'js/systems/11_ui_run_gear_dex_archive.js');
-const OVERMATCHED_COPY = 'Overmatched: this boss outclasses your current build. Temper gear at The Ashen Anvil before challenging it.';
 
 function numberOr(value, fallback = 0, min = -Infinity, max = Infinity) {
   const number = Number(value);
@@ -53,6 +52,7 @@ function createContext(randValue) {
     encounterCoinReward(_floor, power) { return power; },
     makeId(prefix) { return `${prefix}_smoke`; }
   };
+  context.window = context;
   context.globalThis = context;
   return vm.createContext(context);
 }
@@ -63,7 +63,7 @@ async function loadRuntime(randValue) {
     readFile(NORMALIZATION_FILE, 'utf8')
   ]);
   const context = createContext(randValue);
-  vm.runInContext(`${scaling}\n${normalization}\nglobalThis.__boss2Smoke = { generateMonster, normalizeMonster, bossReadinessModel };`, context, { filename: SCALING_FILE });
+  vm.runInContext(`${scaling}\n${normalization}\nglobalThis.__boss2Smoke = { generateMonster, normalizeMonster };`, context, { filename: SCALING_FILE });
   return context.__boss2Smoke;
 }
 
@@ -99,12 +99,10 @@ async function main() {
   assert.deepEqual([legacyBoss.rewardGold, legacyBoss.rewardXp, legacyBoss.rewardShard], [900, 1200, 30], 'saved Boss 2 rewards remain unchanged');
   assert.equal(minimum.normalizeMonster(legacyBoss, 30).power, 748, 'saved Boss 2 repair is idempotent');
 
-  const readiness = minimum.bossReadinessModel(540, 1200);
-  assert.equal(readiness.overmatched, true, 'a 1,200-PWR boss should flag a 540-PWR build as overmatched');
-  assert.equal(readiness.copy, OVERMATCHED_COPY, 'overmatched guidance should name The Ashen Anvil');
-  assert.ok(renderer.includes('bossReadinessModel(d.power, monster.power)') && renderer.includes('boss-warning-line'), 'combat renderer should surface the boss readiness warning');
+  assert.ok(!renderer.includes('bossReadinessModel') && !renderer.includes('boss-warning-line'), 'combat renderer does not grade the player or prescribe preparation');
+  assert.ok(!renderer.includes('Temper gear at The Ashen Anvil before challenging it.'), 'combat renderer does not direct the player to an upgrade path');
 
-  console.log(`PASS Boss 2 readiness scaling: ${bossTwoMin}-${bossTwoMax} PWR; saved 1,100 PWR -> ${legacyBoss.power}; normal D${normalDepth}: ${expectedNormalPower} PWR.`);
+  console.log(`PASS Boss 2 scaling: ${bossTwoMin}-${bossTwoMax} PWR; saved 1,100 PWR -> ${legacyBoss.power}; normal D${normalDepth}: ${expectedNormalPower} PWR.`);
 }
 
 main().catch(error => {

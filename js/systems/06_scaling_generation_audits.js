@@ -169,18 +169,6 @@
     return clamp(target / Math.max(1, currentMidpoint), 0.01, 1);
   }
 
-  function bossReadinessModel(playerPower, bossPower) {
-    const player = Math.max(0, Math.floor(numberOr(playerPower, 0, 0, 9999999)));
-    const boss = Math.max(0, Math.floor(numberOr(bossPower, 0, 0, 9999999)));
-    const overmatched = player <= 0 || boss > player * 1.5;
-    return {
-      overmatched,
-      copy: overmatched
-        ? 'Overmatched: this boss outclasses your current build. Temper gear at The Ashen Anvil before challenging it.'
-        : 'Readiness: your build can challenge this boss. Keep your guard up.'
-    };
-  }
-
   function expectedGearRating(level, rarityKey = 'common', source = 'normal', rawDepth = 0) {
     const safeLevel = normalizeItemLevel(level);
     const sourceScale = source === 'merchant' ? 0.96 : source === 'elite' ? 1.05 : source === 'boss' ? 1.15 : source === 'forge' ? 1.08 : 1;

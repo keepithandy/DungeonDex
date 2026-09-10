@@ -8,6 +8,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
 const verbose = args.includes('--verbose') || args.includes('-v');
 const listOnly = args.includes('--list');
+const includePackageGate = args.includes('--include-package-gate');
 const failLinesArg = args.find(arg => arg.startsWith('--fail-lines='));
 const failLineLimit = Math.max(10, Math.floor(Number(failLinesArg?.split('=')[1]) || 40));
 const selectedTags = args
@@ -67,9 +68,12 @@ const COMMANDS = [
   { tag: 'town', name: 'town runtime cleanup v1.27', cmd: ['node', 'tests/smoke/smoke_town_runtime_cleanup_v126302.mjs'] },
   { tag: 'revisit', name: 'revisit archive codex', cmd: ['node', 'tests/smoke/smoke_revisit_archive_codex_v174.mjs'], optionalPath: 'tests/smoke/smoke_revisit_archive_codex_v174.mjs' },
   { tag: 'revisit', name: 'revisit famous gear flavor', cmd: ['node', 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs'], optionalPath: 'tests/smoke/smoke_revisit_famous_gear_flavor_v175.mjs' },
+  { tag: 'navigation', name: 'Town compact navigation', cmd: ['node', 'tests/smoke/smoke_town_section_navigation_v1300.mjs'] },
+  { tag: 'navigation', name: 'Gear compact navigation', cmd: ['node', 'tests/smoke/smoke_gear_section_navigation_v1300.mjs'] },
+  { tag: 'navigation', name: 'Guild Routes navigation', cmd: ['node', 'tests/smoke/smoke_side_nav_visual_contract_v1300.mjs'] },
   { tag: 'debt', name: 'debt and Talent compatibility', cmd: ['node', 'tests/smoke/smoke_debt_talent_compatibility_v1265.mjs'] },
   { tag: 'app', name: 'app wiring cache manifest', cmd: ['node', 'tests/smoke/smoke_app_wiring_cache_manifest_v1.mjs'] },
-  { tag: 'package', name: 'package build and extraction gate', cmd: ['node', 'tests/smoke/smoke_package_build_extraction_v1265.mjs'] },
+  ...(includePackageGate ? [{ tag: 'package', name: 'package build and extraction gate', cmd: ['node', 'tests/smoke/smoke_package_build_extraction_v1265.mjs'] }] : []),
   { tag: 'app', name: 'mobile layout contracts v1.27', cmd: ['node', 'tests/smoke/smoke_mobile_layout_contracts_v1264.mjs'] },
   { tag: 'app', name: 'touch navigation geometry', cmd: ['node', 'tools/capture_town_mobile_screenshots.mjs', '--verify-geometry'] },
   { tag: 'app', name: 'interface accessibility v1.27', cmd: ['node', 'tests/smoke/smoke_interface_accessibility_v1264.mjs'] },
@@ -164,7 +168,7 @@ if (listOnly) {
 }
 
 console.log(`DungeonDex compact smoke runner`);
-console.log(`Commands: ${suite.length}${selectedTags.length ? ` | filter: ${selectedTags.join(', ')}` : ''}${verbose ? ' | verbose' : ''}`);
+console.log(`Commands: ${suite.length}${selectedTags.length ? ` | filter: ${selectedTags.join(', ')}` : ''}${includePackageGate ? ' | package gate' : ' | no package build'}${verbose ? ' | verbose' : ''}`);
 console.log('');
 
 const results = [];

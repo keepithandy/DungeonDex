@@ -42,7 +42,12 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.match(contractBriefing.inBand, /The mark waits among the sealed bells\. Follow the writ's listed location\./);
   assert.doesNotMatch(contractBriefing.outside, /The mark waits among the sealed bells\./);
   record('Only existing contracts naturally targeting D31-D40 receive the Reliquary briefing', true);
-  await read(`document.getElementById('tab-gear').click(); true`);
+  await read(`(() => {
+    document.getElementById('tab-gear').click();
+    const loadouts = document.querySelector('details[data-gear-section="loadouts"]');
+    if (loadouts) loadouts.open = true;
+    return true;
+  })()`);
   await read(`(() => {
     const input = document.getElementById('namedLoadoutName');
     input.value = 'Reliquary Delver'; input.focus();
@@ -190,7 +195,10 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     const weapon = S.player.equipment.weapon.id;
     const armor = S.player.equipment.armor;
     S.player.inventory.push(armor); S.player.equipment.armor = null;
-    render(); document.querySelector('[data-named-loadout-action="apply"]').click();
+    render();
+    document.querySelector('details[data-gear-section="loadouts"]')?.setAttribute('open', '');
+    document.querySelector('details[data-gear-section="inventory"]')?.setAttribute('open', '');
+    document.querySelector('[data-named-loadout-action="apply"]').click();
     return { weapon:S.player.equipment.weapon.id === weapon, armor:S.player.equipment.armor?.id === armor.id,
       upgrade:S.player.equipment.armor?.upgradeLevel, focus:document.activeElement?.dataset.namedLoadoutAction,
       notice:document.querySelector('.named-loadout-notice')?.innerText,

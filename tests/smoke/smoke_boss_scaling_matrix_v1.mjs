@@ -25,7 +25,6 @@ const TRIALS_PER_POLICY = 200;
 const TRIALS_PER_FIXTURE = TRIALS_PER_POLICY * 3;
 const TURN_LIMIT = 200;
 const MAX_ROLL = 1 - Number.EPSILON;
-const OVERMATCHED_COPY = 'Overmatched: this boss outclasses your current build. Temper gear at The Ashen Anvil before challenging it.';
 const STRICT_BANDS = process.argv.includes('--strict-bands');
 const PRINT_SIGNATURES = process.argv.includes('--print-signatures');
 const VERBOSE = process.argv.includes('--verbose') || process.argv.includes('-v');
@@ -194,7 +193,6 @@ async function loadRuntime() {
     xpGain,
     addPlayerGold,
     normalizeMonster,
-    bossReadinessModel,
     shouldDropLoot,
     shouldDropMythicSetPiece,
     generateMythicSetPiece,
@@ -802,13 +800,6 @@ async function main() {
   const boundaryRows = buildBoundaryMatrix(runtime);
   const dropContract = buildDropContract(runtime);
 
-  const atReadinessThreshold = plain(runtime.api.bossReadinessModel(200, 300));
-  const aboveReadinessThreshold = plain(runtime.api.bossReadinessModel(200, 301));
-  assert.equal(atReadinessThreshold.overmatched, false, 'readiness warning should not appear at exactly 1.5x player power');
-  assert.equal(aboveReadinessThreshold.overmatched, true, 'readiness warning should appear above 1.5x player power');
-  assert.equal(aboveReadinessThreshold.copy, OVERMATCHED_COPY, 'overmatched readiness should direct the player to The Ashen Anvil');
-  assert.ok(!aboveReadinessThreshold.copy.includes('Merchant Gear Upgrades'), 'overmatched readiness should not use the retired Merchant Gear Upgrades wording');
-
   const fixtures = [];
   for (let bossNumber = 1; bossNumber <= BOSS_COUNT; bossNumber += 1) {
     const fixtureSet = buildFixtureSet(runtime, bossNumber);
@@ -817,10 +808,6 @@ async function main() {
       const fixture = fixtureSet[profileName];
       fixture.bossToPlayerRatio = ratio(bossMid.power, fixture.derived.power);
       fixture.inPowerTarget = fixture.bossToPlayerRatio >= 1.2 && fixture.bossToPlayerRatio <= 1.6;
-      const readiness = plain(runtime.api.bossReadinessModel(fixture.derived.power, bossMid.power));
-      assert.equal(readiness.overmatched, bossMid.power > fixture.derived.power * 1.5, `${profileName} Boss ${bossNumber} readiness threshold should match the 1.5x contract`);
-      if (readiness.overmatched) assert.equal(readiness.copy, OVERMATCHED_COPY, `${profileName} Boss ${bossNumber} should use The Ashen Anvil guidance`);
-
       const normalizedOnce = plain(runtime.api.normalizeMonster(generateBoss(runtime, fixture.rawDepth, 0.5), fixture.rawDepth));
       const normalizedTwice = plain(runtime.api.normalizeMonster(normalizedOnce, fixture.rawDepth));
       assert.deepEqual(normalizedTwice, normalizedOnce, `${profileName} Boss ${bossNumber} normalization should be idempotent`);

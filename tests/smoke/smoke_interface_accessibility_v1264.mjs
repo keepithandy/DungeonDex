@@ -393,7 +393,8 @@ async function main() {
     '#searchFilter',
     '#sellJunkGearBtn',
     '#sellAllGearBtn',
-    '#retireArchiveBtn',
+    '[data-clear-gear-filters]',
+    '[data-gear-flag]',
     '[data-equip]',
     '[data-sell]',
     '[data-retire]',
@@ -407,7 +408,12 @@ async function main() {
     '[data-gear-detail-close]',
     '[data-gear-detail-compare]',
     '.trophy-tab',
-    '#clearCacheReloadBtn'
+    '#clearCacheReloadBtn',
+    '#startFreshSaveBtn',
+    '#exportSaveBtn',
+    '#exportPreviousSaveBtn',
+    '#exportRecoverySaveBtn',
+    '#importSaveInput'
   ];
   const activeControlTokens = [...extractedControlTokens]
     .filter(token => !inactiveFutureControlTokens.has(token) && !bootRecoveryControlTokens.has(token));
