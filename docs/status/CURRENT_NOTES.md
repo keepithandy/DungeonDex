@@ -7,10 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.32.0 - Spell Mastery
-- Build/cache labels use `1.32.0-spell-mastery`.
+- DungeonDex v1.32.2 - Merchant Upgrade Hotfix
+- Build/cache labels use `1.32.2-merchant-upgrade-hotfix`.
 
-## v1.32.0 Spell Mastery (Local Release Candidate)
+## v1.32.2 Merchant Upgrade Hotfix (Local Release Candidate)
+<!-- This hotfix restores the active three-slot Merchant Gear Upgrade contract and its read-only summaries. -->
+- Merchant Gear Upgrades remain limited to equipped Weapon, Armor, and Offhand pieces with the established `+3` cap, costs, and stat bonuses.
+- Town Market, Gear summary, and Guild Journal surfaces show current bonuses, next costs, and next-tier details consistently.
+- Unsupported future-slot upgrade definitions from the v1.32.0 UI pass were removed; save compatibility and existing equipment slots remain intact.
+- This is source-only work. No v1.32.2 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
+
+## v1.32.0 Spell Mastery (Historical Local Release Candidate)
 <!-- This local candidate extends the existing spellbook without replacing the combat loop. -->
 - Every successful spell cast records mastery for that spell. Adept mastery at 8 unlocks one Scriptorium inscription; 24 mastery can master the selected path.
 - Lowfire's compact Scriptorium includes safe per-spell respec at 1s50c. Respec clears the path but retains earned mastery and rare folios.
@@ -27,7 +34,7 @@
 - This is source-only work. No v1.31.1 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Historical Local Candidate)
-<!-- Historical candidate details are preserved here; v1.32.0 is the current development authority. -->
+<!-- Historical candidate details are preserved here; v1.32.2 is the current development authority. -->
 - Town now keeps its existing Market, Forge, and Board inside named native collapsible groups; the district header and entry actions remain visible.
 - Gear now keeps its existing Upgrades, Equipment, Loadouts, and Inventory inside named native collapsible groups; Filters remain with Inventory.
 - Existing Town shortcuts reveal the matching Town group before focusing its original panel, and the Guild Routes rail has a brass-and-obsidian visual refresh with existing route behavior intact.

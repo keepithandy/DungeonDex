@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.32.0-spell-mastery';
+const CACHE_NAME = 'dungeondex-v1.32.2-merchant-upgrade-hotfix';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.32.0-spell-mastery';
+const BUILD_QS = '1.32.2-merchant-upgrade-hotfix';
 const ASSETS = [
   './',
   './index.html',

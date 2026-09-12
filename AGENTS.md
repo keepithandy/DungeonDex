@@ -14,10 +14,10 @@ This file is the first-read operating contract for Codex, Claude, ChatGPT, and o
 
 ## Current Release Baseline
 
-- Current source release: `v1.32.0 Spell Mastery` (local release candidate).
+- Current source release: `v1.32.2 Merchant Upgrade Hotfix` (local release candidate).
 - Spell Mastery extends the existing four-spell combat spellbook through the Lowfire Scriptorium. It keeps spell selection, unlock levels, Ember costs, the four-action layout, dungeon entry, and rewards intact while adding per-spell mastery, inscriptions, rare folios, gear affinities, and safe per-spell respec.
 - `VERSION.md` remains the sole version authority; do not infer a release state from this summary.
-- No v1.32.0 package is authorized by this version pass; itch.io upload, release tag, and push require explicit authorization.
+- No v1.32.2 package is authorized by this version pass; itch.io upload, release tag, and push require explicit authorization.
 - The historical v1.27 local package carries an owner-approved physical-device exception; run a fresh Textastic/device pass before any later upload when practical.
 
 ## Active Core Loop

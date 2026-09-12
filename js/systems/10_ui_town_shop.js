@@ -335,10 +335,10 @@ function townProgressionStatusLine(state, stagedStartDepth) {
 
 function merchantGearUpgradeCard(model) {
 	const stateText = model.capped
-			? 'Maxed at +3'
-			: model.affordable
-				? `Upgrade for ${formatMoney(model.cost)}`
-				: `Need ${formatMoney(model.missingCopper)} more copper`;
+	  ? 'Maxed at +3'
+	  : model.affordable
+	    ? `Next cost ${formatMoney(model.cost)}`
+	    : `Need ${formatMoney(model.missingCopper)} more copper`;
 	const action = model.item && !model.capped && model.affordable
 		? `<button class="primary mini merchant-upgrade-action" data-merchant-upgrade="${escapeHtml(model.slot)}">Upgrade • ${escapeHtml(formatMoney(model.cost))}</button>`
 		: `<span class="small muted">${escapeHtml(stateText)}</span>`;
@@ -351,9 +351,13 @@ function merchantGearUpgradeCard(model) {
         <span class="pill ${model.capped ? 'rarity-uncommon' : ''}">${model.capped ? 'Maxed' : escapeHtml(model.tierText || `+${String(model.level)} / +${String(model.cap)}`)}</span>
       </div>
       <div class="merchant-upgrade-card-copy">
+        <span class="small muted">${escapeHtml(`${model.itemName || 'Equipped gear'} • ${model.tierText || `+${String(model.level)} / +${String(model.cap)}`}`)}</span>
         <span>${escapeHtml(model.perTierText || '')}</span>
-        <span class="small muted">${model.capped ? `Total ${escapeHtml(model.currentBonusText || model.currentStat)}` : `Next: ${escapeHtml(model.nextBonusText || model.nextStat)}`}</span>
+        <span class="small muted">Current bonus ${escapeHtml(model.currentBonusText || model.currentStat || 'No bonus')}</span>
+        <span class="small muted">${model.capped ? 'Maxed at +3.' : `Next: ${escapeHtml(model.nextBonusText || model.nextStat)}`}</span>
+        ${!model.capped ? `<span class="small muted">Next cost ${escapeHtml(formatMoney(model.cost))}</span>` : ''}
       </div>
+      <p class="small muted">${escapeHtml(`${model.label} ${model.tierText || `+${String(model.level)} / +${String(model.cap)}`} gives ${model.currentBonusText || model.currentStat || 'No bonus'}.${model.capped ? ' Maxed at +3.' : ` Next tier gives ${model.nextBonusText || model.nextStat}.`}`)}</p>
       <div class="merchant-upgrade-card-footer">${action}</div>
     </article>`;
 }
@@ -367,7 +371,7 @@ function merchantGearUpgradePanelMarkup(state) {
       <div class="split market-subhead">
         <div>
           <strong>The Ashen Anvil</strong>
-		  <p class="small">Temper any equipped piece to +3. Each slot strengthens the stats it already favors.</p>
+		  <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
         </div>
 		<span class="pill">${visibleModels.length}/${models.length} equipped</span>
       </div>

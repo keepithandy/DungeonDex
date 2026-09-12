@@ -3,18 +3,11 @@
 // Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge
   const MERCHANT_GEAR_UPGRADE_COSTS = Object.freeze([50, 125, 250]);
   const MERCHANT_GEAR_UPGRADE_CAP = MERCHANT_GEAR_UPGRADE_COSTS.length;
-  const MERCHANT_GEAR_UPGRADE_SLOTS = Object.freeze(['weapon', 'offhand', 'helm', 'armor', 'gloves', 'boots', 'ring', 'amulet', 'cloak', 'charm']);
+  const MERCHANT_GEAR_UPGRADE_SLOTS = Object.freeze(['weapon', 'armor', 'offhand']);
   const MERCHANT_GEAR_UPGRADE_BONUSES = Object.freeze({
     weapon: Object.freeze({ power: 2 }),
-    offhand: Object.freeze({ guard: 1, wit: 1 }),
-    helm: Object.freeze({ guard: 1, hp: 4 }),
     armor: Object.freeze({ guard: 2, hp: 8 }),
-    gloves: Object.freeze({ power: 1, speed: 1 }),
-    boots: Object.freeze({ guard: 1, speed: 1 }),
-    ring: Object.freeze({ luck: 1, hp: 4 }),
-    amulet: Object.freeze({ wit: 1, hp: 4 }),
-    cloak: Object.freeze({ wit: 1, speed: 1 }),
-    charm: Object.freeze({ wit: 1, luck: 1 })
+    offhand: Object.freeze({ guard: 1, wit: 1 })
   });
   const MERCHANT_GEAR_UPGRADE_STAT_LABELS = Object.freeze({
     power: 'Power', guard: 'Guard', wit: 'Wit', speed: 'Speed', luck: 'Luck', hp: 'HP'
@@ -39,9 +32,12 @@
     }, {});
   }
 
-  function merchantGearUpgradeBonusDisplay(bonuses) {
-    const parts = Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS)
-      .filter(stat => Number(bonuses?.[stat]) > 0)
+  function merchantGearUpgradeBonusDisplay(bonuses, slot = '') {
+    const safeSlot = merchantGearUpgradeSlotKey(slot);
+    const stats = safeSlot
+      ? Object.keys(MERCHANT_GEAR_UPGRADE_BONUSES[safeSlot] || {})
+      : Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS).filter(stat => Number(bonuses?.[stat]) > 0);
+    const parts = stats
       .map(stat => `+${format(bonuses[stat])} ${MERCHANT_GEAR_UPGRADE_STAT_LABELS[stat]}`);
     return parts.length ? parts.join(' and ') : 'No bonus';
   }
@@ -72,11 +68,11 @@
   }
 
   function merchantGearUpgradePerTierText(slot) {
-    return `${merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, 1))} per tier`;
+    return `${merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, 1), slot)} per tier`;
   }
 
   function merchantGearUpgradeBonusText(slot, level) {
-    return merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, normalizeMerchantGearUpgradeLevel(level)));
+    return merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, normalizeMerchantGearUpgradeLevel(level)), slot);
   }
 
   function merchantGearUpgradeStatSummary(item, levelOverride = null) {
@@ -84,7 +80,7 @@
     const slot = merchantGearUpgradeSlotKey(item.slot);
     const bonuses = merchantGearUpgradeBonuses(item, levelOverride);
     const baseStats = isPlainObject(item.stats) ? item.stats : {};
-    const bonusStats = Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS).filter(key => bonuses[key] > 0);
+    const bonusStats = Object.keys(MERCHANT_GEAR_UPGRADE_BONUSES[slot] || {});
     return bonusStats.map(stat => {
       const value = Math.floor(numberOr(baseStats[stat], 0, 0, 999999)) + bonuses[stat];
       return `${MERCHANT_GEAR_UPGRADE_STAT_LABELS[stat]} ${format(value)}`;

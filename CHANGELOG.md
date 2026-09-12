@@ -8,14 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.32.0 Spell Mastery`
-* Current development target: `v1.32.0 Spell Mastery`
-* Current build/cache label: `1.32.0-spell-mastery`
+* Current release candidate/local package baseline: `v1.32.2 Merchant Upgrade Hotfix`
+* Current development target: `v1.32.2 Merchant Upgrade Hotfix`
+* Current build/cache label: `1.32.2-merchant-upgrade-hotfix`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.32.2 - Merchant Upgrade Hotfix
+
+### Upgrade contract and presentation
+
+* Restored Merchant Gear Upgrades to the active Weapon, Armor, and Offhand slots with the established `+3` cap and per-tier stat bonuses.
+* Restored current bonus, next cost, and next-tier details across the Town Market, Gear summary, and Guild Journal surfaces.
+* Removed unsupported future-slot upgrade definitions introduced during the v1.32.0 UI pass.
+* Added no new save fields, currencies, progression, combat rules, reward rules, Revisit lanes, or dungeon-entry paths. This remains a local source candidate until an explicitly authorized upload.
 
 ## v1.32.0 - Spell Mastery
 

@@ -51,7 +51,7 @@
     const statusText = capped
         ? 'Maxed at +3.'
         : canBuy
-          ? `Upgrade for ${costText}.`
+          ? `Next cost ${costText}.`
           : `Need ${missingText}`;
     return `<article class="shop-item merchant-upgrade-card gear-upgrade-summary-card">
       <div class="merchant-upgrade-card-head">
@@ -63,8 +63,10 @@
       </div>
       <div class="merchant-upgrade-card-copy">
         <span>${esc(perTierText)}</span>
-        <span class="small muted">${esc(capped ? `Total ${currentBonusText}` : `Next: ${nextBonusText}`)}</span>
+        <span class="small muted">Current bonus ${esc(currentBonusText)}</span>
+        <span class="small muted">${esc(capped ? 'Maxed at +3.' : `Next: ${nextBonusText}`)}</span>
       </div>
+      <p class="small muted">${esc(`${label} ${levelText} gives ${currentBonusText}.${capped ? ' Maxed at +3.' : ` Next tier gives ${nextBonusText}.`}`)}</p>
       <div class="merchant-upgrade-card-footer"><span class="small muted">${esc(statusText)}</span></div>
     </article>`;
   }
@@ -82,7 +84,7 @@
     panel.innerHTML = `<div class="split market-subhead gear-upgrade-summary-head">
       <div>
         <h2>Gear Upgrades</h2>
-        <p class="small muted">Every equipped piece can be tempered to +3 at the Ashen Anvil.</p>
+        <p class="small muted">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
       </div>
       <span class="pill">${esc(String(visibleModels.length))}/${esc(String(models.length))} equipped</span>
     </div>

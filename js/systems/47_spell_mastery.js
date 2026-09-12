@@ -1,6 +1,6 @@
 'use strict';
 
-// DungeonDex v1.32.0 - Spell Mastery, inscriptions, discoveries, and Scriptorium helpers.
+// DungeonDex v1.32.2 - Spell Mastery, inscriptions, discoveries, and Scriptorium helpers.
 (function(){
   if (window.DungeonDexSpellMastery) return;
 
