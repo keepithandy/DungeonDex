@@ -45,31 +45,27 @@
     const missingText = moneyPlain(model?.missingCopper);
     const tierText = safeText(model?.tierText, `+${level} / +${cap}`);
     const levelText = safeText(model?.levelText, `+${level}`);
-    const perTierText = safeText(model?.perTierText, label === 'Armor' ? '+2 Guard and +8 HP per tier' : label === 'Offhand' ? '+1 Guard and +1 Wit per tier' : '+2 Power per tier');
+    const perTierText = safeText(model?.perTierText, '+1 stat per tier');
     const currentBonusText = safeText(model?.currentBonusText, model?.currentStat || levelText);
     const nextBonusText = safeText(model?.nextBonusText, model?.nextStat || `+${level + 1}`);
-    const statusText = !hasItem
-      ? `Equip a ${label.toLowerCase()} first.`
-      : capped
+    const statusText = capped
         ? 'Maxed at +3.'
         : canBuy
-          ? `Next cost ${costText}.`
+          ? `Upgrade for ${costText}.`
           : `Need ${missingText}`;
     return `<article class="shop-item merchant-upgrade-card gear-upgrade-summary-card">
-      <div class="split">
-        <div>
-          <div class="item-name">${esc(label)}</div>
-          <div class="item-meta">${esc(itemName)} • ${esc(tierText)}</div>
+      <div class="merchant-upgrade-card-head">
+        <div class="merchant-upgrade-title">
+          <span class="merchant-upgrade-slot">${esc(label)}</span>
+          <div class="item-name">${esc(itemName)}</div>
         </div>
-        <span class="pill ${capped ? 'rarity-uncommon' : ''}">${esc(capped ? 'Maxed' : levelText)}</span>
+        <span class="pill ${capped ? 'rarity-uncommon' : ''}">${esc(capped ? 'Maxed' : tierText)}</span>
       </div>
-      <div class="tag-row">
-        <span class="pill">${esc(perTierText)}</span>
-        <span class="pill">Current bonus ${esc(currentBonusText)}</span>
-        ${hasItem && !capped ? `<span class="pill">Next cost ${esc(costText)}</span>` : ''}
-        ${hasItem && capped ? '<span class="pill rarity-uncommon">Maxed at +3</span>' : ''}
+      <div class="merchant-upgrade-card-copy">
+        <span>${esc(perTierText)}</span>
+        <span class="small muted">${esc(capped ? `Total ${currentBonusText}` : `Next: ${nextBonusText}`)}</span>
       </div>
-      <p class="small muted">${esc(`${label} ${levelText} gives ${currentBonusText}. ${perTierText}. ${!hasItem ? statusText : capped ? 'Maxed at +3.' : `Next tier gives ${nextBonusText}. ${statusText}`}`)} Upgrades are bought from the Lowfire Market.</p>
+      <div class="merchant-upgrade-card-footer"><span class="small muted">${esc(statusText)}</span></div>
     </article>`;
   }
 
@@ -77,7 +73,7 @@
     const panel = document.getElementById(PANEL_ID);
     if (!panel || typeof S === 'undefined') return;
     const models = upgradeModels(S);
-    const visibleModels = models.filter(model => model?.slot !== 'offhand' || model?.item);
+    const visibleModels = models.filter(model => model?.item);
     const readyCount = visibleModels.filter(model => model?.item && !model?.capped).length;
     const maxedCount = visibleModels.filter(model => model?.item && model?.capped).length;
     const body = visibleModels.length
@@ -86,11 +82,11 @@
     panel.innerHTML = `<div class="split market-subhead gear-upgrade-summary-head">
       <div>
         <h2>Gear Upgrades</h2>
-        <p class="small muted">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
+        <p class="small muted">Every equipped piece can be tempered to +3 at the Ashen Anvil.</p>
       </div>
-      <span class="pill">${esc(String(maxedCount))} maxed • ${esc(String(readyCount))} ready</span>
+      <span class="pill">${esc(String(visibleModels.length))}/${esc(String(models.length))} equipped</span>
     </div>
-    <div class="list district-ware-list gear-upgrade-summary-list">${body}</div>`;
+    <div class="merchant-upgrade-grid gear-upgrade-summary-list">${body}</div>`;
   }
 
   function installRenderHook(){

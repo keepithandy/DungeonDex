@@ -334,35 +334,27 @@ function townProgressionStatusLine(state, stagedStartDepth) {
 }
 
 function merchantGearUpgradeCard(model) {
-	const stateText = !model.item
-		? `Equip a ${model.label.toLowerCase()} to unlock upgrades.`
-		: model.capped
+	const stateText = model.capped
 			? 'Maxed at +3'
 			: model.affordable
-				? `Next cost ${formatMoney(model.cost)}`
+				? `Upgrade for ${formatMoney(model.cost)}`
 				: `Need ${formatMoney(model.missingCopper)} more copper`;
 	const action = model.item && !model.capped && model.affordable
-		? `<button class="primary mini" data-merchant-upgrade="${escapeHtml(model.slot)}">Upgrade</button>`
+		? `<button class="primary mini merchant-upgrade-action" data-merchant-upgrade="${escapeHtml(model.slot)}">Upgrade • ${escapeHtml(formatMoney(model.cost))}</button>`
 		: `<span class="small muted">${escapeHtml(stateText)}</span>`;
 	return `<article class="shop-item merchant-upgrade-card">
-      <div class="split">
-        <div>
-          <div class="item-name">${escapeHtml(model.label)}</div>
-          <div class="item-meta">${escapeHtml(model.itemName)} • ${escapeHtml(model.tierText || `+${String(model.level)} / +${String(model.cap)}`)}</div>
+      <div class="merchant-upgrade-card-head">
+        <div class="merchant-upgrade-title">
+          <span class="merchant-upgrade-slot">${escapeHtml(model.label)}</span>
+          <div class="item-name">${escapeHtml(model.itemName)}</div>
         </div>
-        <span class="pill">${model.capped ? 'Maxed' : escapeHtml(model.levelText || `+${String(model.level)}`)}</span>
+        <span class="pill ${model.capped ? 'rarity-uncommon' : ''}">${model.capped ? 'Maxed' : escapeHtml(model.tierText || `+${String(model.level)} / +${String(model.cap)}`)}</span>
       </div>
-      ${model.item ? `
-        <div class="tag-row">
-          <span class="pill">${escapeHtml(model.perTierText || '')}</span>
-          <span class="pill">Current bonus ${escapeHtml(model.currentBonusText || model.currentStat)}</span>
-          ${model.capped ? '<span class="pill rarity-uncommon">Maxed at +3</span>' : `<span class="pill">Next cost ${escapeHtml(formatMoney(model.cost))}</span>`}
-        </div>
-        <p class="small">${escapeHtml(model.label)} ${escapeHtml(model.tierText || '')} gives ${escapeHtml(model.currentBonusText || model.currentStat)}.${model.capped ? ' Maxed at +3.' : ` Next tier gives ${escapeHtml(model.nextBonusText || model.nextStat)}.`}</p>
-      ` : `
-        <p class="small muted">No equipped ${escapeHtml(model.label.toLowerCase())} is ready for the merchant.</p>
-      `}
-      <div class="item-actions">${action}</div>
+      <div class="merchant-upgrade-card-copy">
+        <span>${escapeHtml(model.perTierText || '')}</span>
+        <span class="small muted">${model.capped ? `Total ${escapeHtml(model.currentBonusText || model.currentStat)}` : `Next: ${escapeHtml(model.nextBonusText || model.nextStat)}`}</span>
+      </div>
+      <div class="merchant-upgrade-card-footer">${action}</div>
     </article>`;
 }
 
@@ -370,16 +362,18 @@ function merchantGearUpgradePanelMarkup(state) {
 	const models = typeof merchantGearUpgradeSummary === 'function'
 		? merchantGearUpgradeSummary(state)
 		: [];
-	const visibleModels = models.filter(model => model.slot !== 'offhand' || model.item);
+	const visibleModels = models.filter(model => model.item);
 	return `<div class="district-market lowfire-upgrades">
       <div class="split market-subhead">
         <div>
           <strong>The Ashen Anvil</strong>
-          <p class="small">Weapon upgrades are +2 Power per tier. Armor upgrades are +2 Guard and +8 HP per tier. Equipped Offhands gain +1 Guard and +1 Wit per tier.</p>
+		  <p class="small">Temper any equipped piece to +3. Each slot strengthens the stats it already favors.</p>
         </div>
-        <span class="pill">${visibleModels.filter(model => model.item).length}/${visibleModels.length}</span>
+		<span class="pill">${visibleModels.length}/${models.length} equipped</span>
       </div>
-      <div class="list district-ware-list">${visibleModels.map(merchantGearUpgradeCard).join('')}</div>
+	  ${visibleModels.length
+		? `<div class="merchant-upgrade-grid">${visibleModels.map(merchantGearUpgradeCard).join('')}</div>`
+		: '<p class="small muted">Equip a piece of gear to temper it at the Ashen Anvil.</p>'}
     </div>`;
 }
 

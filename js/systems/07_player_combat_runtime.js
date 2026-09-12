@@ -3,6 +3,22 @@
 // Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge
   const MERCHANT_GEAR_UPGRADE_COSTS = Object.freeze([50, 125, 250]);
   const MERCHANT_GEAR_UPGRADE_CAP = MERCHANT_GEAR_UPGRADE_COSTS.length;
+  const MERCHANT_GEAR_UPGRADE_SLOTS = Object.freeze(['weapon', 'offhand', 'helm', 'armor', 'gloves', 'boots', 'ring', 'amulet', 'cloak', 'charm']);
+  const MERCHANT_GEAR_UPGRADE_BONUSES = Object.freeze({
+    weapon: Object.freeze({ power: 2 }),
+    offhand: Object.freeze({ guard: 1, wit: 1 }),
+    helm: Object.freeze({ guard: 1, hp: 4 }),
+    armor: Object.freeze({ guard: 2, hp: 8 }),
+    gloves: Object.freeze({ power: 1, speed: 1 }),
+    boots: Object.freeze({ guard: 1, speed: 1 }),
+    ring: Object.freeze({ luck: 1, hp: 4 }),
+    amulet: Object.freeze({ wit: 1, hp: 4 }),
+    cloak: Object.freeze({ wit: 1, speed: 1 }),
+    charm: Object.freeze({ wit: 1, luck: 1 })
+  });
+  const MERCHANT_GEAR_UPGRADE_STAT_LABELS = Object.freeze({
+    power: 'Power', guard: 'Guard', wit: 'Wit', speed: 'Speed', luck: 'Luck', hp: 'HP'
+  });
 
   function normalizeMerchantGearUpgradeLevel(value) {
     return Math.max(0, Math.min(MERCHANT_GEAR_UPGRADE_CAP, Math.floor(numberOr(value, 0, 0, MERCHANT_GEAR_UPGRADE_CAP))));
@@ -10,7 +26,29 @@
 
   function merchantGearUpgradeSlotKey(slot) {
     const baseSlot = baseSlotForSlot(slot || '', '');
-    return baseSlot === 'weapon' || baseSlot === 'armor' || baseSlot === 'offhand' ? baseSlot : '';
+    return MERCHANT_GEAR_UPGRADE_SLOTS.includes(baseSlot) ? baseSlot : '';
+  }
+
+  function merchantGearUpgradeBonusValues(slot, level = 1) {
+    const safeSlot = merchantGearUpgradeSlotKey(slot);
+    const perTier = MERCHANT_GEAR_UPGRADE_BONUSES[safeSlot] || {};
+    const safeLevel = Math.max(0, Math.floor(numberOr(level, 0, 0, MERCHANT_GEAR_UPGRADE_CAP)));
+    return Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS).reduce((bonuses, stat) => {
+      bonuses[stat] = Math.max(0, Math.floor(numberOr(perTier[stat], 0, 0, 999999))) * safeLevel;
+      return bonuses;
+    }, {});
+  }
+
+  function merchantGearUpgradeBonusDisplay(bonuses) {
+    const parts = Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS)
+      .filter(stat => Number(bonuses?.[stat]) > 0)
+      .map(stat => `+${format(bonuses[stat])} ${MERCHANT_GEAR_UPGRADE_STAT_LABELS[stat]}`);
+    return parts.length ? parts.join(' and ') : 'No bonus';
+  }
+
+  function merchantGearUpgradeLabel(slot) {
+    const safeSlot = merchantGearUpgradeSlotKey(slot);
+    return safeSlot ? `${safeSlot.charAt(0).toUpperCase()}${safeSlot.slice(1)}` : 'Gear';
   }
 
   function merchantGearUpgradeBonuses(item, levelOverride = null) {
@@ -18,17 +56,7 @@
       ? normalizeMerchantGearUpgradeLevel(item?.upgradeLevel)
       : normalizeMerchantGearUpgradeLevel(levelOverride);
     const slot = merchantGearUpgradeSlotKey(item?.slot || '');
-    const bonuses = { power: 0, guard: 0, wit: 0, speed: 0, luck: 0, hp: 0 };
-    if (slot === 'weapon') bonuses.power = level * 2;
-    if (slot === 'armor') {
-      bonuses.guard = level * 2;
-      bonuses.hp = level * 8;
-    }
-    if (slot === 'offhand') {
-      bonuses.guard = level;
-      bonuses.wit = level;
-    }
-    return bonuses;
+    return merchantGearUpgradeBonusValues(slot, level);
   }
 
   function merchantGearUpgradeCost(level) {
@@ -44,21 +72,11 @@
   }
 
   function merchantGearUpgradePerTierText(slot) {
-    const safeSlot = merchantGearUpgradeSlotKey(slot);
-    if (safeSlot === 'armor') return '+2 Guard and +8 HP per tier';
-    if (safeSlot === 'offhand') return '+1 Guard and +1 Wit per tier';
-    return '+2 Power per tier';
+    return `${merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, 1))} per tier`;
   }
 
   function merchantGearUpgradeBonusText(slot, level) {
-    const safeLevel = normalizeMerchantGearUpgradeLevel(level);
-    if (merchantGearUpgradeSlotKey(slot) === 'armor') {
-      return `+${format(safeLevel * 2)} Guard and +${format(safeLevel * 8)} HP`;
-    }
-    if (merchantGearUpgradeSlotKey(slot) === 'offhand') {
-      return `+${format(safeLevel)} Guard and +${format(safeLevel)} Wit`;
-    }
-    return `+${format(safeLevel * 2)} Power`;
+    return merchantGearUpgradeBonusDisplay(merchantGearUpgradeBonusValues(slot, normalizeMerchantGearUpgradeLevel(level)));
   }
 
   function merchantGearUpgradeStatSummary(item, levelOverride = null) {
@@ -66,13 +84,11 @@
     const slot = merchantGearUpgradeSlotKey(item.slot);
     const bonuses = merchantGearUpgradeBonuses(item, levelOverride);
     const baseStats = isPlainObject(item.stats) ? item.stats : {};
-    const power = Math.floor(numberOr(baseStats.power, 0, 0, 999999)) + bonuses.power;
-    const guard = Math.floor(numberOr(baseStats.guard, 0, 0, 999999)) + bonuses.guard;
-    const wit = Math.floor(numberOr(baseStats.wit, 0, 0, 999999)) + bonuses.wit;
-    const hp = Math.floor(numberOr(baseStats.hp, 0, 0, 999999)) + bonuses.hp;
-    if (slot === 'armor') return `Guard ${format(guard)} • HP ${format(hp)}`;
-    if (slot === 'offhand') return `Guard ${format(guard)} • Wit ${format(wit)}`;
-    return `Power ${format(power)}`;
+    const bonusStats = Object.keys(MERCHANT_GEAR_UPGRADE_STAT_LABELS).filter(key => bonuses[key] > 0);
+    return bonusStats.map(stat => {
+      const value = Math.floor(numberOr(baseStats[stat], 0, 0, 999999)) + bonuses[stat];
+      return `${MERCHANT_GEAR_UPGRADE_STAT_LABELS[stat]} ${format(value)}`;
+    }).join(' • ');
   }
 
   function merchantGearUpgradeModel(state, slot) {
@@ -87,9 +103,9 @@
     const missingCopper = affordable || !item || capped ? 0 : Math.max(0, cost - gold);
     return {
       slot: safeSlot,
-      label: safeSlot === 'armor' ? 'Armor' : safeSlot === 'offhand' ? 'Offhand' : 'Weapon',
+      label: merchantGearUpgradeLabel(safeSlot),
       item,
-      itemName: formatGearDisplayName(item) || cleanDisplayText(item?.name || (safeSlot === 'armor' ? 'No armor equipped' : safeSlot === 'offhand' ? 'No offhand equipped' : 'No weapon equipped'), safeSlot === 'armor' ? 'No armor equipped' : safeSlot === 'offhand' ? 'No offhand equipped' : 'No weapon equipped'),
+      itemName: formatGearDisplayName(item) || cleanDisplayText(item?.name || `No ${merchantGearUpgradeLabel(safeSlot).toLowerCase()} equipped`, `No ${merchantGearUpgradeLabel(safeSlot).toLowerCase()} equipped`),
       level,
       levelText: merchantGearUpgradeLevelText(level),
       tierText: merchantGearUpgradeTierText(level, MERCHANT_GEAR_UPGRADE_CAP),
@@ -107,7 +123,7 @@
   }
 
   function merchantGearUpgradeSummary(state) {
-    return ['weapon', 'armor', 'offhand'].map(slot => merchantGearUpgradeModel(state, slot));
+    return MERCHANT_GEAR_UPGRADE_SLOTS.map(slot => merchantGearUpgradeModel(state, slot));
   }
 
   function formatGearDisplayName(item, options = {}) {

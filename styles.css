@@ -219,6 +219,63 @@ p { color: var(--soft); line-height: 1.35; }
 .town-board-shell .quest-card {
   border-color: rgba(255,255,255,0.08);
 }
+.merchant-upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.merchant-upgrade-card {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 9px;
+}
+.merchant-upgrade-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+.merchant-upgrade-title,
+.merchant-upgrade-card-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.merchant-upgrade-slot {
+  color: var(--gold);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.merchant-upgrade-card .item-name {
+  font-size: 0.82rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.merchant-upgrade-card-copy {
+  color: rgba(255,235,204,0.88);
+  font-size: 0.73rem;
+  line-height: 1.25;
+}
+.merchant-upgrade-card-footer {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+.merchant-upgrade-action {
+  width: 100%;
+  min-height: 40px;
+  padding-inline: 7px;
+  font-size: 0.72rem;
+}
+@media (max-width: 340px) {
+  .merchant-upgrade-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .stat-box, .resource-box, .loot-card, .equip-slot, .monster-card, .log-line, .quest-card, .shop-item, .archive-line {
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--line);
