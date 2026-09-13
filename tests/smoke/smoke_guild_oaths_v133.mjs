@@ -73,7 +73,10 @@ const malformed = api.normalizeState({ renown:'not-number', runSequence:Infinity
 assert.equal(malformed.renown, 0);
 assert.equal(malformed.history.length, 0);
 assert.equal(malformed.completions.iron_vigil, 999999);
-assert.equal(api.townPanelMarkup(rankState).includes('Warden Oaths'), true);
+const townMarkup = api.townPanelMarkup(rankState);
+assert.equal(townMarkup.includes('Warden Oaths'), true);
+assert.match(townMarkup, /guild-oaths-dropdown/);
+assert.match(townMarkup, /data-guild-oaths-menu="dropdown"/);
 assert.equal(api.runMarkup(first).includes('Iron Vigil'), true);
 assert.equal(api.journalMarkup(first).includes('Promises brought home'), true);
 console.log('PASS Guild Oaths v1.33: nine authored objectives, action/victory tracking, extraction-only copper and renown, rank keepsakes/titles, settlement idempotence, and malformed-save repair.');

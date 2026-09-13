@@ -287,8 +287,8 @@ async function main() {
     activeSurface = 'Town';
     const town = await evaluate(client, `(() => ({ active: document.querySelector('.screen.active')?.id || '', devtoolsDisabled: window.DUNGEONDEX_DEVTOOLS_ENABLED === false, devtoolsReason: window.DUNGEONDEX_DEVTOOLS_GATE?.reason || '' }))()`);
     record('Public runtime loads Town with DevTools disabled', town.active === 'screen-town' && town.devtoolsDisabled, JSON.stringify(town));
-    const guildboundTown = await evaluate(client, `(() => ({ panel:document.getElementById('guildOathsPanel')?.innerText || '', oaths:document.querySelectorAll('#guildOathsPanel [data-guild-oath]').length, preferences:!!document.getElementById('guildboundPreferencesPanel') }))()`);
-    record('Public Town exposes the Guildbound Hall and device preferences host', /Warden Oaths/.test(guildboundTown.panel) && guildboundTown.oaths === 10 && guildboundTown.preferences, JSON.stringify(guildboundTown));
+    const guildboundTown = await evaluate(client, `(() => ({ panel:document.getElementById('guildOathsPanel')?.innerText || '', oaths:document.querySelectorAll('#guildOathsPanel [data-guild-oath]').length, dropdown:!!document.querySelector('#guildOathsPanel [data-guild-oaths-menu="dropdown"]') && document.querySelector('#guildOathsPanel [data-guild-oaths-menu="dropdown"]')?.open === false, preferences:!!document.getElementById('guildboundPreferencesPanel') }))()`);
+    record('Public Town keeps Warden Oaths in a collapsed dropdown', /Warden Oaths/.test(guildboundTown.panel) && guildboundTown.oaths === 10 && guildboundTown.dropdown && guildboundTown.preferences, JSON.stringify(guildboundTown));
 
     activeSurface = 'Route viewport stability';
     const routeViewport = await evaluate(client, `(() => {

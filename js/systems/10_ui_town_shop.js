@@ -420,9 +420,11 @@ function townReturnReceiptMarkup(state) {
 function renderTown() {
     const guildHall = el('guildOathsPanel');
     if (guildHall) {
-      const oathPickerOpen = guildHall.querySelector('details')?.open;
+      const guildHallDetails = Array.from(guildHall.querySelectorAll('details')).map(details => details.open);
       guildHall.innerHTML = window.DungeonDexGuildOaths?.townPanelMarkup(S) || '';
-      if (oathPickerOpen && guildHall.querySelector('details')) guildHall.querySelector('details').open = true;
+      guildHall.querySelectorAll('details').forEach((details, index) => {
+        if (guildHallDetails[index] !== undefined) details.open = guildHallDetails[index];
+      });
     }
 	const stagingDistrict = currentStagingDistrict(S);
 	const districtDisplay = currentDistrictDisplay(S);

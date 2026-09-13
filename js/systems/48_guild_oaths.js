@@ -267,6 +267,14 @@
     const model = panelModel(state);
     const { guild, rank, nextRank } = model;
     const active = !!state?.run?.active;
+    const summaryName = active && model.active
+      ? `Active: ${model.active.oath.name}`
+      : model.selected
+        ? `Prepared: ${model.selected.name}`
+        : 'No oath prepared';
+    const summaryHint = active
+      ? 'Bound to this descent'
+      : 'Optional challenge · earn copper and renown';
     const cards = model.oaths.map(oath => `<article class="guildbound-card${oath.selected ? ' is-active' : ''}${!oath.ok ? ' is-locked' : ''}">
       <div class="guildbound-card-head"><h4>${escape(oath.name)}</h4>${rewardMarkup(oath)}</div>
       <p>${escape(oath.goal)}</p><p class="guildbound-muted">${escape(oath.flavor)}</p>
@@ -278,16 +286,19 @@
       const owned = guild.keepsakes.includes(keepsake.id);
       return `<article class="guildbound-card${owned ? ' is-complete' : ' is-locked'}"><div class="guildbound-card-head"><h4>${escape(keepsake.name)}</h4><span class="guildbound-chip">${keepsake.renown} renown</span></div><p>${escape(keepsake.detail)}</p><p class="guildbound-muted">Title: ${escape(keepsake.title)}</p><button class="ghost" data-guild-title="${keepsake.id}" aria-pressed="${guild.selectedTitle === keepsake.id}"${active || !owned ? ' disabled' : ''}>${owned ? guild.selectedTitle === keepsake.id ? 'Title worn' : 'Wear title' : `Earn ${keepsake.renown} renown`}</button></article>`;
     }).join('');
-    return `<section class="guildbound-panel guild-oaths-panel" aria-label="Warden Oaths and Guild Renown">
-      <div class="guildbound-heading"><div><span class="guildbound-kicker">Guildbound</span><h3>Warden Oaths</h3></div><span class="guildbound-chip">${escape(rank.name)}</span></div>
+    return `<details class="guildbound-panel guild-oaths-panel guild-oaths-dropdown" data-guild-oaths-menu="dropdown" aria-label="Warden Oaths and Guild Renown">
+      <summary class="guild-oaths-summary"><span class="guild-oaths-summary-mark" aria-hidden="true">✦</span><span class="guild-oaths-summary-copy"><strong>Warden Oaths</strong><small>${escape(summaryName)} · ${escape(summaryHint)}</small></span><span class="guild-oaths-summary-meta"><strong>${guild.renown}</strong><small>renown · ${escape(rank.name)}</small></span></summary>
+      <div class="guild-oaths-dropdown-body">
+      <div class="guildbound-heading"><div><span class="guildbound-kicker">Guildbound Board</span><h3>Choose a promise for your next descent</h3></div><span class="guildbound-chip">${escape(rank.name)}</span></div>
       <p>Make one promise before you descend. Meet its goal and extract alive to earn the stated copper bonus and permanent Guild renown.</p>
       <p><strong>${guild.renown} renown</strong> · ${model.totalCompleted} fulfilled ${model.totalCompleted === 1 ? 'oath' : 'oaths'}${nextRank ? ` · ${nextRank.renown - guild.renown} to ${escape(nextRank.name)}` : ' · Highest Guild rank'}</p>
       ${nextRank ? `<progress class="guildbound-progress" value="${guild.renown}" max="${nextRank.renown}" aria-label="Guild renown toward ${escape(nextRank.name)}">${guild.renown} / ${nextRank.renown}</progress>` : ''}
       <p class="guildbound-notice">${active ? model.active ? `Bound this descent: ${escape(model.active.oath.name)}.` : 'This descent has no oath. Prepare one after returning to Lowfire.' : model.selected ? `Prepared: ${escape(model.selected.name)}. Enter Dungeon starts your oath.` : 'No oath prepared. Free expeditions remain available.'}</p>
       ${guild.notice ? `<p class="guildbound-muted" role="status">${escape(guild.notice)}</p>` : ''}
-      <details${guild.selectedOath ? '' : ' open'}><summary>Choose your next oath · ${escape(model.selected?.name || 'None prepared')}</summary><div class="guildbound-grid">${cards}</div><div class="guildbound-actions"><button class="ghost" data-guild-oath=""${active || !guild.selectedOath ? ' disabled' : ''}>Clear prepared oath</button></div><p class="guildbound-muted">Your selection stays prepared for later descents. Change it freely in Lowfire. Each oath settles once per descent; falling or returning early earns no oath bonus.</p></details>
+      <details class="guild-oath-menu"${guild.selectedOath ? '' : ' open'}><summary>Choose your next oath · ${escape(model.selected?.name || 'None prepared')}</summary><div class="guildbound-grid">${cards}</div><div class="guildbound-actions"><button class="ghost" data-guild-oath=""${active || !guild.selectedOath ? ' disabled' : ''}>Clear prepared oath</button></div><p class="guildbound-muted">Your selection stays prepared for later descents. Change it freely in Lowfire. Each oath settles once per descent; falling or returning early earns no oath bonus.</p></details>
       <details><summary>Guild keepsakes &amp; titles · ${guild.keepsakes.length} / ${KEEPSAKES.length}</summary><p class="guildbound-muted">Keepsakes are awarded once as your renown grows. Their honorary titles change your nameplate, with no combat bonuses.</p><div class="guildbound-grid">${keepsakes}</div><div class="guildbound-actions"><button class="ghost" data-guild-title=""${active || !guild.selectedTitle ? ' disabled' : ''}>Restore original title</button></div></details>
-    </section>`;
+      </div>
+    </details>`;
   }
   function runMarkup(state) {
     if (!state?.run?.active) return '';

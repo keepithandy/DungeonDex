@@ -127,6 +127,7 @@ async function main() {
   expect('docs/status/CURRENT_NOTES.md', 'Build/cache label', capture(notes, /Build\/cache labels use `([^`]+)`/), BUILD_QS);
   expect('index.html', 'title version', capture(indexHtml, /<title>DungeonDex v([^<]+)<\/title>/), VISIBLE_BUILD);
   expect('index.html', 'visible h1 version', capture(indexHtml, /<h1[^>]*id="buildTag"[^>]*>DungeonDex v([^<]+)<\/h1>/), VISIBLE_BUILD);
+  expect('index.html', 'Guildbound DLC title badge', indexHtml.includes('class="ddx-dlc-title"') && indexHtml.includes('Guildbound') ? 'present' : '<missing>', 'present');
   expect('index.html', 'DUNGEONDEX_BUILD', capture(indexHtml, /window\.DUNGEONDEX_BUILD\s*=\s*'([^']+)'/), VISIBLE_BUILD);
   expect('index.html', 'DUNGEONDEX_BUILD_QS', capture(indexHtml, /window\.DUNGEONDEX_BUILD_QS\s*=\s*'([^']+)'/), BUILD_QS);
   expect('app.js', 'DUNGEONDEX_BUILD', capture(appJs, /window\.DUNGEONDEX_BUILD\s*=\s*'([^']+)'/), VISIBLE_BUILD);
