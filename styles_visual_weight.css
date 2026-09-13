@@ -1481,3 +1481,95 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 #screen-run .combat-device-shell:has(.guard-btn.tap-now) .player-hp { box-shadow: 0 0 0 1px rgba(224, 191, 121, .26), inset 0 0 22px rgba(207, 139, 81, .07); }
 .extract-success-popup { background: radial-gradient(circle at 50% 0%, rgba(255, 224, 154, .22), transparent 44%), linear-gradient(180deg, rgba(150, 91, 35, .98), rgba(70, 35, 14, .98)); border-color: rgba(246, 210, 135, .66); box-shadow: 0 18px 48px rgba(0, 0, 0, .5), 0 0 32px rgba(207, 139, 81, .24), inset 0 1px 0 rgba(255, 255, 255, .18); }
 .charter-price-btn.charter-owned { border-color: rgba(224, 191, 121, .42); background: rgba(207, 139, 81, .09); color: #ffe4aa; }
+
+/* Warden Oaths summary refinement: compact, legible, and intentionally premium. */
+#guildOathsPanel .guild-oaths-dropdown {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(145, 213, 194, .52);
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, rgba(101, 190, 153, .2), transparent 34%), linear-gradient(135deg, #17372e 0%, #0d211a 48%, #08100d 100%);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(210, 247, 231, .1), inset 0 0 32px rgba(54, 132, 102, .12);
+}
+#guildOathsPanel .guild-oaths-dropdown::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 7px);
+  opacity: .45;
+}
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary {
+  position: relative;
+  z-index: 1;
+  min-height: 64px;
+  padding: 10px 11px 10px 12px;
+  gap: 10px;
+  border-radius: 15px;
+  background: linear-gradient(100deg, rgba(72, 144, 113, .22), rgba(18, 51, 39, .12) 56%, rgba(7, 17, 13, .08));
+  transition: background-color .18s ease, box-shadow .18s ease;
+}
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::before {
+  content: '';
+  flex: 0 0 3px;
+  width: 3px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c6f2df, #4f967f);
+  box-shadow: 0 0 14px rgba(145, 213, 194, .36);
+}
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary:hover {
+  background: linear-gradient(100deg, rgba(91, 177, 139, .28), rgba(22, 62, 47, .18) 56%, rgba(7, 17, 13, .1));
+  box-shadow: inset 0 1px 0 rgba(210, 247, 231, .12);
+}
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary:focus-visible {
+  outline: 2px solid #d4f4e5;
+  outline-offset: -3px;
+  box-shadow: 0 0 0 4px rgba(86, 170, 133, .22), inset 0 1px 0 rgba(210, 247, 231, .12);
+}
+#guildOathsPanel .guild-oaths-summary-mark {
+  flex-basis: 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border-color: rgba(184, 234, 220, .64);
+  background: radial-gradient(circle at 32% 24%, rgba(210, 247, 231, .22), transparent 42%), rgba(55, 126, 100, .42);
+  color: #d2f3e4;
+  font-size: 1.05rem;
+  box-shadow: inset 0 0 0 1px rgba(210, 247, 231, .06), inset 0 0 16px rgba(145, 213, 194, .14), 0 4px 12px rgba(0, 0, 0, .2);
+}
+#guildOathsPanel .guild-oaths-summary-copy { gap: 2px; align-content: center; }
+#guildOathsPanel .guild-oaths-summary-copy strong { color: #fff1dc; font-family: var(--ddx-font-display); font-size: clamp(.96rem, 2vw, 1.06rem); letter-spacing: .025em; line-height: 1.1; }
+#guildOathsPanel .guild-oaths-summary-copy small { color: #bfe5d7; font-size: .68rem; line-height: 1.35; }
+#guildOathsPanel .guild-oaths-summary-meta { min-width: 78px; padding-left: 10px; border-left: 1px solid rgba(184, 234, 220, .2); }
+#guildOathsPanel .guild-oaths-summary-meta strong { color: #dcf5e8; font-family: var(--ddx-font-display); font-size: 1.02rem; line-height: 1; }
+#guildOathsPanel .guild-oaths-summary-meta small { color: #a9d4c3; font-size: .64rem; letter-spacing: .025em; }
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::after {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(184, 234, 220, .42);
+  border-radius: 9px;
+  background: rgba(46, 107, 84, .28);
+  color: #d2f3e4;
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: inset 0 0 12px rgba(145, 213, 194, .08);
+}
+#guildOathsPanel .guild-oaths-dropdown[open] > summary.guild-oaths-summary::after { background: rgba(75, 129, 115, .42); }
+#guildOathsPanel .guild-oaths-dropdown > .guild-oaths-dropdown-body {
+  position: relative;
+  border-top: 1px solid rgba(145, 213, 194, .2);
+  background: linear-gradient(180deg, rgba(9, 22, 17, .3), rgba(5, 12, 9, .2));
+}
+@media (max-width: 560px) {
+  #guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary { min-height: 60px; padding: 9px 9px 9px 10px; gap: 8px; }
+  #guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::before { height: 31px; }
+  #guildOathsPanel .guild-oaths-summary-mark { flex-basis: 31px; width: 31px; height: 31px; }
+  #guildOathsPanel .guild-oaths-summary-copy small { font-size: .64rem; }
+  #guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::after { flex-basis: 28px; width: 28px; height: 28px; }
+}
