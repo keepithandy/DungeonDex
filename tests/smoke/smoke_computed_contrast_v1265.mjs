@@ -186,7 +186,6 @@ function auditComputedContrast() {
       <p data-contrast="Reliquary Journal detail" class="small muted journal-record-detail">Only retained records place a return here.</p>
       <span data-contrast="Reliquary Journal state badge" class="pill journal-record-badge">Locked — no trophy record</span>
     </article></section>
-    <section class="town-return-receipt-shell"><p data-contrast="Reliquary Town acknowledgement" class="small journal-record-detail town-reliquary-reaction">Lowfire has entered the Gravetoll Bell in the ledger.</p></section>
     <div class="intro-modal-backdrop"><section class="intro-modal-window">
       <p data-contrast="Intro roadmap copy" class="threshold-roadmap-copy">Trophy Echo remains.</p>
     </section></div>

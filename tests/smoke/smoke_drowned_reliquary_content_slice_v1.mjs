@@ -63,8 +63,6 @@ const api = vm.runInContext(`({
   generateGear,
   normalizeMonster,
   reliquaryJournalModel,
-  renderReliquaryTownAcknowledgement,
-  townReturnReceiptMarkup,
   roster: DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']
 })`, context);
 
@@ -91,9 +89,7 @@ const encounterRow = model.rows.find(row => row.key === 'reliquary-encounter');
 assert.equal(encounterRow.badge, 'Discovered', 'the Journal should derive the encounter record from existing discovery state');
 assert.match(encounterRow.primary, /Seventh-Toll Bell-Keeper/);
 assert.equal(model.rows.find(row => row.key === 'reliquary-gear').badge, 'Recorded — in your gear', 'existing Reliquary loot identity should remain visible to the Journal');
-assert.match(api.renderReliquaryTownAcknowledgement(state), /Drowned Reliquary · Completed — safe return/);
-assert.match(api.townReturnReceiptMarkup(state), /Drowned Reliquary/);
-assert.equal(JSON.stringify(state), beforeProjection, 'Town and Journal projections must not mutate the save');
+assert.equal(JSON.stringify(state), beforeProjection, 'Journal projections must not mutate the save');
 assert.deepEqual(Object.keys(state.player).sort(), playerKeysBefore, 'the content slice must not add a player save field');
 
-console.log('PASS Drowned Reliquary content slice: identity-only encounter, existing combat/loot pipeline, Town acknowledgement, Journal projection, normalization and no new save fields.');
+console.log('PASS Drowned Reliquary content slice: identity-only encounter, existing combat/loot pipeline, Journal projection, normalization and no new save fields.');

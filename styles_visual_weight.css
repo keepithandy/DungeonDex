@@ -1161,12 +1161,6 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -2; pointer-event
 #screen-town .town-section-fold > summary { min-height: 52px; padding: 13px 15px; color: var(--ddx-brass-bright); background: linear-gradient(110deg, rgba(207, 139, 81, .13), transparent 74%); }
 #screen-town .town-section-fold > summary::after { color: var(--ddx-teal-bright); }
 #screen-town .town-section-fold[open] > summary { border-bottom-color: rgba(231, 201, 130, .25); background: linear-gradient(105deg, rgba(207, 139, 81, .19), rgba(77, 151, 137, .09)); }
-#screen-town .town-return-receipt { border-color: rgba(145, 213, 194, .27); background: linear-gradient(145deg, rgba(20, 39, 33, .86), rgba(10, 16, 14, .96)); }
-#screen-town .town-return-receipt-head h2 { color: var(--ddx-teal-bright); }
-#screen-town .town-return-status { color: var(--ddx-success); border-color: rgba(167, 219, 180, .42); background: rgba(72, 140, 84, .14); }
-#screen-town .town-return-receipt-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
-#screen-town .town-return-receipt-stats > span { padding: 9px 10px; border: 1px solid rgba(190, 214, 201, .14); border-radius: var(--ddx-radius-sm); background: rgba(0, 0, 0, .18); color: var(--ddx-muted); }
-#screen-town .town-return-receipt-stats b { color: var(--ddx-brass-bright); }
 #screen-town .town-section-shell { gap: 12px; }
 #screen-town .town-section-head h2 { color: var(--ddx-brass-bright); }
 #screen-town .town-section-head p { color: var(--ddx-muted); }
@@ -1295,7 +1289,6 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
 
 @media (min-width: 760px) {
   .ddx-shell { padding-inline: 20px; }
-  #screen-town .town-return-receipt-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #screen-town .town-section-shell { gap: 14px; }
   #screen-gear .gear-player-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
@@ -1316,7 +1309,6 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
   .ddx-action-row .save-status { display: none; }
   .ddx-shell :where(.panel, .guildbound-panel) { border-radius: 15px; }
   .ddx-shell :where(.card-head, .town-section-head, .filter-head, .archive-history-head, .journal-chronicle-head, .merchant-head, .elite-contract-head) { align-items: flex-start; }
-  #screen-town .town-return-receipt-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #screen-run .combat-device-shell { border-radius: 16px; }
 }
 @media (max-width: 560px) {
@@ -1325,10 +1317,9 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
   .ddx-header-title-slot { gap: 6px; }
   .ddx-shell :where(.panel, .guildbound-panel) { padding: 11px; }
   .ddx-shell details.guildbound-panel { padding: 0; }
-  .ddx-shell :where(.item-actions, .inventory-actions, .guildbound-actions, .town-return-actions, .elite-contract-actions, .combat-device-actions) { gap: 6px; }
-  .ddx-shell :where(.item-actions, .inventory-actions, .guildbound-actions, .town-return-actions) > button { flex: 1 1 120px; }
+  .ddx-shell :where(.item-actions, .inventory-actions, .guildbound-actions, .elite-contract-actions, .combat-device-actions) { gap: 6px; }
+  .ddx-shell :where(.item-actions, .inventory-actions, .guildbound-actions) > button { flex: 1 1 120px; }
   #screen-town .town-section-fold > summary, #screen-gear .gear-section-fold > summary { min-height: 50px; padding-inline: 12px; }
-  #screen-town .town-return-receipt-head { align-items: flex-start; }
   #screen-gear .filter-grid { grid-template-columns: minmax(0, 1fr); }
   #screen-run .combat-device-actions button { min-height: 46px !important; padding-inline: 6px; }
 }
@@ -1336,7 +1327,6 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
   .ddx-dlc-title { padding-inline: 6px; font-size: .48rem; letter-spacing: .08em; }
   .ddx-dlc-title-mark { font-size: .7rem; }
   .ddx-shell :where(.panel, .guildbound-panel) { padding: 10px; }
-  #screen-town .town-return-receipt-stats { grid-template-columns: minmax(0, 1fr); }
   #screen-run .combat-device-actions button { font-size: .69rem; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1405,10 +1395,6 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 #screen-town .town-section-fold, #screen-town .guildbound-hall { border-color: rgba(231, 201, 130, .22); background: rgba(19, 14, 11, .86); }
 #screen-town .town-section-fold > summary::after { color: #f0d5a1; }
 #screen-town .town-section-fold[open] > summary { background: linear-gradient(105deg, rgba(207, 139, 81, .19), rgba(178, 116, 67, .08)); }
-#screen-town .town-return-receipt { border-color: rgba(224, 191, 121, .3); background: linear-gradient(145deg, rgba(43, 29, 21, .9), rgba(12, 9, 8, .96)); }
-#screen-town .town-return-receipt-head h2 { color: #f0d5a1; }
-#screen-town .town-return-status { color: #f0d5a1; border-color: rgba(224, 191, 121, .42); background: rgba(167, 115, 47, .14); }
-#screen-town .town-return-receipt-stats > span { border-color: rgba(224, 198, 160, .16); }
 #screen-town .town-market-head .refresh-compact { color: #f0d5a1; }
 #screen-town :where(.elite-contract-card.active, .quest-card.active) { border-color: rgba(224, 191, 121, .56); box-shadow: 0 0 0 1px rgba(224, 191, 121, .14), var(--ddx-shadow-card); }
 

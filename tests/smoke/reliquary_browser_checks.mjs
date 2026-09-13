@@ -186,15 +186,6 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.equal(returned.pending.loot.length,0);
   assert.ok(returned.loadouts && returned.equipment && returned.themed);
   record('D31-D40 combat/loot extracts through the normal bank, return and reload path', true);
-  const receipt = await read(`(() => {
-    const panel = document.getElementById('townReturnReceipt');
-    return { text:panel?.innerText || '', review:!!panel?.querySelector('[data-town-route="gear"]'), history:!!panel?.querySelector('[data-town-route="archive"]') };
-  })()`);
-  assert.ok(/Extraction secured/.test(receipt.text) && /Banked/.test(receipt.text) && receipt.review && receipt.history, JSON.stringify(receipt));
-  await read(`document.querySelector('#townReturnReceipt [data-town-route="archive"]')?.click(); true`);
-  assert.equal(await read(`document.querySelector('.screen.active')?.id`), 'screen-archive');
-  await read(`document.querySelector('#tab-town')?.click(); true`);
-  record('Town latest-return receipt reports the banked haul and routes to the existing Gear or Journal views', true);
   await read(`document.getElementById('tab-gear').click(); true`);
   const applied = await read(`(() => {
     const weapon = S.player.equipment.weapon.id;
@@ -224,7 +215,7 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
       eliteContracts:{ claimed:['lowfire_bounty'] }, runHistory:[{floor:99,reason:'extract'}] } };
     const before = JSON.stringify(oldSave);
     const model = reliquaryJournalModel(oldSave);
-    renderGuildJournalPanel(oldSave); renderReliquaryTownAcknowledgement(oldSave);
+    renderGuildJournalPanel(oldSave);
     return { unchanged:before === JSON.stringify(oldSave), badges:model.rows.map(row => row.badge) };
   })()`);
   assert.ok(projection.unchanged, JSON.stringify(projection));
@@ -275,18 +266,5 @@ async function verifyReliquaryJournalBrowser({ client, evaluate, record }) {
       record(`Reliquary Journal ${width}x${height} ${touch ? 'touch' : 'fine pointer'}: drawer clearance, long-name wrapping and visible state labels`, true);
     }
   }
-  const town = await read(`(() => {
-    S.screen = 'town'; render();
-    const panel = document.querySelector('#townReturnReceipt'); panel.scrollIntoView({block:'center'});
-    return {text:panel.innerText, overflow:panel.scrollWidth > panel.clientWidth + 1};
-  })()`);
-  assert.match(town.text, /Drowned Reliquary · Completed/);
-  assert.match(town.text, /Banked at Floor 1 • Room 4 • Chapter 10 \(D40\)/);
-  assert.ok(!town.overflow);
-  if (process.env.DD_RELIQUARY_CAPTURE_DIR) {
-    const shot = await client.send('Page.captureScreenshot', {format:'png', captureBeyondViewport:false});
-    await writeFile(path.join(process.env.DD_RELIQUARY_CAPTURE_DIR, 'journal-town-acknowledgement.png'), Buffer.from(shot.data,'base64'));
-  }
-  record('Town acknowledges the recorded Gravetoll victory and uses displayed floor/room/chapter for its return receipt', true);
   await read(`S = window.__journalReturnState; delete window.__journalReturnState; save(S); render(); true`);
 }

@@ -405,13 +405,9 @@
         : ended ? `${location(ended.floor)}. ${ended.reason === 'defeat' ? 'This descent was lost; unsecured loot was not recovered.' : 'No safe extraction is recorded for this descent.'}`
         : 'Only retained run entries can place a return here; deeper progress alone cannot.');
     const rows = [boss, contract, gear, encounter, returned];
-    const townRecord = bossComplete || bossActive ? boss : activeLocated ? contract : extracted ? returned : held || retired ? gear : encountered ? encounter : activeRun || ended ? returned : null;
-    return { rows, townRecord };
+    return { rows };
   }
-  function renderReliquaryTownAcknowledgement(state){
-    const record = reliquaryJournalModel(state).townRecord;
-    return record ? `<p class="small journal-record-detail town-reliquary-reaction"><strong>Drowned Reliquary · ${esc(record.badge)}</strong><br>${esc(record.primary)}</p>` : '';
-  }
+
 
   function journalV1233SummaryModel(state){
     const safeState = obj(state);
@@ -568,7 +564,6 @@
     };
   }
   window.reliquaryJournalModel = reliquaryJournalModel;
-  window.renderReliquaryTownAcknowledgement = renderReliquaryTownAcknowledgement;
   window.rivalTraceReadableSummary = rivalTraceReadableSummary;
   window.journalV1233SummaryModel = journalV1233SummaryModel;
   window.renderGuildJournalPanel = renderGuildJournalPanel;

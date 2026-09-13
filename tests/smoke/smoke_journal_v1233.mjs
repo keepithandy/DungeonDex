@@ -160,7 +160,6 @@ const row = (source, key) => rows(source).find(entry => entry.key === `reliquary
 const base = () => ({ player: {}, run: {} });
 const fixture = base();
 assert.ok(rows(fixture).every(entry => entry.badge.startsWith('Locked')));
-assert.equal(live.renderReliquaryTownAcknowledgement(fixture), '');
 fixture.player.depth = fixture.player.safeExtractDepth = 999;
 fixture.player.bossTrophyRecords = [{ rawDepth: 45, bestKillDepth: 45 }];
 fixture.player.runHistory = [{ floor: 99, zone: 'The Drowned Reliquary', reason: 'extract', runLabel: 'D31' }];
@@ -231,10 +230,7 @@ assert.match(markup, /Drowned Reliquary records/);
 assert.match(markup, /Next cost/);
 assert.ok(!markup.includes('&lt;span'), 'Journal currency is plain text before HTML escaping');
 assert.ok(!/<svg|onload="|<button|data-(?:claim|reward|start|complete)-/.test(markup));
-const receipt = live.townReturnReceiptMarkup(fixture);
-assert.match(receipt, /Banked at Floor 1 • Room 4 • Chapter 10 \(D40\)/);
-assert.ok(!receipt.includes('Banked at Floor 40'));
-assert.match(receipt, /Drowned Reliquary · Completed/);
+
 assert.equal(JSON.stringify(fixture), beforeComplete);
 
 for (const malformed of [null, [], {}, { player: null }, { player: { runHistory: 'bad', bossTrophies: false, bossTrophyRecords: [null, true, []], retiredRelics: [null, false], inventory: {}, eliteContracts: { active: [], claimed: 'bad' } }, run: { active: true, floor: {} } }]) {
@@ -245,4 +241,4 @@ for (const malformed of [null, [], {}, { player: null }, { player: { runHistory:
 }
 const activeBoss = { player: {}, run: { active: true, floor: 45, monster: { tier: 'Boss' } } };
 assert.equal(row(activeBoss, 'boss').badge, 'Active');
-console.log('PASS: Reliquary Journal evidence, legacy/malformed histories, read-only rendering and Town depth labels');
+console.log('PASS: Reliquary Journal evidence, legacy/malformed histories, read-only rendering and retained depth labels');
