@@ -24,6 +24,14 @@ This changelog records what changed and why.
 * Aligned the local candidate, runtime labels, direct asset queries, and service-worker cache to `v1.33.2-guildbound`.
 * Preserved the Guildbound gameplay systems, save compatibility, and protected progression contracts.
 
+### Post-merge polish and cleanup
+
+* Compact the Warden Oaths presentation into a focused dropdown with a clearer summary, badge, progress cue, and mobile spacing.
+* Refined the premium dark-fantasy visual treatment across the app while reserving the green warding palette for the Warden Oaths surface.
+* Removed the DLC wording from the main Guildbound title so the header stays focused on DungeonDex branding.
+* Made Journal and Archive records progressive-disclosure sections with preserved open state, reducing repeated scrolling through long histories.
+* Retired the Town latest-return receipt after extraction while keeping the existing Journal and Archive history surfaces available.
+
 This remains a local source candidate; no package, upload, tag, or push is included.
 
 ## v1.33.0 - Guildbound
