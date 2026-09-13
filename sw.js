@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.32.2-merchant-upgrade-hotfix';
+const CACHE_NAME = 'dungeondex-v1.33.0-guildbound';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.32.2-merchant-upgrade-hotfix';
+const BUILD_QS = '1.33.0-guildbound';
 const ASSETS = [
   './',
   './index.html',
@@ -21,6 +21,9 @@ const ASSETS = [
   `./js/systems/07_player_combat_runtime.js?build=${BUILD_QS}`,
   `./js/systems/08_normalization_save.js?build=${BUILD_QS}`,
   `./js/systems/47_spell_mastery.js?build=${BUILD_QS}`,
+  `./js/systems/48_guild_oaths.js?build=${BUILD_QS}`,
+  `./js/systems/49_lantern_rites.js?build=${BUILD_QS}`,
+  `./js/systems/50_guildbound_qol.js?build=${BUILD_QS}`,
   `./js/systems/46_named_loadouts.js?build=${BUILD_QS}`,
   `./js/systems/09_ui_common_intro.js?build=${BUILD_QS}`,
   `./js/systems/10_ui_town_shop.js?build=${BUILD_QS}`,

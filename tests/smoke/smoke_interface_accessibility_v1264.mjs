@@ -37,6 +37,12 @@ const PUBLIC_ACTION_ATTRIBUTES = [
   'data-buy-district',
   'data-run-event',
   'data-action',
+  'data-lantern-rite',
+  'data-lantern-skip',
+  'data-guild-oath',
+  'data-guild-title',
+  'data-guildbound-sections',
+  'data-guildbound-preference',
   'data-equip',
   'data-sell',
   'data-retire',
@@ -192,6 +198,9 @@ async function main() {
     revisit,
     nav,
     namedLoadouts,
+    guildOaths,
+    lanternRites,
+    guildboundQol,
     mobileAudit
   ] = await Promise.all([
     readFile(path.join(ROOT, 'index.html'), 'utf8'),
@@ -211,6 +220,9 @@ async function main() {
     readFile(path.join(ROOT, 'js/systems/44_revisit_lowfire_board_slot.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/22_nav_centering.js'), 'utf8'),
     readFile(path.join(ROOT, 'js/systems/46_named_loadouts.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/48_guild_oaths.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/49_lantern_rites.js'), 'utf8'),
+    readFile(path.join(ROOT, 'js/systems/50_guildbound_qol.js'), 'utf8'),
     readFile(path.join(ROOT, 'docs/status/MOBILE_VALIDATION_V1260.md'), 'utf8')
   ]);
   const base = compact(baseCss);
@@ -347,7 +359,10 @@ async function main() {
     revisit,
     gearModal,
     spellMastery,
-    namedLoadouts
+    namedLoadouts,
+    guildOaths,
+    lanternRites,
+    guildboundQol
   ];
   const extractedControlTokens = new Set(publicControlSources.flatMap(publicControlTokens));
   if (nav.includes("document.createElement('button')")
@@ -396,10 +411,18 @@ async function main() {
     '#runFromIdleBtn',
     '[data-run-event]',
     '[data-action]',
+    '#combatSpellbookBtn',
+    '[data-lantern-rite]',
+    '[data-lantern-skip]',
+    '[data-guild-oath]',
+    '[data-guild-title]',
     '#slotFilter',
     '#rarityFilter',
     '#sortFilter',
     '#searchFilter',
+    '#gearStatusFilter',
+    '[data-guildbound-sections]',
+    '[data-guildbound-preference]',
     '#sellJunkGearBtn',
     '#sellAllGearBtn',
     '[data-clear-gear-filters]',

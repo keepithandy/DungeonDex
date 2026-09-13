@@ -418,6 +418,12 @@ function townReturnReceiptMarkup(state) {
 }
 
 function renderTown() {
+    const guildHall = el('guildOathsPanel');
+    if (guildHall) {
+      const oathPickerOpen = guildHall.querySelector('details')?.open;
+      guildHall.innerHTML = window.DungeonDexGuildOaths?.townPanelMarkup(S) || '';
+      if (oathPickerOpen && guildHall.querySelector('details')) guildHall.querySelector('details').open = true;
+    }
 	const stagingDistrict = currentStagingDistrict(S);
 	const districtDisplay = currentDistrictDisplay(S);
 	const stagedStartDepth = defaultRunStartDepth(S);

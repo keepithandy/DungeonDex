@@ -18,7 +18,12 @@
   function recoverRunToTown(state, message = '') {
     if (!state) return false;
     ensureRunShell(state);
+    const oathResult = window.DungeonDexGuildOaths?.settleRun(state, 'ended');
+    if (oathResult?.message && state.player) pushLog(state, oathResult.message);
     state.run.active = false;
+    window.DungeonDexLanternRites?.clear(state);
+    state.run.guildOath = null;
+    state.run.event = null;
     state.run.monster = null;
     state.run.choices = [];
     state.run.chain = 0;

@@ -952,6 +952,8 @@
       recoverRunToTown(state, 'Recovered from an incomplete combat save and returned to Lowfire.');
     }
     if (state.run.active && state.run.monster) state.screen = 'run';
+    window.DungeonDexGuildOaths?.normalizeForState(state);
+    window.DungeonDexLanternRites?.ensure(state);
 
     state.merchantStock = asArray(parsed.merchantStock, []).map(item => normalizeItem(item)).filter(item => item && item.specialType !== 'start20');
     if (!state.merchantStock.length) state.merchantStock = buildMerchantStock(state);
@@ -999,6 +1001,8 @@
     ensureRunSetBonusState(state);
     state.run.combatLog = asArray(state.run.combatLog, []).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.choices = asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
+    window.DungeonDexGuildOaths?.normalizeForState(state);
+    window.DungeonDexLanternRites?.ensure(state);
     if (state.run.active && !state.run.choices.length) state.run.choices = CORE_COMBAT_ACTIONS.slice();
     if (state.run.active && !state.run.monster) {
       recoverRunToTown(state, 'Recovered from an incomplete combat state before saving and returned to Lowfire.');
