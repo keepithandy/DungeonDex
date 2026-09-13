@@ -1261,7 +1261,8 @@
           <span class="pill">Notes</span>
         </summary>
         <div class="archive-section-body"><div class="list archive-log-list">${archiveLines}</div></div>
-      </details>`;`n    archivePanel.querySelectorAll('details[data-archive-section]').forEach(details => {
+      </details>`;
+    archivePanel.querySelectorAll('details[data-archive-section]').forEach(details => {
       const saved = archiveOpen.get(details.dataset.archiveSection);
       if (saved !== undefined) details.open = saved;
     });

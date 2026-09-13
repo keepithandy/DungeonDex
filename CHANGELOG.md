@@ -8,14 +8,23 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.33.0 Guildbound`
-* Current development target: `v1.33.0 Guildbound`
-* Current build/cache label: `1.33.0-guildbound`
+* Current release candidate/local package baseline: `v1.33.2 Guildbound`
+* Current development target: `v1.33.2 Guildbound`
+* Current build/cache label: `1.33.2-guildbound`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.33.2 - Guildbound
+
+### Release alignment
+
+* Aligned the local candidate, runtime labels, direct asset queries, and service-worker cache to `v1.33.2-guildbound`.
+* Preserved the Guildbound gameplay systems, save compatibility, and protected progression contracts.
+
+This remains a local source candidate; no package, upload, tag, or push is included.
 
 ## v1.33.0 - Guildbound
 
