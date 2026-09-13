@@ -522,6 +522,20 @@
   }
   function renderGuildJournalPanel(state){
     const model = journalV1233SummaryModel(state);
+    const guildboundJournal = window.DungeonDexGuildOaths?.journalMarkup(state) || '';
+    const reliquaryRows = Array.isArray(model.reliquary?.rows) ? model.reliquary.rows : [];
+    const chronicleMarkup = model.sections.length
+      ? `<details class="journal-section-fold" data-journal-section="chronicle">
+          <summary><span>Chronicle entries</span><span class="pill journal-section-count">${esc(model.sections.length)} ${model.sections.length === 1 ? 'record' : 'records'}</span></summary>
+          <div class="journal-fold-body"><div class="journal-grid">${model.sections.map(row).join('')}</div></div>
+        </details>`
+      : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>';
+    const guildboundMarkup = guildboundJournal
+      ? `<details class="journal-section-fold" data-journal-section="guildbound">
+          <summary><span>Guildbound Chronicle</span><span class="pill journal-section-count">Read-only</span></summary>
+          <div class="journal-fold-body">${guildboundJournal}</div>
+        </details>`
+      : '';
     return `<section class="journal-board" id="guildJournalPanel" aria-label="Guild Journal">
       <header class="journal-chronicle-head">
         <div class="journal-chronicle-title">
@@ -535,18 +549,32 @@
         </div>
         <p class="journal-latest"><span>Latest</span><strong>${esc(model.latestRecord)}</strong></p>
       </header>
-      ${model.sections.length
-        ? `<div class="journal-grid">${model.sections.map(row).join('')}</div>`
-        : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
-      ${window.DungeonDexGuildOaths?.journalMarkup(state) || ''}
-      <section class="journal-reliquary" aria-label="Drowned Reliquary records">
-        <h2>Drowned Reliquary</h2>
-        <p class="small muted">The guild records what your journey can prove. These acknowledgements are read-only.</p>
-        <div class="journal-grid">${model.reliquary.rows.map(row).join('')}</div>
-      </section>
+      ${chronicleMarkup}
+      ${guildboundMarkup}
+      <details class="journal-section-fold" data-journal-section="reliquary">
+        <summary><span>Drowned Reliquary</span><span class="pill journal-section-count">${esc(reliquaryRows.length)} records</span></summary>
+        <div class="journal-fold-body">
+          <section class="journal-reliquary" aria-label="Drowned Reliquary records">
+            <p class="small muted">The guild records what your journey can prove. These acknowledgements are read-only.</p>
+            <div class="journal-grid">${reliquaryRows.map(row).join('')}</div>
+          </section>
+        </div>
+      </details>
     </section>`;
   }
-  function injectJournal(){
+  function captureJournalDetails(panel){
+    const openState = new Map();
+    panel?.querySelectorAll('#guildJournalPanel details[data-journal-section]').forEach(details => openState.set(details.dataset.journalSection, details.open));
+    return openState;
+  }
+  function restoreJournalDetails(panel, openState){
+    if (!panel || !(openState instanceof Map)) return;
+    panel.querySelectorAll('#guildJournalPanel details[data-journal-section]').forEach(details => {
+      const saved = openState.get(details.dataset.journalSection);
+      if (saved !== undefined) details.open = saved;
+    });
+  }
+  function injectJournal(openState = null){
     const panel = document.getElementById('archivePanel');
     if (!panel) return;
     const state = typeof S !== 'undefined' ? S : window.S || {};
@@ -554,12 +582,15 @@
     const existing = panel.querySelector('#guildJournalPanel');
     if (existing) existing.outerHTML = html;
     else panel.insertAdjacentHTML('beforeend', html);
+    restoreJournalDetails(panel, openState);
   }
   const originalRenderArchive = typeof window.renderArchive === 'function' ? window.renderArchive : null;
   if (originalRenderArchive) {
     window.renderArchive = function renderArchive(){
+      const panel = document.getElementById('archivePanel');
+      const openState = captureJournalDetails(panel);
       const result = originalRenderArchive.apply(this, arguments);
-      injectJournal();
+      injectJournal(openState);
       return result;
     };
   }

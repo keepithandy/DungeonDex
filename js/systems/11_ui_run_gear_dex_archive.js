@@ -1186,7 +1186,10 @@
   }
 
   function renderArchive() {
-    if (!el('archivePanel') || !el('settingsPanel')) return;
+    const archivePanel = el('archivePanel');
+    if (!archivePanel || !el('settingsPanel')) return;
+    const archiveOpen = new Map();
+    archivePanel.querySelectorAll('details[data-archive-section]').forEach(details => archiveOpen.set(details.dataset.archiveSection, details.open));
     // TODO(v1.7): Use Trophy Hall records as a future callback surface for earlier-dungeon revisit incentives.
     const history = asArray(S.player.runHistory, []).filter(isPlainObject).slice(0, 12);
     const historyMarkup = history.map(rawEntry => {
@@ -1237,23 +1240,31 @@
     const archiveRetiredRelics = sortedRetiredRelics(S.player.retiredRelics);
     const archiveRetiredSummary = retiredRelicSummary(archiveRetiredRelics);
     const retiredRelicLines = archiveRetiredRelics.slice(0, 12).map(retiredRelicArchiveLine).join('') || retiredRelicEmptyState();
-
-    el('archivePanel').innerHTML = `
-      <div class="archive-history-head">
-        <div><h2>Descent History</h2><p class="small muted">Banked, lost, and next-start records.</p></div>
-        <span class="pill">Latest ${format(history.length)}</span>
-      </div>
-      <div class="list run-history-list">${historyMarkup}</div>
-      <div class="sep"></div>
-      <div class="archive-history-head">
-        <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only records plus manual retirement for unequipped gear.</p></div>
-        <span class="pill">${format(archiveRetiredSummary.total)} recorded</span>
-      </div>
-      ${retiredRelicSummaryMarkup(archiveRetiredSummary)}
-      <div class="list archive-log-list">${retiredRelicLines}</div>
-      <div class="sep"></div>
-      <h3>Emberfall Notes</h3>
-      <div class="list archive-log-list">${archiveLines}</div>`;
+    archivePanel.innerHTML = `
+      <details class="archive-section-fold" data-archive-section="history"${archiveOpen.has('history') ? archiveOpen.get('history') ? ' open' : '' : history.length > 0 && history.length <= 3 ? ' open' : ''}>
+        <summary class="archive-history-head archive-section-summary">
+          <div><h2>Descent History</h2><p class="small muted">Banked, lost, and next-start records.</p></div>
+          <span class="pill">Latest ${format(history.length)}</span>
+        </summary>
+        <div class="archive-section-body"><div class="list run-history-list">${historyMarkup}</div></div>
+      </details>
+      <details class="archive-section-fold" data-archive-section="retired-gear">
+        <summary class="archive-history-head archive-section-summary">
+          <div><h3>Retired Gear Hall</h3>${retiredRelicHelpText()}<p class="small muted">Read-only records plus manual retirement for unequipped gear.</p></div>
+          <span class="pill">${format(archiveRetiredSummary.total)} recorded</span>
+        </summary>
+        <div class="archive-section-body">${retiredRelicSummaryMarkup(archiveRetiredSummary)}<div class="list archive-log-list">${retiredRelicLines}</div></div>
+      </details>
+      <details class="archive-section-fold" data-archive-section="notes">
+        <summary class="archive-history-head archive-section-summary">
+          <div><h3>Emberfall Notes</h3><p class="small muted">Field notes and preserved world reactions.</p></div>
+          <span class="pill">Notes</span>
+        </summary>
+        <div class="archive-section-body"><div class="list archive-log-list">${archiveLines}</div></div>
+      </details>`;`n    archivePanel.querySelectorAll('details[data-archive-section]').forEach(details => {
+      const saved = archiveOpen.get(details.dataset.archiveSection);
+      if (saved !== undefined) details.open = saved;
+    });
 
     el('settingsPanel').innerHTML = `
       <h2>System</h2>

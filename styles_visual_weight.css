@@ -1559,3 +1559,65 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
   #guildOathsPanel .guild-oaths-summary-copy small { font-size: .64rem; }
   #guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::after { flex-basis: 28px; width: 28px; height: 28px; }
 }
+
+/* Journal and Archive compact treatment: summaries first, records on demand. */
+#screen-archive .ddx-view-stack { gap: 12px; }
+#screen-archive #archivePanel { display: grid; gap: 10px; }
+#screen-archive #guildJournalPanel { gap: 10px; margin-top: 0; }
+#screen-archive :where(.archive-section-fold, .journal-section-fold) {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(224, 191, 121, .26);
+  border-radius: var(--ddx-radius-md);
+  background: linear-gradient(145deg, rgba(31, 23, 18, .86), rgba(9, 8, 7, .96));
+  box-shadow: var(--ddx-shadow-card);
+}
+#screen-archive :where(.archive-section-fold > summary, .journal-section-fold > summary) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  min-height: 50px;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+  background: linear-gradient(105deg, rgba(207, 139, 81, .13), rgba(178, 116, 67, .035));
+  transition: background-color .18s ease, border-color .18s ease;
+}
+#screen-archive :where(.archive-section-fold > summary, .journal-section-fold > summary)::-webkit-details-marker { display: none; }
+#screen-archive :where(.archive-section-fold > summary, .journal-section-fold > summary)::after {
+  content: '+';
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(224, 191, 121, .32);
+  border-radius: 8px;
+  color: #f0d5a1;
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1;
+  background: rgba(167, 115, 47, .1);
+}
+#screen-archive :where(.archive-section-fold[open] > summary, .journal-section-fold[open] > summary) { border-bottom: 1px solid rgba(224, 191, 121, .24); background: linear-gradient(105deg, rgba(207, 139, 81, .19), rgba(178, 116, 67, .07)); }
+#screen-archive :where(.archive-section-fold[open] > summary, .journal-section-fold[open] > summary)::after { content: '−'; background: rgba(167, 115, 47, .2); }
+#screen-archive :where(.archive-section-fold > summary:hover, .journal-section-fold > summary:hover) { background: linear-gradient(105deg, rgba(207, 139, 81, .2), rgba(178, 116, 67, .08)); }
+#screen-archive :where(.archive-section-fold > summary:focus-visible, .journal-section-fold > summary:focus-visible) { outline: 2px solid var(--ddx-focus); outline-offset: -3px; }
+#screen-archive :where(.archive-section-summary > div, .journal-section-fold > summary > span:first-child) { min-width: 0; }
+#screen-archive .archive-section-summary h2, #screen-archive .archive-section-summary h3 { margin: 0; color: var(--ddx-brass-bright); font-size: .98rem; }
+#screen-archive .archive-section-summary p { margin: 2px 0 0; line-height: 1.35; }
+#screen-archive .archive-section-summary .pill, #screen-archive .journal-section-count { flex: 0 0 auto; }
+#screen-archive :where(.archive-section-body, .journal-fold-body) { min-width: 0; padding: 10px 12px 12px; }
+#screen-archive .archive-section-body .run-history-list, #screen-archive .archive-section-body .archive-log-list { gap: 8px; }
+#screen-archive .archive-section-body .run-history-card { padding: 9px 10px; }
+#screen-archive .journal-section-fold .journal-grid { gap: 8px; }
+#screen-archive .journal-section-fold .journal-row { padding: 9px; gap: 4px; }
+#screen-archive .journal-section-fold .journal-reliquary { margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+#screen-archive .journal-section-fold .journal-reliquary > p { margin: 0 0 9px; }
+#screen-archive .journal-section-fold .guildbound-panel { margin: 0; }
+@media (max-width: 560px) {
+  #screen-archive :where(.archive-section-fold > summary, .journal-section-fold > summary) { min-height: 52px; padding: 9px 10px; }
+  #screen-archive :where(.archive-section-body, .journal-fold-body) { padding: 9px 10px 10px; }
+  #screen-archive .archive-section-summary h2, #screen-archive .archive-section-summary h3 { font-size: .92rem; }
+}
