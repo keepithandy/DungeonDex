@@ -24,7 +24,7 @@ This changelog records what changed and why.
 * Aligned the local candidate, runtime labels, direct asset queries, and service-worker cache to `v1.33.2-guildbound`.
 * Preserved the Guildbound gameplay systems, save compatibility, and protected progression contracts.
 
-### Post-merge polish and cleanup
+### Polish Update
 
 * Compact the Warden Oaths presentation into a focused dropdown with a clearer summary, badge, progress cue, and mobile spacing.
 * Refined the premium dark-fantasy visual treatment across the app while reserving the green warding palette for the Warden Oaths surface.
