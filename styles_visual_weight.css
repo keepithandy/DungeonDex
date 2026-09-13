@@ -1348,3 +1348,136 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
 /* Loading states keep their place while making the waiting state explicit. */
 .ddx-shell :where([aria-busy="true"], .is-loading, .loading) { color: var(--ddx-muted); cursor: progress; opacity: .82; }
 .ddx-shell :where([aria-busy="true"], .is-loading, .loading) :where(button, input, select) { cursor: progress; }
+
+/* Palette correction: keep Guildbound's green reserved for Warden Oaths. */
+:root {
+  --ddx-void: #060606;
+  --ddx-ink: #0d0b0a;
+  --ddx-surface: #14110f;
+  --ddx-surface-raised: #1a1511;
+  --ddx-surface-soft: #241b14;
+  --ddx-muted: #c8bdb2;
+  --ddx-dim: #aa9f96;
+  --ddx-teal: #d2a66b;
+  --ddx-teal-bright: #f0d5a1;
+  --ddx-success: #e0bf79;
+  --ddx-panel-wash: linear-gradient(145deg, rgba(34, 26, 20, .97), rgba(9, 8, 8, .985));
+  --ddx-card-wash: linear-gradient(145deg, rgba(255, 255, 255, .052), rgba(255, 255, 255, .012));
+  --ddx-line-soft: rgba(224, 198, 160, .16);
+  --panel: rgba(18, 14, 12, .95);
+  --panel-2: rgba(9, 8, 8, .99);
+  --soft: var(--ddx-muted);
+}
+
+html { background: var(--ddx-void); }
+body {
+  background: radial-gradient(ellipse at 12% -8%, rgba(188, 103, 43, .16), transparent 34%), radial-gradient(ellipse at 92% 4%, rgba(180, 98, 42, .08), transparent 38%), linear-gradient(180deg, #100c09 0%, var(--ddx-void) 54%, #030303 100%);
+}
+body::before { background: linear-gradient(115deg, rgba(255, 232, 175, .03), transparent 28%, rgba(214, 151, 87, .025) 68%, transparent), repeating-linear-gradient(0deg, rgba(255, 255, 255, .014) 0 1px, transparent 1px 5px); }
+.ddx-guild-header { background: radial-gradient(circle at 7% -40%, rgba(207, 139, 81, .2), transparent 39%), linear-gradient(145deg, rgba(38, 28, 21, .97), rgba(12, 9, 8, .985)); }
+.ddx-guild-header::after { background: linear-gradient(90deg, transparent, rgba(231, 201, 130, .6), rgba(207, 139, 81, .38), transparent); }
+.ddx-dlc-title { background: linear-gradient(135deg, rgba(122, 77, 32, .8), rgba(72, 43, 25, .9)); }
+.ddx-action-row .save-status { color: #f0cf91; }
+.ddx-nav-guild-bar { background: linear-gradient(180deg, rgba(28, 21, 16, .96), rgba(7, 6, 5, .99)); }
+.ddx-nav-guild-bar .tab:not(.active):hover, .ddx-nav-guild-bar .tab:not(.active):focus-visible { background: linear-gradient(135deg, rgba(207, 139, 81, .16), rgba(178, 116, 67, .08)); }
+.ddx-shell :where(button:not(:disabled), select, input, textarea) { border-color: rgba(224, 198, 160, .24); }
+.ddx-shell :where(button.ghost, .ghost, .mini) { border-color: rgba(224, 198, 160, .2); }
+.ddx-shell :where(button.ghost:not(:disabled), .ghost:not(:disabled), .mini:not(:disabled)):hover { background: linear-gradient(135deg, rgba(207, 139, 81, .15), rgba(178, 116, 67, .07)); }
+.ddx-shell :where(button:disabled, [aria-disabled="true"]) { border-color: rgba(224, 198, 160, .3) !important; background: rgba(224, 198, 160, .07) !important; }
+.ddx-shell :where(input, select, textarea) { border-color: rgba(224, 198, 160, .24); background: linear-gradient(145deg, rgba(31, 23, 18, .96), rgba(9, 8, 8, .98)); }
+.ddx-shell :where(input, select, textarea)::placeholder { color: #a99d92; }
+.ddx-shell :where(option) { background: #14110f; }
+.ddx-shell :where(.panel)::before { background: linear-gradient(130deg, rgba(231, 201, 130, .055), transparent 38%, rgba(207, 139, 81, .035)); }
+.ddx-shell :where(.pill, .guildbound-chip, .gear-status-badge, .feed-chip, .charter-badge, .upgrade-badge, .journal-record-badge, .contract-target-badge) { border-color: rgba(224, 198, 160, .24); background: rgba(207, 139, 81, .075); }
+.ddx-shell :where(.rarity-rare) { border-color: rgba(224, 198, 160, .45); background: rgba(207, 139, 81, .1); color: #f0d69c; }
+.ddx-shell :where(.is-complete, .completed, .is-claimed) { border-color: rgba(224, 191, 121, .45); }
+.ddx-shell :where(button[aria-pressed="true"], [role="option"][aria-selected="true"], .guildbound-card.is-active, .lantern-rite-option.is-selected, .trophy-tab.active, .quest-card.active, .elite-contract-card.active, .named-loadout-card.active) { box-shadow: 0 0 0 1px rgba(224, 191, 121, .16), var(--ddx-shadow-card); }
+progress, .xpbar, .hpbar, .milestone-bar, .guildbound-progress { accent-color: var(--ddx-copper); }
+progress::-webkit-progress-value { background: linear-gradient(90deg, var(--ddx-copper), var(--ddx-brass)); }
+progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-copper), var(--ddx-brass)); }
+
+/* Town stays compact and reads in ember-brass tones. */
+#screen-town .ddx-guild-ledger { background: radial-gradient(circle at 4% 0%, rgba(207, 139, 81, .18), transparent 31%), linear-gradient(145deg, rgba(38, 29, 22, .98), rgba(10, 8, 7, .985)); }
+#screen-town .town-district-hub .district-subtitle { color: #e7bc7f; }
+#screen-town .town-district-hub .district-next-descent { color: #d9c7ad; }
+#screen-town .district-wallet-card { border-color: rgba(224, 191, 121, .3); background: linear-gradient(145deg, rgba(55, 36, 22, .68), rgba(17, 11, 8, .9)); }
+#screen-town .district-wallet-title { color: #f0d5a1; }
+#screen-town .town-section-fold, #screen-town .guildbound-hall { border-color: rgba(231, 201, 130, .22); background: rgba(19, 14, 11, .86); }
+#screen-town .town-section-fold > summary::after { color: #f0d5a1; }
+#screen-town .town-section-fold[open] > summary { background: linear-gradient(105deg, rgba(207, 139, 81, .19), rgba(178, 116, 67, .08)); }
+#screen-town .town-return-receipt { border-color: rgba(224, 191, 121, .3); background: linear-gradient(145deg, rgba(43, 29, 21, .9), rgba(12, 9, 8, .96)); }
+#screen-town .town-return-receipt-head h2 { color: #f0d5a1; }
+#screen-town .town-return-status { color: #f0d5a1; border-color: rgba(224, 191, 121, .42); background: rgba(167, 115, 47, .14); }
+#screen-town .town-return-receipt-stats > span { border-color: rgba(224, 198, 160, .16); }
+#screen-town .town-market-head .refresh-compact { color: #f0d5a1; }
+#screen-town :where(.elite-contract-card.active, .quest-card.active) { border-color: rgba(224, 191, 121, .56); box-shadow: 0 0 0 1px rgba(224, 191, 121, .14), var(--ddx-shadow-card); }
+
+/* Shared Guildbound surfaces stay neutral outside the Warden Oaths dropdown. */
+.guildbound-panel { border-color: rgba(231, 201, 130, .26); background: linear-gradient(145deg, rgba(35, 26, 20, .96), rgba(9, 8, 8, .98)); }
+.guildbound-notice { border-left-color: var(--ddx-copper); background: linear-gradient(90deg, rgba(207, 139, 81, .11), rgba(207, 139, 81, .025)); color: #f0e1cf; }
+.guildbound-card.is-active, .guildbound-card[aria-pressed="true"], .lantern-rite-option[aria-pressed="true"] { border-color: rgba(224, 191, 121, .7); box-shadow: inset 3px 0 0 var(--ddx-copper), 0 0 0 1px rgba(224, 191, 121, .14), var(--ddx-shadow-card); }
+.guildbound-card.is-complete { background: linear-gradient(145deg, rgba(101, 76, 39, .24), rgba(22, 17, 13, .9)); }
+.guildbound-card.is-locked { background: linear-gradient(145deg, rgba(124, 110, 91, .07), rgba(10, 8, 7, .72)); }
+.guild-oath-tracker { border-color: rgba(224, 191, 121, .38); background: linear-gradient(145deg, rgba(56, 37, 22, .62), rgba(13, 9, 7, .96)); }
+.lantern-rites-summary { border-color: rgba(224, 191, 121, .34); }
+
+/* Run and combat remain ember-black outside Warden Oaths. */
+#screen-run .ddx-dungeon-writ { background: radial-gradient(circle at 88% 0%, rgba(207, 139, 81, .08), transparent 36%), var(--ddx-panel-wash); }
+#screen-run .ddx-combat-arena { background: radial-gradient(circle at 50% 0%, rgba(207, 139, 81, .11), transparent 33%), linear-gradient(145deg, rgba(30, 22, 17, .98), rgba(8, 7, 6, .99)); }
+#screen-run .combat-device-shell { background: linear-gradient(160deg, rgba(31, 24, 19, .98), rgba(7, 6, 5, .99)); }
+#screen-run .combat-device-top { background: linear-gradient(100deg, rgba(207, 139, 81, .14), rgba(178, 116, 67, .06)); }
+#screen-run .combat-monster-stage { background-color: #100c09; }
+#screen-run .combat-hp-card.player-hp { border-color: rgba(224, 191, 121, .38); }
+#screen-run .combat-device-actions .guard-btn { border-color: rgba(224, 191, 121, .48); background: linear-gradient(145deg, rgba(112, 75, 35, .72), rgba(37, 23, 15, .92)); }
+#screen-run .ddx-combat-record { border-color: rgba(224, 191, 121, .28); }
+#screen-run :where(.feed-chip-extract, .feed-chip-heal, .feed-chip-player) { color: #ffe7b0 !important; border-color: rgba(224, 191, 121, .46); background: rgba(167, 115, 47, .14); }
+
+/* Gear, inventory, and loadouts use copper as the positive state. */
+#screen-gear .gear-player-panel { border-color: rgba(224, 191, 121, .34); background: radial-gradient(circle at 8% 0%, rgba(207, 139, 81, .12), transparent 32%), var(--ddx-panel-wash); }
+#screen-gear .gear-section-fold { background: rgba(19, 14, 11, .86); }
+#screen-gear .gear-section-fold > summary { background: linear-gradient(110deg, rgba(207, 139, 81, .1), transparent 75%); }
+#screen-gear .gear-section-fold[open] > summary { background: linear-gradient(105deg, rgba(207, 139, 81, .13), rgba(178, 116, 67, .08)); }
+#screen-gear .gear-section-fold > summary::after { color: #f0d5a1; }
+#screen-gear :where(.inventory-card, .equip-slot, .named-loadout-card) { background: linear-gradient(145deg, rgba(34, 26, 20, .92), rgba(10, 8, 7, .98)); }
+#screen-gear :where(.equip-slot-filled, .inventory-card.is-equipped) { border-color: rgba(224, 191, 121, .52); box-shadow: inset 3px 0 0 var(--ddx-copper), var(--ddx-shadow-card); }
+#screen-gear .gear-status-badge.better { color: #ffe4aa; border-color: rgba(224, 191, 121, .46); background: rgba(167, 115, 47, .14); }
+#screen-gear .named-loadout-notice { border-left-color: var(--ddx-copper); background: rgba(207, 139, 81, .08); color: #f0e1cf; }
+
+/* Archive, Journal, and modal surfaces use ash, brass, and copper. */
+#screen-dex :where(.collection-shell, .boss-trophy-card, .retired-relic-card), #screen-archive :where(.journal-row, .run-history-card, .journal-empty) { background: linear-gradient(145deg, rgba(30, 23, 18, .92), rgba(8, 7, 6, .98)); }
+#screen-archive .journal-record-badge { color: #f0e5d8; border-color: rgba(224, 191, 121, .38); }
+#screen-archive .guildbound-preferences-panel { border-color: rgba(224, 191, 121, .3); }
+#screen-archive .guildbound-preference { border-color: rgba(224, 198, 160, .18); background: rgba(207, 139, 81, .045); }
+#screen-archive .guildbound-preference:hover { border-color: rgba(224, 191, 121, .46); background: rgba(207, 139, 81, .09); }
+.intro-modal-backdrop, .gear-detail-backdrop { background: rgba(4, 3, 3, .86); }
+.intro-modal-window, .gear-detail-window { background: linear-gradient(145deg, rgba(35, 27, 21, .99), rgba(7, 6, 5, .995)); }
+.gear-detail-backdrop :where(.gear-detail-kicker, .gear-detail-rarity) { color: #f0d5a1; }
+.gear-detail-window :where(.gear-detail-stat, .gear-compare-row) { border-color: rgba(224, 198, 160, .18); }
+.ddx-shell :where(.empty-state, .empty-inventory-card, .empty-relic-shelf, .elite-contract-empty) { border-color: rgba(224, 198, 160, .28); }
+
+/* The Warden Oaths dropdown keeps its distinct green-teal DLC identity. */
+#guildOathsPanel .guild-oaths-dropdown { border-color: rgba(145, 213, 194, .46); background: linear-gradient(145deg, rgba(23, 53, 43, .94), rgba(8, 15, 12, .98)); }
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary { background: linear-gradient(105deg, rgba(47, 91, 73, .26), rgba(75, 129, 115, .12)); }
+#guildOathsPanel .guild-oaths-dropdown[open] > summary.guild-oaths-summary { border-bottom-color: rgba(145, 213, 194, .3); background: linear-gradient(105deg, rgba(55, 106, 84, .3), rgba(75, 129, 115, .16)); }
+#guildOathsPanel .guild-oaths-dropdown > summary.guild-oaths-summary::after { color: #b9e3d5; }
+#guildOathsPanel .guild-oaths-summary-mark { border-color: rgba(145, 213, 194, .56); background: rgba(75, 129, 115, .28); color: #b8eadc; box-shadow: inset 0 0 12px rgba(184, 234, 220, .1); }
+#guildOathsPanel .guild-oaths-summary-copy small { color: #c5e9dc; }
+#guildOathsPanel .guild-oaths-summary-meta strong { color: #b8eadc; }
+#guildOathsPanel .guildbound-kicker { color: #9fddd0; }
+#guildOathsPanel .guildbound-chip { border-color: rgba(145, 213, 194, .4); background: rgba(145, 213, 194, .11); color: #c9e6d4; }
+#guildOathsPanel .guildbound-notice { border-left-color: #91d5c2; background: linear-gradient(90deg, rgba(145, 213, 194, .13), rgba(145, 213, 194, .03)); color: #dcefe8; }
+#guildOathsPanel .guildbound-card { background: linear-gradient(145deg, rgba(20, 51, 40, .78), rgba(8, 17, 13, .95)); }
+#guildOathsPanel .guildbound-card.is-active, #guildOathsPanel .guildbound-card[aria-pressed="true"] { border-color: rgba(145, 213, 194, .76); box-shadow: inset 3px 0 0 #91d5c2, 0 0 0 1px rgba(145, 213, 194, .14), var(--ddx-shadow-card); }
+#guildOathsPanel .guild-oath-menu, #guildOathsPanel .guild-oaths-dropdown-body > details:not(.guild-oath-menu) { border-top-color: rgba(145, 213, 194, .24); }
+#guildOathsPanel .guild-oath-menu > summary, #guildOathsPanel .guild-oaths-dropdown-body > details:not(.guild-oath-menu) > summary { color: #eedfd0; }
+#guildOathsPanel .guild-oath-menu > summary::after, #guildOathsPanel .guild-oaths-dropdown-body > details:not(.guild-oath-menu) > summary::after { color: #afcfc0; }
+#guildOathsPanel .guildbound-progress { accent-color: #91d5c2; }
+#guildOathsPanel .guildbound-progress::-webkit-progress-value { background: linear-gradient(90deg, #4f967f, #b8eadc); }
+#guildOathsPanel .guildbound-progress::-moz-progress-bar { background: linear-gradient(90deg, #4f967f, #b8eadc); }
+
+/* Clear the last legacy green states that sit beneath the premium layer. */
+#screen-run .guard-btn { color: #f0d5a1; }
+#screen-run .player-hpbar span { background: linear-gradient(90deg, rgba(142, 83, 35, .95), rgba(207, 139, 81, .94), rgba(246, 223, 170, .76)); }
+#screen-run .combat-device-shell:has(.guard-btn.tap-now) .player-hp { box-shadow: 0 0 0 1px rgba(224, 191, 121, .26), inset 0 0 22px rgba(207, 139, 81, .07); }
+.extract-success-popup { background: radial-gradient(circle at 50% 0%, rgba(255, 224, 154, .22), transparent 44%), linear-gradient(180deg, rgba(150, 91, 35, .98), rgba(70, 35, 14, .98)); border-color: rgba(246, 210, 135, .66); box-shadow: 0 18px 48px rgba(0, 0, 0, .5), 0 0 32px rgba(207, 139, 81, .24), inset 0 1px 0 rgba(255, 255, 255, .18); }
+.charter-price-btn.charter-owned { border-color: rgba(224, 191, 121, .42); background: rgba(207, 139, 81, .09); color: #ffe4aa; }
