@@ -1579,6 +1579,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
   gap: 11px;
   min-height: 50px;
   padding: 10px 12px;
+  line-height: 1.3;
   cursor: pointer;
   list-style: none;
   background: linear-gradient(105deg, rgba(207, 139, 81, .13), rgba(178, 116, 67, .035));
@@ -1602,7 +1603,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 }
 #screen-archive :where(.archive-section-fold[open] > summary, .journal-section-fold[open] > summary) { border-bottom: 1px solid rgba(224, 191, 121, .24); background: linear-gradient(105deg, rgba(207, 139, 81, .19), rgba(178, 116, 67, .07)); }
 #screen-archive :where(.archive-section-fold[open] > summary, .journal-section-fold[open] > summary)::after { content: '−'; background: rgba(167, 115, 47, .2); }
-#screen-archive :where(.archive-section-fold > summary:hover, .journal-section-fold > summary:hover) { background: linear-gradient(105deg, rgba(207, 139, 81, .2), rgba(178, 116, 67, .08)); }
+#screen-archive :where(.archive-section-fold > summary:hover, .journal-section-fold > summary:hover) { border-color: rgba(224, 191, 121, .42); background: linear-gradient(105deg, rgba(207, 139, 81, .2), rgba(178, 116, 67, .08)); }
 #screen-archive :where(.archive-section-fold > summary:focus-visible, .journal-section-fold > summary:focus-visible) { outline: 2px solid var(--ddx-focus); outline-offset: -3px; }
 #screen-archive :where(.archive-section-summary > div, .journal-section-fold > summary > span:first-child) { min-width: 0; }
 #screen-archive .archive-section-summary h2, #screen-archive .archive-section-summary h3 { margin: 0; color: var(--ddx-brass-bright); font-size: .98rem; }
