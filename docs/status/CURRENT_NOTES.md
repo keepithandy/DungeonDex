@@ -7,8 +7,17 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.32.2 - Merchant Upgrade Hotfix
-- Build/cache labels use `1.32.2-merchant-upgrade-hotfix`.
+- DungeonDex v1.33.0 - Guildbound
+- Build/cache labels use `1.33.0-guildbound`.
+
+## v1.33.0 Guildbound (Local Release Candidate)
+- Warden Oaths add nine optional, extraction-settled run goals with visible progress, copper rewards, and permanent Guild Renown.
+- Guild Renown adds five ranks, one-time keepsakes, honorary title selection, and read-only Journal history without combat or economy stat drift.
+- Lantern Rites add deterministic three-choice drafts after victories 2, 5, 9, 14, 20, 27, 35, and 44. Nine bounded boons alter only the current descent and are safe across reloads, skips, stale tokens, and run end.
+- Gear status filters, Escape-to-clear search, Town/Gear section controls, explicit combat Spellbook access, device-only display preferences, pinch zoom, and a brass/ember/teal visual pass improve usability.
+- New state is additive and normalized through existing save recovery. Existing combat, reward/drop RNG, Merchant Upgrade, Talent, Debt, Elite Contract, Trophy Echo, and dungeon-entry contracts remain protected.
+- Verification is clean: focused Guildbound lifecycle checks pass; interface/accessibility passes 25/25; app-wiring/cache authority passes; and the full compact suite passes 76/76, including browser runtime, contrast, touch geometry, Enter Dungeon, and protected-system regressions.
+- This is source-only work. No v1.33.0 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.32.2 Merchant Upgrade Hotfix (Local Release Candidate)
 <!-- This hotfix restores the active three-slot Merchant Gear Upgrade contract and its read-only summaries. -->
@@ -34,7 +43,7 @@
 - This is source-only work. No v1.31.1 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.31.0 Town, Gear & Guild Navigation Quality of Life (Historical Local Candidate)
-<!-- Historical candidate details are preserved here; v1.32.2 is the current development authority. -->
+<!-- Historical candidate details are preserved here; v1.33.0 is the current development authority. -->
 - Town now keeps its existing Market, Forge, and Board inside named native collapsible groups; the district header and entry actions remain visible.
 - Gear now keeps its existing Upgrades, Equipment, Loadouts, and Inventory inside named native collapsible groups; Filters remain with Inventory.
 - Existing Town shortcuts reveal the matching Town group before focusing its original panel, and the Guild Routes rail has a brass-and-obsidian visual refresh with existing route behavior intact.

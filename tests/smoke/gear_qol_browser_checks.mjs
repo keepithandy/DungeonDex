@@ -25,12 +25,17 @@ export async function verifyGearQolBrowser({ client, evaluate, record }) {
   })()`);
   const controls = await read(`(() => {
     const kept = document.querySelector('[data-gear-detail-id="qol-kept"]');
-    return {badge:kept.innerText.includes('In loadout'), noSale:!kept.querySelector('[data-sell]'),
+    return {statusFilter:!!document.getElementById('gearStatusFilter'), badge:kept.innerText.includes('In loadout'), noSale:!kept.querySelector('[data-sell]'),
       lock:!!document.querySelector('[data-gear-flag="locked"]'), junk:!!document.querySelector('[data-gear-flag="junk"]'),
       scope:document.getElementById('inventoryPanel').innerText.includes('including items hidden by filters')};
   })()`);
   assert.ok(Object.values(controls).every(Boolean), JSON.stringify(controls));
   record('Gear exposes loadout protection, lock/junk controls and bulk-sale scope', true);
+  await read(`(() => { const select=document.getElementById('gearStatusFilter'); select.value='loadout'; select.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`);
+  const statusFiltered = await read(`(() => ({ kept:!!document.querySelector('[data-gear-detail-id="qol-kept"]'), loose:!!document.querySelector('[data-gear-detail-id="qol-loose"]'), value:document.getElementById('gearStatusFilter')?.value || '' }))()`);
+  assert.deepEqual(statusFiltered, { kept:true, loose:false, value:'loadout' });
+  record('Gear status filters isolate saved-loadout items without touching the save', true);
+  await read(`(() => { const select=document.getElementById('gearStatusFilter'); select.value='all'; select.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`);
   await read(`document.querySelector('[data-gear-id="qol-loose"][data-gear-flag="locked"]').click(); true`);
   assert.equal(await read(`S.player.inventory.find(i=>i.id==='qol-loose').locked`), true);
   await pause();

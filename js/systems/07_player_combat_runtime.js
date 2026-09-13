@@ -163,6 +163,8 @@
       luck: base.luck + equip.luck,
       hpBonus: equip.hp
     };
+    const lanternStats = window.DungeonDexLanternRites?.statBonuses(state);
+    if (lanternStats) ['power', 'guard', 'wit', 'speed'].forEach(key => { total[key] += lanternStats[key] || 0; });
     state.player.level = Math.floor(numberOr(state.player.level, 1, 1, 999));
     state.player.maxHp = 100 + total.hpBonus + state.player.level * 10;
     state.player.hp = Math.floor(numberOr(state.player.hp, state.player.maxHp, 0, state.player.maxHp));
@@ -442,6 +444,9 @@
     run.goldBonusPct = Math.floor(numberOr(sink.nextRunGoldBonusPct, 0, 0, 50));
     sink.nextRunGoldBonusPct = 0;
     run.pendingRewards = createPendingRunRewards();
+    run.event = null;
+    window.DungeonDexGuildOaths?.beginRun(state);
+    window.DungeonDexLanternRites?.startRun(state);
     run.zone = zoneName(run.floor);
     run.danger = dangerRatingForDepth(run.floor);
     run.combatLog = [];
@@ -491,6 +496,7 @@
     run.zone = zoneName(run.floor);
     if (typeof expireOverdueEliteContract === 'function') expireOverdueEliteContract(state);
     run.monster = generateMonster(run.floor, state);
+    window.DungeonDexLanternRites?.onEncounterStart(state);
     if (!run.monster) {
       recoverRunToTown(state, 'Recovered from a failed encounter roll and returned to Lowfire.');
       return;
@@ -551,6 +557,8 @@
     ensureRunShell(state);
     action = String(action || '');
     if (!CORE_COMBAT_ACTIONS.includes(action)) return result;
+    // A choice is a pause in the descent: stale combat controls cannot bypass it.
+    if (state.run.event || window.DungeonDexLanternRites?.isDraftReady(state)) return result;
     if (!hasActiveCombat(state)) {
       if (state?.run?.active && !state.run.monster) {
         recoverRunToTown(state, 'Recovered from an incomplete combat state and returned to Lowfire.');
@@ -588,6 +596,7 @@
       monster.hp -= dealt;
       pushCombat(state, `You strike for ${dealt}.`);
     } else if (action === 'guard') {
+      window.DungeonDexGuildOaths?.recordAction(state, 'guard', { successful:true });
       playerShield = Math.round(stats.guard * 0.65 + stats.wit * 0.25);
       const recovered = Math.max(1, Math.round(stats.guard * 0.09));
       state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
@@ -596,15 +605,18 @@
     } else if (action === 'skill') {
       const spell = combatSpellbook(state).selected;
       const spellMasteryApi = window.DungeonDexSpellMastery;
-      const masteryModifiers = typeof spellMasteryApi?.combatModifiers === 'function'
+      const masteryModifiers = { ...(typeof spellMasteryApi?.combatModifiers === 'function'
         ? spellMasteryApi.combatModifiers(state, spell.id, monster)
-        : { damageMultiplier:1, defenseMultiplier:1, shieldMultiplier:1, healMultiplier:1, lowHealthHealMultiplier:1, siphonMultiplier:1, reflectRatio:0, emberOnKill:0 };
+        : { damageMultiplier:1, defenseMultiplier:1, shieldMultiplier:1, healMultiplier:1, lowHealthHealMultiplier:1, siphonMultiplier:1, reflectRatio:0, emberOnKill:0 }) };
+      const lanternSpell = window.DungeonDexLanternRites?.combatModifiers(state);
+      if (lanternSpell) ['damageMultiplier', 'healMultiplier', 'siphonMultiplier'].forEach(key => { masteryModifiers[key] *= lanternSpell[key] || 1; });
       const emberCost = Math.max(0, Math.floor(numberOr(spell.emberCost, 0, 0, 99)));
       if (state.player.ember < emberCost) {
         if (spell.id === 'ashburst') pushCombat(state, 'No ember left. Ashburst fizzles.');
         else pushCombat(state, `Need ${emberCost} Ember. ${spell.name} fizzles.`);
       } else {
         state.player.ember -= emberCost;
+        window.DungeonDexGuildOaths?.recordAction(state, 'skill', { successful:true, spellId:spell.id });
         if (spell.id === 'cinder_ward') {
           playerShield = Math.round((stats.guard * 1.65 + stats.wit * 0.5) * masteryModifiers.shieldMultiplier);
           const recovered = Math.max(1, Math.round((stats.guard * 0.14 + stats.wit * 0.08) * masteryModifiers.healMultiplier));
@@ -641,6 +653,7 @@
         if (masteryResult?.reachedMastery) pushCombat(state, `${spell.name} is ready to master its inscription.`);
       }
     } else if (action === 'extract') {
+      window.DungeonDexGuildOaths?.recordAction(state, 'extract', { successful:true });
       const odds = clamp(38 + stats.speed + stats.luck - threatDepthFromDepth(state.run.floor) * 2, 10, 90);
       if (Math.random() * 100 <= odds) {
         if (monster.contractTarget && window.DungeonDexEliteContracts?.markEliteContractExtract) window.DungeonDexEliteContracts.markEliteContractExtract(state);
@@ -663,6 +676,11 @@
     }
 
     const sootveilGuard = consumeSootveilGuard(state);
+    const lanternShield = window.DungeonDexLanternRites?.consumeOpeningShield(state) || 0;
+    if (lanternShield > 0) {
+      playerShield += lanternShield;
+      pushCombat(state, `Lantern ward shelters you with ${lanternShield} Guard.`);
+    }
     if (sootveilGuard > 0) {
       playerShield += sootveilGuard;
       pushCombat(state, `Sootveil guard holds: +${format(sootveilGuard)} Guard.`);
@@ -1168,6 +1186,11 @@
       eliteKills: source === 'elite' ? 1 : 0
     });
     state.run.roomsCleared += 1;
+    window.DungeonDexGuildOaths?.recordVictory(state, m);
+    const lanternClear = window.DungeonDexLanternRites?.onRoomClear(state);
+    if (lanternClear?.healed) pushCombat(state, `Lantern Rite restores ${lanternClear.healed} HP.`);
+    if (lanternClear?.emberRestored) pushCombat(state, `Lantern Rite restores ${lanternClear.emberRestored} Ember.`);
+    if (lanternClear?.draftQueued) pushCombat(state, 'A Lantern Rite is ready. Choose a blessing before your next fight.');
     state.run.chain += 1;
     const victoryLead = source === 'boss' ? 'Boss cleared' : source === 'elite' ? 'Elite defeated' : 'Room secured';
     const rewardLead = source === 'boss' ? 'Boss Spoils' : source === 'elite' ? 'Elite Spoils' : 'Room Reward';
@@ -1577,6 +1600,7 @@
 
   function finishRun(state, reason, context = {}) {
     ensureRunShell(state);
+    if (!state.run.active) return;
     let runResultDetail = '';
     const endedAtFloor = progressDepthValue(state.run.floor, state.player?.returnDepth || 1);
     const endedAtZone = state.run.zone || currentStagingDistrict(state).name;
@@ -1585,6 +1609,9 @@
       ? progressDepthValue(endedAtFloor, 1)
       : hardcoreDeathCheckpointDepth(state, endedAtFloor);
     const returnLabel = hardcoreDepthReturnLabel(nextReturnDepth);
+    const oathResult = window.DungeonDexGuildOaths?.settleRun(state, reason);
+    if (oathResult?.gold > 0) addPendingRunGold(state, oathResult.gold);
+    if (oathResult?.message) pushLog(state, oathResult.message);
     const rewardSnapshot = runHistoryRewardSnapshot(state.run.pendingRewards);
     if (reason === 'extract') {
       const secured = bankPendingRunRewards(state);
@@ -1626,6 +1653,8 @@
     }
     if (reason === 'extract') state.player.safeExtractDepth = Math.max(state.player.safeExtractDepth || 1, nextReturnDepth);
     state.run.active = false;
+    window.DungeonDexLanternRites?.clear(state);
+    state.run.event = null;
     state.run.monster = null;
     state.run.choices = [];
     state.run.chain = 0;
@@ -1638,7 +1667,7 @@
       reason,
       zone: endedAtZone,
       runLabel: endedRunLabel,
-      detail: runResultDetail,
+      detail: runResultDetail + (oathResult?.message ? ` ${oathResult.message}` : ''),
       summary: summaryLine || '',
       restartDepth: nextReturnDepth,
       restartLabel: returnLabel,

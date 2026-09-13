@@ -323,6 +323,8 @@
           </div>
         </div>
         ${dungeonAtmosphereMarkup(atmosphereProfile, depth)}
+        ${window.DungeonDexGuildOaths?.runMarkup(S) || ''}
+        ${window.DungeonDexLanternRites?.summaryMarkup(S) || ''}
       </div>`;
 
     if (S.run.event) {
@@ -344,6 +346,12 @@
       combatLog.innerHTML = `
         <div class="run-log-head split"><h2>Feed</h2><div class="tag-row"><span class="pill">Decision</span></div></div>
         <div class="run-log-list">${asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT).map(renderCombatFeedLine).join('')}</div>`;
+      return;
+    }
+
+    if (window.DungeonDexLanternRites?.isDraftReady(S)) {
+      combatPanel.innerHTML = window.DungeonDexLanternRites.draftMarkup(S);
+      combatLog.innerHTML = `<div class="run-log-head split"><h2>Feed</h2><span class="pill">Lantern Rite</span></div><div class="run-log-list">${asArray(S.run.combatLog).slice(0, COMBAT_LOG_RENDER_LIMIT).map(renderCombatFeedLine).join('')}</div>`;
       return;
     }
 
@@ -416,6 +424,7 @@
           ${statBox('LCK', d.luck)}
         </section>
 
+        <div class="guildbound-combat-tools"><span class="small muted">${format(S.player.ember)} Ember · ${escapeHtml(selectedSpell.name)} costs ${format(selectedSpell.emberCost)}</span><button class="ghost mini" type="button" id="combatSpellbookBtn" aria-haspopup="menu" aria-controls="combatSpellMenu" aria-expanded="false">Spellbook</button></div>
         <section id="combatSpellMenu" class="combat-spell-menu" role="menu" aria-label="Choose a combat spell" hidden>
           <div class="combat-spell-menu-heading"><span>Spellbook</span><strong>Level ${format(spellbook.level)}</strong></div>
           <div class="combat-spell-option-list">${spellOptions}</div>
@@ -740,6 +749,7 @@
     filtersPanel.innerHTML = `
       <div class="filter-head"><h2>Filters</h2><button class="ghost mini" type="button" data-clear-gear-filters="1">Clear Filters</button></div>
       <div class="filter-grid loadout-filter-grid">
+        ${window.DungeonDexGuildboundQol?.statusFilterMarkup(S) || ''}
         <select id="slotFilter" aria-label="Filter inventory by slot">${['all', ...FUTURE_EQUIPMENT_SLOTS].map(x => `<option value="${escapeHtml(x)}" ${filters.slot===x?'selected':''}>${x === 'all' ? 'All slots' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
         <select id="rarityFilter" aria-label="Filter inventory by rarity">${['all', ...RARITIES.map(r => r.key)].map(x => `<option value="${escapeHtml(x)}" ${filters.rarity===x?'selected':''}>${x === 'all' ? 'All rarities' : escapeHtml(slotDisplayName(x))}</option>`).join('')}</select>
         <select id="sortFilter" aria-label="Sort inventory">
@@ -783,6 +793,7 @@
     const filters = loadoutFilters();
     const items = asArray(S.player?.inventory, []).filter(item => {
       if (!isPlainObject(item)) return false;
+      if (window.DungeonDexGuildboundQol && !window.DungeonDexGuildboundQol.matchesStatusFilter(S, item)) return false;
       if (filters.slot !== 'all' && item.slot !== filters.slot) return false;
       if (filters.rarity !== 'all' && itemRarityKey(item) !== filters.rarity) return false;
       const q = filters.search.trim().toLowerCase();

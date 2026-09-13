@@ -8,14 +8,35 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.32.2 Merchant Upgrade Hotfix`
-* Current development target: `v1.32.2 Merchant Upgrade Hotfix`
-* Current build/cache label: `1.32.2-merchant-upgrade-hotfix`
+* Current release candidate/local package baseline: `v1.33.0 Guildbound`
+* Current development target: `v1.33.0 Guildbound`
+* Current build/cache label: `1.33.0-guildbound`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.33.0 - Guildbound
+
+### Oaths, Renown, and Lantern Rites
+
+* Added nine optional Warden Oaths to the Lowfire Guild Hall. Oaths cover guarded victories, spellwork, elite and boss hunts, long descents, mixed arts, and disciplined runs. Each oath states its goal and extraction-only copper reward before entry.
+* Added permanent Guild Renown with five ranks, one-time keepsakes, honorary titles, and a read-only Guild Chronicle. Falling, breaking an oath, or returning early never awards oath currency; ordinary haul accounting remains unchanged.
+* Added Lantern Rites at eight run victory milestones. Each draft offers three deterministic choices from nine stackable, bounded run-only boons covering power, guard, wit, speed, spell output, healing, Ember cadence, post-victory recovery, and opening protection. Drafts survive reloads and cannot be rerolled or double-claimed.
+
+### Quality of life and presentation
+
+* Added a visible Spellbook button alongside the four combat actions while retaining tap, hold, Arrow Down, and F4 access.
+* Added gear status filters for higher score, locked, marked junk, saved-loadout, and safe-to-sell states; Escape now clears gear search without losing focus.
+* Added Expand All / Collapse All controls for Town and Gear, saved device-only display preferences for comfortable spacing, larger text, and reduced effects, and stronger focus/touch treatment.
+* Refreshed the brass, ember, and teal visual hierarchy across panels, progress indicators, rite cards, and mobile layouts. Pinch zoom is allowed again for accessibility.
+
+### Compatibility and verification
+
+* New state is additive and repaired through the existing save normalizer. Lantern effects clear at run end; Guild rewards enter the existing pending-haul and banking path.
+* Preserved Merchant Gear Upgrade values/caps, spell unlocks/costs, monster and boss curves, base reward/drop RNG, Talent compatibility, Debt, Elite Contracts, Trophy Echo, and the single Enter Dungeon path.
+* Added focused Oath, Lantern, and QoL smoke coverage. This remains a local source candidate; no package, upload, tag, or push is included.
 
 ## v1.32.2 - Merchant Upgrade Hotfix
 

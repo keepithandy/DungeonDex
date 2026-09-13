@@ -19,6 +19,7 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     const reliquaryGear = generateGear('charm', 11, { source:'normal', depthRaw:31 });
     S.player.inventory.push(reliquaryGear);
     window.__reliquaryThemedGearId = reliquaryGear.id;
+    window.__reliquaryLanternDrafts = 0;
     delete S.player.namedLoadouts;
     save(S); S = load(); render();
     return { legacy: Array.isArray(S.player.namedLoadouts) && S.player.namedLoadouts.length === 0,
@@ -78,8 +79,9 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
       await read(`(() => {
         const button = S.run.event
           ? document.querySelector('[data-run-event="leave"]') || document.querySelector('[data-run-event]')
-          : document.querySelector('[data-action="attack"]');
+          : document.querySelector('[data-lantern-rite]') || document.querySelector('[data-action="attack"]');
         if (!button || button.disabled) throw new Error('Missing active combat/event control');
+        if (button.matches('[data-lantern-rite], [data-lantern-skip]')) window.__reliquaryLanternDrafts = (window.__reliquaryLanternDrafts || 0) + 1;
         button.click(); return true;
       })()`);
     }
@@ -140,6 +142,9 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   assert.match(activeReload.theme, /combat-backdrop--drowned-reliquary/);
   record('Active Reliquary reload preserves pending rewards, monster, duplicated loadouts, IDs and upgrades', true);
   await advanceTo(40);
+  const lanternDrafts = await read('window.__reliquaryLanternDrafts || 0');
+  assert.ok(lanternDrafts >= 3, JSON.stringify({ lanternDrafts }));
+  record('Lantern Rites pause the descent at earned milestones and resume through the new choice controls', true, `${lanternDrafts} drafts handled`);
   assert.match(await read('document.getElementById("runStatus").innerText'), /Beyond the Reliquary/);
   assert.equal(await read('!!document.querySelector(".run-flow-summary.is-boss-floor")'), false);
   await read(`(() => {

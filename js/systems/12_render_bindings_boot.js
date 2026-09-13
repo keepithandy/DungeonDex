@@ -113,7 +113,7 @@
 
   function bindInventoryActions() {
     $$('[data-clear-gear-filters]').forEach(btn => btn.onclick = () => {
-      S.filters = { slot:'all', rarity:'all', sort:'power', search:'' };
+      S.filters = { slot:'all', rarity:'all', sort:'power', search:'', status:'all' };
       render();
       el('searchFilter')?.focus();
     });
@@ -170,6 +170,19 @@
   }
 
   function bindCombatActions() {
+    $$('[data-lantern-rite], [data-lantern-skip]').forEach(btn => {
+      btn.onclick = () => runCombatGuardedAction(() => {
+        const api = window.DungeonDexLanternRites;
+        const outcome = btn.hasAttribute('data-lantern-skip')
+          ? api?.skip(S, btn.dataset.lanternSkip)
+          : api?.choose(S, btn.dataset.lanternRite, btn.dataset.lanternToken);
+        if (!outcome?.ok) return;
+        if (outcome.message) pushCombat(S, outcome.message);
+        renderCombatTick(true);
+        const target = document.querySelector('#combatPanel [data-lantern-rite], #combatPanel [data-action="attack"]');
+        target?.focus({ preventScroll:true });
+      });
+    });
     $$('[data-run-event]').forEach(btn => {
       const handler = (e) => {
         if (e) e.preventDefault();
@@ -218,6 +231,7 @@
 
     const spellButton = document.querySelector('[data-spell-button]');
     const spellMenu = el('combatSpellMenu');
+    const spellbookTrigger = el('combatSpellbookBtn');
     const spellOptions = $$('[data-spell-select]');
     if (!spellButton || !spellMenu) return;
 
@@ -233,6 +247,7 @@
       spellMenu.hidden = true;
       spellMenuOpened = false;
       spellButton.setAttribute('aria-expanded', 'false');
+      spellbookTrigger?.setAttribute('aria-expanded', 'false');
     };
     const openSpellMenu = () => {
       if (!hasActiveCombat(S)) return;
@@ -240,6 +255,7 @@
       spellMenu.hidden = false;
       spellMenuOpened = true;
       spellButton.setAttribute('aria-expanded', 'true');
+      spellbookTrigger?.setAttribute('aria-expanded', 'true');
     };
     const castSelectedSpell = () => {
       closeSpellMenu();
@@ -252,6 +268,15 @@
     };
 
     spellButton.disabled = !hasActiveCombat(S);
+    if (spellbookTrigger) {
+      spellbookTrigger.disabled = !hasActiveCombat(S);
+      spellbookTrigger.onclick = () => {
+        if (spellMenu.hidden) {
+          openSpellMenu();
+          spellOptions.find(option => !option.disabled)?.focus();
+        } else closeSpellMenu();
+      };
+    }
     spellButton.onpointerdown = event => {
       if (event?.button != null && event.button !== 0) return;
       if (!hasActiveCombat(S)) return;
@@ -361,6 +386,17 @@
   }
 
   function bindDynamic() {
+    $$('[data-guild-oath]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      const outcome = window.DungeonDexGuildOaths?.selectOath(S, btn.dataset.guildOath);
+      if (outcome?.message) pushLog(S, outcome.message);
+      render();
+      document.querySelector(`[data-guild-oath="${btn.dataset.guildOath}"]`)?.focus({ preventScroll:true });
+    }));
+    $$('[data-guild-title]').forEach(btn => btn.onclick = () => runGuardedAction(() => {
+      window.DungeonDexGuildOaths?.selectTitle(S, btn.dataset.guildTitle);
+      render();
+      document.querySelector(`[data-guild-title="${btn.dataset.guildTitle}"]`)?.focus({ preventScroll:true });
+    }));
     $$('[data-town-route]').forEach(btn => btn.onclick = () => {
       const route = String(btn.dataset.townRoute || '').trim();
       if (!['gear', 'archive'].includes(route)) return;
@@ -427,6 +463,7 @@
     if (el('runFromIdleBtn')) el('runFromIdleBtn').onclick = () => runGuardedAction(() => { startRun(S); render(); });
     if (el('clearCacheReloadBtn')) el('clearCacheReloadBtn').onclick = clearCacheAndReload;
     bindSaveTransferActions();
+    window.DungeonDexGuildboundQol?.bind(S, { render, refreshInventory:refreshInventoryOnly });
   }
 
   function bindSaveTransferActions() {

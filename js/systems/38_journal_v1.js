@@ -542,6 +542,7 @@
       ${model.sections.length
         ? `<div class="journal-grid">${model.sections.map(row).join('')}</div>`
         : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>'}
+      ${window.DungeonDexGuildOaths?.journalMarkup(state) || ''}
       <section class="journal-reliquary" aria-label="Drowned Reliquary records">
         <h2>Drowned Reliquary</h2>
         <p class="small muted">The guild records what your journey can prove. These acknowledgements are read-only.</p>

@@ -14,6 +14,9 @@ It preserves classic browser script load order instead of converting the game to
 - `07_player_combat_runtime.js` — Derived stats, XP/logs, run start, encounters, combat, quests, shops, rest/forge.
 - `08_normalization_save.js` — Item/monster/save normalization and persistence.
 - `47_spell_mastery.js` — Spell mastery save model, inscriptions, rare folios, gear affinities, Scriptorium markup, and Journal summary helpers.
+- `48_guild_oaths.js` — Optional Warden Oaths, extraction settlement, permanent Guild Renown, keepsakes, honorary titles, and chronicle markup.
+- `49_lantern_rites.js` — Deterministic milestone drafts and bounded run-only boons with event priority and reload-safe state.
+- `50_guildbound_qol.js` — Gear status filters, section controls, device display preferences, and focus/touch quality-of-life bindings.
 - `46_named_loadouts.js` — ID-based named equipment snapshots, duplication/reordering, slot-by-slot safe-apply previews, and accessible Gear-tab controls.
 - `09_ui_common_intro.js` — Screen switching, common UI helpers, popups, intro modal.
 - `10_ui_town_shop.js` — Elite contract board, town panels, district wares, shop cards.

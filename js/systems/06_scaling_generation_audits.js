@@ -296,7 +296,7 @@
     const state = {
       build: BUILD,
       screen: 'town',
-      filters: { slot:'all', rarity:'all', search:'', sort:'power' },
+      filters: { slot:'all', rarity:'all', search:'', sort:'power', status:'all' },
       player: {
         name: 'Warden',
         title: 'Ashbound Delver',
@@ -304,6 +304,7 @@
         xp: 0,
         xpNext: 100,
         selectedSpellId: DEFAULT_COMBAT_SPELL_ID,
+        guildOaths: window.DungeonDexGuildOaths?.createState() || null,
         spellMastery: typeof createSpellMasteryState === 'function'
           ? createSpellMasteryState()
           : { version:1, spells:{}, discoveries:[], respecs:0 },
@@ -381,6 +382,8 @@
         combatLog: ['Lowfire waits above. The Hollow Stair waits below.'],
         roomsCleared: 0,
         encounters: 0,
+        guildOath: null,
+        lanternRites: null,
         choices: [],
         goldBonusPct: 0,
         pendingRewards: createPendingRunRewards(),
