@@ -792,7 +792,7 @@ button[aria-disabled="true"] {
 .named-loadout-item.wrongSlot em { color: #ffc48c; text-decoration: underline; text-decoration-style: dotted; }
 .named-loadout-item.missing em { color: #f29b9b; }
 .named-loadout-actions, .named-loadout-order { display: flex; gap: 7px; flex-wrap: wrap; }
-.named-loadout-order { padding-top: 2px; border-top: 1px solid rgba(255,214,151,0.08); }
+.named-loadout-order { padding-top: 8px; border-top: 1px solid rgba(255,214,151,0.08); }
 .named-loadout-order button { flex: 0 1 6rem; }
 .named-loadout-delete { color: #f29b9b; }
 .named-loadout-notice { margin: 0; padding: 8px 10px; border-left: 2px solid rgba(255,214,151,0.5); background: rgba(255,214,151,0.06); }
@@ -1034,7 +1034,7 @@ html.guildbound-large-text { font-size: 18px; }
   --ddx-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --ddx-font-display: Georgia, "Times New Roman", ui-serif, serif;
   --ddx-shadow-panel: 0 16px 34px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(255, 255, 255, .045);
-  --ddx-shadow-card: 0 10px 22px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  --ddx-shadow-card: 0 6px 16px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .065);
   --ddx-shadow-float: 0 24px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(231, 201, 130, .13);
   --ddx-line: rgba(231, 201, 130, .22);
   --ddx-line-soft: rgba(190, 214, 201, .14);
@@ -1353,7 +1353,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
   --ddx-success: #e0bf79;
   --ddx-panel-wash: linear-gradient(145deg, rgba(34, 26, 20, .97), rgba(9, 8, 8, .985));
   --ddx-card-wash: linear-gradient(145deg, rgba(255, 255, 255, .052), rgba(255, 255, 255, .012));
-  --ddx-line-soft: rgba(224, 198, 160, .16);
+  --ddx-line-soft: rgba(224, 198, 160, .22);
   --panel: rgba(18, 14, 12, .95);
   --panel-2: rgba(9, 8, 8, .99);
   --soft: var(--ddx-muted);
@@ -1371,10 +1371,10 @@ body::before { background: linear-gradient(115deg, rgba(255, 232, 175, .03), tra
 .ddx-nav-guild-bar { background: linear-gradient(180deg, rgba(28, 21, 16, .96), rgba(7, 6, 5, .99)); }
 .ddx-nav-guild-bar .tab:not(.active):hover, .ddx-nav-guild-bar .tab:not(.active):focus-visible { background: linear-gradient(135deg, rgba(207, 139, 81, .16), rgba(178, 116, 67, .08)); }
 .ddx-shell :where(button:not(:disabled), select, input, textarea) { border-color: rgba(224, 198, 160, .24); }
-.ddx-shell :where(button.ghost, .ghost, .mini) { border-color: rgba(224, 198, 160, .2); }
+.ddx-shell :where(button.ghost, .ghost, .mini) { border-color: rgba(224, 198, 160, .3); }
 .ddx-shell :where(button.ghost:not(:disabled), .ghost:not(:disabled), .mini:not(:disabled)):hover { background: linear-gradient(135deg, rgba(207, 139, 81, .15), rgba(178, 116, 67, .07)); }
 .ddx-shell :where(button:disabled, [aria-disabled="true"]) { border-color: rgba(224, 198, 160, .3) !important; background: rgba(224, 198, 160, .07) !important; }
-.ddx-shell :where(input, select, textarea) { border-color: rgba(224, 198, 160, .24); background: linear-gradient(145deg, rgba(31, 23, 18, .96), rgba(9, 8, 8, .98)); }
+.ddx-shell :where(input, select, textarea) { border-color: rgba(224, 198, 160, .34); background: linear-gradient(145deg, rgba(31, 23, 18, .96), rgba(9, 8, 8, .98)); }
 .ddx-shell :where(input, select, textarea)::placeholder { color: #a99d92; }
 .ddx-shell :where(option) { background: #14110f; }
 .ddx-shell :where(.panel)::before { background: linear-gradient(130deg, rgba(231, 201, 130, .055), transparent 38%, rgba(207, 139, 81, .035)); }
@@ -1440,6 +1440,11 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 .gear-detail-backdrop :where(.gear-detail-kicker, .gear-detail-rarity) { color: #f0d5a1; }
 .gear-detail-window :where(.gear-detail-stat, .gear-compare-row) { border-color: rgba(224, 198, 160, .18); }
 .ddx-shell :where(.empty-state, .empty-inventory-card, .empty-relic-shelf, .elite-contract-empty) { border-color: rgba(224, 198, 160, .28); }
+
+/* Finishing details shared by the existing compact interface. */
+.ddx-shell :where(h2, h3) { text-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.ddx-shell :where(.pill, .money, .gear-player-stat strong, .stat-box strong) { font-variant-numeric: tabular-nums; }
+.ddx-shell :where(.town-section-fold, .gear-section-fold) > summary { font-weight: 700; }
 
 /* The Warden Oaths dropdown keeps its distinct green-teal DLC identity. */
 #guildOathsPanel .guild-oaths-dropdown { border-color: rgba(145, 213, 194, .46); background: linear-gradient(145deg, rgba(23, 53, 43, .94), rgba(8, 15, 12, .98)); }
