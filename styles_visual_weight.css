@@ -815,7 +815,7 @@ button[aria-disabled="true"] {
   .named-loadout-order button { flex: 1 1 calc(50% - 4px); }
 }
 
-/* Guildbound: warm brass, banked embers, and the warding teal of Lowfire. */
+/* Crimson Oath: warm brass, banked embers, and the warding teal of Lowfire. */
 :root {
   --guildbound-brass: #efd39a;
   --guildbound-teal: #9fddd0;
@@ -943,7 +943,7 @@ html.guildbound-large-text { font-size: 18px; }
   .guildbound-card, .lantern-rite-option, .guildbound-progress { animation: none; transition: none; }
 }
 
-/* Guildbound presentation cleanup: keep the Town rail compact until a warden asks for the board. */
+/* Crimson Oath presentation cleanup: keep the Town rail compact until a warden asks for the board. */
 .guildbound-hall { min-width: 0; }
 .ddx-header-title-slot { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .ddx-dlc-title {
@@ -1000,7 +1000,7 @@ html.guildbound-large-text { font-size: 18px; }
 }
 
 /*
- * Guildbound premium interface layer
+ * Crimson Oath premium interface layer
  * ----------------------------------
  * Final scoped presentation rules for the existing DungeonDex surfaces.
  * Runtime hooks, state, and navigation mechanics remain unchanged.
@@ -1170,7 +1170,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -2; pointer-event
 #screen-town :where(.elite-contract-card.locked, .quest-card.locked, .revisit-unfinished-lanes-card) { border-style: dashed; }
 #screen-town .debt-collector-chip-active { border-color: rgba(240, 163, 154, .48); background: rgba(157, 54, 43, .14); }
 
-/* Guildbound expansion surfaces. */
+/* Crimson Oath expansion surfaces. */
 .guildbound-panel { border-color: rgba(231, 201, 130, .26); background: linear-gradient(145deg, rgba(24, 35, 29, .96), rgba(9, 14, 12, .98)); }
 .guildbound-heading h3 { color: var(--ddx-brass-bright); }
 .guildbound-kicker { color: var(--ddx-brass); }
@@ -1364,7 +1364,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-teal)
 .ddx-shell :where([aria-busy="true"], .is-loading, .loading) { color: var(--ddx-muted); cursor: progress; opacity: .82; }
 .ddx-shell :where([aria-busy="true"], .is-loading, .loading) :where(button, input, select) { cursor: progress; }
 
-/* Palette correction: keep Guildbound's green reserved for Warden Oaths. */
+/* Palette correction: keep the Warden Oaths green reserved for that section. */
 :root {
   --ddx-void: #060606;
   --ddx-ink: #0d0b0a;
@@ -1423,7 +1423,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 #screen-town .town-market-head .refresh-compact { color: #f0d5a1; }
 #screen-town :where(.elite-contract-card.active, .quest-card.active) { border-color: rgba(224, 191, 121, .56); box-shadow: 0 0 0 1px rgba(224, 191, 121, .14), var(--ddx-shadow-card); }
 
-/* Shared Guildbound surfaces stay neutral outside the Warden Oaths dropdown. */
+/* Shared Crimson Oath surfaces stay neutral outside the Warden Oaths dropdown. */
 .guildbound-panel { border-color: rgba(231, 201, 130, .26); background: linear-gradient(145deg, rgba(35, 26, 20, .96), rgba(9, 8, 8, .98)); }
 .guildbound-notice { border-left-color: var(--ddx-copper); background: linear-gradient(90deg, rgba(207, 139, 81, .11), rgba(207, 139, 81, .025)); color: #f0e1cf; }
 .guildbound-card.is-active, .guildbound-card[aria-pressed="true"], .lantern-rite-option[aria-pressed="true"] { border-color: rgba(224, 191, 121, .7); box-shadow: inset 3px 0 0 var(--ddx-copper), 0 0 0 1px rgba(224, 191, 121, .14), var(--ddx-shadow-card); }

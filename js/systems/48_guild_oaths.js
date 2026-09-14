@@ -1,6 +1,6 @@
 'use strict';
 
-// Guildbound: optional extraction objectives and a permanent, cosmetic Guild record.
+// Crimson Oath: optional extraction objectives and a permanent, cosmetic Guild record.
 (function () {
   if (window.DungeonDexGuildOaths) return;
 
@@ -289,7 +289,7 @@
     return `<details class="guildbound-panel guild-oaths-panel guild-oaths-dropdown" data-guild-oaths-menu="dropdown" aria-label="Warden Oaths and Guild Renown">
       <summary class="guild-oaths-summary"><span class="guild-oaths-summary-mark" aria-hidden="true">✦</span><span class="guild-oaths-summary-copy"><strong>Warden Oaths</strong><small>${escape(summaryName)} · ${escape(summaryHint)}</small></span><span class="guild-oaths-summary-meta"><strong>${guild.renown}</strong><small>renown · ${escape(rank.name)}</small></span></summary>
       <div class="guild-oaths-dropdown-body">
-      <div class="guildbound-heading"><div><span class="guildbound-kicker">Guildbound Board</span><h3>Choose a promise for your next descent</h3></div><span class="guildbound-chip">${escape(rank.name)}</span></div>
+      <div class="guildbound-heading"><div><span class="guildbound-kicker">Crimson Oath Board</span><h3>Choose a promise for your next descent</h3></div><span class="guildbound-chip">${escape(rank.name)}</span></div>
       <p>Make one promise before you descend. Meet its goal and extract alive to earn the stated copper bonus and permanent Guild renown.</p>
       <p><strong>${guild.renown} renown</strong> · ${model.totalCompleted} fulfilled ${model.totalCompleted === 1 ? 'oath' : 'oaths'}${nextRank ? ` · ${nextRank.renown - guild.renown} to ${escape(nextRank.name)}` : ' · Highest Guild rank'}</p>
       ${nextRank ? `<progress class="guildbound-progress" value="${guild.renown}" max="${nextRank.renown}" aria-label="Guild renown toward ${escape(nextRank.name)}">${guild.renown} / ${nextRank.renown}</progress>` : ''}

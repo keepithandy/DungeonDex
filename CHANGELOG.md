@@ -21,7 +21,7 @@ This changelog records what changed and why.
 
 ### Release alignment
 
-* Renamed the Guildbound expansion identity to Crimson Oath across the current release surfaces.
+* Renamed the previous expansion identity to Crimson Oath across the current release surfaces.
 * Aligned the local candidate, runtime labels, direct asset queries, and service-worker cache to `v1.33.2-crimson-oath`.
 * Preserved the Warden Oaths, Lantern Rites, save compatibility, and protected progression contracts.
 
@@ -29,7 +29,7 @@ This changelog records what changed and why.
 
 * Compact the Warden Oaths presentation into a focused dropdown with a clearer summary, badge, progress cue, and mobile spacing.
 * Refined the premium dark-fantasy visual treatment across the app while reserving the green warding palette for the Warden Oaths surface.
-* Removed the DLC wording from the main Guildbound title so the header stays focused on DungeonDex branding.
+* Removed the DLC wording from the main title so the header stays focused on DungeonDex branding.
 * Made Journal and Archive records progressive-disclosure sections with preserved open state, reducing repeated scrolling through long histories.
 * Retired the Town latest-return receipt after extraction while keeping the existing Journal and Archive history surfaces available.
 

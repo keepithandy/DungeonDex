@@ -532,7 +532,7 @@
       : '<p class="journal-empty">Complete a Board hunt, defeat a boss, recover a Trophy Echo, or temper equipped gear to begin the chronicle.</p>';
     const guildboundMarkup = guildboundJournal
       ? `<details class="journal-section-fold" data-journal-section="guildbound">
-          <summary><span>Guildbound Chronicle</span><span class="pill journal-section-count">Read-only</span></summary>
+          <summary><span>Crimson Oath Chronicle</span><span class="pill journal-section-count">Read-only</span></summary>
           <div class="journal-fold-body">${guildboundJournal}</div>
         </details>`
       : '';

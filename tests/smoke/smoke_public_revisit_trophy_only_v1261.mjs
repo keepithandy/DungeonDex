@@ -21,7 +21,7 @@ const revisitSource = await readFile(path.join(ROOT, 'js/systems/44_revisit_lowf
 const lockdownSource = await readFile(path.join(ROOT, 'js/systems/31_revisit_activation_surface_lockdown.js'), 'utf8');
 const bindingSource = await readFile(path.join(ROOT, 'js/systems/12_render_bindings_boot.js'), 'utf8');
 
-assert.match(lockdownSource, /1\.33\.2-guildbound/, 'lockdown report should use the v1.33.2 public build key');
+assert.match(lockdownSource, /1\.33\.2-crimson-oath/, 'lockdown report should use the v1.33.2 public build key');
 assert.match(lockdownSource, /const VISIBLE_BUILD = '1\.33\.2';/, 'lockdown report should expose the v1.33.2 visible build');
 assert.match(lockdownSource, /trophy-echo-only/, 'lockdown report should identify the public Trophy Echo-only surface');
 assert.doesNotMatch(lockdownSource, /v1\.23\.4-boss-trophy-v1-completion/, 'lockdown report should not keep the stale v1.23.4 build marker');
