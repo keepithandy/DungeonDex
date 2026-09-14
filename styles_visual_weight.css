@@ -1610,7 +1610,7 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 #screen-archive .archive-section-summary p { margin: 2px 0 0; line-height: 1.35; }
 #screen-archive .archive-section-summary .pill, #screen-archive .journal-section-count { flex: 0 0 auto; }
 #screen-archive .journal-section-count { white-space: nowrap; }
-#questPanel .ledger-subhead > .pill { flex: 0 0 auto; min-width: max-content; white-space: nowrap; }
+#screen-gear .named-loadout-head > .pill { display: none; }
 #screen-archive :where(.archive-section-body, .journal-fold-body) { min-width: 0; padding: 10px 12px 12px; }
 #screen-archive .archive-section-body .run-history-list, #screen-archive .archive-section-body .archive-log-list { gap: 8px; }
 #screen-archive .archive-section-body .run-history-card { padding: 9px 10px; }
