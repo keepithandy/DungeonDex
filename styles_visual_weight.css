@@ -1201,12 +1201,37 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -2; pointer-event
 #screen-run .combat-hud .stat-box { border-color: rgba(231, 201, 130, .18); background: rgba(0, 0, 0, .2); }
 #screen-run .combat-hud .stat-box strong { color: var(--ddx-brass-bright); }
 #screen-run .combat-device-actions { gap: 6px !important; }
-#screen-run .combat-device-actions button { min-height: 46px !important; border-radius: 11px; font-weight: 850; }
+#screen-run .combat-device-actions button {
+  min-height: 46px !important;
+  border-radius: 11px;
+  font-weight: 850;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 222, .18), inset 0 -3px 0 rgba(0, 0, 0, .3), 0 4px 8px rgba(0, 0, 0, .28);
+}
 #screen-run .combat-device-actions .attack-btn { border-color: rgba(231, 201, 130, .58); background: linear-gradient(145deg, rgba(142, 83, 35, .72), rgba(53, 31, 19, .9)); }
 #screen-run .combat-device-actions .skill-btn { border-color: rgba(182, 150, 223, .5); background: linear-gradient(145deg, rgba(89, 61, 112, .7), rgba(29, 20, 39, .92)); }
 #screen-run .combat-device-actions .guard-btn { border-color: rgba(145, 213, 194, .48); background: linear-gradient(145deg, rgba(36, 92, 78, .72), rgba(12, 33, 27, .92)); }
 #screen-run .combat-device-actions .extract-btn { border-color: rgba(240, 163, 154, .48); background: linear-gradient(145deg, rgba(118, 54, 48, .72), rgba(39, 18, 17, .92)); }
-#screen-run .combat-device-actions button:not(:disabled):hover { filter: brightness(1.14); box-shadow: 0 10px 20px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .1); }
+#screen-run .combat-device-actions .attack-btn { color: #fff0d0; --combat-action-edge: #e9ba7c; }
+#screen-run .combat-device-actions .skill-btn { color: #eedfff; --combat-action-edge: #c5a1ed; }
+#screen-run .combat-device-actions .guard-btn { color: #ffe6b4; --combat-action-edge: #d8b878; }
+#screen-run .combat-device-actions .extract-btn { color: #ffe3dd; --combat-action-edge: #df9b8e; }
+#screen-run .combat-device-actions button:not(:disabled):hover {
+  border-color: var(--combat-action-edge);
+  filter: brightness(1.08);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 222, .24), inset 0 -3px 0 rgba(0, 0, 0, .3), 0 4px 10px rgba(0, 0, 0, .32);
+}
+#screen-run .combat-device-actions button:not(:disabled):is(:active, .tap-now) {
+  border-color: var(--combat-action-edge);
+  filter: brightness(1.15);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--combat-action-edge);
+}
+#screen-run .combat-device-actions button:focus-visible {
+  outline: 2px solid var(--ddx-focus);
+  outline-offset: 2px;
+}
+#screen-run .combat-device-actions button:disabled { text-shadow: none; }
 #screen-run .guildbound-combat-tools { color: var(--ddx-muted); }
 #screen-run .combat-spell-menu { border-color: rgba(182, 150, 223, .38); background: linear-gradient(145deg, rgba(35, 27, 47, .95), rgba(12, 10, 17, .98)); box-shadow: var(--ddx-shadow-card); }
 #screen-run .combat-spell-option { border-color: rgba(182, 150, 223, .24); background: rgba(255, 255, 255, .045); color: #eee5fa; }
