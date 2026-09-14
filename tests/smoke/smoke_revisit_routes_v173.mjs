@@ -84,7 +84,7 @@ async function main() {
 
   record(
     'Version docs identify Trophy Echo as the only active Revisit lane',
-    has(version, 'v1.33.2 Guildbound')
+    has(version, 'v1.33.2 Crimson Oath')
       && has(readme, 'Trophy Echo')
       && !has(readme, '**Famous Gear Memory:** Live Revisit lane')
       && !has(readme, '**Rival Trace:** Live Revisit lane')

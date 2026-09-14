@@ -7,11 +7,11 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.33.2 - Guildbound
-- Build/cache labels use `1.33.2-guildbound`.
+- DungeonDex v1.33.2 - Crimson Oath
+- Build/cache labels use `1.33.2-crimson-oath`.
 
-## v1.33.2 Guildbound (Local Release Candidate)
-- Version and cache labels are aligned for the current Guildbound candidate after Journal/Archive compact presentation polish.
+## v1.33.2 Crimson Oath (Local Release Candidate)
+- Version and cache labels are aligned for the current Crimson Oath candidate after Journal/Archive compact presentation polish.
 - This is source-only work. No v1.33.2 package has been created or rebuilt, and publishing, upload, tagging, and push remain unauthorized.
 
 ## v1.33.0 Guildbound (Local Release Candidate)

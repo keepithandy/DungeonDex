@@ -4,7 +4,7 @@
 
 Current baseline: **DungeonDex v1.33.2**
 
-Development continuation: local `main` carries the v1.33.2 Guildbound milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established combat and reward foundations. See the [v1.33.2 release record](CHANGELOG.md). No v1.33.2 package has been built, and publishing, upload, tagging, and push remain unauthorized.
+Development continuation: local `main` carries the v1.33.2 Crimson Oath milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established combat and reward foundations. See the [v1.33.2 release record](CHANGELOG.md). No v1.33.2 package has been built, and publishing, upload, tagging, and push remain unauthorized.
 
 ## License
 
@@ -28,7 +28,7 @@ Focused Revisit placement and Trophy Echo checks are available with:
 node tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs
 ```
 
-Current status: active flagship browser RPG. The v1.33.2 development build includes the core dungeon loop, level-gated spell mastery, three new Guildbound systems (optional Warden Oaths, permanent Guild Renown and titles, and run-only Lantern Rites), protected gear/save quality-of-life controls, explicit spellbook access, status filtering, display preferences, compact Town/Gear sections, route stability, the complete Drowned Reliquary chapter, Elite Contracts, Lowfire Forge crafting/tempering, named loadouts, Guild Journal memory surfaces, Trophy Echo, merchant upgrades, and the established visual identity.
+Current status: active flagship browser RPG. The v1.33.2 development build includes the core dungeon loop, level-gated spell mastery, three new Crimson Oath systems (optional Warden Oaths, permanent Guild Renown and titles, and run-only Lantern Rites), protected gear/save quality-of-life controls, explicit spellbook access, status filtering, display preferences, compact Town/Gear sections, route stability, the complete Drowned Reliquary chapter, Elite Contracts, Lowfire Forge crafting/tempering, named loadouts, Guild Journal memory surfaces, Trophy Echo, merchant upgrades, and the established visual identity.
 
 ## Player Promise
 
@@ -59,7 +59,7 @@ DungeonDex is built around a simple loop:
 ## Current Playable / Live Systems
 
 - **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
-- **Guildbound systems:** Prepare an optional Warden Oath in Lowfire, earn extraction-only Guild Renown and honorary titles, and kindle temporary Lantern Rites during a descent. Oath goals and Lantern drafts persist safely through reloads and settle only once.
+- **Crimson Oath systems:** Prepare an optional Warden Oath in Lowfire, earn extraction-only Guild Renown and honorary titles, and kindle temporary Lantern Rites during a descent. Oath goals and Lantern drafts persist safely through reloads and settle only once.
 - **Guild Routes rail:** Desktop hover/focus reveal and a safe-area-aware 44px mobile/touch `☰` / `×` drawer control for core routes. Hold Town to open its Market, Forge, and Elite Contracts shortcuts; hold it again to close them.
 - **Compact Town and Gear sections:** Existing Town and Gear surfaces use named collapsible groups to reduce long scrolling without changing their actions or discovery.
 - **Elite Contracts:** Compare three named hunts on the Lowfire Elite Board, accept one, recognize the exact target through a restrained in-combat cue, claim the established writ once, and retain a read-only Guild Journal record.

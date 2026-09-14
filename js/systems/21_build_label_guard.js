@@ -8,7 +8,7 @@
 
   const BUILD = '1.33.2';
   const LABEL = 'DungeonDex v' + BUILD;
-  const BUILD_QS = '1.33.2-guildbound';
+  const BUILD_QS = '1.33.2-crimson-oath';
 
   window.DUNGEONDEX_BUILD = BUILD;
   window.DUNGEONDEX_BUILD_QS = BUILD_QS;

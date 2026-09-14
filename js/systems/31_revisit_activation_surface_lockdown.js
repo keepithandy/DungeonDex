@@ -6,7 +6,7 @@
   if (window.DDRevisitActivationSurfaceLockdown) return;
   window.DDRevisitActivationSurfaceLockdown = true;
 
-  const BUILD = '1.33.2-guildbound';
+  const BUILD = '1.33.2-crimson-oath';
   const VISIBLE_BUILD = '1.33.2';
   const PRIMARY_PATH = 'Enter Dungeon / Continue Run';
   const PUBLIC_ROUTE_KEY = 'trophy_echo_route';

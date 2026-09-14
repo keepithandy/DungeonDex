@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.33.2-guildbound';
+const CACHE_NAME = 'dungeondex-v1.33.2-crimson-oath';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.33.2-guildbound';
+const BUILD_QS = '1.33.2-crimson-oath';
 const ASSETS = [
   './',
   './index.html',

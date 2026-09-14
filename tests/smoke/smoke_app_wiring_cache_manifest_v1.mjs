@@ -6,9 +6,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const VISIBLE_BUILD = '1.33.2';
-const RELEASE_NAME = 'Guildbound';
+const RELEASE_NAME = 'Crimson Oath';
 const RELEASE_LABEL = `v${VISIBLE_BUILD} ${RELEASE_NAME}`;
-const BUILD_QS = '1.33.2-guildbound';
+const BUILD_QS = '1.33.2-crimson-oath';
 const PUBLIC_DEPLOYMENT_STATUS = 'The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.33.2 candidate is local only until an explicitly authorized upload.';
 const DEVTOOLS_ONLY_ASSETS = [
   './js/systems/13_devtools_overlay.js?build=' + BUILD_QS,
@@ -127,7 +127,7 @@ async function main() {
   expect('docs/status/CURRENT_NOTES.md', 'Build/cache label', capture(notes, /Build\/cache labels use `([^`]+)`/), BUILD_QS);
   expect('index.html', 'title version', capture(indexHtml, /<title>DungeonDex v([^<]+)<\/title>/), VISIBLE_BUILD);
   expect('index.html', 'visible h1 version', capture(indexHtml, /<h1[^>]*id="buildTag"[^>]*>DungeonDex v([^<]+)<\/h1>/), VISIBLE_BUILD);
-  expect('index.html', 'Guildbound DLC title badge', indexHtml.includes('class="ddx-dlc-title"') && indexHtml.includes('Guildbound') ? 'present' : '<missing>', 'present');
+  expect('index.html', 'Crimson Oath DLC title badge', indexHtml.includes('class="ddx-dlc-title"') && indexHtml.includes('Crimson Oath') ? 'present' : '<missing>', 'present');
   expect('index.html', 'DUNGEONDEX_BUILD', capture(indexHtml, /window\.DUNGEONDEX_BUILD\s*=\s*'([^']+)'/), VISIBLE_BUILD);
   expect('index.html', 'DUNGEONDEX_BUILD_QS', capture(indexHtml, /window\.DUNGEONDEX_BUILD_QS\s*=\s*'([^']+)'/), BUILD_QS);
   expect('app.js', 'DUNGEONDEX_BUILD', capture(appJs, /window\.DUNGEONDEX_BUILD\s*=\s*'([^']+)'/), VISIBLE_BUILD);

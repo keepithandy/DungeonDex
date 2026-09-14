@@ -1649,6 +1649,15 @@ progress::-moz-progress-bar { background: linear-gradient(90deg, var(--ddx-coppe
 #screen-archive .journal-section-fold .journal-reliquary { margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
 #screen-archive .journal-section-fold .journal-reliquary > p { margin: 0 0 9px; }
 #screen-archive .journal-section-fold .guildbound-panel { margin: 0; }
+
+/* Crimson Oath expansion badge: red title treatment, independent of Warden Oaths teal. */
+.ddx-dlc-title {
+  border-color: rgba(236, 126, 112, .72);
+  background: linear-gradient(135deg, rgba(145, 45, 39, .9), rgba(62, 18, 20, .96));
+  color: #ffe0d2;
+  box-shadow: inset 0 0 0 1px rgba(255, 226, 214, .1), 0 5px 16px rgba(80, 12, 18, .38);
+}
+.ddx-dlc-title-mark { color: #ffb4a3; }
 @media (max-width: 560px) {
   #screen-archive :where(.archive-section-fold > summary, .journal-section-fold > summary) { min-height: 52px; padding: 9px 10px; }
   #screen-archive :where(.archive-section-body, .journal-fold-body) { padding: 9px 10px 10px; }

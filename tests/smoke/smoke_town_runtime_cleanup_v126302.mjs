@@ -11,7 +11,7 @@ const app = read('app.js');
 const serviceWorker = read('sw.js');
 const board = read('js/systems/24_lowfire_spark_board.js');
 const wallet = read('js/systems/25_town_wallet_chip_fix.js');
-const build = '1.33.2-guildbound';
+const build = '1.33.2-crimson-oath';
 
 for (const source of [index, app, serviceWorker]) {
   assert.ok(source.includes(build), 'public runtime surfaces should use the current v1.33.2 build query');
