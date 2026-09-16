@@ -2,9 +2,9 @@
 
 **DungeonDex** is a solo-developed, browser-based dungeon crawler focused on compact mobile play, readable combat, gear progression, elite contracts, trophy records, and long-term dungeon memory systems.
 
-Current baseline: **DungeonDex v1.33.2**
+Current baseline: **DungeonDex v1.33.3**
 
-Development continuation: local `main` carries the v1.33.2 Crimson Oath milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established combat and reward foundations. See the [v1.33.2 release record](CHANGELOG.md). No v1.33.2 package has been built, and publishing, upload, tagging, and push remain unauthorized.
+Development continuation: the v1.33.3 Oathkeeper's Polish candidate makes Warden Oath terms, progress, settlement, Renown momentum, and Lantern Rite comparisons easier to read without changing the established combat, reward, or progression foundations. See the [v1.33.3 release record](CHANGELOG.md). No v1.33.3 package has been built; release tagging and itch.io upload remain separate, explicitly authorized actions.
 
 ## License
 
@@ -28,7 +28,7 @@ Focused Revisit placement and Trophy Echo checks are available with:
 node tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs
 ```
 
-Current status: active flagship browser RPG. The v1.33.2 development build includes the core dungeon loop, level-gated spell mastery, three new Crimson Oath systems (optional Warden Oaths, permanent Guild Renown and titles, and run-only Lantern Rites), protected gear/save quality-of-life controls, explicit spellbook access, status filtering, display preferences, compact Town/Gear sections, route stability, the complete Drowned Reliquary chapter, Elite Contracts, Lowfire Forge crafting/tempering, named loadouts, Guild Journal memory surfaces, Trophy Echo, merchant upgrades, and the established visual identity.
+Current status: active flagship browser RPG. The v1.33.3 development build includes the core dungeon loop, level-gated spell mastery, the Crimson Oath systems (optional Warden Oaths, permanent Guild Renown and titles, and run-only Lantern Rites), clearer promise-to-payout feedback, protected gear/save quality-of-life controls, explicit spellbook access, status filtering, display preferences, compact Town/Gear sections, route stability, the complete Drowned Reliquary chapter, Elite Contracts, Lowfire Forge crafting/tempering, named loadouts, Guild Journal memory surfaces, Trophy Echo, merchant upgrades, and the established visual identity.
 
 ## Player Promise
 
@@ -67,7 +67,7 @@ DungeonDex is built around a simple loop:
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
 - **Named Loadouts:** Save equipment by name, duplicate and reorder configurations, review every slot's availability, and safely fill only empty slots without replacing equipped gear.
-- **Trophy Echo:** The only active Revisit lane for v1.33.2, tied to boss trophy or boss record history.
+- **Trophy Echo:** The only active Revisit lane for v1.33.3, tied to boss trophy or boss record history.
 - **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon, armor, and Offhand pieces up to +3. Weapon tiers add Power, armor tiers add Guard and HP, and Offhand tiers add Guard and Wit.
 - **Gear detail modal:** Click/tap a visible gear card or use its Enter/Space inspection trigger for a focus-managed, scroll-safe read-only rundown.
 - **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
@@ -76,7 +76,7 @@ DungeonDex is built around a simple loop:
 
 ## Planned / Locked Systems
 
-These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.33.2:
+These systems may exist in old history or compatibility files, but they are not part of the active Revisit surface in v1.33.3:
 
 - **Famous Gear Memory:** Removed from the active Revisit surface.
 - **Rival Trace:** Removed from the active Revisit surface.
@@ -85,7 +85,7 @@ These systems may exist in old history or compatibility files, but they are not 
 
 ## Revisit Status
 
-Trophy Echo is the only active Revisit lane for v1.33.2. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
+Trophy Echo is the only active Revisit lane for v1.33.3. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
 
 The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of exposing unfinished lane concepts.
 

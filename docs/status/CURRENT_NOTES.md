@@ -7,8 +7,15 @@
 - Do not use old zip names, old release-note filenames, old cache labels, or old smoke-test files as version authority.
 
 ## Current Baseline
-- DungeonDex v1.33.2 - Crimson Oath
-- Build/cache labels use `1.33.2-crimson-oath`.
+- DungeonDex v1.33.3 - Oathkeeper's Polish
+- Build/cache labels use `1.33.3-oathkeepers-polish`.
+
+## v1.33.3 Oathkeeper's Polish (Local Release Candidate)
+- Warden Oath cards expose Promise and Risk terms at a glance, and the active tracker presents each objective as a compact semantic row.
+- Settlement feedback distinguishes fulfilled, lost, broken, and unfulfilled outcomes; successful Oaths report the remaining Renown to the next Guild rank.
+- Lantern Rite choices compare current and resulting effects, and the active summary reports exact progress to the next Rite milestone.
+- This is a clarity-only pass: Oath goals/rewards, Renown thresholds, Rite effects, save state, combat, economy, progression, and dungeon entry are unchanged.
+- This is source-only work. No v1.33.3 package has been created or rebuilt; release tagging and itch.io upload remain separate, explicitly authorized actions.
 
 ## v1.33.2 Crimson Oath (Local Release Candidate)
 - Version and cache labels are aligned for the current Crimson Oath candidate after Journal/Archive compact presentation polish.

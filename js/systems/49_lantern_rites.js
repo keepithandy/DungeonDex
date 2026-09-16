@@ -215,12 +215,14 @@
   function summary(state) {
     const rites = view(state);
     if (!rites) return { active:false, boons:[], pending:null, nextMilestone:null, victoriesUntilNext:0, choicesMade:0 };
+    const victories = whole(state.run.roomsCleared);
     const nextMilestone = MILESTONES.find(milestone => milestone > whole(state.run.roomsCleared)) || null;
     return { active:true,
       boons:BOONS.filter(boon => rites.ranks[boon.id]).map(boon => ({ id:boon.id, name:boon.name, rank:rites.ranks[boon.id], cap:boon.cap, detail:boon.detail(rites.ranks[boon.id]) })),
       pending:rites.pending,
       nextMilestone,
-      victoriesUntilNext:nextMilestone ? nextMilestone - whole(state.run.roomsCleared) : 0,
+      victories,
+      victoriesUntilNext:nextMilestone ? nextMilestone - victories : 0,
       choicesMade:rites.decisions.filter(entry => entry.boonId !== 'skip').length
     };
   }
@@ -231,10 +233,12 @@
     const pending = rites.pending;
     const options = pending.offers.map(id => {
       const boon = BY_ID[id];
-      const rank = rites.ranks[id] + 1;
+      const currentRank = rites.ranks[id];
+      const rank = currentRank + 1;
+      const currentDetail = currentRank ? boon.detail(currentRank) : 'Not yet kindled.';
       return `<button type="button" class="guildbound-card lantern-rite-option" data-lantern-rite="${id}" data-lantern-token="${escape(pending.token)}">
         <span class="guildbound-kicker">${escape(boon.kind)} · ${rank > 1 ? 'Strengthen' : 'Kindle'} ${rankLabel(rank)} / ${rankLabel(boon.cap)}</span>
-        <strong>${escape(boon.name)}</strong><span>${escape(boon.detail(rank))}</span><span class="guildbound-muted">${escape(boon.lore)}</span>
+        <strong>${escape(boon.name)}</strong><span class="lantern-rite-change"><span><b>Now</b>${escape(currentDetail)}</span><span><b>After</b>${escape(boon.detail(rank))}</span></span><span class="guildbound-muted">${escape(boon.lore)}</span>
       </button>`;
     }).join('');
     return `<section class="guildbound-panel lantern-rite-draft" aria-label="Lantern Rite">
@@ -250,11 +254,11 @@
     const model = summary(state);
     if (!model.active) return '';
     const progress = model.pending ? (state.run.event ? 'Rite waiting after this event' : 'A rite is ready')
-      : model.nextMilestone ? `Next rite in ${model.victoriesUntilNext} ${model.victoriesUntilNext === 1 ? 'victory' : 'victories'}` : 'The lantern is fully tended';
-    const chips = model.boons.map(boon => `<span class="guildbound-chip">${escape(boon.name)} ${rankLabel(boon.rank)}</span>`).join('');
+      : model.nextMilestone ? `${model.victories} / ${model.nextMilestone} victories · next rite in ${model.victoriesUntilNext}` : 'The lantern is fully tended';
+    const chips = model.boons.map(boon => `<span class="guildbound-chip" aria-label="${escape(boon.name)} rank ${boon.rank} of ${boon.cap}">${escape(boon.name)} ${rankLabel(boon.rank)}</span>`).join('');
     return `<section class="guildbound-panel lantern-rites-summary" aria-label="Active Lantern Rites">
       <div class="guildbound-heading"><strong>Lantern Rites</strong><span class="guildbound-muted">${escape(progress)}</span></div>
-      ${chips ? `<div class="lantern-rite-chips">${chips}</div><details><summary>View boon effects · this descent only</summary><ul class="lantern-rite-detail-list">${model.boons.map(boon => `<li><strong>${escape(boon.name)} ${rankLabel(boon.rank)}:</strong> ${escape(boon.detail)}</li>`).join('')}</ul></details>` : '<p class="guildbound-muted">Win two fights to kindle your first boon. Boons last until this descent ends.</p>'}
+      ${chips ? `<div class="lantern-rite-chips">${chips}</div><details><summary>Active effects · this descent only</summary><ul class="lantern-rite-detail-list">${model.boons.map(boon => `<li><strong>${escape(boon.name)} ${rankLabel(boon.rank)}:</strong> ${escape(boon.detail)}</li>`).join('')}</ul></details>` : '<p class="guildbound-muted">Win two fights to kindle your first boon. Boons last until this descent ends.</p>'}
     </section>`;
   }
 
