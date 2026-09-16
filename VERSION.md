@@ -1,16 +1,16 @@
 # DungeonDex Version Authority
 
 ## Current Release Candidate / Local Package Version
-v1.33.2 Crimson Oath
+v1.33.3 Oathkeeper's Polish
 
 ## Current Development Target
-v1.33.2 Crimson Oath
+v1.33.3 Oathkeeper's Polish
 
 ## Current Build/Cache Label
-1.33.2-crimson-oath
+1.33.3-oathkeepers-polish
 
 ## Public Itch Deployment Status
-The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.33.2 candidate is local only until an explicitly authorized upload.
+The observed hosted runtime is labeled v1.28.2 and its latest downloadable package is DungeonDex_v1.27_ItchReady (2).zip. The v1.33.3 candidate is local only until an explicitly authorized upload.
 
 ## Version Rules
 - VERSION.md is the source of truth for DungeonDex versioning and the active build/cache label.

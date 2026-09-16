@@ -28,6 +28,8 @@ assert.equal(progress.complete, true, 'Guard oath reaches its stated chapter and
 const settled = api.settleRun(first, 'extract');
 assert.equal(settled.completed, true);
 assert.equal(settled.gold, 60);
+assert.match(settled.message, /Oath fulfilled: Iron Vigil/);
+assert.match(settled.message, /4 renown to Pathfinder/);
 assert.equal(first.player.guildOaths.renown, 2);
 assert.equal(api.settleRun(first, 'extract').gold, 0, 'Settling the same oath twice cannot duplicate its reward.');
 
@@ -50,7 +52,10 @@ broken.run.active = true; broken.run.floor = 1; broken.run.monster = { id:'q1', 
 api.beginRun(broken);
 api.recordAction(broken, 'skill', { successful:true, spellId:'ashburst' });
 assert.equal(api.progressFor(broken.run.guildOath).broken, true, 'Quiet Steel breaks as soon as a spell succeeds.');
-assert.equal(api.settleRun(broken, 'extract').completed, false);
+const brokenSettlement = api.settleRun(broken, 'extract');
+assert.equal(brokenSettlement.completed, false);
+assert.match(brokenSettlement.message, /Oath broken: Quiet Steel/);
+assert.match(brokenSettlement.message, /successful spell breaks this oath/);
 
 const recovered = state();
 api.selectOath(recovered, 'first_light');
@@ -77,6 +82,13 @@ const townMarkup = api.townPanelMarkup(rankState);
 assert.equal(townMarkup.includes('Warden Oaths'), true);
 assert.match(townMarkup, /guild-oaths-dropdown/);
 assert.match(townMarkup, /data-guild-oaths-menu="dropdown"/);
-assert.equal(api.runMarkup(first).includes('Iron Vigil'), true);
+assert.match(townMarkup, /<dt>Promise<\/dt>/);
+assert.match(townMarkup, /<dt>Risk<\/dt>/);
+assert.match(townMarkup, /Falling or returning before every goal is met earns no oath bonus/);
+const runMarkup = api.runMarkup(first);
+assert.equal(runMarkup.includes('Iron Vigil'), true);
+assert.match(runMarkup, /guild-oath-objectives/);
+assert.match(runMarkup, /Status:<\/strong> Goal met/);
+assert.match(runMarkup, /aria-valuetext="Chapters cleared 4 of 4; Victories using Guard 3 of 3"/);
 assert.equal(api.journalMarkup(first).includes('Promises brought home'), true);
 console.log('PASS Guild Oaths v1.33: nine authored objectives, action/victory tracking, extraction-only copper and renown, rank keepsakes/titles, settlement idempotence, and malformed-save repair.');

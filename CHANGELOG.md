@@ -8,14 +8,25 @@ Use this file instead of temporary patch-note files such as `PATCH_NOTES_1_4_X.m
 
 ## Version Source of Truth
 
-* Current release candidate/local package baseline: `v1.33.2 Crimson Oath`
-* Current development target: `v1.33.2 Crimson Oath`
-* Current build/cache label: `1.33.2-crimson-oath`
+* Current release candidate/local package baseline: `v1.33.3 Oathkeeper's Polish`
+* Current development target: `v1.33.3 Oathkeeper's Polish`
+* Current build/cache label: `1.33.3-oathkeepers-polish`
 * Public itch deployment: pending explicit upload; the observed hosted runtime is v1.28.2 and its latest downloadable package is v1.27.
 * Version authority file: `VERSION.md`
 
 `VERSION.md` is the authority for the current active development version.
 This changelog records what changed and why.
+
+## v1.33.3 - Oathkeeper's Polish
+
+### Promise-to-payout clarity
+
+* Warden Oath cards now separate each promise from its risk, while the active tracker presents semantic objective rows and a clearer intact, fulfilled, or broken state.
+* Oath settlement copy distinguishes fulfilled, lost, broken, and unfulfilled returns, and successful settlements show the remaining Renown needed for the next Guild rank.
+* Lantern Rite drafts compare the current effect with the result after choosing, while the active summary shows exact progress toward the next Rite.
+* Focused smoke coverage protects the new copy and markup while preserving all Oath rewards, Renown thresholds, Rite effects, save normalization, and one-time settlement rules.
+
+This remains a source candidate; no package, upload, or release tag is included.
 
 ## v1.33.2 - Crimson Oath
 

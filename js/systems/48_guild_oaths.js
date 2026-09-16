@@ -51,6 +51,18 @@
   const rankIndex = renown => RANKS.indexOf(rankFor(renown));
   const copperText = copper => copper >= 100 ? `${Math.floor(copper / 100)}s${copper % 100 ? `${copper % 100}c` : ''}` : `${copper}c`;
 
+  function breakTrigger(oath) {
+    if (oath?.kind === 'steel') return 'A successful spell breaks this oath.';
+    if (oath?.kind === 'steadfast') return `An extraction attempt before ${oath.rooms} cleared chapters breaks this oath.`;
+    return '';
+  }
+
+  function riskText(oath) {
+    const trigger = breakTrigger(oath);
+    const returnRisk = 'Falling or returning before every goal is met earns no oath bonus.';
+    return trigger ? `${trigger} ${returnRisk}` : returnRisk;
+  }
+
   function createState() {
     return { version:1, selectedOath:'', renown:0, completions:{}, keepsakes:[], selectedTitle:'', previousTitle:'', runSequence:0, settledThrough:0, history:[], notice:'' };
   }
@@ -209,7 +221,7 @@
     }
     const complete = !run.brokeOath && objectives.every(objective => objective.current >= objective.goal);
     const ratio = run.brokeOath ? 0 : objectives.reduce((sum, objective) => sum + objective.current / objective.goal, 0) / objectives.length;
-    const condition = oath.kind === 'steel' ? 'No successful spells this descent.' : oath.kind === 'steadfast' ? 'No combat escape attempt before 6 cleared chapters.' : '';
+    const condition = riskText(oath);
     return { oath, run, objectives, complete, broken:run.brokeOath, percent:Math.floor(ratio * 100), condition };
   }
   function settleRun(state, reason) {
@@ -231,12 +243,14 @@
     const newKeepsakes = guild.keepsakes.filter(id => !oldKeepsakes.has(id));
     const currentRank = rankFor(guild.renown);
     const outcome = completed ? `Oath fulfilled: ${oath.name}. ${copperText(oath.gold)} joins the secured haul; +${oath.renown} Guild renown.`
-      : reason === 'defeat' ? `${oath.name} ended with the descent. No oath reward was earned.`
-        : progress.broken ? `${oath.name} was broken. Your ordinary haul is unaffected.`
-          : `${oath.name} ended before its goal was met. Your ordinary haul is unaffected.`;
+      : reason === 'defeat' ? `Oath lost: ${oath.name}. You fell before returning; no oath bonus was earned.`
+        : progress.broken ? `Oath broken: ${oath.name}. ${breakTrigger(oath) || 'A restricted action ended the promise.'} Your ordinary haul is unaffected.`
+          : `Oath unfulfilled: ${oath.name}. You returned before every goal was met; your ordinary haul is unaffected.`;
     const rankMessage = currentRank.id !== oldRank.id ? ` Guild rank earned: ${currentRank.name}.` : '';
     const keepsakeMessage = newKeepsakes.length ? ` Keepsake earned: ${newKeepsakes.map(id => keepsakeById(id).name).join(', ')}.` : '';
-    guild.notice = `${outcome}${rankMessage}${keepsakeMessage}`.slice(0, 320);
+    const nextRank = RANKS[RANKS.indexOf(currentRank) + 1] || null;
+    const nextRankMessage = completed && nextRank ? ` ${nextRank.renown - guild.renown} renown to ${nextRank.name}.` : completed ? ' Highest Guild rank held.' : '';
+    guild.notice = `${outcome}${rankMessage}${keepsakeMessage}${nextRankMessage}`.slice(0, 320);
     guild.history.unshift({ serial:run.serial, oathId:oath.id, completed, reason:['extract','defeat'].includes(reason) ? reason : 'ended', floor:whole(state.run.floor, 1, 1), rooms:run.rooms, gold:completed ? oath.gold : 0, renown:completed ? oath.renown : 0, finishedAt:Date.now() });
     guild.history = guild.history.slice(0, 12);
     return { settled:true, completed, oathId:oath.id, gold:completed ? oath.gold : 0, renown:completed ? oath.renown : 0, message:guild.notice, newKeepsakes, rank:currentRank.id };
@@ -277,7 +291,8 @@
       : 'Optional challenge · earn copper and renown';
     const cards = model.oaths.map(oath => `<article class="guildbound-card${oath.selected ? ' is-active' : ''}${!oath.ok ? ' is-locked' : ''}">
       <div class="guildbound-card-head"><h4>${escape(oath.name)}</h4>${rewardMarkup(oath)}</div>
-      <p>${escape(oath.goal)}</p><p class="guildbound-muted">${escape(oath.flavor)}</p>
+      <dl class="guild-oath-terms"><div><dt>Promise</dt><dd>${escape(oath.goal)}</dd></div><div><dt>Risk</dt><dd>${escape(riskText(oath))}</dd></div></dl>
+      <p class="guildbound-muted">${escape(oath.flavor)}</p>
       ${oath.completions ? `<p class="guildbound-muted">Fulfilled ${oath.completions} time${oath.completions === 1 ? '' : 's'}</p>` : ''}
       ${!oath.ok ? `<p>${escape(oath.message)}</p>` : ''}
       <button class="ghost" data-guild-oath="${oath.id}" aria-pressed="${oath.selected}"${active || !oath.ok ? ' disabled' : ''}>${oath.selected ? 'Prepared for next descent' : !oath.ok ? 'Oath locked' : 'Prepare oath'}</button>
@@ -304,8 +319,9 @@
     if (!state?.run?.active) return '';
     const progress = progressFor(state.run.guildOath);
     if (!progress) return '';
-    const status = progress.broken ? 'Oath broken · ordinary haul unaffected' : progress.complete ? 'Goal met · extract alive to fulfill' : 'Oath in progress';
-    return `<aside class="guildbound-panel guild-oath-tracker${progress.broken ? ' is-broken' : ''}" aria-label="Active Warden Oath"><div class="guildbound-card-head"><strong>${escape(progress.oath.name)}</strong>${rewardMarkup(progress.oath)}</div><p>${escape(status)}</p><progress class="guildbound-progress" value="${progress.percent}" max="100" aria-label="${escape(progress.oath.name)} objective progress">${progress.percent}%</progress><p class="guildbound-muted">${progress.objectives.map(objective => `${escape(objective.label)} ${objective.current}/${objective.goal}`).join(' · ')}</p>${progress.condition ? `<p class="guildbound-muted">${escape(progress.condition)}</p>` : ''}</aside>`;
+    const status = progress.broken ? 'Broken · ordinary haul unaffected' : progress.complete ? 'Goal met · extract alive to fulfill' : 'In progress';
+    const objectiveText = progress.objectives.map(objective => `${objective.label} ${objective.current} of ${objective.goal}`).join('; ');
+    return `<aside class="guildbound-panel guild-oath-tracker${progress.broken ? ' is-broken' : ''}" aria-label="Active Warden Oath"><div class="guildbound-card-head"><strong>${escape(progress.oath.name)}</strong>${rewardMarkup(progress.oath)}</div><p class="guild-oath-state"><strong>Status:</strong> ${escape(status)}</p><progress class="guildbound-progress" value="${progress.percent}" max="100" aria-label="${escape(progress.oath.name)} objective progress" aria-valuetext="${escape(objectiveText)}">${progress.percent}%</progress><ul class="guild-oath-objectives">${progress.objectives.map(objective => `<li><span>${escape(objective.label)}</span><strong>${objective.current} / ${objective.goal}</strong></li>`).join('')}</ul><p class="guildbound-muted guild-oath-risk"><strong>Risk:</strong> ${escape(progress.condition)}</p></aside>`;
   }
   function journalMarkup(state) {
     const model = panelModel(state);

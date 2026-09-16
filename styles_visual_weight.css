@@ -883,10 +883,23 @@ div.guildbound-progress > span { display: block; height: 100%; background: linea
 .guildbound-card > .guildbound-actions { align-self: end; }
 .guildbound-notice { padding: 10px 12px; border-left: 3px solid #b6c996; border-radius: 0 7px 7px 0; background: rgba(158,180,116,.08); color: #dbe4c9; font-size: .8rem; line-height: 1.5; }
 .guild-oath-tracker { display: grid; gap: 7px; padding: 11px; margin-top: 8px; border: 1px solid rgba(222,194,139,.25); border-radius: 10px; background: rgba(38,48,30,.42); }
+.guild-oath-terms { display: grid; gap: 7px; margin: 0; }
+.guild-oath-terms > div { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; align-items: start; }
+.guild-oath-terms dt { color: #a9d4c3; font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.guild-oath-terms dd { margin: 0; color: #dce2d3; font-size: .8rem; line-height: 1.48; }
+.guild-oath-state { margin: 0; color: #e8dfc8; font-size: .82rem; }
+.guild-oath-objectives { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.guild-oath-objectives li { display: flex; justify-content: space-between; gap: 12px; color: #cdd7c8; font-size: .78rem; line-height: 1.4; }
+.guild-oath-objectives strong { flex: 0 0 auto; color: #f0dfb8; font-variant-numeric: tabular-nums; }
+.guild-oath-risk { margin: 0; }
+.guild-oath-tracker.is-broken { border-color: rgba(207, 112, 91, .5); background: rgba(64, 28, 24, .45); }
 .guild-oath-title { color: #ead5a9; }
 .lantern-rite-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0; }
 .lantern-rite-option { display: grid; align-content: start; gap: 8px; min-width: 0; padding: 13px; border: 1px solid rgba(202,181,130,.35); border-radius: 12px; background: linear-gradient(160deg, rgba(86,70,30,.32), rgba(13,29,24,.9)); color: #f2e2bb; text-align: left; white-space: normal; }
 .lantern-rite-option > strong { font-size: 1rem; line-height: 1.4; }
+.lantern-rite-change { display: grid; gap: 5px; }
+.lantern-rite-change > span { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 7px; color: #dce1d1; font-size: .78rem; line-height: 1.42; }
+.lantern-rite-change b { color: #b8d6c7; font-size: .66rem; letter-spacing: .05em; text-transform: uppercase; }
 .lantern-rite-option:hover { border-color: #e3c17c; background: linear-gradient(160deg, rgba(104,79,34,.48), rgba(25,48,35,.95)); }
 .lantern-rite-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .lantern-rite-detail-list { padding-left: 19px; color: #d1d8c3; font-size: .8rem; line-height: 1.6; }

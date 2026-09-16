@@ -1,14 +1,14 @@
-// DungeonDex v1.33.2 runtime pointer.
+// DungeonDex v1.33.3 runtime pointer.
 // Runtime code now lives in ./js/systems/*.js and is loaded from index.html in numeric order.
 // See ./js/systems/README.md for the system map.
 //
-// v1.33.2: Crimson Oath
+// v1.33.3: Oathkeeper's Polish
 // - Carries forward the level-gated combat spellbook and route stability baseline.
 // - Adds Scriptorium mastery, inscriptions, rare folios, and equipment affinities.
 // - Preserves established rewards, progression, dungeon entry, and four-action combat layout.
 
-window.DUNGEONDEX_BUILD = '1.33.2';
-window.DUNGEONDEX_BUILD_QS = '1.33.2-crimson-oath';
+window.DUNGEONDEX_BUILD = '1.33.3';
+window.DUNGEONDEX_BUILD_QS = '1.33.3-oathkeepers-polish';
 
 window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || function computeDevtoolsGate(locationLike){
   var loc = locationLike || {};
@@ -64,7 +64,7 @@ window.DungeonDexComputeDevtoolsGate = window.DungeonDexComputeDevtoolsGate || f
     document.head.appendChild(script);
   }
   function loadExtensions(){
-    var qs = window.DUNGEONDEX_BUILD_QS || '1.33.2-crimson-oath';
+    var qs = window.DUNGEONDEX_BUILD_QS || '1.33.3-oathkeepers-polish';
     if (window.DUNGEONDEX_DEVTOOLS_ENABLED) {
       loadModule('./js/systems/13_devtools_overlay.js?build=' + qs, 'DungeonDexDevTools', 'DevTools overlay');
       window.setTimeout(function(){ loadModule('./js/systems/14_devtools_scenarios.js?build=' + qs, 'DungeonDexScenarioDevTools', 'DevTools scenario presets'); }, 20);

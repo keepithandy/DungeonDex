@@ -1,6 +1,6 @@
-const CACHE_NAME = 'dungeondex-v1.33.2-crimson-oath';
+const CACHE_NAME = 'dungeondex-v1.33.3-oathkeepers-polish';
 const CACHE_PREFIX = 'dungeondex-';
-const BUILD_QS = '1.33.2-crimson-oath';
+const BUILD_QS = '1.33.3-oathkeepers-polish';
 const ASSETS = [
   './',
   './index.html',
