@@ -4,17 +4,19 @@
 
 Current baseline: **DungeonDex v1.33.2**
 
-Development continuation: local `main` carries the v1.33.2 Crimson Oath milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established combat and reward foundations. See the [v1.33.2 release record](CHANGELOG.md). No v1.33.2 package has been built, and publishing, upload, tagging, and push remain unauthorized.
+Development continuation: local `main` carries the v1.33.2 Crimson Oath milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established dungeon loop.
 
 ## License
 
-DungeonDex uses a [proprietary license](LICENSE): personal play of official, unmodified releases is allowed; reuse, modification, redistribution, and sale of code or assets require written permission, subject to the exceptions in that license. See also the [asset terms](ASSETS_LICENSE.md).
+DungeonDex uses a [proprietary license](LICENSE): personal play of official, unmodified releases is allowed; reuse, modification, redistribution, and sale of code or assets require written permission.
 
-Earlier Apache 2.0 grants remain valid for the source code they cover, including previously licensed code retained in this version. The [prior license and notice](LICENSE-APACHE-2.0.txt) are preserved. The new terms do not retroactively restrict those grants or override third-party rights.
+Earlier Apache 2.0 grants remain valid for the source code they cover, including previously licensed code retained in this version. The [prior license and notice](LICENSE-APACHE-2.0.txt) are preserved in this repo.
 
 ## Try It First
 
 Open `index.html` directly in a browser to review the current playable build.
+
+This project intentionally keeps a no-build browser workflow, which makes local testing and quick smoke checks easy.
 
 For the safest current validation pass, run:
 
@@ -28,7 +30,7 @@ Focused Revisit placement and Trophy Echo checks are available with:
 node tests/smoke/smoke_revisit_lowfire_source_render_v1252.mjs
 ```
 
-Current status: active flagship browser RPG. The v1.33.2 development build includes the core dungeon loop, level-gated spell mastery, three new Crimson Oath systems (optional Warden Oaths, permanent Guild Renown and titles, and run-only Lantern Rites), protected gear/save quality-of-life controls, explicit spellbook access, status filtering, display preferences, compact Town/Gear sections, route stability, the complete Drowned Reliquary chapter, Elite Contracts, Lowfire Forge crafting/tempering, named loadouts, Guild Journal memory surfaces, Trophy Echo, merchant upgrades, and the established visual identity.
+Current status: active flagship browser RPG. The v1.33.2 development build includes the core dungeon loop, level-gated spell mastery, three new Crimson Oath systems (optional Warden Oaths, permanent Guild Renown, and Lantern Rites), and the active Trophy Echo memory lane.
 
 ## Player Promise
 
@@ -59,16 +61,16 @@ DungeonDex is built around a simple loop:
 ## Current Playable / Live Systems
 
 - **Core dungeon loop:** Town preparation, dungeon entry, readable combat, loot, and return flow.
-- **Crimson Oath systems:** Prepare an optional Warden Oath in Lowfire, earn extraction-only Guild Renown and honorary titles, and kindle temporary Lantern Rites during a descent. Oath goals and Lantern drafts persist safely through reloads and settle only once.
-- **Guild Routes rail:** Desktop hover/focus reveal and a safe-area-aware 44px mobile/touch `☰` / `×` drawer control for core routes. Hold Town to open its Market, Forge, and Elite Contracts shortcuts; hold it again to close them.
+- **Crimson Oath systems:** Prepare an optional Warden Oath in Lowfire, earn extraction-only Guild Renown and honorary titles, and kindle temporary Lantern Rites during a descent. Oath goals and Lantern Rites are tied to the active run and preserve the established dungeon flow.
+- **Guild Routes rail:** Desktop hover/focus reveal and a safe-area-aware 44px mobile/touch `☰` / `×` drawer control for core routes. Hold Town to open its Market, Forge, and Elite Contracts surfaces with a compact mobile layout.
 - **Compact Town and Gear sections:** Existing Town and Gear surfaces use named collapsible groups to reduce long scrolling without changing their actions or discovery.
-- **Elite Contracts:** Compare three named hunts on the Lowfire Elite Board, accept one, recognize the exact target through a restrained in-combat cue, claim the established writ once, and retain a read-only Guild Journal record.
+- **Elite Contracts:** Compare three named hunts on the Lowfire Elite Board, accept one, recognize the exact target through a restrained in-combat cue, claim the established writ once, and retain the standard cycle of loadout and loot progression.
 - **Lowfire Forge:** Gear crafting, salvage, and tempering; older internal names remain preserved for existing saves.
 - **Custom visual identity:** Decorative DungeonDex crest and Hollow Stair gate art in the header/Town surfaces.
 - **Guild Journal:** Read-only memory board for existing records and progression memory.
 - **Named Loadouts:** Save equipment by name, duplicate and reorder configurations, review every slot's availability, and safely fill only empty slots without replacing equipped gear.
 - **Trophy Echo:** The only active Revisit lane for v1.33.2, tied to boss trophy or boss record history.
-- **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon, armor, and Offhand pieces up to +3. Weapon tiers add Power, armor tiers add Guard and HP, and Offhand tiers add Guard and Wit.
+- **Merchant gear upgrades:** Spend copper at the Lowfire Market to permanently improve equipped weapon, armor, and Offhand pieces up to +3. Weapon tiers add Power, armor tiers add Guard and HP, and the upgrade system remains compatible with the active save loop.
 - **Gear detail modal:** Click/tap a visible gear card or use its Enter/Space inspection trigger for a focus-managed, scroll-safe read-only rundown.
 - **Debt Collector:** Borrowing, repayment, pressure, and collection status with clearly stated terms.
 - **Asset and release hygiene:** Tracked asset provenance plus one documented semantic-version/build-cache authority flow.
@@ -85,8 +87,8 @@ These systems may exist in old history or compatibility files, but they are not 
 
 ## Revisit Status
 
-Trophy Echo is the only active Revisit lane for v1.33.2. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record.
+Trophy Echo is the only active Revisit lane for v1.33.2. It stays small and deterministic: if the player has boss trophy history, town surfaces a short memory-reflection loop tied to that boss record. If no history exists, the panel shows a locked state and keeps the rest of the town flow unchanged.
 
-The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of exposing unfinished lane concepts.
+The Revisit panel stays housed in the Lowfire Board between Warden Objectives and the Lowfire Elite Board. When no boss trophy or boss record exists, the panel shows a locked Trophy Echo state instead of an empty or misleading route.
 
 Trophy Echo starts and resolves entirely from town. It records completion history, preserves it across reloads, and keeps the main dungeon path separate from memory lanes.
