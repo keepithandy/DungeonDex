@@ -598,6 +598,11 @@ async function main() {
 
     await visitTab('Archive', 'tab-dex', 'screen-dex');
     await visitTab('Guild Journal', 'tab-archive', 'screen-archive');
+    await evaluate(client, `(() => {
+      const chronicle = document.querySelector('#guildJournalPanel details[data-journal-section="chronicle"]');
+      if (chronicle) chronicle.open = true;
+      return true;
+    })()`);
     const journal = await evaluate(client, `(() => ({
       text: document.getElementById('guildJournalPanel')?.innerText || '',
       actionCount: document.querySelectorAll('#guildJournalPanel button').length
