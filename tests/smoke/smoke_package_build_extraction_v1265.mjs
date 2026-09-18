@@ -279,7 +279,7 @@ async function main() {
           && typeof navigator.serviceWorker?.register === 'function'
       }))()`);
       record('Extracted public runtime loads with DevTools disabled', before.devtoolsDisabled && before.town && before.required, JSON.stringify(before));
-      record('Extracted build includes the Guild Journal Chronicle', /Guild Chronicle/.test(before.journal) && /Guild Journal/.test(before.journal), before.journal.slice(0, 300));
+      record('Extracted build includes the Crimson Oath Journal Chronicle', /Crimson Oath Chronicle/.test(before.journal) && /Guild Journal/.test(before.journal), before.journal.slice(0, 300));
 
       const journalNavigation = await evaluate(client, `(() => {
         document.getElementById('tab-archive')?.click();

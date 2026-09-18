@@ -114,7 +114,7 @@ assert.equal(richModel.sections.filter(section => section.title === 'Elite Contr
 context.DDJournalV1Render();
 const html = String(context.document.getElementById('archivePanel').innerHTML);
 assert.ok(html.includes('Guild Journal'));
-assert.ok(html.includes('Guild Chronicle'));
+assert.ok(html.includes('Crimson Oath Chronicle'));
 assert.ok(html.includes('10 records'));
 assert.ok(html.includes('Target defeated: Glassfang Brute'));
 assert.ok(html.includes('Ready to claim'));

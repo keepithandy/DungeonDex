@@ -539,7 +539,7 @@
     return `<section class="journal-board" id="guildJournalPanel" aria-label="Guild Journal">
       <header class="journal-chronicle-head">
         <div class="journal-chronicle-title">
-          <span class="eyebrow">Guild Chronicle</span>
+          <span class="eyebrow">Crimson Oath Chronicle</span>
           <h2>${esc(model.title)}</h2>
           <p>${esc(model.flavor)}</p>
         </div>
