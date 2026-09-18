@@ -14,7 +14,7 @@ Earlier Apache 2.0 grants remain valid for the source code they cover, including
 
 ## Try It First
 
-Open `index.html` directly in a browser to review the current playable build.
+Open `index.html` directly in a browser to review the current playable build. No install or build step is required.
 
 This project intentionally keeps a no-build browser workflow, which makes local testing and quick smoke checks easy.
 
