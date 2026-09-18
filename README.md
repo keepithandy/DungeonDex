@@ -20,6 +20,8 @@ Open `index.html` directly in a browser to review the current playable build. No
 
 This project intentionally keeps a no-build browser workflow, which makes local testing and quick smoke checks easy.
 
+For a quick visual check in VS Code, open `index.html` from this repository.
+
 For the safest current validation pass, run:
 
 ```bash
