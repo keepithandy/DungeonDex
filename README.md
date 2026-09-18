@@ -6,6 +6,8 @@ Current baseline: **DungeonDex v1.33.2**
 
 Development continuation: local `main` carries the v1.33.2 Crimson Oath milestone: Warden Oaths, Guild Renown, and Lantern Rites add meaningful variation to every descent while preserving the established dungeon loop.
 
+Workspace source of truth: `C:\Users\quali\Desktop\source\DungeonDex`.
+
 ## License
 
 DungeonDex uses a [proprietary license](LICENSE): personal play of official, unmodified releases is allowed; reuse, modification, redistribution, and sale of code or assets require written permission.
