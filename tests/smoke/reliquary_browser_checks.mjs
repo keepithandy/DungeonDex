@@ -17,17 +17,21 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     S.player.equipment.armor = generateGear('armor', 150, { forcedRarity:'mythic' });
     S.player.equipment.armor.upgradeLevel = 2;
     const reliquaryGear = generateGear('charm', 11, { source:'normal', depthRaw:31 });
+    const cinderboneGear = generateGear('weapon', 11, { source:'event', depthRaw:41 });
     S.player.inventory.push(reliquaryGear);
+    S.player.inventory.push(cinderboneGear);
     window.__reliquaryThemedGearId = reliquaryGear.id;
+    window.__cinderboneThemedGearId = cinderboneGear.id;
     window.__reliquaryLanternDrafts = 0;
     delete S.player.namedLoadouts;
     save(S); S = load(); render();
     return { legacy: Array.isArray(S.player.namedLoadouts) && S.player.namedLoadouts.length === 0,
       town: document.querySelector('.screen.active')?.id, depth: S.player.returnDepth,
-      themed: (() => { const item = S.player.inventory.find(entry => entry.id === window.__reliquaryThemedGearId); return item && item.maker === 'Drowned Reliquary' && item.tags.includes('drowned-reliquary'); })() };
+      themed: (() => { const item = S.player.inventory.find(entry => entry.id === window.__reliquaryThemedGearId); return item && item.maker === 'Drowned Reliquary' && item.tags.includes('drowned-reliquary'); })(),
+      cinderbone: (() => { const item = S.player.inventory.find(entry => entry.id === window.__cinderboneThemedGearId); return item && item.maker === 'Cinderbone Halls' && item.tags.includes('cinderbone-halls'); })() };
   })()`);
-  assert.ok(setup.legacy && setup.town === 'screen-town' && setup.depth === 30 && setup.themed, JSON.stringify(setup));
-  record('Reliquary legacy save and themed gear reload into normal Town entry', true);
+  assert.ok(setup.legacy && setup.town === 'screen-town' && setup.depth === 30 && setup.themed && setup.cinderbone, JSON.stringify(setup));
+  record('Reliquary legacy save and chapter-themed gear reload into normal Town entry', true);
   const contractBriefing = await read(`(() => {
     const offers = S.town.eliteBoardContracts;
     S.town.eliteBoardContracts = [{ id:'lowfire_bounty', targetFloor:11 }];

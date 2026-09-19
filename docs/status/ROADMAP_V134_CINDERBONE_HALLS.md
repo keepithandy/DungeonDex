@@ -25,7 +25,7 @@
 - [x] Phase 3 — Cinderbone encounter roster
 - [x] Phase 4 — Cinderbone incidents
 - [x] Phase 5 — D45 boss and Elite Contract integration
-- [ ] Phase 6 — Cinderbone gear identity
+- [x] Phase 6 — Cinderbone gear identity
 - [ ] Phase 7 — Chapter Chronicle and Debt Collector clarity
 - [ ] Phase 8 — Large UI and accessibility polish
 - [ ] Phase 9 — Verification and release preparation
@@ -399,6 +399,26 @@ Read the repository operating contract and completed Phase 1-5 handoffs. Add Cin
 
 Preserve all equipment slots, rarity chances, stat budgets, values, item IDs, RNG consumption, equip rules, selling, salvage, locks, junk flags, loadouts, Merchant Gear Upgrade values and caps, save schema, and outside-band gear signatures. Add seeded mechanics controls, source/slot coverage, old-save and malformed-save fixtures, browser save/reload coverage, Gear-screen checks, loadout checks, and protected-system signatures. Update the roadmap checklist and handoff evidence, and commit the completed Phase 6 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 6 Handoff — Cinderbone Gear Identity
+
+- Status: complete; focused commit `feat: add Cinderbone gear identity`.
+- Baseline: `d5f0b9c` (`feat: add Cinderbone incidents`); `VERSION.md` remains `v1.33.2`.
+- Runtime changes:
+  - Added ten bounded Cinderbone slot identities with authored maker, theme, tag, name, and summary metadata.
+  - Applied the identity to normal, Elite, Boss, and Event gear generated at raw D41-D50 through the existing themed-gear pipeline.
+  - Existing inventory cards, comparisons, gear detail modal, loadout previews, return records, and read-only Journal surfaces now receive the Cinderbone identity through their existing item metadata paths.
+  - No new gear slot, stat, set, currency, progression, save field, or reward route was added.
+- Files changed: `js/systems/00_core_constants_data.js`, `js/systems/06_scaling_generation_audits.js`, `tests/smoke/smoke_drowned_reliquary_vertical_slice_v1281.mjs`, `tests/smoke/reliquary_browser_checks.mjs`, and this roadmap.
+- Coverage evidence:
+  - Seeded vertical-slice coverage passed all ten slots across normal, Elite, Boss, and Event sources, identity normalization, mechanics preservation, RNG-call preservation, D30/D51 outside-band controls, and 1,900 protected Reliquary comparisons against `d5f0b9c`.
+  - Gear identity/comparison smoke passed.
+  - Merchant Gear Upgrade smoke passed with upgrade values and caps protected.
+  - Named Loadouts smoke passed duplicate, reorder, preview, safe apply, and save compatibility controls.
+  - Guild Journal smoke passed existing read-only and malformed-history controls.
+  - Browser coverage now includes Cinderbone Event gear save/reload and Gear-screen identity assertions; browser execution remains environment-dependent and was not available for interactive verification here.
+- Protected behavior intentionally unchanged: equipment slots, rarity chances, stat budgets, values, item IDs, RNG consumption, equip/sell/salvage/lock/junk rules, loadouts, Merchant Gear Upgrade behavior, save schema, outside-band gear, combat, rewards, entry, Revisit, Debt, Talent, and Journal history.
+- Next phase: Phase 7 — Chapter Chronicle and Debt Collector clarity.
 
 ## Phase 7 Prompt — Chapter Chronicle and Debt Collector Clarity
 

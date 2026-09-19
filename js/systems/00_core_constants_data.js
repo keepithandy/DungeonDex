@@ -183,6 +183,18 @@
     cloak: Object.freeze({ prefix:'Blackwater', suffix:'of Prayer-Ribbons', theme:'blackwater' }),
     charm: Object.freeze({ prefix:'Drowned', suffix:'of the Last Bell', theme:'bellbound' })
   });
+  const CINDERBONE_GEAR_IDENTITIES = Object.freeze({
+    weapon: Object.freeze({ prefix:'Kilnforged', suffix:'of Cinderbone', theme:'kilnforged' }),
+    offhand: Object.freeze({ prefix:'Ashward', suffix:'of the Furnace Veil', theme:'ashward' }),
+    helm: Object.freeze({ prefix:'Bonecrowned', suffix:'of the Hot Vault', theme:'bonecrowned' }),
+    armor: Object.freeze({ prefix:'Emberbound', suffix:'of the Halls', theme:'emberbound' }),
+    gloves: Object.freeze({ prefix:'Blackhand', suffix:'of the Coal Oath', theme:'blackhand' }),
+    boots: Object.freeze({ prefix:'Cinderstep', suffix:'of the Deep Kiln', theme:'cinderstep' }),
+    ring: Object.freeze({ prefix:'Ashring', suffix:'of the Last Ember', theme:'ashring' }),
+    amulet: Object.freeze({ prefix:'Furnaceheart', suffix:'of Cinderbone', theme:'furnaceheart' }),
+    cloak: Object.freeze({ prefix:'Sootveil', suffix:'of the Bone Galleries', theme:'sootveil' }),
+    charm: Object.freeze({ prefix:'Kilnmark', suffix:'of the Buried Bell', theme:'kilnmark' })
+  });
 
 
   // Mythic sets must not add extra equipment slots.

@@ -110,6 +110,7 @@ async function loadRuntime(baseline = false) {
     DISTRICT_DATA,
     DISTRICT_ENCOUNTER_IDENTITIES: typeof DISTRICT_ENCOUNTER_IDENTITIES === 'undefined' ? {} : DISTRICT_ENCOUNTER_IDENTITIES,
     RELIQUARY_GEAR_IDENTITIES: typeof RELIQUARY_GEAR_IDENTITIES === 'undefined' ? {} : RELIQUARY_GEAR_IDENTITIES,
+    CINDERBONE_GEAR_IDENTITIES: typeof CINDERBONE_GEAR_IDENTITIES === 'undefined' ? {} : CINDERBONE_GEAR_IDENTITIES,
     BOSS_FLOOR_NAMES,
     MONSTER_FAMILIES,
     MONSTER_TYPES,
@@ -383,7 +384,26 @@ for (const source of ['normal', 'elite', 'boss']) {
     assert.equal(normalized.theme, themed.theme, `${slot} Reliquary theme should survive normalization`);
   }
 }
-for (const rawDepth of [30, 41]) {
+assert.deepEqual(plain(Object.keys(runtime.api.CINDERBONE_GEAR_IDENTITIES).sort()), plain(runtime.api.SLOT_ORDER).sort(), 'each existing gear slot should have one Cinderbone identity');
+for (const source of ['normal', 'elite', 'boss', 'event']) {
+  for (const slot of runtime.api.SLOT_ORDER) {
+    runtime.setRandom(seeded(211)); baseline.setRandom(seeded(211));
+    const themed = plain(runtime.api.generateGear(slot, 11, { source, depthRaw:41 }));
+    const control = plain(baseline.api.generateGear(slot, 11, { source, depthRaw:41 }));
+    const identity = runtime.api.CINDERBONE_GEAR_IDENTITIES[slot];
+    assert.equal(themed.maker, 'Cinderbone Halls', `${slot} should carry its Cinderbone maker identity`);
+    assert.equal(themed.theme, identity.theme, `${slot} should use only its Cinderbone identity theme`);
+    assert.ok(themed.name.startsWith(`${identity.prefix} `) && themed.name.endsWith(` ${identity.suffix}`), `${slot} should use its Cinderbone display name`);
+    assert.ok(themed.tags.includes('cinderbone-halls'), `${slot} should be searchable by Cinderbone identity`);
+    assert.deepEqual(gearMechanics(themed), gearMechanics(control), `${slot} ${source} Cinderbone gear mechanics should match pinned main`);
+    assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `${slot} ${source} Cinderbone gear should consume no extra RNG`);
+    const normalized = plain(runtime.api.normalizeItem(themed, slot));
+    assert.equal(normalized.name, themed.name, `${slot} Cinderbone identity should survive normalization`);
+    assert.equal(normalized.maker, themed.maker, `${slot} Cinderbone maker should survive normalization`);
+    assert.equal(normalized.theme, themed.theme, `${slot} Cinderbone theme should survive normalization`);
+  }
+}
+for (const rawDepth of [30, 51]) {
   runtime.setRandom(seeded(rawDepth)); baseline.setRandom(seeded(rawDepth));
   const actual = plain(runtime.api.generateGear('weapon', 11, { source:'normal', depthRaw:rawDepth }));
   const control = plain(baseline.api.generateGear('weapon', 11, { source:'normal', depthRaw:rawDepth }));
