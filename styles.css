@@ -1313,6 +1313,52 @@ button:disabled {
     linear-gradient(135deg, rgba(212,190,160,.06), rgba(12,14,20,.90));
 }
 .district-tone-cinderbone .run-district-flavor { color: rgba(255,210,160,.76); }
+.district-tone-cinderbone .run-flow-summary,
+.district-tone-cinderbone .combat-enemy-header,
+.district-tone-cinderbone .loot-card,
+.district-tone-cinderbone .elite-contract-card,
+.district-tone-cinderbone .journal-board,
+.district-tone-cinderbone .ddx-debt-card {
+  border-color: rgba(235,155,94,.28);
+  box-shadow: inset 0 1px 0 rgba(255,220,174,.05), 0 8px 24px rgba(42,20,13,.16);
+}
+.district-tone-cinderbone .run-flow-summary::before,
+.district-tone-cinderbone .combat-enemy-header::before {
+  content: 'CINDERBONE HALLS';
+  display: block;
+  color: rgba(255,198,139,.72);
+  font-size: .62rem;
+  letter-spacing: .14em;
+  font-weight: 800;
+}
+.cinderbone-chronicle-fold { border-color: rgba(235,155,94,.26); }
+.cinderbone-chronicle-fold > summary { color: #ffd5aa; }
+.cinderbone-chronicle-fold .journal-record-card { border-left: 3px solid rgba(235,155,94,.55); }
+.cinderbone-chronicle-fold .journal-record-badge { border-color: rgba(235,155,94,.34); color: #ffd5aa; }
+.gear-card-subline span:last-child,
+.gear-detail-notes span:first-child { color: rgba(255,207,158,.82); }
+.debt-collector-chips { gap: 7px; }
+.debt-collector-chip { min-height: 28px; display: inline-flex; align-items: center; }
+.debt-v1-status { border-color: rgba(235,155,94,.25); background: linear-gradient(135deg, rgba(235,155,94,.09), rgba(38,24,20,.16)); }
+.debt-v1-status:focus-within, .debt-collector-actions button:focus-visible, .cinderbone-chronicle-fold > summary:focus-visible { outline: 3px solid rgba(255,207,158,.72); outline-offset: 3px; }
+.run-event-card.district-atmosphere-cinderbone,
+.run-event-card.district-tone-cinderbone,
+.run-event-card[data-district-key="cinderbone"],
+.journal-cinderbone,
+.gear-detail-window:has(.gear-detail-summary) { border-color: rgba(235,155,94,.28); }
+.run-event-choice { min-height: 48px; text-align: left; line-height: 1.25; }
+.run-event-choice strong, .run-event-choice span, .journal-record-primary, .journal-record-detail, .gear-detail-summary, .gear-detail-notes { overflow-wrap: anywhere; }
+.gear-detail-window .gear-detail-tags, .journal-record-head, .debt-collector-head { row-gap: 7px; }
+.journal-board details > summary, .elite-contract-card, .loot-card, .gear-detail-window { scroll-margin-block: 12px; }
+.journal-board details > summary:focus-visible, .elite-contract-card button:focus-visible, .run-event-choice:focus-visible, .loot-card [data-gear-detail-trigger]:focus-visible { outline: 3px solid rgba(255,207,158,.72); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .district-tone-cinderbone *, .cinderbone-chronicle-fold *, .debt-v1-status * { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 520px) {
+  .cinderbone-chronicle-fold .journal-record-head { align-items: flex-start; gap: 6px; }
+  .cinderbone-chronicle-fold .journal-record-badge { white-space: normal; text-align: right; }
+  .debt-collector-meta { display: grid; grid-template-columns: 1fr; }
+}
 .district-banner,
 .run-command-strip {
   background:

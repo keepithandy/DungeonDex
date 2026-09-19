@@ -408,6 +408,39 @@
     return { rows };
   }
 
+  function cinderboneChronicleModel(state){
+    const player = obj(state?.player);
+    const run = obj(state?.run);
+    const depth = value => Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 0;
+    const inBand = value => depth(value) >= 41 && depth(value) <= 50;
+    const location = value => {
+      const raw = depth(value);
+      if (!raw || typeof getLoreDepthProgress !== 'function') return 'Location not recorded';
+      const lore = getLoreDepthProgress(raw);
+      return `Floor ${lore.floorNumber} • Room ${lore.roomWithinFloor} • Chapter ${lore.chapterWithinRoom} (D${raw})`;
+    };
+    const makeRow = (key, title, badge, primary, detail) => ({ key: `cinderbone-${key}`, title, badge, primary, detail });
+    const evidence = inBand(run.floor) || inBand(player.safeExtractDepth) || list(player.runHistory).some(entry => inBand(entry?.floor) || entry?.zone === 'Cinderbone Halls');
+    const arrival = makeRow('arrival', 'The furnace halls are known', evidence ? 'Recorded' : 'Locked — no arrival record', evidence ? 'Cinderbone Halls has entered the guild ledger.' : 'No Cinderbone arrival is recorded yet.', evidence ? 'This acknowledgement is derived from an active descent, retained return, or secured depth.' : 'Reach D41 through the existing descent to begin the record.');
+    const activeContract = obj(player.eliteContracts?.active);
+    const contractRaw = typeof eliteContractRawDepthForThreatFloor === 'function' ? eliteContractRawDepthForThreatFloor(depth(activeContract.targetFloor)) : 0;
+    const contractKnown = contractRaw >= 41 && contractRaw <= 50;
+    const elite = makeRow('elite', 'A writ among the furnace bones', contractKnown ? 'Located' : 'Locked — no located writ', contractKnown ? `${text(activeContract.eliteName || activeContract.name, 'Elite target')} is located in Cinderbone Halls.` : 'No Cinderbone Elite Contract location is recorded.', contractKnown ? `${location(contractRaw)}. The existing Board contract remains the authority for claim and outcome.` : 'Only an existing contract with a recorded Cinderbone target belongs in this ledger.');
+    const event = obj(run.event);
+    const incidentKnown = event.chapter === 'cinderbone';
+    const incident = makeRow('incident', 'Ash left on the choice cards', incidentKnown ? 'Active' : 'History not retained', incidentKnown ? text(event.title || event.name, 'A Cinderbone incident is waiting.') : 'Cinderbone incident choices are not retained as a separate history ledger.', incidentKnown ? `${location(run.floor)}. Resolve it through the existing pending-event contract.` : 'The phase keeps incident state bounded and does not create unbounded event history.');
+    const cinderGear = item => obj(item).maker === 'Cinderbone Halls' || list(obj(item).tags).includes('cinderbone-halls');
+    const identifiedGear = [...Object.values(obj(player.equipment)), ...list(player.inventory), ...list(player.retiredRelics).map(entry => obj(entry).item || entry)].find(cinderGear);
+    const gear = makeRow('gear', 'A mark from the furnace bones', identifiedGear ? 'Identified' : 'Locked — no identified gear', identifiedGear ? `${text(identifiedGear.name, 'Cinderbone piece')} carries the Cinderbone Halls mark.` : 'No identified Cinderbone piece remains in the gear record.', identifiedGear ? 'The maker, tag, name, theme, and summary come from the existing themed-gear pipeline.' : 'Only explicit Cinderbone item metadata establishes this record.');
+    const trophyIds = typeof bossTrophyStateModel === 'function' ? bossTrophyStateModel({ player }).ids : [];
+    const d45 = trophyIds.includes('gravetoll_bell');
+    const boss = makeRow('boss', 'The bell in the furnace dark', d45 ? 'Recorded' : 'Locked — no trophy record', d45 ? 'The Gravetoll Bell is recorded beyond the Reliquary crossing.' : 'The Gravetoll Bell has not been recorded in the guild ledger.', `${location(45)}. A location alone does not prove a victory.`);
+    const secured = depth(player.safeExtractDepth) >= 41;
+    const extracted = list(player.runHistory).find(entry => entry.reason === 'extract' && (inBand(entry.floor) || entry.zone === 'Cinderbone Halls'));
+    const returnRow = makeRow('return', 'A safe return through the ash', extracted ? 'Completed' : secured ? 'Secured depth' : 'Locked — no return record', extracted ? 'Lowfire remembers a safe Cinderbone return.' : secured ? 'A Cinderbone depth has been secured, but no safe return is recorded.' : 'No Cinderbone extraction or secured depth is recorded.', extracted ? `${location(extracted.floor)}. This records extraction, not a full chapter clear.` : 'Derived from existing safe-extract and retained run records.');
+    return { rows: [arrival, elite, incident, gear, boss, returnRow], evidence: evidence || contractKnown || incidentKnown || !!identifiedGear || d45 || secured || !!extracted };
+  }
+
 
   function journalV1233SummaryModel(state){
     const safeState = obj(state);
@@ -501,6 +534,7 @@
     });
     return {
       reliquary: reliquaryJournalModel(safeState),
+      cinderbone: cinderboneChronicleModel(safeState),
       title: 'Guild Journal',
       flavor: memoryTotal > 0
         ? `${memoryTotal} ${memoryTotal === 1 ? 'record endures' : 'records endure'} in the guild chronicle.`
@@ -524,6 +558,7 @@
     const model = journalV1233SummaryModel(state);
     const guildboundJournal = window.DungeonDexGuildOaths?.journalMarkup(state) || '';
     const reliquaryRows = Array.isArray(model.reliquary?.rows) ? model.reliquary.rows : [];
+    const cinderboneRows = Array.isArray(model.cinderbone?.rows) ? model.cinderbone.rows : [];
     const chronicleMarkup = model.sections.length
       ? `<details class="journal-section-fold" data-journal-section="chronicle">
           <summary><span>Chronicle entries</span><span class="pill journal-section-count">${esc(model.sections.length)} ${model.sections.length === 1 ? 'record' : 'records'}</span></summary>
@@ -551,6 +586,10 @@
       </header>
       ${chronicleMarkup}
       ${guildboundMarkup}
+      <details class="journal-section-fold cinderbone-chronicle-fold" data-journal-section="cinderbone">
+        <summary><span>Cinderbone Chronicle</span><span class="pill journal-section-count">${esc(cinderboneRows.length)} records</span></summary>
+        <div class="journal-fold-body"><section class="journal-cinderbone" aria-label="Cinderbone Chronicle records"><p class="small muted">Read-only acknowledgements derived from existing descent, contract, gear, trophy, and return records.</p><div class="journal-grid">${cinderboneRows.map(row).join('')}</div></section></div>
+      </details>
       <details class="journal-section-fold" data-journal-section="reliquary">
         <summary><span>Drowned Reliquary</span><span class="pill journal-section-count">${esc(reliquaryRows.length)} records</span></summary>
         <div class="journal-fold-body">
@@ -595,6 +634,7 @@
     };
   }
   window.reliquaryJournalModel = reliquaryJournalModel;
+  window.cinderboneChronicleModel = cinderboneChronicleModel;
   window.rivalTraceReadableSummary = rivalTraceReadableSummary;
   window.journalV1233SummaryModel = journalV1233SummaryModel;
   window.renderGuildJournalPanel = renderGuildJournalPanel;

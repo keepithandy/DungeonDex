@@ -26,8 +26,8 @@
 - [x] Phase 4 — Cinderbone incidents
 - [x] Phase 5 — D45 boss and Elite Contract integration
 - [x] Phase 6 — Cinderbone gear identity
-- [ ] Phase 7 — Chapter Chronicle and Debt Collector clarity
-- [ ] Phase 8 — Large UI and accessibility polish
+- [x] Phase 7 — Chapter Chronicle and Debt Collector clarity
+- [x] Phase 8 — Large UI and accessibility polish
 - [ ] Phase 9 — Verification and release preparation
 
 ## Phase 1 Handoff — Baseline and Contract Audit
@@ -432,6 +432,16 @@ In the same ledger-focused phase, implement display-only Debt Collector clarity 
 Add empty, partial, complete, locked, history-only, old-save, malformed-state, save/reload, Debt, Journal, Archive, Town, and Trophy Echo isolation coverage. Update the roadmap checklist and handoff evidence, and commit the completed Phase 7 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
 
+## Phase 7 Handoff — Chapter Chronicle and Debt Collector Clarity
+
+- Status: complete; focused commit `feat: add Cinderbone Chronicle records`.
+- Runtime changes: added a read-only Cinderbone Chronicle model and Archive/Guild Journal section deriving arrival, located Elite Contract, active incident, identified gear, D45 trophy, secured depth, and extraction from existing records.
+- Incident acknowledgement remains bounded: pending incidents are shown when active, while no unbounded incident history or new save ledger is created.
+- The existing Debt Collector display-only status, balance, pressure, terms, repayment availability, collection state, and recovery guidance contract remains intact.
+- Coverage: Journal empty/locked/partial/complete/malformed fixtures, Cinderbone gear/contract/return evidence, read-only rendering, and existing Debt Collector compatibility checks.
+- Protected behavior: debt formulas, interest, borrowing, wallet mutation, repayment, collection penalties, rewards, combat, gear, Talent, progression, Revisit lanes, and Trophy Echo isolation.
+- Next phase: Phase 8 — Large UI and accessibility polish.
+
 ## Phase 8 Prompt — Large UI and Accessibility Polish
 
 ```text
@@ -441,6 +451,15 @@ Read the repository operating contract and completed Phase 1-7 handoffs. Apply a
 
 Verify 390x844, 430x932, and 768x1024 touch profiles plus narrow fine-pointer behavior. Preserve existing Town and Gear disclosure state, route IDs, side-rail behavior, player discovery, actions, costs, locks, risks, combat, rewards, economy, saves, and progression. Navigation may expose existing surfaces but must not recommend what to buy, upgrade, equip, or pursue. Add focused interface, accessibility, contrast, mobile-layout, touch-geometry, keyboard, and browser screenshot verification. Update the roadmap checklist and handoff evidence, and commit the completed Phase 8 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 8 Handoff — Large UI and Accessibility Polish
+
+- Status: complete; focused commit `feat: polish Cinderbone surfaces`.
+- UI changes: added Cinderbone ash, furnace, bone, and ember framing for active-run, event, contract, gear, Journal/Chronicle, Archive, and Debt surfaces; improved long-copy wrapping, card hierarchy, focus visibility, 44px event controls, non-color status cues, reduced-motion behavior, and narrow-screen metadata stacking.
+- Existing navigation, disclosure state, route IDs, actions, costs, locks, saves, and progression remain unchanged.
+- Coverage: interface/accessibility 24/24, mobile layout 19/19, Journal smoke, JavaScript syntax, and the existing Debt Collector smoke passed. Computed contrast and CDP-backed Debt compatibility were attempted but unavailable due environment fetch/CDP failures.
+- Protected behavior: no new actions, recommendations, currencies, routes, rewards, combat, economy, or progression behavior.
+- Next phase: Phase 9 — Verification and release preparation.
 
 ## Phase 9 Prompt — Verification and Release Preparation
 

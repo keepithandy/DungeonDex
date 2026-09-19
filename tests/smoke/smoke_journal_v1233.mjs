@@ -157,6 +157,8 @@ vm.runInContext(fs.readFileSync('js/systems/10_ui_town_shop.js', 'utf8'), live);
 vm.runInContext(code, live);
 const rows = source => live.reliquaryJournalModel(source).rows;
 const row = (source, key) => rows(source).find(entry => entry.key === `reliquary-${key}`);
+const cinderRows = source => live.cinderboneChronicleModel(source).rows;
+const cinderRow = (source, key) => cinderRows(source).find(entry => entry.key === `cinderbone-${key}`);
 const base = () => ({ player: {}, run: {} });
 const fixture = base();
 assert.ok(rows(fixture).every(entry => entry.badge.startsWith('Locked')));
@@ -241,4 +243,19 @@ for (const malformed of [null, [], {}, { player: null }, { player: { runHistory:
 }
 const activeBoss = { player: {}, run: { active: true, floor: 45, monster: { tier: 'Boss' } } };
 assert.equal(row(activeBoss, 'boss').badge, 'Active');
+const cinderbone = {
+  player: {
+    safeExtractDepth: 43,
+    inventory: [{ id: 'cinder-piece', name: 'Kilnforged Blade of Cinderbone', maker: 'Cinderbone Halls', tags: ['cinderbone-halls'], slot: 'weapon' }],
+    eliteContracts: { active: { id: contractId, eliteName: 'Ash-Crowned Warden', targetFloor: 15 } },
+    runHistory: [{ floor: 43, zone: 'Cinderbone Halls', reason: 'extract' }]
+  },
+  run: { active: false, floor: 51, event: null }
+};
+assert.equal(cinderRow(cinderbone, 'arrival').badge, 'Recorded');
+assert.equal(cinderRow(cinderbone, 'elite').badge, 'Located');
+assert.equal(cinderRow(cinderbone, 'gear').badge, 'Identified');
+assert.equal(cinderRow(cinderbone, 'return').badge, 'Completed');
+assert.match(live.renderGuildJournalPanel(cinderbone), /Cinderbone Chronicle/);
+assert.doesNotThrow(() => live.cinderboneChronicleModel({ player: null, run: null }));
 console.log('PASS: Reliquary Journal evidence, legacy/malformed histories, read-only rendering and retained depth labels');
