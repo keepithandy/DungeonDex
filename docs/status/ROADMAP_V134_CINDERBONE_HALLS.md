@@ -20,7 +20,7 @@
 
 ## Phase Tracker
 
-- [ ] Phase 1 — Baseline and contract audit
+- [x] Phase 1 — Baseline and contract audit
 - [ ] Phase 2 — Cinderbone chapter foundation
 - [ ] Phase 3 — Cinderbone encounter roster
 - [ ] Phase 4 — Cinderbone incidents
@@ -29,6 +29,90 @@
 - [ ] Phase 7 — Chapter Chronicle and Debt Collector clarity
 - [ ] Phase 8 — Large UI and accessibility polish
 - [ ] Phase 9 — Verification and release preparation
+
+## Phase 1 Handoff — Baseline and Contract Audit
+
+### Baseline
+
+- Status: complete; documentation and contract audit only.
+- Branch: `main`.
+- Audited source commit: `e952c67` (`docs: add Cinderbone Halls phase roadmap`).
+- Source authority: `v1.33.2 Crimson Oath`, build `1.33.2-crimson-oath`.
+- Origin state at audit start: local `main` and `origin/main` both at `e952c67`, with `0` ahead and `0` behind.
+- Phase 1 completion commit: the commit containing this handoff.
+- Files changed: this roadmap only. No runtime, style, save, test, version, cache, route, package, or release file changed.
+
+### Current D31-D50 Contract
+
+| Range | Current behavior | Contract for later phases |
+| --- | --- | --- |
+| D31-D40 | `drowned-reliquary` is a complete authored district with five deterministic encounter identities, three incidents, a D40 finale, themed gear presentation, Journal evidence, and dedicated source/browser coverage. | Preserve it as the reference implementation and unchanged control. Do not route Cinderbone through Reliquary-specific helpers. |
+| D41-D44 | `DISTRICT_DATA` already selects `cinderbone`, with chapter name, line, tone, mood, arrival copy, subtitle, flavor, and boss-approach identity available. Encounters, gear, and events still fall back to generic pipelines. | Complete presentation through the existing registry and render pipeline without changing mechanics or RNG consumption. |
+| D45 | The existing boss slot and `gravetoll_bell` trophy definition identify D45 as the Gravetoll Bell. Run UI and approach copy also special-case that identity. Generic boss-floor naming converts raw depth to threat depth and can currently expose `Ashgate Butcher Step`; the `Cinderbone Maw` name at threat depth 45 is not raw D45. | Treat this as an identity seam. Phase 5 must reconcile presentation around the existing D45 boss, not create or rebalance a boss or move its trophy. |
+| D46-D50 | The Cinderbone district registry remains active, but encounters, events, and gear presentation remain generic. | Add bounded chapter content while preserving the D51 Blacktithe boundary. |
+
+### Runtime Ownership Map
+
+| Concern | Current owner and reusable contracts | Later phase |
+| --- | --- | --- |
+| District registry and authored data | `js/systems/00_core_constants_data.js`: `DISTRICT_DATA`, `DISTRICT_ENCOUNTER_IDENTITIES`, `DISTRICT_RUN_EVENT_REGISTRY`, `BOSS_TROPHY_DEFINITIONS`, `BOSS_FLOOR_NAMES`. | 2-6 |
+| District selection and chapter copy | `js/systems/04_depth_progression_charters.js`: `districtByDepth`, `dungeonDistrictIdentityForDepth`, `districtArrivalLine`, `districtToneClass`, `currentDistrictDisplay`, `dungeonDistrictSummary`, `districtArrivalMarkup`, `extractionSummaryLine`, `dungeonBossApproachLineForDepth`, `bossFloorNameByDepth`. | 2, 5 |
+| Encounter generation | `js/systems/06_scaling_generation_audits.js`: `districtMonsterIdentity` and `generateMonster`. Identity selection is deterministic and currently adds no random calls. | 3 |
+| Gear generation | `js/systems/06_scaling_generation_audits.js`: `generateGear`. The D31-D40 branch changes maker, theme, tags, name, and summary while retaining mechanics. | 6 |
+| Incidents and pending haul | `js/systems/07_player_combat_runtime.js`: `createRunEvent`, Reliquary event registry/trigger/finale/resolution helpers, and existing gear, Ember, salvage, heal, leave, and pending-reward effects. | 4 |
+| Save normalization | `js/systems/08_normalization_save.js`: active-run repair, `normalizeMonster`, pending-reward normalization, bounded histories, and old-save fallback. | 2-7 |
+| Run, gear, Dex, and Archive UI | `js/systems/11_ui_run_gear_dex_archive.js`: `renderRun`, generic event-card rendering, active-run labels, boss status, gear detail, Archive, and route rendering. | 2-8 |
+| Boss backdrop presentation | `js/systems/29_monster_backdrops_canvas.js`: existing district-specific visual routing without combat authority. | 3, 5, 8 |
+| Elite Contracts | `js/systems/03_town_contracts_market.js`: one-active lifecycle, exact target, risk/objective helpers, target briefing/location, claim/failure/expiry, and Journal history. | 5 |
+| Guild Journal | `js/systems/38_journal_v1.js`: `reliquaryJournalModel`, evidence derivation from trophies/contracts/gear/monster discovery/run history, progressive disclosure, and disclosure-state retention. | 7 |
+| Debt Collector | `js/systems/28_debt_collector_foundation.js`, `js/systems/34_debt_collector_v1_completion.js`, and `js/systems/41_debt_pressure_v1.js`: display summary, pressure/status/terms/recovery models, borrow/repay contracts, and locked display-only pressure card. | 7-8 |
+| Visual and responsive layer | `styles.css`, `styles_lore_layer.css`, `styles_visual_weight.css`, plus the required script order in `index.html`. | 2, 8 |
+
+### Protected Systems and Stable Signatures
+
+- Preserve combat formulas, late-floor pressure, Common/Elite/Boss scaling, boss cadence, rewards, drop rates, rarity, economy, Merchant Gear Upgrade values and caps, dungeon entry, extraction, and fall behavior.
+- Preserve gear slots, stat budgets, values, IDs, equip/sell/salvage/lock/junk rules, named loadouts, and random-call count.
+- Preserve one active Elite Contract, exact-target completion, established risk and payout, one-time claim, failure/expiry, and Journal history.
+- Preserve Talent points and passives, Debt formulas and wallet mutation, Trophy Echo as the only active Revisit lane, route IDs, required script order, cache authority, and public-runtime cleanliness.
+- Use D30/D31, D40/D41, D45, D50/D51 as boundary controls. D31-D40 must remain an unchanged authored control; D51 must remain Blacktithe.
+- For seeded encounter comparisons, lock family, type, tier, Elite fields, numeric combat/reward fields, normalization output, contract-target behavior, and total random calls. Presentation fields may change only inside the phase's authorized Cinderbone range.
+- For seeded gear comparisons, lock slot, rarity, numeric stats, value, ID behavior, source behavior, and total random calls across `normal`, `elite`, `boss`, and `event`; only approved maker/theme/tag/name/summary fields may differ at D41-D50.
+- Keep `tests/smoke/smoke_boss_scaling_matrix_v1.mjs` signatures green. Use `e952c67` as the pinned pre-Cinderbone control for any new before/after signature harness; do not silently use moving `HEAD` as the baseline.
+
+### Save and History Boundaries
+
+- Prefer derived district state from raw run floor and the existing registry in Phase 2; no new persisted chapter field is currently needed.
+- `normalizeMonster` currently restores authored names only for D31-D40 and searches only the Reliquary roster. Phase 3 must generalize that lookup by district before Cinderbone names can survive active-run reload safely.
+- `state.run.event` currently survives through the merged run object but has no dedicated bounded sanitizer. Phase 4 must add explicit validation/repair for any new Cinderbone event shape and retain token-based duplicate safety.
+- Active pending rewards are normalized; an incomplete or invalid active run returns safely to Town. Preserve both behaviors.
+- `state.player.runHistory` is bounded to 12 entries, `revisitState.notedDistricts` to 12, and `state.archive` to 40. Do not introduce unbounded chapter history.
+- Phase 7 should derive Chronicle evidence from existing run, trophy, contract, identified gear, monster-discovery, extraction, and retained-history records. Any unavoidable additive state must have a default, type/range normalization, malformed-state repair, an explicit bound, and old-save coverage.
+
+### Known Seams and Risks
+
+- `renderRun` currently corrects raw-depth district identity only for D31-D40; D41-D50 can fall back to lore-floor district selection. Phase 2 must generalize this without changing floor math.
+- D45 has split naming authority across trophy data, run UI, approach copy, and threat-depth boss-floor names. Phase 5 owns presentation reconciliation.
+- Reliquary event helpers and Journal model are chapter-specific. Extend or generalize the established contracts; do not copy a second event or Journal framework.
+- The current event object relies partly on raw save passthrough. A Cinderbone implementation must not widen that trust boundary.
+- Cinderbone has registry copy but no authored encounter roster or event registry. Missing data must continue to fall back safely to generic content.
+- Visual work must keep non-color identity cues, contrast, keyboard operation, reduced motion, 44px touch geometry, no horizontal overflow, and existing Town/Gear disclosure state.
+
+### Required Verification by Phase
+
+| Phase | Focused checks to add or run |
+| --- | --- |
+| 2 | New Cinderbone foundation source smoke and browser check for D40/D41 and D50/D51 boundaries, arrival/transition copy, active-run label, save/reload, missing-data fallback, and mobile chapter cue; `smoke_enter_dungeon_runtime_v1.mjs`; `smoke_app_wiring_cache_manifest_v1.mjs`; Reliquary vertical/content controls. |
+| 3 | New seeded Cinderbone encounter smoke comparing mechanics and RNG with pinned `e952c67`; all four identities at Common/Elite presentation; active-monster save/reload; hostile/missing roster fallback; D30/D31, D40/D41, D45, D50/D51 controls; boss scaling matrix; public runtime console. |
+| 4 | New incident smoke covering every choice, eligibility, pending haul, reload before and after choice, stale and duplicate tokens, malformed event repair, old saves, extraction/fall/exit, and non-Cinderbone controls; browser/mobile event cards; existing Reliquary events smoke. |
+| 5 | D45 approach/arrival/aftermath, trophy identity, save/reload, malformed trophy state, scaling/reward signatures, target indicator, each Cinderbone briefing, exact-target claim, duplicate claim, failure/expiry, and Journal history; boss trophy/scaling and Elite Contract lifecycle smokes. |
+| 6 | Seeded gear mechanics and RNG comparison to `e952c67` for every slot and `normal`/`elite`/`boss`/`event`; D40/D41 and D50/D51 controls; old/malformed save; inventory, compare, modal, loadout, return record, Journal; gear identity, named loadout, Merchant upgrade, and rarity progression smokes. |
+| 7 | Chronicle empty/partial/complete/locked/history-only states; old/malformed save and reload; bounded history; Journal/Archive/Town rendering; Debt status/balance/pressure/terms/repayment/collection/recovery display with unchanged numeric results; Journal, Debt, Debt/Talent compatibility, Archive, and Trophy Echo isolation smokes. |
+| 8 | Source and browser checks for visible non-color cues, focus/keyboard behavior, screen-reader labels/status, reduced motion, contrast, wrapping, no horizontal overflow, and 44px controls at 390x844, 430x932, 768x1024 touch, and 360x844 fine-pointer; mobile layout, accessibility, computed contrast, side-nav, and route-scroll smokes. |
+| 9 | Syntax helper; every focused Cinderbone smoke; Reliquary controls; boss, contract, gear, loadout, Journal, Archive, Revisit, Debt, entry, runtime, accessibility, contrast, mobile, app-wiring/cache, boot recovery; `node smoke_compact_suite.mjs` without the retained package gate unless package authorization is separately granted. |
+
+### Phase 2 Handoff
+
+Use the Phase 2 prompt below unchanged. Start from this completed handoff, keep `VERSION.md` at `v1.33.2`, and implement only the chapter foundation. The first required fixes are raw-depth Cinderbone selection in active-run presentation, chapter arrival/transition copy through the registry, visual tokens, reload retention, D40/D41 and D50/D51 controls, and safe fallback. Do not add encounters, incidents, gear identity, boss/contract behavior, Chronicle state, or Debt changes early.
 
 ## Phase 1 Prompt — Baseline and Contract Audit
 
