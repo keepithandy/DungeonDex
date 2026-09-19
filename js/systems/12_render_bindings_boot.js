@@ -190,7 +190,7 @@
         btn.classList.add('tap-now');
         window.setTimeout(() => btn.classList.remove('tap-now'), 90);
         runCombatGuardedAction(() => {
-          const result = resolveRunEvent(S, btn.dataset.runEvent) || {};
+          const result = resolveRunEvent(S, btn.dataset.runEvent, btn.dataset.runEventToken) || {};
           if (result.fullRender || !S.run.active) render();
           else renderCombatTick(!!result.saveNow);
         });

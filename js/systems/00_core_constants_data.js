@@ -463,6 +463,44 @@
           Object.freeze({ id:'leave', label:'Pass beneath it', detail:'Face the final room without taking a tithe.', effect:Object.freeze({ kind:'leave' }) })
         ])
       })
+    }),
+    cinderbone: Object.freeze({
+      random: Object.freeze([
+        Object.freeze({
+          id: 'cinderbone_ashen_arena',
+          kicker: 'Cinderbone Incident',
+          title: 'The Ashen Arena',
+          text: 'The hall opens into a champion’s ring. Ash still clings to the seats, and something beneath the sand wears a crown of fused iron.',
+          options: Object.freeze([
+            Object.freeze({ id:'pry_crown', label:'Pry up the crown', detail:'Pull a furnace cache free, but the buried champion bites back.', effect:Object.freeze({ kind:'gear', damageFactor:0.6, tag:'ashen-arena' }) }),
+            Object.freeze({ id:'search_seats', label:'Search the fallen seats', detail:'Gather loose coin and shards from the old spectators.', effect:Object.freeze({ kind:'salvage', goldMultiplier:1.35, shardsBonus:1, tag:'ashen-arena' }) }),
+            Object.freeze({ id:'leave', label:'Leave the arena', detail:'Cross the ring without disturbing its last champion.', effect:Object.freeze({ kind:'leave', tag:'ashen-arena' }) })
+          ])
+        }),
+        Object.freeze({
+          id: 'cinderbone_bonefurnace_cache',
+          kicker: 'Cinderbone Incident',
+          title: 'Bonefurnace Cache',
+          text: 'A furnace mouth breathes through a stack of white ribs. Inside, a sealed cache knocks softly against the coals.',
+          options: Object.freeze([
+            Object.freeze({ id:'reach_coals', label:'Reach through the coals', detail:'Claim the cache and accept a measured burn.', effect:Object.freeze({ kind:'gear', damageFactor:0.55, tag:'bonefurnace-cache' }) }),
+            Object.freeze({ id:'scrape_slag', label:'Scrape the slag', detail:'Work loose coin and ember-glass without opening the cache.', effect:Object.freeze({ kind:'salvage', goldMultiplier:1.15, shardsBonus:4, tag:'bonefurnace-cache' }) }),
+            Object.freeze({ id:'leave', label:'Let the furnace sleep', detail:'Leave the cache sealed behind its ribbed gate.', effect:Object.freeze({ kind:'leave', tag:'bonefurnace-cache' }) })
+          ])
+        }),
+        Object.freeze({
+          id: 'cinderbone_champion_tithe',
+          kicker: 'Cinderbone Incident',
+          title: 'Champion’s Tithe',
+          text: 'Medals hang from a jawbone ledger, each stamped with a name the furnace has already forgotten. The final line is blank for you.',
+          options: Object.freeze([
+            Object.freeze({ id:'feed_ember', label:'Feed one ember', detail:'Pay the furnace for a richer unsecured haul.', effect:Object.freeze({ kind:'ember-offer', costEmber:1, goldMultiplier:1.7, shardsBonus:2, tag:'champion-tithe' }) }),
+            Object.freeze({ id:'break_ledger', label:'Break the ledger', detail:'Take coin from the ash and let the old names fall.', effect:Object.freeze({ kind:'salvage', goldMultiplier:1.25, shardsBonus:3, tag:'champion-tithe' }) }),
+            Object.freeze({ id:'leave', label:'Leave the names', detail:'Refuse the tithe and keep your name unrecorded.', effect:Object.freeze({ kind:'leave', tag:'champion-tithe' }) })
+          ])
+        })
+      ]),
+      finale: null
     })
   });
 

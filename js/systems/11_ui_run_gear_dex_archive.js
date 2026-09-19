@@ -333,7 +333,7 @@
     if (S.run.event) {
       const event = S.run.event;
       const options = asArray(event.options, []).map(option => `
-        <button class="ghost run-event-choice" data-run-event="${escapeHtml(option.id)}">
+        <button class="ghost run-event-choice" type="button" data-run-event="${escapeHtml(option.id)}" data-run-event-token="${escapeHtml(event.token || '')}" aria-label="${escapeHtml(`${option.label || 'Move on'} — ${option.detail || ''}`)}">
           <strong>${escapeHtml(option.label)}</strong>
           <span>${escapeHtml(option.detail || '')}</span>
         </button>`).join('');

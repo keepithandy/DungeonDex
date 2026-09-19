@@ -23,7 +23,7 @@
 - [x] Phase 1 — Baseline and contract audit
 - [x] Phase 2 — Cinderbone chapter foundation
 - [x] Phase 3 — Cinderbone encounter roster
-- [ ] Phase 4 — Cinderbone incidents
+- [x] Phase 4 — Cinderbone incidents
 - [ ] Phase 5 — D45 boss and Elite Contract integration
 - [ ] Phase 6 — Cinderbone gear identity
 - [ ] Phase 7 — Chapter Chronicle and Debt Collector clarity
@@ -283,6 +283,82 @@ Read the repository operating contract and completed Phase 1-3 handoffs. Add thr
 
 Protect pending-event save/reload, stale-token handling, duplicate resolution, malformed-state repair, chapter exit, extraction, and fall behavior. Do not add a currency, permanent progression, alternate reward route, second event framework, boss slot, Revisit lane, or unbounded save history. Add focused source and browser coverage for every choice, reload before choice, reload after choice, duplicate safety, malformed state, old saves, and non-Cinderbone controls. Update the roadmap checklist and handoff evidence, and commit the completed Phase 4 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 4 Handoff — Cinderbone Incidents
+
+### Completion
+
+- Status: complete; three bounded Cinderbone incidents using the established event framework.
+- Branch: `main`.
+- Baseline: Phase 3 commit `97ed350`.
+- Completion commit: the commit containing this handoff.
+- Version remains `v1.33.2 Crimson Oath`; no package, cache alignment, tag, push, upload, or publication work was performed.
+
+### Authored incidents
+
+- `cinderbone_ashen_arena` — pry a furnace cache free, search for salvage, or leave the ash arena.
+- `cinderbone_bonefurnace_cache` — reach through the coals, scrape slag for coin/shards, or leave the cache sealed.
+- `cinderbone_champion_tithe` — offer one ember for a richer haul, break the ledger for salvage, or leave the names.
+
+Each incident has three readable choices and uses only the existing gear-cache, damage, salvage, coin, ember-offer, leave, and unsecured pending-haul effects.
+
+### Files changed
+
+- `js/systems/00_core_constants_data.js`
+  - Added the three bounded Cinderbone incident definitions under the existing district event registry.
+- `js/systems/07_player_combat_runtime.js`
+  - Generalized district event lookup and resolution from Reliquary-only to registry-backed chapters.
+  - Added deterministic event tokens, Cinderbone eligibility, and stale-token rejection without a second event framework.
+- `js/systems/08_normalization_save.js`
+  - Added bounded event normalization, effect allowlisting, duplicate option removal, dangerous-ID repair, token regeneration, and pending-choice restoration.
+- `js/systems/11_ui_run_gear_dex_archive.js`
+  - Added event token attributes, native button type, and accessible choice labels.
+- `js/systems/12_render_bindings_boot.js`
+  - Passes the rendered event token into the existing resolver.
+- `tests/smoke/smoke_drowned_reliquary_events_v1290.mjs`
+  - Covers all three incidents and all nine choices, stale tokens, duplicate resolution, pending-event reload, malformed state, old saves, and the D51 exit boundary.
+- `tests/smoke/reliquary_browser_checks.mjs`
+  - Adds browser coverage for every Cinderbone choice, reload-before-choice, ARIA labels, stale-token rejection, single resolution, and mobile readability.
+- `docs/status/ROADMAP_V134_CINDERBONE_HALLS.md`
+  - Marked Phase 4 complete and recorded this handoff.
+
+### Behavior changed
+
+- D41-D50 can now pause on one of three authored Cinderbone incidents through the existing between-fight event path.
+- Event choices resolve into the existing unsecured pending haul and return to normal encounter generation.
+- Cinderbone pending events survive save/reload with a deterministic token; stale controls are rejected and duplicate resolution is a safe no-op.
+- Malformed event options are bounded, dangerous IDs are removed, unsupported effects become `leave`, and empty malformed events are cleared safely.
+- Event choice buttons now expose accessible labels containing both action and detail text.
+
+### Behavior intentionally unchanged
+
+- No new currency, permanent progression, reward route, event framework, boss slot, Revisit lane, or unbounded history.
+- Existing Reliquary incidents/finale, generic run events, combat math, scaling, rewards, economy, gear mechanics, extraction, fall recovery, and D51 boundary remain on their established paths.
+- Cinderbone event gear remains generic until Phase 6; no event balance or RNG contract was changed intentionally.
+
+### Save compatibility impact
+
+- No new unbounded state and no version migration.
+- Existing pending Reliquary and generic events normalize through the same bounded event shape.
+- Older active saves without `run.event` remain loadable; malformed pending events are cleared without ending the active run.
+- Reloaded pending events restore `run.choices = ['event']` and regenerate a deterministic token from event ID, floor, and chapter.
+
+### Checks run
+
+- Changed runtime and smoke files passed `node --check`.
+- Cinderbone/Reliquary event smoke passed all three incidents and all nine choices, pending-haul resolution, stale-token rejection, duplicate no-op, malformed repair, old-save load, pending-event reload, and D51 exit.
+- Reliquary vertical slice passed 1,900 seeded comparisons against Phase 3 commit `97ed350`.
+- Filtered compact smoke suite passed: 45/45, including syntax, content, app wiring/cache, mobile geometry, accessibility, contrast, and Enter Dungeon runtime.
+- Browser runner was attempted but failed before assertions with `TypeError: fetch failed`; no browser result is being claimed.
+
+### Remaining risks
+
+- Browser execution remains unavailable in the current environment, so the new browser matrix awaits a working local Chromium endpoint.
+- Cinderbone gear identity and D45 presentation remain assigned to later phases.
+
+### Exact next phase
+
+Proceed with the Phase 5 prompt below. Integrate the existing D45 boss and Elite Contracts with chapter-aware presentation only, preserving boss identity, cadence, scaling, rewards, trophy, contract lifecycle, and Journal history.
 
 ## Phase 5 Prompt — D45 Boss and Elite Contract Integration
 

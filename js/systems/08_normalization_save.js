@@ -185,6 +185,55 @@
     };
   }
 
+  function normalizeRunEventEffect(effect) {
+    if (!isPlainObject(effect)) return { kind:'leave' };
+    const kind = ['gear','salvage','ember-offer','heal','leave'].includes(String(effect.kind || ''))
+      ? String(effect.kind)
+      : 'leave';
+    const result = { kind };
+    const numericKeys = ['damageFactor','goldMultiplier','shardsMultiplier','shardsBonus','ember','costEmber','healBase'];
+    numericKeys.forEach(key => {
+      if (effect[key] != null && Number.isFinite(Number(effect[key]))) result[key] = Number(effect[key]);
+    });
+    const tag = String(effect.tag || '').replace(/[^a-z0-9-]/gi, '').toLowerCase().slice(0, 48);
+    if (tag) result.tag = tag;
+    return result;
+  }
+
+  function normalizeRunEvent(event, floor) {
+    if (!isPlainObject(event)) return null;
+    const depth = Math.max(1, Math.floor(numberOr(floor, event.floor, 1, 999999)));
+    const options = asArray(event.options, [])
+      .filter(isPlainObject)
+      .map(option => ({
+        id: String(option.id || 'leave').replace(/[^a-z0-9_-]/gi, '').slice(0, 64) || 'leave',
+        label: String(option.label || 'Move on').slice(0, 100),
+        detail: String(option.detail || '').slice(0, 220),
+        effect: normalizeRunEventEffect(option.effect)
+      }))
+      .filter(option => !['__proto__', 'constructor', 'prototype'].includes(option.id))
+      .filter((option, index, list) => list.findIndex(candidate => candidate.id === option.id) === index)
+      .slice(0, 3);
+    if (!options.length) return null;
+    const chapter = String(event.chapter || '').replace(/[^a-z0-9-]/gi, '').slice(0, 48);
+    const id = String(event.id || 'run-event').replace(/[^a-z0-9_-]/gi, '').slice(0, 80) || 'run-event';
+    const normalized = {
+      id,
+      kicker: String(event.kicker || 'Run Event').slice(0, 80),
+      title: String(event.title || 'Dungeon Incident').slice(0, 120),
+      text: String(event.text || 'The Hollow Stair interrupts the descent.').slice(0, 420),
+      floor: depth,
+      zone: String(event.zone || zoneName(depth)).slice(0, 100),
+      chapter,
+      finale: !!event.finale,
+      options
+    };
+    normalized.token = typeof runEventToken === 'function'
+      ? runEventToken(normalized)
+      : `${normalized.id}:${normalized.floor}:${normalized.chapter}`;
+    return normalized;
+  }
+
   const TALENT_POINT_STEP = 5;
   const TALENT_POINT_CAP = 20;
   const TALENT_BONUS_KEYS = Object.freeze(['maxHpPct', 'eliteBoardRewardPct', 'charterCostPct', 'sellValuePct']);
@@ -951,12 +1000,13 @@
     state.run.roomsCleared = Math.floor(numberOr(state.run.roomsCleared, 0, 0, 99999));
     state.run.encounters = Math.floor(numberOr(state.run.encounters, 0, 0, 99999));
     state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
+    state.run.event = state.run.active ? normalizeRunEvent(state.run.event, state.run.floor) : null;
     state.run.pendingRewards = state.run.active ? createPendingRunRewards(state.run.pendingRewards) : createPendingRunRewards();
     state.run.startedFromCharter = !!state.run.startedFromCharter;
     state.run.charterStartFloor = Math.floor(numberOr(state.run.charterStartFloor, 0, 0, 999999));
     ensureRunSetBonusState(state);
     if (!state.run.active) { state.run.startedFromCharter = false; state.run.charterStartFloor = 0; state.run.setBonuses = { ashboundLethalUsed:false, bellforgeHits:0, sootveilEscapeUsed:false, sootveilGuard:0 }; clearPendingRunRewards(state); }
-    state.run.choices = asArray(state.run.choices, CORE_COMBAT_ACTIONS).filter(x => CORE_COMBAT_ACTIONS.includes(x));
+    state.run.choices = state.run.event ? ['event'] : asArray(state.run.choices, CORE_COMBAT_ACTIONS).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     state.run.combatLog = asArray(state.run.combatLog, base.run.combatLog).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
     state.run.monster = state.run.active ? normalizeMonster(state.run.monster, state.run.floor) : null;
     if (state.run.active && !state.run.monster) {
@@ -1008,10 +1058,11 @@
       ? progressDepthValue(state.run.floor, defaultRunStartDepth(state))
       : Math.floor(numberOr(state.run.floor, 0, 0, 999999));
     state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));
+    state.run.event = state.run.active ? normalizeRunEvent(state.run.event, state.run.floor) : null;
     state.run.pendingRewards = state.run.active ? createPendingRunRewards(state.run.pendingRewards) : createPendingRunRewards();
     ensureRunSetBonusState(state);
     state.run.combatLog = asArray(state.run.combatLog, []).map(String).slice(0, COMBAT_LOG_STORE_LIMIT);
-    state.run.choices = asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
+    state.run.choices = state.run.event ? ['event'] : asArray(state.run.choices, []).filter(x => CORE_COMBAT_ACTIONS.includes(x));
     window.DungeonDexGuildOaths?.normalizeForState(state);
     window.DungeonDexLanternRites?.ensure(state);
     if (state.run.active && !state.run.choices.length) state.run.choices = CORE_COMBAT_ACTIONS.slice();

@@ -66,6 +66,7 @@ const api = vm.runInContext(`({
   DISTRICT_RUN_EVENT_REGISTRY,
   createBaseState,
   createRunEvent,
+  maybeTriggerDistrictRunEvent,
   maybeTriggerReliquaryFinaleEvent,
   resolveRunEvent,
   winEncounter,
@@ -95,6 +96,82 @@ for (const event of [...registry.random, registry.finale]) {
   assert.ok(event.options.every(option => option.effect && option.id && option.label && option.detail), `${event.id} should keep choice behavior in data`);
 }
 
+const cinderboneRegistry = api.DISTRICT_RUN_EVENT_REGISTRY.cinderbone;
+assert.equal(cinderboneRegistry.random.length, 3, 'Cinderbone should have exactly three authored incidents');
+assert.equal(cinderboneRegistry.finale, null, 'Cinderbone incidents should not create a second boss/finale slot');
+for (const event of cinderboneRegistry.random) {
+  assert.equal(event.kicker, 'Cinderbone Incident', `${event.id} should identify the Cinderbone chapter`);
+  assert.equal(event.options.length, 3, `${event.id} should use the established three-choice event card`);
+  assert.ok(event.options.every(option => option.effect && option.id && option.label && option.detail), `${event.id} should keep choice behavior in data`);
+}
+
+math.random = () => 0.01;
+const cinderboneEntry = activeState(40);
+api.winEncounter(cinderboneEntry);
+assert.equal(cinderboneEntry.run.floor, 41, 'D40 should advance into Cinderbone through the existing progression path');
+assert.equal(cinderboneEntry.run.event?.chapter, 'cinderbone', 'D41 should use the Cinderbone event registry');
+assert.ok(cinderboneRegistry.random.some(event => event.id === cinderboneEntry.run.event.id), 'D41 should select only a Cinderbone incident');
+
+for (let index = 0; index < cinderboneRegistry.random.length; index += 1) {
+  math.random = () => (index + 0.1) / cinderboneRegistry.random.length;
+  for (const option of cinderboneRegistry.random[index].options) {
+    const state = activeState(41);
+    const event = api.createRunEvent(state);
+    assert.equal(event.chapter, 'cinderbone', 'Cinderbone event should carry its chapter identity');
+    state.run.event = { ...event, id:cinderboneRegistry.random[index].id, options:event.options };
+    const before = JSON.stringify(state.run.pendingRewards);
+    const result = api.resolveRunEvent(state, option.id, event.token);
+    assert.equal(result.saveNow, true, `${event.id}/${option.id} should use the established save path`);
+    assert.equal(state.run.event, null, `${event.id}/${option.id} should clear the pending event`);
+    assert.equal(state.run.active, true, `${event.id}/${option.id} should preserve the active run`);
+    assert.ok(state.run.monster, `${event.id}/${option.id} should return to normal encounter generation`);
+    if (option.effect.kind !== 'leave') assert.notEqual(JSON.stringify(state.run.pendingRewards), before, `${event.id}/${option.id} should resolve through the unsecured haul`);
+  }
+}
+
+const staleState = activeState(41);
+const staleEvent = api.createRunEvent(staleState);
+staleState.run.event = staleEvent;
+const staleBefore = JSON.stringify(staleState.run.pendingRewards);
+const staleResult = api.resolveRunEvent(staleState, staleEvent.options[0].id, 'stale-event-token');
+assert.equal(staleResult.stale, true, 'a stale event token should be rejected');
+assert.equal(staleState.run.event.id, staleEvent.id, 'stale event controls should not clear the current event');
+assert.equal(JSON.stringify(staleState.run.pendingRewards), staleBefore, 'stale event controls should not mutate the pending haul');
+const validResult = api.resolveRunEvent(staleState, staleEvent.options[0].id, staleEvent.token);
+assert.equal(validResult.saveNow, true, 'the current event token should resolve normally');
+const duplicateResult = api.resolveRunEvent(staleState, staleEvent.options[0].id, staleEvent.token);
+assert.equal(duplicateResult.saveNow, false, 'a duplicate event resolution should be a safe no-op');
+
+const persistedCinderbone = activeState(41);
+persistedCinderbone.run.event = api.createRunEvent(persistedCinderbone);
+assert.equal(api.save(persistedCinderbone), true, 'a pending Cinderbone incident should serialize through the existing save path');
+const reloadedCinderbone = api.load();
+assert.equal(reloadedCinderbone.run.event?.chapter, 'cinderbone', 'a pending Cinderbone incident should survive save/reload');
+assert.equal(reloadedCinderbone.run.event?.token, persistedCinderbone.run.event.token, 'save/reload should preserve the deterministic event token');
+assert.equal(reloadedCinderbone.run.choices[0], 'event', 'a reloaded pending incident should remain the active choice state');
+
+const malformed = activeState(41);
+malformed.run.event = { id:'cinderbone_broken', title:42, options:[{ id:'__proto__', effect:{ kind:'currency', gold:999999999 } }, null] };
+storage.set(api.STORAGE_KEY, JSON.stringify(malformed));
+const repaired = api.load();
+assert.equal(repaired.run.event, null, 'malformed incident choices should be repaired to no pending event');
+assert.equal(repaired.run.active, true, 'malformed incident data should not end the active run');
+const oldCinderbone = activeState(41);
+delete oldCinderbone.run.event;
+storage.set(api.STORAGE_KEY, JSON.stringify(oldCinderbone));
+const oldLoaded = api.load();
+assert.equal(oldLoaded.run.active, true, 'old active saves without an event should remain loadable');
+assert.equal(oldLoaded.run.floor, 41, 'old active Cinderbone saves should preserve depth');
+
+const chapterExit = activeState(50);
+chapterExit.run.pendingRewards.gold = 17;
+math.random = () => 0.99;
+api.winEncounter(chapterExit);
+assert.equal(chapterExit.run.floor, 51, 'Cinderbone should exit through the existing D51 boundary');
+assert.equal(!!chapterExit.run.event, false, 'chapter exit should not leave a Cinderbone event pending');
+assert.ok(chapterExit.run.pendingRewards.gold >= 17, 'chapter exit should preserve the unsecured haul');
+
+math.random = () => 0.01;
 const entryState = activeState(30);
 api.winEncounter(entryState);
 assert.equal(entryState.run.floor, 31, 'a normal D30 clear should advance through the existing progression path');

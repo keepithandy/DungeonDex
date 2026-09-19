@@ -179,6 +179,39 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     assert.match(geometry.flavor, /champion dust|old victories/i);
     record(`Cinderbone ${profile.width}x${profile.height} mobile header remains readable without overflow`, true);
   }
+  const cinderboneEventMatrix = await read(`DISTRICT_RUN_EVENT_REGISTRY.cinderbone.random.map(event => ({ id:event.id, options:event.options.map(option => option.id) }))`);
+  for (let eventIndex = 0; eventIndex < cinderboneEventMatrix.length; eventIndex += 1) {
+    for (const optionId of cinderboneEventMatrix[eventIndex].options) {
+      const eventCoverage = await read(`(() => {
+        window.__cinderboneCoverageState = S;
+        Math.random = () => (${eventIndex} + 0.1) / ${cinderboneEventMatrix.length};
+        const preview = createBaseState();
+        preview.screen = 'run'; preview.run.active = true; preview.run.floor = 41; preview.run.zone = 'Cinderbone Halls';
+        preview.run.monster = generateMonster(41, preview);
+        preview.run.event = createRunEvent(preview);
+        S = preview; save(S); S = load(); render();
+        const buttons = Array.from(document.querySelectorAll('[data-run-event]'));
+        const target = buttons.find(button => button.dataset.runEvent === '${optionId}');
+        const labels = buttons.map(button => button.getAttribute('aria-label') || '');
+        const stale = resolveRunEvent(S, '${optionId}', 'stale-cinderbone-token');
+        const before = JSON.stringify(S.run.pendingRewards);
+        target?.click();
+        const after = JSON.stringify(S.run.pendingRewards);
+        const result = { event:S.run.event, active:S.run.active, labels, stale:stale?.stale === true,
+          mutated:before !== after, selected:'${optionId}', target:!!target };
+        S = window.__cinderboneCoverageState; delete window.__cinderboneCoverageState; render();
+        return result;
+      })()`);
+      assert.equal(eventCoverage.target, true, JSON.stringify(eventCoverage));
+      assert.equal(eventCoverage.stale, true, JSON.stringify(eventCoverage));
+      assert.equal(eventCoverage.event, null, JSON.stringify(eventCoverage));
+      assert.equal(eventCoverage.active, true, JSON.stringify(eventCoverage));
+      assert.equal(eventCoverage.labels.length, 3, JSON.stringify(eventCoverage));
+      assert.ok(eventCoverage.labels.every(label => label.includes('—')), JSON.stringify(eventCoverage));
+      if (optionId !== 'leave') assert.equal(eventCoverage.mutated, true, JSON.stringify(eventCoverage));
+      record(`Cinderbone ${cinderboneEventMatrix[eventIndex].id}/${optionId}: reload, ARIA label, stale-token rejection and single resolution`, true);
+    }
+  }
   await advanceTo(40);
   const lanternDrafts = await read('window.__reliquaryLanternDrafts || 0');
   assert.ok(lanternDrafts >= 3, JSON.stringify({ lanternDrafts }));
