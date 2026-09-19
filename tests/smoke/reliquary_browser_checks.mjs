@@ -133,14 +133,33 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     const oldMonster = JSON.parse(monster);
     const monsterChanges = Object.keys({...oldMonster,...S.run.monster}).filter(key => JSON.stringify(oldMonster[key]) !== JSON.stringify(S.run.monster[key]));
     const retained = ['id','name','family','type','tier','hp','maxHp','power','guard','speed','rewardGold','rewardXp','rewardShard','lore'];
-    return { pending:pending === JSON.stringify(S.run.pendingRewards), monster:retained.every(key => oldMonster[key] === S.run.monster[key]), monsterChanges,
+    return { pending:pending === JSON.stringify(S.run.pendingRewards), zone:S.run.zone, monster:retained.every(key => oldMonster[key] === S.run.monster[key]), monsterChanges,
       loadouts:window.__reliquaryLoadouts === JSON.stringify(S.player.namedLoadouts),
       equipment:window.__reliquaryEquipment === JSON.stringify(S.player.equipment),
       theme:document.querySelector('.combat-monster-stage')?.className };
   })()`);
-  assert.ok(activeReload.pending && activeReload.monster && activeReload.loadouts && activeReload.equipment, JSON.stringify(activeReload));
+  assert.ok(activeReload.pending && activeReload.zone === 'The Drowned Reliquary' && activeReload.monster && activeReload.loadouts && activeReload.equipment, JSON.stringify(activeReload));
   assert.match(activeReload.theme, /combat-backdrop--drowned-reliquary/);
   record('Active Reliquary reload preserves pending rewards, monster, duplicated loadouts, IDs and upgrades', true);
+  const cinderboneReload = await read(`(() => {
+    window.__reliquaryActiveState = S;
+    const preview = createBaseState();
+    preview.screen = 'run'; preview.run.active = true; preview.run.floor = 41; preview.run.zone = 'The Drowned Reliquary';
+    preview.run.monster = generateMonster(41, preview);
+    S = preview; save(S); S = load(); render();
+    const result = { zone:S.run.zone, key:document.querySelector('.run-flow-summary')?.dataset.districtKey || '',
+      current:document.querySelector('.run-flow-primary strong')?.textContent || '',
+      flavor:document.querySelector('.run-district-flavor')?.textContent || '',
+      theme:document.querySelector('.combat-device-shell')?.className || '' };
+    S = window.__reliquaryActiveState; delete window.__reliquaryActiveState; render();
+    return result;
+  })()`);
+  assert.deepEqual(cinderboneReload, {
+    zone:'Cinderbone Halls', key:'cinderbone', current:'Cinderbone Halls',
+    flavor:'Cinderbone keeps old victories warm in the ash.', theme:cinderboneReload.theme
+  }, JSON.stringify(cinderboneReload));
+  assert.match(cinderboneReload.theme, /district-tone-cinderbone/);
+  record('Cinderbone D41 active-run identity, visual tone and stale-zone save repair survive reload', true);
   await advanceTo(40);
   const lanternDrafts = await read('window.__reliquaryLanternDrafts || 0');
   assert.ok(lanternDrafts >= 3, JSON.stringify({ lanternDrafts }));

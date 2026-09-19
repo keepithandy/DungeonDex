@@ -119,6 +119,7 @@ async function loadRuntime(baseline = false) {
     dungeonBossApproachLineForDepth: typeof dungeonBossApproachLineForDepth === 'undefined' ? null : dungeonBossApproachLineForDepth,
     districtArrivalLine,
     districtArrivalMarkup,
+    districtToneClass,
     districtMonsterIdentity: typeof districtMonsterIdentity === 'undefined' ? null : districtMonsterIdentity,
     generateMonster,
     generateGear,
@@ -149,6 +150,12 @@ assert.deepEqual(
   { min: 31, max: 40, name: 'The Drowned Reliquary', tone: 'drowned-reliquary' },
   'the vertical slice should occupy the boss-free D31-D40 registry gap'
 );
+const cinderbone = districts.find(district => district.id === 'cinderbone');
+assert.deepEqual(
+  { min: cinderbone?.min, max: cinderbone?.max, name: cinderbone?.name, tone: cinderbone?.tone },
+  { min: 41, max: 50, name: 'Cinderbone Halls', tone: 'cinderbone' },
+  'Cinderbone should occupy the complete D41-D50 chapter band'
+);
 
 for (let index = 1; index < districts.length; index += 1) {
   assert.equal(districts[index].min, districts[index - 1].max + 1, `${districts[index].name} should begin immediately after ${districts[index - 1].name}`);
@@ -157,6 +164,8 @@ assert.equal(runtime.api.districtByDepth(30).id, 'ember-debtworks', 'D30 should 
 assert.equal(runtime.api.districtByDepth(31).id, 'drowned-reliquary', 'D31 should enter the Drowned Reliquary');
 assert.equal(runtime.api.districtByDepth(40).id, 'drowned-reliquary', 'D40 should remain in the Drowned Reliquary');
 assert.equal(runtime.api.districtByDepth(41).id, 'cinderbone', 'D41 should remain Cinderbone Halls');
+assert.equal(runtime.api.districtByDepth(50).id, 'cinderbone', 'D50 should remain Cinderbone Halls');
+assert.equal(runtime.api.districtByDepth(51).id, 'blacktithe', 'D51 should begin Blacktithe Deep');
 assert.equal(runtime.api.dungeonBossApproachLineForDepth(45), 'Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect.', 'D45 should conclude the Reliquary story through the existing boss path');
 assert.equal(runtime.api.dungeonBossApproachLineForDepth(40), 'Boss approach: no named toll answers from this sealed band.', 'D40 should not gain a new boss conclusion');
 
@@ -167,6 +176,13 @@ assert.match(identity.subtitle, /drowned|bell|water|relic/i, 'district subtitle 
 assert.match(runtime.api.districtArrivalLine(reliquary), /drowned|bell|water|relic/i, 'arrival copy should introduce the Reliquary');
 assert.match(runtime.api.districtArrivalMarkup(31, reliquary), /Entering[\s\S]*The Drowned Reliquary/, 'D31 should render the district arrival card');
 assert.equal(runtime.api.districtArrivalMarkup(32, reliquary), '', 'the arrival card should remain entry-only');
+assert.equal(runtime.api.dungeonDistrictIdentityForDepth(41).name, 'Cinderbone Halls', 'D41 should expose the Cinderbone chapter identity');
+assert.equal(runtime.api.dungeonDistrictIdentityForDepth(41).safeFallback, false, 'valid Cinderbone depth should not report fallback identity');
+assert.match(runtime.api.dungeonDistrictIdentityForDepth(41).subtitle, /stone|champion|dust/i, 'Cinderbone should carry authored subtitle copy');
+assert.match(runtime.api.districtArrivalLine(cinderbone), /furnace|champion|dust/i, 'Cinderbone arrival copy should introduce the chapter');
+assert.match(runtime.api.districtArrivalMarkup(41, cinderbone), /Entering[\s\S]*Cinderbone Halls/, 'D41 should render the Cinderbone arrival card');
+assert.equal(runtime.api.districtArrivalMarkup(42, cinderbone), '', 'the Cinderbone arrival card should remain entry-only');
+assert.equal(runtime.api.districtToneClass(cinderbone), 'district-tone-cinderbone', 'Cinderbone should resolve to its visual tone class');
 
 assert.equal(Object.keys(runtime.api.BOSS_FLOOR_NAMES).length, 20, 'the named boss catalog should remain unchanged');
 for (let depth = 31; depth <= 40; depth += 1) {
@@ -240,9 +256,10 @@ const [runUiSource, backdropSource, stylesSource] = await Promise.all([
   readFile(path.join(ROOT, 'js/systems/29_monster_backdrops_canvas.js'), 'utf8'),
   readFile(path.join(ROOT, 'styles.css'), 'utf8')
 ]);
-assert.match(runUiSource, /const runDistrict = depth >= 31 && depth <= 40\s*\? currentStagingDistrict\(S\) : getLoreFloorDistrict\(loreDepth.floorNumber\);/, 'raw-depth render correction is limited to the Reliquary band');
+assert.match(runUiSource, /const runDistrict = currentStagingDistrict\(S\);/, 'active-run rendering should use raw-depth district identity for every chapter');
 assert.match(backdropSource, /drowned-reliquary/, 'canvas routing should register the Reliquary theme');
 assert.match(stylesSource, /\.district-tone-drowned-reliquary/, 'Town/combat district tokens should include the Reliquary tone');
+assert.match(stylesSource, /\.district-tone-cinderbone/, 'Town/combat district tokens should include the Cinderbone tone');
 assert.match(stylesSource, /\.combat-monster-stage\.combat-backdrop--drowned-reliquary/, 'the combat stage should include a Reliquary backdrop treatment');
 
 const baseline = await loadRuntime(true);

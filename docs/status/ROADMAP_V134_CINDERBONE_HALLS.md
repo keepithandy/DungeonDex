@@ -21,7 +21,7 @@
 ## Phase Tracker
 
 - [x] Phase 1 — Baseline and contract audit
-- [ ] Phase 2 — Cinderbone chapter foundation
+- [x] Phase 2 — Cinderbone chapter foundation
 - [ ] Phase 3 — Cinderbone encounter roster
 - [ ] Phase 4 — Cinderbone incidents
 - [ ] Phase 5 — D45 boss and Elite Contract integration
@@ -133,6 +133,68 @@ Read the repository operating contract and the Phase 1 handoff. Turn the existin
 
 Add focused source and browser smoke coverage for district selection, chapter arrival, active-run identity, save/reload, boundaries, and fallback behavior. Update the roadmap checklist and handoff evidence, report behavior changed and intentionally unchanged, and commit the completed Phase 2 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 2 Handoff — Cinderbone Chapter Foundation
+
+### Completion
+
+- Status: complete; chapter foundation only.
+- Branch: `main`.
+- Completion commit: the commit containing this handoff.
+- Baseline preserved: `v1.33.2 Crimson Oath`, build `1.33.2-crimson-oath`.
+- Version, package, cache, tag, push, upload, and publication work were not performed.
+
+### Files changed
+
+- `js/systems/11_ui_run_gear_dex_archive.js`
+  - Active-run district presentation now derives from `currentStagingDistrict(S)` for every raw depth, not only D31-D40.
+  - Run status exposes a stable `data-district-key` and authored district flavor copy.
+- `js/systems/08_normalization_save.js`
+  - Active saved runs now repair `run.zone` from authoritative raw floor depth, preventing stale chapter labels after reload.
+- `styles.css`
+  - Added Cinderbone run-header border/background treatment and a readable authored flavor cue while retaining the existing tone variables and combat backdrop.
+- `tests/smoke/smoke_drowned_reliquary_vertical_slice_v1281.mjs`
+  - Added Cinderbone registry, D41/D50/D51 boundary, identity, arrival, tone, and source-contract assertions.
+- `tests/smoke/reliquary_browser_checks.mjs`
+  - Added active-save zone repair and D41 Cinderbone render/reload assertions.
+- `docs/status/ROADMAP_V134_CINDERBONE_HALLS.md`
+  - Marked Phase 2 complete and recorded this handoff.
+
+### Player-visible behavior changed
+
+- Active runs at D41-D50 now consistently show Cinderbone Halls in the run header, event shell, combat tone, and district data attributes.
+- The run header includes the authored Cinderbone flavor: “Cinderbone keeps old victories warm in the ash.”
+- Reloading an active Cinderbone run repairs a stale saved zone label back to `Cinderbone Halls`.
+- Cinderbone run headers receive furnace/bone visual framing with a non-color text cue.
+
+### Behavior intentionally unchanged
+
+- No new encounter identities, incidents, gear identity, boss behavior, Elite Contract behavior, Chronicle state, Debt behavior, currencies, progression, Revisit lane, or dungeon-entry route.
+- Combat formulas, scaling, rewards, drop rates, rarity, economy, equipment mechanics, save histories, RNG consumption, D40/D45 cadence, and D51 boundary remain unchanged.
+- D45’s existing Gravetoll Bell presentation seam remains assigned to Phase 5.
+
+### Save compatibility impact
+
+- Additive schema: none.
+- Existing active saves remain loadable. Their active `run.zone` is repaired from the already-persisted raw floor; inactive historical zone text is preserved.
+- Missing or invalid district identity continues to fall back through the existing Lowfire-safe registry path.
+
+### Checks run
+
+- `node --check` passed for the changed runtime and smoke files.
+- Cinderbone/Reliquary vertical slice passed with 1,900 seeded comparisons, including numeric values, Elite modifiers, RNG consumption, bosses, and outside-band visuals.
+- Filtered compact smoke suite passed: 45/45, including repository syntax, Reliquary controls, app wiring/cache, mobile geometry, accessibility, contrast, and Enter Dungeon runtime.
+- Browser smoke was attempted through `smoke_public_runtime_console_v1265.mjs` but could not start because the local Chromium `/json/version` endpoint timed out. No browser assertions ran.
+
+### Remaining risks
+
+- Cinderbone still uses generic encounter, event, and gear presentation until Phases 3, 4, and 6.
+- D45 naming remains split between existing boss/trophy/run authorities until Phase 5.
+- The browser-specific D41 reload assertion is present but awaits a successful local Chromium session.
+
+### Exact next phase
+
+Proceed with the Phase 3 prompt below. Add four bounded Cinderbone encounter identities, generalize active-monster normalization by district, and add seeded mechanics/RNG, save/reload, fallback, browser, mobile-readability, and D30/D31-D50/D51 control coverage. Keep all combat, scaling, rewards, drop logic, and encounter RNG behavior unchanged.
 
 ## Phase 3 Prompt — Cinderbone Encounter Roster
 

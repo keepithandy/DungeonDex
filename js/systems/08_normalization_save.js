@@ -936,7 +936,12 @@
       : Math.floor(numberOr(state.run.floor, 0, 0, 999999));
     state.run.chain = Math.floor(numberOr(state.run.chain, 0, 0, 99999));
     state.run.danger = dangerRatingForDepth(Math.max(1, state.run.floor || 1));
-    state.run.zone = String(state.run.zone || zoneName(Math.max(1, state.run.floor || 1)));
+    const normalizedRunDepth = Math.max(1, state.run.floor || 1);
+    // District presentation is derived from the active raw depth. Repair stale
+    // chapter labels from older saves while leaving inactive history untouched.
+    state.run.zone = state.run.active
+      ? zoneName(normalizedRunDepth)
+      : String(state.run.zone || zoneName(normalizedRunDepth));
     state.run.roomsCleared = Math.floor(numberOr(state.run.roomsCleared, 0, 0, 99999));
     state.run.encounters = Math.floor(numberOr(state.run.encounters, 0, 0, 99999));
     state.run.goldBonusPct = Math.floor(numberOr(state.run.goldBonusPct, 0, 0, 50));

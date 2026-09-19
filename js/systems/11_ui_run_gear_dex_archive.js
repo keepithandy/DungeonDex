@@ -253,8 +253,10 @@
     if (!S.ui) S.ui = { combatLogExpanded:false };
     const depth = S.run.floor || 1;
     const loreDepth = getLoreDepthProgress(depth);
-    const runDistrict = depth >= 31 && depth <= 40
-      ? currentStagingDistrict(S) : getLoreFloorDistrict(loreDepth.floorNumber);
+    // Active runs are keyed by raw Stair depth. Keep the presentation district
+    // on that same source of truth across every chapter, including Cinderbone
+    // D41-D50. Lore-floor math still owns the floor/room/chapter labels below.
+    const runDistrict = currentStagingDistrict(S);
     const districtDisplay = currentDistrictDisplay(S);
     const floorName = getLoreFloorName(loreDepth.floorNumber);
     const isBossFight = monster && monster.tier === 'Boss';
@@ -302,11 +304,12 @@
 
     runStatus.innerHTML = `
       <div class="combat-device-top ${shellTone}">
-        <div class="run-flow-summary ${(depth >= 31 && depth <= 40 ? isBossFight : loreDepth.isBossChapter) ? 'is-boss-floor' : ''}" aria-label="Run status">
+        <div class="run-flow-summary ${(depth >= 31 && depth <= 40 ? isBossFight : loreDepth.isBossChapter) ? 'is-boss-floor' : ''}" data-district-key="${escapeHtml(runDistrict?.id || 'lowfire')}" aria-label="Run status">
           <div class="run-flow-primary">
             <span>Current</span>
             <strong>${escapeHtml(currentFloorText)}</strong>
             <small>${escapeHtml(districtDisplay.subtitle || floorName)}</small>
+            <small class="run-district-flavor">${escapeHtml(districtDisplay.shortFlavor || '')}</small>
             <small>${escapeHtml(currentProgressRoomText)}</small>
             <small>${escapeHtml(currentProgressChapterText)}</small>
           </div>
