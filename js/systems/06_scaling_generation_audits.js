@@ -484,7 +484,7 @@
     let guard = Math.round(power * 0.32 * ladder.guardMult);
     let speed = Math.round(power * 0.19 * ladder.speedMult);
     let rewardMult = (threatDepth <= 3 ? (boss ? 1.55 : elite ? 1.28 : 1.12) : boss ? 1.5 : elite ? 1.18 : 1) * ladder.rewardMult;
-    let name = encounterIdentity.name;
+    let name = boss && rawDepth === 45 ? 'Gravetoll Bell' : encounterIdentity.name;
     let reviveUsed = false;
     const eliteReward = elite ? eliteRewardProfile(modifiers, rawDepth) : null;
     // Boss power corrections are combat-only. Keep their established reward basis intact.
@@ -518,7 +518,9 @@
       rewardGold,
       rewardXp: Math.max(6, Math.round(rewardXpPower * 1.05 * rewardMult)),
       rewardShard: boss ? rand(22, 34) : elite ? rand(7, 12) + (eliteReward?.shardBonus || 0) : rand(1, 4),
-      lore: boss ? 'A named ruin-lord waits deeper than prayer.' : encounterIdentity.lore || `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
+      lore: boss && rawDepth === 45
+        ? 'A cracked bell-ruler tolls through the Cinderbone Halls, calling old champions to account.'
+        : boss ? 'A named ruin-lord waits deeper than prayer.' : encounterIdentity.lore || `A ${tier.toLowerCase()} threat shaped by the ruin-depths.`
     };
     return contractTarget && typeof applyEliteContractTargetMonster === 'function'
       ? applyEliteContractTargetMonster(state, monster, contractTarget)

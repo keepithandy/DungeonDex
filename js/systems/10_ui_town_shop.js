@@ -225,7 +225,8 @@ function eliteContractBoardMarkup(state) {
 	const active = contracts.active;
 	const contractCard = (contract, model, options = {}) => {
 		const risk = eliteContractRisk(contract);
-		const locationBriefing = model.locationBriefing || eliteContractTargetBriefing(model.targetFloor);
+		const locationBriefing = model.locationBriefing || eliteContractTargetBriefing(model.targetFloor, contract.id);
+		const locationLabel = eliteContractTargetDistrictLabel(model.targetFloor) || 'Location';
 		const ready = !!options.ready;
 		const activeCard = !!options.active;
 		const reward = options.reward ?? calculateContractReward(contract, state);
@@ -240,7 +241,7 @@ function eliteContractBoardMarkup(state) {
           <div class="elite-contract-detail-grid small">
             <span><b>Target</b>${escapeHtml(model.eliteName || contract.eliteName || contract.name || '')}</span>
             <span><b>Where</b>${escapeHtml(model.targetLocation || `Floor ${model.targetFloor || '?'}`)}</span>
-            ${locationBriefing ? `<span><b>Reliquary</b>${escapeHtml(locationBriefing)}</span>` : ''}
+            ${locationBriefing ? `<span><b>${escapeHtml(locationLabel)}</b>${escapeHtml(locationBriefing)}</span>` : ''}
             <span><b>Objective</b>${escapeHtml(model.contractText || contract.contractText || `Defeat ${contract.eliteName} when it appears.`)}</span>
             <span><b>Bonus Writ</b>${escapeHtml(model.bonusWrit || contract.bonusWrit || 'None')}</span>
           </div>

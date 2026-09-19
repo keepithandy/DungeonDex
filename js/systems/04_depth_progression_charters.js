@@ -216,9 +216,15 @@
   function dungeonBossApproachLineForDepth(depth) {
     const rawDepth = progressDepthValue(depth, 1);
     if (rawDepth === 45) {
-      return 'Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect.';
+      return 'Beyond the flooded doors, the Gravetoll Bell tolls into Cinderbone Halls, where old champions burn into the walls.';
     }
     return dungeonDistrictIdentityForDepth(rawDepth).bossApproachLine;
+  }
+
+  function dungeonBossAftermathLineForDepth(depth) {
+    return progressDepthValue(depth, 1) === 45
+      ? 'The Gravetoll Bell falls silent. Cinderbone keeps the old champion dust, but the path beyond is open.'
+      : '';
   }
 
   function dungeonDistrictSummary(depth){
@@ -360,6 +366,7 @@
   }
 
   function bossFloorNameByDepth(depth) {
+    if (depthStageValue(depth) === 45) return 'Gravetoll Bell';
     const threatDepth = bossThreatDepthFromDepth(depth);
     return BOSS_FLOOR_NAMES[threatDepth] || (threatDepth > 0 && threatDepth % BOSS_INTERVAL === 0 ? `Boss Floor ${threatDepth}` : '');
   }

@@ -1200,6 +1200,10 @@
     pushLog(state, `${victoryLead}: ${m.name} at ${runDepthLabel(state)}.`);
     if (source === 'boss') {
       recordBossTrophyUnlock(state, state.run.floor, m.name);
+      const aftermath = typeof dungeonBossAftermathLineForDepth === 'function'
+        ? dungeonBossAftermathLineForDepth(state.run.floor)
+        : '';
+      if (aftermath) pushCombat(state, aftermath);
       const discovery = window.DungeonDexSpellMastery?.discoverRareInscription?.(state, 'boss');
       if (discovery?.unlocked) pushCombat(state, `Boss folio found: ${discovery.inscription.name} is available at the Scriptorium.`);
     }

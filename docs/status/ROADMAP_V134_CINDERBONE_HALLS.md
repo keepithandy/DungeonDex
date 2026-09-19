@@ -24,7 +24,7 @@
 - [x] Phase 2 — Cinderbone chapter foundation
 - [x] Phase 3 — Cinderbone encounter roster
 - [x] Phase 4 — Cinderbone incidents
-- [ ] Phase 5 — D45 boss and Elite Contract integration
+- [x] Phase 5 — D45 boss and Elite Contract integration
 - [ ] Phase 6 — Cinderbone gear identity
 - [ ] Phase 7 — Chapter Chronicle and Debt Collector clarity
 - [ ] Phase 8 — Large UI and accessibility polish
@@ -369,6 +369,26 @@ Read the repository operating contract and completed Phase 1-4 handoffs. Connect
 
 Do not create a boss, contract type, payout path, farming loop, alternate claim path, or dungeon-entry route. Add focused boss, trophy, contract, target-indicator, claim, save/reload, malformed-state, Journal-history, and protected-system coverage. Update the roadmap checklist and handoff evidence, and commit the completed Phase 5 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 5 Handoff — D45 Boss and Elite Contract Integration
+
+- Status: complete; focused commit `feat: integrate Cinderbone boss contracts`.
+- Baseline: `d5f0b9c` (`feat: add Cinderbone incidents`); `VERSION.md` remains `v1.33.2`.
+- Runtime changes:
+  - Reconciled raw D45 boss presentation as `Gravetoll Bell` while preserving the existing boss slot, trophy identity, cadence, scaling, combat, and rewards.
+  - Added Cinderbone-aware D45 approach and victory-aftermath copy through existing progression and combat paths.
+  - Preserved `Gravetoll Bell` through active-monster normalization and reload.
+  - Added three bounded Cinderbone Elite Contract briefings and the existing `Cinderbone Halls` target indicator for the established exact-target board lifecycle.
+  - Persisted and repaired the briefing through existing active-contract normalization without adding a contract type, payout route, currency, or history field.
+- Files changed: `js/systems/03_town_contracts_market.js`, `js/systems/04_depth_progression_charters.js`, `js/systems/06_scaling_generation_audits.js`, `js/systems/07_player_combat_runtime.js`, `js/systems/08_normalization_save.js`, `js/systems/10_ui_town_shop.js`, the three focused smoke files, `tests/smoke/reliquary_browser_checks.mjs`, and this roadmap.
+- Coverage evidence:
+  - Elite Contract lifecycle smoke passed the three authored briefings, target label, active-board model, exact-target lifecycle, claim, duplicate safety, failure/expiry, and existing controls.
+  - Boss Trophy smoke passed.
+  - Boss scaling matrix passed 20 named bosses, 60 legal progression fixtures, 36,000 real combat fights, and 18/18 post-Boss-2 readiness fixtures.
+  - Drowned Reliquary vertical slice passed 1,900 seeded comparisons against `d5f0b9c`, including protected numeric values, Elite modifiers, RNG consumption, bosses, and outside-band visuals.
+  - Browser assertions were syntax-checked, but browser execution remains unavailable because the local Chromium endpoint has not been reachable in this environment.
+- Protected behavior intentionally unchanged: boss mechanics, cadence, scaling, combat math, rewards, trophy/reward history, Elite Contract risk/payout/claim/failure/expiry rules, Journal history, save schema, entry, Revisit, Debt, Talent, gear, and non-Cinderbone controls.
+- Next phase: Phase 6 — Cinderbone gear identity.
 
 ## Phase 6 Prompt — Cinderbone Gear Identity
 

@@ -236,8 +236,8 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
   await read(`S = window.__reliquaryActiveState; delete window.__reliquaryActiveState; render(); true`);
   assert.equal(d45Conclusion.label, 'Gravetoll Bell', JSON.stringify(d45Conclusion));
   assert.ok(d45Conclusion.visible, JSON.stringify(d45Conclusion));
-  assert.match(d45Conclusion.detailMarkup, /Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect\./, JSON.stringify(d45Conclusion));
-  record('The existing D45 boss presentation concludes the Reliquary story without a new boss slot', true);
+  assert.match(d45Conclusion.detailMarkup, /Beyond the flooded doors, the Gravetoll Bell tolls into Cinderbone Halls/, JSON.stringify(d45Conclusion));
+  record('The existing D45 boss presentation crosses from the Reliquary into Cinderbone without a new boss slot', true);
   const haul = await read(`({ gold:S.run.pendingRewards.gold, loot:S.run.pendingRewards.loot.map(i=>i.id), banked:S.player.gold })`);
   assert.ok(haul.gold > 0 && haul.loot.length > 0, JSON.stringify(haul));
   await pause();

@@ -145,9 +145,10 @@
     const districtIdentity = Array.isArray(districtRoster)
       ? districtRoster.find(entry => entry.name === monster.name && entry.family === family && entry.type === type)
       : null;
+    const knownBossIdentity = tier === 'Boss' && level === 45 ? 'Gravetoll Bell' : '';
     const name = monster.contractTarget
       ? String(monster.contractEliteName || monster.name || 'Recovered Elite Hunt')
-      : districtIdentity?.name || `${family} ${type}`.trim();
+      : knownBossIdentity || districtIdentity?.name || `${family} ${type}`.trim();
     return {
       id: monster.id || makeId('monster'),
       name: name || 'Recovered Hollow Threat',

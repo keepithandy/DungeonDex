@@ -118,6 +118,8 @@ async function loadRuntime(baseline = false) {
     districtByDepth,
     dungeonDistrictIdentityForDepth,
     dungeonBossApproachLineForDepth: typeof dungeonBossApproachLineForDepth === 'undefined' ? null : dungeonBossApproachLineForDepth,
+    dungeonBossAftermathLineForDepth: typeof dungeonBossAftermathLineForDepth === 'undefined' ? null : dungeonBossAftermathLineForDepth,
+    bossFloorNameByDepth: typeof bossFloorNameByDepth === 'undefined' ? null : bossFloorNameByDepth,
     districtArrivalLine,
     districtArrivalMarkup,
     districtToneClass,
@@ -167,7 +169,9 @@ assert.equal(runtime.api.districtByDepth(40).id, 'drowned-reliquary', 'D40 shoul
 assert.equal(runtime.api.districtByDepth(41).id, 'cinderbone', 'D41 should remain Cinderbone Halls');
 assert.equal(runtime.api.districtByDepth(50).id, 'cinderbone', 'D50 should remain Cinderbone Halls');
 assert.equal(runtime.api.districtByDepth(51).id, 'blacktithe', 'D51 should begin Blacktithe Deep');
-assert.equal(runtime.api.dungeonBossApproachLineForDepth(45), 'Beyond the flooded doors, the Gravetoll Bell calls in what the drowned could not collect.', 'D45 should conclude the Reliquary story through the existing boss path');
+assert.equal(runtime.api.dungeonBossApproachLineForDepth(45), 'Beyond the flooded doors, the Gravetoll Bell tolls into Cinderbone Halls, where old champions burn into the walls.', 'D45 should carry the chapter-aware Gravetoll Bell approach');
+assert.equal(runtime.api.dungeonBossAftermathLineForDepth(45), 'The Gravetoll Bell falls silent. Cinderbone keeps the old champion dust, but the path beyond is open.', 'D45 should carry chapter-aware aftermath copy');
+assert.equal(runtime.api.bossFloorNameByDepth(45), 'Gravetoll Bell', 'raw D45 should use the existing trophy identity as its presentation name');
 assert.equal(runtime.api.dungeonBossApproachLineForDepth(40), 'Boss approach: no named toll answers from this sealed band.', 'D40 should not gain a new boss conclusion');
 
 const identity = plain(runtime.api.dungeonDistrictIdentityForDepth(31));
@@ -320,9 +324,13 @@ for (const depth of [1, 15, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
     const oldReloaded = plain(baseline.api.normalizeMonster(control, depth));
     assert.deepEqual(mechanics(reloaded), mechanics(oldReloaded), `save normalization mechanics at D${depth}, seed ${seed}`);
     if (depth >= 31 && depth <= 40) assert.equal(reloaded.name, actual.name, 'known Reliquary identity survives normalization');
-    if (depth >= 41 && depth <= 50) {
+    if (depth >= 41 && depth <= 50 && depth !== 45) {
       assert.ok(CINDERBONE_NAMES.includes(actual.name), `known Cinderbone identity generated at D${depth}`);
       assert.equal(reloaded.name, actual.name, 'known Cinderbone identity survives normalization');
+    }
+    if (depth === 45) {
+      assert.equal(actual.name, 'Gravetoll Bell', 'D45 should retain the existing boss identity');
+      assert.equal(reloaded.name, 'Gravetoll Bell', 'D45 boss identity should survive normalization');
     }
     assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `RNG consumption at D${depth}, seed ${seed}`);
     if (depth < 31 || depth > 50) {

@@ -109,6 +109,7 @@ function createRuntime() {
     eliteContractTargetScaling,
     eliteContractRawDepthForThreatFloor,
     eliteContractTargetBriefing,
+    eliteContractTargetDistrictLabel,
     eliteBoardContractModel
   };`, sandbox);
   return { api: sandbox.__eliteLifecycleApi, store };
@@ -122,9 +123,18 @@ assert.equal(api.eliteContractRawDepthForThreatFloor(11), 31, 'Reliquary briefin
 assert.equal(api.eliteContractRawDepthForThreatFloor(14), 40, 'Reliquary briefing ends at the existing D40 target mapping');
 assert.equal(api.eliteContractTargetBriefing(11), "The mark waits among the sealed bells. Follow the writ's listed location.");
 assert.equal(api.eliteContractTargetBriefing(14), "The mark waits among the sealed bells. Follow the writ's listed location.");
-assert.equal(api.eliteContractTargetBriefing(15), '', 'the briefing must not leak beyond D40');
+assert.equal(api.eliteContractTargetBriefing(18), '', 'the briefing must not leak beyond Cinderbone');
+assert.equal(api.eliteContractTargetDistrictLabel(15), 'Cinderbone Halls', 'threat floor 15 should label the Cinderbone target band');
+assert.equal(api.eliteContractTargetBriefing(15, 'lowfire_bounty'), "The mark is ash-crowned in the furnace halls. Follow the writ's listed location.");
+assert.equal(api.eliteContractTargetBriefing(15, 'hazard_contract'), 'The mark stalks the champion galleries. Keep the Cinderbone heat behind you.');
+assert.equal(api.eliteContractTargetBriefing(15, 'cinderjaw_bailiff'), 'The mark stamps names into bone ash. Break the writ before it reaches the next hall.');
+assert.equal(api.eliteContractTargetBriefing(18, 'lowfire_bounty'), '', 'the Cinderbone briefing must not leak into Blacktithe');
+for (const id of ['lowfire_bounty', 'hazard_contract', 'cinderjaw_bailiff']) {
+  const cinderboneOffer = api.eliteBoardContractModel(api.eliteContractDef(id), null, false, { targetFloor:15 });
+  assert.equal(cinderboneOffer.locationBriefing, api.eliteContractTargetBriefing(15, id), `${id} should carry its Cinderbone briefing`);
+}
 const inBandOffer = api.eliteBoardContractModel(api.eliteContractDef('lowfire_bounty'), null, false, { targetFloor: 11 });
-const outsideOffer = api.eliteBoardContractModel(api.eliteContractDef('lowfire_bounty'), null, false, { targetFloor: 15 });
+const outsideOffer = api.eliteBoardContractModel(api.eliteContractDef('lowfire_bounty'), null, false, { targetFloor: 18 });
 assert.equal(inBandOffer.locationBriefing, api.eliteContractTargetBriefing(11));
 assert.equal(outsideOffer.locationBriefing, '');
 

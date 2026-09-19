@@ -164,9 +164,25 @@
 
   function eliteContractTargetBriefing(targetFloor) {
     const rawDepth = eliteContractRawDepthForThreatFloor(targetFloor);
-    return rawDepth >= 31 && rawDepth <= 40
-      ? 'The mark waits among the sealed bells. Follow the writ\'s listed location.'
-      : '';
+    const contractId = arguments.length > 1 ? String(arguments[1] || '') : '';
+    if (rawDepth >= 31 && rawDepth <= 40) return 'The mark waits among the sealed bells. Follow the writ\'s listed location.';
+    if (rawDepth >= 41 && rawDepth <= 50) {
+      const briefings = {
+        lowfire_bounty: 'The mark is ash-crowned in the furnace halls. Follow the writ\'s listed location.',
+        hazard_contract: 'The mark stalks the champion galleries. Keep the Cinderbone heat behind you.',
+        cinderjaw_bailiff: 'The mark stamps names into bone ash. Break the writ before it reaches the next hall.'
+      };
+      return briefings[contractId] || 'The mark waits among the furnace bones. Follow the writ\'s listed location.';
+    }
+    return '';
+  }
+
+  function eliteContractTargetDistrictLabel(targetFloor) {
+    const rawDepth = eliteContractRawDepthForThreatFloor(targetFloor);
+    const district = typeof districtByDepth === 'function' ? districtByDepth(rawDepth) : null;
+    if (district?.id === 'drowned-reliquary') return 'Reliquary';
+    if (district?.id === 'cinderbone') return 'Cinderbone Halls';
+    return '';
   }
 
   function eliteContractTargetFloor(state) {
@@ -195,7 +211,7 @@
       district,
       targetFloor,
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
-      locationBriefing: eliteContractTargetBriefing(targetFloor),
+      locationBriefing: eliteContractTargetBriefing(targetFloor, contract.id),
       killedPlayerAtLocation: seed?.killedPlayerAtLocation || contract.killedPlayerAtLocation || '',
       rivalDefeats: Math.max(1, Math.floor(numberOr(seed?.rivalDefeats || seed?.defeats || contract.rivalDefeats, 1, 1, 9999))),
       threat: Math.max(1, Math.min(3, Math.floor(numberOr(seed?.threat ?? contract.threat, 1, 1, 3)))),
@@ -496,6 +512,7 @@
             contractText: savedActive.contractText || def.contractText || `Defeat ${savedActive.eliteName || def.eliteName || def.name} when it appears.`,
             bonusWrit: savedActive.bonusWrit || def.bonusWrit || 'Defeat it before resting.',
             bonusWritType: savedActive.bonusWritType || def.bonusWritType || 'rest',
+            locationBriefing: savedActive.locationBriefing || eliteContractTargetBriefing(savedActive.targetFloor, def.id),
             bonusWritCompleted: !!savedActive.bonusWritCompleted,
             bonusWritMissed: !!savedActive.bonusWritMissed,
             bonusWritFailed: !!savedActive.bonusWritFailed || !!savedActive.bonusWritMissed,
@@ -3004,6 +3021,7 @@
       bonusWrit: model.bonusWrit,
       bonusWritType: model.bonusWritType,
       targetLocation: model.targetLocation,
+      locationBriefing: model.locationBriefing,
       rewardPreview: model.rewardPreview,
       flavor: model.flavor,
       accepted: true,
@@ -3062,6 +3080,7 @@
       bonusWrit: contract.bonusWrit || 'Defeat it before resting.',
       bonusWritType: contract.bonusWritType || 'rest',
       targetLocation: eliteContractTargetLocationLabel(targetFloor),
+      locationBriefing: eliteContractTargetBriefing(targetFloor, contract.id),
       killedPlayerAtLocation: rival.killedPlayerAtLocation || '',
       rivalDefeats: Math.max(1, Math.floor(numberOr(rival.defeats, 1, 1, 9999))),
       rewardPreview: '+silver, +rare chance, trophy chance',

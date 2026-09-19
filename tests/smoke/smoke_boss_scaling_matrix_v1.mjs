@@ -33,12 +33,12 @@ const COMPACT = process.env.DUNGEONDEX_SMOKE_COMPACT === '1';
 // These signatures lock every deterministic matrix layer and the fully-upgraded
 // post-Boss-2 readiness audit.
 const EXPECTED_SIGNATURES = Object.freeze({
-  bosses: '6819b3b962b7116e92cef541791d0f0c7c067298d590b4313c6432c96ac2a736',
+  bosses: '12ab3c2e1ef94868e96d09a3119cd5cab1e51f3abd1653ec2efc6c5331197351',
   boundaries: 'e637ec549b225431dc1bec184dcbf941af0c38068de7b28232f5e93638400766',
   rewards: '7e1ffd5d75fed8a069d21861ce1aaec95b4704c3bd4593aeed019c3a7c3c9eaf',
   drops: '1849879d2d98cb7e62ca7f2f99cb247fb24423bad9811f3f3b37d8ab0f1f2e93',
   // D31 five-identity Reliquary roster; seeded numeric comparisons and all other signatures stay fixed.
-  adjacentNormals: '5214d6430eb6fe8e8889f2cfb82a2f1d8595f23459c35e85987f2b58d0812028',
+  adjacentNormals: '9a83f50896c42389dc3da57c3530a1238dc51860a029a4f3176da70086cbffb7',
   // Reliquary gear presentation changes fixture identity only; combat, rewards, drops, and seeded numeric layers remain fixed.
   fixtures: '40fe25f8d8a6d9f65f010921eb45c9f4caef401ddfb9ee0c16b07590974998cd',
   combat: '22dc25babdcbe9ce71ed0a8162b3f02af1e32da0922303d6ec0d0b0f29175d13'
@@ -251,7 +251,8 @@ function buildGenerationMatrix(runtime) {
     const rawDepth = bossNumber * RAW_BOSS_INTERVAL;
     const threatFloor = runtime.api.threatDepthFromDepth(rawDepth);
     const encounterName = runtime.api.bossFloorNameByDepth(rawDepth);
-    assert.equal(encounterName, runtime.api.BOSS_FLOOR_NAMES[threatFloor], `Boss ${bossNumber} should use its named floor`);
+    const expectedEncounterName = rawDepth === 45 ? 'Gravetoll Bell' : runtime.api.BOSS_FLOOR_NAMES[threatFloor];
+    assert.equal(encounterName, expectedEncounterName, `Boss ${bossNumber} should use its named floor`);
     assert.ok(encounterName, `Boss ${bossNumber} at D${rawDepth} should have a named encounter`);
 
     const row = { bossNumber, rawDepth, threatFloor, encounterName, rolls: {} };
