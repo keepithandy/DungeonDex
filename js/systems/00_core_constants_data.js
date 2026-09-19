@@ -384,6 +384,32 @@
         type: 'Warden',
         lore: 'A bell-keeper waits beyond the last prayer-ribbon, still counting the tolls owed to the drowned.'
       })
+    ]),
+    'cinderbone': Object.freeze([
+      Object.freeze({
+        name: 'Ash-Crowned Warden',
+        family: 'Knight',
+        type: 'Warden',
+        lore: 'A champion’s crown has fused to its helm, and the old oath still points its blade down the furnace stair.'
+      }),
+      Object.freeze({
+        name: 'Bonefurnace Herald',
+        family: 'Construct',
+        type: 'Herald',
+        lore: 'Its ribbed iron chest carries the last announcement of a dead arena, voiced through a throat of kiln ash.'
+      }),
+      Object.freeze({
+        name: 'Cinderwake Lurker',
+        family: 'Mireborn',
+        type: 'Lurker',
+        lore: 'A heat-baked scavenger slips between bone pillars, wearing champion dust like a second skin.'
+      }),
+      Object.freeze({
+        name: 'Champion-Dust Colossus',
+        family: 'Wyrm',
+        type: 'Colossus',
+        lore: 'The hall built a spine around something too large to bury. Every furnace breath shakes old medals loose.'
+      })
     ])
   });
 

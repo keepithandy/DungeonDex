@@ -22,7 +22,7 @@
 
 - [x] Phase 1 — Baseline and contract audit
 - [x] Phase 2 — Cinderbone chapter foundation
-- [ ] Phase 3 — Cinderbone encounter roster
+- [x] Phase 3 — Cinderbone encounter roster
 - [ ] Phase 4 — Cinderbone incidents
 - [ ] Phase 5 — D45 boss and Elite Contract integration
 - [ ] Phase 6 — Cinderbone gear identity
@@ -205,6 +205,74 @@ Read the repository operating contract and completed Phase 1-2 handoffs. Add fou
 
 Do not add numeric role definitions, a new affix framework, persistent combat statuses, reward routes, balance changes, or a second encounter-generation framework. Verify that existing district, D45 boss, combat, reward, and generation signatures remain stable. Add focused source, seeded, browser, mobile-readability, and fallback smoke coverage. Update the roadmap checklist and handoff evidence, and commit the completed Phase 3 work with a focused commit. Do not change VERSION.md, build a package, push, tag, upload, or publish.
 ```
+
+## Phase 3 Handoff — Cinderbone Encounter Roster
+
+### Completion
+
+- Status: complete; bounded encounter identity and active-monster save normalization only.
+- Branch: `main`.
+- Baseline: Phase 2 commit `8e388f4`.
+- Completion commit: the commit containing this handoff.
+- Version remains `v1.33.2 Crimson Oath`; no package, cache alignment, tag, push, upload, or publication work was performed.
+
+### Four authored identities
+
+- `Ash-Crowned Warden` — `Knight / Warden`.
+- `Bonefurnace Herald` — `Construct / Herald`.
+- `Cinderwake Lurker` — `Mireborn / Lurker`.
+- `Champion-Dust Colossus` — `Wyrm / Colossus`.
+
+All four entries are identity-only: name, existing family, existing type, and lore. No numeric tuning, role modifiers, affixes, statuses, or reward fields were added.
+
+### Files changed
+
+- `js/systems/00_core_constants_data.js`
+  - Added the four bounded `cinderbone` encounter identities.
+- `js/systems/08_normalization_save.js`
+  - Active-monster normalization now resolves the district roster from saved raw depth instead of hardcoding D31-D40 Reliquary.
+  - Recognized Cinderbone identities retain their names through reload; unrecognized or hostile saved labels fall back to their family/type label.
+- `tests/smoke/smoke_drowned_reliquary_vertical_slice_v1281.mjs`
+  - Added exact roster, reachability, family/type, identity-only, D41-D50 normalization, hostile fallback, and Phase 2 baseline comparisons.
+- `tests/smoke/reliquary_browser_checks.mjs`
+  - Added Cinderbone active-monster reload and 390x844/430x932 mobile readability checks.
+- `docs/status/ROADMAP_V134_CINDERBONE_HALLS.md`
+  - Marked Phase 3 complete and recorded this handoff.
+
+### Behavior changed
+
+- Common and Elite Cinderbone encounters now receive one of the four authored names and lore through the existing generator.
+- Recognized Cinderbone monster identity survives active-run save/reload.
+- Cinderbone header/mobile checks now verify readable identity and no horizontal overflow.
+
+### Behavior intentionally unchanged
+
+- Existing monster families, types, scaling, combat formulas, Elite modifiers, boss cadence, rewards, drop logic, RNG call count, contract targeting, and outside-band behavior.
+- No Cinderbone incidents, gear identity, D45 integration, Chronicle, Debt, new progression, or new save field.
+- D31-D40 Reliquary identities and controls remain unchanged.
+
+### Save compatibility impact
+
+- No additive save schema.
+- Active monster normalization now uses `districtByDepth(savedLevel)` and the existing bounded registry.
+- Old Reliquary saves remain supported; generic and malformed monster identities retain safe family/type fallback.
+
+### Checks run
+
+- Changed runtime and smoke files passed `node --check`.
+- Phase 2 baseline comparison passed: 1,900 seeded comparisons against `8e388f4`, including numeric values, Elite modifiers, RNG consumption, bosses, and outside-band visuals.
+- Filtered compact smoke suite passed: 45/45, including syntax, content, app wiring/cache, mobile geometry, accessibility, contrast, and Enter Dungeon runtime.
+- Browser assertions are present for Cinderbone reload and mobile readability but require a successful local Chromium session; the prior browser runner timed out before `/json/version` became available.
+
+### Remaining risks
+
+- Cinderbone event and gear presentation remain generic until Phases 4 and 6.
+- D45 boss presentation remains assigned to Phase 5.
+- Browser execution is still blocked by the local Chromium endpoint timeout.
+
+### Exact next phase
+
+Proceed with the Phase 4 prompt below. Add three authored Cinderbone incidents through the established event-choice and pending-haul contracts, with save/reload, duplicate/stale-token, malformed-state, old-save, extraction/fall, mobile-card, and non-Cinderbone control coverage.
 
 ## Phase 4 Prompt — Cinderbone Incidents
 

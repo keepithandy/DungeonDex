@@ -135,9 +135,15 @@
     const eliteReward = null;
     const family = String(monster.family || (monster.contractTarget ? 'Elite Hunt' : 'Husk'));
     const type = String(monster.type || (monster.contractTarget ? 'Contract' : 'Stalker'));
-    // Retain a known identity on reload without remapping historical encounters.
-    const districtIdentity = level >= 31 && level <= 40 && typeof DISTRICT_ENCOUNTER_IDENTITIES !== 'undefined'
-      ? DISTRICT_ENCOUNTER_IDENTITIES['drowned-reliquary']?.find(entry => entry.name === monster.name && entry.family === family && entry.type === type)
+    // Retain a known district identity on reload without remapping historical
+    // encounters. The registry is optional so isolated/runtime recovery tools
+    // still degrade to the rolled family/type identity.
+    const district = typeof districtByDepth === 'function' ? districtByDepth(level) : null;
+    const districtRoster = district && typeof DISTRICT_ENCOUNTER_IDENTITIES !== 'undefined'
+      ? DISTRICT_ENCOUNTER_IDENTITIES[district.id]
+      : null;
+    const districtIdentity = Array.isArray(districtRoster)
+      ? districtRoster.find(entry => entry.name === monster.name && entry.family === family && entry.type === type)
       : null;
     const name = monster.contractTarget
       ? String(monster.contractEliteName || monster.name || 'Recovered Elite Hunt')

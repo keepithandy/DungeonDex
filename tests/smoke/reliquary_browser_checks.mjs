@@ -150,6 +150,7 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     const result = { zone:S.run.zone, key:document.querySelector('.run-flow-summary')?.dataset.districtKey || '',
       current:document.querySelector('.run-flow-primary strong')?.textContent || '',
       flavor:document.querySelector('.run-district-flavor')?.textContent || '',
+      monster:S.run.monster?.name || '',
       theme:document.querySelector('.combat-device-shell')?.className || '' };
     S = window.__reliquaryActiveState; delete window.__reliquaryActiveState; render();
     return result;
@@ -158,8 +159,26 @@ export async function verifyReliquaryBrowser({ client, evaluate, waitFor, record
     zone:'Cinderbone Halls', key:'cinderbone', current:'Cinderbone Halls',
     flavor:'Cinderbone keeps old victories warm in the ash.', theme:cinderboneReload.theme
   }, JSON.stringify(cinderboneReload));
+  assert.match(cinderboneReload.monster, /Ash-Crowned Warden|Bonefurnace Herald|Cinderwake Lurker|Champion-Dust Colossus/);
   assert.match(cinderboneReload.theme, /district-tone-cinderbone/);
   record('Cinderbone D41 active-run identity, visual tone and stale-zone save repair survive reload', true);
+  for (const profile of [{width:390,height:844,touch:true},{width:430,height:932,touch:true}]) {
+    await client.send('Emulation.setDeviceMetricsOverride', { width:profile.width, height:profile.height, deviceScaleFactor:1, mobile:profile.touch });
+    await client.send('Emulation.setTouchEmulationEnabled', { enabled:profile.touch, maxTouchPoints:5 });
+    await read('render(); true'); await pause();
+    const geometry = await read(`(() => {
+      const summary = document.querySelector('.run-flow-summary');
+      const flavor = document.querySelector('.run-district-flavor');
+      return { width:innerWidth, overflow:document.documentElement.scrollWidth > innerWidth + 1,
+        key:summary?.dataset.districtKey || '', flavor:flavor?.textContent || '',
+        visible:!!flavor && getComputedStyle(flavor).display !== 'none' && getComputedStyle(flavor).visibility !== 'hidden' };
+    })()`);
+    assert.equal(geometry.overflow, false, JSON.stringify(geometry));
+    assert.equal(geometry.key, 'cinderbone', JSON.stringify(geometry));
+    assert.equal(geometry.visible, true, JSON.stringify(geometry));
+    assert.match(geometry.flavor, /champion dust|old victories/i);
+    record(`Cinderbone ${profile.width}x${profile.height} mobile header remains readable without overflow`, true);
+  }
   await advanceTo(40);
   const lanternDrafts = await read('window.__reliquaryLanternDrafts || 0');
   assert.ok(lanternDrafts >= 3, JSON.stringify({ lanternDrafts }));

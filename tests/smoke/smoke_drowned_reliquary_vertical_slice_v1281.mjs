@@ -21,6 +21,7 @@ const RUNTIME_FILES = [
   'js/systems/29_monster_backdrops_canvas.js'
 ];
 const RELIQUARY_NAMES = Object.freeze(['Bell-Drowned Warden', 'Siltbound Reliquary Lurker', 'Reliquary Chain Herald', 'Blackwater Bell Seer', 'Seventh-Toll Bell-Keeper']);
+const CINDERBONE_NAMES = Object.freeze(['Ash-Crowned Warden', 'Bonefurnace Herald', 'Cinderwake Lurker', 'Champion-Dust Colossus']);
 const BASELINE_COMMIT = process.env.DD_RELIQUARY_BASELINE || 'HEAD';
 
 function plain(value) {
@@ -199,6 +200,16 @@ for (const entry of roster) {
   assert.ok(!Object.values(entry).some(value => typeof value === 'number'), `${entry.name} should add no numeric combat or reward modifier`);
 }
 
+const cinderboneRoster = plain(runtime.api.DISTRICT_ENCOUNTER_IDENTITIES.cinderbone);
+assert.equal(cinderboneRoster.length, CINDERBONE_NAMES.length, 'Cinderbone should have exactly four bounded encounter identities');
+assert.deepEqual(cinderboneRoster.map(entry => entry.name).sort(), CINDERBONE_NAMES.slice().sort(), 'Cinderbone encounter names should remain stable');
+for (const entry of cinderboneRoster) {
+  assert.ok(runtime.api.MONSTER_FAMILIES.includes(entry.family), `${entry.name} should reuse an existing family`);
+  assert.ok(runtime.api.MONSTER_TYPES.includes(entry.type), `${entry.name} should reuse an existing role`);
+  assert.deepEqual(Object.keys(entry).sort(), ['family', 'lore', 'name', 'type'], `${entry.name} should remain identity-only data`);
+  assert.ok(!Object.values(entry).some(value => typeof value === 'number'), `${entry.name} should add no numeric combat or reward modifier`);
+}
+
 const reachedIdentities = new Set();
 for (const family of runtime.api.MONSTER_FAMILIES) {
   for (const type of runtime.api.MONSTER_TYPES) {
@@ -207,6 +218,14 @@ for (const family of runtime.api.MONSTER_FAMILIES) {
 }
 assert.deepEqual([...reachedIdentities].sort(), RELIQUARY_NAMES.slice().sort(), 'all four identities are reachable through existing rolls');
 
+const reachedCinderboneIdentities = new Set();
+for (const family of runtime.api.MONSTER_FAMILIES) {
+  for (const type of runtime.api.MONSTER_TYPES) {
+    reachedCinderboneIdentities.add(runtime.api.districtMonsterIdentity(41, family, type).name);
+  }
+}
+assert.deepEqual([...reachedCinderboneIdentities].sort(), CINDERBONE_NAMES.slice().sort(), 'all four Cinderbone identities are reachable through existing rolls');
+
 const outsideIdentity = plain(runtime.api.districtMonsterIdentity(30, 'Ghoul', 'Maw'));
 assert.deepEqual(outsideIdentity, { name: 'Ghoul Maw', family: 'Ghoul', type: 'Maw', lore: '' }, 'existing districts should keep the rolled monster identity');
 const firstIdentity = plain(runtime.api.districtMonsterIdentity(31, 'Ghoul', 'Maw'));
@@ -214,6 +233,10 @@ const secondIdentity = plain(runtime.api.districtMonsterIdentity(31, 'Ghoul', 'S
 assert.ok(RELIQUARY_NAMES.includes(firstIdentity.name), 'the first mapping should use the Reliquary roster');
 assert.ok(RELIQUARY_NAMES.includes(secondIdentity.name), 'the second mapping should use the Reliquary roster');
 assert.notEqual(firstIdentity.name, secondIdentity.name, 'the two deterministic mappings should expose both encounter identities');
+const hostileCinderboneIdentity = plain(runtime.api.districtMonsterIdentity(41, 'Bogus Family', 'Bogus Type'));
+assert.ok(CINDERBONE_NAMES.includes(hostileCinderboneIdentity.name), 'hostile rolled labels should remain inside the bounded Cinderbone roster');
+const missingCinderboneIdentity = plain(runtime.api.normalizeMonster({ name:'Untrusted Threat', family:'Bogus Family', type:'Bogus Type', tier:'Common', level:41 }, 41));
+assert.equal(missingCinderboneIdentity.name, 'Bogus Family Bogus Type', 'unrecognized Cinderbone save identities should safely fall back to rolled labels');
 
 runtime.setRandom(() => 0.99);
 const preReliquaryMonster = plain(runtime.api.generateMonster(29, null));
@@ -231,6 +254,15 @@ runtime.setRandom(sequenceRandom([0, 0.10], 0.99));
 const alternateMonster = plain(runtime.api.generateMonster(31, null));
 assert.ok(RELIQUARY_NAMES.includes(alternateMonster.name), 'alternate rolled identity should remain inside the Reliquary roster');
 assert.notEqual(alternateMonster.name, reliquaryMonster.name, 'seeded generation should reach both vertical-slice encounters');
+
+runtime.setRandom(() => 0.99);
+const cinderboneMonster = plain(runtime.api.generateMonster(41, null));
+assert.equal(cinderboneMonster.tier, 'Common', 'the Cinderbone fixture should be a common monster');
+assert.ok(CINDERBONE_NAMES.includes(cinderboneMonster.name), 'generated D41 monsters should use the bounded Cinderbone identities');
+const cinderboneReloaded = plain(runtime.api.normalizeMonster({ ...cinderboneMonster, hp: Math.max(1, cinderboneMonster.hp - 3) }, 41));
+assert.equal(cinderboneReloaded.name, cinderboneMonster.name, 'known Cinderbone identities should survive active-monster normalization');
+assert.equal(cinderboneReloaded.family, cinderboneMonster.family, 'Cinderbone reload should preserve family');
+assert.equal(cinderboneReloaded.type, cinderboneMonster.type, 'Cinderbone reload should preserve type');
 
 const state = plain(runtime.api.createBaseState());
 state.run.active = true;
@@ -257,6 +289,7 @@ const [runUiSource, backdropSource, stylesSource] = await Promise.all([
   readFile(path.join(ROOT, 'styles.css'), 'utf8')
 ]);
 assert.match(runUiSource, /const runDistrict = currentStagingDistrict\(S\);/, 'active-run rendering should use raw-depth district identity for every chapter');
+assert.match(await readFile(path.join(ROOT, 'js/systems/08_normalization_save.js'), 'utf8'), /const district = typeof districtByDepth === 'function' \? districtByDepth\(level\) : null;/, 'active-monster normalization should resolve the district from saved depth');
 assert.match(backdropSource, /drowned-reliquary/, 'canvas routing should register the Reliquary theme');
 assert.match(stylesSource, /\.district-tone-drowned-reliquary/, 'Town/combat district tokens should include the Reliquary tone');
 assert.match(stylesSource, /\.district-tone-cinderbone/, 'Town/combat district tokens should include the Cinderbone tone');
@@ -287,8 +320,12 @@ for (const depth of [1, 15, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 
     const oldReloaded = plain(baseline.api.normalizeMonster(control, depth));
     assert.deepEqual(mechanics(reloaded), mechanics(oldReloaded), `save normalization mechanics at D${depth}, seed ${seed}`);
     if (depth >= 31 && depth <= 40) assert.equal(reloaded.name, actual.name, 'known Reliquary identity survives normalization');
+    if (depth >= 41 && depth <= 50) {
+      assert.ok(CINDERBONE_NAMES.includes(actual.name), `known Cinderbone identity generated at D${depth}`);
+      assert.equal(reloaded.name, actual.name, 'known Cinderbone identity survives normalization');
+    }
     assert.equal(runtime.randomCallCount(), baseline.randomCallCount(), `RNG consumption at D${depth}, seed ${seed}`);
-    if (depth < 31 || depth > 40) {
+    if (depth < 31 || depth > 50) {
       for (const key of ['name', 'family', 'type', 'lore']) assert.equal(actual[key], control[key], `outside-band ${key} at D${depth}`);
       const currentBackdrop = runtime.backdropApi.generateMonsterBackdrop(control, { run: { active: true, floor: depth } });
       const oldBackdrop = baseline.backdropApi.generateMonsterBackdrop(control, { run: { active: true, floor: depth } });
